@@ -1,24 +1,23 @@
-import logo from './logo.svg';
+import React, { useState, useEffect, useRef } from "react"
+import { ThemeContext, themes } from "./theme/ThemeContext";
+import NavBar from "./NavBar/NavBar";
 import './App.css';
+const App = () => {
 
-function App() {
+  // Does the useState() even need a default value
+  const [theme, setTheme] = useState(themes.dark);
+
+  const toggleTheme = () => {
+    setTheme(theme === themes.dark ? themes.light : themes.dark);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    // Wrap our entire component tree with the context Provider
+    <ThemeContext.Provider value>
+      <div className="App">
+        <NavBar />
+      </div>
+    </ThemeContext.Provider>
   );
 }
 
