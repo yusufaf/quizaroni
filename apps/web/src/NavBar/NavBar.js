@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Routes, Route, Link } from "react-router-dom";
-// import Login from "./Login";
+import Login from "../Login/Login";
 // import Signup from "../Signup/Signup";
 // import Home from "../Home/Home";
 // import Profile from "../Profile/Profile";
@@ -24,24 +24,27 @@ const NavBar = props => {
                 src={QuizaroniLogo}
                 alt="Quizaroni logo"
             />
-            <input type="checkbox" id={navStyles["checkbox_toggle"]} />
-            <label for="checkbox_toggle" class="hamburger">&#9776;</label>
             <div className={navStyles.menu}>
-                <li className="link-item">
-                    <Link className={navStyles.link} to="/">Home</Link>
+                <li >
+                    <Link to="/" className={navStyles.link}>Home</Link>
+                </li>
+                <li >
+                    <Link to="/login" className={navStyles.link}>Login</Link>
+                </li>
+                <li >
+                    <Link to="/login" className={navStyles.link}>My Flashcards</Link>
                 </li>
                 <li className="dark-mode">
                     {/* <DarkModeIcon /> */}
                 </li>
             </div>
             <Routes>
-
-                {/* <Route
-                    path="/signup"
+                <Route
+                    path="/login"
                     element={
-                        // <Signup />
+                        <Login />
                     }
-                /> */}
+                />
                 {/* <Route
                     path='/profile'
                     element={

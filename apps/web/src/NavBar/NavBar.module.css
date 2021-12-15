@@ -1,50 +1,36 @@
 .navbar {
     display        : flex;
     align-items    : center;
-    justify-content: space-between;
 }
 
 .logo {
-    position  : absolute;
+    position  : fixed;
     height    : 13rem;
     width     : 13rem;
     left      : -1rem;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
 }
 
 .menu {
     display: flex;
-
+    gap: 2rem;
+    /* height: fit-content; */
     list-style: none;
     /* top right bottom left */
     margin-top: 1.5rem;
+    margin-left: 20rem;
     padding   : 0;
-    overflow  : hidden;
-
-    border-bottom: 1px solid gray;
-}
-
-.link-item {
-    /* display: inline-flex; */
-}
-
-#checkbox_toggle {
-    display: none;
-}
-
-#checkbox_toggle:checked~.menu {
-    display: block;
 }
 
 /* Nav-Bar Link */
 .link {
-    /* 20px font size */
+    border-radius   : 0.25rem;
     font-size      : 1.25rem;
-    text-align     : center;
     text-decoration: none;
-    color          : #111111;
+    cursor: pointer;
 }
 
 .link:hover {
-    background: blue;
+    border-bottom: 0.3rem solid #61B874;
+    transition      : 0.1s ease;
 }
