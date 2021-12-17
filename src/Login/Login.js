@@ -52,7 +52,7 @@ const Login = props => {
             />
 
             {showErrorText.emailInput &&
-                <span className={loginStyles.loginError}>
+                <span className={loginStyles.emailError}>
                      An email is required.
                 </span>
             }
