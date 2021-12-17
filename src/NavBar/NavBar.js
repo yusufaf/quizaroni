@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from "react"
-import { Routes, Route, Link } from "react-router-dom";
-import Login from "../Login/Login";
-// import Signup from "../Signup/Signup";
-// import Home from "../Home/Home";
-// import Profile from "../Profile/Profile";
+import { Routes, Route, NavLink, Link } from "react-router-dom";
 import { Alert, AlertTitle } from '@mui/material/';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
+import Login from "../Login/Login";
+import Signup from "../Signup/Signup";
+// import Home from "../Home/Home";
+// import Profile from "../Profile/Profile";
 // import { AccountCircle, KeyboardArrowDown } from "@material-ui/icons";
 import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
 import * as navStyles from './NavBar.module.css';
+import CreateSet from "../CreateSet/CreateSet";
 
 /*
     Navigation Bar Component
@@ -26,32 +27,35 @@ const NavBar = props => {
             />
             <div className={navStyles.menu}>
                 <li >
-                    <Link to="/" className={navStyles.link}>Home</Link>
+                    <NavLink to="/" className={navStyles.link}>Home</NavLink>
                 </li>
                 <li >
-                    <Link to="/login" className={navStyles.link}>Login</Link>
+                    <NavLink
+                        to="/login"
+                        className={navStyles.link} 
+                        style={({ isActive }) => ({
+                            borderBottom: isActive ? '0.2rem solid #61B874' : 'none',
+                        })}
+                    >
+                        Login
+                    </NavLink>
                 </li>
                 <li >
-                    <Link to="/login" className={navStyles.link}>My Flashcards</Link>
+                    <NavLink 
+                        to="/create"
+                        className={navStyles.link}
+                        style={({ isActive }) => ({
+                            borderBottom: isActive ? '0.2rem solid #61B874' : 'none',
+                        })}
+                    >Create</NavLink>
+                </li>
+                <li >
+                    <NavLink to="/login" className={navStyles.link}>My Flashcards</NavLink>
                 </li>
                 <li className="dark-mode">
                     {/* <DarkModeIcon /> */}
                 </li>
             </div>
-            <Routes>
-                <Route
-                    path="/login"
-                    element={
-                        <Login />
-                    }
-                />
-                {/* <Route
-                    path='/profile'
-                    element={
-                        // <Profile/>
-                    }
-                /> */}
-            </Routes>
         </nav>
     );
 }
