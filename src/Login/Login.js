@@ -93,7 +93,7 @@ const Login = props => {
                 className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
                 onClick={() => handleLogin()}
             >
-                Log In
+                <b>Log In</b>
             </div>
 
             {/* Signup Link  */}
