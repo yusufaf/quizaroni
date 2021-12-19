@@ -1,5 +1,7 @@
 .createPage {
-
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
 .createContainer {
@@ -9,7 +11,7 @@
     left    : 20rem;
     top     : 7.5rem;
     padding : 1.25rem;
-
+    border-radius: 0.75rem;
     box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 }
 
@@ -90,13 +92,60 @@
     margin-top    : 1.25rem;
 }
 
+.createSet {
+    position: absolute;
+    right: 2rem;
+    top: 2rem;
+    height: 2.5rem;
+    width: 6rem;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+
+    border-radius: 0.75rem;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    
+    background: orange;
+}
+
+.createSet:hover {
+    background: rgb(253, 187, 63);
+    transition: 0.2s ease
+}
+
+.createSet.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.deleteCard {
+    position: absolute;
+    right: 1rem;
+    top: 1.5rem;
+    cursor: pointer;
+}
+
+.deleteCard:hover {
+    color: rgb(206, 41, 41);
+    transition: 0.2s ease;
+}
+
+.uploadImage {
+    position: absolute;
+    right: 1rem;
+    top: 4.5rem;
+    cursor: pointer;
+}
+
 .newCard {    
     position: relative;
     width   : 70rem;
     left    : 20rem;
     padding : 1.25rem;
+    border-radius: 0.75rem;
     box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
-    margin-bottom: 2rem;
 }
 
 .firstCard {
@@ -125,4 +174,39 @@
     margin-bottom: 1rem;
 
     width: 27.5rem;
+}
+
+.addCard {
+    /* margin-top: 2rem; */
+    position: relative;
+    width   : 70rem;
+    left    : 20rem;
+    padding : 1.25rem;
+    background: orange;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+    margin-bottom: 2rem;
+    border-radius: 0.75rem;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+
+    text-align: center;
+    cursor: pointer;
+}
+
+.addCard.noInputs {
+    margin-top: 28.5rem;
+}
+
+.addCard:hover {
+    background: rgb(253, 187, 63);
+    transition: 0.2s ease
+}
+
+.addIcon {
+    font-size: 3rem;
+    color: black;
 }
