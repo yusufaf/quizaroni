@@ -9,7 +9,7 @@
     flex-direction: column;
     gap           : 1.25rem;
 
-    border-radius: 0.625rem;
+    border-radius: 0.75rem;
     /* offset-x | offset-y | blur-radius | spread-radius | color */
     /* LIGHT MODE : gray box shadow to give a "card" effect */
     box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
@@ -55,7 +55,7 @@
 
 .login {
     background-color: orange;
-    border-radius   : 5px;
+    border-radius: 0.75rem;
     transition      : 0.2s ease;
     cursor          : pointer;
 }
@@ -65,8 +65,8 @@
 }
 
 .login.disabled {
-    background-color: grey;
-    pointer-events  : none;
+    opacity: 0.5;
+    pointer-events: none;
 }
 
 .signupLink,
