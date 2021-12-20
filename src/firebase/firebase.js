@@ -18,9 +18,9 @@ const firebaseConfig = {
 //   measurementId: "${config.measurementId}"
 
 // Initialize Firebase
-const firebase = initializeApp(firebaseConfig);
-const analytics = getAnalytics(firebase);
+export const firebaseApp = initializeApp(firebaseConfig);
+// const analytics = getAnalytics(firebase);
 
 export const database = getFirestore();
-export default firebase;
+
 
