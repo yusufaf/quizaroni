@@ -1,4 +1,9 @@
 import React, { useState, useEffect, useRef } from "react"
+
+import { query, where, collection } from "@firebase/firestore";
+import { firebaseApp, database } from "../firebase/firebase";
+import { GoogleAuthProvider } from "firebase/auth";
+
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle } from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
@@ -8,6 +13,9 @@ import * as loginStyles from './Login.module.css';
     Login Component
 */
 const Login = props => {
+
+    /* OAuth Variables */
+    const provider = new GoogleAuthProvider();
 
     /* React-Router function for switching routes */
     let navigate = useNavigate();
@@ -34,6 +42,8 @@ const Login = props => {
     }
 
     const handleLogin = () => {
+
+        const usersCollection = collection(database, "users");
 
     }
 

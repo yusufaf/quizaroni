@@ -1,4 +1,9 @@
 import React, { useState, useEffect, useRef } from "react"
+
+import { addDoc, collection } from "@firebase/firestore";
+import { firebaseApp, database } from "../firebase/firebase";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle } from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
@@ -10,6 +15,8 @@ import * as signupStyles from "../Signup/Signup.module.css"
     Signup Component
 */
 const Signup = props => {
+
+    /* */
 
     /* React-Router function for switching routes */
     let navigate = useNavigate();
@@ -37,8 +44,32 @@ const Signup = props => {
         setShowErrorText(updatedErrorText);
     }
 
-    const handleSignup = () => {
+    const handleSignup = async () => {
+        if (enteredEmail?.trim() && enteredUsername?.trim() && enteredPass?.trim()) {
+            console.log("Entered user information was not empty");
 
+            console.log("database = ", database);
+            try {
+                const usersCollection = collection(database, "users");
+                const userRef = await addDoc(usersCollection, {
+                    username: enteredUsername,
+                    password: enteredPass,
+                    email: enteredEmail,
+                });
+
+                const auth = getAuth();
+                createUserWithEmailAndPassword(auth, enteredEmail, enteredPass)
+                .then((userCredential) => {
+                    // If successfully signed up, user signed in automatically
+                    console.log("userCredential object = ", userCredential);
+                })
+
+                console.log("Document written with ID: ", userRef);
+            } catch (e) {
+                console.error("Error adding document: ", e);
+            }
+          
+        }
     }
 
     return (
