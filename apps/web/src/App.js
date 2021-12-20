@@ -8,6 +8,7 @@ import NavBar from "./NavBar/NavBar";
 import Login from "./Login/Login";
 import Signup from "./Signup/Signup";
 import CreateSet from "./CreateSet/CreateSet";
+import { firebaseApp } from "./firebase/firebase";
 
 import './App.css';
 const App = () => {
