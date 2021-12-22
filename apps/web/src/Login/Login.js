@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react"
 
 import { query, where, collection } from "@firebase/firestore";
 import { firebaseApp, database } from "../firebase/firebase";
-import { GoogleAuthProvider } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider } from "firebase/auth";
 
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle } from '@mui/material/';
@@ -42,79 +42,116 @@ const Login = props => {
     }
 
     const handleLogin = () => {
+        if (enteredEmail?.trim() && enteredPass?.trim()) {
+            const usersCollection = collection(database, "users");
 
-        const usersCollection = collection(database, "users");
+            // Firebase Auth Sign-In
+            const auth = getAuth();
+            signInWithEmailAndPassword(auth, enteredEmail, enteredPass)
+                .then((userCredential) => {
+                    // If in the then() callback: Successfully signed in
+                    const user = userCredential.user;
 
+                    console.log("Signed in user = ", user);
+                    setShowAlert(true);
+                    setAlertType("success");
+                    setTimeout(() => {
+                        setShowAlert(false);
+
+                        // Redirect user to their home page after
+                        // navigate("/", { replace: true });
+                    }, 500);
+                })
+                .catch((error) => {
+                    // Can use this to display some error in the form of an alert popup / banner
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                });
+
+        }
     }
 
     return (
-        <div className={loginStyles.loginContainer}>
-            <div className={loginStyles.title}>
-                Login
-            </div>
+        <>
+            <div className={loginStyles.loginContainer}>
+                <div className={loginStyles.title}>
+                    Login
+                </div>
 
-            <input
-                className={showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
-                name="emailInput"
-                placeholder="Type your email address"
-                onBlur={e => checkIfInputEmpty(e)}
-                onChange={e => setEnteredEmail(e.target.value)}
-            />
+                <input
+                    className={showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
+                    name="emailInput"
+                    placeholder="Type your email address"
+                    onBlur={e => checkIfInputEmpty(e)}
+                    onChange={e => setEnteredEmail(e.target.value)}
+                />
 
-            {showErrorText.emailInput &&
-                <span className={loginStyles.emailError}>
-                     An email is required.
-                </span>
-            }
-            {/* Password Input */}
-            <input
-                className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
-                name="passInput"
-                placeholder="Type your password"
-                type={passVisibility ? "text" : "password"}
-                onBlur={e => checkIfInputEmpty(e)}
-                onChange={e => setEnteredPass(e.target.value)}
-            />
-            {/* Show/Hide Password */}
-            {passVisibility ?
-                <Visibility
-                    className={loginStyles.passToggle}
-                    onClick={() => setPassVisibility(!passVisibility)}
+                {showErrorText.emailInput &&
+                    <span className={loginStyles.emailError}>
+                        An email is required.
+                    </span>
+                }
+                {/* Password Input */}
+                <input
+                    className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
+                    name="passInput"
+                    placeholder="Type your password"
+                    type={passVisibility ? "text" : "password"}
+                    onBlur={e => checkIfInputEmpty(e)}
+                    onChange={e => setEnteredPass(e.target.value)}
+                />
+                {/* Show/Hide Password */}
+                {passVisibility ?
+                    <Visibility
+                        className={loginStyles.passToggle}
+                        onClick={() => setPassVisibility(!passVisibility)}
+                    >
+                    </Visibility> :
+                    <VisibilityOff
+                        className={loginStyles.passToggle}
+                        onClick={() => setPassVisibility(!passVisibility)}
+                    >
+                    </VisibilityOff>
+                }
+                {showErrorText.passInput &&
+                    <span className={loginStyles.passwordError}>
+                        A password is required.
+                    </span>
+                }
+
+                <Link to="/forgot" className={loginStyles.forgot}>
+                    Forgot password?
+                </Link>
+
+                {/* Login Button */}
+                <div
+                    className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
+                    onClick={() => handleLogin()}
                 >
-                </Visibility> :
-                <VisibilityOff
-                    className={loginStyles.passToggle}
-                    onClick={() => setPassVisibility(!passVisibility)}
+                    <b>Log In</b>
+                </div>
+
+                {/* Signup Link  */}
+                <Link
+                    className={loginStyles.signupLink}
+                    to="/signup"
                 >
-                </VisibilityOff>
-            }
-            {showErrorText.passInput &&
-                <span className={loginStyles.passwordError}>
-                    A password is required.
-                </span>
-            }
+                    Don't have an account? Click here to sign up!
+                </Link>
 
-            <Link to="/forgot" className={loginStyles.forgot}>
-                Forgot password?
-            </Link>
-
-            {/* Login Button */}
-            <div
-                className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
-                onClick={() => handleLogin()}
-            >
-                <b>Log In</b>
             </div>
-
-            {/* Signup Link  */}
-            <Link
-                className={loginStyles.signupLink}
-                to="/signup"
-            >
-                Don't have an account? Click here to sign up!
-            </Link>
-
-        </div>
+            {showAlert &&
+                <Alert
+                    className={loginStyles.alert}
+                    severity={alertType}
+                >
+                    <AlertTitle>
+                        <b>{alertType === "success" ? "Success" : "Error"}</b>
+                    </AlertTitle>
+                    {alertType === "success" ? "Successfully logged in!" : "Could not login, check email and password"}
+                </Alert>
+            }
+        </>
     );
 }
 

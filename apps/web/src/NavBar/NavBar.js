@@ -6,6 +6,7 @@ import Login from "../Login/Login";
 import Signup from "../Signup/Signup";
 // import Home from "../Home/Home";
 // import Profile from "../Profile/Profile";
+import { useTheme } from "../theme/useTheme";
 // import { AccountCircle, KeyboardArrowDown } from "@material-ui/icons";
 import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
 import * as navStyles from './NavBar.module.css';
@@ -15,11 +16,17 @@ import CreateSet from "../CreateSet/CreateSet";
     Navigation Bar Component
 */
 const NavBar = props => {
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertType, setAlertType] = useState("");
+    const { isDarkMode, toggleDarkMode, theme} = useTheme();
+  
+    useEffect(() => {
+        document.body.style.backgroundColor = theme.background;
+    }, [isDarkMode, theme])
+  
 
     return (
-        <nav className={navStyles.navbar}>
+        <nav className={navStyles.navbar}
+             style={{color: theme.foreground, background: theme.background}}
+        >
             <img
                 className={navStyles.logo}
                 src={QuizaroniLogo}
@@ -32,7 +39,7 @@ const NavBar = props => {
                 <li >
                     <NavLink
                         to="/login"
-                        className={navStyles.link} 
+                        className={navStyles.link}
                         style={({ isActive }) => ({
                             borderBottom: isActive ? '0.2rem solid #61B874' : 'none',
                         })}
@@ -41,19 +48,25 @@ const NavBar = props => {
                     </NavLink>
                 </li>
                 <li >
-                    <NavLink 
+                    <NavLink
                         to="/create"
                         className={navStyles.link}
                         style={({ isActive }) => ({
                             borderBottom: isActive ? '0.2rem solid #61B874' : 'none',
                         })}
-                    >Create</NavLink>
+                    >Create
+                    </NavLink>
                 </li>
                 <li >
                     <NavLink to="/login" className={navStyles.link}>My Flashcards</NavLink>
                 </li>
                 <li className="dark-mode">
-                    {/* <DarkModeIcon /> */}
+                    <DarkModeIcon
+                        onClick={toggleDarkMode}
+                        className={navStyles.darkModeToggle}
+                        style={{ color: isDarkMode ? "yellow" : "black" }}
+                    />
+
                 </li>
             </div>
         </nav>

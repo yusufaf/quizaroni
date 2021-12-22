@@ -1,6 +1,6 @@
-import React, { useState } from "react"
-import { Provider } from 'react-redux'
-import { ThemeContext, themes } from "./theme/ThemeContext";
+import React, { useState, useEffect } from "react"
+import { ThemeProvider } from "./theme/ThemeProvider";
+import { Provider } from "react-redux";
 import { Routes, Route } from "react-router-dom";
 import store from "./store";
 // Component imports
@@ -12,46 +12,38 @@ import { firebaseApp } from "./firebase/firebase";
 
 import './App.css';
 const App = () => {
+  // Wrap component tree with redux store and the theme context
 
-  // Does the useState() even need a default value
-  const [theme, setTheme] = useState(themes.dark);
-
-  const toggleTheme = () => {
-    setTheme(theme === themes.dark ? themes.light : themes.dark);
-  }
-
-  // Wrap compoonent tree with redux store and the theme context
   return (
-    <>
-      <Provider store={store}>
-        <ThemeContext.Provider value>
-          <div className="App">
-            <NavBar />
-          </div>
-        </ThemeContext.Provider>
-      </Provider>
-      {/* Controls all routes present in the application, not necessarily visible */}
-      <Routes>
-        <Route
-          path="/login"
-          element={
-            <Login />
-          }
-        />
-        <Route
-          path='/signup'
-          element={
-            <Signup />
-          }
-        />
-        <Route
-          path="/create"
-          element={
-            <CreateSet />
-          }
-        />
-      </Routes>
-    </>
+    <Provider store={store}>
+      <ThemeProvider>
+        <div className="App">
+          <NavBar />
+        </div>
+        {/* Controls all routes present in the application, not necessarily visible */}
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <Login />
+            }
+          />
+          <Route
+            path='/signup'
+            element={
+              <Signup />
+            }
+          />
+          <Route
+            path="/create"
+            element={
+              <CreateSet />
+            }
+          />
+        </Routes>
+      </ThemeProvider>
+    </Provider>
+
   );
 }
 

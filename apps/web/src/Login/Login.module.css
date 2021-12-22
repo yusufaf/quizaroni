@@ -99,6 +99,11 @@
 
 .alert {
     position: absolute;
-    top     : 110%;
-    width   : fit-content;
+    left: 39vw;
+    top: 46vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 3rem;
+    width: 20rem;
 }
