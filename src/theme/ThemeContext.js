@@ -3,16 +3,17 @@ import { createContext } from "react";
 // Dark mode color #1f1b24
 export const themes = {
     light: {
+      name: "light",
       foreground: "#000000",
-      background: "#eeeeee",
+      background: "#ffffff",
+      body: ""
     },
     dark: {
+      name: "dark",
       foreground: "#ffffff",
-      background: "#222222",
+      background: "#1f1b24",
+      body: ""
     },
   };
 
-export const ThemeContext = createContext({
-    theme: themes.dark, // default theme
-    toggleTheme: () => {},
-  });
+export const ThemeContext = createContext();

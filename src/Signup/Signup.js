@@ -44,12 +44,18 @@ const Signup = props => {
         setShowErrorText(updatedErrorText);
     }
 
+    /* Function for handling standard email/password signup method 
+       Will likely have signup functions for Google OAuth
+    */
     const handleSignup = async () => {
         if (enteredEmail?.trim() && enteredUsername?.trim() && enteredPass?.trim()) {
             console.log("Entered user information was not empty");
 
             console.log("database = ", database);
             try {
+                // If using this Firebase Authentication, then have the createUserWithEmail() function before storing in databse
+                // In the then(), store in the database?
+
                 const usersCollection = collection(database, "users");
                 const userRef = await addDoc(usersCollection, {
                     username: enteredUsername,
@@ -57,102 +63,131 @@ const Signup = props => {
                     email: enteredEmail,
                 });
 
+                console.log("Document written with ID: ", userRef);
+
                 const auth = getAuth();
                 createUserWithEmailAndPassword(auth, enteredEmail, enteredPass)
-                .then((userCredential) => {
-                    // If successfully signed up, user signed in automatically
-                    console.log("userCredential object = ", userCredential);
-                })
+                    .then((userCredential) => {
+                        // If successfully signed up, user signed in automatically
+                        const user = userCredential.user;
+                        console.log("Signed up user = ", user);
+                        setShowAlert(true);
+                        setAlertType("success");
+                        setTimeout(() => {
+                            setShowAlert(false);
 
-                console.log("Document written with ID: ", userRef);
+                            // Redirect user to their home page after
+                            // navigate("/", { replace: true });
+                        }, 500);
+                    })
+                    .catch((error) => {
+                        const errorCode = error.cod
+                        // In here, account creation can fail if the account already exists or the password is invalid.
+                        const errorMessage = error.message;
+                        console.log(`Error ${errorCode} = ${errorMessage}`);
+                    });
+
             } catch (e) {
                 console.error("Error adding document: ", e);
             }
-          
+
         }
     }
 
     return (
-        <div className={loginStyles.loginContainer}>
-            <div className={loginStyles.title}>
-                Signup
-            </div>
+        <>
+            <div className={loginStyles.loginContainer}>
+                <div className={loginStyles.title}>
+                    Signup
+                </div>
 
-            {/* Email Input  */}
-            <input
-                className={showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
-                name="emailInput"
-                placeholder="Type your email address"
-                onBlur={e => checkIfInputEmpty(e)}
-                onChange={e => setEnteredEmail(e.target.value)}
-            />
+                {/* Email Input  */}
+                <input
+                    className={showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
+                    name="emailInput"
+                    placeholder="Type your email address"
+                    onBlur={e => checkIfInputEmpty(e)}
+                    onChange={e => setEnteredEmail(e.target.value)}
+                />
 
-            {showErrorText.emailInput &&
-                <span className={signupStyles.emailError}>
-                    An email is required.
-                </span>
-            }
+                {showErrorText.emailInput &&
+                    <span className={signupStyles.emailError}>
+                        An email is required.
+                    </span>
+                }
 
-            {/* Username Input */}
-            <input
-                className={showErrorText.nameInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
-                name="nameInput"
-                placeholder="Type your username"
-                onBlur={e => checkIfInputEmpty(e)}
-                onChange={e => setEnteredUsername(e.target.value)}
-            />
+                {/* Username Input */}
+                <input
+                    className={showErrorText.nameInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
+                    name="nameInput"
+                    placeholder="Type your username"
+                    onBlur={e => checkIfInputEmpty(e)}
+                    onChange={e => setEnteredUsername(e.target.value)}
+                />
 
-            {showErrorText.nameInput &&
-                <span className={signupStyles.nameError}>
-                    A username is required.
-                </span>
-            }
+                {showErrorText.nameInput &&
+                    <span className={signupStyles.nameError}>
+                        A username is required.
+                    </span>
+                }
 
-            {/* Password Input */}
-            <input
-                className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
-                name="passInput"
-                placeholder="Type your password"
-                type={passVisibility ? "text" : "password"}
-                onBlur={e => checkIfInputEmpty(e)}
-                onChange={e => setEnteredPass(e.target.value)}
-            />
+                {/* Password Input */}
+                <input
+                    className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
+                    name="passInput"
+                    placeholder="Type your password"
+                    type={passVisibility ? "text" : "password"}
+                    onBlur={e => checkIfInputEmpty(e)}
+                    onChange={e => setEnteredPass(e.target.value)}
+                />
 
-            {/* Show/Hide Password */}
-            {passVisibility ?
-                <Visibility
-                    className={signupStyles.passToggle}
-                    onClick={() => setPassVisibility(!passVisibility)}
+                {/* Show/Hide Password */}
+                {passVisibility ?
+                    <Visibility
+                        className={signupStyles.passToggle}
+                        onClick={() => setPassVisibility(!passVisibility)}
+                    >
+                    </Visibility> :
+                    <VisibilityOff
+                        className={signupStyles.passToggle}
+                        onClick={() => setPassVisibility(!passVisibility)}
+                    >
+                    </VisibilityOff>
+                }
+                {showErrorText.passInput &&
+                    <span className={signupStyles.passwordError}>
+                        A password is required.
+                    </span>
+                }
+
+                {/* Signup Button */}
+                <div
+                    className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
+                    onClick={() => handleSignup()}
                 >
-                </Visibility> :
-                <VisibilityOff
-                    className={signupStyles.passToggle}
-                    onClick={() => setPassVisibility(!passVisibility)}
+                    <b>Sign Up</b>
+                </div>
+
+                {/* Signup Link  */}
+                <Link
+                    className={loginStyles.signupLink}
+                    to="/login"
                 >
-                </VisibilityOff>
-            }
-            {showErrorText.passInput &&
-                <span className={signupStyles.passwordError}>
-                    A password is required.
-                </span>
-            }
-
-            {/* Signup Button */}
-            <div
-                className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
-                onClick={() => handleSignup()}
-            >
-                <b>Sign Up</b>
+                    Already have an account? Click here to login!
+                </Link>
             </div>
-
-            {/* Signup Link  */}
-            <Link
-                className={loginStyles.signupLink}
-                to="/login"
-            >
-                Already have an account? Click here to login!
-            </Link>
-        </div>
+            {showAlert &&
+                <Alert
+                    className={loginStyles.alert}
+                    severity={alertType}
+                >
+                    <AlertTitle>
+                        <b>{alertType === "success" ? "Success" : "Error"}</b>
+                    </AlertTitle>
+                    {alertType === "success" ? "Account successfully created!" : "Could not create an account"}
+                </Alert>
+            }
+        </>
     );
 }
 

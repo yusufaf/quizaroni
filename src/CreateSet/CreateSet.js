@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from "react"
-import { collection, addDoc } from "firebase/firestore"; 
+import { collection, addDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, Tooltip } from '@mui/material/';
-// import { Visibility, VisibilityOff } from '@mui/icons-material/';
-
+import { useTheme } from "../theme/useTheme";
 import * as createSetStyles from './CreateSet.module.css';
 /*
     CreateSet Component
 */
 const CreateSet = props => {
+
+    const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     /* React-Router function for switching routes */
     let navigate = useNavigate();
@@ -32,16 +33,16 @@ const CreateSet = props => {
         descInput: false
     })
 
-    
+
     const createNewSet = () => {
         // Iterate over array of card objects
         // Check that every() object has a nonempty term and definition
         let createdCardObjects = [...createdSetCards];
-        
+
         // Could call trim() to ensure that there's some content
-        let allCardsHaveContent = createdCardObjects.every( (card, index) => {
+        let allCardsHaveContent = createdCardObjects.every((card, index) => {
             return card.term.trim() && card.definition.trim();
-          });
+        });
 
         console.log("allCardsHaveContent = ", allCardsHaveContent);
         // Label as optional, not required
@@ -76,7 +77,7 @@ const CreateSet = props => {
 
     const updateCardValue = (index, type, value) => {
         let newCreatedSetCards = [...createdSetCards];
-        newCreatedSetCards[index][type] = value; 
+        newCreatedSetCards[index][type] = value;
 
         console.log("newCreatedSetCards = ", newCreatedSetCards);
         setCreatedSetCards(newCreatedSetCards);
@@ -88,7 +89,10 @@ const CreateSet = props => {
 
         for (const [index, val] of createdSetCards.entries()) {
             jsx.push(
-                <div className={index === 0 ? `${createSetStyles.newCard} ${createSetStyles.firstCard}` : `${createSetStyles.newCard}`}>
+                <div
+                    className={index === 0 ? `${createSetStyles.newCard} ${createSetStyles.firstCard}` : `${createSetStyles.newCard}`}
+                    key={index}
+                >
                     <div className={createSetStyles.newCardHeader}>
                         <span><b>Card {index + 1}</b></span>
                         <Tooltip
@@ -97,7 +101,7 @@ const CreateSet = props => {
                             arrow={true}
                         >
                             <span className={createSetStyles.deleteCard} onClick={() => handleDelete(index)}>
-                                <i className="material-icons-outlined" style={{fontSize: "2rem"}}>
+                                <i className="material-icons-outlined" style={{ fontSize: "2rem" }}>
                                     delete
                                 </i>
                             </span>
@@ -108,7 +112,7 @@ const CreateSet = props => {
                             arrow={true}
                         >
                             <span className={createSetStyles.uploadImage}>
-                                <i className="material-icons-outlined" style={{fontSize: "2rem"}} >
+                                <i className="material-icons-outlined" style={{ fontSize: "2rem" }} >
                                     image
                                 </i>
                             </span>
@@ -142,7 +146,9 @@ const CreateSet = props => {
     return (
         <>
             <div className={createSetStyles.createPage}>
-                <div className={createSetStyles.createContainer}>
+                <div className={createSetStyles.createContainer}
+                    style={{ color: theme.foreground, background: theme.background }}
+                >
                     <div className={createSetStyles.title}>
                         Create a new flash card set
                     </div>
