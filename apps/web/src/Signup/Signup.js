@@ -8,8 +8,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle } from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
 
+import { useTheme } from "../theme/useTheme";
 import * as loginStyles from '../Login/Login.module.css';
 import * as signupStyles from "../Signup/Signup.module.css"
+import * as appStyles from "../App.module.css";
 
 /*
     Signup Component
@@ -17,6 +19,8 @@ import * as signupStyles from "../Signup/Signup.module.css"
 const Signup = props => {
 
     /* */
+
+    const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     /* React-Router function for switching routes */
     let navigate = useNavigate();
@@ -70,7 +74,7 @@ const Signup = props => {
                     .then((userCredential) => {
                         // If successfully signed up, user signed in automatically
                         const user = userCredential.user;
-                        console.log("Signed up user = ", user);
+                        console.log("Successfully created account = ", user);
                         setShowAlert(true);
                         setAlertType("success");
                         setTimeout(() => {
@@ -81,7 +85,7 @@ const Signup = props => {
                         }, 500);
                     })
                     .catch((error) => {
-                        const errorCode = error.cod
+                        const errorCode = error.code;
                         // In here, account creation can fail if the account already exists or the password is invalid.
                         const errorMessage = error.message;
                         console.log(`Error ${errorCode} = ${errorMessage}`);
@@ -96,14 +100,15 @@ const Signup = props => {
 
     return (
         <>
-            <div className={loginStyles.loginContainer}>
+            <div className={loginStyles.loginContainer} style={{ color: theme.foreground, background: theme.background }}>
                 <div className={loginStyles.title}>
                     Signup
                 </div>
 
                 {/* Email Input  */}
                 <input
-                    className={showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
+                    className={showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                        : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
                     name="emailInput"
                     placeholder="Type your email address"
                     onBlur={e => checkIfInputEmpty(e)}
@@ -118,7 +123,8 @@ const Signup = props => {
 
                 {/* Username Input */}
                 <input
-                    className={showErrorText.nameInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
+                    className={showErrorText.nameInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                        : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
                     name="nameInput"
                     placeholder="Type your username"
                     onBlur={e => checkIfInputEmpty(e)}
@@ -133,7 +139,8 @@ const Signup = props => {
 
                 {/* Password Input */}
                 <input
-                    className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
+                    className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                        : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
                     name="passInput"
                     placeholder="Type your password"
                     type={passVisibility ? "text" : "password"}
@@ -144,12 +151,12 @@ const Signup = props => {
                 {/* Show/Hide Password */}
                 {passVisibility ?
                     <Visibility
-                        className={signupStyles.passToggle}
+                        className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
                         onClick={() => setPassVisibility(!passVisibility)}
                     >
                     </Visibility> :
                     <VisibilityOff
-                        className={signupStyles.passToggle}
+                        className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
                         onClick={() => setPassVisibility(!passVisibility)}
                     >
                     </VisibilityOff>
