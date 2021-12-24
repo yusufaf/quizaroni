@@ -5,6 +5,7 @@ import { Alert, AlertTitle, Tooltip } from '@mui/material/';
 import { useTheme } from "../theme/useTheme";
 import * as createSetStyles from './CreateSet.module.css';
 import * as appStyles from "../App.module.css";
+import NewCardInput from "./NewCardInput/NewCardInput";
 /*
     CreateSet Component
 */
@@ -19,6 +20,8 @@ const CreateSet = props => {
     const [enteredTitle, setEnteredTitle] = useState("");
     const [enteredDescription, setEnteredDescription] = useState("");
     const [enteredLabel, setEnteredLabel] = useState("");
+    
+    const [selectedFile, setSelectedFile] = useState(null);
 
 
     // Array of objects?
@@ -41,22 +44,28 @@ const CreateSet = props => {
         let createdCardObjects = [...createdSetCards];
 
         // Could call trim() to ensure that there's some content
-        let allCardsHaveContent = createdCardObjects.every((card, index) => {
-            return card.term.trim() && card.definition.trim();
-        });
+        let allCardsHaveContent = createdCardObjects.every((card, index) => card.term.trim() && card.definition.trim());
 
         console.log("allCardsHaveContent = ", allCardsHaveContent);
         // Label as optional, not required
         if (enteredTitle.trim() && enteredDescription.trim() && allCardsHaveContent) {
 
         }
-
+        else {
+            /* Display an alert that could not create the set, or just have it disabled wiht some state */
+        }
     }
 
+    /* Checking that title and description have inputted text */
     const checkIfInputEmpty = event => {
         let updatedErrorText = { ...showErrorText };
         updatedErrorText[event.target.name] = event.target.value === "";
         setShowErrorText(updatedErrorText);
+    }
+
+    /* Runs everytime the file selected for the image upload changes */
+    const onFileChange = event => {
+        setSelectedFile(event.target.files[0]);
     }
 
     // Delete the selected card, indices will realign
@@ -87,60 +96,9 @@ const CreateSet = props => {
     // Render the JSX of all the card inputs
     const renderCreateCards = () => {
         let jsx = [];
-
-        for (const [index, val] of createdSetCards.entries()) {
-            jsx.push(
-                <div
-                    className={index === 0 ? `${createSetStyles.newCard} ${createSetStyles.firstCard}` : `${createSetStyles.newCard}`}
-                    key={index}
-                    style={{ color: theme.foreground, background: theme.background }}
-                >
-                    <div className={createSetStyles.newCardHeader}>
-                        <span><b>Card {index + 1}</b></span>
-                        <Tooltip
-                            title="Delete this card"
-                            placement="bottom"
-                            arrow={true}
-                        >
-                            <span className={createSetStyles.deleteCard} onClick={() => handleDelete(index)}>
-                                <i className="material-icons-outlined" style={{ fontSize: "2rem" }}>
-                                    delete
-                                </i>
-                            </span>
-                        </Tooltip>
-                        <Tooltip
-                            title="Upload an image"
-                            placement="bottom"
-                            arrow={true}
-                        >
-                            <span className={createSetStyles.uploadImage}>
-                                <i className="material-icons-outlined" style={{ fontSize: "2rem" }} >
-                                    image
-                                </i>
-                            </span>
-                        </Tooltip>
-                    </div>
-                    <div className={createSetStyles.newCardInputs}>
-                        <div className={createSetStyles.newCardTerm}>
-                            <label className={createSetStyles.inputLabel}>Term</label>
-                            <input
-                                className={isDarkMode ? `${createSetStyles.newCardInput} ${appStyles.darkInput}` : `${createSetStyles.newCardInput} ${appStyles.lightInput}`}
-                                placeholder="Enter a term"
-                                onChange={(e) => updateCardValue(index, "term", e.target.value)}
-                            // style={{backgroundColor: `${theme.background}`}}
-                            />
-                        </div>
-                        <div className={createSetStyles.newCardDefinition}>
-                            <label className={createSetStyles.inputLabel}>Definition</label>
-                            <input
-                                className={isDarkMode ? `${createSetStyles.newCardInput} ${appStyles.darkInput}` : `${createSetStyles.newCardInput} ${appStyles.lightInput}`}
-                                placeholder="Enter a definition"
-                                onChange={(e) => updateCardValue(index, "definition", e.target.value)}
-                            />
-                        </div>
-                    </div>
-                </div>
-            )
+        for (const [index, value] of createdSetCards.entries()) {
+            const props = { index, createdSetCards, setCreatedSetCards, handleDelete, updateCardValue };
+            jsx.push(<NewCardInput key={index} {...props} />)
         }
 
         return jsx;
@@ -158,7 +116,8 @@ const CreateSet = props => {
                     <div className={createSetStyles.inputContainer}>
                         <label className={createSetStyles.inputLabel}>Title</label>
                         <input
-                             placeholder="Enter a title for your new study set"
+                            className={isDarkMode ? `${createSetStyles.labelInput} ${appStyles.darkInput}` : `${createSetStyles.labelInput} ${appStyles.lightInput}`}
+                            placeholder="Enter a title for your new study set"
                         />
                         <label className={createSetStyles.inputLabel}>Description</label>
                         <textarea

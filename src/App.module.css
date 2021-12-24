@@ -48,3 +48,18 @@
   color        : #F5F5F5;
   border-bottom: 0.2rem solid #F5F5F5;
 }
+
+.lightBoxShadow {
+  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+.darkBoxShadow {}
+
+.lightBorder {
+  width: 100%;
+  border-bottom: 0.2rem solid #121212;
+}
+
+.darkBorder {
+  border-bottom: 0.2rem solid #F5F5F5;
+}

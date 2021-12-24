@@ -1,6 +1,6 @@
 .navbar {
-    display        : flex;
-    align-items    : center;
+    display    : flex;
+    align-items: center;
 }
 
 .logo {
@@ -12,39 +12,74 @@
 }
 
 .menu {
-    display: flex;
-    gap: 2rem;
-    height: 5vh;
-    list-style: none;
+    display    : flex;
+    gap        : 2rem;
+    height     : 5vh;
+    list-style : none;
     /* top right bottom left */
-    margin-top: 1.5rem;
+    margin-top : 1.5rem;
     margin-left: 20rem;
-    padding   : 0;
+    padding    : 0;
 }
 
 /* Nav-Bar Link */
 .link {
-    border-radius   : 0.15rem;
+    border-radius  : 0.15rem;
     font-size      : 1.25rem;
     text-decoration: none;
-    cursor: pointer;
+    cursor         : pointer;
 }
 
-.logout:hover, .link:hover {
-    opacity: 0.6;
-    transition      : 0.1s ease;
+.logout:hover,
+.link:hover {
+    opacity   : 0.6;
+    transition: 0.1s ease;
 }
 
-.darkModeToggle {
+.rightActions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+
     position: absolute;
-    right: 1vw;
-    top: 2.5vh;
-    cursor: pointer;
+    right   : 4rem;
 }
 
 .logout {
-    position: absolute;
-    right: 4vw;
-    font-size      : 1.25rem;
+    font-size: 1.25rem;
     cursor: pointer;
+}
+
+.darkModeToggle {
+    cursor  : pointer;
+}
+
+.accountCircle {
+    display: flex;
+    cursor: pointer;
+}
+
+.dropdown {
+    position: absolute;
+    top: 2rem;
+
+    border-radius: 0.75rem;
+    padding      : 1rem;
+    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
+
+    z-index: 1000;
+}
+
+.dropdownLink {
+    font-size      : 1.25rem;
+    text-decoration: none;
+}
+
+.dropdownItem {
+    width: 100%;
+    margin-bottom: 0.25rem;
+}
+.dropdownItem:hover {
+    opacity: 0.7;
 }
