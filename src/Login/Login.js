@@ -15,6 +15,7 @@ import * as appStyles from "../App.module.css";
     Login Component
 */
 const Login = props => {
+    const { userAuthState, setUserAuthState } = props;
 
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
@@ -39,6 +40,22 @@ const Login = props => {
         passInput: false
     })
 
+    useEffect(() => {
+        console.log("LocalStorage object in useEffect", localStorage);
+        /* If the user info is in localStorage, keep them logged in */
+        if (localStorage.getItem("userInfo") !== null) {
+            const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+            console.log("userInfo  currently stored in localStorage = ", userInfo);
+            const tokenExpiration = userInfo.stsTokenManager.expirationTime;
+
+            /* If the user's token hasn't expired */
+            if (Date.now() < tokenExpiration) {
+                setUserAuthState(userInfo);
+            }
+        }
+    }, [])
+
+
     const checkIfInputEmpty = event => {
         let updatedErrorText = { ...showErrorText };
         updatedErrorText[event.target.name] = event.target.value === "";
@@ -57,7 +74,9 @@ const Login = props => {
                     // If in the then() callback: Successfully signed in
                     const user = userCredential.user;
                     console.log("Signed in user = ", user);
-
+                    console.log("auth.currentUser = ", auth.currentUser)
+                    setUserAuthState(user);
+                    
                     localStorage.setItem('userInfo', JSON.stringify(user));
                     setShowAlert(true);
                     setAlertType("success");
@@ -84,7 +103,6 @@ const Login = props => {
                         // navigate("/", { replace: true });
                     }, 500);
                 });
-
         }
     }
 
@@ -110,6 +128,7 @@ const Login = props => {
                         An email is required.
                     </span>
                 }
+
                 {/* Password Input */}
                 <input
                     className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`

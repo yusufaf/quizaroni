@@ -3,6 +3,8 @@ import { ThemeProvider } from "./theme/ThemeProvider";
 import { Provider } from "react-redux";
 import { Routes, Route } from "react-router-dom";
 import store from "./store";
+
+import { useTheme } from "./theme/useTheme";
 // Component imports
 import NavBar from "./NavBar/NavBar";
 import Login from "./Login/Login";
@@ -15,18 +17,21 @@ import * as appStyles from "./App.module.css";
 const App = () => {
   // Wrap component tree with redux store and the theme context
 
+  const [userAuthState, setUserAuthState] = useState(null);
+
+
   return (
     <Provider store={store}>
       <ThemeProvider>
         <div className="App">
-          <NavBar />
+          <NavBar userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
         </div>
         {/* Controls all routes present in the application, not necessarily visible */}
         <Routes>
           <Route
             path="/login"
             element={
-              <Login />
+              <Login userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
             }
           />
           <Route
