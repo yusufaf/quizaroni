@@ -8,11 +8,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle } from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
 
+import { useTheme } from "../theme/useTheme";
 import * as loginStyles from './Login.module.css';
+import * as appStyles from "../App.module.css";
 /*
     Login Component
 */
 const Login = props => {
+
+    const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     /* OAuth Variables */
     const provider = new GoogleAuthProvider();
@@ -43,6 +47,7 @@ const Login = props => {
 
     const handleLogin = () => {
         if (enteredEmail?.trim() && enteredPass?.trim()) {
+            /* When they log in, need to set some state based on idk */
             const usersCollection = collection(database, "users");
 
             // Firebase Auth Sign-In
@@ -51,8 +56,9 @@ const Login = props => {
                 .then((userCredential) => {
                     // If in the then() callback: Successfully signed in
                     const user = userCredential.user;
-
                     console.log("Signed in user = ", user);
+
+                    localStorage.setItem('userInfo', JSON.stringify(user));
                     setShowAlert(true);
                     setAlertType("success");
                     setTimeout(() => {
@@ -66,6 +72,17 @@ const Login = props => {
                     // Can use this to display some error in the form of an alert popup / banner
                     const errorCode = error.code;
                     const errorMessage = error.message;
+
+                    console.log(`Couldn't login. Error ${errorCode} = ${errorMessage}`);
+
+                    setShowAlert(true);
+                    setAlertType("error");
+                    setTimeout(() => {
+                        setShowAlert(false);
+
+                        // Redirect user to their home page after
+                        // navigate("/", { replace: true });
+                    }, 500);
                 });
 
         }
@@ -73,13 +90,15 @@ const Login = props => {
 
     return (
         <>
-            <div className={loginStyles.loginContainer}>
+            <div className={loginStyles.loginContainer} style={{ color: theme.foreground, background: theme.background }}>
                 <div className={loginStyles.title}>
                     Login
                 </div>
 
                 <input
-                    className={showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
+                    className={
+                        showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                            : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
                     name="emailInput"
                     placeholder="Type your email address"
                     onBlur={e => checkIfInputEmpty(e)}
@@ -93,7 +112,8 @@ const Login = props => {
                 }
                 {/* Password Input */}
                 <input
-                    className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error}` : `${loginStyles.input}`}
+                    className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                        : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
                     name="passInput"
                     placeholder="Type your password"
                     type={passVisibility ? "text" : "password"}
@@ -103,12 +123,12 @@ const Login = props => {
                 {/* Show/Hide Password */}
                 {passVisibility ?
                     <Visibility
-                        className={loginStyles.passToggle}
+                        className={`${loginStyles.passToggle} ${isDarkMode && loginStyles.dark}`}
                         onClick={() => setPassVisibility(!passVisibility)}
                     >
                     </Visibility> :
                     <VisibilityOff
-                        className={loginStyles.passToggle}
+                        className={`${loginStyles.passToggle} ${isDarkMode && loginStyles.dark}`}
                         onClick={() => setPassVisibility(!passVisibility)}
                     >
                     </VisibilityOff>

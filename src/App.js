@@ -8,9 +8,10 @@ import NavBar from "./NavBar/NavBar";
 import Login from "./Login/Login";
 import Signup from "./Signup/Signup";
 import CreateSet from "./CreateSet/CreateSet";
+import ForgotPassword from "./ForgotPassword/ForgotPassword";
 import { firebaseApp } from "./firebase/firebase";
 
-import './App.css';
+import * as appStyles from "./App.module.css";
 const App = () => {
   // Wrap component tree with redux store and the theme context
 
@@ -38,6 +39,12 @@ const App = () => {
             path="/create"
             element={
               <CreateSet />
+            }
+          />
+          <Route
+            path="/forgot"
+            element={
+              <ForgotPassword />
             }
           />
         </Routes>

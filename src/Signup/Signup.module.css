@@ -9,16 +9,21 @@
 }
 
 .nameError {
-    top: 46%;
+    top: 48%;
 }
 
 .passwordError {
-    top: 64%;
+    top: 66%;
 }
 
 .passToggle {
     position: absolute;
-    top     : 55%;
-    right   : 5%;
+    top     : 57.5%;
+    right   : 6%;
     cursor  : pointer;
+    color: #121212;
+}
+
+.passToggle.dark {
+    color: #f5f5f5;
 }
