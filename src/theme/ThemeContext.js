@@ -1,18 +1,17 @@
 import { createContext } from "react";
 
-// Dark mode color #1f1b24
 export const themes = {
     light: {
       name: "light",
-      foreground: "#000000",
+      foreground: "#121212",
       background: "#ffffff",
-      body: ""
+      body: "#F5F5F5"
     },
     dark: {
       name: "dark",
-      foreground: "#ffffff",
-      background: "#1f1b24",
-      body: ""
+      foreground: "#F5F5F5",
+      background: "#1c1c1c",
+      body: "#121212"
     },
   };
 

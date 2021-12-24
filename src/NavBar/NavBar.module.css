@@ -4,7 +4,7 @@
 }
 
 .logo {
-    position  : fixed;
+    position  : absolute;
     height    : 13rem;
     width     : 13rem;
     left      : -1rem;
@@ -24,21 +24,27 @@
 
 /* Nav-Bar Link */
 .link {
-    border-radius   : 0.25rem;
+    border-radius   : 0.15rem;
     font-size      : 1.25rem;
     text-decoration: none;
     cursor: pointer;
 }
 
-.link:hover {
-    border-bottom: 0.3rem solid #61B874;
+.logout:hover, .link:hover {
+    opacity: 0.6;
     transition      : 0.1s ease;
 }
 
 .darkModeToggle {
-    font-size: 2.5rem;
     position: absolute;
     right: 1vw;
     top: 2.5vh;
+    cursor: pointer;
+}
+
+.logout {
+    position: absolute;
+    right: 4vw;
+    font-size      : 1.25rem;
     cursor: pointer;
 }

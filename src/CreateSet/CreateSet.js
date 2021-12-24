@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, Tooltip } from '@mui/material/';
 import { useTheme } from "../theme/useTheme";
 import * as createSetStyles from './CreateSet.module.css';
+import * as appStyles from "../App.module.css";
 /*
     CreateSet Component
 */
@@ -92,6 +93,7 @@ const CreateSet = props => {
                 <div
                     className={index === 0 ? `${createSetStyles.newCard} ${createSetStyles.firstCard}` : `${createSetStyles.newCard}`}
                     key={index}
+                    style={{ color: theme.foreground, background: theme.background }}
                 >
                     <div className={createSetStyles.newCardHeader}>
                         <span><b>Card {index + 1}</b></span>
@@ -122,15 +124,16 @@ const CreateSet = props => {
                         <div className={createSetStyles.newCardTerm}>
                             <label className={createSetStyles.inputLabel}>Term</label>
                             <input
-                                className={createSetStyles.newCardInput}
+                                className={isDarkMode ? `${createSetStyles.newCardInput} ${appStyles.darkInput}` : `${createSetStyles.newCardInput} ${appStyles.lightInput}`}
                                 placeholder="Enter a term"
                                 onChange={(e) => updateCardValue(index, "term", e.target.value)}
+                            // style={{backgroundColor: `${theme.background}`}}
                             />
                         </div>
                         <div className={createSetStyles.newCardDefinition}>
                             <label className={createSetStyles.inputLabel}>Definition</label>
                             <input
-                                className={createSetStyles.newCardInput}
+                                className={isDarkMode ? `${createSetStyles.newCardInput} ${appStyles.darkInput}` : `${createSetStyles.newCardInput} ${appStyles.lightInput}`}
                                 placeholder="Enter a definition"
                                 onChange={(e) => updateCardValue(index, "definition", e.target.value)}
                             />
@@ -155,18 +158,17 @@ const CreateSet = props => {
                     <div className={createSetStyles.inputContainer}>
                         <label className={createSetStyles.inputLabel}>Title</label>
                         <input
-                            className={createSetStyles.titleInput}
-                            placeholder="Enter a title for your new study set"
+                             placeholder="Enter a title for your new study set"
                         />
                         <label className={createSetStyles.inputLabel}>Description</label>
                         <textarea
-                            className={createSetStyles.descInput}
+                            className={isDarkMode ? `${createSetStyles.descInput} ${createSetStyles.dark} ${appStyles.darkInput}` : `${createSetStyles.descInput} ${appStyles.lightInput}`}
                             placeholder="Enter a description for your new study set"
                         />
                         <label className={createSetStyles.inputLabel}>Label</label>
                         <div className={createSetStyles.labelInputContainer}>
                             <input
-                                className={createSetStyles.labelInput}
+                                className={isDarkMode ? `${createSetStyles.labelInput} ${appStyles.darkInput}` : `${createSetStyles.labelInput} ${appStyles.lightInput}`}
                                 placeholder="Enter a label for your new study set"
                             />
                             <span> or select an existing one </span>

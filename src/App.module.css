@@ -1,0 +1,50 @@
+/* light: {
+      name: "light",
+      foreground: "#121212",
+      background: "#ffffff",
+      body: "#F5F5F5"
+    },
+    dark: {
+      name: "dark",
+      foreground: "#F5F5F5",
+      background: "#1c1c1c",
+      body: "#121212"
+    }, */
+
+.light {
+  background  : #ffffff;
+  color       : #121212;
+  border-color: #121212
+}
+
+.dark {
+  background  : #1c1c1c;
+  color       : #F5F5F5;
+  border-color: #F5F5F5
+}
+
+.lightInput,
+.darkInput {
+  border   : none;
+  outline  : none;
+  padding  : 0.5rem 0;
+  font-size: 1rem;
+}
+
+.lightInput:focus,
+.darkInput:focus {
+  border-bottom: 0.2rem solid orange;
+  transition   : 0.2s ease;
+}
+
+.lightInput {
+  background   : #ffffff;
+  color        : #121212;
+  border-bottom: 0.2rem solid #121212;
+}
+
+.darkInput {
+  background   : #1c1c1c;
+  color        : #F5F5F5;
+  border-bottom: 0.2rem solid #F5F5F5;
+}
