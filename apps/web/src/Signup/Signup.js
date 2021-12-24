@@ -17,8 +17,7 @@ import * as appStyles from "../App.module.css";
     Signup Component
 */
 const Signup = props => {
-
-    /* */
+    const { userAuthState, setUserAuthState } = props;
 
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
@@ -75,6 +74,9 @@ const Signup = props => {
                         // If successfully signed up, user signed in automatically
                         const user = userCredential.user;
                         console.log("Successfully created account = ", user);
+                        setUserAuthState(user);
+
+                        /* Display a success/error login alert for 1 second */
                         setShowAlert(true);
                         setAlertType("success");
                         setTimeout(() => {
@@ -82,19 +84,23 @@ const Signup = props => {
 
                             // Redirect user to their home page after
                             // navigate("/", { replace: true });
-                        }, 500);
+                        }, 1000);
                     })
                     .catch((error) => {
                         const errorCode = error.code;
                         // In here, account creation can fail if the account already exists or the password is invalid.
                         const errorMessage = error.message;
                         console.log(`Error ${errorCode} = ${errorMessage}`);
-                    });
 
+                        setShowAlert(true);
+                        setAlertType("error");
+                        setTimeout(() => {
+                            setShowAlert(false);
+                        }, 1000);
+                    });
             } catch (e) {
                 console.error("Error adding document: ", e);
             }
-
         }
     }
 

@@ -10,6 +10,7 @@ import Signup from "../Signup/Signup";
 // import Profile from "../Profile/Profile";
 import { useTheme } from "../theme/useTheme";
 import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
+import * as appStyles from '../App.module.css';
 import * as navStyles from './NavBar.module.css';
 import CreateSet from "../CreateSet/CreateSet";
 
@@ -17,16 +18,19 @@ import CreateSet from "../CreateSet/CreateSet";
     Navigation Bar Component
 */
 const NavBar = props => {
+    const { userAuthState, setUserAuthState } = props;
+
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
+
     const auth = getAuth();
 
     // Dropdown for account actions / settings / profile in top right corner
-    const [showDropdown, setShowDropdown] = useState();
+    const [showDropdown, setShowDropdown] = useState(false);
 
     useEffect(() => {
+        document.body.style.transition = "0.2s ease";
         document.body.style.backgroundColor = theme.body;
     }, [isDarkMode, theme])
-
 
 
     /* Using Firebase's built in sign out method */
@@ -37,8 +41,11 @@ const NavBar = props => {
         signOut(auth).then(() => {
             // Sign-out successful.
             console.log("User successfully signed out");
+            if (localStorage.getItem("userInfo") !== null) {
+                localStorage.removeItem("userInfo");
+            }
+            setUserAuthState(null);
         }).catch((error) => {
-            // An error happened.
             console.error("Something bad happened = ", error);
         });
 
@@ -100,18 +107,65 @@ const NavBar = props => {
                         My Flashcards
                     </NavLink>
                 </li>
-                <div
-                    className={navStyles.logout}
-                    style={{ color: `${theme.foreground}` }}
-                    onClick={() => handleLogout()}
-                >
-                    Logout
+                <div className={navStyles.rightActions}>
+                    <li>
+                        {userAuthState &&
+                            <div
+                                className={navStyles.logout}
+                                style={{ color: `${theme.foreground}` }}
+                                onClick={() => handleLogout()}
+                            >
+                                Logout
+                            </div>
+                        }
+                    </li>
+                    <DarkModeIcon
+                        onClick={toggleDarkMode}
+                        className={navStyles.darkModeToggle}
+                        style={{ color: isDarkMode ? "yellow" : "#121212", fontSize: "2rem" }}
+                    />
+                    <div
+                        className={navStyles.accountCircle}
+                        onClick={() => setShowDropdown(!showDropdown)}
+                    >
+                        <AccountCircle
+                            style={{ fontSize: "2rem" }}
+                        />
+                        <KeyboardArrowDown
+                            style={{ fontSize: "2rem" }}
+                        />
+                    </div>
+                    {showDropdown &&
+                        <div
+                            className={navStyles.dropdown}
+                        >
+                            <div className={navStyles.dropdownItem}>
+                                <Link
+                                    className={`${navStyles.dropdownLink} ${isDarkMode ? appStyles.darkBorder : appStyles.lightBorder}`}
+                                    to="/profile"
+                                    style={{
+                                        color: `${theme.foreground}`
+                                    }}
+                                >
+                                    Profile
+                                </Link>
+                            </div>
+                            <div className={navStyles.dropdownItem}>
+                                <Link
+                                    className={`${navStyles.dropdownLink} ${isDarkMode ? appStyles.darkBorder : appStyles.lightBorder}`}
+                                    to="/profile"
+                                    style={{
+                                        color: `${theme.foreground}`
+                                    }}
+                                >
+                                    Profile
+                                </Link>
+                            </div>
+                        </div>
+                    }
+
                 </div>
-                <DarkModeIcon
-                    onClick={toggleDarkMode}
-                    className={navStyles.darkModeToggle}
-                    style={{ color: isDarkMode ? "yellow" : "#121212", fontSize: "2rem" }}
-                />
+
             </div>
         </nav>
     );
