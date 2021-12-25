@@ -10,6 +10,7 @@ import NavBar from "./NavBar/NavBar";
 import Login from "./Login/Login";
 import Signup from "./Signup/Signup";
 import CreateSet from "./CreateSet/CreateSet";
+import Profile from "./Profile/Profile";
 import ForgotPassword from "./ForgotPassword/ForgotPassword";
 import { firebaseApp } from "./firebase/firebase";
 
@@ -52,9 +53,16 @@ const App = () => {
               <ForgotPassword />
             }
           />
-        </Routes>
-      </ThemeProvider>
-    </Provider>
+          <Route
+            path="/profile"
+            element={
+              <Profile />
+            }
+          />
+      </Routes>
+
+    </ThemeProvider>
+    </Provider >
 
   );
 }

@@ -52,7 +52,7 @@ const ForgotPassword = props => {
     return (
         <>
             <div className={forgotPassStyles.forgotContainer} style={{ color: theme.foreground, background: theme.background }}>
-                <div className={loginStyles.title}>
+                <div className={appStyles.title}>
                     Reset your password
                 </div>
 

@@ -56,10 +56,17 @@
 .darkBoxShadow {}
 
 .lightBorder {
-  width: 100%;
+  width        : 100%;
   border-bottom: 0.2rem solid #121212;
 }
 
 .darkBorder {
   border-bottom: 0.2rem solid #F5F5F5;
+}
+
+.title {
+  font-size  : 1.25rem;
+  font-weight: bold;
+  /* Possibly remove the align-self */
+  align-self : flex-start;
 }
