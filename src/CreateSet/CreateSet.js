@@ -20,9 +20,9 @@ const CreateSet = props => {
     const [enteredTitle, setEnteredTitle] = useState("");
     const [enteredDescription, setEnteredDescription] = useState("");
     const [enteredLabel, setEnteredLabel] = useState("");
-    
-    const [selectedFile, setSelectedFile] = useState(null);
 
+    // Store a reference to the HTML file <input>
+    const fileInput = useRef(null);
 
     // Array of objects?
     const [createdSetCards, setCreatedSetCards] = useState([{ term: "", definition: "" }]);
@@ -64,8 +64,9 @@ const CreateSet = props => {
     }
 
     /* Runs everytime the file selected for the image upload changes */
-    const onFileChange = event => {
-        setSelectedFile(event.target.files[0]);
+    const onFileChange = (event, index) => {
+        console.log("File chosen = ", event.target.files[0]);
+        updateCardValue(index, "file", event.target.files[0]);
     }
 
     // Delete the selected card, indices will realign
@@ -97,7 +98,15 @@ const CreateSet = props => {
     const renderCreateCards = () => {
         let jsx = [];
         for (const [index, value] of createdSetCards.entries()) {
-            const props = { index, createdSetCards, setCreatedSetCards, handleDelete, updateCardValue };
+            const props = {
+                index,
+                createdSetCards,
+                setCreatedSetCards,
+                handleDelete,
+                updateCardValue,
+                onFileChange,
+                fileInput
+            };
             jsx.push(<NewCardInput key={index} {...props} />)
         }
 
