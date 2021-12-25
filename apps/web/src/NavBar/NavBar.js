@@ -136,31 +136,24 @@ const NavBar = props => {
                         />
                     </div>
                     {showDropdown &&
+
                         <div
                             className={navStyles.dropdown}
                         >
-                            <div className={navStyles.dropdownItem}>
-                                <Link
-                                    className={`${navStyles.dropdownLink} ${isDarkMode ? appStyles.darkBorder : appStyles.lightBorder}`}
-                                    to="/profile"
-                                    style={{
-                                        color: `${theme.foreground}`
-                                    }}
-                                >
-                                    Profile
-                                </Link>
-                            </div>
-                            <div className={navStyles.dropdownItem}>
-                                <Link
-                                    className={`${navStyles.dropdownLink} ${isDarkMode ? appStyles.darkBorder : appStyles.lightBorder}`}
-                                    to="/profile"
-                                    style={{
-                                        color: `${theme.foreground}`
-                                    }}
-                                >
-                                    Profile
-                                </Link>
-                            </div>
+                            {/* Profile is only accessible if they login */}
+                            {userAuthState &&
+                                <div className={navStyles.dropdownItem}>
+                                    <Link
+                                        className={`${navStyles.dropdownLink} ${isDarkMode ? appStyles.darkBorder : appStyles.lightBorder}`}
+                                        to="/profile"
+                                        style={{
+                                            color: `${theme.foreground}`
+                                        }}
+                                    >
+                                        Profile
+                                    </Link>
+                                </div>
+                            }
                         </div>
                     }
 

@@ -5,7 +5,7 @@ import * as createSetStyles from '../CreateSet.module.css';
 import * as appStyles from "../../App.module.css";
 
 const NewCardInput = props => {
-    const { index, handleDelete, updateCardValue } = props;
+    const { index, handleDelete, updateCardValue, onFileChange, fileInput } = props;
 
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
@@ -33,11 +33,24 @@ const NewCardInput = props => {
                     placement="bottom"
                     arrow={true}
                 >
-                    <span className={createSetStyles.uploadImage}>
-                        <i className="material-icons-outlined" style={{ fontSize: "2rem" }} >
+                    {/* Upload file container */}
+                    <div className={createSetStyles.uploadImage}>
+                        <input
+                            type="file"
+                            id="fileInput"
+                            ref={fileInput}
+                            accept=".png, .jpg"
+                            onChange={e => onFileChange(e, index)}
+                            style={{ display: "none" }}
+                        />
+                        <i
+                            className="material-icons-outlined"
+                            style={{ fontSize: "2rem" }}
+                            onClick={() => fileInput.current.click()}
+                        >
                             image
                         </i>
-                    </span>
+                    </div>
                 </Tooltip>
             </div>
             <div className={createSetStyles.newCardInputs}>
@@ -47,7 +60,6 @@ const NewCardInput = props => {
                         className={isDarkMode ? `${createSetStyles.newCardInput} ${appStyles.darkInput}` : `${createSetStyles.newCardInput} ${appStyles.lightInput}`}
                         placeholder="Enter a term"
                         onChange={(e) => updateCardValue(index, "term", e.target.value)}
-                    // style={{backgroundColor: `${theme.background}`}}
                     />
                 </div>
                 <div className={createSetStyles.newCardDefinition}>
