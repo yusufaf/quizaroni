@@ -7,10 +7,13 @@ import firebase from 'firebase/compat/app';
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css';
 
+/* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle } from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
+import LoginMessage from "../LoginMessage/LoginMessage";
 
+/* Styling */
 import { useTheme } from "../theme/useTheme";
 import * as loginStyles from './Login.module.css';
 import * as appStyles from "../App.module.css";
@@ -111,15 +114,12 @@ const Login = props => {
 
     return (
         <>
-            <div className={loginStyles.loginContainer} style={{ color: theme.foreground, background: theme.background }}>
-                {userAuthState ?
-                    <div
-                        style={{ textAlign: "center" }}
-                    >
-                        <b>You're already logged in!</b>
-                    </div>
-                    :
-                    (
+            {userAuthState ?
+                <LoginMessage page="login" />
+                :
+                (
+                    <div className={loginStyles.loginContainer} style={{ color: theme.foreground, background: theme.background }}>
+
                         <>
                             <div className={appStyles.title}>
                                 Login
@@ -190,10 +190,10 @@ const Login = props => {
                                 Don't have an account? Click here to sign up!
                             </Link>
                         </>
-                    )
-                }
-            </div>
 
+                    </div>
+                )
+            }
             {showAlert &&
                 <Alert
                     className={loginStyles.alert}

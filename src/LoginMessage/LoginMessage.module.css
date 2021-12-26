@@ -1,0 +1,21 @@
+.container {
+    position   : absolute;
+    width      : 22rem;
+    left       : 45rem;
+    top        : 10rem;
+
+    display       : flex;
+    flex-direction: column;
+    gap           : 1.25rem;
+
+    font-size: 1.25rem;
+    border-radius : 0.75rem;
+
+
+    /* offset-x | offset-y | blur-radius | spread-radius | color */
+    /* LIGHT MODE : gray box shadow to give a "card" effect */
+    box-shadow    : 0 3px 10px rgb(0 0 0 / 0.2);
+    padding       : 1.25rem;
+
+    text-align: center;
+}
