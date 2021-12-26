@@ -61,7 +61,7 @@ const NavBar = props => {
                 alt="Quizaroni logo"
             />
             <div className={navStyles.menu}>
-                <li >
+                <div>
                     <NavLink to="/" className={navStyles.link}
                         style={({ isActive }) => ({
                             borderBottom: isActive ? '0.2rem solid orange' : 'none',
@@ -70,8 +70,8 @@ const NavBar = props => {
                     >
                         Home
                     </NavLink>
-                </li>
-                <li >
+                </div>
+                <div >
                     <NavLink
                         to="/login"
                         className={navStyles.link}
@@ -82,8 +82,8 @@ const NavBar = props => {
                     >
                         Login
                     </NavLink>
-                </li>
-                <li >
+                </div>
+                <div >
                     <NavLink
                         to="/create"
                         className={navStyles.link}
@@ -93,22 +93,9 @@ const NavBar = props => {
                         })}
                     >Create
                     </NavLink>
-                </li>
-                <li >
-                    <NavLink
-                        to="/login"
-                        className={navStyles.link}
-                        style={({ isActive }) => ({
-                            borderBottom: isActive ? '0.2rem solid orange' : 'none',
-                            color: `${theme.foreground}`
-                        })}
-
-                    >
-                        My Flashcards
-                    </NavLink>
-                </li>
+                </div>
                 <div className={navStyles.rightActions}>
-                    <li>
+                    <div>
                         {userAuthState &&
                             <div
                                 className={navStyles.logout}
@@ -118,7 +105,7 @@ const NavBar = props => {
                                 Logout
                             </div>
                         }
-                    </li>
+                    </div>
                     <DarkModeIcon
                         onClick={toggleDarkMode}
                         className={navStyles.darkModeToggle}

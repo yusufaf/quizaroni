@@ -44,7 +44,7 @@ const App = () => {
           <Route
             path="/create"
             element={
-              <CreateSet />
+              <CreateSet userAuthState={userAuthState} />
             }
           />
           <Route
