@@ -3,11 +3,17 @@ import React, { useState, useEffect, useRef } from "react"
 import { addDoc, collection } from "@firebase/firestore";
 import { firebaseApp, database } from "../firebase/firebase";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import firebase from 'firebase/compat/app';
+import * as firebaseui from 'firebaseui'
+import 'firebaseui/dist/firebaseui.css';
 
+/* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle } from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
+import LoginMessage from "../LoginMessage/LoginMessage";
 
+/* Styling */
 import { useTheme } from "../theme/useTheme";
 import * as loginStyles from '../Login/Login.module.css';
 import * as signupStyles from "../Signup/Signup.module.css"
@@ -106,89 +112,95 @@ const Signup = props => {
 
     return (
         <>
-            <div className={loginStyles.loginContainer} style={{ color: theme.foreground, background: theme.background }}>
-                <div className={loginStyles.title}>
-                    Signup
-                </div>
+            {userAuthState ?
+                <LoginMessage page="signup" />
+                :
+                (
+                    <div className={loginStyles.loginContainer} style={{ color: theme.foreground, background: theme.background }}>
+                        <div className={loginStyles.title}>
+                            Sign up
+                        </div>
 
-                {/* Email Input  */}
-                <input
-                    className={showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                        : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                    name="emailInput"
-                    placeholder="Type your email address"
-                    onBlur={e => checkIfInputEmpty(e)}
-                    onChange={e => setEnteredEmail(e.target.value)}
-                />
+                        {/* Email Input  */}
+                        <input
+                            className={showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                                : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
+                            name="emailInput"
+                            placeholder="Type your email address"
+                            onBlur={e => checkIfInputEmpty(e)}
+                            onChange={e => setEnteredEmail(e.target.value)}
+                        />
 
-                {showErrorText.emailInput &&
-                    <span className={signupStyles.emailError}>
-                        An email is required.
-                    </span>
-                }
+                        {showErrorText.emailInput &&
+                            <span className={signupStyles.emailError}>
+                                An email is required.
+                            </span>
+                        }
 
-                {/* Username Input */}
-                <input
-                    className={showErrorText.nameInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                        : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                    name="nameInput"
-                    placeholder="Type your username"
-                    onBlur={e => checkIfInputEmpty(e)}
-                    onChange={e => setEnteredUsername(e.target.value)}
-                />
+                        {/* Username Input */}
+                        <input
+                            className={showErrorText.nameInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                                : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
+                            name="nameInput"
+                            placeholder="Type your username"
+                            onBlur={e => checkIfInputEmpty(e)}
+                            onChange={e => setEnteredUsername(e.target.value)}
+                        />
 
-                {showErrorText.nameInput &&
-                    <span className={signupStyles.nameError}>
-                        A username is required.
-                    </span>
-                }
+                        {showErrorText.nameInput &&
+                            <span className={signupStyles.nameError}>
+                                A username is required.
+                            </span>
+                        }
 
-                {/* Password Input */}
-                <input
-                    className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                        : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                    name="passInput"
-                    placeholder="Type your password"
-                    type={passVisibility ? "text" : "password"}
-                    onBlur={e => checkIfInputEmpty(e)}
-                    onChange={e => setEnteredPass(e.target.value)}
-                />
+                        {/* Password Input */}
+                        <input
+                            className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                                : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
+                            name="passInput"
+                            placeholder="Type your password"
+                            type={passVisibility ? "text" : "password"}
+                            onBlur={e => checkIfInputEmpty(e)}
+                            onChange={e => setEnteredPass(e.target.value)}
+                        />
 
-                {/* Show/Hide Password */}
-                {passVisibility ?
-                    <Visibility
-                        className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
-                        onClick={() => setPassVisibility(!passVisibility)}
-                    >
-                    </Visibility> :
-                    <VisibilityOff
-                        className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
-                        onClick={() => setPassVisibility(!passVisibility)}
-                    >
-                    </VisibilityOff>
-                }
-                {showErrorText.passInput &&
-                    <span className={signupStyles.passwordError}>
-                        A password is required.
-                    </span>
-                }
+                        {/* Show/Hide Password */}
+                        {passVisibility ?
+                            <Visibility
+                                className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
+                                onClick={() => setPassVisibility(!passVisibility)}
+                            >
+                            </Visibility> :
+                            <VisibilityOff
+                                className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
+                                onClick={() => setPassVisibility(!passVisibility)}
+                            >
+                            </VisibilityOff>
+                        }
+                        {showErrorText.passInput &&
+                            <span className={signupStyles.passwordError}>
+                                A password is required.
+                            </span>
+                        }
 
-                {/* Signup Button */}
-                <div
-                    className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
-                    onClick={() => handleSignup()}
-                >
-                    <b>Sign Up</b>
-                </div>
+                        {/* Signup Button */}
+                        <div
+                            className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
+                            onClick={() => handleSignup()}
+                        >
+                            <b>Sign Up</b>
+                        </div>
 
-                {/* Signup Link  */}
-                <Link
-                    className={loginStyles.signupLink}
-                    to="/login"
-                >
-                    Already have an account? Click here to login!
-                </Link>
-            </div>
+                        {/* Signup Link  */}
+                        <Link
+                            className={loginStyles.signupLink}
+                            to="/login"
+                        >
+                            Already have an account? Click here to login!
+                        </Link>
+                    </div>
+                )
+            }
             {showAlert &&
                 <Alert
                     className={loginStyles.alert}

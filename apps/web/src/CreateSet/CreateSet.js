@@ -1,16 +1,23 @@
 import React, { useState, useEffect, useRef } from "react"
+
+/* Firebase Operations */
 import { collection, addDoc } from "firebase/firestore";
+
+/* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, Tooltip } from '@mui/material/';
+import NewCardInput from "./NewCardInput/NewCardInput";
+import LoginMessage from "../LoginMessage/LoginMessage";
+
+/* Styling */
 import { useTheme } from "../theme/useTheme";
 import * as createSetStyles from './CreateSet.module.css';
 import * as appStyles from "../App.module.css";
-import NewCardInput from "./NewCardInput/NewCardInput";
 /*
     CreateSet Component
 */
 const CreateSet = props => {
-
+    const { userAuthState } = props;
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     /* React-Router function for switching routes */
@@ -49,6 +56,12 @@ const CreateSet = props => {
         console.log("allCardsHaveContent = ", allCardsHaveContent);
         // Label as optional, not required
         if (enteredTitle.trim() && enteredDescription.trim() && allCardsHaveContent) {
+            /*
+            - In the flashsets collection in the database: storing the user
+            */
+
+            // Convert date to string
+            const creationDate = new Date();
 
         }
         else {
@@ -113,59 +126,71 @@ const CreateSet = props => {
         return jsx;
     }
 
+
     return (
         <>
-            <div className={createSetStyles.createPage}>
-                <div className={createSetStyles.createContainer}
-                    style={{ color: theme.foreground, background: theme.background }}
-                >
-                    <div className={createSetStyles.title}>
-                        Create a new flash card set
-                    </div>
-                    <div className={createSetStyles.inputContainer}>
-                        <label className={createSetStyles.inputLabel}>Title</label>
-                        <input
-                            className={isDarkMode ? `${createSetStyles.labelInput} ${appStyles.darkInput}` : `${createSetStyles.labelInput} ${appStyles.lightInput}`}
-                            placeholder="Enter a title for your new study set"
-                        />
-                        <label className={createSetStyles.inputLabel}>Description</label>
-                        <textarea
-                            className={isDarkMode ? `${createSetStyles.descInput} ${createSetStyles.dark} ${appStyles.darkInput}` : `${createSetStyles.descInput} ${appStyles.lightInput}`}
-                            placeholder="Enter a description for your new study set"
-                        />
-                        <label className={createSetStyles.inputLabel}>Label</label>
-                        <div className={createSetStyles.labelInputContainer}>
-                            <input
-                                className={isDarkMode ? `${createSetStyles.labelInput} ${appStyles.darkInput}` : `${createSetStyles.labelInput} ${appStyles.lightInput}`}
-                                placeholder="Enter a label for your new study set"
-                            />
-                            <span> or select an existing one </span>
-                            <select className={createSetStyles.labelDropdown}>
-                                <option></option>
-                            </select>
+            {!userAuthState ?
+                <LoginMessage page="createSet" />
+                :
+                (
+                    <div className={createSetStyles.createPage}>
+                        {/* LoginMessage component */}
+                        {
+
+                        }
+
+                        <div className={createSetStyles.createContainer}
+                            style={{ color: theme.foreground, background: theme.background }}
+                        >
+                            <div className={createSetStyles.title}>
+                                Create a new flash card set
+                            </div>
+                            <div className={createSetStyles.inputContainer}>
+                                <label className={createSetStyles.inputLabel}>Title</label>
+                                <input
+                                    className={isDarkMode ? `${createSetStyles.labelInput} ${appStyles.darkInput}` : `${createSetStyles.labelInput} ${appStyles.lightInput}`}
+                                    placeholder="Enter a title for your new study set"
+                                />
+                                <label className={createSetStyles.inputLabel}>Description</label>
+                                <textarea
+                                    className={isDarkMode ? `${createSetStyles.descInput} ${createSetStyles.dark} ${appStyles.darkInput}` : `${createSetStyles.descInput} ${appStyles.lightInput}`}
+                                    placeholder="Enter a description for your new study set"
+                                />
+                                <label className={createSetStyles.inputLabel}>Label</label>
+                                <div className={createSetStyles.labelInputContainer}>
+                                    <input
+                                        className={isDarkMode ? `${createSetStyles.labelInput} ${appStyles.darkInput}` : `${createSetStyles.labelInput} ${appStyles.lightInput}`}
+                                        placeholder="Enter a label for your new study set"
+                                    />
+                                    <span> or select an existing one </span>
+                                    <select className={createSetStyles.labelDropdown}>
+                                        <option></option>
+                                    </select>
+                                </div>
+                            </div>
+                            {/* ${createSetStyles.disabled} */}
+                            <div className={`${createSetStyles.createSet} `}
+                                onClick={() => createNewSet()}
+                            >
+                                <b>Create Set</b>
+                            </div>
+                        </div>
+                        {/* Individual Card Inputs */}
+                        {renderCreateCards()}
+
+                        <div className={createdSetCards.length !== 0 ? `${createSetStyles.addCard}` : `${createSetStyles.addCard} ${createSetStyles.noInputs}`}
+                            onClick={() => {
+                                addCreateCardInput();
+                            }}>
+                            <i
+                                className={`material-icons ${createSetStyles.addIcon}`}>
+                                add_circle_outline
+                            </i>
+                            <span><b>ADD CARD</b></span>
                         </div>
                     </div>
-                    {/* ${createSetStyles.disabled} */}
-                    <div className={`${createSetStyles.createSet} `}
-                        onClick={() => createNewSet()}
-                    >
-                        <b>Create Set</b>
-                    </div>
-                </div>
-                {/* Individual Card Inputs */}
-                {renderCreateCards()}
-
-                <div className={createdSetCards.length !== 0 ? `${createSetStyles.addCard}` : `${createSetStyles.addCard} ${createSetStyles.noInputs}`}
-                    onClick={() => {
-                        addCreateCardInput();
-                    }}>
-                    <i
-                        className={`material-icons ${createSetStyles.addIcon}`}>
-                        add_circle_outline
-                    </i>
-                    <span><b>ADD CARD</b></span>
-                </div>
-            </div>
+                )
+            }
         </>
     );
 }
