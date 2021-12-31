@@ -94,7 +94,10 @@
     width     : 6rem;
     box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 
+    font-size: 1rem;
     border-radius: 0.75rem;
+    border       : none;
+    outline      : none;
 
     display        : flex;
     align-items    : center;
@@ -167,13 +170,18 @@
 .addCard {
     /* margin-top: 2rem; */
     position     : relative;
-    width        : 70rem;
+    width        : 73rem;
     left         : 20rem;
     padding      : 1.25rem;
     background   : orange;
     box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
     margin-bottom: 2rem;
+
     border-radius: 0.75rem;
+    border       : none;
+    outline      : none;
+
+    transition: 0.2s ease;
 
     display        : flex;
     flex-direction : row;
@@ -191,7 +199,10 @@
 
 .addCard:hover {
     background: rgb(253, 187, 63);
-    transition: 0.2s ease
+}
+
+.addCard:focus {
+    border: 0.2rem solid #f72500;
 }
 
 .addIcon {
