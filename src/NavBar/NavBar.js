@@ -123,7 +123,6 @@ const NavBar = props => {
                         />
                     </div>
                     {showDropdown &&
-
                         <div
                             className={navStyles.dropdown}
                         >

@@ -46,22 +46,6 @@ const Login = props => {
         passInput: false
     })
 
-    useEffect(() => {
-        console.log("LocalStorage object in useEffect", localStorage);
-        /* If the user info is in localStorage, keep them logged in */
-        if (localStorage.getItem("userInfo") !== null) {
-            const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-            console.log("userInfo  currently stored in localStorage = ", userInfo);
-            const tokenExpiration = userInfo.stsTokenManager.expirationTime;
-
-            /* If the user's token hasn't expired */
-            if (Date.now() < tokenExpiration) {
-                setUserAuthState(userInfo);
-            }
-        }
-    }, [])
-
-
     const checkIfInputEmpty = event => {
         let updatedErrorText = { ...showErrorText };
         updatedErrorText[event.target.name] = event.target.value === "";
@@ -77,10 +61,9 @@ const Login = props => {
             const auth = getAuth();
             signInWithEmailAndPassword(auth, enteredEmail, enteredPass)
                 .then((userCredential) => {
-                    // If in the then() callback: Successfully signed in
+                    /* If in the then() callback: Successfully signed in */
                     const user = userCredential.user;
                     console.log("Signed in user = ", user);
-                    console.log("auth.currentUser = ", auth.currentUser)
                     setUserAuthState(user);
 
                     localStorage.setItem('userInfo', JSON.stringify(user));
@@ -88,13 +71,12 @@ const Login = props => {
                     setAlertType("success");
                     setTimeout(() => {
                         setShowAlert(false);
-
                         // Redirect user to their home page after
-                        // navigate("/", { replace: true });
+                        navigate("/");
                     }, 500);
                 })
                 .catch((error) => {
-                    // Can use this to display some error in the form of an alert popup / banner
+                    /* Could not sign in, error occurred */
                     const errorCode = error.code;
                     const errorMessage = error.message;
 
@@ -104,9 +86,6 @@ const Login = props => {
                     setAlertType("error");
                     setTimeout(() => {
                         setShowAlert(false);
-
-                        // Redirect user to their home page after
-                        // navigate("/", { replace: true });
                     }, 500);
                 });
         }
@@ -175,12 +154,12 @@ const Login = props => {
                             </Link>
 
                             {/* Login Button */}
-                            <div
+                            <button
                                 className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
                                 onClick={() => handleLogin()}
                             >
                                 <b>Log In</b>
-                            </div>
+                            </button>
 
                             {/* Signup Link  */}
                             <Link
@@ -196,7 +175,7 @@ const Login = props => {
             }
             {showAlert &&
                 <Alert
-                    className={loginStyles.alert}
+                    className={appStyles.alert}
                     severity={alertType}
                 >
                     <AlertTitle>

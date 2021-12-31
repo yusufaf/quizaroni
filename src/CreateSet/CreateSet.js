@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react"
 
 /* Firebase Operations */
 import { collection, addDoc } from "firebase/firestore";
+import { firebaseApp, database } from "../firebase/firebase";
 
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
@@ -44,25 +45,44 @@ const CreateSet = props => {
         descInput: false
     })
 
-
-    const createNewSet = () => {
-        // Iterate over array of card objects
-        // Check that every() object has a nonempty term and definition
+    /* Check that length of createdCardObjects is not 0 */
+    const createNewSet = async () => {
         let createdCardObjects = [...createdSetCards];
 
-        // Could call trim() to ensure that there's some content
+        // trim() on each input to ensure that there's some content
         let allCardsHaveContent = createdCardObjects.every((card, index) => card.term.trim() && card.definition.trim());
 
         console.log("allCardsHaveContent = ", allCardsHaveContent);
-        // Label as optional, not required
+
+        /* Label as optional, not required */
         if (enteredTitle.trim() && enteredDescription.trim() && allCardsHaveContent) {
             /*
             - In the flashsets collection in the database: storing the user
             */
 
             // Convert date to string
-            const creationDate = new Date();
+            const creationDate = new Date().toLocaleDateString();
+            const label = enteredLabel || "";
+            const uid = userAuthState.uid;
 
+            const flashCollection = collection(database, "flashcards");
+            const cardsRef = await addDoc(flashCollection, {
+                title: enteredTitle,
+                description: enteredDescription,
+                uid,
+                creationDate,
+                label,
+                cards: createdCardObjects
+            });
+            console.log("Successfully created new flash set");
+
+            setShowAlert(true);
+            setAlertType("error");
+            setTimeout(() => {
+                setShowAlert(false);
+                // Redirect user to their home page after
+                // navigate("/", { replace: true });
+            }, 1000);
         }
         else {
             /* Display an alert that could not create the set, or just have it disabled wiht some state */
@@ -126,7 +146,6 @@ const CreateSet = props => {
         return jsx;
     }
 
-
     return (
         <>
             {!userAuthState ?
@@ -134,11 +153,6 @@ const CreateSet = props => {
                 :
                 (
                     <div className={createSetStyles.createPage}>
-                        {/* LoginMessage component */}
-                        {
-
-                        }
-
                         <div className={createSetStyles.createContainer}
                             style={{ color: theme.foreground, background: theme.background }}
                         >
@@ -150,17 +164,20 @@ const CreateSet = props => {
                                 <input
                                     className={isDarkMode ? `${createSetStyles.labelInput} ${appStyles.darkInput}` : `${createSetStyles.labelInput} ${appStyles.lightInput}`}
                                     placeholder="Enter a title for your new study set"
+                                    onChange={e => setEnteredTitle(e.target.value)}
                                 />
                                 <label className={createSetStyles.inputLabel}>Description</label>
                                 <textarea
                                     className={isDarkMode ? `${createSetStyles.descInput} ${createSetStyles.dark} ${appStyles.darkInput}` : `${createSetStyles.descInput} ${appStyles.lightInput}`}
                                     placeholder="Enter a description for your new study set"
+                                    onChange={e => setEnteredDescription(e.target.value)}
                                 />
                                 <label className={createSetStyles.inputLabel}>Label</label>
                                 <div className={createSetStyles.labelInputContainer}>
                                     <input
                                         className={isDarkMode ? `${createSetStyles.labelInput} ${appStyles.darkInput}` : `${createSetStyles.labelInput} ${appStyles.lightInput}`}
                                         placeholder="Enter a label for your new study set"
+                                        onChange={e => setEnteredLabel(e.target.value)}
                                     />
                                     <span> or select an existing one </span>
                                     <select className={createSetStyles.labelDropdown}>
@@ -169,16 +186,19 @@ const CreateSet = props => {
                                 </div>
                             </div>
                             {/* ${createSetStyles.disabled} */}
-                            <div className={`${createSetStyles.createSet} `}
+                            <button
+                                tabIndex="0"
+                                className={`${createSetStyles.createSet} `}
                                 onClick={() => createNewSet()}
                             >
                                 <b>Create Set</b>
-                            </div>
+                            </button>
                         </div>
                         {/* Individual Card Inputs */}
                         {renderCreateCards()}
 
-                        <div className={createdSetCards.length !== 0 ? `${createSetStyles.addCard}` : `${createSetStyles.addCard} ${createSetStyles.noInputs}`}
+                        <button
+                            className={createdSetCards.length !== 0 ? `${createSetStyles.addCard}` : `${createSetStyles.addCard} ${createSetStyles.noInputs}`}
                             onClick={() => {
                                 addCreateCardInput();
                             }}>
@@ -186,10 +206,21 @@ const CreateSet = props => {
                                 className={`material-icons ${createSetStyles.addIcon}`}>
                                 add_circle_outline
                             </i>
-                            <span><b>ADD CARD</b></span>
-                        </div>
+                            <b>ADD CARD</b>
+                        </button>
                     </div>
                 )
+            }
+             {showAlert &&
+                <Alert
+                    className={appStyles.alert}
+                    severity={alertType}
+                >
+                    <AlertTitle>
+                        <b>{alertType === "success" ? "Success" : "Error"}</b>
+                    </AlertTitle>
+                    {alertType === "success" ? "Successfully logged in!" : "Could not login, check email and password"}
+                </Alert>
             }
         </>
     );

@@ -88,7 +88,7 @@ const ForgotPassword = props => {
 
             {showAlert &&
                 <Alert
-                    className={loginStyles.alert}
+                    className={appStyles.alert}
                     severity={alertType}
                 >
                     <AlertTitle>
