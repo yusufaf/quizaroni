@@ -87,9 +87,8 @@ const Signup = props => {
                         setAlertType("success");
                         setTimeout(() => {
                             setShowAlert(false);
-
-                            // Redirect user to their home page after
-                            // navigate("/", { replace: true });
+                            // Redirect user to the create page after
+                            navigate("/create", { replace: true });
                         }, 1000);
                     })
                     .catch((error) => {
@@ -184,12 +183,12 @@ const Signup = props => {
                         }
 
                         {/* Signup Button */}
-                        <div
+                        <button
                             className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
                             onClick={() => handleSignup()}
                         >
                             <b>Sign Up</b>
-                        </div>
+                        </button>
 
                         {/* Signup Link  */}
                         <Link
@@ -203,7 +202,7 @@ const Signup = props => {
             }
             {showAlert &&
                 <Alert
-                    className={loginStyles.alert}
+                    className={appStyles.alert}
                     severity={alertType}
                 >
                     <AlertTitle>

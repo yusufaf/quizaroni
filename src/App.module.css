@@ -64,9 +64,22 @@
   border-bottom: 0.2rem solid #F5F5F5;
 }
 
+/* Generic "page title", like for Login or Create set */
 .title {
   font-size  : 1.25rem;
   font-weight: bold;
+
   /* Possibly remove the align-self */
-  align-self : flex-start;
+  align-self: flex-start;
+}
+
+.alert {
+  position       : absolute;
+  left           : 39vw;
+  top            : 8vh;
+  display        : flex;
+  justify-content: center;
+  align-items    : center;
+  height         : 3rem;
+  width          : 20rem;
 }

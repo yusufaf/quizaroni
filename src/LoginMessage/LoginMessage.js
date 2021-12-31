@@ -14,11 +14,11 @@ const LoginMessage = props => {
     const messages = {
         "createSet": "Please login or create an account to start creating flash cards!",
         "login": "You're already logged in!",
-        "signup": "Please log out of your account to create a new account!"
+        "signup": "Please log out of your account to create a new account!",
+        "profile": "Please login to view your profile!",
+        "home": "Please login to view your created flash cards!"
     }
 
-    /* React-Router function for switching routes */
-    // let navigate = useNavigate();
     return (
         <div className={messageStyles.container} style={{ color: theme.foreground, background: theme.background }}>
             <b>{messages[page]}</b>
