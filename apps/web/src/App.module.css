@@ -61,6 +61,7 @@
 }
 
 .darkBorder {
+  width: 100%;
   border-bottom: 0.2rem solid #F5F5F5;
 }
 
@@ -82,4 +83,12 @@
   align-items    : center;
   height         : 3rem;
   width          : 20rem;
+}
+
+.hoverLight:hover {
+  background: rgb(241, 239, 239);
+}
+
+.hoverDark:hover {
+  background: rgb(39, 38, 38);
 }

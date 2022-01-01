@@ -68,15 +68,7 @@
 .labelDropdown {
     margin-left     : 0.5rem;
     width           : 5rem;
-    border          : none;
-    border-bottom   : 0.2rem solid black;
     outline         : none;
-    /* border-radius: 0.25rem; */
-}
-
-
-.labelDropdown:focus {
-    border-bottom: 0.2rem solid orange;
 }
 
 .inputContainer {
@@ -95,6 +87,7 @@
     box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 
     font-size: 1rem;
+    font-weight: bold;
     border-radius: 0.75rem;
     border       : none;
     outline      : none;
@@ -181,6 +174,8 @@
     border       : none;
     outline      : none;
 
+    font-weight: bold;
+    text-transform: uppercase;
     transition: 0.2s ease;
 
     display        : flex;
