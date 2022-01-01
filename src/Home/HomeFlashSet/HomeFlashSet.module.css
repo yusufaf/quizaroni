@@ -1,0 +1,11 @@
+.flashSet {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    border-radius: 0.25rem;
+}
+
+.data {
+    width: 10rem;
+}

@@ -162,25 +162,27 @@ const CreateSet = props => {
                             <div className={createSetStyles.inputContainer}>
                                 <label className={createSetStyles.inputLabel}>Title</label>
                                 <input
-                                    className={isDarkMode ? `${createSetStyles.labelInput} ${appStyles.darkInput}` : `${createSetStyles.labelInput} ${appStyles.lightInput}`}
+                                    className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}                                    
                                     placeholder="Enter a title for your new study set"
                                     onChange={e => setEnteredTitle(e.target.value)}
                                 />
                                 <label className={createSetStyles.inputLabel}>Description</label>
                                 <textarea
-                                    className={isDarkMode ? `${createSetStyles.descInput} ${createSetStyles.dark} ${appStyles.darkInput}` : `${createSetStyles.descInput} ${appStyles.lightInput}`}
+                                    className={`${createSetStyles.descInput} ${isDarkMode ? `${createSetStyles.dark} ${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
                                     placeholder="Enter a description for your new study set"
                                     onChange={e => setEnteredDescription(e.target.value)}
                                 />
                                 <label className={createSetStyles.inputLabel}>Label</label>
                                 <div className={createSetStyles.labelInputContainer}>
                                     <input
-                                        className={isDarkMode ? `${createSetStyles.labelInput} ${appStyles.darkInput}` : `${createSetStyles.labelInput} ${appStyles.lightInput}`}
+                                        className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
                                         placeholder="Enter a label for your new study set"
                                         onChange={e => setEnteredLabel(e.target.value)}
                                     />
-                                    <span> or select an existing one </span>
-                                    <select className={createSetStyles.labelDropdown}>
+                                    <span>or select an existing one</span>
+                                    <select className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
+                                    >
+                                        {/* renderLabelOptions() - Specific to a user */}
                                         <option></option>
                                     </select>
                                 </div>
@@ -188,10 +190,10 @@ const CreateSet = props => {
                             {/* ${createSetStyles.disabled} */}
                             <button
                                 tabIndex="0"
-                                className={`${createSetStyles.createSet} `}
+                                className={`${createSetStyles.createSet}`}
                                 onClick={() => createNewSet()}
                             >
-                                <b>Create Set</b>
+                                Create Set
                             </button>
                         </div>
                         {/* Individual Card Inputs */}
@@ -206,12 +208,12 @@ const CreateSet = props => {
                                 className={`material-icons ${createSetStyles.addIcon}`}>
                                 add_circle_outline
                             </i>
-                            <b>ADD CARD</b>
+                            Add Card
                         </button>
                     </div>
                 )
             }
-             {showAlert &&
+            {showAlert &&
                 <Alert
                     className={appStyles.alert}
                     severity={alertType}
