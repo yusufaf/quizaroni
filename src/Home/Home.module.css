@@ -8,3 +8,24 @@
     border-radius: 0.75rem;
     box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
 }
+
+.header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    /* gap: 17rem; */
+    font-size: 1.25rem;
+    font-weight: bold;
+
+    margin-top: 1rem;
+}
+
+.searchContainer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.search {
+    width: 20rem;
+}

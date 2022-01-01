@@ -9,6 +9,7 @@ import { firebaseApp, database } from "../firebase/firebase";
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, Tooltip } from '@mui/material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
+import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
 
 /* Styling */
 import { useTheme } from "../theme/useTheme";
@@ -16,13 +17,14 @@ import * as homeStyles from './Home.module.css';
 import * as appStyles from "../App.module.css";
 
 /*
-    CreateSet Component
+    Home Component
 */
 const Home = props => {
     const { userAuthState } = props;
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     const [flashSets, setFlashSets] = useState([]);
+    const [enteredSearch, setEnteredSearch] = useState("");
 
     /* React-Router function for switching routes */
     let navigate = useNavigate();
@@ -39,26 +41,51 @@ const Home = props => {
     }, [userAuthState])
 
     const retrieveResults = async () => {
-        /* Query the database for this user's flashcards */
-        const uid = userAuthState.uid;
-        const flashCollection = collection(database, "flashcards");
+        if (userAuthState) {
+            /* Query the database for this user's flashcards */
+            const uid = userAuthState.uid;
+            const flashCollection = collection(database, "flashcards");
 
-        const queryResult = query(flashCollection, where("uid", "==", uid));
+            const queryResult = query(flashCollection, where("uid", "==", uid));
 
-        const querySnapshot = await getDocs(queryResult);
-        console.log("querySnapshot = ", querySnapshot);
+            const querySnapshot = await getDocs(queryResult);
+            console.log("querySnapshot = ", querySnapshot);
 
-        let localFlashSets = [];
+            let localFlashSets = [];
 
-        querySnapshot.forEach((doc) => {
-            /* What metadata do we need for the documents in the flashcards collection */
-            const flashSet = doc.data();
-            if (flashSet.cards) {
-                console.log(flashSet);
-                localFlashSets.push(flashSet);
-            }
-        });
-        setFlashSets(localFlashSets);
+            querySnapshot.forEach((doc) => {
+                /* What metadata do we need for the documents in the flashcards collection */
+                const flashSet = doc.data();
+                if (flashSet.cards) {
+                    console.log(flashSet);
+                    localFlashSets.push(flashSet);
+                }
+            });
+            setFlashSets(localFlashSets);
+        }
+    }
+
+    const renderSearchBar = () => {
+        return (
+            <div className={homeStyles.searchContainer}>
+                <input
+                    className={`${homeStyles.search} ${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
+                    placeholder="Search for a study set"
+                    onChange={e => setEnteredSearch(e.target.value)}
+                />
+            </div>
+        )
+    }
+
+    const renderHeader = () => {
+        return (
+            <div className={homeStyles.header}>
+                <span>Title</span>
+                <span>Description</span>
+                <span>Created on</span>
+                <span>Label</span>
+            </div>
+        )
     }
 
     const renderFlashSets = () => {
@@ -67,8 +94,7 @@ const Home = props => {
 
         console.log("localFlashsets = ", localFlashSets);
         for (const flashSet of localFlashSets) {
-            const {cards, creationDate, description, title, uid} = flashSet;            
-            // jsx.push(HomeFlashSet flashSet={flashSet}>);
+            jsx.push(<HomeFlashSet flashSet={flashSet} />);
         }
 
         return jsx;
@@ -86,7 +112,11 @@ const Home = props => {
                             Your Flashsets
                         </div>
                         {flashSets.length > 0 &&
-                            renderFlashSets()
+                            <>
+                                {renderSearchBar()}
+                                {renderHeader()}
+                                {renderFlashSets()}
+                            </>
                         }
                     </div>
                 )
