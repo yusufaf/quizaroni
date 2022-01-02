@@ -18,6 +18,7 @@ import { useTheme } from "../theme/useTheme";
 import * as loginStyles from '../Login/Login.module.css';
 import * as signupStyles from "../Signup/Signup.module.css"
 import * as appStyles from "../App.module.css";
+import * as C from "../utilities/constants";
 
 /*
     Signup Component
@@ -84,7 +85,7 @@ const Signup = props => {
 
                         /* Display a success/error login alert for 1 second */
                         setShowAlert(true);
-                        setAlertType("success");
+                        setAlertType(C.SUCCESS);
                         setTimeout(() => {
                             setShowAlert(false);
                             // Redirect user to the create page after
@@ -206,9 +207,9 @@ const Signup = props => {
                     severity={alertType}
                 >
                     <AlertTitle>
-                        <b>{alertType === "success" ? "Success" : "Error"}</b>
+                        <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
                     </AlertTitle>
-                    {alertType === "success" ? "Account successfully created!" : "Could not create an account"}
+                    {alertType === C.SUCCESS ? "Account successfully created!" : "Could not create an account"}
                 </Alert>
             }
         </>

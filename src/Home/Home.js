@@ -25,6 +25,7 @@ const Home = props => {
 
     const [flashSets, setFlashSets] = useState([]);
     const [enteredSearch, setEnteredSearch] = useState("");
+    const [viewFlashset, setViewFlashset] = useState(false);
 
     /* React-Router function for switching routes */
     let navigate = useNavigate();
@@ -108,16 +109,20 @@ const Home = props => {
                 :
                 (
                     <div className={homeStyles.flashSets} style={{ color: theme.foreground, background: theme.background }}>
+                        {/* ViewFlashset rendered right here? */}
                         <div className={appStyles.title}>
                             Your Flashsets
                         </div>
-                        {flashSets.length > 0 &&
+                        {!viewFlashset && flashSets.length > 0 &&
                             <>
                                 {renderSearchBar()}
                                 {renderHeader()}
                                 {renderFlashSets()}
                             </>
                         }
+                        {/* Message if no flash sets have bene created */}
+                        {/* flashSets.length === 0 */}
+
                     </div>
                 )
             }
