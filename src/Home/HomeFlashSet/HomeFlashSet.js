@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect } from "react"
 
 /* Firebase Operations */
 
@@ -8,8 +8,6 @@ import { firebaseApp, database } from "../../firebase/firebase";
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, Tooltip } from '@mui/material/';
-// import LoginMessage from "../LoginMessage/LoginMessage";
-// import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
 
 /* Styling */
 import { useTheme } from "../../theme/useTheme";

@@ -14,6 +14,8 @@ import LoginMessage from "../LoginMessage/LoginMessage";
 import { useTheme } from "../theme/useTheme";
 import * as createSetStyles from './CreateSet.module.css';
 import * as appStyles from "../App.module.css";
+import * as C from "../utilities/constants";
+
 /*
     CreateSet Component
 */
@@ -29,11 +31,12 @@ const CreateSet = props => {
     const [enteredDescription, setEnteredDescription] = useState("");
     const [enteredLabel, setEnteredLabel] = useState("");
 
+    const [createSetEnabled, setCreateSetEnabled] = useState(false);
+    const [createdSetCards, setCreatedSetCards] = useState([{ term: "", definition: "" }]);
+
     // Store a reference to the HTML file <input>
     const fileInput = useRef(null);
 
-    // Array of objects?
-    const [createdSetCards, setCreatedSetCards] = useState([{ term: "", definition: "" }]);
 
     /* Alert Popup */
     const [showAlert, setShowAlert] = useState(false);
@@ -49,18 +52,13 @@ const CreateSet = props => {
     const createNewSet = async () => {
         let createdCardObjects = [...createdSetCards];
 
-        // trim() on each input to ensure that there's some content
+        /* trim() on each input to ensure that there's some content */
         let allCardsHaveContent = createdCardObjects.every((card, index) => card.term.trim() && card.definition.trim());
 
         console.log("allCardsHaveContent = ", allCardsHaveContent);
 
         /* Label as optional, not required */
         if (enteredTitle.trim() && enteredDescription.trim() && allCardsHaveContent) {
-            /*
-            - In the flashsets collection in the database: storing the user
-            */
-
-            // Convert date to string
             const creationDate = new Date().toLocaleDateString();
             const label = enteredLabel || "";
             const uid = userAuthState.uid;
@@ -81,7 +79,7 @@ const CreateSet = props => {
             setTimeout(() => {
                 setShowAlert(false);
                 // Redirect user to their home page after
-                // navigate("/", { replace: true });
+                navigate("/");
             }, 1000);
         }
         else {
@@ -102,14 +100,14 @@ const CreateSet = props => {
         updateCardValue(index, "file", event.target.files[0]);
     }
 
-    // Delete the selected card, indices will realign
+    /* Delete the selected card, indices will realign */
     const handleDelete = (index) => {
         let newCreatedSetCards = [...createdSetCards];
         newCreatedSetCards.splice(index, 1);
         setCreatedSetCards(newCreatedSetCards);
     }
 
-    // Adding a new card input box with a term input and description input
+    /* Adding a new card input box with a term input and description input */
     const addCreateCardInput = () => {
         let newCreatedSetCards = [...createdSetCards];
         newCreatedSetCards.push({
@@ -127,7 +125,7 @@ const CreateSet = props => {
         setCreatedSetCards(newCreatedSetCards);
     }
 
-    // Render the JSX of all the card inputs
+    /* Render the JSX of all the card inputs */
     const renderCreateCards = () => {
         let jsx = [];
         for (const [index, value] of createdSetCards.entries()) {
@@ -213,15 +211,16 @@ const CreateSet = props => {
                     </div>
                 )
             }
+
             {showAlert &&
                 <Alert
                     className={appStyles.alert}
                     severity={alertType}
                 >
                     <AlertTitle>
-                        <b>{alertType === "success" ? "Success" : "Error"}</b>
+                        <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
                     </AlertTitle>
-                    {alertType === "success" ? "Successfully logged in!" : "Could not login, check email and password"}
+                    {alertType === C.SUCCESS ? "Successfully logged in!" : "Could not login, check email and password"}
                 </Alert>
             }
         </>

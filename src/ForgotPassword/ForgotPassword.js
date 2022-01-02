@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { Alert, AlertTitle } from '@mui/material/';
 import { useTheme } from "../theme/useTheme";
 import * as appStyles from "../App.module.css";
 import * as loginStyles from "../Login/Login.module.css";
 import * as forgotPassStyles from "./ForgotPassword.module.css";
+import * as C from "../utilities/constants";
 
 /*
     Forgot Password Component
 */
 const ForgotPassword = props => {
-    const { isDarkMode, toggleDarkMode, theme } = useTheme();
+    const { isDarkMode, theme } = useTheme();
     const auth = getAuth();
 
     const [enteredEmail, setEnteredEmail] = useState("");
@@ -35,9 +36,8 @@ const ForgotPassword = props => {
         sendPasswordResetEmail(auth, enteredEmail)
             .then(() => {
                 console.log("Password reset email successfully sent!");
-
                 setShowAlert(true);
-                setAlertType("success");
+                setAlertType(C.SUCCESS);
                 setTimeout(() => {
                     setShowAlert(false);
                 }, 500);
@@ -92,9 +92,9 @@ const ForgotPassword = props => {
                     severity={alertType}
                 >
                     <AlertTitle>
-                        <b>{alertType === "success" ? "Success" : "Error"}</b>
+                        <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
                     </AlertTitle>
-                    {alertType === "success" ? "Email sent, please check your email!" : "Couldn't send an email to that address"}
+                    {alertType === C.SUCCESS ? "Email sent, please check your email!" : "Couldn't send an email to that address"}
                 </Alert>
             }
         </>
