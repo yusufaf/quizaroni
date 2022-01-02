@@ -17,6 +17,8 @@ import LoginMessage from "../LoginMessage/LoginMessage";
 import { useTheme } from "../theme/useTheme";
 import * as loginStyles from './Login.module.css';
 import * as appStyles from "../App.module.css";
+import * as C from "../utilities/constants";
+
 /*
     Login Component
 */
@@ -68,7 +70,7 @@ const Login = props => {
 
                     localStorage.setItem('userInfo', JSON.stringify(user));
                     setShowAlert(true);
-                    setAlertType("success");
+                    setAlertType(C.SUCCESS);
                     setTimeout(() => {
                         setShowAlert(false);
                         // Redirect user to their home page after
@@ -83,7 +85,7 @@ const Login = props => {
                     console.log(`Couldn't login. Error ${errorCode} = ${errorMessage}`);
 
                     setShowAlert(true);
-                    setAlertType("error");
+                    setAlertType(C.ERROR);
                     setTimeout(() => {
                         setShowAlert(false);
                     }, 500);
@@ -179,9 +181,9 @@ const Login = props => {
                     severity={alertType}
                 >
                     <AlertTitle>
-                        <b>{alertType === "success" ? "Success" : "Error"}</b>
+                        <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
                     </AlertTitle>
-                    {alertType === "success" ? "Successfully logged in!" : "Could not login, check email and password"}
+                    {alertType === C.SUCCESS ? "Successfully logged in!" : "Could not login, check email and password"}
                 </Alert>
             }
         </>
