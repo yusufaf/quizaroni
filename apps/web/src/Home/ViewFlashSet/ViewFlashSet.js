@@ -13,23 +13,22 @@ import { useTheme } from "../../theme/useTheme";
 import * as viewFlashStyles from './ViewFlashSet.module.css';
 import * as appStyles from "../../App.module.css";
 
-const HomeFlashSet = props => {
-    const { userAuthState } = props;
-    const {
-        cards,
-        creationDate,
-        title,
-        description,
-        label,
-        uid
-    } = props.flashSet;
+const ViewFlashSet = props => {
+    const { 
+        viewFlashset,
+        setViewFlashset,
+        selectedFlashSet,
+        setSelectedFlashSet,
+        userAuthState 
+    } = props;
+    
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     return (
         <div>
-            
+
         </div>
     )
 }
 
-export default HomeFlashSet;
+export default ViewFlashSet;

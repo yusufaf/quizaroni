@@ -8,6 +8,7 @@ import { firebaseApp, database } from "../../firebase/firebase";
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, Tooltip } from '@mui/material/';
+import { ArrowBack } from '@mui/icons-material/';
 
 /* Styling */
 import { useTheme } from "../../theme/useTheme";
@@ -15,7 +16,8 @@ import * as homeFlashStyles from './HomeFlashSet.module.css';
 import * as appStyles from "../../App.module.css";
 
 const HomeFlashSet = props => {
-    const { userAuthState } = props;
+    console.log("props in HomeFlashSet = ", props);
+    const { userAuthState, setSelectedFlashSet, setViewFlashSet, flashSet} = props;
     const {
         cards,
         creationDate,
@@ -30,7 +32,10 @@ const HomeFlashSet = props => {
         <div
             className={`${homeFlashStyles.flashSet} ${isDarkMode ? `${appStyles.hoverDark} ${appStyles.darkInput}` : `${appStyles.hoverLight} ${appStyles.lightInput}`}`}
             key={uid}
-            // onClick={() => }
+            onClick={() => {
+                setSelectedFlashSet(flashSet)
+                setViewFlashSet(true);
+            }}
         >
             <div className={homeFlashStyles.data}>{title}</div>
             <div className={homeFlashStyles.data}>{description}{description}{description}{description}</div>

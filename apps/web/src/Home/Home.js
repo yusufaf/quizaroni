@@ -10,6 +10,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, Tooltip } from '@mui/material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
+import ViewFlashSet from "./ViewFlashSet/ViewFlashSet";
 
 /* Styling */
 import { useTheme } from "../theme/useTheme";
@@ -25,7 +26,23 @@ const Home = props => {
 
     const [flashSets, setFlashSets] = useState([]);
     const [enteredSearch, setEnteredSearch] = useState("");
-    const [viewFlashset, setViewFlashset] = useState(false);
+
+    const [viewFlashSet, setViewFlashSet] = useState(false);
+    const [selectedFlashSet, setSelectedFlashSet] = useState({});
+
+    const viewSetProps = {
+        viewFlashSet,
+        setViewFlashSet,
+        selectedFlashSet,
+        setSelectedFlashSet,
+        userAuthState
+    };
+
+    const homeSetProps = {
+        setViewFlashSet,
+        setSelectedFlashSet,
+        userAuthState,
+    }
 
     /* React-Router function for switching routes */
     let navigate = useNavigate();
@@ -37,10 +54,13 @@ const Home = props => {
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState("");
 
+    /* */
     useEffect(() => {
         retrieveResults();
     }, [userAuthState])
 
+
+    /* Retrieve the created flashset sfor the signed-in user */
     const retrieveResults = async () => {
         if (userAuthState) {
             /* Query the database for this user's flashcards */
@@ -66,6 +86,7 @@ const Home = props => {
         }
     }
 
+    /* Render the search bar for the "Your Flashsets" page */
     const renderSearchBar = () => {
         return (
             <div className={homeStyles.searchContainer}>
@@ -78,6 +99,7 @@ const Home = props => {
         )
     }
 
+    /* Render the column headers for the "Your Flashsets" page */
     const renderHeader = () => {
         return (
             <div className={homeStyles.header}>
@@ -95,7 +117,12 @@ const Home = props => {
 
         console.log("localFlashsets = ", localFlashSets);
         for (const flashSet of localFlashSets) {
-            jsx.push(<HomeFlashSet flashSet={flashSet} />);
+            jsx.push(
+                <HomeFlashSet
+                    flashSet={flashSet}
+                    {...homeSetProps}
+                />
+            );
         }
 
         return jsx;
@@ -109,17 +136,29 @@ const Home = props => {
                 :
                 (
                     <div className={homeStyles.flashSets} style={{ color: theme.foreground, background: theme.background }}>
+                        {console.log("selectedFlashSet = ", selectedFlashSet)}
                         {/* ViewFlashset rendered right here? */}
-                        <div className={appStyles.title}>
-                            Your Flashsets
-                        </div>
-                        {!viewFlashset && flashSets.length > 0 &&
-                            <>
-                                {renderSearchBar()}
-                                {renderHeader()}
-                                {renderFlashSets()}
-                            </>
+                        {viewFlashSet && Object.keys(selectedFlashSet).length !== 0 ?
+                            <ViewFlashSet {...viewSetProps} />
+                            :
+                            (
+                                <>
+                                    <div className={appStyles.title}>
+                                        Your Flashsets
+                                    </div>
+                                    {!viewFlashSet && flashSets.length > 0 &&
+                                        (
+                                            <>
+                                                {renderSearchBar()}
+                                                {renderHeader()}
+                                                {renderFlashSets()}
+                                            </>
+                                        )
+                                    }
+                                </>
+                            )
                         }
+
                         {/* Message if no flash sets have bene created */}
                         {/* flashSets.length === 0 */}
 
