@@ -17,7 +17,7 @@ import * as appStyles from "../../App.module.css";
 
 const HomeFlashSet = props => {
     console.log("props in HomeFlashSet = ", props);
-    const { userAuthState, setSelectedFlashSet, setViewFlashSet, flashSet} = props;
+    const { userAuthState, setSelectedFlashSet, setViewFlashSet, flashSet } = props;
     const {
         cards,
         creationDate,
@@ -41,6 +41,17 @@ const HomeFlashSet = props => {
             <div className={homeFlashStyles.data}>{description}{description}{description}{description}</div>
             <div className={homeFlashStyles.data}>{creationDate}</div>
             <div className={homeFlashStyles.data}>{label || "N/A"}</div>
+            <Tooltip
+                title="Delete this card"
+                placement="bottom"
+                arrow={true}
+            >
+                <span className={appStyles.deleteCard}>
+                    <i className="material-icons-outlined" style={{ fontSize: "2rem" }}>
+                        delete
+                    </i>
+                </span>
+            </Tooltip>
         </div>
     )
 }

@@ -18,6 +18,8 @@ import { firebaseApp } from "./firebase/firebase";
 import { useTheme } from "./theme/useTheme";
 import * as appStyles from "./App.module.css";
 
+import { handleDesktopZoom } from "./utilities/handleDesktopZoom";
+
 const App = () => {
   // Wrap component tree with redux store and the theme context
 
@@ -35,6 +37,8 @@ const App = () => {
         setUserAuthState(userInfo);
       }
     }
+
+    handleDesktopZoom();
   }, []);
 
   return (

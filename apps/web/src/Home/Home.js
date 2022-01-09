@@ -24,6 +24,8 @@ const Home = props => {
     const { userAuthState } = props;
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
+    let originalFlashSets;
+
     const [flashSets, setFlashSets] = useState([]);
     const [enteredSearch, setEnteredSearch] = useState("");
 
@@ -59,8 +61,20 @@ const Home = props => {
         retrieveResults();
     }, [userAuthState])
 
+    useEffect(() => {
+        let searchTerm = enteredSearch.toLowerCase();
+        let newFlashSets = flashSets.filter(flashSet => {
+            let {title, description } = flashSet;
+            title = title.toLowerCase();
+            description = description.toLowerCase();
+            return title.includes(searchTerm) || description.toLowerCase().includes(searchTerm);
+        })
 
-    /* Retrieve the created flashset sfor the signed-in user */
+        /* Display a message when the search didn't have any results? */
+        newFlashSets.length === 0 ? setFlashSets(originalFlashSets) : setFlashSets(newFlashSets);
+    }, [enteredSearch])
+
+    /* Retrieve the created flashsets for the signed-in user */
     const retrieveResults = async () => {
         if (userAuthState) {
             /* Query the database for this user's flashcards */
@@ -75,13 +89,14 @@ const Home = props => {
             let localFlashSets = [];
 
             querySnapshot.forEach((doc) => {
-                /* What metadata do we need for the documents in the flashcards collection */
+                /* What metadata do we need for the documents in the flashcards collection? */
                 const flashSet = doc.data();
                 if (flashSet.cards) {
-                    console.log(flashSet);
+                    console.log("FlashSet found in database = ", flashSet);
                     localFlashSets.push(flashSet);
                 }
             });
+            originalFlashSets = localFlashSets;
             setFlashSets(localFlashSets);
         }
     }
@@ -106,7 +121,7 @@ const Home = props => {
                 <span>Title</span>
                 <span>Description</span>
                 <span>Created on</span>
-                <span>Label</span>
+                <span style={{marginRight: "7rem"}}>Label</span>
             </div>
         )
     }
@@ -146,7 +161,7 @@ const Home = props => {
                                     <div className={appStyles.title}>
                                         Your Flashsets
                                     </div>
-                                    {!viewFlashSet && flashSets.length > 0 &&
+                                    {!viewFlashSet && flashSets?.length > 0 &&
                                         (
                                             <>
                                                 {renderSearchBar()}

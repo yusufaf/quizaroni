@@ -14,20 +14,67 @@ import * as viewFlashStyles from './ViewFlashSet.module.css';
 import * as appStyles from "../../App.module.css";
 
 const ViewFlashSet = props => {
-    const { 
-        viewFlashset,
-        setViewFlashset,
+    const {
+        viewFlashSet,
+        setViewFlashSet,
         selectedFlashSet,
         setSelectedFlashSet,
-        userAuthState 
+        userAuthState
     } = props;
-    
+
+    console.log("props = ", props);
+
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
-    return (
-        <div>
+    const [showReminderModal, setShowReminderModal] = useState(false);
+    
+    const handleDownloadSet = () => {
 
-        </div>
+    }
+
+    /* Ideally: Displaying a modal where a checkbox whether you want a reminder to study this flashset */
+    const handleEmailReminders = () => {
+
+    }
+
+    const renderActionBar = () => {
+        return (
+            <div className={viewFlashStyles.actionBar}>
+                <span>
+                    <i className="material-icons-outlined" style={{ fontSize: "2rem", cursor: "pointer" }}>
+                        download
+                    </i>
+                    Download
+                </span>
+
+                <span className="material-icons-outlined">
+                    <i className="material-icons-outlined" style={{ fontSize: "2rem", cursor: "pointer" }}>
+                        email
+                    </i>
+                </span>
+            </div>
+        )
+    }
+
+    const renderBackButton = () => {
+        return (
+            <span className={viewFlashStyles.backButton} onClick={() => setViewFlashSet(false)}>
+                <i className="material-icons-outlined" style={{ fontSize: "2rem", cursor: "pointer" }}>
+                    arrow_back
+                </i>
+                Back to Your Flashsets
+            </span>
+        )
+    }
+
+    return (
+        <>
+            <div className={appStyles.title} style={{ marginTop: "1rem" }}>
+                {selectedFlashSet.title}
+            </div>
+            {renderBackButton()}
+            {renderActionBar()}
+        </>
     )
 }
 
