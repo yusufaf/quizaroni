@@ -92,3 +92,15 @@
 .hoverDark:hover {
   background: rgb(39, 38, 38);
 }
+
+.deleteCard {
+  position: absolute;
+  right   : 1rem;
+  top     : 1.5rem;
+  cursor  : pointer;
+}
+
+.deleteCard:hover {
+  color     : rgb(206, 41, 41);
+  transition: 0.2s ease;
+}
