@@ -22,7 +22,7 @@ const NewCardInput = props => {
                     placement="bottom"
                     arrow={true}
                 >
-                    <span className={createSetStyles.deleteCard} onClick={() => handleDelete(index)}>
+                    <span className={appStyles.deleteCard} onClick={() => handleDelete(index)}>
                         <i className="material-icons-outlined" style={{ fontSize: "2rem" }}>
                             delete
                         </i>
