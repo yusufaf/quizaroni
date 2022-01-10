@@ -37,3 +37,30 @@
     background     : red;
     transition: 0.2s ease;
 }
+
+.profileCard {
+    position   : absolute;
+    width      : 20rem;
+    left       : 5rem;
+    top        : 7.5rem;
+
+    display       : flex;
+    flex-direction: column;
+    gap           : 1.25rem;
+
+    border-radius : 0.75rem;
+    /* offset-x | offset-y | blur-radius | spread-radius | color */
+    /* LIGHT MODE : gray box shadow to give a "card" effect */
+    box-shadow    : 0 3px 10px rgb(0 0 0 / 0.2);
+    padding       : 1.25rem;
+}
+
+.profilePicture {
+    position: relative;
+    display: flex;
+    align-self: center;
+    height: 10rem;
+    width: 10rem;
+    background: grey;
+    border-radius: 50%;
+}
