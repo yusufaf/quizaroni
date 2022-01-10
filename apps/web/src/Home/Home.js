@@ -64,7 +64,7 @@ const Home = props => {
     useEffect(() => {
         let searchTerm = enteredSearch.toLowerCase();
         let newFlashSets = flashSets.filter(flashSet => {
-            let {title, description } = flashSet;
+            let { title, description } = flashSet;
             title = title.toLowerCase();
             description = description.toLowerCase();
             return title.includes(searchTerm) || description.toLowerCase().includes(searchTerm);
@@ -121,7 +121,7 @@ const Home = props => {
                 <span>Title</span>
                 <span>Description</span>
                 <span>Created on</span>
-                <span style={{marginRight: "7rem"}}>Label</span>
+                <span style={{ marginRight: "7rem" }}>Label</span>
             </div>
         )
     }
@@ -149,36 +149,34 @@ const Home = props => {
             {!userAuthState ?
                 <LoginMessage page="home" />
                 :
-                (
-                    <div className={homeStyles.flashSets} style={{ color: theme.foreground, background: theme.background }}>
-                        {console.log("selectedFlashSet = ", selectedFlashSet)}
-                        {/* ViewFlashset rendered right here? */}
-                        {viewFlashSet && Object.keys(selectedFlashSet).length !== 0 ?
-                            <ViewFlashSet {...viewSetProps} />
-                            :
-                            (
-                                <>
-                                    <div className={appStyles.title}>
-                                        Your Flashsets
-                                    </div>
-                                    {!viewFlashSet && flashSets?.length > 0 &&
-                                        (
-                                            <>
-                                                {renderSearchBar()}
-                                                {renderHeader()}
-                                                {renderFlashSets()}
-                                            </>
-                                        )
-                                    }
-                                </>
-                            )
-                        }
+                <div className={homeStyles.flashSets} style={{ color: theme.foreground, background: theme.background }}>
+                    {console.log("selectedFlashSet = ", selectedFlashSet)}
+                    {/* ViewFlashset rendered right here? */}
+                    {viewFlashSet && Object.keys(selectedFlashSet).length !== 0 ?
+                        <ViewFlashSet {...viewSetProps} />
+                        :
+                        (
+                            <>
+                                <div className={appStyles.title}>
+                                    Your Flashsets
+                                </div>
+                                {renderSearchBar()}
+                                {renderHeader()}
+                                {!viewFlashSet && flashSets?.length > 0 &&
+                                    (
+                                        <>
 
-                        {/* Message if no flash sets have bene created */}
-                        {/* flashSets.length === 0 */}
+                                            {renderFlashSets()}
+                                        </>
+                                    )
+                                }
+                            </>
+                        )
+                    }
 
-                    </div>
-                )
+                    {/* Message if no flash sets have bene created */}
+                    {/* flashSets.length === 0 */}
+                </div>
             }
         </>
     );
