@@ -4,6 +4,7 @@ import { doc, deleteDoc } from "firebase/firestore";
 import { getAuth, deleteUser } from "firebase/auth";
 import { Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
+import ProfileCard from "./ProfileCard";
 
 /* Styling */
 import { useTheme } from "../theme/useTheme";
@@ -38,12 +39,12 @@ const Profile = props => {
             {!userAuthState ?
                 <LoginMessage page="profile" />
                 :
-                (
+                <>
+                    <ProfileCard />
                     <div className={profileStyles.profileContainer} style={{ color: theme.foreground, background: theme.background }}>
                         <div className={appStyles.title}>
                             Profile
                         </div>
-
                         <div className={profileStyles.deleteTitle}>Permanently delete account</div>
                         <div
                             className={profileStyles.deleteAccount}
@@ -85,9 +86,8 @@ const Profile = props => {
                                 </DialogActions>
                             </Dialog>
                         }
-
                     </div>
-                )
+                </>
             }
         </>
     )
