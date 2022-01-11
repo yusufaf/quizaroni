@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useCallback, useEffect, useRef } from "react"
 
 import { query, where, collection } from "@firebase/firestore";
 import { firebaseApp, database } from "../firebase/firebase";
@@ -48,14 +48,11 @@ const Login = props => {
         passInput: false
     })
 
-    const checkIfInputEmpty = event => {
-        let updatedErrorText = { ...showErrorText };
-        updatedErrorText[event.target.name] = event.target.value === "";
-        setShowErrorText(updatedErrorText);
-    }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleLogin = () => {
-        if (enteredEmail?.trim() && enteredPass?.trim()) {
+        console.log("Entered handleLogin with ", enteredEmail, enteredPass);
+        if (enteredEmail.trim() && enteredPass.trim()) {
             /* When they log in, need to set some state based on idk */
             const usersCollection = collection(database, "users");
 
@@ -92,6 +89,30 @@ const Login = props => {
                 });
         }
     }
+
+    const enterKeyHandler = useCallback((e) => {
+        const key = e.key.trim();
+        if (key === "Enter") {
+            handleLogin();
+        }
+    },
+        [handleLogin],
+    );
+
+    useEffect(() => {
+        document.addEventListener("keydown", enterKeyHandler);
+        return () => {
+            document.removeEventListener("keydown", enterKeyHandler);
+        }
+    }, [enterKeyHandler])
+
+    const checkIfInputEmpty = event => {
+        let updatedErrorText = { ...showErrorText };
+        updatedErrorText[event.target.name] = event.target.value === "";
+        setShowErrorText(updatedErrorText);
+    }
+
+
 
     return (
         <>
