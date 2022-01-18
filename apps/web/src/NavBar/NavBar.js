@@ -5,6 +5,9 @@ import { getAuth, signOut } from "firebase/auth";
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { AccountCircle, KeyboardArrowDown } from "@mui/icons-material"
 import { useTheme } from "../theme/useTheme";
+
+import ProfileDropdown from "../Profile/ProfileDropdown";
+
 import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
 
 import * as appStyles from '../App.module.css';
@@ -21,21 +24,22 @@ const NavBar = props => {
 
     const auth = getAuth();
 
-    // Dropdown for account actions / settings / profile in top right corner
+    /* Dropdown for account actions / settings / profile in top right corner */
     const [showDropdown, setShowDropdown] = useState(false);
 
     /* Alert Popup */
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState("");
 
-
+    /* Applying theme to body */
     useEffect(() => {
         document.body.style.transition = "0.2s ease";
         document.body.style.backgroundColor = theme.body;
     }, [isDarkMode, theme])
 
-
-    /* Using Firebase's built in sign out method */
+     /**
+     * Handles logging out a user, using Firebase's provided method signOut()
+     */
     const handleLogout = () => {
         console.log("Current user authentication object = ", auth);
 
@@ -134,22 +138,7 @@ const NavBar = props => {
 
                         {/* Account Options Dropdown */}
                         {showDropdown &&
-                            <div className={navStyles.dropdown}>
-                                {/* Profile is only accessible if they login */}
-                                {userAuthState &&
-                                    <div className={navStyles.dropdownItem}>
-                                        <Link
-                                            className={`${navStyles.dropdownLink} ${isDarkMode ? appStyles.darkBorder : appStyles.lightBorder}`}
-                                            to="/profile"
-                                            style={{
-                                                color: `${theme.foreground}`
-                                            }}
-                                        >
-                                            Profile
-                                        </Link>
-                                    </div>
-                                }
-                            </div>
+                            <ProfileDropdown userAuthState={userAuthState} setShowDropdown={setShowDropdown}/>
                         }
                     </div>
                 </div>
