@@ -13,6 +13,8 @@ import { Alert, AlertTitle } from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 
+import { enterKeyHandler } from "../utilities/functions";
+
 /* Styling */
 import { useTheme } from "../theme/useTheme";
 import * as loginStyles from './Login.module.css';
@@ -24,7 +26,6 @@ import * as C from "../utilities/constants";
 */
 const Login = props => {
     const { userAuthState, setUserAuthState } = props;
-
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     /* OAuth Variables */
@@ -48,8 +49,6 @@ const Login = props => {
         passInput: false
     })
 
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleLogin = () => {
         console.log("Entered handleLogin with ", enteredEmail, enteredPass);
         if (enteredEmail.trim() && enteredPass.trim()) {
@@ -90,21 +89,13 @@ const Login = props => {
         }
     }
 
-    const enterKeyHandler = useCallback((e) => {
+    /* Function to check if "Enter" key was hit and call function */
+    const enterKeyHandler = (e) => {
         const key = e.key.trim();
         if (key === "Enter") {
             handleLogin();
         }
-    },
-        [handleLogin],
-    );
-
-    useEffect(() => {
-        document.addEventListener("keydown", enterKeyHandler);
-        return () => {
-            document.removeEventListener("keydown", enterKeyHandler);
-        }
-    }, [enterKeyHandler])
+    };
 
     const checkIfInputEmpty = event => {
         let updatedErrorText = { ...showErrorText };
@@ -112,16 +103,16 @@ const Login = props => {
         setShowErrorText(updatedErrorText);
     }
 
-
-
     return (
         <>
             {userAuthState ?
                 <LoginMessage page="login" />
                 :
                 (
-                    <div className={loginStyles.loginContainer} style={{ color: theme.foreground, background: theme.background }}>
-
+                    <div className={loginStyles.loginContainer} 
+                        style={{ color: theme.foreground, background: theme.background }}
+                        onKeyPress={enterKeyHandler}
+                    >
                         <>
                             <div className={appStyles.title}>
                                 Login

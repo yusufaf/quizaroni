@@ -56,6 +56,9 @@ const ViewFlashSet = props => {
         )
     }
 
+    /**
+     * Renders the back button
+     */
     const renderBackButton = () => {
         return (
             <span className={viewFlashStyles.backButton} onClick={() => setViewFlashSet(false)}>

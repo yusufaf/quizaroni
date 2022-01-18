@@ -64,3 +64,34 @@
     background: grey;
     border-radius: 50%;
 }
+
+.uploadImage {
+    position: absolute;
+    left: 9rem;
+    cursor: pointer;
+}
+
+/* Profile Dropdown Styles */
+.dropdown {
+    position: absolute;
+    top: 2rem;
+
+    border-radius: 0.75rem;
+    padding      : 1rem;
+    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
+
+    z-index: 1000;
+}
+
+.dropdownLink {
+    font-size      : 1.25rem;
+    text-decoration: none;
+}
+
+.dropdownItem {
+    width: 100%;
+    margin-bottom: 0.25rem;
+}
+.dropdownItem:hover {
+    opacity: 0.7;
+}
