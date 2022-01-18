@@ -32,7 +32,7 @@ const Profile = props => {
         });
     }
 
-    console.log("userAuthState in Profile.js = ", userAuthState);
+    // console.log("userAuthState in Profile.js = ", userAuthState);
 
     return (
         <>

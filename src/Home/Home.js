@@ -22,7 +22,7 @@ import * as appStyles from "../App.module.css";
 */
 const Home = props => {
     const { userAuthState } = props;
-    const { isDarkMode, toggleDarkMode, theme } = useTheme();
+    const { isDarkMode, theme } = useTheme();
 
     let originalFlashSets;
 
@@ -114,7 +114,9 @@ const Home = props => {
         )
     }
 
-    /* Render the column headers for the "Your Flashsets" page */
+    /**
+     * Renders the the header for the "Your Flashsets" page
+     */
     const renderHeader = () => {
         return (
             <div className={homeStyles.header}>
@@ -126,6 +128,9 @@ const Home = props => {
         )
     }
 
+    /**
+     * Renders the the flashsets for the "Your Flashsets" page
+     */
     const renderFlashSets = () => {
         let localFlashSets = [...flashSets];
         let jsx = []
