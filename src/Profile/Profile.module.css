@@ -27,7 +27,7 @@
     background: rgb(231, 24, 24);
     font-weight: bold;
     padding: 0.5rem;
-    width     : 8rem;
+    width     : fit-content;
     box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 
     border-radius: 0.75rem;
@@ -74,12 +74,11 @@
 /* Profile Dropdown Styles */
 .dropdown {
     position: absolute;
+    left: 4rem;
     top: 2rem;
-
     border-radius: 0.75rem;
     padding      : 1rem;
     box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
-
     z-index: 1000;
 }
 
@@ -94,4 +93,9 @@
 }
 .dropdownItem:hover {
     opacity: 0.7;
+}
+
+.deletePasswordInput {
+    width: 100%;
+    margin-top: 2rem;
 }
