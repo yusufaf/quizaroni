@@ -8,10 +8,9 @@ import * as appStyles from "../App.module.css";
 
 const ProfileDropdown = props => {
     const { userAuthState, setUserAuthState, setShowDropdown} = props;
-    const { isDarkMode, toggleDarkMode, theme } = useTheme();
+    const { isDarkMode, theme } = useTheme();
 
     const dropdownRef = useRef(null);
-
 
     /* useEffect to add a clickOutsideListener for the Profile dropdown JSX */
     useEffect(() => {
