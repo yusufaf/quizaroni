@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Tooltip } from '@mui/material/';
 import { useTheme } from "../../theme/useTheme";
+
+import { ChromePicker } from "react-color";
+
 import * as createSetStyles from '../CreateSet.module.css';
 import * as appStyles from "../../App.module.css";
 
 const NewCardInput = props => {
     const { index, handleDelete, updateCardValue, onFileChange, fileInput } = props;
-
-    const { isDarkMode, toggleDarkMode, theme } = useTheme();
+    const { isDarkMode, theme } = useTheme();
 
     return (
         <div
@@ -61,6 +63,11 @@ const NewCardInput = props => {
                         placeholder="Enter a term"
                         onChange={(e) => updateCardValue(index, "term", e.target.value)}
                     />
+                </div>
+                <div className={createSetStyles.cardActions}>
+                    <span className="material-icons-outlined">
+                        format_color_text
+                    </span>
                 </div>
                 <div className={createSetStyles.newCardDefinition}>
                     <label className={createSetStyles.inputLabel}>Definition</label>

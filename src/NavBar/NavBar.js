@@ -19,7 +19,6 @@ import * as C from "../utilities/constants";
 */
 const NavBar = props => {
     const { userAuthState, setUserAuthState } = props;
-
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     const auth = getAuth();
@@ -30,6 +29,11 @@ const NavBar = props => {
     /* Alert Popup */
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState("");
+
+    const activeLinkStyle = ({ isActive }) => ({
+        borderBottom: isActive ? '0.2rem solid orange' : 'none',
+        color: `${theme.foreground}`
+    });
 
     /* Applying theme to body */
     useEffect(() => {
@@ -75,10 +79,7 @@ const NavBar = props => {
                 <div className={navStyles.menu}>
                     <div>
                         <NavLink to="/" className={navStyles.link}
-                            style={({ isActive }) => ({
-                                borderBottom: isActive ? '0.2rem solid orange' : 'none',
-                                color: `${theme.foreground}`
-                            })}
+                            style={activeLinkStyle}
                         >
                             Home
                         </NavLink>
@@ -87,10 +88,7 @@ const NavBar = props => {
                         <NavLink
                             to="/login"
                             className={navStyles.link}
-                            style={({ isActive }) => ({
-                                borderBottom: isActive ? '0.2rem solid orange' : 'none',
-                                color: `${theme.foreground}`
-                            })}
+                            style={activeLinkStyle}
                         >
                             Login
                         </NavLink>
@@ -99,10 +97,7 @@ const NavBar = props => {
                         <NavLink
                             to="/create"
                             className={navStyles.link}
-                            style={({ isActive }) => ({
-                                borderBottom: isActive ? '0.2rem solid orange' : 'none',
-                                color: `${theme.foreground}`
-                            })}
+                            style={activeLinkStyle}
                         >
                             Create
                         </NavLink>

@@ -11,6 +11,8 @@ import { useTheme } from "../theme/useTheme";
 import * as profileStyles from './Profile.module.css';
 import * as appStyles from "../App.module.css";
 
+import * as C from "../utilities/constants";
+
 const Profile = props => {
     const { userAuthState, setUserAuthState } = props;
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
@@ -32,8 +34,6 @@ const Profile = props => {
         });
     }
 
-    // console.log("userAuthState in Profile.js = ", userAuthState);
-
     return (
         <>
             {!userAuthState ?
@@ -45,7 +45,8 @@ const Profile = props => {
                         <div className={appStyles.title}>
                             Profile
                         </div>
-                        <div className={profileStyles.deleteTitle}>Permanently delete account</div>
+                        {/* Consolidate this into a style in App.css */}
+                        <div className={appStyles.smallTitle}>Delete Account</div>
                         <div
                             className={profileStyles.deleteAccount}
                             onClick={() => setShowDeleteDialog(true)}
@@ -61,15 +62,14 @@ const Profile = props => {
                                 <DialogTitle>Delete Account</DialogTitle>
                                 <DialogContent>
                                     <DialogContentText>
-                                        We're sad to see you go, but if you're certain you want to delete your account, please confirm your password below.
+                                        {C.DELETE_ACCOUNT_MSG}
                                     </DialogContentText>
                                     <input
-                                        className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
+                                        className={`${profileStyles.deletePasswordInput} ${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
                                         type="password"
                                         name="passwordInput"
                                         placeholder="Enter your password"
                                         onChange={e => setEnteredPass(e.target.value)}
-                                        style={{ width: "100%" }}
                                     />
                                 </DialogContent>
                                 <DialogActions>
