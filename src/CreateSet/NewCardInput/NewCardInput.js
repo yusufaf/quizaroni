@@ -8,8 +8,33 @@ import * as createSetStyles from '../CreateSet.module.css';
 import * as appStyles from "../../App.module.css";
 
 const NewCardInput = props => {
-    const { index, handleDelete, updateCardValue, onFileChange, fileInput } = props;
+    const { index, handleDelete, updateCardValue, onFileChange, onColorChange, fileInput } = props;
     const { isDarkMode, theme } = useTheme();
+
+    const colorPickerRef = useRef(null);
+    const [showColorPicker, setShowColorPicker] = useState(false);
+    const [localColor, setLocalColor] = useState("");
+
+
+    // useEffect(() => {
+    //     window.addEventListener("click", handleClickOutside);
+    //     return () => {
+    //         window.removeEventListener("click", handleClickOutside);
+    //     }
+    // }, [colorPickerRef])
+
+    /**
+     * Handles hiding dropdown when clicking away from it
+     * @param {*} e 
+     */
+    const handleClickOutside = e => {
+        console.log("colorPickerRef.current = ", colorPickerRef.current);
+        console.log("e.target = ", e.target);
+        if (colorPickerRef.current && !colorPickerRef?.current?.contains(e.target) && !colorPik) {
+            setShowColorPicker(false);
+        }
+    }
+
 
     return (
         <div
@@ -65,9 +90,21 @@ const NewCardInput = props => {
                     />
                 </div>
                 <div className={createSetStyles.cardActions}>
-                    <span className="material-icons-outlined">
+                    <span className={`material-icons-round ${createSetStyles.colorPickerIcon}`}
+                        onClick={() => setShowColorPicker(!showColorPicker)}
+                    >
                         format_color_text
                     </span>
+                    {showColorPicker &&
+                        <ChromePicker
+                            className={`${createSetStyles.colorPicker}`}
+                            color={localColor}
+                            onChange={(e) => {
+                                onColorChange(e);
+                                setLocalColor(e.hex);
+                            }}
+                        />
+                    }
                 </div>
                 <div className={createSetStyles.newCardDefinition}>
                     <label className={createSetStyles.inputLabel}>Definition</label>
