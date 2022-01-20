@@ -192,3 +192,19 @@
     font-size: 3rem;
     color    : #121212;
 }
+
+.cardActions {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.colorPickerIcon {
+    position: absolute;
+    cursor: pointer;
+}
+
+.colorPicker {
+    position: absolute;
+    bottom: 2.5rem;
+}
