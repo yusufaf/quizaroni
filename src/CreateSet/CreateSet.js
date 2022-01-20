@@ -37,7 +37,6 @@ const CreateSet = props => {
     // Store a reference to the HTML file <input>
     const fileInput = useRef(null);
 
-
     /* Alert Popup */
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState("");
@@ -53,9 +52,7 @@ const CreateSet = props => {
         let createdCardObjects = [...createdSetCards];
 
         /* trim() on each input to ensure that there's some content */
-        let allCardsHaveContent = createdCardObjects.every((card, index) => card.term.trim() && card.definition.trim());
-
-        console.log("allCardsHaveContent = ", allCardsHaveContent);
+        let allCardsHaveContent = createdCardObjects.every((card) => card.term.trim() && card.definition.trim());
 
         /* Label as optional, not required */
         if (enteredTitle.trim() && enteredDescription.trim() && allCardsHaveContent) {
@@ -87,7 +84,10 @@ const CreateSet = props => {
         }
     }
 
-    /* Checking that title and description have inputted text */
+    /**
+     * Verify that the term or definition input has content before creating study set
+     * @param {*} event 
+     */
     const checkIfInputEmpty = event => {
         let updatedErrorText = { ...showErrorText };
         updatedErrorText[event.target.name] = event.target.value === "";
@@ -100,7 +100,10 @@ const CreateSet = props => {
         updateCardValue(index, "file", event.target.files[0]);
     }
 
-    /* Delete the selected card, indices will realign */
+    /**
+     * Delete the selected card
+     * @param {*} index 
+     */
     const handleDelete = (index) => {
         let newCreatedSetCards = [...createdSetCards];
         newCreatedSetCards.splice(index, 1);
@@ -117,6 +120,12 @@ const CreateSet = props => {
         setCreatedSetCards(newCreatedSetCards);
     }
 
+    /**
+     * Update a given card input's value in the array storing the cards
+     * @param {*} index 
+     * @param {*} type 
+     * @param {*} value 
+     */
     const updateCardValue = (index, type, value) => {
         let newCreatedSetCards = [...createdSetCards];
         newCreatedSetCards[index][type] = value;
@@ -125,22 +134,33 @@ const CreateSet = props => {
         setCreatedSetCards(newCreatedSetCards);
     }
 
-    /* Render the JSX of all the card inputs */
+    /**
+     * 
+     * @returns 
+     */
+    const onColorChange = (event) => {
+        // console.log("color = ", color);
+        console.log("event = ", event);
+    }
+
+    /**
+     * Render the JSX for all the card inputs
+     */
     const renderCreateCards = () => {
         let jsx = [];
         for (const [index, value] of createdSetCards.entries()) {
             const props = {
-                index,
                 createdSetCards,
-                setCreatedSetCards,
+                fileInput,
                 handleDelete,
-                updateCardValue,
+                index,
+                onColorChange,
                 onFileChange,
-                fileInput
+                setCreatedSetCards,
+                updateCardValue,
             };
             jsx.push(<NewCardInput key={index} {...props} />)
         }
-
         return jsx;
     }
 
