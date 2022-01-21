@@ -41,9 +41,9 @@ const NavBar = props => {
         document.body.style.backgroundColor = theme.body;
     }, [isDarkMode, theme])
 
-     /**
-     * Handles logging out a user, using Firebase's provided method signOut()
-     */
+    /**
+    * Handles logging out a user, using Firebase's provided method signOut()
+    */
     const handleLogout = () => {
         console.log("Current user authentication object = ", auth);
 
@@ -121,7 +121,10 @@ const NavBar = props => {
                         />
                         <div
                             className={navStyles.accountCircle}
-                            onClick={() => setShowDropdown(!showDropdown)}
+                            onClick={() => {
+                                console.log("Showing dropdown")
+                                setShowDropdown(true)
+                            }}
                         >
                             <AccountCircle
                                 style={{ fontSize: "2rem" }}
@@ -133,7 +136,7 @@ const NavBar = props => {
 
                         {/* Account Options Dropdown */}
                         {showDropdown &&
-                            <ProfileDropdown userAuthState={userAuthState} setShowDropdown={setShowDropdown}/>
+                            <ProfileDropdown userAuthState={userAuthState} setShowDropdown={setShowDropdown} />
                         }
                     </div>
                 </div>

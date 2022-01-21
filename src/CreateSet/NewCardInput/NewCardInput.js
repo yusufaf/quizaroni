@@ -8,7 +8,7 @@ import * as createSetStyles from '../CreateSet.module.css';
 import * as appStyles from "../../App.module.css";
 
 const NewCardInput = props => {
-    const { index, handleDelete, updateCardValue, onFileChange, onColorChange, fileInput } = props;
+    const { index, handleDelete, updateCardValue, onFileChange, onColorChange, fileInputRef } = props;
     const { isDarkMode, theme } = useTheme();
 
     const colorPickerRef = useRef(null);
@@ -28,11 +28,11 @@ const NewCardInput = props => {
      * @param {*} e 
      */
     const handleClickOutside = e => {
-        console.log("colorPickerRef.current = ", colorPickerRef.current);
-        console.log("e.target = ", e.target);
-        if (colorPickerRef.current && !colorPickerRef?.current?.contains(e.target) && !colorPik) {
-            setShowColorPicker(false);
-        }
+        // console.log("colorPickerRef.current = ", colorPickerRef.current);
+        // console.log("e.target = ", e.target);
+        // if (colorPickerRef.current && !colorPickerRef?.current?.contains(e.target) && !colorPik) {
+        //     setShowColorPicker(false);
+        // }
     }
 
 
@@ -65,7 +65,7 @@ const NewCardInput = props => {
                         <input
                             type="file"
                             id="fileInput"
-                            ref={fileInput}
+                            ref={fileInputRef}
                             accept=".png, .jpg"
                             onChange={e => onFileChange(e, index)}
                             style={{ display: "none" }}
@@ -73,7 +73,7 @@ const NewCardInput = props => {
                         <i
                             className="material-icons-outlined"
                             style={{ fontSize: "2rem" }}
-                            onClick={() => fileInput.current.click()}
+                            onClick={() => fileInputRef.current.click()}
                         >
                             image
                         </i>

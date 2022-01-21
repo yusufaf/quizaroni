@@ -71,13 +71,11 @@
   font-weight: bold;
 
   /* Possibly remove the align-self */
-  align-self: flex-start;
 }
 
 .smallTitle {
   font-size  : 1rem;
   font-weight: bold;
-  align-self : flex-start;
 }
 
 .largeTitle {
