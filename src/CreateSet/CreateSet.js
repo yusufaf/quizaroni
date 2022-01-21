@@ -35,7 +35,7 @@ const CreateSet = props => {
     const [createdSetCards, setCreatedSetCards] = useState([{ term: "", definition: "" }]);
 
     // Store a reference to the HTML file <input>
-    const fileInput = useRef(null);
+    const fileInputRef = useRef(null);
 
     /* Alert Popup */
     const [showAlert, setShowAlert] = useState(false);
@@ -151,7 +151,7 @@ const CreateSet = props => {
         for (const [index, value] of createdSetCards.entries()) {
             const props = {
                 createdSetCards,
-                fileInput,
+                fileInputRef,
                 handleDelete,
                 index,
                 onColorChange,
