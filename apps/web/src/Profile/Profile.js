@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-
+import { database } from "../firebase/firebase";
 import { doc, deleteDoc } from "firebase/firestore";
 import { getAuth, deleteUser } from "firebase/auth";
 import { Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
@@ -20,6 +20,15 @@ const Profile = props => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [enteredPass, setEnteredPass] = useState("");
 
+    // Store a property for each user of the theme
+    const [defaultTheme, setDefaultTheme] = useState(userAuthState?.bruh ?? "dark");
+
+    /**
+     * 
+     */
+    const handleDefaultTheme = theme => {
+        /* Update user database with the newly selected theme */
+    }
 
     /* Make call using Firebase Auth API to delete this user's account, have to sign in, prompt them to enter their password again, kinda like Github messages*/
     const handleDeleteAccount = async () => {
@@ -27,7 +36,9 @@ const Profile = props => {
             // User deleted.
 
             /* Delete that user's flashcards */
-            // await deleteDoc(doc(db, "cities", "DC"));
+
+            const result = deleteDoc(doc(database, "users", userAuthState.uid));
+            console.log("Result of deleting account = ", result);
         }).catch((error) => {
             // An error ocurred
             // ...
@@ -45,8 +56,43 @@ const Profile = props => {
                         <div className={appStyles.title}>
                             Profile
                         </div>
-                        {/* Consolidate this into a style in App.css */}
-                        <div className={appStyles.smallTitle}>Delete Account</div>
+
+                        <div className={profileStyles.heading}>
+                            <span className="material-icons-outlined">
+                                dark_mode
+                            </span>
+                            <div className={appStyles.smallTitle}>Default Theme</div>
+                        </div>
+
+                        <div className={profileStyles.themeSelect}>
+                            <span className={`material-icons-outlined ${defaultTheme === "light" ? profileStyles.themeSelected : ""}`}
+                                onClick={() => handleDefaultTheme("dark")}
+                            >
+                                light_mode
+                            </span>
+                            <span className={`material-icons-outlined ${defaultTheme === "dark" ? profileStyles.themeSelected : ""}`}
+                                onClick={() => handleDefaultTheme("dark")}
+                            >
+                                dark_mode
+                            </span>
+                        </div>
+
+                        <div className={profileStyles.heading}>
+                            <span className="material-icons-outlined">
+                                person
+                            </span>
+                            <div className={appStyles.smallTitle}>Change Username</div>
+                        </div>
+                        <input
+                            className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
+                        />
+                        <div className={profileStyles.heading}>
+                            <span className="material-icons-outlined">
+                                remove_circle
+                            </span>
+                            <div className={appStyles.smallTitle}>Delete Account</div>
+                        </div>
+
                         <div
                             className={profileStyles.deleteAccount}
                             onClick={() => setShowDeleteDialog(true)}

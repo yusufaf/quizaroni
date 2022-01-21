@@ -61,23 +61,25 @@ const Signup = props => {
         if (enteredEmail?.trim() && enteredUsername?.trim() && enteredPass?.trim()) {
             console.log("Entered user information was not empty");
 
-            console.log("database = ", database);
             try {
                 // If using this Firebase Authentication, then have the createUserWithEmail() function before storing in databse
                 // In the then(), store in the database?
-
-                const usersCollection = collection(database, "users");
-                const userRef = await addDoc(usersCollection, {
-                    username: enteredUsername,
-                    password: enteredPass,
-                    email: enteredEmail,
-                });
-
-                console.log("Document written with ID: ", userRef);
-
                 const auth = getAuth();
                 createUserWithEmailAndPassword(auth, enteredEmail, enteredPass)
                     .then((userCredential) => {
+                        const usersCollection = collection(database, "users");
+                        const userRef = addDoc(usersCollection, {
+                            username: enteredUsername,
+                            password: enteredPass,
+                            email: enteredEmail,
+                            defaultTheme: "dark",
+                            creationDate: new Date().toLocaleDateString()
+                        });
+        
+                        /* TODO: Add labels collection associated with that user */
+        
+                        console.log("Document written with ID: ", userRef);
+
                         // If successfully signed up, user signed in automatically
                         const user = userCredential.user;
                         console.log("Successfully created account = ", user);
