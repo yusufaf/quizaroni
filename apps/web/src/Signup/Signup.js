@@ -62,11 +62,10 @@ const Signup = props => {
             console.log("Entered user information was not empty");
 
             try {
-                // If using this Firebase Authentication, then have the createUserWithEmail() function before storing in databse
-                // In the then(), store in the database?
                 const auth = getAuth();
                 createUserWithEmailAndPassword(auth, enteredEmail, enteredPass)
                     .then((userCredential) => {
+                        /* Add a new entry for the new user in the database */
                         const usersCollection = collection(database, "users");
                         const userRef = addDoc(usersCollection, {
                             username: enteredUsername,
@@ -79,6 +78,8 @@ const Signup = props => {
                         /* TODO: Add labels collection associated with that user */
         
                         console.log("Document written with ID: ", userRef);
+                        // userRef.document("example").collection("subCollection")
+
 
                         // If successfully signed up, user signed in automatically
                         const user = userCredential.user;
@@ -119,7 +120,7 @@ const Signup = props => {
                 :
                 (
                     <div className={loginStyles.loginContainer} style={{ color: theme.foreground, background: theme.background }}>
-                        <div className={loginStyles.title}>
+                        <div className={`${appStyles.title} ${loginStyles.title}`}>
                             Sign up
                         </div>
 

@@ -42,6 +42,17 @@ const NavBar = props => {
     }, [isDarkMode, theme])
 
     /**
+     * Display alert showing that the user has successfully logged out
+     */
+    const displayLogoutAlert = () => {
+        setShowAlert(true);
+        setAlertType(C.SUCCESS);
+        setTimeout(() => {
+            setShowAlert(false);
+        }, 1000);
+    }
+
+    /**
     * Handles logging out a user, using Firebase's provided method signOut()
     */
     const handleLogout = () => {
@@ -51,16 +62,14 @@ const NavBar = props => {
         signOut(auth).then(() => {
             // Sign-out successful.
             console.log("User successfully signed out");
+
+            /* TODO: Don't necessarily have to remove the object entirely, just reset its value to null? */
             if (localStorage.getItem("userInfo") !== null) {
                 localStorage.removeItem("userInfo");
             }
             setUserAuthState(null);
 
-            setShowAlert(true);
-            setAlertType(C.SUCCESS);
-            setTimeout(() => {
-                setShowAlert(false);
-            }, 1000);
+            displayLogoutAlert();
         }).catch((error) => {
             console.error("Something bad happened = ", error);
         });
@@ -122,7 +131,6 @@ const NavBar = props => {
                         <div
                             className={navStyles.accountCircle}
                             onClick={() => {
-                                console.log("Showing dropdown")
                                 setShowDropdown(true)
                             }}
                         >
