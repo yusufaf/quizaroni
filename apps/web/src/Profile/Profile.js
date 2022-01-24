@@ -27,12 +27,10 @@ const Profile = props => {
      * 
      */
     const handleDefaultTheme = theme => {
-        if (!isDarkMode) {
-            toggleDarkMode();
-        }
+        // setDefaultTheme(theme);
+        toggleDarkMode();
 
         /* Update user database with the newly selected theme */
-
     }
 
     /* Make call using Firebase Auth API to delete this user's account, have to sign in, prompt them to enter their password again, kinda like Github messages*/
@@ -71,7 +69,7 @@ const Profile = props => {
 
                         <div className={profileStyles.themeSelect}>
                             <span className={`material-icons-outlined ${defaultTheme === "light" ? profileStyles.themeSelected : ""}`}
-                                onClick={() => handleDefaultTheme("dark")}
+                                onClick={() => handleDefaultTheme("light")}
                             >
                                 light_mode
                             </span>
