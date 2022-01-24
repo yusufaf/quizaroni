@@ -7,7 +7,6 @@ import { AccountCircle, KeyboardArrowDown } from "@mui/icons-material"
 import { useTheme } from "../theme/useTheme";
 
 import ProfileDropdown from "../Profile/ProfileDropdown";
-
 import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
 
 import * as appStyles from '../App.module.css';
@@ -50,6 +49,23 @@ const NavBar = props => {
         setTimeout(() => {
             setShowAlert(false);
         }, 1000);
+    }
+
+    /*
+        TODO: Consolidate AlertJSX into a single function
+    */
+    const returnAlertJSX = () => {
+        return (
+            <Alert
+                className={appStyles.alert}
+                severity={alertType}
+            >
+                <AlertTitle>
+                    <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
+                </AlertTitle>
+                {alertType === C.SUCCESS ? C.LOGOUT_SUCCESS_MSG : C.LOGOUT_ERROR_MSG}
+            </Alert>
+        );
     }
 
     /**
@@ -150,15 +166,7 @@ const NavBar = props => {
                 </div>
             </nav>
             {showAlert &&
-                <Alert
-                    className={appStyles.alert}
-                    severity={alertType}
-                >
-                    <AlertTitle>
-                        <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
-                    </AlertTitle>
-                    {alertType === C.SUCCESS ? "Successfully logged out!" : "Error when logging out"}
-                </Alert>
+                returnAlertJSX()
             }
         </>
     );

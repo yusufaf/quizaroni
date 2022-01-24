@@ -20,9 +20,6 @@ import * as signupStyles from "../Signup/Signup.module.css"
 import * as appStyles from "../App.module.css";
 import * as C from "../utilities/constants";
 
-/*
-    Signup Component
-*/
 const Signup = props => {
     const { userAuthState, setUserAuthState } = props;
 
@@ -48,6 +45,31 @@ const Signup = props => {
         passInput: false,
     })
 
+    /**
+   * Display alert indicating status of sign up attempt
+   * @param {*} type 
+   */
+    const displaySignupAlert = (type) => {
+        setShowAlert(true);
+        if (type === C.SUCCESS) {
+            setAlertType(C.SUCCESS);
+            setTimeout(() => {
+                setShowAlert(false);
+
+                // Redirect user to their home page after
+                navigate("/create", { replace: true });
+            }, 1000);
+            return;
+        }
+        if (type === C.ERROR) {
+            setAlertType(C.ERROR);
+            setTimeout(() => {
+                setShowAlert(false);
+            }, 500);
+            return;
+        }
+    }
+
     const checkIfInputEmpty = event => {
         let updatedErrorText = { ...showErrorText };
         updatedErrorText[event.target.name] = event.target.value === "";
@@ -59,58 +81,74 @@ const Signup = props => {
     */
     const handleSignup = async () => {
         if (enteredEmail?.trim() && enteredUsername?.trim() && enteredPass?.trim()) {
-            console.log("Entered user information was not empty");
-
             try {
                 const auth = getAuth();
                 createUserWithEmailAndPassword(auth, enteredEmail, enteredPass)
                     .then((userCredential) => {
+                        const user = userCredential.user;
+                        // TODO: There's some refresh + access token stuff in the userCredential object
+                        const { uid } = user;
+                        console.log("userCredential upon user sign up = ", userCredential);
+
                         /* Add a new entry for the new user in the database */
                         const usersCollection = collection(database, "users");
+
+                        /* TODO: If using Firebase authentication, no need to store the passwords yourself */
                         const userRef = addDoc(usersCollection, {
                             username: enteredUsername,
                             password: enteredPass,
                             email: enteredEmail,
                             defaultTheme: "dark",
-                            creationDate: new Date().toLocaleDateString()
+                            creationDate: new Date().toLocaleDateString(),
+                            lastSignInDate: new Date().toLocaleDateString(),
+                            uid,
                         });
-        
+
                         /* TODO: Add labels collection associated with that user */
-        
+
                         console.log("Document written with ID: ", userRef);
                         // userRef.document("example").collection("subCollection")
 
-
                         // If successfully signed up, user signed in automatically
-                        const user = userCredential.user;
-                        console.log("Successfully created account = ", user);
                         setUserAuthState(user);
-
-                        /* Display a success/error login alert for 1 second */
-                        setShowAlert(true);
-                        setAlertType(C.SUCCESS);
-                        setTimeout(() => {
-                            setShowAlert(false);
-                            // Redirect user to the create page after
-                            navigate("/create", { replace: true });
-                        }, 1000);
+                        displaySignupAlert(C.SUCCESS);
                     })
                     .catch((error) => {
                         const errorCode = error.code;
                         // In here, account creation can fail if the account already exists or the password is invalid.
                         const errorMessage = error.message;
                         console.log(`Error ${errorCode} = ${errorMessage}`);
-
-                        setShowAlert(true);
-                        setAlertType("error");
-                        setTimeout(() => {
-                            setShowAlert(false);
-                        }, 1000);
+                        displaySignupAlert(C.ERROR);
                     });
             } catch (e) {
                 console.error("Error adding document: ", e);
             }
         }
+    }
+
+    /**
+     * Checks if the enter key was pressed, calls sign up function
+     * @param {*} e 
+     */
+    const enterKeyHandler = (e) => {
+        const key = e.key.trim();
+        if (key === "Enter") {
+            handleSignup();
+        }
+    };
+
+    const returnAlertJSX = () => {
+        return (
+            <Alert
+                className={appStyles.alert}
+                severity={alertType}
+            >
+                <AlertTitle>
+                    <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
+                </AlertTitle>
+                {alertType === C.SUCCESS ? C.SIGNUP_SUCCESS_MSG : C.SIGNUP_ERROR_MSG}
+            </Alert>
+        );
     }
 
     return (
@@ -119,7 +157,11 @@ const Signup = props => {
                 <LoginMessage page="signup" />
                 :
                 (
-                    <div className={loginStyles.loginContainer} style={{ color: theme.foreground, background: theme.background }}>
+                    <div
+                        className={loginStyles.loginContainer}
+                        style={{ color: theme.foreground, background: theme.background }}
+                        onKeyPress={enterKeyHandler}
+                    >
                         <div className={`${appStyles.title} ${loginStyles.title}`}>
                             Sign up
                         </div>
@@ -205,15 +247,7 @@ const Signup = props => {
                 )
             }
             {showAlert &&
-                <Alert
-                    className={appStyles.alert}
-                    severity={alertType}
-                >
-                    <AlertTitle>
-                        <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
-                    </AlertTitle>
-                    {alertType === C.SUCCESS ? "Account successfully created!" : "Could not create an account"}
-                </Alert>
+                returnAlertJSX()
             }
         </>
     );

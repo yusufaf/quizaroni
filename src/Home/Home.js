@@ -139,7 +139,6 @@ const Home = props => {
         let localFlashSets = [...flashSets];
         let jsx = []
 
-        console.log("localFlashsets = ", localFlashSets);
         for (const flashSet of localFlashSets) {
             jsx.push(
                 <HomeFlashSet
@@ -148,7 +147,6 @@ const Home = props => {
                 />
             );
         }
-
         return jsx;
     }
 

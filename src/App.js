@@ -63,7 +63,7 @@ const App = () => {
           <Route
             path='/signup'
             element={
-              <Signup />
+              <Signup userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
             }
           />
           <Route
