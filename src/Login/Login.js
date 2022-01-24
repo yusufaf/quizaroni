@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect, useRef } from "react"
 
-import { query, where, collection } from "@firebase/firestore";
+import { doc, updateDoc, query, where, collection, getDoc, getDocs } from "@firebase/firestore";
 import { firebaseApp, database } from "../firebase/firebase";
-import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import firebase from 'firebase/compat/app';
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css';
@@ -21,9 +21,6 @@ import * as loginStyles from './Login.module.css';
 import * as appStyles from "../App.module.css";
 import * as C from "../utilities/constants";
 
-/*
-    Login Component
-*/
 const Login = props => {
     const { userAuthState, setUserAuthState } = props;
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
@@ -50,8 +47,9 @@ const Login = props => {
     })
 
     /**
-    * Display alert showing that the user has successfully logged in
-    */
+     * Display alert indicating status of login attempt
+     * @param {*} type 
+     */
     const displayLoginAlert = (type) => {
         setShowAlert(true);
         if (type === C.SUCCESS) {
@@ -71,23 +69,49 @@ const Login = props => {
             }, 500);
             return;
         }
+    }
 
+    const returnAlertJSX = () => {
+        return (
+            <Alert
+                className={appStyles.alert}
+                severity={alertType}
+            >
+                <AlertTitle>
+                    <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
+                </AlertTitle>
+                {alertType === C.SUCCESS ? C.LOGIN_SUCCESS_MSG : C.LOGIN_ERROR_MSG}
+            </Alert>
+        );
+    }
+
+    const updateLastSignIn = async (uid) => {
+        const usersCollection = collection(database, "users");
+        const queryResult = query(usersCollection, where("uid", "==", uid));
+        const querySnapshot = await getDocs(queryResult);
+
+        const userDoc = querySnapshot.docs[0];
+        if (userDoc) {
+            const userRef = userDoc.ref;
+             updateDoc(userRef, {
+                lastSignInDate: new Date().toLocaleDateString()
+            });
+        }
     }
 
     const handleLogin = () => {
-        console.log("Entered handleLogin with ", enteredEmail, enteredPass);
         if (enteredEmail.trim() && enteredPass.trim()) {
-            /* When they log in, need to set some state based on idk */
-            const usersCollection = collection(database, "users");
-
             // Firebase Auth Sign-In
             const auth = getAuth();
             signInWithEmailAndPassword(auth, enteredEmail, enteredPass)
                 .then((userCredential) => {
                     /* If in the then() callback: Successfully signed in */
                     const user = userCredential.user;
+                    const { uid } = user;
                     console.log("Signed in user = ", user);
                     setUserAuthState(user);
+
+                    updateLastSignIn(uid);
 
                     localStorage.setItem('userInfo', JSON.stringify(user));
                     displayLoginAlert(C.SUCCESS);
@@ -202,15 +226,7 @@ const Login = props => {
                 )
             }
             {showAlert &&
-                <Alert
-                    className={appStyles.alert}
-                    severity={alertType}
-                >
-                    <AlertTitle>
-                        <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
-                    </AlertTitle>
-                    {alertType === C.SUCCESS ? "Successfully logged in!" : "Could not login, check email and password"}
-                </Alert>
+                returnAlertJSX()
             }
         </>
     );
