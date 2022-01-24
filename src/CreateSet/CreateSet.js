@@ -21,7 +21,7 @@ import * as C from "../utilities/constants";
 */
 const CreateSet = props => {
     const { userAuthState } = props;
-    const { isDarkMode, toggleDarkMode, theme } = useTheme();
+    const { isDarkMode, theme } = useTheme();
 
     /* React-Router function for switching routes */
     let navigate = useNavigate();

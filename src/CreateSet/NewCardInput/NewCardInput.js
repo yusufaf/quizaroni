@@ -50,7 +50,7 @@ const NewCardInput = props => {
                     arrow={true}
                 >
                     <span className={appStyles.deleteCard} onClick={() => handleDelete(index)}>
-                        <i className="material-icons-outlined" style={{ fontSize: "2rem" }}>
+                        <i className={`material-icons-outlined ${appStyles.standardIcon}`}>
                             delete
                         </i>
                     </span>
