@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react"
+import { useSelector, useDispatch } from 'react-redux'
+// import { setUserAuthState } from "../reducers/userAuthState";
 
 /* Firebase Operations */
 
@@ -23,6 +25,8 @@ import * as appStyles from "../App.module.css";
 const Home = props => {
     const { userAuthState } = props;
     const { isDarkMode, theme } = useTheme();
+
+    const reduxUserAuthState = useSelector((state) => state.userAuthState);
 
     let originalFlashSets;
 

@@ -49,6 +49,31 @@ const Login = props => {
         passInput: false
     })
 
+    /**
+    * Display alert showing that the user has successfully logged in
+    */
+    const displayLoginAlert = (type) => {
+        setShowAlert(true);
+        if (type === C.SUCCESS) {
+            setAlertType(C.SUCCESS);
+            setTimeout(() => {
+                setShowAlert(false);
+
+                // Redirect user to their home page after
+                navigate("/");
+            }, 500);
+            return;
+        }
+        if (type === C.ERROR) {
+            setAlertType(C.ERROR);
+            setTimeout(() => {
+                setShowAlert(false);
+            }, 500);
+            return;
+        }
+
+    }
+
     const handleLogin = () => {
         console.log("Entered handleLogin with ", enteredEmail, enteredPass);
         if (enteredEmail.trim() && enteredPass.trim()) {
@@ -65,13 +90,7 @@ const Login = props => {
                     setUserAuthState(user);
 
                     localStorage.setItem('userInfo', JSON.stringify(user));
-                    setShowAlert(true);
-                    setAlertType(C.SUCCESS);
-                    setTimeout(() => {
-                        setShowAlert(false);
-                        // Redirect user to their home page after
-                        navigate("/");
-                    }, 500);
+                    displayLoginAlert(C.SUCCESS);
                 })
                 .catch((error) => {
                     /* Could not sign in, error occurred */
@@ -79,12 +98,7 @@ const Login = props => {
                     const errorMessage = error.message;
 
                     console.log(`Couldn't login. Error ${errorCode} = ${errorMessage}`);
-
-                    setShowAlert(true);
-                    setAlertType(C.ERROR);
-                    setTimeout(() => {
-                        setShowAlert(false);
-                    }, 500);
+                    displayLoginAlert(C.ERROR);
                 });
         }
     }
@@ -109,12 +123,12 @@ const Login = props => {
                 <LoginMessage page="login" />
                 :
                 (
-                    <div className={loginStyles.loginContainer} 
+                    <div className={loginStyles.loginContainer}
                         style={{ color: theme.foreground, background: theme.background }}
                         onKeyPress={enterKeyHandler}
                     >
                         <>
-                            <div className={appStyles.title}>
+                            <div className={`${appStyles.title} ${loginStyles.title}`}>
                                 Login
                             </div>
 
