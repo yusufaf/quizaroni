@@ -13,8 +13,6 @@ import { Alert, AlertTitle } from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 
-import { enterKeyHandler } from "../utilities/functions";
-
 /* Styling */
 import { useTheme } from "../theme/useTheme";
 import * as loginStyles from './Login.module.css';
@@ -85,6 +83,10 @@ const Login = props => {
         );
     }
 
+    /**
+     * Update the last time the user signed in on the database
+     * @param {*} uid 
+     */
     const updateLastSignIn = async (uid) => {
         const usersCollection = collection(database, "users");
         const queryResult = query(usersCollection, where("uid", "==", uid));
@@ -108,11 +110,8 @@ const Login = props => {
                     /* If in the then() callback: Successfully signed in */
                     const user = userCredential.user;
                     const { uid } = user;
-                    console.log("Signed in user = ", user);
                     setUserAuthState(user);
-
                     updateLastSignIn(uid);
-
                     localStorage.setItem('userInfo', JSON.stringify(user));
                     displayLoginAlert(C.SUCCESS);
                 })

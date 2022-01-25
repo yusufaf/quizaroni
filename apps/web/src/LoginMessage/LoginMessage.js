@@ -3,25 +3,16 @@ import { useTheme } from "../theme/useTheme";
 
 import macaroniDance from "../resources/images/macaroni_dance.gif";
 import * as messageStyles from './LoginMessage.module.css';
-/*
-    LoginMessage Component
-*/
+import { LOGIN_MESSAGES } from "../utilities/constants";
+
 const LoginMessage = props => {
     const { page } = props;
 
     const { isDarkMode, theme } = useTheme();
 
-    const messages = {
-        "createSet": "Please login or create an account to start creating flash cards!",
-        "login": "You're already logged in!",
-        "signup": "Please log out of your account to create a new account!",
-        "profile": "Please login to view your profile!",
-        "home": "Please login to view your created flash cards!"
-    }
-
     return (
         <div className={messageStyles.container} style={{ color: theme.foreground, background: theme.background }}>
-            <b>{messages[page]}</b>
+            <b>{LOGIN_MESSAGES[page]}</b>
             <img
                 src={macaroniDance}
                 alt="Macaroni dancing"

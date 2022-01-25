@@ -137,17 +137,13 @@ const Home = props => {
      */
     const renderFlashSets = () => {
         let localFlashSets = [...flashSets];
-        let jsx = []
 
-        for (const flashSet of localFlashSets) {
-            jsx.push(
-                <HomeFlashSet
-                    flashSet={flashSet}
-                    {...homeSetProps}
-                />
-            );
-        }
-        return jsx;
+        return localFlashSets.map((flashSet) => {
+            return <HomeFlashSet
+                flashSet={flashSet}
+                {...homeSetProps}
+            />
+        })
     }
 
 
