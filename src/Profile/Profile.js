@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { database } from "../firebase/firebase";
-import { doc, deleteDoc } from "firebase/firestore";
+import { doc, deleteDoc, updateDoc, query, where, collection, getDoc, getDocs } from "firebase/firestore";
 import { getAuth, deleteUser } from "firebase/auth";
 import { Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
@@ -26,11 +26,23 @@ const Profile = props => {
     /**
      * 
      */
-    const handleDefaultTheme = theme => {
+    const handleDefaultTheme = async (theme) => {
         // setDefaultTheme(theme);
         toggleDarkMode();
 
         /* Update user database with the newly selected theme */
+        const {uid} = userAuthState;
+        const usersCollection = collection(database, "users");
+        const queryResult = query(usersCollection, where("uid", "==", uid)).limit(1);
+        const querySnapshot = await getDocs(queryResult);
+
+        const userDoc = querySnapshot.docs[0];
+        if (userDoc) {
+            const userRef = userDoc.ref;
+             updateDoc(userRef, {
+                defaultTheme: theme
+            });
+        }
     }
 
     /* Make call using Firebase Auth API to delete this user's account, have to sign in, prompt them to enter their password again, kinda like Github messages*/
@@ -39,7 +51,6 @@ const Profile = props => {
             // User deleted.
 
             /* Delete that user's flashcards */
-
             const result = deleteDoc(doc(database, "users", userAuthState.uid));
             console.log("Result of deleting account = ", result);
         }).catch((error) => {

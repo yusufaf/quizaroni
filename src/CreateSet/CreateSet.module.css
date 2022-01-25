@@ -184,8 +184,9 @@
     background: rgb(253, 187, 63);
 }
 
+/* TODO:  */
 .addCard:focus {
-    border: 0.2rem solid #f72500;
+    /* border: 0.2rem solid #f72500; */
 }
 
 .addIcon {

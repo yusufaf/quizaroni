@@ -102,13 +102,8 @@ const Signup = props => {
                             creationDate: new Date().toLocaleDateString(),
                             lastSignInDate: new Date().toLocaleDateString(),
                             uid,
+                            labels: [],
                         });
-
-                        /* TODO: Add labels collection associated with that user */
-
-                        console.log("Document written with ID: ", userRef);
-                        // userRef.document("example").collection("subCollection")
-
                         // If successfully signed up, user signed in automatically
                         setUserAuthState(user);
                         displaySignupAlert(C.SUCCESS);
