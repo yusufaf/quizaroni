@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 
 /* Firebase Operations */
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { firebaseApp, database } from "../firebase/firebase";
 
 /* Outside Components */
@@ -34,6 +34,8 @@ const CreateSet = props => {
     const [createSetEnabled, setCreateSetEnabled] = useState(false);
     const [createdSetCards, setCreatedSetCards] = useState([{ term: "", definition: "" }]);
 
+    let labels = [];
+
     // Store a reference to the HTML file <input>
     const fileInputRef = useRef(null);
 
@@ -46,6 +48,32 @@ const CreateSet = props => {
         titleInput: false,
         descInput: false
     })
+
+    const retrieveLabels = async () => {
+        const { uid } = userAuthState;
+        const usersCollection = collection(database, "users");
+        const queryResult = query(usersCollection, where("uid", "==", uid));
+        const querySnapshot = await getDocs(queryResult);
+
+        const userDoc = querySnapshot.docs[0];
+        if (userDoc) {
+            const userData = userDoc.data();
+            console.log("userData = ", userData);
+            return userData.labels;
+        }
+    }
+
+    const renderLabelOptions = () => {
+        const labelsResult = retrieveLabels();
+
+        labelsResult.then(labels => {
+            return labels.map( (label, index) => {
+                return <option key={index} value={label}>
+                    {label}
+                </option>
+            });
+        });
+    }
 
     /* Check that length of createdCardObjects is not 0 */
     const createNewSet = async () => {
@@ -147,21 +175,19 @@ const CreateSet = props => {
      * Render the JSX for all the card inputs
      */
     const renderCreateCards = () => {
-        let jsx = [];
-        for (const [index, value] of createdSetCards.entries()) {
-            const props = {
-                createdSetCards,
-                fileInputRef,
-                handleDelete,
-                index,
-                onColorChange,
-                onFileChange,
-                setCreatedSetCards,
-                updateCardValue,
-            };
-            jsx.push(<NewCardInput key={index} {...props} />)
-        }
-        return jsx;
+        let props = {
+            createdSetCards,
+            fileInputRef,
+            handleDelete,
+            onColorChange,
+            onFileChange,
+            setCreatedSetCards,
+            updateCardValue,
+        };
+        return createdSetCards.map((_, index) => {
+            props.index = index;
+            return <NewCardInput key={index} {...props} />
+        })
     }
 
     return (
@@ -180,7 +206,7 @@ const CreateSet = props => {
                             <div className={createSetStyles.inputContainer}>
                                 <label className={createSetStyles.inputLabel}>Title</label>
                                 <input
-                                    className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}                                    
+                                    className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
                                     placeholder="Enter a title for your new study set"
                                     onChange={e => setEnteredTitle(e.target.value)}
                                 />
@@ -200,8 +226,7 @@ const CreateSet = props => {
                                     <span>or select an existing one</span>
                                     <select className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
                                     >
-                                        {/* renderLabelOptions() - Specific to a user */}
-                                        <option></option>
+                                        {renderLabelOptions()}
                                     </select>
                                 </div>
                             </div>
