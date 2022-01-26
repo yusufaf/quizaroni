@@ -50,16 +50,18 @@ const CreateSet = props => {
     })
 
     const retrieveLabels = async () => {
-        const { uid } = userAuthState;
-        const usersCollection = collection(database, "users");
-        const queryResult = query(usersCollection, where("uid", "==", uid));
-        const querySnapshot = await getDocs(queryResult);
+        if (userAuthState) {
+            const { uid } = userAuthState;
+            const usersCollection = collection(database, "users");
+            const queryResult = query(usersCollection, where("uid", "==", uid));
+            const querySnapshot = await getDocs(queryResult);
 
-        const userDoc = querySnapshot.docs[0];
-        if (userDoc) {
-            const userData = userDoc.data();
-            console.log("userData = ", userData);
-            return userData.labels;
+            const userDoc = querySnapshot.docs[0];
+            if (userDoc) {
+                const userData = userDoc.data();
+                console.log("userData = ", userData);
+                return userData.labels;
+            }
         }
     }
 
@@ -67,11 +69,14 @@ const CreateSet = props => {
         const labelsResult = retrieveLabels();
 
         labelsResult.then(labels => {
-            return labels.map( (label, index) => {
+            return labels.map((label, index) => {
                 return <option key={index} value={label}>
                     {label}
                 </option>
             });
+        })
+        .catch((error) => {
+            console.log("Error caught");
         });
     }
 
@@ -190,6 +195,10 @@ const CreateSet = props => {
         })
     }
 
+    useEffect(() => {
+        console.log("renderLabelOptions = ", renderLabelOptions());
+    }, [userAuthState])
+
     return (
         <>
             {!userAuthState ?
@@ -224,8 +233,7 @@ const CreateSet = props => {
                                         onChange={e => setEnteredLabel(e.target.value)}
                                     />
                                     <span>or select an existing one</span>
-                                    <select className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                                    >
+                                    <select className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}>
                                         {renderLabelOptions()}
                                     </select>
                                 </div>

@@ -21,10 +21,45 @@ import * as C from "../utilities/constants";
 
 const Login = props => {
     const { userAuthState, setUserAuthState } = props;
-    const { isDarkMode, toggleDarkMode, theme } = useTheme();
+    const { isDarkMode, theme } = useTheme();
 
     /* OAuth Variables */
+    const auth = getAuth();
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    let firebaseUI;
+
+    let uiConfig = {
+        callbacks: {
+            signInSuccessWithAuthResult: (authResult, redirectUrl) => {
+                const { user } = authResult;
+                const { uid } = user;
+
+                // Google Access Token in the authResult object?
+
+                console.log("authResult = ", authResult);
+                // User successfully signed in.
+                // Return type determines whether we continue the redirect automatically
+                // or whether we leave that to developer to handle.
+                setUserAuthState(user);
+                updateLastSignIn(uid);
+                localStorage.setItem('userInfo', JSON.stringify(user));
+                displayLoginAlert(C.SUCCESS);
+                return false;
+            },
+            uiShown: function () {
+                // The widget is rendered.
+                // Hide the loader.
+                document.getElementById('loader').style.display = 'none';
+            }
+        },
+        // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
+        signInFlow: 'popup',
+        signInOptions: [
+            GoogleAuthProvider.PROVIDER_ID,
+        ],
+    };
 
     /* React-Router function for switching routes */
     let navigate = useNavigate();
@@ -43,6 +78,13 @@ const Login = props => {
         emailInput: false,
         passInput: false
     })
+
+    useEffect(() => {
+        firebaseUI = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
+        if (firebaseUI && !userAuthState) {
+            firebaseUI.start('#firebaseui-auth-container', uiConfig);
+        }
+    }, [])
 
     /**
      * Display alert indicating status of login attempt
@@ -95,16 +137,37 @@ const Login = props => {
         const userDoc = querySnapshot.docs[0];
         if (userDoc) {
             const userRef = userDoc.ref;
-             updateDoc(userRef, {
+            updateDoc(userRef, {
                 lastSignInDate: new Date().toLocaleDateString()
             });
         }
     }
 
+    const handleGoogleSignIn = () => {
+        const auth = getAuth();
+
+        signInWithPopup(auth, provider)
+            .then((result) => {
+                // This gives you a Google Access Token. You can use it to access the Google API.
+                const credential = GoogleAuthProvider.credentialFromResult(result);
+                const token = credential.accessToken;
+                // The signed-in user info.
+                const user = result.user;
+                const { uid } = user;
+                setUserAuthState(user);
+                updateLastSignIn(uid);
+                localStorage.setItem('userInfo', JSON.stringify(user));
+                displayLoginAlert(C.SUCCESS);
+            })
+            .catch((error) => {
+                console.log(`Couldn't sign in with Google`);
+                displayLoginAlert(C.ERROR);
+            });
+    }
+
     const handleLogin = () => {
         if (enteredEmail.trim() && enteredPass.trim()) {
             // Firebase Auth Sign-In
-            const auth = getAuth();
             signInWithEmailAndPassword(auth, enteredEmail, enteredPass)
                 .then((userCredential) => {
                     /* If in the then() callback: Successfully signed in */
@@ -146,82 +209,97 @@ const Login = props => {
                 <LoginMessage page="login" />
                 :
                 (
-                    <div className={loginStyles.loginContainer}
-                        style={{ color: theme.foreground, background: theme.background }}
-                        onKeyPress={enterKeyHandler}
-                    >
-                        <>
-                            <div className={`${appStyles.title} ${loginStyles.title}`}>
-                                Login
-                            </div>
+                    <>
+                        <div className={loginStyles.loginContainer}
+                            style={{ color: theme.foreground, background: theme.background }}
+                            onKeyPress={enterKeyHandler}
+                        >
+                            <>
+                                <div className={`${appStyles.title} ${loginStyles.title}`}>
+                                    Login
+                                </div>
 
-                            <input
-                                className={
-                                    showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                                <input
+                                    className={
+                                        showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                                            : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
+                                    name="emailInput"
+                                    placeholder="Type your email address"
+                                    onBlur={e => checkIfInputEmpty(e)}
+                                    onChange={e => setEnteredEmail(e.target.value)}
+                                />
+
+                                {showErrorText.emailInput &&
+                                    <span className={loginStyles.emailError}>
+                                        An email is required.
+                                    </span>
+                                }
+
+                                {/* Password Input */}
+                                <input
+                                    className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
                                         : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                                name="emailInput"
-                                placeholder="Type your email address"
-                                onBlur={e => checkIfInputEmpty(e)}
-                                onChange={e => setEnteredEmail(e.target.value)}
-                            />
+                                    name="passInput"
+                                    placeholder="Type your password"
+                                    type={passVisibility ? "text" : "password"}
+                                    onBlur={e => checkIfInputEmpty(e)}
+                                    onChange={e => setEnteredPass(e.target.value)}
+                                />
+                                {/* Show/Hide Password */}
+                                {passVisibility ?
+                                    <Visibility
+                                        className={`${loginStyles.passToggle} ${isDarkMode && loginStyles.dark}`}
+                                        onClick={() => setPassVisibility(!passVisibility)}
+                                    >
+                                    </Visibility> :
+                                    <VisibilityOff
+                                        className={`${loginStyles.passToggle} ${isDarkMode && loginStyles.dark}`}
+                                        onClick={() => setPassVisibility(!passVisibility)}
+                                    >
+                                    </VisibilityOff>
+                                }
+                                {showErrorText.passInput &&
+                                    <span className={loginStyles.passwordError}>
+                                        A password is required.
+                                    </span>
+                                }
 
-                            {showErrorText.emailInput &&
-                                <span className={loginStyles.emailError}>
-                                    An email is required.
-                                </span>
-                            }
+                                <Link to="/forgot" className={loginStyles.forgot}>
+                                    Forgot password?
+                                </Link>
 
-                            {/* Password Input */}
-                            <input
-                                className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                                    : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                                name="passInput"
-                                placeholder="Type your password"
-                                type={passVisibility ? "text" : "password"}
-                                onBlur={e => checkIfInputEmpty(e)}
-                                onChange={e => setEnteredPass(e.target.value)}
-                            />
-                            {/* Show/Hide Password */}
-                            {passVisibility ?
-                                <Visibility
-                                    className={`${loginStyles.passToggle} ${isDarkMode && loginStyles.dark}`}
-                                    onClick={() => setPassVisibility(!passVisibility)}
+                                {/* Login Button */}
+                                <button
+                                    className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
+                                    onClick={() => handleLogin()}
                                 >
-                                </Visibility> :
-                                <VisibilityOff
-                                    className={`${loginStyles.passToggle} ${isDarkMode && loginStyles.dark}`}
-                                    onClick={() => setPassVisibility(!passVisibility)}
+                                    <b>Log In</b>
+                                </button>
+
+                                {/* Signup Link  */}
+                                <Link
+                                    className={loginStyles.signupLink}
+                                    to="/signup"
                                 >
-                                </VisibilityOff>
-                            }
-                            {showErrorText.passInput &&
-                                <span className={loginStyles.passwordError}>
-                                    A password is required.
-                                </span>
-                            }
+                                    Don't have an account? Click here to sign up!
+                                </Link>
+                            </>
+                        </div>
+                        <div id="firebaseui-auth-container"
+                            style={{ color: theme.foreground, background: theme.background }}
+                        >
 
-                            <Link to="/forgot" className={loginStyles.forgot}>
-                                Forgot password?
-                            </Link>
-
-                            {/* Login Button */}
-                            <button
-                                className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
-                                onClick={() => handleLogin()}
+                        </div>
+                        <div id="loader">Loading...</div>
+                        {/* <div className={loginStyles.loginContainer}
+                            style={{ left: "75rem", color: theme.foreground, background: theme.background }}
+                        >
+                            <button onClick={() => handleGoogleSignIn()}
                             >
-                                <b>Log In</b>
+                                Sign in With Google
                             </button>
-
-                            {/* Signup Link  */}
-                            <Link
-                                className={loginStyles.signupLink}
-                                to="/signup"
-                            >
-                                Don't have an account? Click here to sign up!
-                            </Link>
-                        </>
-
-                    </div>
+                        </div> */}
+                    </>
                 )
             }
             {showAlert &&
