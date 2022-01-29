@@ -115,7 +115,7 @@
   transition: 0.2s ease;
 }
 
-.standardIcon {
+.clickIcon {
   font-size: 2rem;
   cursor: pointer;
 }

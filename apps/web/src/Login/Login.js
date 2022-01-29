@@ -3,7 +3,6 @@ import React, { useState, useCallback, useEffect, useRef } from "react"
 import { doc, updateDoc, query, where, collection, getDoc, getDocs } from "@firebase/firestore";
 import { firebaseApp, database } from "../firebase/firebase";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import firebase from 'firebase/compat/app';
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css';
 
@@ -49,8 +48,7 @@ const Login = props => {
                 return false;
             },
             uiShown: function () {
-                // The widget is rendered.
-                // Hide the loader.
+                // The widget is rendered. + Hide the loader
                 document.getElementById('loader').style.display = 'none';
             }
         },
@@ -85,6 +83,15 @@ const Login = props => {
             firebaseUI.start('#firebaseui-auth-container', uiConfig);
         }
     }, [])
+
+    // TODO: Possible quality of life styling
+    // useEffect(() => {
+    //     let element = document.querySelector(".firebaseui-idp-button");
+    //     if (element) {
+    //         console.log("Setting color to ", theme.foreground);
+    //         element.style.backgroundColor = `${theme.foreground}`;
+    //     }
+    // }, [theme])
 
     /**
      * Display alert indicating status of login attempt
@@ -143,27 +150,25 @@ const Login = props => {
         }
     }
 
-    const handleGoogleSignIn = () => {
-        const auth = getAuth();
-
-        signInWithPopup(auth, provider)
-            .then((result) => {
-                // This gives you a Google Access Token. You can use it to access the Google API.
-                const credential = GoogleAuthProvider.credentialFromResult(result);
-                const token = credential.accessToken;
-                // The signed-in user info.
-                const user = result.user;
-                const { uid } = user;
-                setUserAuthState(user);
-                updateLastSignIn(uid);
-                localStorage.setItem('userInfo', JSON.stringify(user));
-                displayLoginAlert(C.SUCCESS);
-            })
-            .catch((error) => {
-                console.log(`Couldn't sign in with Google`);
-                displayLoginAlert(C.ERROR);
-            });
-    }
+    // const handleGoogleSignIn = () => {
+    //     signInWithPopup(auth, provider)
+    //         .then((result) => {
+    //             // This gives you a Google Access Token. You can use it to access the Google API.
+    //             const credential = GoogleAuthProvider.credentialFromResult(result);
+    //             const token = credential.accessToken;
+    //             // The signed-in user info.
+    //             const user = result.user;
+    //             const { uid } = user;
+    //             setUserAuthState(user);
+    //             updateLastSignIn(uid);
+    //             localStorage.setItem('userInfo', JSON.stringify(user));
+    //             displayLoginAlert(C.SUCCESS);
+    //         })
+    //         .catch((error) => {
+    //             console.log(`Couldn't sign in with Google`);
+    //             displayLoginAlert(C.ERROR);
+    //         });
+    // }
 
     const handleLogin = () => {
         if (enteredEmail.trim() && enteredPass.trim()) {
@@ -286,19 +291,11 @@ const Login = props => {
                             </>
                         </div>
                         <div id="firebaseui-auth-container"
+                            className={loginStyles.firebaseUI}
                             style={{ color: theme.foreground, background: theme.background }}
                         >
-
                         </div>
                         <div id="loader">Loading...</div>
-                        {/* <div className={loginStyles.loginContainer}
-                            style={{ left: "75rem", color: theme.foreground, background: theme.background }}
-                        >
-                            <button onClick={() => handleGoogleSignIn()}
-                            >
-                                Sign in With Google
-                            </button>
-                        </div> */}
                     </>
                 )
             }

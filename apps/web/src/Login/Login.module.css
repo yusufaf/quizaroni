@@ -1,10 +1,8 @@
 .loginContainer {
     position: absolute;
     width: 22rem;
-    /* width   : 20vw; */
-    left: 37vw;
+    left: 40rem;
     top: 20vh;
-    /* top     : 10rem; */
 
     display       : flex;
     flex-direction: column;
@@ -105,4 +103,15 @@
 
 .passwordError {
     top: 58%;
+}
+
+.firebaseUI {
+    position: absolute;
+    left: 70rem;
+    top: 20vh;
+
+    border-radius: 0.75rem;
+    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
+    padding      : 1.25rem;
+    text-align: center;
 }

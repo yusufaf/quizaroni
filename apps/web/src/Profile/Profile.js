@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { database } from "../firebase/firebase";
-import { doc, deleteDoc, updateDoc, query, where, collection, getDoc, getDocs } from "firebase/firestore";
+import { doc, deleteDoc, updateDoc, query, where, collection, getDoc, getDocs, limit} from "firebase/firestore";
 import { getAuth, deleteUser } from "firebase/auth";
 import { Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
@@ -27,19 +27,24 @@ const Profile = props => {
      * 
      */
     const handleDefaultTheme = async (theme) => {
-        // setDefaultTheme(theme);
-        toggleDarkMode();
+        console.log("Entering handleDefaultTheme");
+        // TODO: Handling immediately changing based on selection
+        // if (theme === "dark" ) {
+        //     console.log("TOGGLING DARK MODE");
+        //     toggleDarkMode();
+        // }
+        setDefaultTheme(theme);
 
         /* Update user database with the newly selected theme */
-        const {uid} = userAuthState;
+        const { uid } = userAuthState;
         const usersCollection = collection(database, "users");
-        const queryResult = query(usersCollection, where("uid", "==", uid)).limit(1);
+        const queryResult = query(usersCollection, where("uid", "==", uid), limit(1));
         const querySnapshot = await getDocs(queryResult);
 
         const userDoc = querySnapshot.docs[0];
         if (userDoc) {
             const userRef = userDoc.ref;
-             updateDoc(userRef, {
+            updateDoc(userRef, {
                 defaultTheme: theme
             });
         }
