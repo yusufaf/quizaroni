@@ -5,7 +5,7 @@ import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import { firebaseApp, database } from "../firebase/firebase";
 
 /* Outside Components */
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, Tooltip } from '@mui/material/';
 import NewCardInput from "./NewCardInput/NewCardInput";
 import LoginMessage from "../LoginMessage/LoginMessage";
@@ -16,9 +16,6 @@ import * as createSetStyles from './CreateSet.module.css';
 import * as appStyles from "../App.module.css";
 import * as C from "../utilities/constants";
 
-/*
-    CreateSet Component
-*/
 const CreateSet = props => {
     const { userAuthState } = props;
     const { isDarkMode, theme } = useTheme();
@@ -75,9 +72,9 @@ const CreateSet = props => {
                 </option>
             });
         })
-        .catch((error) => {
-            console.log("Error caught");
-        });
+            .catch((error) => {
+                console.log("Error caught");
+            });
     }
 
     /* Check that length of createdCardObjects is not 0 */
@@ -156,14 +153,12 @@ const CreateSet = props => {
     /**
      * Update a given card input's value in the array storing the cards
      * @param {*} index 
-     * @param {*} type 
+     * @param {*} property 
      * @param {*} value 
      */
-    const updateCardValue = (index, type, value) => {
+    const updateCardValue = (index, property, value) => {
         let newCreatedSetCards = [...createdSetCards];
-        newCreatedSetCards[index][type] = value;
-
-        console.log("newCreatedSetCards = ", newCreatedSetCards);
+        newCreatedSetCards[index][property] = value;
         setCreatedSetCards(newCreatedSetCards);
     }
 
@@ -171,9 +166,8 @@ const CreateSet = props => {
      * 
      * @returns 
      */
-    const onColorChange = (event) => {
-        // console.log("color = ", color);
-        console.log("event = ", event);
+    const onColorChange = (event, index) => {
+        updateCardValue(index, "textColor", event.hex);
     }
 
     /**
