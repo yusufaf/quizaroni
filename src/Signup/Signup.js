@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react"
 
-import { addDoc, collection } from "@firebase/firestore";
+import { doc, updateDoc, query, where, collection, getDoc, getDocs, addDoc } from "firebase/firestore";
 import { firebaseApp, database } from "../firebase/firebase";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import firebase from 'firebase/compat/app';
+import { getAuth, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css';
 
@@ -22,8 +21,57 @@ import * as C from "../utilities/constants";
 
 const Signup = props => {
     const { userAuthState, setUserAuthState } = props;
+    const { isDarkMode, theme } = useTheme();
 
-    const { isDarkMode, toggleDarkMode, theme } = useTheme();
+
+    /* OAuth Variables */
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    let firebaseUI;
+
+    let uiConfig = {
+        callbacks: {
+            signInSuccessWithAuthResult: (authResult, redirectUrl) => {
+                const { user } = authResult;
+                const { uid } = user;
+
+                console.log("authResult = ", authResult);
+                // User successfully signed in.
+                // Return type determines whether we continue the redirect automatically
+                // or whether we leave that to developer to handle.
+
+                const usersCollection = collection(database, "users");
+
+                /* TODO: If using Firebase authentication, no need to store the passwords yourself */
+                const userRef = addDoc(usersCollection, {
+                    username: enteredUsername,
+                    password: enteredPass,
+                    email: enteredEmail,
+                    defaultTheme: "dark",
+                    creationDate: new Date().toLocaleDateString(),
+                    lastSignInDate: new Date().toLocaleDateString(),
+                    uid,
+                    labels: [],
+                });
+
+                setUserAuthState(user);
+                localStorage.setItem('userInfo', JSON.stringify(user));
+                displaySignupAlert(C.SUCCESS);
+                return false;
+            },
+            uiShown: function () {
+                // The widget is rendered. + Hide the loader
+                document.getElementById('loader').style.display = 'none';
+            }
+        },
+        // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
+        signInFlow: 'popup',
+        signInOptions: [
+            GoogleAuthProvider.PROVIDER_ID,
+        ],
+    };
 
     /* React-Router function for switching routes */
     let navigate = useNavigate();
@@ -44,6 +92,13 @@ const Signup = props => {
         nameInput: false,
         passInput: false,
     })
+
+    useEffect(() => {
+        firebaseUI = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
+        if (firebaseUI && !userAuthState) {
+            firebaseUI.start('#firebaseui-auth-container', uiConfig);
+        }
+    }, [])
 
     /**
    * Display alert indicating status of sign up attempt
@@ -152,93 +207,101 @@ const Signup = props => {
                 <LoginMessage page="signup" />
                 :
                 (
-                    <div
-                        className={loginStyles.loginContainer}
-                        style={{ color: theme.foreground, background: theme.background }}
-                        onKeyPress={enterKeyHandler}
-                    >
-                        <div className={`${appStyles.title} ${loginStyles.title}`}>
-                            Sign up
+                    <>
+                        <div
+                            className={loginStyles.loginContainer}
+                            style={{ color: theme.foreground, background: theme.background }}
+                            onKeyPress={enterKeyHandler}
+                        >
+                            <div className={`${appStyles.title} ${loginStyles.title}`}>
+                                Sign up
+                            </div>
+
+                            {/* Email Input  */}
+                            <input
+                                className={showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                                    : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
+                                name="emailInput"
+                                placeholder="Type your email address"
+                                onBlur={e => checkIfInputEmpty(e)}
+                                onChange={e => setEnteredEmail(e.target.value)}
+                            />
+
+                            {showErrorText.emailInput &&
+                                <span className={signupStyles.emailError}>
+                                    An email is required.
+                                </span>
+                            }
+
+                            {/* Username Input */}
+                            <input
+                                className={showErrorText.nameInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                                    : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
+                                name="nameInput"
+                                placeholder="Type your username"
+                                onBlur={e => checkIfInputEmpty(e)}
+                                onChange={e => setEnteredUsername(e.target.value)}
+                            />
+
+                            {showErrorText.nameInput &&
+                                <span className={signupStyles.nameError}>
+                                    A username is required.
+                                </span>
+                            }
+
+                            {/* Password Input */}
+                            <input
+                                className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                                    : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
+                                name="passInput"
+                                placeholder="Type your password"
+                                type={passVisibility ? "text" : "password"}
+                                onBlur={e => checkIfInputEmpty(e)}
+                                onChange={e => setEnteredPass(e.target.value)}
+                            />
+
+                            {/* Show/Hide Password */}
+                            {passVisibility ?
+                                <Visibility
+                                    className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
+                                    onClick={() => setPassVisibility(!passVisibility)}
+                                >
+                                </Visibility> :
+                                <VisibilityOff
+                                    className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
+                                    onClick={() => setPassVisibility(!passVisibility)}
+                                >
+                                </VisibilityOff>
+                            }
+                            {showErrorText.passInput &&
+                                <span className={signupStyles.passwordError}>
+                                    A password is required.
+                                </span>
+                            }
+
+                            {/* Signup Button */}
+                            <button
+                                className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
+                                onClick={() => handleSignup()}
+                            >
+                                <b>Sign Up</b>
+                            </button>
+
+                            {/* Signup Link  */}
+                            <Link
+                                className={loginStyles.signupLink}
+                                to="/login"
+                            >
+                                Already have an account? Click here to login!
+                            </Link>
                         </div>
-
-                        {/* Email Input  */}
-                        <input
-                            className={showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                                : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                            name="emailInput"
-                            placeholder="Type your email address"
-                            onBlur={e => checkIfInputEmpty(e)}
-                            onChange={e => setEnteredEmail(e.target.value)}
-                        />
-
-                        {showErrorText.emailInput &&
-                            <span className={signupStyles.emailError}>
-                                An email is required.
-                            </span>
-                        }
-
-                        {/* Username Input */}
-                        <input
-                            className={showErrorText.nameInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                                : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                            name="nameInput"
-                            placeholder="Type your username"
-                            onBlur={e => checkIfInputEmpty(e)}
-                            onChange={e => setEnteredUsername(e.target.value)}
-                        />
-
-                        {showErrorText.nameInput &&
-                            <span className={signupStyles.nameError}>
-                                A username is required.
-                            </span>
-                        }
-
-                        {/* Password Input */}
-                        <input
-                            className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                                : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                            name="passInput"
-                            placeholder="Type your password"
-                            type={passVisibility ? "text" : "password"}
-                            onBlur={e => checkIfInputEmpty(e)}
-                            onChange={e => setEnteredPass(e.target.value)}
-                        />
-
-                        {/* Show/Hide Password */}
-                        {passVisibility ?
-                            <Visibility
-                                className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
-                                onClick={() => setPassVisibility(!passVisibility)}
-                            >
-                            </Visibility> :
-                            <VisibilityOff
-                                className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
-                                onClick={() => setPassVisibility(!passVisibility)}
-                            >
-                            </VisibilityOff>
-                        }
-                        {showErrorText.passInput &&
-                            <span className={signupStyles.passwordError}>
-                                A password is required.
-                            </span>
-                        }
-
-                        {/* Signup Button */}
-                        <button
-                            className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
-                            onClick={() => handleSignup()}
+                        <div id="firebaseui-auth-container"
+                            className={loginStyles.firebaseUI}
+                            style={{ color: theme.foreground, background: theme.background }}
                         >
-                            <b>Sign Up</b>
-                        </button>
-
-                        {/* Signup Link  */}
-                        <Link
-                            className={loginStyles.signupLink}
-                            to="/login"
-                        >
-                            Already have an account? Click here to login!
-                        </Link>
-                    </div>
+                        </div>
+                        <div id="loader">Loading...</div>
+                    </>
                 )
             }
             {showAlert &&

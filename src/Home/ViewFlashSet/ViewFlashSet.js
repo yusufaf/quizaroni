@@ -27,7 +27,7 @@ const ViewFlashSet = props => {
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     const [showReminderModal, setShowReminderModal] = useState(false);
-    
+
     const handleDownloadSet = () => {
 
     }
@@ -41,32 +41,18 @@ const ViewFlashSet = props => {
         return (
             <div className={viewFlashStyles.actionBar}>
                 <span>
-                    <i className="material-icons-outlined" style={{ fontSize: "2rem", cursor: "pointer" }}>
+                    <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
                         download
                     </i>
                     Download
                 </span>
 
                 <span className="material-icons-outlined">
-                    <i className="material-icons-outlined" style={{ fontSize: "2rem", cursor: "pointer" }}>
+                    <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
                         email
                     </i>
                 </span>
             </div>
-        )
-    }
-
-    /**
-     * Renders the back button
-     */
-    const renderBackButton = () => {
-        return (
-            <span className={viewFlashStyles.backButton} onClick={() => setViewFlashSet(false)}>
-                <i className="material-icons-outlined" style={{ fontSize: "2rem", cursor: "pointer" }}>
-                    arrow_back
-                </i>
-                Back to Your Flashsets
-            </span>
         )
     }
 
@@ -75,7 +61,12 @@ const ViewFlashSet = props => {
             <div className={appStyles.title} style={{ marginTop: "1rem" }}>
                 {selectedFlashSet.title}
             </div>
-            {renderBackButton()}
+            <span className={viewFlashStyles.backButton} onClick={() => setViewFlashSet(false)}>
+                <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
+                    arrow_back
+                </i>
+                Back to Your Flashsets
+            </span>
             {renderActionBar()}
         </>
     )

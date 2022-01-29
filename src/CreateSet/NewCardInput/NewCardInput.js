@@ -13,9 +13,10 @@ const NewCardInput = props => {
 
     const colorPickerRef = useRef(null);
     const [showColorPicker, setShowColorPicker] = useState(false);
+    // localColor is just for testing purposes, don't need this right?
     const [localColor, setLocalColor] = useState("");
 
-
+    // TODO: Clicking away from ColorPicker
     // useEffect(() => {
     //     window.addEventListener("click", handleClickOutside);
     //     return () => {
@@ -35,7 +36,6 @@ const NewCardInput = props => {
         // }
     }
 
-
     return (
         <div
             className={index === 0 ? `${createSetStyles.newCard} ${createSetStyles.firstCard}` : `${createSetStyles.newCard}`}
@@ -50,7 +50,7 @@ const NewCardInput = props => {
                     arrow={true}
                 >
                     <span className={appStyles.deleteCard} onClick={() => handleDelete(index)}>
-                        <i className={`material-icons-outlined ${appStyles.standardIcon}`}>
+                        <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
                             delete
                         </i>
                     </span>
@@ -71,8 +71,7 @@ const NewCardInput = props => {
                             style={{ display: "none" }}
                         />
                         <i
-                            className="material-icons-outlined"
-                            style={{ fontSize: "2rem" }}
+                            className={`material-icons-outlined ${appStyles.clickIcon}`}
                             onClick={() => fileInputRef.current.click()}
                         >
                             image
@@ -100,7 +99,7 @@ const NewCardInput = props => {
                             className={`${createSetStyles.colorPicker}`}
                             color={localColor}
                             onChange={(e) => {
-                                onColorChange(e);
+                                onColorChange(e, index);
                                 setLocalColor(e.hex);
                             }}
                         />
@@ -118,6 +117,5 @@ const NewCardInput = props => {
         </div>
     )
 }
-
 
 export default NewCardInput;
