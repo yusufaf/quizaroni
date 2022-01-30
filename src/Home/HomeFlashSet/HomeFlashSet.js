@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 
 /* Firebase Operations */
 
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, deleteDoc, query, where, getDocs } from "firebase/firestore";
 import { firebaseApp, database } from "../../firebase/firebase";
 
 /* Outside Components */
@@ -57,8 +57,23 @@ const HomeFlashSet = props => {
         console.log("queryResult in HomeFlashSet = ", queryResult);
     }
 
-    const handleDeleteSet = () => {
+    /**
+     * Deletes this flash set.
+     * TODO: Make sure that the Home page re renders the flash sets after deletion
+     */
+    const handleDeleteSet = async () => {
+        const flashCollection = collection(database, "flashcards");
+        const queryResult = query(flashCollection, where("uid", "==", uid));
 
+        const querySnapshot = await getDocs(queryResult);
+
+        const setDoc = querySnapshot.docs[0];
+        if (setDoc) {
+            const setRef = setDoc.ref;
+            deleteDoc(setRef).then((result) => {
+                console.log("Result of deletion = ", result);
+            })
+        }
     }
 
     useEffect(() => {

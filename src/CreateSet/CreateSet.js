@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react"
 
 /* Firebase Operations */
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
-import { firebaseApp, database } from "../firebase/firebase";
+import { collection, addDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
+import { database } from "../firebase/firebase";
 
 /* Outside Components */
 import { useNavigate } from "react-router-dom";
@@ -77,6 +77,28 @@ const CreateSet = props => {
             });
     }
 
+    const createNewLabel = async () => {
+        /* Check database if this label already exists */
+        const { uid } = userAuthState;
+        const usersCollection = collection(database, "users");
+        const queryResult = query(usersCollection, where("uid", "==", uid));
+        const querySnapshot = await getDocs(queryResult);
+
+        const userDoc = querySnapshot.docs[0];
+        if (userDoc) {
+            const userData = userDoc.data();
+            const userRef = userDoc.ref;
+            /* Add label if it doesn't already exist for current user 
+                TODO: Test if this works
+            */
+            if (!userData.labels.includes(enteredLabel)) {
+                updateDoc(userRef, {
+                    labels: [...userData.labels].push(enteredLabel)
+                });
+            }
+        }
+    }
+
     /* Check that length of createdCardObjects is not 0 */
     const createNewSet = async () => {
         let createdCardObjects = [...createdSetCards];
@@ -96,10 +118,15 @@ const CreateSet = props => {
                 label,
                 cards: createdCardObjects
             });
+
+            if (label) {
+                createNewLabel();
+            }
+
             console.log("Successfully created new flash set");
 
             setShowAlert(true);
-            setAlertType("error");
+            setAlertType(C.SUCCESS);
             setTimeout(() => {
                 setShowAlert(false);
                 navigate("/");
@@ -263,7 +290,7 @@ const CreateSet = props => {
                     <AlertTitle>
                         <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
                     </AlertTitle>
-                    {alertType === C.SUCCESS ? "Successfully logged in!" : "Could not login, check email and password"}
+                    {alertType === C.SUCCESS ? "Set successfully created!" : "Could not create set"}
                 </Alert>
             }
         </>

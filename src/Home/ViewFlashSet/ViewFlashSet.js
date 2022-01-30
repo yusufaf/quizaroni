@@ -44,7 +44,7 @@ const ViewFlashSet = props => {
                     <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
                         download
                     </i>
-                    Downloadog
+                    Download
                 </span>
 
                 <span className="material-icons-outlined">
@@ -54,6 +54,19 @@ const ViewFlashSet = props => {
                 </span>
             </div>
         )
+    }
+
+     /**
+     * Render the JSX for all the flash sets
+     */
+      const renderSetCards = () => {
+       console.log("selectedFlashSet in renderSetCards = ", selectedFlashSet);
+       const {cards} = selectedFlashSet;
+
+        return cards.map((card, index) => {
+           console.log("card = ", card);
+           
+        })
     }
 
     return (
@@ -68,6 +81,7 @@ const ViewFlashSet = props => {
                 Back to Your Flashsets
             </span>
             {renderActionBar()}
+            {renderSetCards()}
         </>
     )
 }

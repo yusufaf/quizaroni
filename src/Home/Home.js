@@ -133,7 +133,7 @@ const Home = props => {
     }
 
     /**
-     * Renders the the flashsets for the "Your Flashsets" page
+     * Renders the flashsets for the "Your Flashsets" page
      */
     const renderFlashSets = () => {
         let localFlashSets = [...flashSets];
@@ -153,7 +153,6 @@ const Home = props => {
                 <LoginMessage page="home" />
                 :
                 <div className={homeStyles.flashSets} style={{ color: theme.foreground, background: theme.background }}>
-                    {console.log("selectedFlashSet = ", selectedFlashSet)}
                     {/* ViewFlashset rendered right here? */}
                     {viewFlashSet && Object.keys(selectedFlashSet).length !== 0 ?
                         <ViewFlashSet {...viewSetProps} />
@@ -165,6 +164,7 @@ const Home = props => {
                                 </div>
                                 {renderSearchBar()}
                                 {renderHeader()}
+                                {/* TODO: Review */}
                                 {!viewFlashSet && flashSets?.length > 0 &&
                                     (
                                         <>
