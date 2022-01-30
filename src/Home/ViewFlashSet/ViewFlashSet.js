@@ -44,7 +44,7 @@ const ViewFlashSet = props => {
                     <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
                         download
                     </i>
-                    Download
+                    Downloadog
                 </span>
 
                 <span className="material-icons-outlined">

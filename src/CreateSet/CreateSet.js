@@ -80,11 +80,8 @@ const CreateSet = props => {
     /* Check that length of createdCardObjects is not 0 */
     const createNewSet = async () => {
         let createdCardObjects = [...createdSetCards];
-
-        /* trim() on each input to ensure that there's some content */
         let allCardsHaveContent = createdCardObjects.every((card) => card.term.trim() && card.definition.trim());
 
-        /* Label as optional, not required */
         if (enteredTitle.trim() && enteredDescription.trim() && allCardsHaveContent) {
             const creationDate = new Date().toLocaleDateString();
             const label = enteredLabel || "";
@@ -105,7 +102,6 @@ const CreateSet = props => {
             setAlertType("error");
             setTimeout(() => {
                 setShowAlert(false);
-                // Redirect user to their home page after
                 navigate("/");
             }, 1000);
         }
