@@ -116,3 +116,8 @@
   font-size: 2rem;
   cursor: pointer;
 }
+
+.clickIconSmall {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
