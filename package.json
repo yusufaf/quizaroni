@@ -31,7 +31,7 @@
     "eject": "react-scripts eject",
     "deploy": "npx firebase deploy",
     "start": "parcel public/index.html",
-    "build": "parcel build public/index.html"
+    "build": "parcel build public/index.html --dist-dir build"
   },
   "eslintConfig": {
     "extends": [
