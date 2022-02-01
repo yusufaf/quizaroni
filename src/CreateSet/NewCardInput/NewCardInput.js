@@ -42,7 +42,7 @@ const NewCardInput = props => {
             key={index}
             style={{ color: theme.foreground, background: theme.background }}
         >
-            <div className={createSetStyles.newCardHeader}>
+            <div>
                 <span><b>Card {index + 1}</b></span>
                 <Tooltip
                     title="Delete this card"
