@@ -7,6 +7,7 @@
     "@emotion/styled": "^11.6.0",
     "@mui/icons-material": "^5.2.1",
     "@mui/material": "^5.2.3",
+    "@parcel/transformer-image": "^2.2.1",
     "@reduxjs/toolkit": "^1.7.0",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^11.2.7",
@@ -26,11 +27,11 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "npx firebase deploy"
+    "deploy": "npx firebase deploy",
+    "start": "parcel public/index.html",
+    "build": "parcel build public/index.html"
   },
   "eslintConfig": {
     "extends": [
@@ -49,5 +50,14 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@parcel/config-default": "^2.2.1",
+    "@parcel/packager-raw-url": "^2.2.1",
+    "@parcel/transformer-raw": "^2.2.1",
+    "@parcel/transformer-webmanifest": "^2.2.1",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "parcel": "latest"
   }
 }
