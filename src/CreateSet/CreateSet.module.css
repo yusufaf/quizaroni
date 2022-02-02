@@ -110,13 +110,6 @@
     pointer-events: none;
 }
 
-.uploadImage {
-    position: absolute;
-    right   : 1rem;
-    top     : 4.5rem;
-    cursor  : pointer;
-}
-
 .newCard {
     position     : relative;
     width        : 70rem;
@@ -208,4 +201,26 @@
 .colorPicker {
     position: absolute;
     bottom: 2.5rem;
+}
+
+.deleteCard, .uploadImage {
+    position: absolute;
+    cursor  : pointer;
+    right   : 1rem;
+}
+
+.deleteCard {
+    top: 1.5rem;
+}
+
+.deleteCard:hover {
+    color: rgb(206, 41, 41);
+}
+
+.uploadImage {
+    top     : 4.5rem;
+}
+
+.uploadImage:hover {
+    color: blue;
 }

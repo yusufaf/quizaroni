@@ -104,14 +104,6 @@
   background: rgb(39, 38, 38);
 }
 
-.deleteCard {
-  position: absolute;
-  right   : 1rem;
-  top     : 1.5rem;
-}
-
-
-
 .clickIcon {
   font-size: 2rem;
   cursor: pointer;
