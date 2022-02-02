@@ -46,37 +46,37 @@ const NewCardInput = props => {
                 <span><b>Card {index + 1}</b></span>
                 <Tooltip
                     title="Delete this card"
-                    placement="bottom"
+                    placement="right"
                     arrow={true}
                 >
-                    <span className={appStyles.deleteCard} onClick={() => handleDelete(index)}>
-                        <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
+                    <span className={createSetStyles.deleteCard} onClick={() => handleDelete(index)}>
+                        <i className={`material-icons-outlined  ${appStyles.clickIcon}`}>
                             delete
                         </i>
                     </span>
                 </Tooltip>
+                {/* Upload file container */}
+                <input
+                    type="file"
+                    id="fileInput"
+                    ref={fileInputRef}
+                    accept=".png, .jpg"
+                    onChange={e => onFileChange(e, index)}
+                    style={{ display: "none" }}
+                />
                 <Tooltip
                     title="Upload an image"
-                    placement="bottom"
+                    placement="right"
                     arrow={true}
                 >
-                    {/* Upload file container */}
-                    <div className={createSetStyles.uploadImage}>
-                        <input
-                            type="file"
-                            id="fileInput"
-                            ref={fileInputRef}
-                            accept=".png, .jpg"
-                            onChange={e => onFileChange(e, index)}
-                            style={{ display: "none" }}
-                        />
+                    <span className={createSetStyles.uploadImage}>
                         <i
-                            className={`material-icons-outlined ${appStyles.clickIcon}`}
+                            className={`material-icons-outlined  ${appStyles.clickIcon}`}
                             onClick={() => fileInputRef.current.click()}
                         >
                             image
                         </i>
-                    </div>
+                    </span>
                 </Tooltip>
             </div>
             <div className={createSetStyles.newCardInputs}>
@@ -114,7 +114,7 @@ const NewCardInput = props => {
                     />
                 </div>
             </div>
-        </div>
+        </div >
     )
 }
 
