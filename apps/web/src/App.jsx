@@ -20,7 +20,7 @@ import * as appStyles from "./App.module.css";
 
 import { handleDesktopZoom } from "./utilities/handleDesktopZoom";
 
-const App = () => {
+function App() {
   // Wrap component tree with redux store and the theme context
 
   /* TODO: Bring the auth state into a Redux slice / reducer */
