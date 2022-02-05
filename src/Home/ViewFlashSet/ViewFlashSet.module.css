@@ -1,11 +1,49 @@
-.actionBar {
+.actionBar {}
 
+.cardCount {
+    position: absolute;
+    font-size: 1.25rem;
+    background-color: red;
+    top: 13rem;
 }
 
+.viewPage {
+    display       : flex;
+    flex-direction: column;
+    justify-content: center;
+    gap           : 2rem;
+}
+
+.viewContainer {
+    position     : absolute;
+    height       : 10rem;
+    width        : 70rem;
+    left         : 20rem;
+    top          : 7.5rem;
+    padding      : 1.25rem;
+    border-radius: 0.75rem;
+    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+
 .backButton {
-    display: flex;
+    display    : flex;
     align-items: center;
-    
-    position: absolute;
-    top: 0;
+    position   : absolute;
+    top        : 0;
+}
+
+.firstCard {
+    margin-top: 10rem;
+}
+
+.viewFlashCard {
+    position     : relative;
+    width        : 70rem;
+    right        : 1.5rem;
+    padding      : 1.25rem;
+    border-radius: 0.75rem;
+    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
+
+    margin-bottom: 2.5rem;
 }

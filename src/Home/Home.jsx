@@ -138,8 +138,9 @@ const Home = props => {
     const renderFlashSets = () => {
         let localFlashSets = [...flashSets];
 
-        return localFlashSets.map((flashSet) => {
+        return localFlashSets.map((flashSet, index) => {
             return <HomeFlashSet
+                key={index}
                 flashSet={flashSet}
                 {...homeSetProps}
             />
@@ -152,13 +153,13 @@ const Home = props => {
             {!userAuthState ?
                 <LoginMessage page="home" />
                 :
-                <div className={homeStyles.flashSets} style={{ color: theme.foreground, background: theme.background }}>
+                <>
                     {/* ViewFlashset rendered right here? */}
                     {viewFlashSet && Object.keys(selectedFlashSet).length !== 0 ?
                         <ViewFlashSet {...viewSetProps} />
                         :
                         (
-                            <>
+                            <div className={homeStyles.flashSets} style={{ color: theme.foreground, background: theme.background }}>
                                 <div className={appStyles.title}>
                                     Your Flashsets
                                 </div>
@@ -168,18 +169,16 @@ const Home = props => {
                                 {!viewFlashSet && flashSets?.length > 0 &&
                                     (
                                         <>
-
                                             {renderFlashSets()}
                                         </>
                                     )
                                 }
-                            </>
+                            </div>
                         )
                     }
-
                     {/* Message if no flash sets have bene created */}
                     {/* flashSets.length === 0 */}
-                </div>
+                </>
             }
         </>
     );
