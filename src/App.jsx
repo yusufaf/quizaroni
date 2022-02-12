@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { Provider } from "react-redux";
 import { Routes, Route } from "react-router-dom";
