@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { Alert, AlertTitle } from '@mui/material/';
 import { useTheme } from "../theme/useTheme";

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ThemeContext, themes } from "./ThemeContext";
 
 // Abstract into a custom provider component  
