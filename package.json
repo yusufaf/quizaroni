@@ -1,16 +1,16 @@
 {
   "name": "quizaroni",
-  "version": "0.1.0",
   "private": true,
+  "version": "0.0.0",
+    "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
   "dependencies": {
-    "@emotion/react": "^11.7.1",
-    "@emotion/styled": "^11.6.0",
     "@mui/icons-material": "^5.2.1",
     "@mui/material": "^5.2.3",
     "@reduxjs/toolkit": "^1.7.0",
-    "@testing-library/jest-dom": "^5.16.1",
-    "@testing-library/react": "^11.2.7",
-    "@testing-library/user-event": "^12.8.3",
     "babel-preset-react": "^6.24.1",
     "firebase": "^9.6.4",
     "firebase-admin": "^10.0.1",
@@ -18,44 +18,14 @@
     "firebaseui": "^6.0.0",
     "mongodb": "^4.3.1",
     "react": "^17.0.2",
-    "react-color": "^2.19.3",
     "react-dom": "^17.0.2",
+    "react-color": "^2.19.3",
     "react-firebaseui": "^6.0.0",
     "react-redux": "^7.2.6",
-    "react-router-dom": "^6.0.2",
-    "react-scripts": "^4.0.3",
-    "styled-components": "^5.3.3",
-    "vite": "^2.7.13",
-    "web-vitals": "^1.1.2"
-  },
-  "scripts": {
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "deploy": "npx firebase deploy",
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "react-router-dom": "^6.0.2"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^1.1.4",
-    "vite": "^2.7.2"
+    "@vitejs/plugin-react": "^1.0.7",
+    "vite": "^2.8.0"
   }
 }

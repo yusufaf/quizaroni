@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 import { NavLink, Link } from "react-router-dom";
 import { Alert, AlertTitle } from '@mui/material/';
 import { getAuth, signOut } from "firebase/auth";

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useTheme } from "../theme/useTheme";
 
 import macaroniDance from "../resources/images/macaroni_dance.gif";
