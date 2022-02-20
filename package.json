@@ -2,12 +2,13 @@
   "name": "quizaroni",
   "private": true,
   "version": "0.0.0",
-    "scripts": {
+  "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.2.1",
     "@mui/material": "^5.2.3",
     "@reduxjs/toolkit": "^1.7.0",
@@ -18,8 +19,8 @@
     "firebaseui": "^6.0.0",
     "mongodb": "^4.3.1",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2",
     "react-color": "^2.19.3",
+    "react-dom": "^17.0.2",
     "react-firebaseui": "^6.0.0",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.0.2"
