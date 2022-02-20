@@ -51,10 +51,14 @@ const HomeFlashSet = props => {
 
     /* Flipping state */
     const handleFavoriteSet = () => {
+        console.log("In handleFavoriteSet");
+
         /* Update the set to be favorited in DB */
         const flashCollection = collection(database, "flashcards");
         const queryResult = query(flashCollection, where("uid", "==", uid));
         console.log("queryResult in HomeFlashSet = ", queryResult);
+
+        
     }
 
     /**
@@ -97,7 +101,9 @@ const HomeFlashSet = props => {
                         placement="right"
                         arrow={true}
                     >
-                        <span className={homeFlashStyles.favoriteCard}>
+                        <span className={homeFlashStyles.favoriteCard}
+                            onClick={() => handleFavoriteSet()}
+                        >
                             <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
                                 star_outline
                             </i>
