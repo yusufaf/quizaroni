@@ -31,7 +31,7 @@ const CreateSet = props => {
     const [createSetEnabled, setCreateSetEnabled] = useState(false);
     const [createdSetCards, setCreatedSetCards] = useState([{ term: "", definition: "" }]);
 
-    let labels = [];
+    const [labelOptions, setLabelOptions] = useState([]);
 
     // Store a reference to the HTML file <input>
     const fileInputRef = useRef(null);
@@ -45,6 +45,10 @@ const CreateSet = props => {
         titleInput: false,
         descInput: false
     })
+
+    useEffect(() => {
+        renderLabelOptions();
+    }, []);
 
     const retrieveLabels = async () => {
         if (userAuthState) {
@@ -64,13 +68,15 @@ const CreateSet = props => {
 
     const renderLabelOptions = () => {
         const labelsResult = retrieveLabels();
+        console.log("labelsResult = ", labelsResult);
 
         labelsResult.then(labels => {
-            return labels.map((label, index) => {
+            const labelsMap = labels.map((label, index) => {
                 return <option key={index} value={label}>
                     {label}
                 </option>
             });
+            setLabelOptions(labelsMap);
         })
             .catch((error) => {
                 console.log("Error caught");
@@ -212,10 +218,6 @@ const CreateSet = props => {
         })
     }
 
-    useEffect(() => {
-        console.log("renderLabelOptions = ", renderLabelOptions());
-    }, [userAuthState])
-
     return (
         <>
             {!userAuthState ?
@@ -251,7 +253,7 @@ const CreateSet = props => {
                                     />
                                     <span>or select an existing one</span>
                                     <select className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}>
-                                        {renderLabelOptions()}
+                                        {labelOptions}
                                     </select>
                                 </div>
                             </div>

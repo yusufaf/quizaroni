@@ -6,7 +6,7 @@
 
 .createContainer {
     position     : absolute;
-    height       : 20rem;
+    height       : fit-content;
     width        : 70rem;
     left         : 20rem;
     top          : 7.5rem;
@@ -67,7 +67,7 @@
 
 .labelDropdown {
     margin-left: 0.5rem;
-    width      : 5rem;
+    width      : fit-content;
     outline    : none;
 }
 

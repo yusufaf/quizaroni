@@ -89,12 +89,19 @@ const NewCardInput = props => {
                     />
                 </div>
                 <div className={createSetStyles.cardActions}>
-                    <span className={`material-icons-round ${createSetStyles.colorPickerIcon}`}
-                        onClick={() => setShowColorPicker(!showColorPicker)}
+                    <Tooltip
+                        title="Change card text color"
+                        placement="bottom"
+                        arrow={true}
                     >
-                        format_color_text
-                    </span>
+                        <span className={`material-icons-round ${createSetStyles.colorPickerIcon}`}
+                            onClick={() => setShowColorPicker(!showColorPicker)}
+                        >
+                            format_color_text
+                        </span>
+                    </Tooltip>
                     {showColorPicker &&
+
                         <ChromePicker
                             className={`${createSetStyles.colorPicker}`}
                             color={localColor}
