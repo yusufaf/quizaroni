@@ -6,7 +6,7 @@ import { firebaseApp, database } from "../../firebase/firebase";
 
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Tooltip } from '@mui/material/';
+import { Alert, AlertTitle, FormControlLabel, Switch, Tooltip } from '@mui/material/';
 
 import ViewFlashCard from "./ViewFlashCard";
 
@@ -29,6 +29,7 @@ const ViewFlashSet = props => {
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     const [showReminderModal, setShowReminderModal] = useState(false);
+    const [disableTextColor, setDisableTextColor] = useState(false);
 
     const handleDownloadSet = () => {
 
@@ -54,6 +55,27 @@ const ViewFlashSet = props => {
                         email
                     </i>
                 </span>
+
+                <span>
+                    <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
+                        download
+                    </i>
+                    Download
+                </span>
+                <span>
+                    <FormControlLabel control={
+                        <Switch
+                            size="small"
+                            checked={disableTextColor}
+                            onChange={() => {
+                                console.log("setting to ", !disableTextColor);
+                                setDisableTextColor(!disableTextColor)
+                            }}
+                        />
+                    } label="Disable Text Color"
+                    />
+                </span>
+
             </div>
         )
     }
@@ -66,7 +88,12 @@ const ViewFlashSet = props => {
         const { cards } = selectedFlashSet;
 
         return cards.map((card, index) => {
-            return <ViewFlashCard key={index} cardInfo={card} index={index} />
+            return <ViewFlashCard
+                key={index}
+                cardInfo={card}
+                index={index}
+                disableTextColor={disableTextColor}
+            />
         })
     }
 

@@ -6,11 +6,11 @@ import * as viewFlashStyles from './ViewFlashSet.module.css';
 import * as appStyles from "../../App.module.css";
 
 const ViewFlashCard = props => {
-    const { cardInfo, index } = props;
+    const { cardInfo, disableTextColor, index } = props;
     const { isDarkMode, theme } = useTheme();
 
 
-    console.log("cardInfo in ", cardInfo);
+    console.log("disableTextColor in ", disableTextColor);
 
     return (
         <div className={`${viewFlashStyles.viewFlashCard} ${index === 0 ? viewFlashStyles.firstCard : ""}`}
@@ -21,13 +21,13 @@ const ViewFlashCard = props => {
             <div className={viewFlashStyles.viewCardContainer}>
                 <div className={viewFlashStyles.viewCardTerm}>
                     <label className={appStyles.inputLabel}>Term</label>
-                    <span style={{ color: `${cardInfo?.textColor && cardInfo.textColor}` }}>
+                    <span style={{ color: `${cardInfo?.textColor && !disableTextColor ? cardInfo.textColor : ""}` }}>
                         {cardInfo.term}
                     </span>
                 </div>
                 <div className={viewFlashStyles.viewCardDefinition}>
                     <label className={appStyles.inputLabel}>Definition</label>
-                    <span style={{ color: `${cardInfo?.textColor && cardInfo.textColor}` }}>
+                    <span style={{ color: `${cardInfo?.textColor && !disableTextColor ? cardInfo.textColor : ""}` }}>
                         {cardInfo.definition}
                     </span>
                 </div>
