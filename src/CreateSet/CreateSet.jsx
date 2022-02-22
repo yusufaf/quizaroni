@@ -71,12 +71,19 @@ const CreateSet = props => {
         console.log("labelsResult = ", labelsResult);
 
         labelsResult.then(labels => {
-            const labelsMap = labels.map((label, index) => {
+            let blankOption = [
+                <option key={"blank"} />
+            ];
+
+            let labelsArray = labels.map((label, index) => {
                 return <option key={index} value={label}>
                     {label}
                 </option>
             });
-            setLabelOptions(labelsMap);
+
+            const combined = [...blankOption, labelsArray];
+
+            setLabelOptions(combined);
         })
             .catch((error) => {
                 console.log("Error caught");
@@ -265,6 +272,12 @@ const CreateSet = props => {
                             >
                                 Create Set
                             </button>
+                            <span>
+
+                            </span>
+                            <i className={`material-icons-outlined ${createSetStyles.import}`}>
+                                upload_file
+                            </i>
                         </div>
                         {/* Individual Card Inputs */}
                         {renderCreateCards()}

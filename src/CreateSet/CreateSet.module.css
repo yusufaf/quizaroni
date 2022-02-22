@@ -224,3 +224,9 @@
 .uploadImage:hover {
     color: blue;
 }
+
+.import {
+    position: absolute;
+    right     : 5rem;
+    top       : 10rem;
+}
