@@ -55,13 +55,7 @@ const ViewFlashSet = props => {
                         email
                     </i>
                 </span>
-
-                <span>
-                    <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
-                        download
-                    </i>
-                    Download
-                </span>
+                <br></br>
                 <span>
                     <FormControlLabel control={
                         <Switch
