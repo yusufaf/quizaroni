@@ -14,6 +14,8 @@ import LoginMessage from "../LoginMessage/LoginMessage";
 import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
 import ViewFlashSet from "./ViewFlashSet/ViewFlashSet";
 
+import { FLASHSET_COLUMNS } from "../utilities/constants";
+
 /* Styling */
 import { useTheme } from "../theme/useTheme";
 import * as homeStyles from './Home.module.css';
@@ -145,6 +147,17 @@ const Home = props => {
                 {...homeSetProps}
             />
         })
+    }
+
+    const filterFlashsets = (column) => {
+        switch (column) {
+            case "Title":
+
+                break;
+
+            default:
+                break;
+        }
     }
 
 

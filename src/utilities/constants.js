@@ -19,3 +19,10 @@ export const LOGIN_MESSAGES = {
     "profile": "Please login to view your profile!",
     "home": "Please login to view your created flash cards!"
 }
+
+export const FLASHSET_COLUMNS = {
+    TITLE: "Title",
+    DESCRIPTION: "Description", 
+    CREATED: "Created on",
+    LABEL: "Label"
+}

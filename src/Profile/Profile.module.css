@@ -120,3 +120,34 @@
     width: 100%;
     margin-top: 2rem;
 }
+
+.changeUsernameContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+}
+
+.changeUsername {
+    height    : 2.5rem;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+
+    font-size    : 1rem;
+    font-weight  : bold;
+    border-radius: 0.75rem;
+    border       : none;
+    outline      : none;
+
+    display        : flex;
+    align-items    : center;
+    justify-content: center;
+    cursor         : pointer;
+
+    background: orange;
+}
+
+.changeUsername:hover {
+    background: rgb(253, 187, 63);
+    transition: 0.2s ease
+}

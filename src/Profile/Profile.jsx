@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { database } from "../firebase/firebase";
-import { doc, deleteDoc, updateDoc, query, where, collection, getDoc, getDocs, limit} from "firebase/firestore";
+import { doc, deleteDoc, updateDoc, query, where, collection, getDoc, getDocs, limit } from "firebase/firestore";
 import { getAuth, deleteUser } from "firebase/auth";
 import { Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
@@ -19,6 +19,7 @@ const Profile = props => {
 
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [enteredPass, setEnteredPass] = useState("");
+    const [enteredNewUsername, setEnteredNewUsername] = useState("");
 
     // Store a property for each user of the theme
     const [defaultTheme, setDefaultTheme] = useState(userAuthState?.bruh ?? "dark");
@@ -64,6 +65,13 @@ const Profile = props => {
         });
     }
 
+    /**
+     * 
+     */
+    const handleChangeUsername = () => {
+
+    }
+
     return (
         <>
             {!userAuthState ?
@@ -102,9 +110,21 @@ const Profile = props => {
                             </span>
                             <div className={appStyles.smallTitle}>Change Username</div>
                         </div>
-                        <input
-                            className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
-                        />
+                        <div className={profileStyles.changeUsernameContainer}>
+                            <input
+                                className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
+                                onChange={(e) => setEnteredNewUsername(e.target.value)}
+                            />
+                            <button
+                                tabIndex="0"
+                                className={profileStyles.changeUsername}
+                                onClick={() => createNewSet()}
+                                disabled={enteredNewUsername === ""}
+                            >
+                                Submit
+                            </button>
+                        </div>
+
                         <div className={profileStyles.heading}>
                             <span className="material-icons-outlined">
                                 remove_circle
