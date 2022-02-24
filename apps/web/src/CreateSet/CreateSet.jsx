@@ -275,7 +275,9 @@ const CreateSet = props => {
                             <span>
 
                             </span>
-                            <i className={`material-icons-outlined ${createSetStyles.import}`}>
+                            <i className={`material-icons-outlined ${createSetStyles.import}`}
+                                onClick={() => alert("hi")}
+                            >
                                 upload_file
                             </i>
                         </div>
