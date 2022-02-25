@@ -151,3 +151,9 @@
     background: rgb(253, 187, 63);
     transition: 0.2s ease
 }
+
+.changeInputs {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}

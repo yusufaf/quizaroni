@@ -160,6 +160,9 @@ const Home = props => {
         }
     }
 
+    /*  TODO:
+    - Add "Last Viewed" property to flashsets + table 
+    */
 
     return (
         <>
