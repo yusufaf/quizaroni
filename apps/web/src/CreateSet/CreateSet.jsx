@@ -27,7 +27,8 @@ const CreateSet = props => {
     const [enteredTitle, setEnteredTitle] = useState("");
     const [enteredDescription, setEnteredDescription] = useState("");
     const [enteredLabel, setEnteredLabel] = useState("");
-
+    const [selectedLabel, setSelectedLabel] = useState("");
+    
     const [createSetEnabled, setCreateSetEnabled] = useState(false);
     const [createdSetCards, setCreatedSetCards] = useState([{ term: "", definition: "" }]);
 
@@ -259,7 +260,10 @@ const CreateSet = props => {
                                         onChange={e => setEnteredLabel(e.target.value)}
                                     />
                                     <span>or select an existing one</span>
-                                    <select className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}>
+                                    <select
+                                        className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
+                                        onChange={(e) => setSelectedLabel(e.target.value)}
+                                    >
                                         {labelOptions}
                                     </select>
                                 </div>

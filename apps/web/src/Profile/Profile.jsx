@@ -19,7 +19,10 @@ const Profile = props => {
 
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [enteredPass, setEnteredPass] = useState("");
+
     const [enteredNewUsername, setEnteredNewUsername] = useState("");
+    const [enteredNewPassword, setEnteredNewPassword] = useState("");
+    const [enteredConfirmPassword, setEnteredConfirmPassword] = useState("");
 
     // Store a property for each user of the theme
     const [defaultTheme, setDefaultTheme] = useState(userAuthState?.bruh ?? "dark");
@@ -113,8 +116,41 @@ const Profile = props => {
                         <div className={profileStyles.changeUsernameContainer}>
                             <input
                                 className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
+                                placeholder="Enter new username"
                                 onChange={(e) => setEnteredNewUsername(e.target.value)}
                             />
+                            <button
+                                tabIndex="0"
+                                className={profileStyles.changeUsername}
+                                onClick={() => createNewSet()}
+                                disabled={enteredNewUsername === ""}
+                            >
+                                Submit
+                            </button>
+                        </div>
+
+
+                        <div className={profileStyles.heading}>
+                            <span class="material-icons-outlined">
+                                password
+                            </span>
+                            <div className={appStyles.smallTitle}>Change Password</div>
+                        </div>
+
+                        <div className={profileStyles.changeUsernameContainer}>
+                            <div className={profileStyles.changeInputs}>
+                                <input
+                                    className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
+                                    placeholder="Enter new password"
+                                // onChange={(e) => setEnteredNewUsername(e.target.value)}
+                                />
+                                <input
+                                    className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
+                                    placeholder="Enter new password"
+                                // onChange={(e) => setEnteredNewUsername(e.target.value)}
+                                />
+                            </div>
+
                             <button
                                 tabIndex="0"
                                 className={profileStyles.changeUsername}
