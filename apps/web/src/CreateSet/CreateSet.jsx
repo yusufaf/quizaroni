@@ -120,6 +120,7 @@ const CreateSet = props => {
 
         if (enteredTitle.trim() && enteredDescription.trim() && allCardsHaveContent) {
             const creationDate = new Date().toLocaleDateString();
+            const lastViewedDate = new Date().toLocaleDateString();
             const label = enteredLabel || "";
             const uid = userAuthState.uid;
 
@@ -129,6 +130,7 @@ const CreateSet = props => {
                 description: enteredDescription,
                 uid,
                 creationDate,
+                lastViewed: lastViewedDate,
                 label,
                 cards: createdCardObjects
             });
@@ -258,11 +260,14 @@ const CreateSet = props => {
                                         className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
                                         placeholder="Enter a label for your new study set"
                                         onChange={e => setEnteredLabel(e.target.value)}
+                                        disabled={selectedLabel !== ""}
                                     />
                                     <span>or select an existing one</span>
                                     <select
-                                        className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
+                                        className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`
+                                    }
                                         onChange={(e) => setSelectedLabel(e.target.value)}
+                                        disabled={enteredLabel !== ""}
                                     >
                                         {labelOptions}
                                     </select>

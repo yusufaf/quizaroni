@@ -131,8 +131,8 @@
 
 .newCardInputs {
     display          : flex;
-    /* flex-direction: row; */
-    gap              : 8rem;
+    justify-content: space-between;
+    /* gap              : 8rem; */
     margin-top       : 0.5rem;
 }
 
@@ -195,18 +195,31 @@
 
 .cardActions {
     position: relative;
+    top: -1rem;
     display: flex;
+    flex-direction: column;
     align-items: center;
+    gap: 1rem;
 }
 
 .colorPickerIcon {
-    position: absolute;
     cursor: pointer;
 }
 
 .colorPicker {
     position: absolute;
     bottom: 2.5rem;
+}
+
+.colorPickerContainer {
+    position: absolute;
+}
+
+.colorClose {
+    position: relative;
+    bottom: 2.5rem;
+    cursor: pointer;
+    z-index: 100;
 }
 
 .deleteCard, .uploadImage {

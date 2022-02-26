@@ -6,7 +6,7 @@ import * as viewFlashStyles from './ViewFlashSet.module.css';
 import * as appStyles from "../../App.module.css";
 
 const ViewFlashCard = props => {
-    const { cardInfo, disableTextColor, index } = props;
+    const { cardInfo, disableTextColor, disableBackgroundColor, index } = props;
     const { isDarkMode, theme } = useTheme();
 
 

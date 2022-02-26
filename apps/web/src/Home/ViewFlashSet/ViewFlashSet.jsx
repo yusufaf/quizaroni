@@ -30,12 +30,16 @@ const ViewFlashSet = props => {
 
     const [showReminderModal, setShowReminderModal] = useState(false);
     const [disableTextColor, setDisableTextColor] = useState(false);
+    const [disableBackgroundColor, setDisableBackgroundColor] = useState(false);
 
+    /* TODO: Using a library like React-pdf? Otherwise just creating a text file w/ comma sep values */
     const handleDownloadSet = () => {
 
     }
 
-    /* Ideally: Displaying a modal where a checkbox whether you want a reminder to study this flashset */
+    /* TODO: Future future task.
+    Ideally: Displaying a modal where a checkbox whether you want a reminder to study this flashset 
+    */
     const handleEmailReminders = () => {
 
     }
@@ -55,6 +59,7 @@ const ViewFlashSet = props => {
                         email
                     </i>
                 </span>
+                {/* TODO: Replace these br tags with spacing in CSS */}
                 <br></br>
                 <span>
                     <FormControlLabel control={
@@ -67,6 +72,19 @@ const ViewFlashSet = props => {
                             }}
                         />
                     } label="Disable Text Color"
+                    />
+                </span>
+                <br></br>
+                <span>
+                    <FormControlLabel control={
+                        <Switch
+                            size="small"
+                            checked={disableBackgroundColor}
+                            onChange={() => {
+                                setDisableBackgroundColor(!disableBackgroundColor)
+                            }}
+                        />
+                    } label="Disable Background Color"
                     />
                 </span>
 
@@ -87,10 +105,12 @@ const ViewFlashSet = props => {
                 cardInfo={card}
                 index={index}
                 disableTextColor={disableTextColor}
+                disableBackgroundColor={disableBackgroundColor}
             />
         })
     }
-
+    
+    /* TODO: Fix the spacing between the ViewContainer and the (first) ViewCards */
     return (
         <div className={viewFlashStyles.viewPage}>
             <div className={viewFlashStyles.viewContainer}
