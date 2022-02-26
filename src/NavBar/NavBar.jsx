@@ -52,7 +52,7 @@ const NavBar = props => {
     }
 
     /*
-        TODO: Consolidate AlertJSX into a single function
+        TODO: Consolidate AlertJSX into a single function for all alerts??
     */
     const returnAlertJSX = () => {
         return (
@@ -84,7 +84,6 @@ const NavBar = props => {
                 localStorage.removeItem("userInfo");
             }
             setUserAuthState(null);
-
             displayLogoutAlert();
         }).catch((error) => {
             console.error("Something bad happened = ", error);
@@ -93,6 +92,7 @@ const NavBar = props => {
 
     const handleShowDropdown = () => {
         if (userAuthState) {
+            console.log("Show the dropdown")
             setShowDropdown(true);
         }
     }
@@ -141,6 +141,9 @@ const NavBar = props => {
                                     style={{ color: `${theme.foreground}` }}
                                     onClick={() => handleLogout()}
                                 >
+                                    <span class="material-icons-outlined">
+                                        logout
+                                    </span>
                                     Logout
                                 </div>
                             }
@@ -150,6 +153,9 @@ const NavBar = props => {
                             className={navStyles.darkModeToggle}
                             style={{ color: isDarkMode ? "yellow" : "#121212", fontSize: "2rem" }}
                         />
+
+                        {/* TODO: Review the userAuthState conditional here */}
+
                         <div
                             className={navStyles.accountCircle}
                             onClick={() => handleShowDropdown()}
@@ -162,7 +168,6 @@ const NavBar = props => {
                             />
                         </div>
 
-                        {/* Account Options Dropdown */}
                         {showDropdown &&
                             <ProfileDropdown userAuthState={userAuthState} setShowDropdown={setShowDropdown} />
                         }

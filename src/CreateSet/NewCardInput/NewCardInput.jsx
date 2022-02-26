@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useRef } from "react"
 import { Tooltip } from '@mui/material/';
 import { useTheme } from "../../theme/useTheme";
 
@@ -12,9 +12,10 @@ const NewCardInput = props => {
     const { isDarkMode, theme } = useTheme();
 
     const colorPickerRef = useRef(null);
-    const [showColorPicker, setShowColorPicker] = useState(false);
-    // localColor is just for testing purposes, don't need this right?
-    const [localColor, setLocalColor] = useState("");
+    const [showTextColorPicker, setShowTextColorPicker] = useState(false);
+    const [showBackgroundColorPicker, setShowBackgroundColorPicker] = useState(false);
+    const [localTextColor, setLocalTextColor] = useState("");
+    const [localBackgroundColor, setLocalBackgroundColor] = useState("");
 
     // TODO: Clicking away from ColorPicker
     // useEffect(() => {
@@ -91,23 +92,53 @@ const NewCardInput = props => {
                 <div className={createSetStyles.cardActions}>
                     <Tooltip
                         title="Change card text color"
-                        placement="bottom"
+                        placement="top"
                         arrow={true}
                     >
                         <span className={`material-icons-round ${createSetStyles.colorPickerIcon}`}
-                            onClick={() => setShowColorPicker(!showColorPicker)}
+                            onClick={() => setShowTextColorPicker(!showTextColorPicker)}
+                            style={{ color: `${localTextColor ? localTextColor : ""}` }}
                         >
                             format_color_text
                         </span>
                     </Tooltip>
-                    {showColorPicker &&
+                    {showTextColorPicker &&
+                        <div className={createSetStyles.colorPickerContainer}>
+                            <div className={`material-icons-round ${createSetStyles.colorClose}`}
+                                style={{ color: theme.foreground, background: theme.background }}
+                            >
+                                close
+                            </div>
+                            <ChromePicker
+                                className={`${createSetStyles.colorPicker} ${createSetStyles.backgroundPicker}`}
+                                color={localTextColor}
+                                onChange={(e) => {
+                                    onColorChange(e, index);
+                                    setLocalTextColor(e.hex);
+                                }}
+                            />
+                        </div>
+                    }
 
+                    <Tooltip
+                        title="Change background color"
+                        placement="bottom"
+                        arrow={true}
+                    >
+                        <span className={`material-icons-round ${createSetStyles.colorPickerIcon}`}
+                            onClick={() => setShowBackgroundColorPicker(!showBackgroundColorPicker)}
+                            style={{ color: `${localBackgroundColor ? localBackgroundColor : ""}` }}
+                        >
+                            format_color_fill
+                        </span>
+                    </Tooltip>
+                    {showBackgroundColorPicker &&
                         <ChromePicker
                             className={`${createSetStyles.colorPicker}`}
-                            color={localColor}
+                            color={localBackgroundColor}
                             onChange={(e) => {
                                 onColorChange(e, index);
-                                setLocalColor(e.hex);
+                                setLocalBackgroundColor(e.hex);
                             }}
                         />
                     }
