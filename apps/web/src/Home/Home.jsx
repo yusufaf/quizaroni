@@ -33,6 +33,8 @@ const Home = props => {
     let originalFlashSets;
 
     const [flashSets, setFlashSets] = useState([]);
+    const [searchFilteredSets, setSearchFilteredSets] = useState([]);
+
     const [enteredSearch, setEnteredSearch] = useState("");
 
     const [viewFlashSet, setViewFlashSet] = useState(false);
@@ -68,13 +70,22 @@ const Home = props => {
     }, [userAuthState])
 
     useEffect(() => {
+        if (enteredSearch === "") {
+            console.log("originalFlashSets = ", originalFlashSets);
+            setFlashSets(originalFlashSets);
+        }
         let searchTerm = enteredSearch.toLowerCase();
+        console.log("searchTerm = ", searchTerm)
+        console.log("flashSets in Search useEffect = ", flashSets);
         let newFlashSets = flashSets.filter(flashSet => {
             let { title, description } = flashSet;
             title = title.toLowerCase();
             description = description.toLowerCase();
-            return title.includes(searchTerm) || description.toLowerCase().includes(searchTerm);
+            console.log("title.includes(searchTerm) || description.includes(searchTerm) = ", title.includes(searchTerm) || description.includes(searchTerm));
+            return title.includes(searchTerm) || description.includes(searchTerm);
         })
+
+        console.log("newFlashSets = ", newFlashSets);
 
         /* Display a message when the search didn't have any results? */
         newFlashSets.length === 0 ? setFlashSets(originalFlashSets) : setFlashSets(newFlashSets);
@@ -88,23 +99,23 @@ const Home = props => {
             const flashCollection = collection(database, "flashcards");
 
             const queryResult = query(flashCollection, where("uid", "==", uid));
-
             const querySnapshot = await getDocs(queryResult);
-            console.log("querySnapshot = ", querySnapshot);
 
             let localFlashSets = [];
 
             querySnapshot.forEach((doc) => {
-                /* What metadata do we need for the documents in the flashcards collection? */
                 const flashSet = doc.data();
                 if (flashSet.cards) {
-                    console.log("FlashSet found in database = ", flashSet);
                     localFlashSets.push(flashSet);
                 }
             });
             originalFlashSets = localFlashSets;
             setFlashSets(localFlashSets);
         }
+    }
+
+    const handleFavoriteFilter = () => {
+
     }
 
     /* Render the search bar for the "Your Flashsets" page */
@@ -130,6 +141,15 @@ const Home = props => {
                 <span>Description</span>
                 <span>Created on</span>
                 <span style={{ marginRight: "7rem" }}>Label</span>
+                {/* TODO: Favorited filter */}
+                <span className={homeStyles.favoriteFilter}>
+                    <input
+                        id="favorite"
+                        type="checkbox"
+                        onChange={() => handleFavoriteFilter()}
+                    />
+                    <label for="favorite" style={{marginBottom: "0.3rem"}}>{'\u2605'}</label>
+                </span>
             </div>
         )
     }

@@ -9,19 +9,20 @@ const ViewFlashCard = props => {
     const { cardInfo, disableTextColor, disableBackgroundColor, index } = props;
     const { isDarkMode, theme } = useTheme();
 
-
-    console.log("disableTextColor in ", disableTextColor);
-
     return (
         <div className={`${viewFlashStyles.viewFlashCard} ${index === 0 ? viewFlashStyles.firstCard : ""}`}
             key={index}
-            style={{ color: theme.foreground, background: theme.background }}
+            style={{
+                color: theme.foreground, backgroundColor: `${cardInfo?.backgroundColor && !disableBackgroundColor ? cardInfo.backgroundColor : theme.background}`
+            }}
         >
             <span><b>Card {index + 1}</b></span>
             <div className={viewFlashStyles.viewCardContainer}>
                 <div className={viewFlashStyles.viewCardTerm}>
                     <label className={appStyles.inputLabel}>Term</label>
-                    <span style={{ color: `${cardInfo?.textColor && !disableTextColor ? cardInfo.textColor : ""}` }}>
+                    <span style={{
+                        color: `${cardInfo?.textColor && !disableTextColor ? cardInfo.textColor : ""}`,
+                    }}>
                         {cardInfo.term}
                     </span>
                 </div>

@@ -90,12 +90,12 @@ const NavBar = props => {
         });
     }
 
-    const handleShowDropdown = () => {
-        if (userAuthState) {
-            console.log("Show the dropdown")
-            setShowDropdown(true);
-        }
-    }
+    // const handleShowDropdown = () => {
+    //     if (userAuthState) {
+    //         console.log("Show the dropdown")
+    //         setShowDropdown(true);
+    //     }
+    // }
 
     return (
         <>
@@ -158,7 +158,7 @@ const NavBar = props => {
 
                         <div
                             className={navStyles.accountCircle}
-                            onClick={() => handleShowDropdown()}
+                            onClick={() => setShowDropdown(true)}
                         >
                             <AccountCircle
                                 style={{ fontSize: "2rem" }}

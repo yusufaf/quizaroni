@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 
 /* Firebase Operations */
 
-import { collection, deleteDoc, query, where, getDocs } from "firebase/firestore";
+import { collection, deleteDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
 import { firebaseApp, database } from "../../firebase/firebase";
 
 /* Outside Components */
@@ -26,7 +26,6 @@ import * as homeFlashStyles from './HomeFlashSet.module.css';
 import * as appStyles from "../../App.module.css";
 
 const HomeFlashSet = props => {
-    console.log("props in HomeFlashSet = ", props);
     const { userAuthState, setSelectedFlashSet, setViewFlashSet, flashSet } = props;
     const {
         cards,
@@ -34,12 +33,34 @@ const HomeFlashSet = props => {
         title,
         description,
         label,
+        setID,
         uid
-    } = props.flashSet;
-    const { isDarkMode, toggleDarkMode, theme } = useTheme();
+    } = flashSet;
+    const { isDarkMode, theme } = useTheme();
 
-    // TODO: Possibly move this up to parent component, might not matter too much
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    const [isFavorited, setIsFavorited] = useState(false);
+
+
+    useEffect(() => {
+        checkIfFavorited();
+    }, [])
+
+    const checkIfFavorited = async () => {
+        const flashCollection = collection(database, "flashcards");
+        const queryResult = query(flashCollection,
+            where("setID", "==", setID)
+        );
+
+        const docSnap = await getDocs(queryResult);
+        const userDoc = docSnap.docs[0];
+
+        if (userDoc) {
+            const { favorited } = userDoc.data();
+            setIsFavorited(favorited);
+        }
+    }
+
 
     const handleViewFlashset = e => {
         let target = e.target;
@@ -50,15 +71,23 @@ const HomeFlashSet = props => {
     }
 
     /* Flipping state */
-    const handleFavoriteSet = () => {
-        console.log("In handleFavoriteSet");
-
+    const handleFavoriteSet = async (setID) => {
         /* Update the set to be favorited in DB */
         const flashCollection = collection(database, "flashcards");
-        const queryResult = query(flashCollection, where("uid", "==", uid));
-        console.log("queryResult in HomeFlashSet = ", queryResult);
+        const queryResult = query(flashCollection,
+            where("setID", "==", setID)
+        );
 
-        
+        const docSnap = await getDocs(queryResult);
+        const userDoc = docSnap.docs[0];
+
+        setIsFavorited(!isFavorited);
+        if (userDoc) {
+            const userRef = userDoc.ref;
+            updateDoc(userRef, {
+                favorited: !isFavorited
+            });
+        }
     }
 
     /**
@@ -67,22 +96,20 @@ const HomeFlashSet = props => {
      */
     const handleDeleteSet = async () => {
         const flashCollection = collection(database, "flashcards");
-        const queryResult = query(flashCollection, where("uid", "==", uid));
+        const queryResult = query(flashCollection,
+            where("setID", "==", setID)
+        );
 
         const querySnapshot = await getDocs(queryResult);
-
         const setDoc = querySnapshot.docs[0];
         if (setDoc) {
             const setRef = setDoc.ref;
             deleteDoc(setRef).then((result) => {
-                console.log("Result of deletion = ", result);
+                setShowDeleteConfirmation(false);
             })
         }
     }
 
-    useEffect(() => {
-        console.log("showDeleteConfirmation = ", showDeleteConfirmation);
-    }, [showDeleteConfirmation])
 
     return (
         <>
@@ -102,9 +129,15 @@ const HomeFlashSet = props => {
                         arrow={true}
                     >
                         <span className={homeFlashStyles.favoriteCard}
-                            onClick={() => handleFavoriteSet()}
                         >
-                            <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
+                            <i className={`material-icons-outlined ${appStyles.clickIcon}
+                                ${isFavorited && homeFlashStyles.favorited}
+                            `}
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    handleFavoriteSet(setID)
+                                }}
+                            >
                                 star_outline
                             </i>
                         </span>
@@ -116,9 +149,10 @@ const HomeFlashSet = props => {
                     >
                         <span
                             className={homeFlashStyles.deleteCard}
-                            onClick={() => setShowDeleteConfirmation(true)}
                         >
-                            <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
+                            <i className={`material-icons-outlined ${appStyles.clickIcon}`}
+                                onClick={() => setShowDeleteConfirmation(true)}
+                            >
                                 delete
                             </i>
                         </span>
@@ -152,7 +186,7 @@ const HomeFlashSet = props => {
                     <DialogActions>
                         <div
                             className={homeFlashStyles.confirmDeleteCard}
-                            onClick={handleDeleteSet}
+                            onClick={() => handleDeleteSet(setID)}
                         >
                             Delete Card
                         </div>
