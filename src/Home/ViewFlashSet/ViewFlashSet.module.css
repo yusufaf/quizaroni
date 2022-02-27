@@ -1,9 +1,14 @@
 .actionBar {}
 
+.download {
+    display: flex;
+    align-items: center;
+}
+
 .cardCount {
     position: absolute;
     font-size: 1.25rem;
-    top: 13rem;
+    top: 20rem;
     left: 0;
 }
 
@@ -16,7 +21,7 @@
 
 .viewContainer {
     position     : absolute;
-    height       : 10rem;
+    height       : 12rem;
     width        : 70rem;
     left         : 20rem;
     top          : 7.5rem;

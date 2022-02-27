@@ -14,11 +14,15 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    /* gap: 17rem; */
     font-size: 1.25rem;
     font-weight: bold;
 
     margin-top: 1rem;
+}
+
+.favoriteFilter {
+    display: flex;
+    align-items: center;
 }
 
 .searchContainer {
