@@ -42,7 +42,7 @@ const Profile = props => {
         /* Update user database with the newly selected theme */
         const { uid } = userAuthState;
         const usersCollection = collection(database, "users");
-        const queryResult = query(usersCollection, where("uid", "==", uid), limit(1));
+        const queryResult = query(usersCollection, where("uid", "==", uid));
         const querySnapshot = await getDocs(queryResult);
 
         const userDoc = querySnapshot.docs[0];

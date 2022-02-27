@@ -17,11 +17,15 @@
     align-items   : center;
     position      : absolute;
     right         : 1rem;
-    bottom: 0;
-    z-index: 1000;
+    bottom        : 0;
+    z-index       : 1000;
 }
 
 .favoriteCard:hover {
+    color: rgb(236, 206, 72);
+}
+
+.favorited {
     color: rgb(236, 206, 72);
 }
 
@@ -31,11 +35,10 @@
 }
 
 .confirmDeleteCard {
-    cursor: pointer;
-    padding: 0.25rem;
-    color     : rgb(233, 29, 29);
+    cursor       : pointer;
+    padding      : 0.25rem;
+    color        : rgb(233, 29, 29);
     border-radius: 0.25rem;
 }
 
-.confirmDeleteCard:hover {
-}
+.confirmDeleteCard:hover {}

@@ -125,6 +125,7 @@ const CreateSet = props => {
             const uid = userAuthState.uid;
 
             const flashCollection = collection(database, "flashcards");
+
             const cardsRef = await addDoc(flashCollection, {
                 title: enteredTitle,
                 description: enteredDescription,
@@ -134,6 +135,10 @@ const CreateSet = props => {
                 label,
                 cards: createdCardObjects
             });
+
+            updateDoc(cardsRef, {
+                setID: cardsRef.id
+            })
 
             if (label) {
                 createNewLabel();

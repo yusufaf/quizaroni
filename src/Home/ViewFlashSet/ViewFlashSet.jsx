@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 /* Firebase Operations */
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, updateDoc } from "firebase/firestore";
 import { firebaseApp, database } from "../../firebase/firebase";
 
 /* Outside Components */
@@ -17,7 +17,6 @@ import * as appStyles from "../../App.module.css";
 
 const ViewFlashSet = props => {
     const {
-        viewFlashSet,
         setViewFlashSet,
         selectedFlashSet,
         setSelectedFlashSet,
@@ -32,9 +31,57 @@ const ViewFlashSet = props => {
     const [disableTextColor, setDisableTextColor] = useState(false);
     const [disableBackgroundColor, setDisableBackgroundColor] = useState(false);
 
+    const handleDisableColorToggle = async (type) => {
+        const { uid } = userAuthState;
+        const { setID } = selectedFlashSet;
+
+        const flashCollection = collection(database, "flashcards");
+        const queryResult = query(flashCollection,
+            where("setID", "==", setID)
+        );
+        const docSnap = await getDocs(queryResult);
+        const flashDoc = docSnap.docs[0];
+
+        if (type === "TEXT") {
+            setDisableTextColor(!disableTextColor)
+            if (flashDoc) {
+                const docRef = flashDoc.ref;
+                updateDoc(docRef, {
+                    disableTextColor: !disableTextColor
+                });
+            }
+        }
+        else if (type === "BACKGROUND") {
+            setDisableBackgroundColor(!disableBackgroundColor)
+            if (flashDoc) {
+                const docRef = flashDoc.ref;
+                updateDoc(docRef, {
+                    disableBackgroundColor: !disableBackgroundColor
+                });
+            }
+        }
+    }
+
+
     /* TODO: Using a library like React-pdf? Otherwise just creating a text file w/ comma sep values */
     const handleDownloadSet = () => {
 
+        /* Initial implementation of the following text file structure:
+            Card {index}:
+                term: ""
+                definition: ""
+        */
+        const anchor = document.createElement("a");
+        const cards = selectedFlashSet.cards;
+        const mappedCards = cards.map((card, index) => ({ [`Card ${index + 1}`]: { term: card.term, definition: card.definition } }));
+        const cleanedCards = Object.assign({}, ...mappedCards);
+
+        const file = new Blob([JSON.stringify(cleanedCards, null, 2)], { type: 'text/plain' });
+        anchor.href = URL.createObjectURL(file);
+        const { title: setTitle } = selectedFlashSet;
+        anchor.download = `${setTitle}_Set.txt`;
+        document.body.appendChild(anchor); // Required for this to work in FireFox
+        anchor.click();
     }
 
     /* TODO: Future future task.
@@ -47,8 +94,10 @@ const ViewFlashSet = props => {
     const renderActionBar = () => {
         return (
             <div className={viewFlashStyles.actionBar}>
-                <span>
-                    <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
+                <span className={viewFlashStyles.download} >
+                    <i className={`material-icons-outlined ${appStyles.clickIcon}`}
+                        onClick={() => handleDownloadSet()}
+                    >
                         download
                     </i>
                     Download
@@ -66,10 +115,7 @@ const ViewFlashSet = props => {
                         <Switch
                             size="small"
                             checked={disableTextColor}
-                            onChange={() => {
-                                console.log("setting to ", !disableTextColor);
-                                setDisableTextColor(!disableTextColor)
-                            }}
+                            onChange={() => handleDisableColorToggle("TEXT")}
                         />
                     } label="Disable Text Color"
                     />
@@ -80,9 +126,7 @@ const ViewFlashSet = props => {
                         <Switch
                             size="small"
                             checked={disableBackgroundColor}
-                            onChange={() => {
-                                setDisableBackgroundColor(!disableBackgroundColor)
-                            }}
+                            onChange={() => handleDisableColorToggle("BACKGROUND")}
                         />
                     } label="Disable Background Color"
                     />
@@ -109,7 +153,7 @@ const ViewFlashSet = props => {
             />
         })
     }
-    
+
     /* TODO: Fix the spacing between the ViewContainer and the (first) ViewCards */
     return (
         <div className={viewFlashStyles.viewPage}>
