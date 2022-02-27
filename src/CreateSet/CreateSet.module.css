@@ -85,12 +85,12 @@
 }
 
 .createSet {
-    position  : absolute;
-    right     : 2rem;
-    top       : 2rem;
-    height    : 2.5rem;
+    position     : absolute;
+    right        : 2rem;
+    top          : 2rem;
+    height       : 2.5rem;
     /* width     : 6rem; */
-    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
 
     font-size    : 1rem;
     font-weight  : bold;
@@ -130,10 +130,10 @@
 }
 
 .newCardInputs {
-    display          : flex;
-    justify-content: space-between;
+    display             : flex;
+    justify-content     : space-between;
     /* gap              : 8rem; */
-    margin-top       : 0.5rem;
+    margin-top          : 0.5rem;
 }
 
 .newCardTerm,
@@ -194,12 +194,12 @@
 }
 
 .cardActions {
-    position: relative;
-    top: -1rem;
-    display: flex;
+    position      : relative;
+    top           : -1rem;
+    display       : flex;
     flex-direction: column;
-    align-items: center;
-    gap: 1rem;
+    align-items   : center;
+    gap           : 1rem;
 }
 
 .colorPickerIcon {
@@ -208,7 +208,7 @@
 
 .colorPicker {
     position: absolute;
-    bottom: 2.5rem;
+    bottom  : 2.5rem;
 }
 
 .colorPickerContainer {
@@ -217,12 +217,13 @@
 
 .colorClose {
     position: relative;
-    bottom: 2.5rem;
-    cursor: pointer;
-    z-index: 100;
+    bottom  : 2.5rem;
+    cursor  : pointer;
+    z-index : 100;
 }
 
-.deleteCard, .uploadImage {
+.deleteCard,
+.uploadImage {
     position: absolute;
     cursor  : pointer;
     right   : 1rem;
@@ -237,7 +238,7 @@
 }
 
 .uploadImage {
-    top     : 4.5rem;
+    top: 4.5rem;
 }
 
 .uploadImage:hover {
@@ -246,6 +247,18 @@
 
 .import {
     position: absolute;
-    right     : 5rem;
-    top       : 10rem;
+    right   : 5rem;
+    top     : 10rem;
+}
+
+.importModal {
+    position : absolute;
+    top      : 50%;
+    left     : 50%;
+    transform: translate(-50%, -50%);
+
+    height: 30rem;
+    width: 50rem;
+
+    padding: 1.5rem;
 }

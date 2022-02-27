@@ -6,7 +6,7 @@ import { database } from "../firebase/firebase";
 
 /* Outside Components */
 import { useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Tooltip } from '@mui/material/';
+import { Alert, AlertTitle, Modal, Tooltip } from '@mui/material/';
 import NewCardInput from "./NewCardInput/NewCardInput";
 import LoginMessage from "../LoginMessage/LoginMessage";
 
@@ -28,11 +28,12 @@ const CreateSet = props => {
     const [enteredDescription, setEnteredDescription] = useState("");
     const [enteredLabel, setEnteredLabel] = useState("");
     const [selectedLabel, setSelectedLabel] = useState("");
-    
-    const [createSetEnabled, setCreateSetEnabled] = useState(false);
+
     const [createdSetCards, setCreatedSetCards] = useState([{ term: "", definition: "" }]);
 
     const [labelOptions, setLabelOptions] = useState([]);
+
+    const [showImportModal, setShowImportModal] = useState(false);
 
     // Store a reference to the HTML file <input>
     const fileInputRef = useRef(null);
@@ -270,7 +271,7 @@ const CreateSet = props => {
                                     <span>or select an existing one</span>
                                     <select
                                         className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`
-                                    }
+                                        }
                                         onChange={(e) => setSelectedLabel(e.target.value)}
                                         disabled={enteredLabel !== ""}
                                     >
@@ -290,7 +291,7 @@ const CreateSet = props => {
 
                             </span>
                             <i className={`material-icons-outlined ${createSetStyles.import}`}
-                                onClick={() => alert("hi")}
+                                onClick={() => setShowImportModal(true)}
                             >
                                 upload_file
                             </i>
@@ -312,6 +313,25 @@ const CreateSet = props => {
                     </div>
                 )
             }
+
+            <Modal
+                open={showImportModal}
+                onClose={() => setShowImportModal(false)}
+            >
+                <div className={createSetStyles.importModal}
+                    style={{ color: theme.foreground, background: theme.background }}
+                >
+                    <div className={appStyles.largeTitle}>
+                        Import cards
+                    </div>
+                    {/* Option to enter the cards like Quizlet has */}
+                    <textarea
+                        className={`${createSetStyles.descInput} ${isDarkMode ? `${createSetStyles.dark} ${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
+                        placeholder="Enter a description for your new study set"
+                        onChange={e => setEnteredDescription(e.target.value)}
+                    />
+                </div>
+            </Modal>
 
             {showAlert &&
                 <Alert
