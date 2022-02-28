@@ -26,3 +26,10 @@ export const FLASHSET_COLUMNS = {
     CREATED: "Created on",
     LABEL: "Label"
 }
+
+export const CREATE_SET = {
+    TITLE: "Create a new flash card set",
+    TITLE_PLACE: "Enter a title for your new study set",
+    DESC_PLACE: "Enter a description for your new study set",
+    LABEL_PLACE: "Enter a label for your new study set",
+}

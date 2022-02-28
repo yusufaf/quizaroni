@@ -148,7 +148,7 @@ const Home = props => {
                         type="checkbox"
                         onChange={() => handleFavoriteFilter()}
                     />
-                    <label for="favorite" style={{marginBottom: "0.3rem"}}>{'\u2605'}</label>
+                    <label htmlFor="favorite" style={{marginBottom: "0.3rem"}}>{'\u2605'}</label>
                 </span>
             </div>
         )
