@@ -7,7 +7,7 @@ import * as profileStyles from './Profile.module.css';
 import * as appStyles from "../App.module.css";
 
 const ProfileDropdown = props => {
-    const { userAuthState, setUserAuthState, setShowDropdown} = props;
+    const { setShowDropdown } = props;
     const { isDarkMode, theme } = useTheme();
 
     const dropdownRef = useRef(null);
@@ -32,19 +32,18 @@ const ProfileDropdown = props => {
 
     return (
         <div className={profileStyles.dropdown} ref={dropdownRef}>
-            {userAuthState &&
-                <div className={profileStyles.dropdownItem}>
-                    <Link
-                        className={`${profileStyles.dropdownLink} ${isDarkMode ? appStyles.darkBorder : appStyles.lightBorder}`}
-                        to="/profile"
-                        style={{
-                            color: `${theme.foreground}`
-                        }}
-                    >
-                        Profile
-                    </Link>
-                </div>
-            }
+            <div className={profileStyles.dropdownItem}>
+                <Link
+                    className={`${profileStyles.dropdownLink} ${isDarkMode ? appStyles.darkBorder : appStyles.lightBorder}`}
+                    to="/profile"
+                    style={{
+                        color: `${theme.foreground}`
+                    }}
+                >
+                    Profile
+                </Link>
+            </div>
+
         </div>
     )
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { database } from "../firebase/firebase";
 import { doc, deleteDoc, updateDoc, query, where, collection, getDoc, getDocs, limit } from "firebase/firestore";
-import { getAuth, deleteUser } from "firebase/auth";
+import { getAuth, deleteUser, updatePassword } from "firebase/auth";
 import { Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 import ProfileCard from "./ProfileCard";
@@ -16,6 +16,9 @@ import * as C from "../utilities/constants";
 const Profile = props => {
     const { userAuthState, setUserAuthState } = props;
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
+
+    const auth = getAuth();
+    const user = auth.currentUser;
 
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [enteredPass, setEnteredPass] = useState("");
@@ -69,9 +72,44 @@ const Profile = props => {
     }
 
     /**
-     * 
+     * Change username for authenticated user
      */
-    const handleChangeUsername = () => {
+    const handleChangeUsername = async () => {
+        /*  TODO:
+        - Imposing some restrictions on the length / type of username
+        */
+
+        const { uid } = userAuthState;
+        const usersCollection = collection(database, "users");
+        const queryResult = query(usersCollection, where("uid", "==", uid));
+        const docSnap = await getDocs(queryResult);
+
+        const userDoc = docSnap.docs[0];
+        if (userDoc) {
+            const userRef = userDoc.ref;
+            updateDoc(userRef, {
+                username: enteredNewUsername
+            });
+        }
+    }
+
+    /**
+     * Change user password if signed up with email / password
+     */
+    const handleChangePassword = () => {
+        if (enteredNewPassword !== enteredConfirmPassword) {
+            //TODO: Display alert
+        }
+
+        // console.log("userAuthState = ", userAuthState);
+        console.log("user object = ", user);
+        updatePassword(user, enteredNewPassword).then(() => {
+            // Update successful.
+            console.log("Successfully changed password")
+        }).catch((error) => {
+            // An error ocurred
+            // ...
+        });
 
     }
 
@@ -81,7 +119,7 @@ const Profile = props => {
                 <LoginMessage page="profile" />
                 :
                 <>
-                    <ProfileCard />
+                    <ProfileCard userAuthState={userAuthState}/>
                     <div className={profileStyles.profileContainer} style={{ color: theme.foreground, background: theme.background }}>
                         <div className={appStyles.title}>
                             Profile
@@ -122,13 +160,12 @@ const Profile = props => {
                             <button
                                 tabIndex="0"
                                 className={profileStyles.changeUsername}
-                                onClick={() => createNewSet()}
+                                onClick={() => handleChangeUsername()}
                                 disabled={enteredNewUsername === ""}
                             >
                                 Submit
                             </button>
                         </div>
-
 
                         <div className={profileStyles.heading}>
                             <span class="material-icons-outlined">
@@ -139,23 +176,24 @@ const Profile = props => {
 
                         <div className={profileStyles.changeUsernameContainer}>
                             <div className={profileStyles.changeInputs}>
+                                {/* TODO: Add password visibility toggles here */}
                                 <input
                                     className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
                                     placeholder="Enter new password"
-                                // onChange={(e) => setEnteredNewUsername(e.target.value)}
+                                    onChange={(e) => setEnteredNewPassword(e.target.value)}
                                 />
                                 <input
                                     className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
-                                    placeholder="Enter new password"
-                                // onChange={(e) => setEnteredNewUsername(e.target.value)}
+                                    placeholder="Confirm new password"
+                                    onChange={(e) => setEnteredConfirmPassword(e.target.value)}
                                 />
                             </div>
 
                             <button
                                 tabIndex="0"
                                 className={profileStyles.changeUsername}
-                                onClick={() => createNewSet()}
-                                disabled={enteredNewUsername === ""}
+                                onClick={() => handleChangePassword()}
+                                disabled={enteredNewPassword === "" || enteredConfirmPassword === ""}
                             >
                                 Submit
                             </button>

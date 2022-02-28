@@ -14,7 +14,13 @@ import LoginMessage from "../LoginMessage/LoginMessage";
 import { useTheme } from "../theme/useTheme";
 import * as createSetStyles from './CreateSet.module.css';
 import * as appStyles from "../App.module.css";
-import * as C from "../utilities/constants";
+import {
+    SUCCESS,
+    SUCCESS_U,
+    ERROR,
+    ERROR_U,
+    CREATE_SET
+} from "../utilities/constants";
 
 const CreateSet = props => {
     const { userAuthState } = props;
@@ -148,7 +154,7 @@ const CreateSet = props => {
             console.log("Successfully created new flash set");
 
             setShowAlert(true);
-            setAlertType(C.SUCCESS);
+            setAlertType(SUCCESS);
             setTimeout(() => {
                 setShowAlert(false);
                 navigate("/");
@@ -245,26 +251,26 @@ const CreateSet = props => {
                             style={{ color: theme.foreground, background: theme.background }}
                         >
                             <div className={createSetStyles.title}>
-                                Create a new flash card set
+                                {CREATE_SET.TITLE}
                             </div>
                             <div className={createSetStyles.inputContainer}>
                                 <label className={createSetStyles.inputLabel}>Title</label>
                                 <input
                                     className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                                    placeholder="Enter a title for your new study set"
+                                    placeholder={CREATE_SET.TITLE_PLACE}
                                     onChange={e => setEnteredTitle(e.target.value)}
                                 />
                                 <label className={createSetStyles.inputLabel}>Description</label>
                                 <textarea
                                     className={`${createSetStyles.descInput} ${isDarkMode ? `${createSetStyles.dark} ${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                                    placeholder="Enter a description for your new study set"
+                                    placeholder={CREATE_SET.DESC_PLACE}
                                     onChange={e => setEnteredDescription(e.target.value)}
                                 />
                                 <label className={createSetStyles.inputLabel}>Label</label>
                                 <div className={createSetStyles.labelInputContainer}>
                                     <input
                                         className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                                        placeholder="Enter a label for your new study set"
+                                        placeholder={CREATE_SET.LABEL_PLACE}
                                         onChange={e => setEnteredLabel(e.target.value)}
                                         disabled={selectedLabel !== ""}
                                     />
@@ -339,9 +345,9 @@ const CreateSet = props => {
                     severity={alertType}
                 >
                     <AlertTitle>
-                        <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
+                        <b>{alertType === SUCCESS ? SUCCESS_U : ERROR_U}</b>
                     </AlertTitle>
-                    {alertType === C.SUCCESS ? "Set successfully created!" : "Could not create set"}
+                    {alertType === SUCCESS ? "Set successfully created!" : "Could not create set"}
                 </Alert>
             }
         </>

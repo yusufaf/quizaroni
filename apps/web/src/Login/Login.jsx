@@ -240,7 +240,6 @@ const Login = props => {
                                     </span>
                                 }
 
-                                {/* Password Input */}
                                 <input
                                     className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
                                         : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
@@ -250,7 +249,6 @@ const Login = props => {
                                     onBlur={e => checkIfInputEmpty(e)}
                                     onChange={e => setEnteredPass(e.target.value)}
                                 />
-                                {/* Show/Hide Password */}
                                 {passVisibility ?
                                     <Visibility
                                         className={`${loginStyles.passToggle} ${isDarkMode && loginStyles.dark}`}

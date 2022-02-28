@@ -1,4 +1,7 @@
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
+
+import { database } from "../firebase/firebase";
+import { query, where, collection, getDocs } from "firebase/firestore";
 
 import { Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
 
@@ -13,8 +16,38 @@ const ProfileCard = props => {
 
     const profilePicRef = useRef(null);
 
+    const [createdSetCount, setCreatedSetCount] = useState(0);
+    const [createdDate, setCreatedDate] = useState("");
+
+    // TODO: Should this go to the parent component to change based if user changes username in main container
+    const [username, setUsername] = useState("");
+
+    useEffect(() => {
+        retrieveMetadata()
+    }, [])
+
     const handleProfilePicture = () => {
 
+    }
+
+    const retrieveMetadata = async () => {
+        const { uid } = userAuthState;
+        console.log(userAuthState);
+        const usersCollection = collection(database, "users");
+        const queryResult = query(usersCollection, where("uid", "==", uid));
+        const querySnapshot = await getDocs(queryResult);
+
+        const userDoc = querySnapshot.docs[0];
+        if (userDoc) {
+            const { creationDate, username } = userDoc.data();
+            setCreatedDate(creationDate);
+            setUsername(username);
+        }
+
+        const flashCollection = collection(database, "flashcards");
+        const flashQueryResult = query(flashCollection, where("uid", "==", uid));
+        const flashSnapshot = await getDocs(flashQueryResult);
+        setCreatedSetCount(flashSnapshot.docs.length);
     }
 
     /*
@@ -56,14 +89,17 @@ const ProfileCard = props => {
                     add_photo_alternate
                 </span>
             </div>
-            <div>
-                Username
+            <div className={profileStyles.info}>
+                <span className={profileStyles.infoHeading}>Username</span>
+                <span>{username}</span>
             </div>
-            <div>
-                # of Flashsets Created
+            <div className={profileStyles.info}>
+                <span className={profileStyles.infoHeading}># of Flashsets Created</span>
+                <span>{createdSetCount}</span>
             </div>
-            <div>
-                Account Created
+            <div className={profileStyles.info}>
+                <span className={profileStyles.infoHeading}>Account Created</span>
+                <span>{createdDate}</span>
             </div>
         </div>
     )
