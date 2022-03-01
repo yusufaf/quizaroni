@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { database } from "../firebase/firebase";
-import { doc, deleteDoc, updateDoc, query, where, collection, getDoc, getDocs, limit } from "firebase/firestore";
-import { getAuth, deleteUser, updatePassword } from "firebase/auth";
+import { deleteDoc, updateDoc, query, where, collection, getDoc, getDocs, limit } from "firebase/firestore";
+import { EmailAuthProvider, getAuth, deleteUser, updatePassword, reauthenticateWithCredential } from "firebase/auth";
 import { Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 import ProfileCard from "./ProfileCard";
@@ -20,18 +20,38 @@ const Profile = props => {
     const auth = getAuth();
     const user = auth.currentUser;
 
+
+
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [enteredPass, setEnteredPass] = useState("");
+    const [enteredDeletePass, setEnteredDeletePass] = useState("");
 
     const [enteredNewUsername, setEnteredNewUsername] = useState("");
     const [enteredNewPassword, setEnteredNewPassword] = useState("");
     const [enteredConfirmPassword, setEnteredConfirmPassword] = useState("");
 
+    /* User Input Error Checking */
+    const [showErrorText, setShowErrorText] = useState({
+        confirmPassInput: false
+    })
+
     // Store a property for each user of the theme
     const [defaultTheme, setDefaultTheme] = useState(userAuthState?.bruh ?? "dark");
 
+    let credential = EmailAuthProvider.credential(
+        user.email,
+        enteredDeletePass
+    );
+
+    console.log("credential = ", credential);
+
+    const checkIfInputMatches = event => {
+        let updatedErrorText = { ...showErrorText };
+        updatedErrorText[event.target.name] = event.target.value !== enteredNewPassword;
+        setShowErrorText(updatedErrorText);
+    }
+
     /**
-     * 
+     * Update user's selected default theme
      */
     const handleDefaultTheme = async (theme) => {
         console.log("Entering handleDefaultTheme");
@@ -59,16 +79,30 @@ const Profile = props => {
 
     /* Make call using Firebase Auth API to delete this user's account, have to sign in, prompt them to enter their password again, kinda like Github messages*/
     const handleDeleteAccount = async () => {
-        deleteUser(userAuthState).then(() => {
-            // User deleted.
+        reauthenticateWithCredential(user, credential)
+            .then(() => {
+                // User successfully reauthenticated. New ID tokens should be valid.
+                deleteUser(userAuthState).then(() => {
+                    // User deleted.
+                    /* Delete that user's flashcards */
+                    const flashCollection = collection(database, "flashcards");
+                    const queryResult = query(flashCollection, where("uid", "==", uid));
+                    const querySnapshot = getDocs(queryResult);
 
-            /* Delete that user's flashcards */
-            const result = deleteDoc(doc(database, "users", userAuthState.uid));
-            console.log("Result of deleting account = ", result);
-        }).catch((error) => {
-            // An error ocurred
-            // ...
-        });
+                    querySnapshot.forEach((doc) => {
+                        const docRef = doc.ref
+                        const result = deleteDoc(docRef);
+                    });
+                }).catch((error) => {
+                    // An error ocurred
+                    // ...
+                });
+            })
+            .catch(error => {
+                // TODO: Display alert / text indicating password was wrong
+            });
+
+
     }
 
     /**
@@ -119,7 +153,7 @@ const Profile = props => {
                 <LoginMessage page="profile" />
                 :
                 <>
-                    <ProfileCard userAuthState={userAuthState}/>
+                    <ProfileCard userAuthState={userAuthState} />
                     <div className={profileStyles.profileContainer} style={{ color: theme.foreground, background: theme.background }}>
                         <div className={appStyles.title}>
                             Profile
@@ -182,11 +216,27 @@ const Profile = props => {
                                     placeholder="Enter new password"
                                     onChange={(e) => setEnteredNewPassword(e.target.value)}
                                 />
-                                <input
-                                    className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
-                                    placeholder="Confirm new password"
-                                    onChange={(e) => setEnteredConfirmPassword(e.target.value)}
-                                />
+                                <div className={profileStyles.confirmPassword}>
+                                    <input
+                                        className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
+                                        name="confirmPassInput"
+                                        placeholder="Confirm new password"
+                                        onChange={(e) => {
+                                            checkIfInputMatches(e);
+                                            setEnteredConfirmPassword(e.target.value)
+                                        }}
+                                        onBlur={e => checkIfInputMatches(e)}
+                                    />
+
+                                    {showErrorText.confirmPassInput &&
+                                        <span className={appStyles.errorText}
+                                            style={{ top: "1rem" }}
+                                        >
+                                            Confirmed password doesn't match entered password
+                                        </span>
+                                    }
+                                </div>
+
                             </div>
 
                             <button
@@ -228,7 +278,7 @@ const Profile = props => {
                                         type="password"
                                         name="passwordInput"
                                         placeholder="Enter your password"
-                                        onChange={e => setEnteredPass(e.target.value)}
+                                        onChange={e => setEnteredDeletePass(e.target.value)}
                                     />
                                 </DialogContent>
                                 <DialogActions>
@@ -236,12 +286,13 @@ const Profile = props => {
                             Disabled state for the button if no password entered
                             Have to do verification of that password before closing modal
                         */}
-                                    <div
+                                    <button
                                         className={profileStyles.deleteAccount}
                                         onClick={() => handleDeleteAccount()}
+                                        disabled={enteredDeletePass === ""}
                                     >
                                         Delete Account
-                                    </div>
+                                    </button>
                                 </DialogActions>
                             </Dialog>
                         }
