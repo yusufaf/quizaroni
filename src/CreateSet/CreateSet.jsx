@@ -58,6 +58,9 @@ const CreateSet = props => {
         renderLabelOptions();
     }, []);
 
+    /**
+     * Retrieve the user's existing labels for the dropdown
+     */
     const retrieveLabels = async () => {
         if (userAuthState) {
             const { uid } = userAuthState;
@@ -68,7 +71,6 @@ const CreateSet = props => {
             const userDoc = querySnapshot.docs[0];
             if (userDoc) {
                 const userData = userDoc.data();
-                console.log("userData = ", userData);
                 return userData.labels;
             }
         }
@@ -76,7 +78,6 @@ const CreateSet = props => {
 
     const renderLabelOptions = () => {
         const labelsResult = retrieveLabels();
-        console.log("labelsResult = ", labelsResult);
 
         labelsResult.then(labels => {
             let blankOption = [
@@ -143,6 +144,7 @@ const CreateSet = props => {
                 cards: createdCardObjects
             });
 
+            // Store the Firebase document ID as the set's "id"
             updateDoc(cardsRef, {
                 setID: cardsRef.id
             })
@@ -161,7 +163,7 @@ const CreateSet = props => {
             }, 1000);
         }
         else {
-            /* Display an alert that could not create the set, or just have it disabled wiht some state */
+            /* TODO: Display an alert that could not create the set, or just have it disabled wiht some state */
         }
     }
 
@@ -285,7 +287,6 @@ const CreateSet = props => {
                                     </select>
                                 </div>
                             </div>
-                            {/* ${createSetStyles.disabled} */}
                             <button
                                 tabIndex="0"
                                 className={`${createSetStyles.createSet}`}
@@ -304,7 +305,6 @@ const CreateSet = props => {
                         </div>
                         {/* Individual Card Inputs */}
                         {renderCreateCards()}
-
                         <button
                             className={createdSetCards.length !== 0 ? `${createSetStyles.addCard}` : `${createSetStyles.addCard} ${createSetStyles.noInputs}`}
                             onClick={() => {
