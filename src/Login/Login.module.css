@@ -1,3 +1,8 @@
+.loginPage {
+    position: absolute;
+    /* top: 20rem; */
+}
+
 .loginContainer {
     position: absolute;
     width: 22rem;

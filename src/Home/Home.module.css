@@ -1,6 +1,6 @@
 .flashSets {
     position     : relative;
-    height       : 20rem;
+    height       : fit-content;
     width        : 70rem;
     left         : 20rem;
     top          : 4rem;
