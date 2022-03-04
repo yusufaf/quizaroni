@@ -49,9 +49,12 @@ const Home = props => {
     };
 
     const homeSetProps = {
+        flashSets, 
+        setFlashSets,
         setViewFlashSet,
         setSelectedFlashSet,
         userAuthState,
+
     }
 
     /* React-Router function for switching routes */
@@ -148,7 +151,7 @@ const Home = props => {
                         type="checkbox"
                         onChange={() => handleFavoriteFilter()}
                     />
-                    <label htmlFor="favorite" style={{marginBottom: "0.3rem"}}>{'\u2605'}</label>
+                    <label htmlFor="favorite" style={{ marginBottom: "0.3rem" }}>{'\u2605'}</label>
                 </span>
             </div>
         )

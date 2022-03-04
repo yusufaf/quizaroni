@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 
 /* Firebase Operations */
 
-import { collection, deleteDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
 import { firebaseApp, database } from "../../firebase/firebase";
 
 /* Outside Components */
@@ -26,7 +26,15 @@ import * as homeFlashStyles from './HomeFlashSet.module.css';
 import * as appStyles from "../../App.module.css";
 
 const HomeFlashSet = props => {
-    const { userAuthState, setSelectedFlashSet, setViewFlashSet, flashSet } = props;
+    const {
+        userAuthState,
+        flashSets,
+        setFlashSets,
+        setSelectedFlashSet,
+        setViewFlashSet,
+        flashSet
+    } = props;
+
     const {
         cards,
         creationDate,
@@ -40,6 +48,7 @@ const HomeFlashSet = props => {
 
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [isFavorited, setIsFavorited] = useState(false);
+    const [showActionsMenu, setShowActionsMenu] = useState(false);
 
 
     useEffect(() => {
@@ -110,6 +119,59 @@ const HomeFlashSet = props => {
         }
     }
 
+    const handleDuplicateSet = async (e) => {
+        e.stopPropagation();
+
+        const { uid } = userAuthState;
+
+        const flashCollection = collection(database, "flashcards");
+        const queryResult = query(flashCollection,
+            where("setID", "==", setID),
+            where("uid", "==", uid)
+        );
+
+        const docSnap = await getDocs(queryResult);
+
+        const numDocs = docSnap.docs.length;
+        const setDoc = docSnap.docs[0];
+
+        let fullFlashsetInfo;
+
+        if (setDoc) {
+            fullFlashsetInfo = setDoc.data();
+
+            const { title } = fullFlashsetInfo
+            const duplicateTitle = `${title} (${numDocs})`;
+            const creationDate = new Date().toLocaleDateString();
+            const lastViewedDate = new Date().toLocaleDateString();
+
+            let modifiedFlashset = {
+                ...fullFlashsetInfo,
+                title: duplicateTitle,
+                creationDate,
+                lastViewedDate
+            }
+
+            let cardsRef = await addDoc(flashCollection, modifiedFlashset);
+
+            const newID = cardsRef.id;
+            // Store the Firebase document ID as the set's "id"
+            updateDoc(cardsRef, {
+                setID: newID
+            })
+
+            let duplicatedFlashset = {
+                ...modifiedFlashSet,
+                setID: newID
+            }
+
+            const currFlashsets = [...flashSets];
+            currFlashsets.push(duplicatedFlashset);
+            setFlashSets(currFlashsets);
+        }
+
+    }
+
 
     return (
         <>
@@ -123,40 +185,67 @@ const HomeFlashSet = props => {
                 <div className={homeFlashStyles.data}>{creationDate}</div>
                 <div className={homeFlashStyles.data}>{label || "N/A"}</div>
                 <div className={homeFlashStyles.actions}>
-                    <Tooltip
-                        title="Favorite this card"
-                        placement="right"
-                        arrow={true}
-                    >
-                        <span className={homeFlashStyles.favoriteCard}
+                    <div className={homeFlashStyles.mainActions}>
+                        <Tooltip
+                            title="Favorite this card"
+                            placement="right"
+                            arrow={true}
                         >
-                            <i className={`material-icons-outlined ${appStyles.clickIcon}
+                            <span className={homeFlashStyles.favoriteCard}
+                            >
+                                <i className={`material-icons-outlined ${appStyles.clickIcon}
                                 ${isFavorited && homeFlashStyles.favorited}
                             `}
-                                onClick={e => {
-                                    e.stopPropagation();
-                                    handleFavoriteSet(setID)
-                                }}
-                            >
-                                star_outline
-                            </i>
-                        </span>
-                    </Tooltip>
-                    <Tooltip
-                        title="Delete this card"
-                        placement="right"
-                        arrow={true}
-                    >
-                        <span
-                            className={homeFlashStyles.deleteCard}
+                                    onClick={e => {
+                                        e.stopPropagation();
+                                        handleFavoriteSet(setID)
+                                    }}
+                                >
+                                    star_outline
+                                </i>
+                            </span>
+                        </Tooltip>
+                        <Tooltip
+                            title="Delete this card"
+                            placement="right"
+                            arrow={true}
                         >
-                            <i className={`material-icons-outlined ${appStyles.clickIcon}`}
-                                onClick={() => setShowDeleteConfirmation(true)}
+                            <span
+                                className={homeFlashStyles.deleteCard}
                             >
-                                delete
-                            </i>
-                        </span>
-                    </Tooltip>
+                                <i className={`material-icons-outlined ${appStyles.clickIcon}`}
+                                    onClick={() => setShowDeleteConfirmation(true)}
+                                >
+                                    delete
+                                </i>
+                            </span>
+                        </Tooltip>
+                    </div>
+
+                    <span className={`material-icons-outlined ${appStyles.clickIcon}`}
+                        onClick={e => {
+                            e.stopPropagation();
+                            setShowActionsMenu(!showActionsMenu)
+                        }}
+                    >
+                        more_vert
+                    </span>
+                    {showActionsMenu &&
+                        <div className={homeFlashStyles.actionsMenu}
+                            style={{ color: theme.foreground, background: theme.background }}
+                        >
+                            <div className={homeFlashStyles.menuItem}>
+                                <i className={`material-icons-outlined ${appStyles.clickIcon}`}
+                                    onClick={(e) => handleDuplicateSet(e)}
+                                >
+                                    content_copy
+                                </i>
+                                Duplicate
+                            </div>
+                        </div>
+
+                    }
+
                 </div>
             </div>
 

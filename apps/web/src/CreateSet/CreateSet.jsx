@@ -130,7 +130,7 @@ const CreateSet = props => {
             const creationDate = new Date().toLocaleDateString();
             const lastViewedDate = new Date().toLocaleDateString();
             const label = enteredLabel || "";
-            const uid = userAuthState.uid;
+            const { uid } = userAuthState;
 
             const flashCollection = collection(database, "flashcards");
 
