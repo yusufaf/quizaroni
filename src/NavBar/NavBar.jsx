@@ -21,11 +21,7 @@ const NavBar = props => {
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     const auth = getAuth();
-
-    /* Dropdown for account actions / settings / profile in top right corner */
     const [showDropdown, setShowDropdown] = useState(false);
-
-    /* Alert Popup */
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState("");
 
@@ -52,7 +48,7 @@ const NavBar = props => {
     }
 
     /*
-        TODO: Consolidate AlertJSX into a single function for all alerts??
+        TODO: Consolidate AlertJSX into a single component for all alerts in the application?
     */
     const returnAlertJSX = () => {
         return (
