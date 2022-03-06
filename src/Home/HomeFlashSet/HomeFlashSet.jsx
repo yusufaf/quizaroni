@@ -7,6 +7,7 @@ import { firebaseApp, database } from "../../firebase/firebase";
 
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
+import HomeActionsMenu from "./HomeActionsMenu";
 
 import {
     Alert,
@@ -231,19 +232,12 @@ const HomeFlashSet = props => {
                         more_vert
                     </span>
                     {showActionsMenu &&
-                        <div className={homeFlashStyles.actionsMenu}
-                            style={{ color: theme.foreground, background: theme.background }}
-                        >
-                            <div className={homeFlashStyles.menuItem}>
-                                <i className={`material-icons-outlined ${appStyles.clickIcon}`}
-                                    onClick={(e) => handleDuplicateSet(e)}
-                                >
-                                    content_copy
-                                </i>
-                                Duplicate
-                            </div>
-                        </div>
-
+                        <HomeActionsMenu
+                            flashSet={flashSet}
+                            flashSets={flashSets}
+                            setFlashSets={setFlashSets}
+                            userAuthState={userAuthState}
+                        />
                     }
 
                 </div>

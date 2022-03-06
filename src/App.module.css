@@ -102,10 +102,12 @@
 
 .hoverLight:hover {
   background: rgb(241, 239, 239);
+  transition: 0.2s ease;
 }
 
 .hoverDark:hover {
   background: rgb(39, 38, 38);
+  transition: 0.2s ease;
 }
 
 .clickIcon {
@@ -137,4 +139,15 @@
   font-size: 0.8rem;
   position: absolute;
   white-space: nowrap;
+}
+
+.textButton {
+  font-size: 1.25rem;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
+  user-select: none;
+}
+
+.textButton:hover {
+  
 }

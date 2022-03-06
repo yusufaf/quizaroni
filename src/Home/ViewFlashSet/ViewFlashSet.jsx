@@ -163,6 +163,11 @@ const ViewFlashSet = props => {
                 <div className={appStyles.title} style={{ marginTop: "1rem" }}>
                     {selectedFlashSet.title}
                 </div>
+
+                <div>
+                    {selectedFlashSet.description}
+                </div>
+
                 <span className={viewFlashStyles.backButton} onClick={() => setViewFlashSet(false)}>
                     <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
                         arrow_back
