@@ -68,3 +68,7 @@
 }
 
 .confirmDeleteCard:hover {}
+
+.renameCard {
+    color: orange;
+}

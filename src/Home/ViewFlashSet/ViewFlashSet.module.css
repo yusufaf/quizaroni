@@ -13,15 +13,18 @@
 }
 
 .viewPage {
-    display       : flex;
-    flex-direction: column;
-    justify-content: center;
-    gap           : 2rem;
+   
 }
 
+
+/* TODO: Fix this
+
+- Grid display?
+
+*/
 .viewContainer {
     position     : absolute;
-    height       : 12rem;
+    height       : 15rem;
     width        : 70rem;
     left         : 20rem;
     top          : 7.5rem;
