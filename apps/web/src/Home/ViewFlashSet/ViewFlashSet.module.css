@@ -1,20 +1,18 @@
 .actionBar {}
 
 .download {
-    display: flex;
+    display    : flex;
     align-items: center;
 }
 
 .cardCount {
-    position: absolute;
+    position : absolute;
     font-size: 1.25rem;
-    top: 20rem;
-    left: 0;
+    top      : 20rem;
+    left     : 0;
 }
 
-.viewPage {
-   
-}
+.viewPage {}
 
 
 /* TODO: Fix this
@@ -33,12 +31,48 @@
     box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
 }
 
+.header {
+    display: grid;
+    grid-template-columns: 30rem auto;
+}
+
+
+.setInfo {
+}
+
+.lightBorder {
+    border-right: 0.2rem solid #121212;
+}
+
+.darkBorder {
+    border-right: 0.2rem solid #F5F5F5;
+}
+
+.studySection {
+    padding-left: 1rem;
+}
+
+.studyOptions {
+    display: grid;
+    grid-template-columns: 15rem 15rem;
+    grid-template-rows: auto auto;
+}
+
+.studyButton {
+    font-size: 1.25rem;
+}
+
 
 .backButton {
     display    : flex;
     align-items: center;
     position   : absolute;
     top        : 0;
+}
+
+.back:active {
+    border-radius: 50%;
+    background: green;
 }
 
 .firstCard {
@@ -57,16 +91,16 @@
 }
 
 .viewCardContainer {
-    display          : flex;
-    gap              : 25rem;
-    margin-top       : 0.5rem;
+    display   : flex;
+    gap       : 25rem;
+    margin-top: 0.5rem;
 }
 
 .viewCardTerm,
 .viewCardDefinition {
     display       : flex;
     flex-direction: column;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    flex-grow: 1;
+    align-items   : flex-start;
+    flex-wrap     : wrap;
+    flex-grow     : 1;
 }
