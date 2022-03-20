@@ -111,15 +111,17 @@ const NavBar = props => {
                             Home
                         </NavLink>
                     </div>
-                    <div >
-                        <NavLink
-                            to="/login"
-                            className={navStyles.link}
-                            style={activeLinkStyle}
-                        >
-                            Login
-                        </NavLink>
-                    </div>
+                    {!userAuthState &&
+                        <div >
+                            <NavLink
+                                to="/login"
+                                className={navStyles.link}
+                                style={activeLinkStyle}
+                            >
+                                Login
+                            </NavLink>
+                        </div>
+                    }
                     <div >
                         <NavLink
                             to="/create"
@@ -127,6 +129,15 @@ const NavBar = props => {
                             style={activeLinkStyle}
                         >
                             Create
+                        </NavLink>
+                    </div>
+                    <div >
+                        <NavLink
+                            to="/explore"
+                            className={navStyles.link}
+                            style={activeLinkStyle}
+                        >
+                            Explore
                         </NavLink>
                     </div>
                     <div className={navStyles.rightActions}>

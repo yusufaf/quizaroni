@@ -84,6 +84,12 @@ function App() {
               <Profile userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
             }
           />
+          <Route
+            path="/explore"
+            element={
+              <></>
+            }
+          />
           {/* TODO: Route for view / editing flashsets */}
           <Route
             path="/view"

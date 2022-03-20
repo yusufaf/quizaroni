@@ -311,7 +311,6 @@ const CreateSet = props => {
                                 upload_file
                             </i>
                         </div>
-                        {/* Individual Card Inputs */}
                         {renderCreateCards()}
                         <button
                             className={createdSetCards.length !== 0 ? `${createSetStyles.addCard}` : `${createSetStyles.addCard} ${createSetStyles.noInputs}`}

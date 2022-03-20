@@ -15,6 +15,9 @@ import { useTheme } from "../../theme/useTheme";
 import * as viewFlashStyles from './ViewFlashSet.module.css';
 import * as appStyles from "../../App.module.css";
 
+import { VIEW_SET } from "../../utilities/constants";
+const { BACKGROUND, TEXT } = VIEW_SET;
+
 const ViewFlashSet = props => {
     const {
         setViewFlashSet,
@@ -30,6 +33,7 @@ const ViewFlashSet = props => {
     const [showReminderModal, setShowReminderModal] = useState(false);
     const [disableTextColor, setDisableTextColor] = useState(false);
     const [disableBackgroundColor, setDisableBackgroundColor] = useState(false);
+    const [studySetViewable, setStudySetViewable] = useState(false);
 
 
     /* Update the title of the page to include the title of the set*/
@@ -128,7 +132,7 @@ const ViewFlashSet = props => {
                             checked={disableTextColor}
                             onChange={() => handleDisableColorToggle("TEXT")}
                         />
-                    } label="Disable Text Color"
+                    } label={`Text Color: ${disableTextColor ? "Disabled" : "Enabled"}`}
                     />
                 </span>
                 <br></br>
@@ -139,10 +143,20 @@ const ViewFlashSet = props => {
                             checked={disableBackgroundColor}
                             onChange={() => handleDisableColorToggle("BACKGROUND")}
                         />
-                    } label="Disable Background Color"
+                    } label={`Background Color: ${disableBackgroundColor ? "Disabled" : "Enabled"}`}
                     />
                 </span>
-
+                <br></br>
+                <span>
+                    <FormControlLabel control={
+                        <Switch
+                            size="small"
+                            checked={studySetViewable}
+                            onChange={() => setStudySetViewable(!studySetViewable)}
+                        />
+                    } label={`Viewable: ${studySetViewable ? "Public" : "Private"}`}
+                    />
+                </span>
             </div>
         )
     }
@@ -171,21 +185,36 @@ const ViewFlashSet = props => {
             <div className={viewFlashStyles.viewContainer}
                 style={{ color: theme.foreground, background: theme.background }}
             >
-                <div className={appStyles.title} style={{ marginTop: "1rem" }}>
-                    {selectedFlashSet.title}
+                <div className={viewFlashStyles.header}>
+
+                    <div className={`${viewFlashStyles.setInfo} ${isDarkMode ? viewFlashStyles.darkBorder : viewFlashStyles.lightBorder}`}
+                    >
+                        <div className={appStyles.title} style={{ marginTop: "1rem" }}>
+                            {selectedFlashSet.title}
+                        </div>
+                        <div>
+                            {selectedFlashSet.description}
+                        </div>
+                        <span className={viewFlashStyles.backButton} onClick={() => setViewFlashSet(false)}>
+                            <i className={`material-icons-outlined ${appStyles.clickIcon} ${viewFlashStyles.back}`}>
+                                arrow_back
+                            </i>
+                            Back to Your Flashsets
+                        </span>
+                        {renderActionBar()}
+                    </div>
+                    <div className={viewFlashStyles.studySection}>
+                        <div className={appStyles.title}>
+                            Study
+                        </div>
+                        <div className={viewFlashStyles.studyOptions}>
+                            <div className={viewFlashStyles.studyButton}>
+                                Flashcards
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div>
-                    {selectedFlashSet.description}
-                </div>
-
-                <span className={viewFlashStyles.backButton} onClick={() => setViewFlashSet(false)}>
-                    <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
-                        arrow_back
-                    </i>
-                    Back to Your Flashsets
-                </span>
-                {renderActionBar()}
                 <div className={viewFlashStyles.cardCount}>
                     Number of cards in this study set: {selectedFlashSet.cards.length}
                 </div>
