@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 /* Firebase Operations */
 import { collection, query, where, getDocs, updateDoc } from "firebase/firestore";
@@ -30,6 +30,17 @@ const ViewFlashSet = props => {
     const [showReminderModal, setShowReminderModal] = useState(false);
     const [disableTextColor, setDisableTextColor] = useState(false);
     const [disableBackgroundColor, setDisableBackgroundColor] = useState(false);
+
+
+    /* Update the title of the page to include the title of the set*/
+    useEffect(() => {
+        const { title } = selectedFlashSet;
+        document.title = `Quizaroni | ${title}`
+        return () => {
+            document.title = `Quizaroni`;
+        }
+    }, [])
+
 
     const handleDisableColorToggle = async (type) => {
         const { uid } = userAuthState;
