@@ -33,3 +33,8 @@ export const CREATE_SET = {
     DESC_PLACE: "Enter a description for your new study set",
     LABEL_PLACE: "Enter a label for your new study set",
 }
+
+export const VIEW_SET = {
+    BACKGROUND: "BACKGROUND",
+    TEXT: "TEXT"
+}
