@@ -54,8 +54,16 @@ const CreateSet = props => {
         descInput: false
     })
 
+    /* On mount:
+    - Render the options for the options dropdown
+    - Update the title of the page to say "Create a new study set" 
+    */
     useEffect(() => {
         renderLabelOptions();
+        document.title = `Quizaroni | Create new study set`
+        return () => {
+            document.title = `Quizaroni`;
+        }
     }, []);
 
     /**

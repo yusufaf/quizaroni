@@ -78,6 +78,13 @@ const Login = props => {
     })
 
     useEffect(() => {
+        document.title = `Quizaroni | Login`
+        return () => {
+            document.title = `Quizaroni`;
+        }
+    }, [])
+
+    useEffect(() => {
         firebaseUI = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
         if (firebaseUI && !userAuthState) {
             firebaseUI.start('#firebaseui-auth-container', uiConfig);

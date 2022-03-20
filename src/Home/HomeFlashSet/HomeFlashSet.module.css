@@ -27,20 +27,17 @@
 }
 
 .actionsMenu {
-    position: absolute;
-    right: 0;
-    left: 5rem;
-
-    min-width: 7rem;
-
-    display: flex;
+    position      : absolute;
+    right         : 0;
+    left          : 5rem;
+    min-width     : 7rem;
+    display       : flex;
     flex-direction: column;
-
-    transition: 0.2s ease-in;
+    transition    : 0.2s ease-in;
 }
 
 .menuItem {
-    display: flex;
+    display    : flex;
     align-items: center;
 
     gap: 0.5rem;

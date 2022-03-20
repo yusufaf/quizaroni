@@ -49,7 +49,7 @@ const Home = props => {
     };
 
     const homeSetProps = {
-        flashSets, 
+        flashSets,
         setFlashSets,
         setViewFlashSet,
         setSelectedFlashSet,
@@ -66,6 +66,13 @@ const Home = props => {
     /* Alert Popup */
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState("");
+
+    useEffect(() => {
+        document.title = `Quizaroni | Home`
+        return () => {
+            document.title = `Quizaroni`;
+        }
+    }, [])
 
     /* */
     useEffect(() => {

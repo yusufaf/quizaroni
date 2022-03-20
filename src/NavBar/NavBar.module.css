@@ -2,6 +2,7 @@
     display    : flex;
     align-items: center;
     transition : 0.2s ease;
+    user-select: none;
 }
 
 .logo {
