@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-
 /* Firebase Operations */
 import { collection, query, where, getDocs, updateDoc } from "firebase/firestore";
 import { firebaseApp, database } from "../../firebase/firebase";
@@ -15,7 +14,8 @@ import { useTheme } from "../../theme/useTheme";
 import * as viewFlashStyles from './ViewFlashSet.module.css';
 import * as appStyles from "../../App.module.css";
 
-import { VIEW_SET } from "../../utilities/constants";
+import FLASH_CARDS_IMG from "../../resources/images/flash-card.png";
+import { STUDY_MODES, VIEW_SET } from "../../utilities/constants";
 const { BACKGROUND, TEXT } = VIEW_SET;
 
 const ViewFlashSet = props => {
@@ -26,8 +26,6 @@ const ViewFlashSet = props => {
         userAuthState
     } = props;
 
-    console.log("props = ", props);
-
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     const [showReminderModal, setShowReminderModal] = useState(false);
@@ -35,8 +33,9 @@ const ViewFlashSet = props => {
     const [disableBackgroundColor, setDisableBackgroundColor] = useState(false);
     const [studySetViewable, setStudySetViewable] = useState(false);
 
+    const [selectedStudyMode, setSelectedStudyMode] = useState("");
 
-    /* Update the title of the page to include the title of the set*/
+    /* Update the title of the page to include the title of the set */
     useEffect(() => {
         const { title } = selectedFlashSet;
         document.title = `Quizaroni | ${title}`
@@ -57,7 +56,7 @@ const ViewFlashSet = props => {
         const docSnap = await getDocs(queryResult);
         const flashDoc = docSnap.docs[0];
 
-        if (type === "TEXT") {
+        if (type === TEXT) {
             setDisableTextColor(!disableTextColor)
             if (flashDoc) {
                 const docRef = flashDoc.ref;
@@ -66,7 +65,7 @@ const ViewFlashSet = props => {
                 });
             }
         }
-        else if (type === "BACKGROUND") {
+        else if (type === BACKGROUND) {
             setDisableBackgroundColor(!disableBackgroundColor)
             if (flashDoc) {
                 const docRef = flashDoc.ref;
@@ -189,18 +188,20 @@ const ViewFlashSet = props => {
 
                     <div className={`${viewFlashStyles.setInfo} ${isDarkMode ? viewFlashStyles.darkBorder : viewFlashStyles.lightBorder}`}
                     >
-                        <div className={appStyles.title} style={{ marginTop: "1rem" }}>
-                            {selectedFlashSet.title}
-                        </div>
-                        <div>
-                            {selectedFlashSet.description}
-                        </div>
                         <span className={viewFlashStyles.backButton} onClick={() => setViewFlashSet(false)}>
                             <i className={`material-icons-outlined ${appStyles.clickIcon} ${viewFlashStyles.back}`}>
                                 arrow_back
                             </i>
                             Back to Your Flashsets
                         </span>
+                        
+                        <div className={appStyles.title}>
+                            {selectedFlashSet.title}
+                        </div>
+                        <div>
+                            {selectedFlashSet.description}
+                        </div>
+
                         {renderActionBar()}
                     </div>
                     <div className={viewFlashStyles.studySection}>
@@ -208,8 +209,11 @@ const ViewFlashSet = props => {
                             Study
                         </div>
                         <div className={viewFlashStyles.studyOptions}>
-                            <div className={viewFlashStyles.studyButton}>
-                                Flashcards
+                            <div className={`${viewFlashStyles.studyButton} ${isDarkMode ? appStyles.hoverDark : appStyles.hoverLight}`}
+                                onClick={() => setSelectedStudyMode(STUDY_MODES.FLASHCARDS)}
+                            >
+                                <img src={FLASH_CARDS_IMG} height={32} width={32} />
+                                <span>Flashcards </span>
                             </div>
                         </div>
                     </div>
