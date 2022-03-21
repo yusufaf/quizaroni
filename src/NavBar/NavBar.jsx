@@ -111,17 +111,6 @@ const NavBar = props => {
                             Home
                         </NavLink>
                     </div>
-                    {!userAuthState &&
-                        <div >
-                            <NavLink
-                                to="/login"
-                                className={navStyles.link}
-                                style={activeLinkStyle}
-                            >
-                                Login
-                            </NavLink>
-                        </div>
-                    }
                     <div >
                         <NavLink
                             to="/create"
@@ -142,7 +131,7 @@ const NavBar = props => {
                     </div>
                     <div className={navStyles.rightActions}>
                         <div>
-                            {userAuthState &&
+                            {userAuthState ?
                                 <div
                                     className={navStyles.logout}
                                     style={{ color: `${theme.foreground}` }}
@@ -152,6 +141,19 @@ const NavBar = props => {
                                         logout
                                     </span>
                                     Logout
+                                </div>
+                                :
+                                <div >
+                                    <span class="material-icons-outlined">
+                                        login
+                                    </span>
+                                    <NavLink
+                                        to="/login"
+                                        className={navStyles.link}
+                                        style={activeLinkStyle}
+                                    >
+                                        Login
+                                    </NavLink>
                                 </div>
                             }
                         </div>
