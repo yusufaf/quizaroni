@@ -38,3 +38,7 @@ export const VIEW_SET = {
     BACKGROUND: "BACKGROUND",
     TEXT: "TEXT"
 }
+
+export const STUDY_MODES = {
+    FLASHCARDS: "FLASHCARDS"
+}
