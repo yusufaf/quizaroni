@@ -16,6 +16,7 @@ import * as appStyles from "../../App.module.css";
 
 import FLASH_CARDS_IMG from "../../resources/images/flash-card.png";
 import { STUDY_MODES, VIEW_SET } from "../../utilities/constants";
+import FlashcardsStudy from "./FlashcardsStudy";
 const { BACKGROUND, TEXT } = VIEW_SET;
 
 const ViewFlashSet = props => {
@@ -181,51 +182,62 @@ const ViewFlashSet = props => {
     /* TODO: Fix the spacing between the ViewContainer and the (first) ViewCards */
     return (
         <div className={viewFlashStyles.viewPage}>
-            <div className={viewFlashStyles.viewContainer}
-                style={{ color: theme.foreground, background: theme.background }}
-            >
-                <div className={viewFlashStyles.header}>
+            {
+                selectedStudyMode === STUDY_MODES.FLASHCARDS ?
+                    (
+                        <FlashcardsStudy
+                            selectedFlashSet={selectedFlashSet}
+                            userAuthState={userAuthState}
+                        />
+                    )
+                    :
+                    (
+                        <div className={viewFlashStyles.viewContainer}
+                            style={{ color: theme.foreground, background: theme.background }}
+                        >
+                            <div className={viewFlashStyles.header}>
 
-                    <div className={`${viewFlashStyles.setInfo} ${isDarkMode ? viewFlashStyles.darkBorder : viewFlashStyles.lightBorder}`}
-                    >
-                        <span className={viewFlashStyles.backButton} onClick={() => setViewFlashSet(false)}>
-                            <i className={`material-icons-outlined ${appStyles.clickIcon} ${viewFlashStyles.back}`}>
-                                arrow_back
-                            </i>
-                            Back to Your Flashsets
-                        </span>
-                        
-                        <div className={appStyles.title}>
-                            {selectedFlashSet.title}
-                        </div>
-                        <div>
-                            {selectedFlashSet.description}
-                        </div>
+                                <div className={`${viewFlashStyles.setInfo} ${isDarkMode ? viewFlashStyles.darkBorder : viewFlashStyles.lightBorder}`}
+                                >
+                                    <span className={viewFlashStyles.backButton} onClick={() => setViewFlashSet(false)}>
+                                        <i className={`material-icons-outlined ${appStyles.clickIcon} ${viewFlashStyles.back}`}>
+                                            arrow_back
+                                        </i>
+                                        Back to Your Flashsets
+                                    </span>
 
-                        {renderActionBar()}
-                    </div>
-                    <div className={viewFlashStyles.studySection}>
-                        <div className={appStyles.title}>
-                            Study
-                        </div>
-                        <div className={viewFlashStyles.studyOptions}>
-                            <div className={`${viewFlashStyles.studyButton} ${isDarkMode ? appStyles.hoverDark : appStyles.hoverLight}`}
-                                onClick={() => setSelectedStudyMode(STUDY_MODES.FLASHCARDS)}
-                            >
-                                <img src={FLASH_CARDS_IMG} height={32} width={32} />
-                                <span>Flashcards </span>
+                                    <div className={appStyles.title}>
+                                        {selectedFlashSet.title}
+                                    </div>
+                                    <div>
+                                        {selectedFlashSet.description}
+                                    </div>
+
+                                    {renderActionBar()}
+                                </div>
+                                <div className={viewFlashStyles.studySection}>
+                                    <div className={appStyles.title}>
+                                        Study
+                                    </div>
+                                    <div className={viewFlashStyles.studyOptions}>
+                                        <div className={`${viewFlashStyles.studyButton} ${isDarkMode ? appStyles.hoverDark : appStyles.hoverLight}`}
+                                            onClick={() => setSelectedStudyMode(STUDY_MODES.FLASHCARDS)}
+                                        >
+                                            <img src={FLASH_CARDS_IMG} height={32} width={32} />
+                                            <span>Flashcards </span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
+                            <div className={viewFlashStyles.cardCount}>
+                                Number of cards in this study set: {selectedFlashSet.cards.length}
+                            </div>
+                            {renderSetCards()}
                         </div>
-                    </div>
-                </div>
-
-                <div className={viewFlashStyles.cardCount}>
-                    Number of cards in this study set: {selectedFlashSet.cards.length}
-                </div>
-                {renderSetCards()}
-            </div>
+                    )
+            }
         </div>
-
     )
 }
 
