@@ -5,11 +5,10 @@ import { useState, useEffect, useRef } from "react"
 // import { database } from "../firebase/firebase";
 
 /* Outside Components */
-import { Alert, AlertTitle, Modal, Tooltip } from '@mui/material/';
+import { Card, Typography } from '@mui/material/';
 
 /* Styling */
 import { useTheme } from "../../theme/useTheme";
-import * as appStyles from "../../App.module.css";
 import * as viewFlashStyles from './ViewFlashSet.module.css';
 
 // import {
@@ -22,6 +21,8 @@ const FlashcardsStudy = props => {
 
     const [currentCard, setCurrentCard] = useState({});
 
+    // TODO: Makestyles here?
+    const cardStyling = { display: 'flex', minHeight: "20rem", minWidth: "30rem", justifyContent: "center" }
 
     const handleArrowClick = (direction) => {
 
@@ -39,10 +40,11 @@ const FlashcardsStudy = props => {
                 >
                     arrow_backward
                 </div>
-
-                <div>
-
-                </div>
+                <Card sx={cardStyling}>
+                    <Typography variant="h5" sx={{ alignSelf: "center" }}>
+                        Live From Space
+                    </Typography>
+                </Card>
 
                 <div class={`material-icons ${viewFlashStyles.directionArrow}`}
                     onClick={() => handleArrowClick("forward")}

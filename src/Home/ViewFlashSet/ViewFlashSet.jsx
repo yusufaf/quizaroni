@@ -5,7 +5,7 @@ import { firebaseApp, database } from "../../firebase/firebase";
 
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, FormControlLabel, Switch, Tooltip } from '@mui/material/';
+import { Alert, AlertTitle, FormControlLabel, Switch, Paper, Tooltip } from '@mui/material/';
 
 import ViewFlashCard from "./ViewFlashCard";
 

@@ -74,30 +74,35 @@
     cursor  : pointer;
 }
 
-/* Profile Dropdown Styles */
+/*
+======================= 
+Profile Dropdown Styles 
+=======================
+*/
 .dropdown {
     position     : absolute;
-    left         : 4rem;
-    top          : 2rem;
-    border-radius: 0.75rem;
-    padding      : 1rem;
-    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
-    z-index      : 1000;
+    /* left         : 4rem; */
+    /* top          : 2rem; */
+    /* border-radius: 0.75rem; */
+    /* padding      : 1rem; */
+    /* box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2); */
+    /* z-index      : 1000; */
 }
+
 
 .dropdownLink {
     font-size      : 1.25rem;
     text-decoration: none;
 }
 
-.dropdownItem {
+/* .dropdownItem {
     width        : 100%;
     margin-bottom: 0.25rem;
 }
 
 .dropdownItem:hover {
     opacity: 0.7;
-}
+} */
 
 .heading {
     display    : flex;
