@@ -6,7 +6,6 @@
 }
 
 .cardCount {
-    position : absolute;
     font-size: 1.25rem;
     top      : 20rem;
     left     : 0;
@@ -20,12 +19,12 @@
 }
 
 
-/* TODO: Fix this
+/* ================ */
+/* View Flashset Page Styling */
+/* ================ */
 
-- Grid display?
-
-*/
 .viewContainer {
+    grid-row: 1;
     height          : 15rem;
     width           : 70rem;
     padding         : 1rem 1.25rem;

@@ -25,6 +25,8 @@ const NavBar = props => {
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState("");
 
+    const dropdownRef = useRef(null);
+
     const activeLinkStyle = ({ isActive }) => ({
         borderBottom: isActive ? '0.2rem solid orange' : 'none',
         color: `${theme.foreground}`
@@ -168,6 +170,7 @@ const NavBar = props => {
                         <div
                             className={navStyles.accountCircle}
                             onClick={() => setShowDropdown(true)}
+                            ref={dropdownRef}
                         >
                             <AccountCircle
                                 style={{ fontSize: "2rem" }}
@@ -176,10 +179,9 @@ const NavBar = props => {
                                 style={{ fontSize: "2rem" }}
                             />
                         </div>
-
-                        {showDropdown &&
-                            <ProfileDropdown userAuthState={userAuthState} setShowDropdown={setShowDropdown} />
-                        }
+                        <ProfileDropdown userAuthState={userAuthState} showDropdown={showDropdown}
+                            dropdownRef={dropdownRef} setShowDropdown={setShowDropdown}
+                        />
                     </div>
                 </div>
             </nav>

@@ -1,5 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+
+import { Menu, MenuItem } from '@mui/material/';
 
 /* Styling */
 import { useTheme } from "../theme/useTheme";
@@ -7,43 +9,42 @@ import * as profileStyles from './Profile.module.css';
 import * as appStyles from "../App.module.css";
 
 const ProfileDropdown = props => {
-    const { setShowDropdown } = props;
+    const { showDropdown, setShowDropdown } = props;
     const { isDarkMode, theme } = useTheme();
 
-    const dropdownRef = useRef(null);
+    console.log("Theme = ", theme);
 
-    /* useEffect to add a clickOutsideListener for the Profile dropdown JSX */
-    useEffect(() => {
-        window.addEventListener("click", handleClickOutside);
-        return () => {
-            window.removeEventListener("click", handleClickOutside);
-        }
-    }, [dropdownRef])
-
-    /**
-     * Handles hiding dropdown when clicking away from it
-     * @param {*} e 
-     */
-    const handleClickOutside = e => {
-        if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-            setShowDropdown(false);
-        }
-    }
+    // const useStyles = makeStyles({
+    //     root: {
+    //         color: "azure",
+    //         '& .MuiInputLabel-root': { color: "#adadad", }
+    //     }
+    // })
 
     return (
-        <div className={profileStyles.dropdown} ref={dropdownRef}>
-            <div className={profileStyles.dropdownItem}>
-                <Link
-                    className={`${profileStyles.dropdownLink} ${isDarkMode ? appStyles.darkBorder : appStyles.lightBorder}`}
-                    to="/profile"
-                    style={{
-                        color: `${theme.foreground}`
+        <div className={profileStyles.dropdown}>
+            <Menu
+                open={showDropdown}
+                onClose={() => setShowDropdown(false)}
+            >
+                <MenuItem
+                    sx={{
+                        backgroundColor: theme.background,
+                        color: theme.foreground
                     }}
+                    onClick={() => setShowDropdown(false)}
                 >
-                    Profile
-                </Link>
-            </div>
-
+                    <Link
+                        className={`${profileStyles.dropdownLink} ${isDarkMode ? appStyles.darkBorder : appStyles.lightBorder}`}
+                        to="/profile"
+                        style={{
+                            color: `${theme.foreground}`
+                        }}
+                    >
+                        Profile
+                    </Link>
+                </MenuItem>
+            </Menu>
         </div>
     )
 }
