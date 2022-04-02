@@ -119,16 +119,24 @@
 /* Fullscreen Study Styling */
 /* ================ */
 
+.studyElements {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    transform: translate(0, 50%);
+}
+
+
 .studyCard {
     
 }
 
 /*  */
-.directionArrow {
+/* .directionArrow {
     border-radius: 50%;
     width: 2rem;
     cursor: pointer;
-}
+} */
 
 .directionArrow:hover {
     

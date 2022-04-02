@@ -8,7 +8,7 @@ import 'firebaseui/dist/firebaseui.css';
 
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle } from '@mui/material/';
+import { Alert, AlertTitle, Card, Typography } from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 
@@ -221,7 +221,7 @@ const Login = props => {
                 <LoginMessage page="login" />
                 :
                 (
-                    <>
+                    <div className={loginStyles.loginPage}>
                         <div className={loginStyles.loginContainer}
                             style={{ color: theme.foreground, background: theme.background }}
                             onKeyPress={enterKeyHandler}
@@ -301,7 +301,7 @@ const Login = props => {
                         >
                         </div>
                         <div id="loader">Loading...</div>
-                    </>
+                    </div>
                 )
             }
             {showAlert &&
