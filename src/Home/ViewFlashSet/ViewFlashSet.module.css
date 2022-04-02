@@ -1,4 +1,4 @@
-.actionBar {}
+/* .actionBar {} */
 
 .download {
     display    : flex;
@@ -38,7 +38,7 @@
 }
 
 
-.setInfo {}
+/* .setInfo {} */
 
 .lightBorder {
     border-right: 0.2rem solid #121212;
@@ -124,20 +124,4 @@
     align-items: center;
     gap: 2rem;
     transform: translate(0, 50%);
-}
-
-
-.studyCard {
-    
-}
-
-/*  */
-/* .directionArrow {
-    border-radius: 50%;
-    width: 2rem;
-    cursor: pointer;
-} */
-
-.directionArrow:hover {
-    
 }
