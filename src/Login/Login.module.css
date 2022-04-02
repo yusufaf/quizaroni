@@ -1,6 +1,10 @@
 .loginPage {
-    position: absolute;
-    /* top: 20rem; */
+    display      : grid;
+    align-items  : center;
+    justify-items: center;
+    margin       : 0 auto;
+    /* display: flex;
+    justify-content: center; */
 }
 
 .loginContainer {
