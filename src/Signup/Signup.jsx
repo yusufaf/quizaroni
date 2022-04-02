@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 
-import { doc, updateDoc, query, where, collection, getDoc, getDocs, addDoc } from "firebase/firestore";
+import { doc, updateDoc, query, where, collection, addDoc } from "firebase/firestore";
 import { firebaseApp, database } from "../firebase/firebase";
 import { getAuth, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import * as firebaseui from 'firebaseui'
@@ -8,7 +8,7 @@ import 'firebaseui/dist/firebaseui.css';
 
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle } from '@mui/material/';
+import { Alert, AlertTitle, Card, Typography } from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 
