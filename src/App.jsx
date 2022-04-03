@@ -12,15 +12,14 @@ import Signup from "./Signup/Signup";
 import CreateSet from "./CreateSet/CreateSet";
 import Profile from "./Profile/Profile";
 import ForgotPassword from "./ForgotPassword/ForgotPassword";
-import { firebaseApp } from "./firebase/firebase";
 
 /* Styling */
 import { useTheme } from "./theme/useTheme";
-import * as appStyles from "./App.module.css";
+// import * as appStyles from "./App.module.css";
 
 import { handleDesktopZoom } from "./utilities/handleDesktopZoom";
 
-function App() {
+const App = () => {
   // Wrap component tree with redux store and the theme context
 
   /* TODO: Bring the auth state into a Redux slice / reducer */
