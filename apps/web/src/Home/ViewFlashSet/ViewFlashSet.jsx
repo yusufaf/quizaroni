@@ -4,8 +4,8 @@ import { collection, query, where, getDocs, updateDoc } from "firebase/firestore
 import { firebaseApp, database } from "../../firebase/firebase";
 
 /* Outside Components */
-import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, FormControlLabel, Switch, Paper, Tooltip } from '@mui/material/';
+import { Alert, AlertTitle, FormControlLabel, IconButton, Switch, Paper, Tooltip } from '@mui/material/';
+import { ArrowBack } from '@mui/icons-material/';
 
 import ViewFlashCard from "./ViewFlashCard";
 
@@ -35,6 +35,13 @@ const ViewFlashSet = props => {
     const [studySetViewable, setStudySetViewable] = useState(false);
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
+
+    // TODO: Increase size of arrow buttons?
+    const arrowIconStyling = {
+        '&.MuiIconButton-colorPrimary': {
+            color: theme.foreground,
+        },
+    }
 
     /* Update the title of the page to include the title of the set */
     useEffect(() => {
@@ -188,6 +195,7 @@ const ViewFlashSet = props => {
                         <FlashcardsStudy
                             selectedFlashSet={selectedFlashSet}
                             userAuthState={userAuthState}
+                            setSelectedStudyMode={setSelectedStudyMode}
                         />
                     )
                     :
@@ -199,10 +207,15 @@ const ViewFlashSet = props => {
 
                                 <div className={`${viewFlashStyles.setInfo} ${isDarkMode ? viewFlashStyles.darkBorder : viewFlashStyles.lightBorder}`}
                                 >
-                                    <span className={viewFlashStyles.backButton} onClick={() => setViewFlashSet(false)}>
-                                        <i className={`material-icons-outlined ${appStyles.clickIcon} ${viewFlashStyles.back}`}>
-                                            arrow_back
-                                        </i>
+                                    <IconButton color="primary"
+                                        aria-label="arrow backward" component="span"
+                                        sx={arrowIconStyling}
+                                        onClick={() => setViewFlashSet(false)}
+                                    >
+                                            <ArrowBack />
+                                    </IconButton>
+
+                                    <span>
                                         Back to Your Flashsets
                                     </span>
 

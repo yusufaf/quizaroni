@@ -1,12 +1,12 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 
 /* Firebase Operations */
 // import { collection, addDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
 // import { database } from "../firebase/firebase";
 
 /* Outside Components */
-import { Card, IconButton, Typography } from '@mui/material/';
-import { ArrowBack, ArrowForward } from '@mui/icons-material/';
+import { Card, IconButton, LinearProgress, Typography } from '@mui/material/';
+import { ArrowBack, ArrowForward, } from '@mui/icons-material/';
 
 
 /* Styling */
@@ -18,11 +18,17 @@ import * as viewFlashStyles from './ViewFlashSet.module.css';
 // } from "../utilities/constants";
 
 const FlashcardsStudy = props => {
-    const { userAuthState, selectedFlashSet, } = props;
+    const { userAuthState, selectedFlashSet, setSelectedStudyMode } = props;
     const { theme } = useTheme();
 
-    const [currentCard, setCurrentCard] = useState({});
+    const [currentCard, setCurrentCard] = useState(selectedFlashSet.cards[0]);
     const [currentCardIndex, setCurrentCardIndex] = useState(0);
+    // TODO: Intended to keep track of the number of cards the user has clicked on and actually flipped/viewed
+    const [cardsStudied, setCardsStudied] = useState(0);
+
+    const [showWarningModal, setShowWarningModal] = useState(false);
+
+    console.log("selectedFlashSet = ", selectedFlashSet);
 
     // TODO: Makestyles here?
     const cardStyling = {
@@ -36,51 +42,71 @@ const FlashcardsStudy = props => {
             transition: "0.5s ease",
         }
     }
-    // TODO: Increase size of arrow buttons?
     const arrowIconStyling = {
+        "&:hover": {
+        },
         '&.MuiIconButton-colorPrimary': {
             color: theme.foreground,
         },
     }
 
     const handleArrowClick = (direction) => {
-        const length = Object.keys(selectedFlashSet).length;
+        const length = selectedFlashSet.cards.length;
         let newCardIndex = currentCardIndex;
         newCardIndex = direction === "FORWARD" ? newCardIndex + 1 : newCardIndex - 1;
-        console.log("newCardIndex is now = ", newCardIndex);
 
-        if (currentCardIndex + 1 >= length) {
+        if (newCardIndex < 0 || newCardIndex >= length) {
+            return;
             // TODO: Display page with "Study Again" button and return to home button
         }
+
         setCurrentCardIndex(newCardIndex);
+        const { cards } = selectedFlashSet;
+        setCurrentCard(cards[newCardIndex]);
     }
 
     return (
         <div className={viewFlashStyles.studyPage}>
             {/* TODO: In global App stylings: define back arrow */}
+            <IconButton color="primary"
+                aria-label="arrow backward" component="span"
+                sx={arrowIconStyling}
+                onClick={() => setSelectedStudyMode("")}
+            >
+                <ArrowBack fontSize="large" />
+            </IconButton>
+            {/* TODO: Determine font-size */}
+            <Typography
+                component="span"
+            >
+                Exit Study
+            </Typography>
 
             {/* Progress Bar / Info here */}
+            <LinearProgress variant="determinate" value={0} />
+
 
             <div className={viewFlashStyles.studyElements}>
-
                 <IconButton color="primary"
                     aria-label="arrow backward" component="span"
                     sx={arrowIconStyling}
                     onClick={() => handleArrowClick("BACKWARD")}
                 >
-                    <ArrowBack />
+                    <ArrowBack fontSize="large" />
                 </IconButton>
-                <Card sx={cardStyling} raised>
+                <Card sx={cardStyling} raised
+                    onClick={() => alert("bruh")}
+                >
+                    {/* Action Buttons in top right corner of current card */}
                     <Typography variant="h5" sx={{ alignSelf: "center" }}>
-                        {/* {currentCard.name} */}
-                        Live from Space
+                        {currentCard.term}
                     </Typography>
                 </Card>
                 <IconButton color="primary" aria-label="arrow forward" component="span"
                     sx={arrowIconStyling}
                     onClick={() => handleArrowClick("FORWARD")}
                 >
-                    <ArrowForward />
+                    <ArrowForward fontSize="large" />
                 </IconButton>
             </div>
         </div>
