@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 /* Firebase Operations */
 // import { collection, addDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
 // import { database } from "../firebase/firebase";
 
 /* Outside Components */
-import { Card, IconButton, LinearProgress, Typography } from '@mui/material/';
+import { Card, IconButton, LinearProgress, Tooltip, Typography } from '@mui/material/';
 import { ArrowBack, ArrowForward, } from '@mui/icons-material/';
 
 
@@ -23,6 +23,7 @@ const FlashcardsStudy = props => {
 
     const [currentCard, setCurrentCard] = useState(selectedFlashSet.cards[0]);
     const [currentCardIndex, setCurrentCardIndex] = useState(0);
+
     // TODO: Intended to keep track of the number of cards the user has clicked on and actually flipped/viewed
     const [cardsStudied, setCardsStudied] = useState(0);
 
@@ -75,25 +76,33 @@ const FlashcardsStudy = props => {
             >
                 <ArrowBack fontSize="large" />
             </IconButton>
-            {/* TODO: Determine font-size */}
             <Typography
+                variant="h6"
                 component="span"
+                sx={{
+                    "&.MuiTypography-root": {
+                        color: theme.foreground
+                    }
+                }}
             >
                 Exit Study
             </Typography>
 
             {/* Progress Bar / Info here */}
             <LinearProgress variant="determinate" value={0} />
-
-
             <div className={viewFlashStyles.studyElements}>
-                <IconButton color="primary"
-                    aria-label="arrow backward" component="span"
-                    sx={arrowIconStyling}
-                    onClick={() => handleArrowClick("BACKWARD")}
+                <Tooltip
+                    title="Go to previous card"
                 >
-                    <ArrowBack fontSize="large" />
-                </IconButton>
+                    <IconButton color="primary"
+                        aria-label="arrow backward" component="span"
+                        sx={arrowIconStyling}
+                        onClick={() => handleArrowClick("BACKWARD")}
+                    >
+
+                        <ArrowBack fontSize="large" />
+                    </IconButton>
+                </Tooltip>
                 <Card sx={cardStyling} raised
                     onClick={() => alert("bruh")}
                 >
@@ -102,14 +111,18 @@ const FlashcardsStudy = props => {
                         {currentCard.term}
                     </Typography>
                 </Card>
-                <IconButton color="primary" aria-label="arrow forward" component="span"
-                    sx={arrowIconStyling}
-                    onClick={() => handleArrowClick("FORWARD")}
+                <Tooltip
+                    title="Go to next card"
                 >
-                    <ArrowForward fontSize="large" />
-                </IconButton>
+                    <IconButton color="primary" aria-label="arrow forward" component="span"
+                        sx={arrowIconStyling}
+                        onClick={() => handleArrowClick("FORWARD")}
+                    >
+                        <ArrowForward fontSize="large" />
+                    </IconButton>
+                </Tooltip>
             </div>
-        </div>
+        </div >
     );
 }
 
