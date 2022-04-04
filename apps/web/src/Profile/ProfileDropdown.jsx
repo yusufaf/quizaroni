@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Menu, MenuItem } from '@mui/material/';
@@ -14,18 +13,20 @@ const ProfileDropdown = props => {
 
     console.log("Theme = ", theme);
 
-    // const useStyles = makeStyles({
-    //     root: {
-    //         color: "azure",
-    //         '& .MuiInputLabel-root': { color: "#adadad", }
-    //     }
-    // })
+    // TODO: Fix this
+    const profileMenuStyling = {
+        '&.MuiMenu-paper': {
+            color: theme.foreground,
+            backgroundColor: theme.background
+        },
+    }
 
     return (
         <div className={profileStyles.dropdown}>
             <Menu
                 open={showDropdown}
                 onClose={() => setShowDropdown(false)}
+                sx={profileMenuStyling}
             >
                 <MenuItem
                     sx={{

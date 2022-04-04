@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { NavLink, Link } from "react-router-dom";
-import { Alert, AlertTitle } from '@mui/material/';
+import { Alert, AlertTitle, Tooltip } from '@mui/material/';
 import { getAuth, signOut } from "firebase/auth";
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { AccountCircle, KeyboardArrowDown } from "@mui/icons-material"
@@ -13,9 +13,6 @@ import * as appStyles from '../App.module.css';
 import * as navStyles from './NavBar.module.css';
 import * as C from "../utilities/constants";
 
-/*
-    Navigation Bar Component
-*/
 const NavBar = props => {
     const { userAuthState, setUserAuthState } = props;
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
@@ -159,11 +156,15 @@ const NavBar = props => {
                                 </div>
                             }
                         </div>
-                        <DarkModeIcon
-                            onClick={toggleDarkMode}
-                            className={navStyles.darkModeToggle}
-                            style={{ color: isDarkMode ? "yellow" : "#121212", fontSize: "2rem" }}
-                        />
+                        <Tooltip
+                            title="Toggle dark mode"
+                        >
+                            <DarkModeIcon
+                                onClick={toggleDarkMode}
+                                className={navStyles.darkModeToggle}
+                                style={{ color: isDarkMode ? "yellow" : "#121212", fontSize: "2rem" }}
+                            />
+                        </Tooltip>
 
                         {/* TODO: Review the userAuthState conditional here */}
 
