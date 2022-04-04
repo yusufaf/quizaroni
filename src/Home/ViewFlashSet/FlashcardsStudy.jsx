@@ -5,7 +5,16 @@ import { useState } from "react"
 // import { database } from "../firebase/firebase";
 
 /* Outside Components */
-import { Card, IconButton, LinearProgress, Tooltip, Typography } from '@mui/material/';
+import {
+    Button,
+    Card,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    IconButton, LinearProgress, Tooltip, Typography
+} from '@mui/material/';
 import { ArrowBack, ArrowForward, } from '@mui/icons-material/';
 
 
@@ -29,9 +38,8 @@ const FlashcardsStudy = props => {
 
     const [showWarningModal, setShowWarningModal] = useState(false);
 
-    console.log("selectedFlashSet = ", selectedFlashSet);
+    console.log("showWarningModal is = ", showWarningModal);
 
-    // TODO: Makestyles here?
     const cardStyling = {
         display: 'flex',
         minHeight: "25rem",
@@ -43,6 +51,26 @@ const FlashcardsStudy = props => {
             transition: "0.5s ease",
         }
     }
+
+    const warningStyling = {
+        "& .MuiPaper-root": {
+            backgroundColor: theme.background,
+        }
+    }
+
+    const typographyStyling = {
+        "&.MuiTypography-root": {
+            color: theme.foreground
+        }
+    }
+
+    const retrieveTextStyling = (color, fontSize = "1.5rem") => {
+        return {
+            color,
+            fontSize
+        }
+    }
+
     const arrowIconStyling = {
         "&:hover": {
         },
@@ -66,31 +94,71 @@ const FlashcardsStudy = props => {
         setCurrentCard(cards[newCardIndex]);
     }
 
+    const handleMainBackArrow = () => {
+        setShowWarningModal(true)
+    }
+
+    const handleCloseWarning = () => {
+        setShowWarningModal(false);
+    }
+
     return (
         <div className={viewFlashStyles.studyPage}>
             {/* TODO: In global App stylings: define back arrow */}
             <IconButton color="primary"
                 aria-label="arrow backward" component="span"
                 sx={arrowIconStyling}
-                onClick={() => setSelectedStudyMode("")}
+                onClick={() => handleMainBackArrow()}
             >
                 <ArrowBack fontSize="large" />
             </IconButton>
+            <Dialog
+                open={showWarningModal}
+                onClose={handleCloseWarning}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+                sx={warningStyling}
+            >
+                <DialogTitle id="alert-dialog-title"
+                    sx={retrieveTextStyling(theme.foreground, "1.75rem")}
+                >
+                    {"Stop studying this set?"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description"
+                        sx={retrieveTextStyling(theme.foreground, "1.5rem")}
+                    >
+                        You haven't finished studying all the cards in this set, are you sure you want to exit?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseWarning} >Cancel</Button>
+                    <Button onClick={() => {
+                        handleCloseWarning();
+                        setSelectedStudyMode("")
+                    }} autoFocus>
+                        Yes
+                    </Button>
+                </DialogActions>
+            </Dialog>
             <Typography
                 variant="h6"
                 component="span"
-                sx={{
-                    "&.MuiTypography-root": {
-                        color: theme.foreground
-                    }
-                }}
+                sx={typographyStyling}
             >
                 Exit Study
             </Typography>
 
             {/* Progress Bar / Info here */}
+            <Typography
+                variant="h5"
+                sx={{ ...typographyStyling, marginBottom: "1rem" }}
+            >
+                Progress
+            </Typography>
             <LinearProgress variant="determinate" value={0} />
             <div className={viewFlashStyles.studyElements}>
+                {/* TODO: Figure out how to adjust the font size of the Tooltip */}
                 <Tooltip
                     title="Go to previous card"
                 >
