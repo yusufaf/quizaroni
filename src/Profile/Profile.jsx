@@ -167,16 +167,24 @@ const Profile = props => {
                         </div>
 
                         <div className={profileStyles.themeSelect}>
-                            <span className={`material-icons-outlined ${defaultTheme === "light" ? profileStyles.themeSelected : ""}`}
-                                onClick={() => handleDefaultTheme("light")}
+                            <Tooltip title="Switch default to Light mode"
+                                placement="left"
                             >
-                                light_mode
-                            </span>
-                            <span className={`material-icons-outlined ${defaultTheme === "dark" ? profileStyles.themeSelected : ""}`}
-                                onClick={() => handleDefaultTheme("dark")}
+                                <span className={`material-icons-outlined ${defaultTheme === "light" ? profileStyles.themeSelected : ""}`}
+                                    onClick={() => handleDefaultTheme("light")}
+                                >
+                                    light_mode
+                                </span>
+                            </Tooltip>
+                            <Tooltip title="Switch default to Dark mode"
+                                placement="right"
                             >
-                                dark_mode
-                            </span>
+                                <span className={`material-icons-outlined ${defaultTheme === "dark" ? profileStyles.themeSelected : ""}`}
+                                    onClick={() => handleDefaultTheme("dark")}
+                                >
+                                    dark_mode
+                                </span>
+                            </Tooltip>
                         </div>
 
                         <div className={profileStyles.heading}>

@@ -5,7 +5,7 @@ import { firebaseApp, database } from "../../firebase/firebase";
 
 /* Outside Components */
 import { Alert, AlertTitle, FormControlLabel, IconButton, Switch, Paper, Tooltip } from '@mui/material/';
-import { ArrowBack } from '@mui/icons-material/';
+import { ArrowBack, Download } from '@mui/icons-material/';
 
 import ViewFlashCard from "./ViewFlashCard";
 
@@ -116,6 +116,9 @@ const ViewFlashSet = props => {
     const renderActionBar = () => {
         return (
             <div className={viewFlashStyles.actionBar}>
+                {/* <IconButton>
+                    <Download/>
+                </IconButton> */}
                 <span className={viewFlashStyles.download} >
                     <i className={`material-icons-outlined ${appStyles.clickIcon}`}
                         onClick={() => handleDownloadSet()}

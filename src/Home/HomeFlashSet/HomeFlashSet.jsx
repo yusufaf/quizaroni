@@ -17,8 +17,11 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Menu, 
+    MenuItem,
     Tooltip,
 } from '@mui/material/';
+
 import { ArrowBack } from '@mui/icons-material/';
 
 /* Styling */
@@ -170,7 +173,6 @@ const HomeFlashSet = props => {
             currFlashsets.push(duplicatedFlashset);
             setFlashSets(currFlashsets);
         }
-
     }
 
 
@@ -231,6 +233,7 @@ const HomeFlashSet = props => {
                     >
                         more_vert
                     </span>
+                    
                     {showActionsMenu &&
                         <HomeActionsMenu
                             flashSet={flashSet}
