@@ -1,5 +1,5 @@
 import { useState, useRef } from "react"
-import { Tooltip } from '@mui/material/';
+import { IconButton, Tooltip, Typography } from '@mui/material/';
 import { useTheme } from "../../theme/useTheme";
 
 import { ChromePicker } from "react-color";
@@ -44,7 +44,14 @@ const NewCardInput = props => {
             style={{ color: theme.foreground, background: theme.background }}
         >
             <div>
-                <span><b>Card {index + 1}</b></span>
+                <Typography
+                    variant="h6"
+                    sx={{
+                        fontWeight: "bold"
+                    }}
+                >
+                    Card {index + 1}
+                </Typography>
                 <Tooltip
                     title="Delete this card"
                     placement="right"
@@ -82,7 +89,16 @@ const NewCardInput = props => {
             </div>
             <div className={createSetStyles.newCardInputs}>
                 <div className={createSetStyles.newCardTerm}>
-                    <label className={createSetStyles.inputLabel}>Term</label>
+                    <Typography
+                        variant="subtitle1"
+                        sx={{
+                            color: "orange",
+                        }}
+                    >
+                        Term
+                    </Typography>
+                    {/* <label className={createSetStyles.inputLabel}>Term</label> */}
+
                     <input
                         className={isDarkMode ? `${createSetStyles.newCardInput} ${appStyles.darkInput}` : `${createSetStyles.newCardInput} ${appStyles.lightInput}`}
                         placeholder="Enter a term"
@@ -144,7 +160,15 @@ const NewCardInput = props => {
                     }
                 </div>
                 <div className={createSetStyles.newCardDefinition}>
-                    <label className={createSetStyles.inputLabel}>Definition</label>
+                    <Typography
+                        variant="subtitle1"
+                        sx={{
+                            color: "orange",
+                        }}
+                    >
+                        Definition
+                    </Typography>
+                    {/* <label className={createSetStyles.inputLabel}>Definition</label> */}
                     <input
                         className={isDarkMode ? `${createSetStyles.newCardInput} ${appStyles.darkInput}` : `${createSetStyles.newCardInput} ${appStyles.lightInput}`}
                         placeholder="Enter a definition"
