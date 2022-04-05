@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react"
-
 /* Styling */
 import { useTheme } from "../../theme/useTheme";
 import * as viewFlashStyles from './ViewFlashSet.module.css';
 import * as appStyles from "../../App.module.css";
+
+import { Tooltip, Typography } from '@mui/material/';
 
 const ViewFlashCard = props => {
     const { cardInfo, disableTextColor, disableBackgroundColor, index } = props;
@@ -15,8 +15,15 @@ const ViewFlashCard = props => {
             style={{
                 color: theme.foreground, backgroundColor: `${cardInfo?.backgroundColor && !disableBackgroundColor ? cardInfo.backgroundColor : theme.background}`
             }}
-        >
-            <span><b>Card {index + 1}</b></span>
+        >   
+            <Typography
+                variant="h6"
+                sx={{
+                    fontWeight: "bold"
+                }}
+            >
+                Card {index + 1}
+            </Typography>
             <div className={viewFlashStyles.viewCardContainer}>
                 <div className={viewFlashStyles.viewCardTerm}>
                     <label className={appStyles.inputLabel}>Term</label>

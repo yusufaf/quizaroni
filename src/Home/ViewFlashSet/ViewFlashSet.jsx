@@ -4,7 +4,7 @@ import { collection, query, where, getDocs, updateDoc } from "firebase/firestore
 import { firebaseApp, database } from "../../firebase/firebase";
 
 /* Outside Components */
-import { Alert, AlertTitle, FormControlLabel, IconButton, Switch, Paper, Tooltip } from '@mui/material/';
+import { Alert, AlertTitle, FormControlLabel, IconButton, Switch, Paper, Tooltip, Typography } from '@mui/material/';
 import { ArrowBack, Download } from '@mui/icons-material/';
 
 import ViewFlashCard from "./ViewFlashCard";
@@ -215,20 +215,26 @@ const ViewFlashSet = props => {
                                         sx={arrowIconStyling}
                                         onClick={() => setViewFlashSet(false)}
                                     >
-                                            <ArrowBack />
+                                        <ArrowBack />
                                     </IconButton>
 
                                     <span>
                                         Back to Your Flashsets
                                     </span>
 
-                                    <div className={appStyles.title}>
+                                    <Typography
+                                        variant="h5"
+                                        sx={{
+                                            fontWeight: "bold"
+                                        }}
+                                    >
                                         {selectedFlashSet.title}
-                                    </div>
-                                    <div>
+                                    </Typography>
+                                    <Typography
+                                        variant="body1"
+                                    >
                                         {selectedFlashSet.description}
-                                    </div>
-
+                                    </Typography>
                                     {renderActionBar()}
                                 </div>
                                 <div className={viewFlashStyles.studySection}>
