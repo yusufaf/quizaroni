@@ -6,7 +6,8 @@ import { database } from "../firebase/firebase";
 
 /* Outside Components */
 import { useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Modal, Tooltip, Typography } from '@mui/material/';
+import { Alert, AlertTitle, IconButton, Modal, Tooltip, Typography } from '@mui/material/';
+import { UploadFile } from "@mui/icons-material";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import LoginMessage from "../LoginMessage/LoginMessage";
 
@@ -337,14 +338,24 @@ const CreateSet = props => {
                             >
                                 Create Set
                             </button>
+                            {/* What is this span for */}
                             <span>
-
                             </span>
-                            <i className={`material-icons-outlined ${createSetStyles.import}`}
+                            <IconButton
+                                onClick={() => setShowImportModal(true)}
+                            >
+                                <UploadFile
+                                    fontSize="large"
+                                    sx={{
+                                        color: theme.foreground
+                                    }}
+                                />
+                            </IconButton>
+                            {/* <i className={`material-icons-outlined ${createSetStyles.import}`}
                                 onClick={() => setShowImportModal(true)}
                             >
                                 upload_file
-                            </i>
+                            </i> */}
                         </div>
                         {renderCreateCards()}
                         <button
