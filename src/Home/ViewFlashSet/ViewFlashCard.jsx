@@ -36,25 +36,30 @@ const ViewFlashCard = props => {
                 color: theme.foreground, backgroundColor: `${cardInfo?.backgroundColor && !disableBackgroundColor ? cardInfo.backgroundColor : theme.background}`
             }}
         >
-            <Typography
-                variant="h5"
-                sx={{
-                    fontWeight: "bold"
-                }}
-            >
-                Card {index + 1}
-            </Typography>
-
-            <Tooltip
-                title="Play TTS"
-                placement="top"
-            >
-                <IconButton
-                    onClick={handleAudioPlayback}
+            <div className={viewFlashStyles.cardHeader}>
+                <Typography
+                    variant="h5"
+                    sx={{
+                        fontWeight: "bold"
+                    }}
                 >
-                    <VolumeUp />
-                </IconButton>
-            </Tooltip>
+                    Card {index + 1}
+                </Typography>
+
+                <div className={viewFlashStyles.cardActions}>
+                    <Tooltip
+                        title="Play TTS"
+                        placement="top"
+                    >
+                        <IconButton
+                            onClick={handleAudioPlayback}
+                        >
+                            <VolumeUp />
+                        </IconButton>
+                    </Tooltip>
+                </div>
+            </div>
+
             <div className={viewFlashStyles.viewCardContainer}>
                 <div className={viewFlashStyles.viewCardTerm}>
                     <Typography
