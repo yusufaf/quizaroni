@@ -1,14 +1,14 @@
-import { useState, useCallback, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 
-import { doc, updateDoc, query, where, collection, getDoc, getDocs } from "@firebase/firestore";
-import { firebaseApp, database } from "../firebase/firebase";
+import { doc, updateDoc, query, where, collection, getDocs } from "@firebase/firestore";
+import { database } from "../firebase/firebase";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css';
 
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Card, Typography } from '@mui/material/';
+import { Alert, AlertTitle, Button, Card, Typography } from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 
@@ -279,13 +279,31 @@ const Login = props => {
                                 </Link>
 
                                 {/* Login Button */}
-                                <button
+                                <Button
+                                    variant="contained"
+                                    disabled={enteredEmail === "" || enteredPass === ""}
+                                    onClick={() => handleLogin()}
+                                    sx={{
+                                        backgroundColor: "orange",
+                                        color: theme.foreground,
+                                        fontSize: "1rem",
+                                        "&.Mui-disabled": {
+                                            backgroundColor: "orange",
+                                            cursor: "not-allowed"
+                                        },
+                                        "&.MuiButton-root:hover": {
+                                            backgroundColor: "rgb(206, 143, 27)"
+                                        }
+                                    }}
+                                >
+                                    Log In
+                                </Button>
+                                {/* <button
                                     className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
                                     onClick={() => handleLogin()}
                                 >
                                     <b>Log In</b>
-                                </button>
-
+                                </button> */}
                                 {/* Signup Link  */}
                                 <Link
                                     className={loginStyles.signupLink}

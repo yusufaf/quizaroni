@@ -6,7 +6,7 @@ import { database } from "../firebase/firebase";
 
 /* Outside Components */
 import { useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Modal, Tooltip } from '@mui/material/';
+import { Alert, AlertTitle, Modal, Tooltip, Typography } from '@mui/material/';
 import NewCardInput from "./NewCardInput/NewCardInput";
 import LoginMessage from "../LoginMessage/LoginMessage";
 
@@ -60,7 +60,7 @@ const CreateSet = props => {
     */
     useEffect(() => {
         renderLabelOptions();
-        document.title = `Quizaroni | Create new study set`
+        document.title = `Quizaroni | Create`
         return () => {
             document.title = `Quizaroni`;
         }
@@ -260,23 +260,58 @@ const CreateSet = props => {
                         <div className={createSetStyles.createContainer}
                             style={{ color: theme.foreground, background: theme.background }}
                         >
-                            <div className={createSetStyles.title}>
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    fontWeight: "bold"
+                                }}
+                            >
                                 {CREATE_SET.TITLE}
-                            </div>
+                            </Typography>
+                            {/* <div className={createSetStyles.title}>
+                                {CREATE_SET.TITLE}
+                            </div> */}
                             <div className={createSetStyles.inputContainer}>
-                                <label className={createSetStyles.inputLabel}>Title</label>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{
+                                        color: "orange",
+                                        fontWeight: "bold"
+                                    }}
+                                >
+                                    Title
+                                </Typography>
+                                {/* <label className={createSetStyles.inputLabel}>Title</label> */}
                                 <input
                                     className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
                                     placeholder={CREATE_SET.TITLE_PLACE}
                                     onChange={e => setEnteredTitle(e.target.value)}
                                 />
-                                <label className={createSetStyles.inputLabel}>Description</label>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{
+                                        color: "orange",
+                                        fontWeight: "bold"
+                                    }}
+                                >
+                                    Description
+                                </Typography>
+                                {/* <label className={createSetStyles.inputLabel}>Description</label> */}
                                 <textarea
                                     className={`${createSetStyles.descInput} ${isDarkMode ? `${createSetStyles.dark} ${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
                                     placeholder={CREATE_SET.DESC_PLACE}
                                     onChange={e => setEnteredDescription(e.target.value)}
                                 />
-                                <label className={createSetStyles.inputLabel}>Label</label>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{
+                                        color: "orange",
+                                        fontWeight: "bold"
+                                    }}
+                                >
+                                    Label
+                                </Typography>
+                                {/* <label className={createSetStyles.inputLabel}>Label</label> */}
                                 <div className={createSetStyles.labelInputContainer}>
                                     <input
                                         className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
