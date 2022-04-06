@@ -4,7 +4,7 @@ import { collection, query, where, getDocs, updateDoc } from "firebase/firestore
 import { firebaseApp, database } from "../../firebase/firebase";
 
 /* Outside Components */
-import { Alert, AlertTitle, FormControlLabel, IconButton, Switch, Paper, Tooltip, Typography } from '@mui/material/';
+import { Alert, AlertTitle, Chip, FormControlLabel, IconButton, Switch, Paper, Tooltip, Typography } from '@mui/material/';
 import { ArrowBack, Download } from '@mui/icons-material/';
 
 import ViewFlashCard from "./ViewFlashCard";
@@ -142,18 +142,36 @@ const ViewFlashSet = props => {
                             checked={disableTextColor}
                             onChange={() => handleDisableColorToggle("TEXT")}
                         />
-                    } label={`Text Color: ${disableTextColor ? "Disabled" : "Enabled"}`}
+                    } label={
+                        <Typography
+                            sx={{
+                                color: disableTextColor ? "red" : "green"
+                            }}
+                        >
+                            {`Text Color: ${disableTextColor ? "Disabled" : "Enabled"}`}
+                        </Typography>
+                    }
                     />
                 </span>
                 <br></br>
                 <span>
-                    <FormControlLabel control={
-                        <Switch
-                            size="small"
-                            checked={disableBackgroundColor}
-                            onChange={() => handleDisableColorToggle("BACKGROUND")}
-                        />
-                    } label={`Background Color: ${disableBackgroundColor ? "Disabled" : "Enabled"}`}
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                size="small"
+                                checked={disableBackgroundColor}
+                                onChange={() => handleDisableColorToggle("BACKGROUND")}
+                            />
+                        }
+                        label={
+                            <Typography
+                                sx={{
+                                    color: disableBackgroundColor ? "red" : "green"
+                                }}
+                            >
+                                {`Background Color: ${disableBackgroundColor ? "Disabled" : "Enabled"}`}
+                            </Typography>
+                        }
                     />
                 </span>
                 <br></br>
@@ -230,6 +248,13 @@ const ViewFlashSet = props => {
                                     >
                                         {selectedFlashSet.title}
                                     </Typography>
+
+                                    <Chip label="TODO: Label here" variant="outlined"
+                                        sx={{
+                                            height: "2.5rem",
+                                            color: theme.foreground
+                                        }}
+                                    />
                                     <Typography
                                         variant="body1"
                                     >

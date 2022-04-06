@@ -93,11 +93,20 @@
     position     : relative;
     width        : 70rem;
     right        : 1.5rem;
-    padding      : 1.25rem;
+    padding      : 1rem 1.25rem 1.25rem 1.25rem;
     border-radius: 0.75rem;
     box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
 
     margin-bottom: 2.5rem;
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+}
+
+.cardActions {
+    margin-left: auto;
 }
 
 .viewCardContainer {
