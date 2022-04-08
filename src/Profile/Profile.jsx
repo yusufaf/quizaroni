@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { database } from "../firebase/firebase";
 import { deleteDoc, updateDoc, query, where, collection, getDoc, getDocs, limit } from "firebase/firestore";
 import { EmailAuthProvider, getAuth, deleteUser, updatePassword, reauthenticateWithCredential } from "firebase/auth";
-import { Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
+import { Button, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 import ProfileCard from "./ProfileCard";
 
@@ -144,169 +144,197 @@ const Profile = props => {
             // An error ocurred
             // ...
         });
+    }
 
+
+
+    if (!userAuthState) {
+        return <LoginMessage page="profile" />;
     }
 
     return (
         <>
-            {!userAuthState ?
-                <LoginMessage page="profile" />
-                :
-                <>
-                    <ProfileCard userAuthState={userAuthState} />
-                    <div className={profileStyles.profileContainer} style={{ color: theme.foreground, background: theme.background }}>
-                        <div className={appStyles.title}>
-                            Profile
-                        </div>
+            <>
+                <ProfileCard userAuthState={userAuthState} />
+                <div className={profileStyles.profileContainer} style={{ color: theme.foreground, background: theme.background }}>
+                    <div className={appStyles.title}>
+                        Profile
+                    </div>
 
-                        <div className={profileStyles.heading}>
-                            <span className="material-icons-outlined">
+                    <div className={profileStyles.heading}>
+                        <span className="material-icons-outlined">
+                            dark_mode
+                        </span>
+                        <div className={appStyles.smallTitle}>Default Theme</div>
+                    </div>
+
+                    <div className={profileStyles.themeSelect}>
+                        <Tooltip title="Switch default to Light mode"
+                            placement="left"
+                        >
+                            <span className={`material-icons-outlined ${defaultTheme === "light" ? profileStyles.themeSelected : ""}`}
+                                onClick={() => handleDefaultTheme("light")}
+                            >
+                                light_mode
+                            </span>
+                        </Tooltip>
+                        <Tooltip title="Switch default to Dark mode"
+                            placement="right"
+                        >
+                            <span className={`material-icons-outlined ${defaultTheme === "dark" ? profileStyles.themeSelected : ""}`}
+                                onClick={() => handleDefaultTheme("dark")}
+                            >
                                 dark_mode
                             </span>
-                            <div className={appStyles.smallTitle}>Default Theme</div>
-                        </div>
+                        </Tooltip>
+                    </div>
 
-                        <div className={profileStyles.themeSelect}>
-                            <Tooltip title="Switch default to Light mode"
-                                placement="left"
-                            >
-                                <span className={`material-icons-outlined ${defaultTheme === "light" ? profileStyles.themeSelected : ""}`}
-                                    onClick={() => handleDefaultTheme("light")}
-                                >
-                                    light_mode
-                                </span>
-                            </Tooltip>
-                            <Tooltip title="Switch default to Dark mode"
-                                placement="right"
-                            >
-                                <span className={`material-icons-outlined ${defaultTheme === "dark" ? profileStyles.themeSelected : ""}`}
-                                    onClick={() => handleDefaultTheme("dark")}
-                                >
-                                    dark_mode
-                                </span>
-                            </Tooltip>
-                        </div>
+                    <div className={profileStyles.heading}>
+                        <span className="material-icons-outlined">
+                            person
+                        </span>
+                        <div className={appStyles.smallTitle}>Change Username</div>
+                    </div>
+                    <div className={profileStyles.changeUsernameContainer}>
+                        <input
+                            className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
+                            placeholder="Enter new username"
+                            onChange={(e) => setEnteredNewUsername(e.target.value)}
+                        />
 
-                        <div className={profileStyles.heading}>
-                            <span className="material-icons-outlined">
-                                person
-                            </span>
-                            <div className={appStyles.smallTitle}>Change Username</div>
-                        </div>
-                        <div className={profileStyles.changeUsernameContainer}>
+                        <Button
+                            variant="contained"
+                            onClick={() => handleChangeUsername()}
+                            disabled={enteredNewUsername === ""}
+                            sx={{
+                                backgroundColor: "orange",
+                                color: theme.foreground
+                            }}
+                        >
+                            Submit
+                        </Button>
+
+                        {/* <button
+                            tabIndex="0"
+                            className={profileStyles.changeUsername}
+                            onClick={() => handleChangeUsername()}
+                            disabled={enteredNewUsername === ""}
+                        >
+                            Submit
+                        </button> */}
+                    </div>
+
+                    <div className={profileStyles.heading}>
+                        <span class="material-icons-outlined">
+                            password
+                        </span>
+                        <div className={appStyles.smallTitle}>Change Password</div>
+                    </div>
+
+                    <div className={profileStyles.changeUsernameContainer}>
+                        <div className={profileStyles.changeInputs}>
+                            {/* TODO: Add password visibility toggles here */}
                             <input
                                 className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
-                                placeholder="Enter new username"
-                                onChange={(e) => setEnteredNewUsername(e.target.value)}
+                                placeholder="Enter new password"
+                                onChange={(e) => setEnteredNewPassword(e.target.value)}
                             />
-                            <button
-                                tabIndex="0"
-                                className={profileStyles.changeUsername}
-                                onClick={() => handleChangeUsername()}
-                                disabled={enteredNewUsername === ""}
-                            >
-                                Submit
-                            </button>
-                        </div>
-
-                        <div className={profileStyles.heading}>
-                            <span class="material-icons-outlined">
-                                password
-                            </span>
-                            <div className={appStyles.smallTitle}>Change Password</div>
-                        </div>
-
-                        <div className={profileStyles.changeUsernameContainer}>
-                            <div className={profileStyles.changeInputs}>
-                                {/* TODO: Add password visibility toggles here */}
+                            <div className={profileStyles.confirmPassword}>
                                 <input
                                     className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
-                                    placeholder="Enter new password"
-                                    onChange={(e) => setEnteredNewPassword(e.target.value)}
+                                    name="confirmPassInput"
+                                    placeholder="Confirm new password"
+                                    onChange={(e) => {
+                                        checkIfInputMatches(e);
+                                        setEnteredConfirmPassword(e.target.value)
+                                    }}
+                                    onBlur={e => checkIfInputMatches(e)}
                                 />
-                                <div className={profileStyles.confirmPassword}>
-                                    <input
-                                        className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
-                                        name="confirmPassInput"
-                                        placeholder="Confirm new password"
-                                        onChange={(e) => {
-                                            checkIfInputMatches(e);
-                                            setEnteredConfirmPassword(e.target.value)
-                                        }}
-                                        onBlur={e => checkIfInputMatches(e)}
-                                    />
 
-                                    {showErrorText.confirmPassInput &&
-                                        <span className={appStyles.errorText}
-                                            style={{ top: "1rem" }}
-                                        >
-                                            Confirmed password doesn't match entered password
-                                        </span>
-                                    }
-                                </div>
-
+                                {showErrorText.confirmPassInput &&
+                                    <span className={appStyles.errorText}
+                                        style={{ top: "1rem" }}
+                                    >
+                                        Confirmed password doesn't match entered password
+                                    </span>
+                                }
                             </div>
 
-                            <button
-                                tabIndex="0"
-                                className={profileStyles.changeUsername}
-                                onClick={() => handleChangePassword()}
-                                disabled={enteredNewPassword === "" || enteredConfirmPassword === ""}
-                            >
-                                Submit
-                            </button>
                         </div>
 
-                        <div className={profileStyles.heading}>
-                            <span className="material-icons-outlined">
-                                remove_circle
-                            </span>
-                            <div className={appStyles.smallTitle}>Delete Account</div>
-                        </div>
-
-                        <div
-                            className={profileStyles.deleteAccount}
-                            onClick={() => setShowDeleteDialog(true)}
+                        <Button
+                            variant="contained"
+                            onClick={() => handleChangePassword()}
+                            disabled={enteredNewPassword === "" || enteredConfirmPassword === "" || showErrorText.confirmPassInput}
+                            sx={{
+                                backgroundColor: "orange",
+                                color: theme.foreground
+                            }}
                         >
-                            Delete Account
-                        </div>
-                        {showDeleteDialog &&
-                            <Dialog
-                                open={showDeleteDialog}
-                                onClose={() => setShowDeleteDialog(false)}
-                                style={{ bottom: "20rem" }}
-                            >
-                                <DialogTitle>Delete Account</DialogTitle>
-                                <DialogContent>
-                                    <DialogContentText>
-                                        {C.DELETE_ACCOUNT_MSG}
-                                    </DialogContentText>
-                                    <input
-                                        className={`${profileStyles.deletePasswordInput} ${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
-                                        type="password"
-                                        name="passwordInput"
-                                        placeholder="Enter your password"
-                                        onChange={e => setEnteredDeletePass(e.target.value)}
-                                    />
-                                </DialogContent>
-                                <DialogActions>
-                                    {/* Redo the Styling for this delete button, possibly using MUI's Button component or just using ideas from work 
+                            Submit
+                        </Button>
+
+                        {/* <button
+                            tabIndex="0"
+                            className={profileStyles.changeUsername}
+                            onClick={() => handleChangePassword()}
+                            disabled={enteredNewPassword === "" || enteredConfirmPassword === ""}
+                        >
+                            Submit
+                        </button> */}
+
+                    </div>
+
+                    <div className={profileStyles.heading}>
+                        <span className="material-icons-outlined">
+                            remove_circle
+                        </span>
+                        <div className={appStyles.smallTitle}>Delete Account</div>
+                    </div>
+
+                    <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => setShowDeleteDialog(true)}
+                    >
+                        Delete Account
+                    </Button>
+
+                    <Dialog
+                        open={showDeleteDialog}
+                        onClose={() => setShowDeleteDialog(false)}
+                        style={{ bottom: "20rem" }}
+                    >
+                        <DialogTitle>Delete Account</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                {C.DELETE_ACCOUNT_MSG}
+                            </DialogContentText>
+                            <input
+                                className={`${profileStyles.deletePasswordInput} ${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
+                                type="password"
+                                name="passwordInput"
+                                placeholder="Enter your password"
+                                onChange={e => setEnteredDeletePass(e.target.value)}
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            {/* Redo the Styling for this delete button, possibly using MUI's Button component or just using ideas from work 
                             Disabled state for the button if no password entered
                             Have to do verification of that password before closing modal
                         */}
-                                    <button
-                                        className={profileStyles.deleteAccount}
-                                        onClick={() => handleDeleteAccount()}
-                                        disabled={enteredDeletePass === ""}
-                                    >
-                                        Delete Account
-                                    </button>
-                                </DialogActions>
-                            </Dialog>
-                        }
-                    </div>
-                </>
-            }
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={() => handleDeleteAccount()}
+                                disabled={enteredDeletePass === ""}
+                            >
+                                Delete Account
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                </div>
+            </>
         </>
     )
 }

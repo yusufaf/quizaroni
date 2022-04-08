@@ -251,127 +251,126 @@ const CreateSet = props => {
         })
     }
 
+    if (!userAuthState) {
+        return <LoginMessage page="createSet" />;
+    }
+
     return (
         <>
-            {!userAuthState ?
-                <LoginMessage page="createSet" />
-                :
-                (
-                    <div className={createSetStyles.createPage}>
-                        <div className={createSetStyles.createContainer}
-                            style={{ color: theme.foreground, background: theme.background }}
-                        >
-                            <Typography
-                                variant="h5"
-                                sx={{
-                                    fontWeight: "bold"
-                                }}
-                            >
-                                {CREATE_SET.TITLE}
-                            </Typography>
-                            {/* <div className={createSetStyles.title}>
+            <div className={createSetStyles.createPage}>
+                <div className={createSetStyles.createContainer}
+                    style={{ color: theme.foreground, background: theme.background }}
+                >
+                    <Typography
+                        variant="h5"
+                        sx={{
+                            fontWeight: "bold"
+                        }}
+                    >
+                        {CREATE_SET.TITLE}
+                    </Typography>
+                    {/* <div className={createSetStyles.title}>
                                 {CREATE_SET.TITLE}
                             </div> */}
-                            <div className={createSetStyles.inputContainer}>
-                                <Typography
-                                    variant="subtitle1"
-                                    sx={{
-                                        color: "orange",
-                                        fontWeight: "bold"
-                                    }}
-                                >
-                                    Title
-                                </Typography>
-                                {/* <label className={createSetStyles.inputLabel}>Title</label> */}
-                                <input
-                                    className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                                    placeholder={CREATE_SET.TITLE_PLACE}
-                                    onChange={e => setEnteredTitle(e.target.value)}
-                                />
-                                <Typography
-                                    variant="subtitle1"
-                                    sx={{
-                                        color: "orange",
-                                        fontWeight: "bold"
-                                    }}
-                                >
-                                    Description
-                                </Typography>
-                                {/* <label className={createSetStyles.inputLabel}>Description</label> */}
-                                <textarea
-                                    className={`${createSetStyles.descInput} ${isDarkMode ? `${createSetStyles.dark} ${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                                    placeholder={CREATE_SET.DESC_PLACE}
-                                    onChange={e => setEnteredDescription(e.target.value)}
-                                />
-                                <Typography
-                                    variant="subtitle1"
-                                    sx={{
-                                        color: "orange",
-                                        fontWeight: "bold"
-                                    }}
-                                >
-                                    Label
-                                </Typography>
-                                {/* <label className={createSetStyles.inputLabel}>Label</label> */}
-                                <div className={createSetStyles.labelInputContainer}>
-                                    <input
-                                        className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                                        placeholder={CREATE_SET.LABEL_PLACE}
-                                        onChange={e => setEnteredLabel(e.target.value)}
-                                        disabled={selectedLabel !== ""}
-                                    />
-                                    <span>or select an existing one</span>
-                                    <select
-                                        className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`
-                                        }
-                                        onChange={(e) => setSelectedLabel(e.target.value)}
-                                        disabled={enteredLabel !== ""}
-                                    >
-                                        {labelOptions}
-                                    </select>
-                                </div>
-                            </div>
-                            <button
-                                tabIndex="0"
-                                className={`${createSetStyles.createSet}`}
-                                onClick={() => createNewSet()}
+                    <div className={createSetStyles.inputContainer}>
+                        <Typography
+                            variant="subtitle1"
+                            sx={{
+                                color: "orange",
+                                fontWeight: "bold"
+                            }}
+                        >
+                            Title
+                        </Typography>
+                        {/* <label className={createSetStyles.inputLabel}>Title</label> */}
+                        <input
+                            className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
+                            placeholder={CREATE_SET.TITLE_PLACE}
+                            onChange={e => setEnteredTitle(e.target.value)}
+                        />
+                        <Typography
+                            variant="subtitle1"
+                            sx={{
+                                color: "orange",
+                                fontWeight: "bold"
+                            }}
+                        >
+                            Description
+                        </Typography>
+                        {/* <label className={createSetStyles.inputLabel}>Description</label> */}
+                        <textarea
+                            className={`${createSetStyles.descInput} ${isDarkMode ? `${createSetStyles.dark} ${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
+                            placeholder={CREATE_SET.DESC_PLACE}
+                            onChange={e => setEnteredDescription(e.target.value)}
+                        />
+                        <Typography
+                            variant="subtitle1"
+                            sx={{
+                                color: "orange",
+                                fontWeight: "bold"
+                            }}
+                        >
+                            Label
+                        </Typography>
+                        {/* <label className={createSetStyles.inputLabel}>Label</label> */}
+                        <div className={createSetStyles.labelInputContainer}>
+                            <input
+                                className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
+                                placeholder={CREATE_SET.LABEL_PLACE}
+                                onChange={e => setEnteredLabel(e.target.value)}
+                                disabled={selectedLabel !== ""}
+                            />
+                            <span>or select an existing one</span>
+                            <select
+                                className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`
+                                }
+                                onChange={(e) => setSelectedLabel(e.target.value)}
+                                disabled={enteredLabel !== ""}
                             >
-                                Create Set
-                            </button>
-                            {/* What is this span for */}
-                            <span>
-                            </span>
-                            <IconButton
-                                onClick={() => setShowImportModal(true)}
-                            >
-                                <UploadFile
-                                    fontSize="large"
-                                    sx={{
-                                        color: theme.foreground
-                                    }}
-                                />
-                            </IconButton>
-                            {/* <i className={`material-icons-outlined ${createSetStyles.import}`}
+                                {labelOptions}
+                            </select>
+                        </div>
+                    </div>
+                    <button
+                        tabIndex="0"
+                        className={`${createSetStyles.createSet}`}
+                        onClick={() => createNewSet()}
+                    >
+                        Create Set
+                    </button>
+                    {/* What is this span for */}
+                    <span>
+                    </span>
+                    <IconButton
+                        onClick={() => setShowImportModal(true)}
+                    >
+                        <UploadFile
+                            fontSize="large"
+                            sx={{
+                                color: theme.foreground
+                            }}
+                        />
+                    </IconButton>
+                    {/* <i className={`material-icons-outlined ${createSetStyles.import}`}
                                 onClick={() => setShowImportModal(true)}
                             >
                                 upload_file
                             </i> */}
-                        </div>
-                        {renderCreateCards()}
-                        <button
-                            className={createdSetCards.length !== 0 ? `${createSetStyles.addCard}` : `${createSetStyles.addCard} ${createSetStyles.noInputs}`}
-                            onClick={() => {
-                                addCreateCardInput();
-                            }}>
-                            <i
-                                className={`material-icons ${createSetStyles.addIcon}`}>
-                                add_circle_outline
-                            </i>
-                            Add Card
-                        </button>
-                    </div>
-                )
-            }
+                </div>
+                {renderCreateCards()}
+                <button
+                    className={createdSetCards.length !== 0 ? `${createSetStyles.addCard}` : `${createSetStyles.addCard} ${createSetStyles.noInputs}`}
+                    onClick={() => {
+                        addCreateCardInput();
+                    }}>
+                    <i
+                        className={`material-icons ${createSetStyles.addIcon}`}>
+                        add_circle_outline
+                    </i>
+                    Add Card
+                </button>
+            </div>
+            )
 
             <Modal
                 open={showImportModal}
