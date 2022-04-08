@@ -23,7 +23,7 @@
     text-align: center;
 }
 
-.deleteAccount {
+/* .deleteAccount {
     background : rgb(231, 24, 24);
     outline    : none;
     border     : none;
@@ -39,7 +39,7 @@
 .deleteAccount:hover {
     background: red;
     transition: 0.2s ease;
-}
+} */
 
 .profileCard {
     position: absolute;
@@ -142,7 +142,7 @@ Profile Dropdown Styles
     gap           : 2rem;
 }
 
-.changeUsername {
+/* .changeUsername {
     height    : 2.5rem;
     padding   : 0.5rem 1rem;
     box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
@@ -164,7 +164,7 @@ Profile Dropdown Styles
 .changeUsername:hover {
     background: rgb(253, 187, 63);
     transition: 0.2s ease
-}
+} */
 
 .changeInputs {
     display       : flex;

@@ -194,38 +194,37 @@ const Home = props => {
     - Add "Last Viewed" property to flashsets + table 
     */
 
+
+    if (!userAuthState) {
+        return <LoginMessage page="home" />;
+    }
+
     return (
         <>
-            {!userAuthState ?
-                <LoginMessage page="home" />
+            {/* ViewFlashset rendered right here? */}
+            {viewFlashSet && Object.keys(selectedFlashSet).length !== 0 ?
+                <ViewFlashSet {...viewSetProps} />
                 :
-                <>
-                    {/* ViewFlashset rendered right here? */}
-                    {viewFlashSet && Object.keys(selectedFlashSet).length !== 0 ?
-                        <ViewFlashSet {...viewSetProps} />
-                        :
-                        (
-                            <div className={homeStyles.flashSets} style={{ color: theme.foreground, background: theme.background }}>
-                                <div className={appStyles.title}>
-                                    Your Flashsets
-                                </div>
-                                {renderSearchBar()}
-                                {renderHeader()}
-                                {/* TODO: Review */}
-                                {!viewFlashSet && flashSets?.length > 0 &&
-                                    (
-                                        <>
-                                            {renderFlashSets()}
-                                        </>
-                                    )
-                                }
-                            </div>
-                        )
-                    }
-                    {/* Message if no flash sets have bene created */}
-                    {/* flashSets.length === 0 */}
-                </>
+                (
+                    <div className={homeStyles.flashSets} style={{ color: theme.foreground, background: theme.background }}>
+                        <div className={appStyles.title}>
+                            Your Flashsets
+                        </div>
+                        {renderSearchBar()}
+                        {renderHeader()}
+                        {/* TODO: Review */}
+                        {!viewFlashSet && flashSets?.length > 0 &&
+                            (
+                                <>
+                                    {renderFlashSets()}
+                                </>
+                            )
+                        }
+                    </div>
+                )
             }
+            {/* Message if no flash sets have bene created */}
+            {/* flashSets.length === 0 */}
         </>
     );
 }

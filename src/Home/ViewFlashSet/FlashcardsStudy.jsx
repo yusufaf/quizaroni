@@ -13,9 +13,12 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
-    IconButton, LinearProgress, Tooltip, Typography
+    IconButton,
+    LinearProgress,
+    Tooltip,
+    Typography
 } from '@mui/material/';
-import { ArrowBack, ArrowForward, } from '@mui/icons-material/';
+import { ArrowBack, ArrowForward, VolumeUp } from '@mui/icons-material/';
 
 
 /* Styling */
@@ -33,8 +36,12 @@ const FlashcardsStudy = props => {
     const [currentCard, setCurrentCard] = useState(selectedFlashSet.cards[0]);
     const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
+    const [currentCardSide, setCurrentCardSide] = useState(false);
+
     // TODO: Intended to keep track of the number of cards the user has clicked on and actually flipped/viewed
     const [cardsStudied, setCardsStudied] = useState(0);
+
+    
 
     const [showWarningModal, setShowWarningModal] = useState(false);
 
@@ -42,8 +49,8 @@ const FlashcardsStudy = props => {
 
     const cardStyling = {
         display: 'flex',
-        minHeight: "25rem",
-        minWidth: "50rem",
+        minHeight: "30rem",
+        minWidth: "60rem",
         justifyContent: "center",
         "&.MuiCard-root": {
             color: theme.foreground,
@@ -100,6 +107,21 @@ const FlashcardsStudy = props => {
 
     const handleCloseWarning = () => {
         setShowWarningModal(false);
+    }
+
+    const handleAudioPlayback = () => {
+        // if (timeoutRef.current) {
+        //     clearTimeout(timeoutRef.current)
+        // }
+        const audio = new SpeechSynthesisUtterance();
+        audio.text = currentCard.term;
+        window.speechSynthesis.speak(audio);
+        // Wait half a second before speaking of definition
+        timeoutRef.current = setTimeout(() => {
+            audio.text = currentCard.definition;
+            window.speechSynthesis.speak(audio);
+        }, 500)
+        // timeoutRef.current = "";
     }
 
     return (
@@ -172,12 +194,28 @@ const FlashcardsStudy = props => {
                     </IconButton>
                 </Tooltip>
                 <Card sx={cardStyling} raised
-                    onClick={() => alert("bruh")}
+                    onClick={() => setCurrentCardSide(!currentCardSide)}
                 >
                     {/* Action Buttons in top right corner of current card */}
-                    <Typography variant="h5" sx={{ alignSelf: "center" }}>
+                    <Typography variant="h4" sx={{
+                        alignSelf: "center",
+                    }}>
+                        
                         {currentCard.term}
                     </Typography>
+
+                    <div className={viewFlashStyles.cardActions}>
+                        <Tooltip
+                            title="Play TTS"
+                            placement="top"
+                        >
+                            <IconButton
+                                onClick={handleAudioPlayback}
+                            >
+                                <VolumeUp />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
                 </Card>
                 <Tooltip
                     title="Go to next card"
