@@ -4,8 +4,8 @@ import { collection, query, where, getDocs, updateDoc } from "firebase/firestore
 import { firebaseApp, database } from "../../firebase/firebase";
 
 /* Outside Components */
-import { Alert, AlertTitle, Chip, FormControlLabel, IconButton, Switch, Paper, Tooltip, Typography } from '@mui/material/';
-import { ArrowBack, Download } from '@mui/icons-material/';
+import { Alert, AlertTitle, Chip, FormControlLabel, IconButton, Menu, MenuItem, Switch, Paper, Tooltip, Typography } from '@mui/material/';
+import { Add, ArrowBack, Download, MenuOpen } from '@mui/icons-material/';
 
 import ViewFlashCard from "./ViewFlashCard";
 
@@ -26,6 +26,8 @@ const ViewFlashSet = props => {
         setSelectedFlashSet,
         userAuthState
     } = props;
+
+    console.log("selectedFlashSet = ", selectedFlashSet)
 
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
@@ -127,6 +129,10 @@ const ViewFlashSet = props => {
                     </i>
                     Download
                 </span>
+
+                <IconButton>
+                    <MenuOpen/>
+                </IconButton>
 
                 <span className="material-icons-outlined">
                     <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
@@ -249,12 +255,25 @@ const ViewFlashSet = props => {
                                         {selectedFlashSet.title}
                                     </Typography>
 
-                                    <Chip label="TODO: Label here" variant="outlined"
+                                    <Chip label={selectedFlashSet.label ? selectedFlashSet.label : "No label selected"} variant="outlined"
                                         sx={{
                                             height: "2.5rem",
                                             color: theme.foreground
                                         }}
                                     />
+                                    <Tooltip
+                                        title="Create label"
+                                        placement="right"
+                                    >
+                                        <IconButton color="primary"
+                                            aria-label="arrow backward" component="span"
+                                            sx={arrowIconStyling}
+                                        >
+                                            <Add />
+                                        </IconButton>
+                                    </Tooltip>
+
+                                    {/*  */}
                                     <Typography
                                         variant="body1"
                                     >

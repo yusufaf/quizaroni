@@ -215,113 +215,112 @@ const Login = props => {
         setShowErrorText(updatedErrorText);
     }
 
+
+    if (userAuthState) {
+        return <LoginMessage page="login" />;
+    }
+
     return (
         <>
-            {userAuthState ?
-                <LoginMessage page="login" />
-                :
-                (
-                    <div className={loginStyles.loginPage}>
-                        <div className={loginStyles.loginContainer}
-                            style={{ color: theme.foreground, background: theme.background }}
-                            onKeyPress={enterKeyHandler}
+            <div className={loginStyles.loginPage}>
+                <div className={loginStyles.loginContainer}
+                    style={{ color: theme.foreground, background: theme.background }}
+                    onKeyPress={enterKeyHandler}
+                >
+                    <>
+                        <div className={`${appStyles.title} ${loginStyles.title}`}>
+                            Login
+                        </div>
+
+                        <input
+                            className={
+                                showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                                    : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
+                            name="emailInput"
+                            placeholder="Type your email address"
+                            onBlur={e => checkIfInputEmpty(e)}
+                            onChange={e => setEnteredEmail(e.target.value)}
+                        />
+
+                        {showErrorText.emailInput &&
+                            <span className={loginStyles.emailError}>
+                                An email is required.
+                            </span>
+                        }
+
+                        <input
+                            className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
+                                : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
+                            name="passInput"
+                            placeholder="Type your password"
+                            type={passVisibility ? "text" : "password"}
+                            onBlur={e => checkIfInputEmpty(e)}
+                            onChange={e => setEnteredPass(e.target.value)}
+                        />
+                        {passVisibility ?
+                            <Visibility
+                                className={`${loginStyles.passToggle} ${isDarkMode && loginStyles.dark}`}
+                                onClick={() => setPassVisibility(!passVisibility)}
+                            >
+                            </Visibility> :
+                            <VisibilityOff
+                                className={`${loginStyles.passToggle} ${isDarkMode && loginStyles.dark}`}
+                                onClick={() => setPassVisibility(!passVisibility)}
+                            >
+                            </VisibilityOff>
+                        }
+                        {showErrorText.passInput &&
+                            <span className={loginStyles.passwordError}>
+                                A password is required.
+                            </span>
+                        }
+
+                        <Link to="/forgot" className={loginStyles.forgot}>
+                            Forgot password?
+                        </Link>
+
+                        {/* Login Button */}
+                        <Button
+                            variant="contained"
+                            disabled={enteredEmail === "" || enteredPass === ""}
+                            onClick={() => handleLogin()}
+                            sx={{
+                                backgroundColor: "orange",
+                                color: theme.foreground,
+                                fontSize: "1rem",
+                                "&.Mui-disabled": {
+                                    backgroundColor: "orange",
+                                    cursor: "not-allowed"
+                                },
+                                "&.MuiButton-root:hover": {
+                                    backgroundColor: "rgb(206, 143, 27)"
+                                }
+                            }}
                         >
-                            <>
-                                <div className={`${appStyles.title} ${loginStyles.title}`}>
-                                    Login
-                                </div>
-
-                                <input
-                                    className={
-                                        showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                                            : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                                    name="emailInput"
-                                    placeholder="Type your email address"
-                                    onBlur={e => checkIfInputEmpty(e)}
-                                    onChange={e => setEnteredEmail(e.target.value)}
-                                />
-
-                                {showErrorText.emailInput &&
-                                    <span className={loginStyles.emailError}>
-                                        An email is required.
-                                    </span>
-                                }
-
-                                <input
-                                    className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                                        : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                                    name="passInput"
-                                    placeholder="Type your password"
-                                    type={passVisibility ? "text" : "password"}
-                                    onBlur={e => checkIfInputEmpty(e)}
-                                    onChange={e => setEnteredPass(e.target.value)}
-                                />
-                                {passVisibility ?
-                                    <Visibility
-                                        className={`${loginStyles.passToggle} ${isDarkMode && loginStyles.dark}`}
-                                        onClick={() => setPassVisibility(!passVisibility)}
-                                    >
-                                    </Visibility> :
-                                    <VisibilityOff
-                                        className={`${loginStyles.passToggle} ${isDarkMode && loginStyles.dark}`}
-                                        onClick={() => setPassVisibility(!passVisibility)}
-                                    >
-                                    </VisibilityOff>
-                                }
-                                {showErrorText.passInput &&
-                                    <span className={loginStyles.passwordError}>
-                                        A password is required.
-                                    </span>
-                                }
-
-                                <Link to="/forgot" className={loginStyles.forgot}>
-                                    Forgot password?
-                                </Link>
-
-                                {/* Login Button */}
-                                <Button
-                                    variant="contained"
-                                    disabled={enteredEmail === "" || enteredPass === ""}
-                                    onClick={() => handleLogin()}
-                                    sx={{
-                                        backgroundColor: "orange",
-                                        color: theme.foreground,
-                                        fontSize: "1rem",
-                                        "&.Mui-disabled": {
-                                            backgroundColor: "orange",
-                                            cursor: "not-allowed"
-                                        },
-                                        "&.MuiButton-root:hover": {
-                                            backgroundColor: "rgb(206, 143, 27)"
-                                        }
-                                    }}
-                                >
-                                    Log In
-                                </Button>
-                                {/* <button
+                            Log In
+                        </Button>
+                        {/* <button
                                     className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
                                     onClick={() => handleLogin()}
                                 >
                                     <b>Log In</b>
                                 </button> */}
-                                {/* Signup Link  */}
-                                <Link
-                                    className={loginStyles.signupLink}
-                                    to="/signup"
-                                >
-                                    Don't have an account? Click here to sign up!
-                                </Link>
-                            </>
-                        </div>
-                        <div id="firebaseui-auth-container"
-                            className={loginStyles.firebaseUI}
-                            style={{ color: theme.foreground, background: theme.background }}
+                        {/* Signup Link  */}
+                        <Link
+                            className={loginStyles.signupLink}
+                            to="/signup"
                         >
-                        </div>
-                        <div id="loader">Loading...</div>
-                    </div>
-                )
-            }
+                            Don't have an account? Click here to sign up!
+                        </Link>
+                    </>
+                </div>
+                <div id="firebaseui-auth-container"
+                    className={loginStyles.firebaseUI}
+                    style={{ color: theme.foreground, background: theme.background }}
+                >
+                </div>
+                <div id="loader">Loading...</div>
+            </div>
             {showAlert &&
                 returnAlertJSX()
             }
