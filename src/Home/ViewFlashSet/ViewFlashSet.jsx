@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 /* Firebase Operations */
 import { collection, query, where, getDocs, updateDoc } from "firebase/firestore";
 import { firebaseApp, database } from "../../firebase/firebase";
 
 /* Outside Components */
 import { Alert, AlertTitle, Chip, FormControlLabel, IconButton, Menu, MenuItem, Switch, Paper, Tooltip, Typography } from '@mui/material/';
-import { Add, ArrowBack, Download, MenuOpen } from '@mui/icons-material/';
+import { Add, ArrowBack, Download, EditNotifications, MenuOpen } from '@mui/icons-material/';
 
 import ViewFlashCard from "./ViewFlashCard";
 
@@ -31,7 +31,10 @@ const ViewFlashSet = props => {
 
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
-    const [showReminderModal, setShowReminderModal] = useState(false);
+    const controlAnchorRef = useRef(null);
+
+    const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+    const [showControlMenu, setShowControlMenu] = useState(false);
     const [disableTextColor, setDisableTextColor] = useState(false);
     const [disableBackgroundColor, setDisableBackgroundColor] = useState(false);
     const [studySetViewable, setStudySetViewable] = useState(false);
@@ -117,81 +120,123 @@ const ViewFlashSet = props => {
 
     const renderActionBar = () => {
         return (
-            <div className={viewFlashStyles.actionBar}>
-                {/* <IconButton>
-                    <Download/>
-                </IconButton> */}
-                <span className={viewFlashStyles.download} >
-                    <i className={`material-icons-outlined ${appStyles.clickIcon}`}
+            <>
+                <div style={{ marginTop: "1rem" }}>
+                    <IconButton
                         onClick={() => handleDownloadSet()}
+                        sx={{
+                            padding: "0.75rem"
+                        }}
                     >
-                        download
-                    </i>
-                    Download
-                </span>
-
-                <IconButton>
-                    <MenuOpen/>
-                </IconButton>
-
-                <span className="material-icons-outlined">
-                    <i className={`material-icons-outlined ${appStyles.clickIcon}`}>
-                        email
-                    </i>
-                </span>
-                {/* TODO: Replace these br tags with spacing in CSS */}
-                <br></br>
-                <span>
-                    <FormControlLabel control={
-                        <Switch
-                            size="small"
-                            checked={disableTextColor}
-                            onChange={() => handleDisableColorToggle("TEXT")}
-                        />
-                    } label={
-                        <Typography
+                        <Download
                             sx={{
-                                color: disableTextColor ? "red" : "green"
+                                color: theme.foreground
                             }}
-                        >
-                            {`Text Color: ${disableTextColor ? "Disabled" : "Enabled"}`}
-                        </Typography>
-                    }
-                    />
-                </span>
-                <br></br>
-                <span>
-                    <FormControlLabel
-                        control={
+                        />
+                    </IconButton>
+                    <Typography
+                        component="span"
+                    >
+                        Download
+                    </Typography>
+                </div>
+                <div>
+                    <IconButton
+                        onClick={() => setShowNotificationsModal(true)}
+                        sx={{
+                            padding: "0.75rem"
+                        }}
+                    >
+                        <EditNotifications
+                            sx={{
+                                color: theme.foreground
+                            }}
+                        />
+                    </IconButton>
+                    <Typography
+                        component="span"
+                    >
+                        Manage Notifications
+                    </Typography>
+                </div>
+                <div
+                    ref={controlAnchorRef}
+                >
+                    <IconButton
+                        onClick={() => setShowControlMenu(true)}
+                        sx={{
+                            padding: "0.75rem"
+                        }}
+                    >
+                        <MenuOpen
+                            sx={{
+                                color: theme.foreground
+                            }}
+                        />
+                    </IconButton>
+
+                    <Typography
+                        component="span"
+                    >
+                        Control Menu
+                    </Typography>
+                </div>
+                <Menu
+                    open={showControlMenu}
+                    onClose={() => setShowControlMenu(false)}
+                    anchorEl={controlAnchorRef.current}
+                >
+                    <MenuItem>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    size="small"
+                                    checked={disableTextColor}
+                                    onChange={() => handleDisableColorToggle("TEXT")}
+                                />
+                            } label={
+                                <Typography
+                                    sx={{
+                                        color: disableTextColor ? "red" : "green"
+                                    }}
+                                >
+                                    {`Text Color: ${disableTextColor ? "Disabled" : "Enabled"}`}
+                                </Typography>
+                            }
+                        />
+                    </MenuItem>
+                    <MenuItem>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    size="small"
+                                    checked={disableBackgroundColor}
+                                    onChange={() => handleDisableColorToggle("BACKGROUND")}
+                                />
+                            }
+                            label={
+                                <Typography
+                                    sx={{
+                                        color: disableBackgroundColor ? "red" : "green"
+                                    }}
+                                >
+                                    {`Background Color: ${disableBackgroundColor ? "Disabled" : "Enabled"}`}
+                                </Typography>
+                            }
+                        />
+                    </MenuItem>
+                    <MenuItem>
+                        <FormControlLabel control={
                             <Switch
                                 size="small"
-                                checked={disableBackgroundColor}
-                                onChange={() => handleDisableColorToggle("BACKGROUND")}
+                                checked={studySetViewable}
+                                onChange={() => setStudySetViewable(!studySetViewable)}
                             />
-                        }
-                        label={
-                            <Typography
-                                sx={{
-                                    color: disableBackgroundColor ? "red" : "green"
-                                }}
-                            >
-                                {`Background Color: ${disableBackgroundColor ? "Disabled" : "Enabled"}`}
-                            </Typography>
-                        }
-                    />
-                </span>
-                <br></br>
-                <span>
-                    <FormControlLabel control={
-                        <Switch
-                            size="small"
-                            checked={studySetViewable}
-                            onChange={() => setStudySetViewable(!studySetViewable)}
+                        } label={`Viewable: ${studySetViewable ? "Public" : "Private"}`}
                         />
-                    } label={`Viewable: ${studySetViewable ? "Public" : "Private"}`}
-                    />
-                </span>
-            </div>
+                    </MenuItem>
+                </Menu>
+            </>
         )
     }
 
@@ -296,9 +341,11 @@ const ViewFlashSet = props => {
                                 </div>
                             </div>
 
-                            <div className={viewFlashStyles.cardCount}>
+                            <Typography
+                                variant="h6"
+                            >
                                 Number of cards in this study set: {selectedFlashSet.cards.length}
-                            </div>
+                            </Typography>
                             {renderSetCards()}
                         </div>
                     )

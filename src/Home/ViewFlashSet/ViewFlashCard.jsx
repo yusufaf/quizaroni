@@ -54,7 +54,11 @@ const ViewFlashCard = props => {
                         <IconButton
                             onClick={handleAudioPlayback}
                         >
-                            <VolumeUp />
+                            <VolumeUp
+                                sx={{
+                                    color: theme.foreground
+                                }}
+                            />
                         </IconButton>
                     </Tooltip>
                 </div>

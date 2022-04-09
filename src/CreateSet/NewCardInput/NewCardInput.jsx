@@ -1,6 +1,6 @@
 import { useState, useRef } from "react"
 import { IconButton, Tooltip, Typography } from '@mui/material/';
-import { AddPhotoAlternate, Delete } from "@mui/icons-material";
+import { AddPhotoAlternate, Delete, FormatColorText, FormatColorFill } from "@mui/icons-material";
 import { useTheme } from "../../theme/useTheme";
 
 import { ChromePicker } from "react-color";
@@ -117,20 +117,22 @@ const NewCardInput = props => {
                         placement="top"
                         arrow={true}
                     >
-                        <span className={`material-icons-round ${createSetStyles.colorPickerIcon}`}
-                            onClick={() => setShowTextColorPicker(!showTextColorPicker)}
-                            style={{ color: `${localTextColor ? localTextColor : ""}` }}
+                        <IconButton
+                            onClick={() => {
+                                setShowBackgroundColorPicker(false)
+                                setShowTextColorPicker(!showTextColorPicker)
+                            }}
                         >
-                            format_color_text
-                        </span>
+                            <FormatColorText
+                                fontSize="large"
+                                sx={{
+                                    color: `${localTextColor ? localTextColor : theme.foreground}`
+                                }}
+                            />
+                        </IconButton>
                     </Tooltip>
                     {showTextColorPicker &&
                         <div className={createSetStyles.colorPickerContainer}>
-                            <div className={`material-icons-round ${createSetStyles.colorClose}`}
-                                style={{ color: theme.foreground, background: theme.background }}
-                            >
-                                close
-                            </div>
                             <ChromePicker
                                 className={`${createSetStyles.colorPicker} ${createSetStyles.backgroundPicker}`}
                                 color={localTextColor}
@@ -147,12 +149,19 @@ const NewCardInput = props => {
                         placement="bottom"
                         arrow={true}
                     >
-                        <span className={`material-icons-round ${createSetStyles.colorPickerIcon}`}
-                            onClick={() => setShowBackgroundColorPicker(!showBackgroundColorPicker)}
-                            style={{ color: `${localBackgroundColor ? localBackgroundColor : ""}` }}
+                        <IconButton
+                            onClick={() => {
+                                setShowTextColorPicker(false);
+                                setShowBackgroundColorPicker(!showBackgroundColorPicker);
+                            }}
                         >
-                            format_color_fill
-                        </span>
+                            <FormatColorFill
+                                fontSize="large"
+                                sx={{
+                                    color: `${localBackgroundColor ? localBackgroundColor : theme.foreground}`
+                                }}
+                            />
+                        </IconButton>
                     </Tooltip>
                     {showBackgroundColorPicker &&
                         <ChromePicker

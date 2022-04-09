@@ -270,18 +270,20 @@ const Home = props => {
                                 rowsPerPageOptions={[5]}
                                 checkboxSelection
                                 disableSelectionOnClick
+                                onRowClick={() => {
+                                }}
                             />
                         </div>
 
 
                         {/* TODO: Review */}
-                        {/* {!viewFlashSet && flashSets?.length > 0 &&
+                        {!viewFlashSet && flashSets?.length > 0 &&
                             (
                                 <>
                                     {renderFlashSets()}
                                 </>
                             )
-                        } */}
+                        }
                     </div>
                 )
             }
