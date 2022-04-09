@@ -41,7 +41,7 @@ const FlashcardsStudy = props => {
     // TODO: Intended to keep track of the number of cards the user has clicked on and actually flipped/viewed
     const [cardsStudied, setCardsStudied] = useState(0);
 
-    
+
 
     const [showWarningModal, setShowWarningModal] = useState(false);
 
@@ -154,11 +154,22 @@ const FlashcardsStudy = props => {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseWarning} >Cancel</Button>
-                    <Button onClick={() => {
-                        handleCloseWarning();
-                        setSelectedStudyMode("")
-                    }} autoFocus>
+                    <Button onClick={handleCloseWarning}
+                        sx={{
+                            color: "orange"
+                        }}
+                    >
+                        Cancel</Button>
+                    <Button
+                        onClick={() => {
+                            handleCloseWarning();
+                            setSelectedStudyMode("")
+                        }}
+                        autoFocus
+                        sx={{
+                            color: "orange"
+                        }}
+                    >
                         Yes
                     </Button>
                 </DialogActions>
@@ -200,7 +211,7 @@ const FlashcardsStudy = props => {
                     <Typography variant="h4" sx={{
                         alignSelf: "center",
                     }}>
-                        
+
                         {currentCard.term}
                     </Typography>
 
@@ -212,7 +223,11 @@ const FlashcardsStudy = props => {
                             <IconButton
                                 onClick={handleAudioPlayback}
                             >
-                                <VolumeUp />
+                                <VolumeUp 
+                                    sx={{
+                                        color: theme.foreground
+                                    }}
+                                />
                             </IconButton>
                         </Tooltip>
                     </div>

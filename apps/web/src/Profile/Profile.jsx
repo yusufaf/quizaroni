@@ -12,6 +12,7 @@ import * as profileStyles from './Profile.module.css';
 import * as appStyles from "../App.module.css";
 
 import * as C from "../utilities/constants";
+import { color } from "@mui/system";
 
 const Profile = props => {
     const { userAuthState, setUserAuthState } = props;
@@ -302,7 +303,13 @@ const Profile = props => {
                     <Dialog
                         open={showDeleteDialog}
                         onClose={() => setShowDeleteDialog(false)}
-                        style={{ bottom: "20rem" }}
+                        sx={{
+                            // TODO: WTF IS THIS
+                            "&.MuiDialog-paper": {
+                                backgroundColor: theme.background,
+                            },
+                            bottom: "20rem",
+                        }}
                     >
                         <DialogTitle>Delete Account</DialogTitle>
                         <DialogContent>
