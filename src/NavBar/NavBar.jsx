@@ -136,14 +136,14 @@ const NavBar = props => {
                                     style={{ color: `${theme.foreground}` }}
                                     onClick={() => handleLogout()}
                                 >
-                                    <span class="material-icons-outlined">
+                                    <span className="material-icons-outlined">
                                         logout
                                     </span>
                                     Logout
                                 </div>
                                 :
                                 <div >
-                                    <span class="material-icons-outlined">
+                                    <span className="material-icons-outlined">
                                         login
                                     </span>
                                     <NavLink
