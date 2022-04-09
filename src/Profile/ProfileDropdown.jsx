@@ -8,10 +8,8 @@ import * as profileStyles from './Profile.module.css';
 import * as appStyles from "../App.module.css";
 
 const ProfileDropdown = props => {
-    const { showDropdown, setShowDropdown } = props;
+    const { dropdownRef, showDropdown, setShowDropdown } = props;
     const { isDarkMode, theme } = useTheme();
-
-    console.log("Theme = ", theme);
 
     // TODO: Fix this
     const profileMenuStyling = {
@@ -27,6 +25,7 @@ const ProfileDropdown = props => {
                 open={showDropdown}
                 onClose={() => setShowDropdown(false)}
                 sx={profileMenuStyling}
+                anchorEl={dropdownRef.current}
             >
                 <MenuItem
                     sx={{

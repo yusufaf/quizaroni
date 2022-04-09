@@ -165,9 +165,6 @@ const NavBar = props => {
                                 style={{ color: isDarkMode ? "yellow" : "#121212", fontSize: "2rem" }}
                             />
                         </Tooltip>
-
-                        {/* TODO: Review the userAuthState conditional here */}
-
                         <div
                             className={navStyles.accountCircle}
                             onClick={() => setShowDropdown(true)}
