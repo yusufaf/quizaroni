@@ -1,12 +1,12 @@
 .flashSets {
-    position     : relative;
-    height       : fit-content;
-    width        : 70rem;
-    left         : 20rem;
-    top          : 4rem;
-    padding      : 1.25rem;
+    position: relative;
+    height: fit-content;
+    width: 70rem;
+    left: 20rem;
+    top: 4rem;
+    padding: 1.25rem;
     border-radius: 0.75rem;
-    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 }
 
 .header {
@@ -32,4 +32,10 @@
 
 .search {
     width: 20rem;
+}
+
+.tableContainer {
+    margin-top: 2rem;
+    height: 40rem;
+    width: 100%;
 }

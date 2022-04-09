@@ -85,27 +85,6 @@
     margin-top    : 1.25rem;
 }
 
-.createSet {
-    position     : absolute;
-    right        : 2rem;
-    top          : 2rem;
-    height       : 2.5rem;
-    /* width     : 6rem; */
-    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
-
-    font-size    : 1rem;
-    font-weight  : bold;
-    border-radius: 0.75rem;
-    border       : none;
-    outline      : none;
-
-    display        : flex;
-    align-items    : center;
-    justify-content: center;
-    cursor         : pointer;
-
-    background: orange;
-}
 
 .createSet:hover {
     background: rgb(253, 187, 63);
@@ -116,6 +95,13 @@
     opacity       : 0.5;
     pointer-events: none;
 }
+
+
+/* 
+=============================
+Individual Card Input Styling
+=============================
+*/
 
 .newCard {
     position     : relative;
@@ -146,6 +132,12 @@
 .newCardInput {
     margin-bottom: 1rem;
     width        : 27.5rem;
+}
+
+.newCardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .addCard {
@@ -221,29 +213,6 @@
     bottom  : 2.5rem;
     cursor  : pointer;
     z-index : 100;
-}
-
-.deleteCard,
-.uploadImage {
-    position: absolute;
-    cursor  : pointer;
-    right   : 1rem;
-}
-
-.deleteCard {
-    top: 1.5rem;
-}
-
-.deleteCard:hover {
-    color: rgb(206, 41, 41);
-}
-
-.uploadImage {
-    top: 4.5rem;
-}
-
-.uploadImage:hover {
-    color: blue;
 }
 
 .import {

@@ -1,5 +1,6 @@
 import { useState, useRef } from "react"
 import { IconButton, Tooltip, Typography } from '@mui/material/';
+import { AddPhotoAlternate, Delete } from "@mui/icons-material";
 import { useTheme } from "../../theme/useTheme";
 
 import { ChromePicker } from "react-color";
@@ -43,7 +44,7 @@ const NewCardInput = props => {
             key={index}
             style={{ color: theme.foreground, background: theme.background }}
         >
-            <div>
+            <div className={createSetStyles.newCardHeader}>
                 <Typography
                     variant="h6"
                     sx={{
@@ -52,40 +53,45 @@ const NewCardInput = props => {
                 >
                     Card {index + 1}
                 </Typography>
-                <Tooltip
-                    title="Delete this card"
-                    placement="right"
-                    arrow={true}
-                >
-                    <span className={createSetStyles.deleteCard} onClick={() => handleDelete(index)}>
-                        <i className={`material-icons-outlined  ${appStyles.clickIcon}`}>
-                            delete
-                        </i>
-                    </span>
-                </Tooltip>
-                {/* Upload file container */}
-                <input
-                    type="file"
-                    id="fileInput"
-                    ref={fileInputRef}
-                    accept=".png, .jpg"
-                    onChange={e => onFileChange(e, index)}
-                    style={{ display: "none" }}
-                />
-                <Tooltip
-                    title="Upload an image"
-                    placement="right"
-                    arrow={true}
-                >
-                    <span className={createSetStyles.uploadImage}>
-                        <i
-                            className={`material-icons-outlined  ${appStyles.clickIcon}`}
+
+                <div className={createSetStyles.newCardActions}>
+                    <Tooltip
+                        title="Delete this card"
+                        placement="top"
+                    >
+                        <IconButton
+                            onClick={() => handleDelete(index)}
+                        >
+                            <Delete
+                                sx={{
+                                    color: theme.foreground
+                                }}
+                            />
+                        </IconButton>
+                    </Tooltip>
+                    <input
+                        type="file"
+                        id="fileInput"
+                        ref={fileInputRef}
+                        accept=".png, .jpg"
+                        onChange={e => onFileChange(e, index)}
+                        style={{ display: "none" }}
+                    />
+                    <Tooltip
+                        title="Upload an image"
+                        placement="top"
+                    >
+                        <IconButton
                             onClick={() => fileInputRef.current.click()}
                         >
-                            image
-                        </i>
-                    </span>
-                </Tooltip>
+                            <AddPhotoAlternate
+                                sx={{
+                                    color: theme.foreground
+                                }}
+                            />
+                        </IconButton>
+                    </Tooltip>
+                </div>
             </div>
             <div className={createSetStyles.newCardInputs}>
                 <div className={createSetStyles.newCardTerm}>

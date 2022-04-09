@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react"
 import { useSelector, useDispatch } from 'react-redux'
 // import { setUserAuthState } from "../reducers/userAuthState";
+import { DataGrid } from '@mui/x-data-grid';
+
 
 /* Firebase Operations */
 
@@ -9,7 +11,8 @@ import { firebaseApp, database } from "../firebase/firebase";
 
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Tooltip } from '@mui/material/';
+import { Alert, AlertTitle, Tooltip, Typography } from '@mui/material/';
+
 import LoginMessage from "../LoginMessage/LoginMessage";
 import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
 import ViewFlashSet from "./ViewFlashSet/ViewFlashSet";
@@ -54,7 +57,6 @@ const Home = props => {
         setViewFlashSet,
         setSelectedFlashSet,
         userAuthState,
-
     }
 
     /* React-Router function for switching routes */
@@ -66,6 +68,42 @@ const Home = props => {
     /* Alert Popup */
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState("");
+
+    const columns = [
+        {
+            field: 'title',
+            headerName: 'Title',
+            width: 100
+        },
+        {
+            field: 'description',
+            headerName: 'Description',
+            width: 150,
+            editable: false,
+        },
+        {
+            field: 'creationDate',
+            headerName: 'Created on',
+            type: "date",
+            width: 150,
+            editable: false,
+        },
+        {
+            field: 'label',
+            headerName: 'Label',
+            width: 100,
+            editable: false,
+        },
+        // {
+        //     field: 'fullName',
+        //     headerName: 'Full name',
+        //     description: 'This column has a value getter and is not sortable.',
+        //     sortable: false,
+        //     width: 160,
+        //     valueGetter: (params) =>
+        //         `${params.row.firstName || ''} ${params.row.lastName || ''}`,
+        // },
+    ];
 
     useEffect(() => {
         document.title = `Quizaroni | Home`
@@ -81,12 +119,12 @@ const Home = props => {
 
     useEffect(() => {
         if (enteredSearch === "") {
-            console.log("originalFlashSets = ", originalFlashSets);
+            // console.log("originalFlashSets = ", originalFlashSets);
             setFlashSets(originalFlashSets);
         }
         let searchTerm = enteredSearch.toLowerCase();
-        console.log("searchTerm = ", searchTerm)
-        console.log("flashSets in Search useEffect = ", flashSets);
+        // console.log("searchTerm = ", searchTerm)
+        // console.log("flashSets in Search useEffect = ", flashSets);
         let newFlashSets = flashSets.filter(flashSet => {
             let { title, description } = flashSet;
             title = title.toLowerCase();
@@ -120,6 +158,10 @@ const Home = props => {
                 }
             });
             originalFlashSets = localFlashSets;
+            console.log("localFlashSets = ", localFlashSets);
+            localFlashSets.map((set) => {
+                set.id = set.uid;
+            })
             setFlashSets(localFlashSets);
         }
     }
@@ -179,16 +221,16 @@ const Home = props => {
         })
     }
 
-    const filterFlashsets = (column) => {
-        switch (column) {
-            case "Title":
+    // const filterFlashsets = (column) => {
+    //     switch (column) {
+    //         case "Title":
 
-                break;
+    //             break;
 
-            default:
-                break;
-        }
-    }
+    //         default:
+    //             break;
+    //     }
+    // }
 
     /*  TODO:
     - Add "Last Viewed" property to flashsets + table 
@@ -207,19 +249,39 @@ const Home = props => {
                 :
                 (
                     <div className={homeStyles.flashSets} style={{ color: theme.foreground, background: theme.background }}>
-                        <div className={appStyles.title}>
+                        <Typography
+                            variant="h5"
+                            sx={{
+                                fontWeight: "bold"
+                            }}
+                        >
                             Your Flashsets
-                        </div>
+                        </Typography>
+
                         {renderSearchBar()}
-                        {renderHeader()}
+                        {/* {renderHeader()} */}
+
+                        <div className={homeStyles.tableContainer}>
+                            {/* TODO: Have loading spinner for when data is loading */}
+                            <DataGrid
+                                rows={flashSets ?? []}
+                                columns={columns}
+                                pageSize={5}
+                                rowsPerPageOptions={[5]}
+                                checkboxSelection
+                                disableSelectionOnClick
+                            />
+                        </div>
+
+
                         {/* TODO: Review */}
-                        {!viewFlashSet && flashSets?.length > 0 &&
+                        {/* {!viewFlashSet && flashSets?.length > 0 &&
                             (
                                 <>
                                     {renderFlashSets()}
                                 </>
                             )
-                        }
+                        } */}
                     </div>
                 )
             }
