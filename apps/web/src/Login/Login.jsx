@@ -216,10 +216,6 @@ const Login = props => {
     }
 
 
-    if (userAuthState) {
-        return <LoginMessage page="login" />;
-    }
-
     return (
         <>
             <div className={loginStyles.loginPage}>
@@ -228,10 +224,15 @@ const Login = props => {
                     onKeyPress={enterKeyHandler}
                 >
                     <>
-                        <div className={`${appStyles.title} ${loginStyles.title}`}>
+                        <Typography
+                            variant="h5"
+                            sx={{
+                                fontWeight: "bold",
+                                alignSelf: "flex-start"
+                            }}
+                        >
                             Login
-                        </div>
-
+                        </Typography>
                         <input
                             className={
                                 showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`

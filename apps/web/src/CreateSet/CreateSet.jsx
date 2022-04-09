@@ -6,8 +6,8 @@ import { database } from "../firebase/firebase";
 
 /* Outside Components */
 import { useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, IconButton, Modal, Tooltip, Typography } from '@mui/material/';
-import { UploadFile } from "@mui/icons-material";
+import { Alert, AlertTitle, Button, IconButton, Modal, Tooltip, Typography } from '@mui/material/';
+import { Create, UploadFile } from "@mui/icons-material";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import LoginMessage from "../LoginMessage/LoginMessage";
 
@@ -331,33 +331,74 @@ const CreateSet = props => {
                             </select>
                         </div>
                     </div>
-                    <button
-                        tabIndex="0"
-                        className={`${createSetStyles.createSet}`}
+                    <Button
+                        variant="contained"
                         onClick={() => createNewSet()}
+                        sx={{
+                            backgroundColor: "orange",
+                            color: theme.foreground,
+                            fontWeight: "bold",
+                            position: "absolute",
+                            right: "2rem",
+                            top: "2rem",
+                            "&:hover": {
+                                background: "rgb(253, 187, 63)",
+                            }
+                        }}
+                        disabled={false}
                     >
-                        Create Set
-                    </button>
-                    {/* What is this span for */}
-                    <span>
-                    </span>
-                    <IconButton
-                        onClick={() => setShowImportModal(true)}
-                    >
-                        <UploadFile
-                            fontSize="large"
+                        <Create
                             sx={{
-                                color: theme.foreground
+                                marginRight: "0.5rem"
                             }}
                         />
-                    </IconButton>
-                    {/* <i className={`material-icons-outlined ${createSetStyles.import}`}
-                                onClick={() => setShowImportModal(true)}
-                            >
-                                upload_file
-                            </i> */}
+                        Create Set
+                    </Button>
+                    <Tooltip
+                        title="Import from text"
+                        placement="right"
+                    >
+                        <IconButton
+                            onClick={() => setShowImportModal(true)}
+                        >
+                            <UploadFile
+                                fontSize="large"
+                                sx={{
+                                    color: theme.foreground
+                                }}
+                            />
+                        </IconButton>
+                    </Tooltip>
                 </div>
                 {renderCreateCards()}
+
+                <Button
+                    variant="contained"
+                    onClick={() => {
+                        addCreateCardInput();
+                    }}
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        backgroundColor: "orange",
+                        color: theme.foreground,
+                        fontWeight: "bold",
+                        position: "absolute",
+                        right: "2rem",
+                        top: "2rem",
+                        "&:hover": {
+                            background: "rgb(253, 187, 63)",
+                        }
+                    }}
+                >
+                    <i
+                        className={`material-icons ${createSetStyles.addIcon}`}>
+                        add_circle_outline
+                    </i>
+                    Add Card
+                </Button>
+
                 <button
                     className={createdSetCards.length !== 0 ? `${createSetStyles.addCard}` : `${createSetStyles.addCard} ${createSetStyles.noInputs}`}
                     onClick={() => {
@@ -370,7 +411,6 @@ const CreateSet = props => {
                     Add Card
                 </button>
             </div>
-            )
 
             <Modal
                 open={showImportModal}

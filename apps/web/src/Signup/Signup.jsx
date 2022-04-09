@@ -8,7 +8,7 @@ import 'firebaseui/dist/firebaseui.css';
 
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Button, Card, Typography } from '@mui/material/';
+import { Alert, AlertTitle, Button, Card, IconButton, Typography } from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 
@@ -220,9 +220,15 @@ const Signup = props => {
                             style={{ color: theme.foreground, background: theme.background }}
                             onKeyPress={enterKeyHandler}
                         >
-                            <div className={`${appStyles.title} ${loginStyles.title}`}>
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    fontWeight: "bold",
+                                    alignSelf: "flex-start"
+                                }}
+                            >
                                 Sign up
-                            </div>
+                            </Typography>
 
                             {/* Email Input  */}
                             <input
@@ -266,8 +272,22 @@ const Signup = props => {
                                 onBlur={e => checkIfInputEmpty(e)}
                                 onChange={e => setEnteredPass(e.target.value)}
                             />
+{/* 
+                            <IconButton>
+                                {passVisibility ?
+                                    <Visibility
+                                        className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
+                                        onClick={() => setPassVisibility(!passVisibility)}
+                                    >
+                                    </Visibility> :
+                                    <VisibilityOff
+                                        className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
+                                        onClick={() => setPassVisibility(!passVisibility)}
+                                    >
+                                    </VisibilityOff>
+                                }
+                            </IconButton> */}
 
-                            {/* Show/Hide Password */}
                             {passVisibility ?
                                 <Visibility
                                     className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
@@ -305,16 +325,6 @@ const Signup = props => {
                             >
                                 Sign Up
                             </Button>
-
-                            {/* Signup Button */}
-                            {/* <button
-                                className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
-                                onClick={() => handleSignup()}
-                            >
-                                <b>Sign Up</b>
-                            </button> */}
-
-                            {/* Signup Link  */}
                             <Link
                                 className={loginStyles.signupLink}
                                 to="/login"

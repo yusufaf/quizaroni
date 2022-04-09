@@ -37,12 +37,12 @@ const Profile = props => {
     // Store a property for each user of the theme
     const [defaultTheme, setDefaultTheme] = useState(userAuthState?.bruh ?? "dark");
 
-    let credential = EmailAuthProvider.credential(
-        user.email,
-        enteredDeletePass
-    );
-
-    console.log("credential = ", credential);
+    if (userAuthState) {
+        let credential = EmailAuthProvider.credential(
+            user.email,
+            enteredDeletePass
+        );
+    }
 
     const checkIfInputMatches = event => {
         let updatedErrorText = { ...showErrorText };
@@ -145,7 +145,6 @@ const Profile = props => {
             // ...
         });
     }
-
 
 
     if (!userAuthState) {
