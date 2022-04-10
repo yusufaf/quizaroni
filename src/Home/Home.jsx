@@ -272,6 +272,9 @@ const Home = props => {
                                 disableSelectionOnClick
                                 onRowClick={() => {
                                 }}
+                                sx={{
+                                    color: theme.foreground
+                                }}
                             />
                         </div>
 
