@@ -3,9 +3,22 @@ import { useEffect, useState, useRef } from "react"
 import { collection, query, where, getDocs, updateDoc } from "firebase/firestore";
 import { firebaseApp, database } from "../../firebase/firebase";
 
-/* Outside Components */
-import { Alert, AlertTitle, Chip, FormControlLabel, IconButton, Menu, MenuItem, Switch, Paper, Tooltip, Typography } from '@mui/material/';
-import { Add, ArrowBack, Download, EditNotifications, MenuOpen } from '@mui/icons-material/';
+import {
+    Alert,
+    AlertTitle,
+    Card,
+    Chip,
+    FormControlLabel,
+    IconButton,
+    Menu,
+    MenuItem,
+    Modal,
+    Switch,
+    Paper,
+    Tooltip,
+    Typography
+} from '@mui/material/';
+import { Add, ArrowBack, Download, EditNotifications, Email, MenuOpen } from '@mui/icons-material/';
 
 import ViewFlashCard from "./ViewFlashCard";
 
@@ -46,7 +59,23 @@ const ViewFlashSet = props => {
         '&.MuiIconButton-colorPrimary': {
             color: theme.foreground,
         },
-    }
+    };
+
+    const notificationsModalStyling = {
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        display: 'flex',
+        flexDirection: "column",
+        padding: "1.5rem",
+        height: "25rem",
+        width: "50rem",
+        "&.MuiCard-root": {
+            color: theme.foreground,
+            backgroundColor: theme.background,
+        }
+    };
 
     /* Update the title of the page to include the title of the set */
     useEffect(() => {
@@ -116,6 +145,25 @@ const ViewFlashSet = props => {
     */
     const handleEmailReminders = () => {
 
+    }
+
+    const testEmail = async () => {
+        const data = {
+            to: "yusufafzal12@gmail.com",
+            subject: "Test Email lmao",
+            text: "Test reminder email WOOOOOOOOOOO,"
+        };
+        console.log("JSON.stringify(data) = ", JSON.stringify(data));
+
+        const response = await fetch("http://localhost:5000/send_email", {
+            method: "POST",
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        return response.json();
     }
 
     const renderActionBar = () => {
@@ -272,82 +320,107 @@ const ViewFlashSet = props => {
                     )
                     :
                     (
-                        <div className={viewFlashStyles.viewContainer}
-                            style={{ color: theme.foreground, background: theme.background }}
-                        >
-                            <div className={viewFlashStyles.header}>
+                        <>
+                            <div className={viewFlashStyles.viewContainer}
+                                style={{ color: theme.foreground, background: theme.background }}
+                            >
+                                <div className={viewFlashStyles.header}>
 
-                                <div className={`${viewFlashStyles.setInfo} ${isDarkMode ? viewFlashStyles.darkBorder : viewFlashStyles.lightBorder}`}
-                                >
-                                    <IconButton color="primary"
-                                        aria-label="arrow backward" component="span"
-                                        sx={arrowIconStyling}
-                                        onClick={() => setViewFlashSet(false)}
-                                    >
-                                        <ArrowBack />
-                                    </IconButton>
-
-                                    <span>
-                                        Back to Your Flashsets
-                                    </span>
-
-                                    <Typography
-                                        variant="h5"
-                                        sx={{
-                                            fontWeight: "bold"
-                                        }}
-                                    >
-                                        {selectedFlashSet.title}
-                                    </Typography>
-
-                                    <Chip label={selectedFlashSet.label ? selectedFlashSet.label : "No label selected"} variant="outlined"
-                                        sx={{
-                                            height: "2.5rem",
-                                            color: theme.foreground
-                                        }}
-                                    />
-                                    <Tooltip
-                                        title="Create label"
-                                        placement="right"
+                                    <div className={`${viewFlashStyles.setInfo} ${isDarkMode ? viewFlashStyles.darkBorder : viewFlashStyles.lightBorder}`}
                                     >
                                         <IconButton color="primary"
                                             aria-label="arrow backward" component="span"
                                             sx={arrowIconStyling}
+                                            onClick={() => setViewFlashSet(false)}
                                         >
-                                            <Add />
+                                            <ArrowBack />
                                         </IconButton>
-                                    </Tooltip>
 
-                                    {/*  */}
-                                    <Typography
-                                        variant="body1"
-                                    >
-                                        {selectedFlashSet.description}
-                                    </Typography>
-                                    {renderActionBar()}
-                                </div>
-                                <div className={viewFlashStyles.studySection}>
-                                    <div className={appStyles.title}>
-                                        Study
-                                    </div>
-                                    <div className={viewFlashStyles.studyOptions}>
-                                        <div className={`${viewFlashStyles.studyButton} ${isDarkMode ? appStyles.hoverDark : appStyles.hoverLight}`}
-                                            onClick={() => setSelectedStudyMode(STUDY_MODES.FLASHCARDS)}
+                                        <span>
+                                            Back to Your Flashsets
+                                        </span>
+
+                                        <Typography
+                                            variant="h5"
+                                            sx={{
+                                                fontWeight: "bold"
+                                            }}
                                         >
-                                            <img src={FLASH_CARDS_IMG} height={32} width={32} />
-                                            <span>Flashcards </span>
+                                            {selectedFlashSet.title}
+                                        </Typography>
+
+                                        <Chip label={selectedFlashSet.label ? selectedFlashSet.label : "No label selected"} variant="outlined"
+                                            sx={{
+                                                height: "2.5rem",
+                                                color: theme.foreground
+                                            }}
+                                        />
+                                        <Tooltip
+                                            title="Create label"
+                                            placement="right"
+                                        >
+                                            <IconButton color="primary"
+                                                aria-label="arrow backward" component="span"
+                                                sx={arrowIconStyling}
+                                            >
+                                                <Add />
+                                            </IconButton>
+                                        </Tooltip>
+
+                                        {/*  */}
+                                        <Typography
+                                            variant="body1"
+                                        >
+                                            {selectedFlashSet.description}
+                                        </Typography>
+                                        {renderActionBar()}
+                                    </div>
+                                    <div className={viewFlashStyles.studySection}>
+                                        <div className={appStyles.title}>
+                                            Study
+                                        </div>
+                                        <div className={viewFlashStyles.studyOptions}>
+                                            <div className={`${viewFlashStyles.studyButton} ${isDarkMode ? appStyles.hoverDark : appStyles.hoverLight}`}
+                                                onClick={() => setSelectedStudyMode(STUDY_MODES.FLASHCARDS)}
+                                            >
+                                                <img src={FLASH_CARDS_IMG} height={32} width={32} />
+                                                <span>Flashcards </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <Typography
-                                variant="h6"
+                                <Typography
+                                    variant="h6"
+                                >
+                                    Number of cards in this study set: {selectedFlashSet.cards.length}
+                                </Typography>
+                                {renderSetCards()}
+                            </div>
+                            <Modal
+                                open={showNotificationsModal}
+                                onClose={() => setShowNotificationsModal(false)}
                             >
-                                Number of cards in this study set: {selectedFlashSet.cards.length}
-                            </Typography>
-                            {renderSetCards()}
-                        </div>
+                                <Card
+                                    sx={notificationsModalStyling}
+                                >
+                                    <Typography
+                                        variant="h5"
+                                    >
+                                        Manage Notifications
+                                    </Typography>
+                                    <div>
+                                        <IconButton
+                                            onClick={() => testEmail().then(data => {
+                                                console.log("Data received from POSTing data")
+                                            })}
+                                        >
+                                            <Email />
+                                        </IconButton>
+                                    </div>
+                                </Card>
+                            </Modal>
+                        </>
                     )
             }
         </div>

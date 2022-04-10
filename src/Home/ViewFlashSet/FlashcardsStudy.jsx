@@ -193,7 +193,7 @@ const FlashcardsStudy = props => {
             <div className={viewFlashStyles.studyElements}>
                 {/* TODO: Figure out how to adjust the font size of the Tooltip */}
                 <Tooltip
-                    title="Go to previous card"
+                    title={<Typography fontSize="1rem">Go to previous card</Typography>}
                 >
                     <IconButton color="primary"
                         aria-label="arrow backward" component="span"
@@ -223,7 +223,7 @@ const FlashcardsStudy = props => {
                             <IconButton
                                 onClick={handleAudioPlayback}
                             >
-                                <VolumeUp 
+                                <VolumeUp
                                     sx={{
                                         color: theme.foreground
                                     }}
@@ -233,8 +233,8 @@ const FlashcardsStudy = props => {
                     </div>
                 </Card>
                 <Tooltip
-                    title="Go to next card"
-                >
+                    title={<Typography fontSize="1rem">Go to next card</Typography>}
+                    >
                     <IconButton color="primary" aria-label="arrow forward" component="span"
                         sx={arrowIconStyling}
                         onClick={() => handleArrowClick("FORWARD")}
