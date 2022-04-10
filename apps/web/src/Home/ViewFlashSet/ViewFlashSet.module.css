@@ -1,8 +1,8 @@
 .viewPage {
-    display      : grid;
-    align-items  : center;
+    display: grid;
+    align-items: center;
     justify-items: center;
-    margin       : 0 auto;
+    margin: 0 auto;
 }
 
 
@@ -12,11 +12,11 @@
 
 .viewContainer {
     grid-row: 1;
-    height          : 25rem;
-    width           : 70rem;
-    padding         : 1rem 1.25rem;
-    border-radius   : 0.75rem;
-    box-shadow      : 0 3px 10px rgb(0 0 0 / 0.2);
+    height: 25rem;
+    width: 70rem;
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
 }
 
 /* .actionBar {
@@ -27,7 +27,7 @@
 
 
 .header {
-    display              : grid;
+    display: grid;
     grid-template-columns: 30rem auto;
 }
 
@@ -49,36 +49,24 @@
 }
 
 .studyOptions {
-    margin-top           : 1rem;
-    display              : grid;
+    margin-top: 1rem;
+    display: grid;
     grid-template-columns: 15rem 15rem;
-    grid-template-rows   : auto auto;
+    grid-template-rows: auto auto;
 }
 
 .studyButton {
-    font-size      : 1.25rem;
-    display        : flex;
-    flex-direction : column;
+    font-size: 1.25rem;
+    display: flex;
+    flex-direction: column;
     justify-content: center;
-    align-items    : center;
+    align-items: center;
 
     user-select: none;
-    cursor     : pointer;
+    cursor: pointer;
 
-    padding      : 0.75rem 0.5rem;
+    padding: 0.75rem 0.5rem;
     border-radius: 0.25rem;
-}
-
-.study .backButton {
-    display    : flex;
-    align-items: center;
-    position   : absolute;
-    top        : 0;
-}
-
-.back:active {
-    border-radius: 50%;
-    background   : green;
 }
 
 .firstCard {
@@ -86,13 +74,12 @@
 }
 
 .viewFlashCard {
-    position     : relative;
-    width        : 70rem;
-    right        : 1.5rem;
-    padding      : 1rem 1.25rem 1.25rem 1.25rem;
+    position: relative;
+    width: 70rem;
+    right: 1.5rem;
+    padding: 1rem 1.25rem 1.25rem 1.25rem;
     border-radius: 0.75rem;
-    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
-
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
     margin-bottom: 2.5rem;
 }
 
@@ -102,22 +89,24 @@
 }
 
 .cardActions {
-    margin-left: auto;
+    /* margin-left: auto; */
+    position: absolute;
+    right: 7rem;
 }
 
 .viewCardContainer {
-    display   : flex;
-    gap       : 25rem;
+    display: flex;
+    gap: 25rem;
     margin-top: 0.5rem;
 }
 
 .viewCardTerm,
 .viewCardDefinition {
-    display       : flex;
+    display: flex;
     flex-direction: column;
-    align-items   : flex-start;
-    flex-wrap     : wrap;
-    flex-grow     : 1;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    flex-grow: 1;
 }
 
 /* ================ */
