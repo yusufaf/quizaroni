@@ -1,4 +1,5 @@
 import express from 'express';
+import { MongoClient } from "mongodb";
 import cors from "cors";
 import bodyparser from "body-parser";
 // import * as path from "path";
@@ -7,6 +8,20 @@ import * as smtpserver from "smtp-server";
 import dotenv from "dotenv";
 
 dotenv.config()
+
+
+/*
+  MongoDB Setup
+*/
+const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING)
+let db;
+
+client.connect((err) => {
+  if (err) {
+    return console.log(err);
+  }
+  db = client.db("quizaroni");
+})
 
 /* 
 SMTP Server Code
@@ -54,10 +69,12 @@ const api_app = express();
 api_app.use(cors());
 api_app.use(bodyparser.json());
 
-const port = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
 // console.log that your server is up and running
-api_app.listen(port, () => console.log(`Listening on port ${port}`));
+api_app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`)
+});
 
 api_app.get("/api", (req, res) => {
   res.send("Yo whats up")
@@ -80,11 +97,11 @@ api_app.post("/send_email", async (req, res) => {
     subject,
     text,
   })
-  .catch(err => {
-    console.log("err = ", err);
-  })
+    .catch(err => {
+      console.log("err = ", err);
+    })
   // res.json()
-  res.json({status: "OK"});
+  res.json({ status: "OK" });
 })
 
 export const handler = api_app;
