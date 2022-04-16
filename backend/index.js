@@ -4,7 +4,7 @@ import cors from "cors";
 import bodyparser from "body-parser";
 // import * as path from "path";
 import * as nodemailer from "nodemailer";
-import * as smtpserver from "smtp-server";
+// import * as smtpserver from "smtp-server";
 import dotenv from "dotenv";
 
 dotenv.config()
@@ -39,23 +39,23 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const smtp_server = new smtpserver.SMTPServer({
-  name: "Quizaroni SMTP",
-  // onData -- callback to handle incoming messages
-  onData(stream, session, callback) {
-    parser(stream, {}, (err, parsed) => {
-      if (err)
-        // console.log("Error:", err)
+// const smtp_server = new smtpserver.SMTPServer({
+//   name: "Quizaroni SMTP",
+//   // onData -- callback to handle incoming messages
+//   onData(stream, session, callback) {
+//     parser(stream, {}, (err, parsed) => {
+//       if (err)
+//         // console.log("Error:", err)
 
-        // console.log(parsed)
-        stream.on("end", callback)
-    })
+//         // console.log(parsed)
+//         stream.on("end", callback)
+//     })
 
-  },
-  disabledCommands: ['AUTH']
-});
+//   },
+//   disabledCommands: ['AUTH']
+// });
 
-smtp_server.listen(465);
+// smtp_server.listen(465);
 
 
 // app.use(cors()) 
