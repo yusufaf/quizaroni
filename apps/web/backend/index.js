@@ -5,29 +5,37 @@ import bodyparser from "body-parser";
 // import * as path from "path";
 import * as nodemailer from "nodemailer";
 // import * as smtpserver from "smtp-server";
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
 
-dotenv.config()
+// dotenv.config()
 
 
 /*
   MongoDB Setup
 */
-const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING)
+const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+// console.log(process.env.MONGODB_CONNECTION_STRING);
 let db;
 
-client.connect((err) => {
-  if (err) {
-    return console.log(err);
+async function run() {
+  try {
+    await client.connect();
+    db = client.db("quizaroni")
   }
-  db = client.db("quizaroni");
-})
+  finally {
+    await client.close();
+  }
+
+}
+run().catch(console.dir);
 
 /* 
 SMTP Server Code
 */
-
-console.log({ name: process.env.EMAIL_USERNAME, pass: process.env.EMAIL_PASSWORD });
 
 // transporter object for Gmail account
 const transporter = nodemailer.createTransport({
