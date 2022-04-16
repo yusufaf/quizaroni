@@ -125,7 +125,7 @@ const FlashcardsStudy = props => {
     }
 
     return (
-        <div className={viewFlashStyles.studyPage}>
+        <div>
             {/* TODO: In global App stylings: define back arrow */}
             <IconButton color="primary"
                 aria-label="arrow backward" component="span"
