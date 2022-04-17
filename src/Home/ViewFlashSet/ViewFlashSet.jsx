@@ -6,8 +6,14 @@ import { firebaseApp, database } from "../../firebase/firebase";
 import {
     Alert,
     AlertTitle,
+    Button,
     Card,
     Chip,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
     FormControlLabel,
     IconButton,
     Menu,
@@ -15,6 +21,7 @@ import {
     Modal,
     Switch,
     Paper,
+    TextField,
     Tooltip,
     Typography
 } from '@mui/material/';
@@ -48,6 +55,8 @@ const ViewFlashSet = props => {
 
     const [showNotificationsModal, setShowNotificationsModal] = useState(false);
     const [showControlMenu, setShowControlMenu] = useState(false);
+    const [showCreateLabelDialog, setShowCreateLabelDialog] = useState(false);
+
     const [disableTextColor, setDisableTextColor] = useState(false);
     const [disableBackgroundColor, setDisableBackgroundColor] = useState(false);
     const [studySetViewable, setStudySetViewable] = useState(false);
@@ -164,6 +173,10 @@ const ViewFlashSet = props => {
             body: JSON.stringify(data)
         })
         return response.json();
+    }
+
+    const createNewLabel = () => {
+        // Check if the label already exists
     }
 
     const renderActionBar = () => {
@@ -362,6 +375,7 @@ const ViewFlashSet = props => {
                                             <IconButton color="primary"
                                                 aria-label="arrow backward" component="span"
                                                 sx={arrowIconStyling}
+                                                onClick={() => setShowCreateLabelDialog(true)}
                                             >
                                                 <Add />
                                             </IconButton>
@@ -397,6 +411,37 @@ const ViewFlashSet = props => {
                                 </Typography>
                                 {renderSetCards()}
                             </div>
+                            <Dialog open={showCreateLabelDialog} onClose={() => setShowCreateLabelDialog(false)}
+                            >
+                                <DialogTitle>Create new label</DialogTitle>
+                                <DialogContent>
+                                    <DialogContentText>
+                                        Please enter the name of the label you want to create.
+                                    </DialogContentText>
+                                    <TextField
+                                        autoFocus
+                                        margin="dense"
+                                        id="name"
+                                        label="Label Name"
+                                        type="email"
+                                        fullWidth
+                                        variant="standard"
+                                        sx={{
+                                            color: "orange"
+                                        }}
+                                    />
+                                </DialogContent>
+                                <DialogActions>
+                                    {/* Todo: Figure out good color for a cancel button */}
+                                    <Button onClick={() => setShowCreateLabelDialog(false)}
+                                        sx={{ color: "gray" }}
+                                    >Cancel</Button>
+                                    <Button onClick={() => createNewLabel()}
+                                        sx={{ color: "orange" }}
+
+                                    >Create</Button>
+                                </DialogActions>
+                            </Dialog>
                             <Modal
                                 open={showNotificationsModal}
                                 onClose={() => setShowNotificationsModal(false)}
