@@ -5,6 +5,8 @@ import bodyparser from "body-parser";
 // import * as path from "path";
 import * as nodemailer from "nodemailer";
 import dotenv from "dotenv";
+import {MailService} from '@sendgrid/mail';
+
 
 dotenv.config();
 
@@ -44,24 +46,6 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// const smtp_server = new smtpserver.SMTPServer({
-//   name: "Quizaroni SMTP",
-//   // onData -- callback to handle incoming messages
-//   onData(stream, session, callback) {
-//     parser(stream, {}, (err, parsed) => {
-//       if (err)
-//         // console.log("Error:", err)
-
-//         // console.log(parsed)
-//         stream.on("end", callback)
-//     })
-
-//   },
-//   disabledCommands: ['AUTH']
-// });
-
-// smtp_server.listen(465);
-
 
 /* 
 REST API Code
@@ -91,16 +75,16 @@ api_app.post("/send_email", async (req, res) => {
   // console.log("request object = ", req);
   const { to, subject, text } = req.body
   console.log("Testing email API route")
+  
+  const content = {
+    to: '',
+    from: email,
+    subject: `New Message From - ${email}`,
+    text: message,
+    html: `<p>${message}</p>`
+  }
 
-  await transporter.sendMail({
-    from: process.env.EMAIL_USERNAME,
-    to,
-    subject,
-    text,
-  })
-    .catch(err => {
-      console.log("err = ", err);
-    })
+
   // res.json()
   res.json({ status: "OK" });
 })

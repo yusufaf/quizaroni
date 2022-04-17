@@ -20,6 +20,7 @@
     "@mui/material": "^5.2.3",
     "@mui/x-data-grid": "^5.8.0",
     "@reduxjs/toolkit": "^1.7.0",
+    "@sendgrid/mail": "^7.6.2",
     "axios": "^0.26.1",
     "babel-preset-react": "^6.24.1",
     "cors": "^2.8.5",
