@@ -6,6 +6,10 @@
 
 
 .createContainer {
+    /* TODO: Change to GRID */
+    /* display: grid;
+    grid-template-columns: auto auto; */
+
     position     : absolute;
     height       : fit-content;
     width        : 70rem;

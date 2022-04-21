@@ -66,6 +66,7 @@ const NewCardInput = props => {
                                 sx={{
                                     color: theme.foreground
                                 }}
+                                fontSize="medium"
                             />
                         </IconButton>
                     </Tooltip>

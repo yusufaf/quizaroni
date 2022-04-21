@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { database } from "../firebase/firebase";
 import { deleteDoc, updateDoc, query, where, collection, getDoc, getDocs, limit } from "firebase/firestore";
 import { EmailAuthProvider, getAuth, deleteUser, updatePassword, reauthenticateWithCredential } from "firebase/auth";
-import { Button, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
+import { Button, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from '@mui/material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 import ProfileCard from "./ProfileCard";
 
@@ -157,9 +157,14 @@ const Profile = props => {
             <>
                 <ProfileCard userAuthState={userAuthState} />
                 <div className={profileStyles.profileContainer} style={{ color: theme.foreground, background: theme.background }}>
-                    <div className={appStyles.title}>
+                    <Typography
+                        variant="h5"
+                        sx={{
+                            fontWeight: "bold"
+                        }}
+                    >
                         Profile
-                    </div>
+                    </Typography>
 
                     <div className={profileStyles.heading}>
                         <span className="material-icons-outlined">
