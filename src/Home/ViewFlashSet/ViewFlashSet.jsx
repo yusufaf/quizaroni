@@ -390,9 +390,14 @@ const ViewFlashSet = props => {
                                         {renderActionBar()}
                                     </div>
                                     <div className={viewFlashStyles.studySection}>
-                                        <div className={appStyles.title}>
+                                        <Typography
+                                            variant="h6"
+                                            sx={{
+                                                fontWeight: "bold"
+                                            }}
+                                        >
                                             Study
-                                        </div>
+                                        </Typography>
                                         <div className={viewFlashStyles.studyOptions}>
                                             <div className={`${viewFlashStyles.studyButton} ${isDarkMode ? appStyles.hoverDark : appStyles.hoverLight}`}
                                                 onClick={() => setSelectedStudyMode(STUDY_MODES.FLASHCARDS)}
@@ -403,7 +408,6 @@ const ViewFlashSet = props => {
                                         </div>
                                     </div>
                                 </div>
-
                                 <Typography
                                     variant="h6"
                                 >
