@@ -11,7 +11,8 @@ import { firebaseApp, database } from "../firebase/firebase";
 
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Tooltip, Typography } from '@mui/material/';
+import { Alert, AlertTitle, IconButton, Tooltip, Typography } from '@mui/material/';
+import { MenuOpen } from "@mui/icons-material";
 
 import LoginMessage from "../LoginMessage/LoginMessage";
 import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
@@ -94,15 +95,24 @@ const Home = props => {
             width: 100,
             editable: false,
         },
-        // {
-        //     field: 'fullName',
-        //     headerName: 'Full name',
-        //     description: 'This column has a value getter and is not sortable.',
-        //     sortable: false,
-        //     width: 160,
-        //     valueGetter: (params) =>
-        //         `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-        // },
+        {
+            field: 'actions',
+            headerName: '',
+            width: 75,
+            editable: false,
+            sortable: false,
+            renderCell: (cellValues) => {
+                return (
+                    <>
+                        <Tooltip title="Open actions menu" placement="right">
+                            <IconButton>
+                                <MenuOpen />
+                            </IconButton>
+                        </Tooltip>
+                    </>
+                );
+            }
+        }
     ];
 
     useEffect(() => {

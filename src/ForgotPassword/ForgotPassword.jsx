@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
-import { Alert, AlertTitle } from '@mui/material/';
+import { Alert, AlertTitle, Typography } from '@mui/material/';
 import { useTheme } from "../theme/useTheme";
 import * as appStyles from "../App.module.css";
 import * as loginStyles from "../Login/Login.module.css";
@@ -52,9 +52,14 @@ const ForgotPassword = props => {
     return (
         <>
             <div className={forgotPassStyles.forgotContainer} style={{ color: theme.foreground, background: theme.background }}>
-                <div className={appStyles.title}>
+                <Typography
+                    variant="h6"
+                    sx={{
+                        fontWeight: "bold"
+                    }}
+                >
                     Reset your password
-                </div>
+                </Typography>
 
                 <div className={forgotPassStyles.info}>
                     Please enter your account's email below. We will send an email with instructions and a link to reset your password.
@@ -86,7 +91,8 @@ const ForgotPassword = props => {
 
             </div>
 
-            {showAlert &&
+            {
+                showAlert &&
                 <Alert
                     className={appStyles.alert}
                     severity={alertType}

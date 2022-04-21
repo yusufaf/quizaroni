@@ -45,7 +45,6 @@ const CreateSet = props => {
     // Store a reference to the HTML file <input>
     const fileInputRef = useRef(null);
 
-    /* Alert Popup */
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState("");
 
@@ -55,10 +54,9 @@ const CreateSet = props => {
         descInput: false
     })
 
-    /* On mount:
-    - Render the options for the options dropdown
-    - Update the title of the page to say "Create a new study set" 
-    */
+    const createSetDisabled = !enteredTitle || !enteredDescription;
+
+
     useEffect(() => {
         renderLabelOptions();
         document.title = `Quizaroni | Create`
@@ -269,9 +267,6 @@ const CreateSet = props => {
                     >
                         {CREATE_SET.TITLE}
                     </Typography>
-                    {/* <div className={createSetStyles.title}>
-                                {CREATE_SET.TITLE}
-                            </div> */}
                     <div className={createSetStyles.inputContainer}>
                         <Typography
                             variant="subtitle1"
@@ -331,44 +326,53 @@ const CreateSet = props => {
                             </select>
                         </div>
                     </div>
-                    <Button
-                        variant="contained"
-                        onClick={() => createNewSet()}
-                        sx={{
-                            backgroundColor: "orange",
-                            color: theme.foreground,
-                            fontWeight: "bold",
-                            position: "absolute",
-                            right: "2rem",
-                            top: "2rem",
-                            "&:hover": {
-                                background: "rgb(253, 187, 63)",
-                            }
-                        }}
-                        disabled={false}
-                    >
-                        <Create
+                    <div>
+                        <Button
+                            variant="contained"
+                            onClick={() => createNewSet()}
                             sx={{
-                                marginRight: "0.5rem"
+                                backgroundColor: "orange",
+                                color: theme.foreground,
+                                fontWeight: "bold",
+                                position: "absolute",
+                                right: "2rem",
+                                top: "2rem",
+                                "&:hover": {
+                                    background: "rgb(253, 187, 63)",
+                                }
                             }}
-                        />
-                        Create Set
-                    </Button>
-                    <Tooltip
-                        title="Import from text"
-                        placement="right"
-                    >
-                        <IconButton
-                            onClick={() => setShowImportModal(true)}
+                            disabled={createSetDisabled}
                         >
-                            <UploadFile
-                                fontSize="large"
+                            <Create
                                 sx={{
-                                    color: theme.foreground
+                                    marginRight: "0.5rem"
                                 }}
                             />
-                        </IconButton>
-                    </Tooltip>
+                            Create Set
+                        </Button>
+                        {/* {createSetDisabled
+                            &&
+                            <Typography>
+                                yo
+                            </Typography>
+                        } */}
+                    </div>
+
+                    <IconButton
+                        onClick={() => setShowImportModal(true)}
+                    >
+                        <UploadFile
+                            fontSize="large"
+                            sx={{
+                                color: theme.foreground
+                            }}
+                        />
+                    </IconButton>
+                    <Typography variant="subtitle1"
+                        component="span"
+                    >
+                        Import cards
+                    </Typography>
                 </div>
                 {renderCreateCards()}
 
@@ -419,9 +423,14 @@ const CreateSet = props => {
                 <div className={createSetStyles.importModal}
                     style={{ color: theme.foreground, background: theme.background }}
                 >
-                    <div className={appStyles.largeTitle}>
+                    <Typography
+                        variant="h5"
+                        sx={{
+                            fontWeight: "bold"
+                        }}
+                    >
                         Import cards
-                    </div>
+                    </Typography>
                     {/* Option to enter the cards like Quizlet has */}
                     <textarea
                         className={`${createSetStyles.descInput} ${isDarkMode ? `${createSetStyles.dark} ${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
