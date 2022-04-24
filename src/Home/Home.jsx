@@ -11,8 +11,8 @@ import { firebaseApp, database } from "../firebase/firebase";
 
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, IconButton, Tooltip, Typography } from '@mui/material/';
-import { MenuOpen } from "@mui/icons-material";
+import { Alert, AlertTitle, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material/';
+import { ContentCopy, Edit, MenuOpen, FavoriteBorder, Favorite } from "@mui/icons-material";
 
 import LoginMessage from "../LoginMessage/LoginMessage";
 import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
@@ -43,6 +43,7 @@ const Home = props => {
 
     const [viewFlashSet, setViewFlashSet] = useState(false);
     const [selectedFlashSet, setSelectedFlashSet] = useState({});
+    const [showActionsMenu, setShowActionsMenu] = useState(false);
 
     const viewSetProps = {
         viewFlashSet,
@@ -58,6 +59,14 @@ const Home = props => {
         setViewFlashSet,
         setSelectedFlashSet,
         userAuthState,
+    }
+
+    const openActionsMenu = () => {
+        setShowActionsMenu(true);
+    }
+
+    const hideActionsMenu = () => {
+        setShowActionsMenu(false);
     }
 
     /* React-Router function for switching routes */
@@ -105,10 +114,43 @@ const Home = props => {
                 return (
                     <>
                         <Tooltip title="Open actions menu" placement="right">
-                            <IconButton>
+                            <IconButton
+                                onClick={openActionsMenu}
+                                sx={{
+                                    color: theme.foreground
+                                }}
+                            >
                                 <MenuOpen />
                             </IconButton>
                         </Tooltip>
+                        <Menu open={showActionsMenu} onClose={hideActionsMenu}>
+                            <MenuItem>
+                                <IconButton>
+                                    <Edit />
+                                </IconButton>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{
+                                        fontSize: '1.5rem',
+                                    }}
+                                >
+                                    Rename
+                                </Typography>
+                            </MenuItem>
+                            <MenuItem>
+                                <IconButton>
+                                    <ContentCopy />
+                                </IconButton>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{
+                                        fontSize: '1.5rem',
+                                    }}
+                                >
+                                    Duplicate
+                                </Typography>
+                            </MenuItem>
+                        </Menu>
                     </>
                 );
             }
