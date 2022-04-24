@@ -21,8 +21,6 @@ const Profile = props => {
     const auth = getAuth();
     const user = auth.currentUser;
 
-
-
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [enteredDeletePass, setEnteredDeletePass] = useState("");
 
