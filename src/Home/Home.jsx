@@ -45,6 +45,9 @@ const Home = props => {
     const [selectedFlashSet, setSelectedFlashSet] = useState({});
     const [showActionsMenu, setShowActionsMenu] = useState(false);
 
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    const [isFavorited, setIsFavorited] = useState(false);
+
     const viewSetProps = {
         viewFlashSet,
         setViewFlashSet,
@@ -163,12 +166,27 @@ const Home = props => {
                         <div className={homeStyles.importantActions}>
                             <Tooltip
                                 title="Delete this set"
-                                placement="top"
+                                placement="right"
                             >
                                 <IconButton
                                     onClick={() => handleDelete(index)}
                                 >
                                     <Delete
+                                        sx={{
+                                            color: theme.foreground
+                                        }}
+                                        fontSize="medium"
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip
+                                title="Favorite this card"
+                                placement="right"
+                            >
+                                <IconButton
+                                    onClick={() => handleDelete(index)}
+                                >
+                                    <FavoriteBorder
                                         sx={{
                                             color: theme.foreground
                                         }}
@@ -242,6 +260,22 @@ const Home = props => {
                 set.id = set.uid;
             })
             setFlashSets(localFlashSets);
+        }
+    }
+
+    const handleDeleteSet = async () => {
+        const flashCollection = collection(database, "flashcards");
+        const queryResult = query(flashCollection,
+            where("setID", "==", setID)
+        );
+
+        const querySnapshot = await getDocs(queryResult);
+        const setDoc = querySnapshot.docs[0];
+        if (setDoc) {
+            const setRef = setDoc.ref;
+            deleteDoc(setRef).then((result) => {
+                setShowDeleteConfirmation(false);
+            })
         }
     }
 
