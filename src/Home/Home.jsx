@@ -12,7 +12,7 @@ import { firebaseApp, database } from "../firebase/firebase";
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material/';
-import { ContentCopy, Edit, MenuOpen, FavoriteBorder, Favorite } from "@mui/icons-material";
+import { ContentCopy, Delete, Edit, MenuOpen, FavoriteBorder, Favorite } from "@mui/icons-material";
 
 import LoginMessage from "../LoginMessage/LoginMessage";
 import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
@@ -75,6 +75,8 @@ const Home = props => {
     // Store a reference to the HTML file <input>
     const fileInput = useRef(null);
 
+    const actionsMenuRef = useRef(null);
+
     /* Alert Popup */
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState("");
@@ -112,7 +114,7 @@ const Home = props => {
             sortable: false,
             renderCell: (cellValues) => {
                 return (
-                    <>
+                    <div ref={actionsMenuRef} className={homeStyles.actionsContainer}>
                         <Tooltip title="Open actions menu" placement="right">
                             <IconButton
                                 onClick={openActionsMenu}
@@ -123,11 +125,16 @@ const Home = props => {
                                 <MenuOpen />
                             </IconButton>
                         </Tooltip>
-                        <Menu open={showActionsMenu} onClose={hideActionsMenu}>
+                        <Menu
+                            anchorEl={actionsMenuRef.current}
+                            open={showActionsMenu} onClose={hideActionsMenu}
+                        >
                             <MenuItem>
-                                <IconButton>
-                                    <Edit />
-                                </IconButton>
+                                <Edit
+                                    sx={{
+                                        marginRight: "0.75rem"
+                                    }}
+                                />
                                 <Typography
                                     variant="subtitle1"
                                     sx={{
@@ -138,9 +145,11 @@ const Home = props => {
                                 </Typography>
                             </MenuItem>
                             <MenuItem>
-                                <IconButton>
-                                    <ContentCopy />
-                                </IconButton>
+                                <ContentCopy
+                                    sx={{
+                                        marginRight: "0.75rem"
+                                    }}
+                                />
                                 <Typography
                                     variant="subtitle1"
                                     sx={{
@@ -151,7 +160,25 @@ const Home = props => {
                                 </Typography>
                             </MenuItem>
                         </Menu>
-                    </>
+                        <div className={homeStyles.importantActions}>
+                            <Tooltip
+                                title="Delete this set"
+                                placement="top"
+                            >
+                                <IconButton
+                                    onClick={() => handleDelete(index)}
+                                >
+                                    <Delete
+                                        sx={{
+                                            color: theme.foreground
+                                        }}
+                                        fontSize="medium"
+                                    />
+                                </IconButton>
+                            </Tooltip>
+                        </div>
+
+                    </div>
                 );
             }
         }
