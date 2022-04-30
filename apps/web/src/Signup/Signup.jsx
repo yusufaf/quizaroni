@@ -15,7 +15,7 @@ import LoginMessage from "../LoginMessage/LoginMessage";
 /* Styling */
 import { useTheme } from "../theme/useTheme";
 import * as loginStyles from '../Login/Login.module.css';
-import * as signupStyles from "../Signup/Signup.module.css"
+import * as signupStyles from "./Signup.module.css"
 import * as appStyles from "../App.module.css";
 import * as C from "../utilities/constants";
 
