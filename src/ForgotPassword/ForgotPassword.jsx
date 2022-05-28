@@ -1,15 +1,12 @@
 import { useState } from "react";
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
-import { Alert, AlertTitle, Typography } from '@mui/material/';
+import { Alert, AlertTitle, Typography, TextField } from '@mui/material/';
 import { useTheme } from "../theme/useTheme";
 import * as appStyles from "../App.module.css";
 import * as loginStyles from "../Login/Login.module.css";
 import * as forgotPassStyles from "./ForgotPassword.module.css";
 import * as C from "../utilities/constants";
 
-/*
-    Forgot Password Component
-*/
 const ForgotPassword = props => {
     const { isDarkMode, theme } = useTheme();
     const auth = getAuth();
@@ -65,14 +62,14 @@ const ForgotPassword = props => {
                     Please enter your account's email below. We will send an email with instructions and a link to reset your password.
                 </div>
 
-                <input
-                    className={
-                        showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                            : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                    name="emailInput"
-                    placeholder="Enter your email address"
-                    onBlur={e => checkIfInputEmpty(e)}
+
+                {/*  onBlur={e => checkIfInputEmpty(e)} */}
+                <TextField
+                    label="Email"
+                    value={enteredEmail}
                     onChange={e => setEnteredEmail(e.target.value)}
+                    helperText={showErrorText.emailInput && "An email is required"}
+                    size="small"
                 />
 
                 {showErrorText.emailInput &&
