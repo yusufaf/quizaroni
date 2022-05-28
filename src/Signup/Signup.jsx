@@ -8,7 +8,7 @@ import 'firebaseui/dist/firebaseui.css';
 
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Button, Card, IconButton, Typography } from '@mui/material/';
+import { Alert, AlertTitle, Button, Card, Typography, TextField, InputAdornment, IconButton } from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 
@@ -230,14 +230,21 @@ const Signup = props => {
                                 Sign up
                             </Typography>
 
-                            {/* Email Input  */}
-                            <input
+                            {/* <input
                                 className={showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
                                     : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
                                 name="emailInput"
                                 placeholder="Type your email address"
                                 onBlur={e => checkIfInputEmpty(e)}
                                 onChange={e => setEnteredEmail(e.target.value)}
+                            /> */}
+
+                            <TextField
+                                label="Email"
+                                value={enteredEmail}
+                                onChange={e => setEnteredEmail(e.target.value)}
+                                helperText={showErrorText.emailInput && "An email is required"}
+                                size="small"
                             />
 
                             {showErrorText.emailInput &&
@@ -246,15 +253,23 @@ const Signup = props => {
                                 </span>
                             }
 
-                            {/* Username Input */}
-                            <input
+                            {/* <input
                                 className={showErrorText.nameInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
                                     : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
                                 name="nameInput"
                                 placeholder="Type your username"
                                 onBlur={e => checkIfInputEmpty(e)}
                                 onChange={e => setEnteredUsername(e.target.value)}
+                            /> */}
+
+                            <TextField
+                                label="Username"
+                                value={enteredUsername}
+                                onChange={e => setEnteredUsername(e.target.value)}
+                                helperText={showErrorText.nameInput && "A username is required"}
+                                size="small"
                             />
+
 
                             {showErrorText.nameInput &&
                                 <span className={signupStyles.nameError}>
@@ -262,8 +277,7 @@ const Signup = props => {
                                 </span>
                             }
 
-                            {/* Password Input */}
-                            <input
+                            {/* <input
                                 className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
                                     : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
                                 name="passInput"
@@ -271,35 +285,30 @@ const Signup = props => {
                                 type={passVisibility ? "text" : "password"}
                                 onBlur={e => checkIfInputEmpty(e)}
                                 onChange={e => setEnteredPass(e.target.value)}
-                            />
-{/* 
-                            <IconButton>
-                                {passVisibility ?
-                                    <Visibility
-                                        className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
-                                        onClick={() => setPassVisibility(!passVisibility)}
-                                    >
-                                    </Visibility> :
-                                    <VisibilityOff
-                                        className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
-                                        onClick={() => setPassVisibility(!passVisibility)}
-                                    >
-                                    </VisibilityOff>
-                                }
-                            </IconButton> */}
+                            /> */}
 
-                            {passVisibility ?
-                                <Visibility
-                                    className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
-                                    onClick={() => setPassVisibility(!passVisibility)}
-                                >
-                                </Visibility> :
-                                <VisibilityOff
-                                    className={`${signupStyles.passToggle} ${isDarkMode && signupStyles.dark}`}
-                                    onClick={() => setPassVisibility(!passVisibility)}
-                                >
-                                </VisibilityOff>
-                            }
+                            <TextField
+                                label="Password"
+                                type={passVisibility ? 'text' : 'password'}
+                                value={enteredPass}
+                                onChange={e => setEnteredPass(e.target.value)}
+                                size="small"
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={() => setPassVisibility(!passVisibility)}
+                                                edge="end"
+                                            >
+                                                {passVisibility ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
+                            />
+
+
                             {showErrorText.passInput &&
                                 <span className={signupStyles.passwordError}>
                                     A password is required.

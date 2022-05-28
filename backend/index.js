@@ -5,7 +5,7 @@ import bodyparser from "body-parser";
 // import * as path from "path";
 import * as nodemailer from "nodemailer";
 import dotenv from "dotenv";
-import {MailService} from '@sendgrid/mail';
+import mailjet from "node-mailjet"
 
 
 dotenv.config();
@@ -35,16 +35,7 @@ run().catch(console.dir);
 /* 
 SMTP Server Code
 */
-
-// transporter object for Gmail account
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  host: 'smtp.gmail.com',
-  auth: {
-    user: process.env.EMAIL_USERNAME,
-    pass: process.env.EMAIL_PASSWORD
-  }
-});
+const mailjetObj = mailjet.connect(process.env.MAILJET_API_KEY, process.env.MAILJET_SECRET_KEY);
 
 
 /* 
@@ -75,18 +66,45 @@ api_app.post("/send_email", async (req, res) => {
   // console.log("request object = ", req);
   const { to, subject, text } = req.body
   console.log("Testing email API route")
-  
-  const content = {
-    to: '',
-    from: email,
-    subject: `New Message From - ${email}`,
-    text: message,
-    html: `<p>${message}</p>`
-  }
+  console.log({to, subject, text});
 
-
-  // res.json()
-  res.json({ status: "OK" });
+  // const content = {
+  //   to: '',
+  //   from: email,
+  //   subject: `New Message From - ${email}`,
+  //   text: message,
+  //   html: `<p>${message}</p>`
+  // }
+  mailjetObj
+    .post("send", { 'version': 'v3.1' })
+    .request({
+      "Messages": [
+        {
+          "From": {
+            "Email": process.env.EMAIL_USERNAME,
+            "Name": "Quizaroni"
+          },
+          "To": [
+            {
+              "Email": "quizaroni.app@gmail.com",
+              "Name": "Quizaroni"
+            }
+          ],
+          "Subject": "Greetings from Mailjet.",
+          "TextPart": "My first Mailjet email",
+          "HTMLPart": "<h3>Hey, welcome to Quizaroni!</h3><br />Lets cook up some study resources!",
+          "CustomID": "QuizaroniTest"
+        }
+      ]
+    })
+  request
+    .then((result) => {
+      console.log(result.body);
+      res.json({ status: "OK" });
+    })
+    .catch((err) => {
+      console.log(err.statusCode)
+    })
 })
 
 export const handler = api_app;
