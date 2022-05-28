@@ -1,23 +1,35 @@
-import { useState, useEffect, useRef } from "react"
 import { useTheme } from "../theme/useTheme";
-
 import macaroniDance from "../resources/images/macaroni_dance.gif";
-import * as messageStyles from './LoginMessage.module.css';
 import { LOGIN_MESSAGES } from "../utilities/constants";
+import { Card, Typography } from '@mui/material/';
 
 const LoginMessage = props => {
     const { page } = props;
 
     const { isDarkMode, theme } = useTheme();
 
+    const messageStyling = {
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-60%, -70%)",
+        minWidth: "40rem",
+        maxWidth: "40rem",
+        display: "flex",
+        flexDirection: "column",
+        gap: "1.25rem",
+        padding: "1.25rem",
+        textAlign: "center"
+    }
+
     return (
-        <div className={messageStyles.container} style={{ color: theme.foreground, background: theme.background }}>
-            <b>{LOGIN_MESSAGES[page]}</b>
-            <img
-                src={macaroniDance}
-                alt="Macaroni dancing"
-            />
-        </div>
+            <Card sx={messageStyling} raised>
+                <Typography variant="h5" style={{ fontWeight: "bold"}}>{LOGIN_MESSAGES[page]}</Typography>
+                <img
+                    src={macaroniDance}
+                    alt="Macaroni dancing"
+                />
+            </Card>
     );
 }
 

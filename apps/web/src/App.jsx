@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react"
-import { ThemeProvider } from "./theme/ThemeProvider";
+import { ThemeProvider as CustomThemeProvider } from "./theme/ThemeProvider";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Provider } from "react-redux";
 import { Routes, Route } from "react-router-dom";
+
 import store from "./store";
 
 /* Component imports */
@@ -42,7 +44,7 @@ const App = () => {
 
   return (
     <Provider store={store}>
-      <ThemeProvider>
+      <CustomThemeProvider>
         <div className="App">
           <NavBar userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
         </div>
@@ -95,7 +97,7 @@ const App = () => {
           />
 
         </Routes>
-      </ThemeProvider>
+      </CustomThemeProvider>
     </Provider >
   );
 }

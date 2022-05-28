@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-
 import { Menu, MenuItem } from '@mui/material/';
 
 /* Styling */
@@ -8,7 +7,7 @@ import * as profileStyles from './Profile.module.css';
 import * as appStyles from "../App.module.css";
 
 const ProfileDropdown = props => {
-    const { dropdownRef, showDropdown, setShowDropdown } = props;
+    const { dropdownRef, showDropdown, setShowDropdown, userAuthState } = props;
     const { isDarkMode, theme } = useTheme();
 
     // TODO: Fix this
@@ -22,7 +21,7 @@ const ProfileDropdown = props => {
     return (
         <div className={profileStyles.dropdown}>
             <Menu
-                open={showDropdown}
+                open={showDropdown && userAuthState}
                 onClose={() => setShowDropdown(false)}
                 sx={profileMenuStyling}
                 anchorEl={dropdownRef.current}
