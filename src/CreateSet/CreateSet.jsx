@@ -22,6 +22,7 @@ import {
     ERROR_U,
     CREATE_SET
 } from "../utilities/constants";
+import { updateBrowserTitle } from "../utilities/functions";
 
 const CreateSet = props => {
     const { userAuthState } = props;
@@ -56,13 +57,9 @@ const CreateSet = props => {
 
     const createSetDisabled = !enteredTitle || !enteredDescription;
 
-
     useEffect(() => {
         renderLabelOptions();
-        document.title = `Quizaroni | Create`
-        return () => {
-            document.title = `Quizaroni`;
-        }
+        updateBrowserTitle("Create");
     }, []);
 
     /**

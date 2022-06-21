@@ -18,13 +18,12 @@ import * as loginStyles from '../Login/Login.module.css';
 import * as signupStyles from "./Signup.module.css"
 import * as appStyles from "../App.module.css";
 import * as C from "../utilities/constants";
+import { updateBrowserTitle } from "../utilities/functions";
 
 const Signup = props => {
     const { userAuthState, setUserAuthState } = props;
     const { isDarkMode, theme } = useTheme();
 
-
-    /* OAuth Variables */
     const auth = getAuth();
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
@@ -94,10 +93,7 @@ const Signup = props => {
     })
 
     useEffect(() => {
-        document.title = `Quizaroni | Sign Up`
-        return () => {
-            document.title = `Quizaroni`;
-        }
+        updateBrowserTitle("Sign Up");
     }, [])
 
     useEffect(() => {

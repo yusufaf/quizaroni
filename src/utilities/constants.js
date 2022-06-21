@@ -42,3 +42,11 @@ export const VIEW_SET = {
 export const STUDY_MODES = {
     FLASHCARDS: "FLASHCARDS"
 }
+
+
+
+export const DOWNLOAD_FILE_TYPES = {
+    TXT: "TXT",
+    JSON: "JSON",
+    CSV: "CSV"
+}
