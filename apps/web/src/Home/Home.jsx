@@ -1,29 +1,27 @@
-import { useState, useEffect, useRef } from "react"
-import { useSelector, useDispatch } from 'react-redux'
+import { useEffect, useRef, useState } from "react";
+import { useSelector } from 'react-redux';
 // import { setUserAuthState } from "../reducers/userAuthState";
 import { DataGrid } from '@mui/x-data-grid';
 
 
-/* Firebase Operations */
-
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { firebaseApp, database } from "../firebase/firebase";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { database } from "../firebase/firebase";
 
 /* Outside Components */
-import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material/';
-import { ContentCopy, Delete, Edit, MenuOpen, FavoriteBorder, Favorite } from "@mui/icons-material";
+import { ContentCopy, Delete, Edit, FavoriteBorder, MenuOpen } from "@mui/icons-material";
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material/';
+import { useNavigate } from "react-router-dom";
 
 import LoginMessage from "../LoginMessage/LoginMessage";
 import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
 import ViewFlashSet from "./ViewFlashSet/ViewFlashSet";
 
-import { FLASHSET_COLUMNS } from "../utilities/constants";
 
 /* Styling */
-import { useTheme } from "../theme/useTheme";
-import * as homeStyles from './Home.module.css';
 import * as appStyles from "../App.module.css";
+import { useTheme } from "../theme/useTheme";
+import { updateBrowserTitle } from "../utilities/functions";
+import * as homeStyles from './Home.module.css';
 
 /*
     Home Component
@@ -45,8 +43,23 @@ const Home = props => {
     const [selectedFlashSet, setSelectedFlashSet] = useState({});
     const [showActionsMenu, setShowActionsMenu] = useState(false);
 
+    const [showDuplicateConfirmation, setShowDuplicateConfirmation] = useState(false);
+
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [isFavorited, setIsFavorited] = useState(false);
+
+    const warningStyling = {
+        "& .MuiPaper-root": {
+            backgroundColor: theme.background,
+        }
+    }
+
+    const retrieveTextStyling = (color, fontSize = "1.5rem") => {
+        return {
+            color,
+            fontSize
+        }
+    }
 
     const viewSetProps = {
         viewFlashSet,
@@ -70,6 +83,10 @@ const Home = props => {
 
     const hideActionsMenu = () => {
         setShowActionsMenu(false);
+    }
+
+    const handleCloseDuplicateConfirmation = () => {
+        setShowDuplicateConfirmation(false);
     }
 
     /* React-Router function for switching routes */
@@ -147,7 +164,9 @@ const Home = props => {
                                     Rename
                                 </Typography>
                             </MenuItem>
-                            <MenuItem>
+                            <MenuItem
+                                onClick={() => setShowDuplicateConfirmation(true)}
+                            >
                                 <ContentCopy
                                     sx={{
                                         marginRight: "0.75rem"
@@ -203,10 +222,7 @@ const Home = props => {
     ];
 
     useEffect(() => {
-        document.title = `Quizaroni | Home`
-        return () => {
-            document.title = `Quizaroni`;
-        }
+        updateBrowserTitle("Home")
     }, [])
 
     /* */
@@ -360,7 +376,7 @@ const Home = props => {
             {viewFlashSet && Object.keys(selectedFlashSet).length !== 0 ?
                 <ViewFlashSet {...viewSetProps} />
                 :
-                (
+                <>
                     <div className={homeStyles.flashSets} style={{ color: theme.foreground, background: theme.background }}>
                         <Typography
                             variant="h5"
@@ -401,7 +417,46 @@ const Home = props => {
                             )
                         }
                     </div>
-                )
+                    <Dialog
+                        open={showDuplicateConfirmation}
+                        onClose={handleCloseDuplicateConfirmation}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                        sx={warningStyling}
+                    >
+                        <DialogTitle id="alert-dialog-title"
+                            sx={retrieveTextStyling(theme.foreground, "1.75rem")}
+                        >
+                            {"Duplicate this set?"}
+                        </DialogTitle>
+                        <DialogContent>
+                            <DialogContentText id="alert-dialog-description"
+                                sx={retrieveTextStyling(theme.foreground, "1.5rem")}
+                            >
+                                Are you sure you want to duplicate this set?
+                            </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={handleCloseDuplicateConfirmation}
+                                sx={{
+                                    color: "orange"
+                                }}
+                            >
+                                Cancel</Button>
+                            <Button
+                                onClick={() => {
+                                    handleCloseDuplicateConfirmation();
+                                }}
+                                autoFocus
+                                sx={{
+                                    color: "orange"
+                                }}
+                            >
+                                Yes
+                            </Button>
+                        </DialogActions>
+                    </Dialog>
+                </>
             }
             {/* Message if no flash sets have bene created */}
             {/* flashSets.length === 0 */}

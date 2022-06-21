@@ -17,6 +17,7 @@ import { useTheme } from "../theme/useTheme";
 import * as loginStyles from './Login.module.css';
 import * as appStyles from "../App.module.css";
 import * as C from "../utilities/constants";
+import { updateBrowserTitle } from "../utilities/functions";
 
 const Login = props => {
     const { userAuthState, setUserAuthState } = props;
@@ -78,10 +79,7 @@ const Login = props => {
     })
 
     useEffect(() => {
-        document.title = `Quizaroni | Login`
-        return () => {
-            document.title = `Quizaroni`;
-        }
+        updateBrowserTitle("Login")
     }, [])
 
     useEffect(() => {
