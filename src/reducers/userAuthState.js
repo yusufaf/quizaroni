@@ -3,7 +3,6 @@ import { createSlice } from '@reduxjs/toolkit'
 export const userAuthSlice = createSlice({
   name: 'userAuthState',
   initialState: {
-    gay: "yes"
   },
   reducers: {
     setUserAuthState: (state, action) => {

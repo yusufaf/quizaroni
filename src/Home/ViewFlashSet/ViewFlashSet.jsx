@@ -1,41 +1,39 @@
-import { useEffect, useState, useRef } from "react"
-/* Firebase Operations */
-import { collection, query, where, getDocs, updateDoc } from "firebase/firestore";
-import { firebaseApp, database } from "../../firebase/firebase";
+import { useEffect, useRef, useState } from "react";
+import { collection, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { database } from "../../firebase/firebase";
 
+import { Add, ArrowBack, Download, EditNotifications, Email, MenuOpen } from '@mui/icons-material/';
 import {
-    Alert,
-    AlertTitle,
     Button,
     Card,
     Chip,
     Dialog,
-    DialogTitle,
+    DialogActions,
     DialogContent,
     DialogContentText,
-    DialogActions,
+    DialogTitle,
+    FormControl,
     FormControlLabel,
     IconButton,
     Menu,
     MenuItem,
     Modal,
+    Select,
     Switch,
-    Paper,
     TextField,
     Tooltip,
     Typography
 } from '@mui/material/';
-import { Add, ArrowBack, Download, EditNotifications, Email, MenuOpen } from '@mui/icons-material/';
 
 import ViewFlashCard from "./ViewFlashCard";
 
-/* Styling */
+import * as appStyles from "../../App.module.css";
 import { useTheme } from "../../theme/useTheme";
 import * as viewFlashStyles from './ViewFlashSet.module.css';
-import * as appStyles from "../../App.module.css";
+import { updateBrowserTitle } from "../../utilities/functions";
 
 import FLASH_CARDS_IMG from "../../resources/images/flash-card.png";
-import { STUDY_MODES, VIEW_SET } from "../../utilities/constants";
+import { DOWNLOAD_FILE_TYPES, STUDY_MODES, VIEW_SET } from "../../utilities/constants";
 import FlashcardsStudy from "./FlashcardsStudy";
 const { BACKGROUND, TEXT } = VIEW_SET;
 
@@ -63,6 +61,16 @@ const ViewFlashSet = props => {
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
 
+    const [showDownloadPopup, setShowDownloadPopup] = useState(false);
+    const [downloadFileType, setDownloadFileType] = useState(DOWNLOAD_FILE_TYPES.TXT);
+    const fileDownloadTypes = Object.values(DOWNLOAD_FILE_TYPES).map(value => {
+        return (
+            <MenuItem value={value}>
+                {value}
+            </MenuItem>
+        )
+    });
+
     // TODO: Increase size of arrow buttons?
     const arrowIconStyling = {
         '&.MuiIconButton-colorPrimary': {
@@ -86,13 +94,9 @@ const ViewFlashSet = props => {
         }
     };
 
-    /* Update the title of the page to include the title of the set */
     useEffect(() => {
         const { title } = selectedFlashSet;
-        document.title = `Quizaroni | ${title}`
-        return () => {
-            document.title = `Quizaroni`;
-        }
+        updateBrowserTitle(title);
     }, [])
 
 
@@ -141,10 +145,12 @@ const ViewFlashSet = props => {
         const mappedCards = cards.map((card, index) => ({ [`Card ${index + 1}`]: { term: card.term, definition: card.definition } }));
         const cleanedCards = Object.assign({}, ...mappedCards);
 
-        const file = new Blob([JSON.stringify(cleanedCards, null, 2)], { type: 'text/plain' });
+        const type = downloadFileType === DOWNLOAD_FILE_TYPES.TXT ? "text/plain" : "application/json"
+
+        const file = new Blob([JSON.stringify(cleanedCards, null, 2)], { type });
         anchor.href = URL.createObjectURL(file);
         const { title: setTitle } = selectedFlashSet;
-        anchor.download = `${setTitle}_Set.txt`;
+        anchor.download = `${setTitle}_Set.${type.toLowerCase()}`;
         document.body.appendChild(anchor); // Required for this to work in FireFox
         anchor.click();
     }
@@ -176,7 +182,7 @@ const ViewFlashSet = props => {
     }
 
     const createNewLabel = () => {
-        // Check if the label already exists
+        // TOOD: Check if the label already exists
     }
 
     const renderActionBar = () => {
@@ -184,7 +190,7 @@ const ViewFlashSet = props => {
             <>
                 <div style={{ marginTop: "1rem" }}>
                     <IconButton
-                        onClick={() => handleDownloadSet()}
+                        onClick={() => setShowDownloadPopup(true)}
                         sx={{
                             padding: "0.75rem"
                         }}
@@ -469,6 +475,32 @@ const ViewFlashSet = props => {
                                     </div>
                                 </Card>
                             </Modal>
+                            <Dialog open={showDownloadPopup} onClose={() => setShowDownloadPopup(false)}
+                            >
+                                <DialogTitle>Download flash set</DialogTitle>
+                                <DialogContent>
+                                    <DialogContentText>
+                                        Choose what format you'd like to download the flash set as
+                                    </DialogContentText>
+                                    <FormControl>
+                                        <Select
+                                            onChange={(e) => setDownloadFileType(e.target.value)}
+                                            value={downloadFileType}
+                                            defaultValue=""
+                                        >
+                                            {fileDownloadTypes}
+                                        </Select>
+                                    </FormControl>
+                                </DialogContent>
+                                <DialogActions>
+                                    <Button onClick={() => setShowDownloadPopup(false)}
+                                    >Cancel</Button>
+                                    <Button onClick={() => handleDownloadSet()}
+                                        sx={{ color: "orange" }}
+
+                                    >Download</Button>
+                                </DialogActions>
+                            </Dialog>
                         </>
                     )
             }
