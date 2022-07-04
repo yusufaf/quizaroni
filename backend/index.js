@@ -3,7 +3,6 @@ import { MongoClient } from "mongodb";
 import cors from "cors";
 import bodyparser from "body-parser";
 // import * as path from "path";
-import * as nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import mailjet from "node-mailjet"
 

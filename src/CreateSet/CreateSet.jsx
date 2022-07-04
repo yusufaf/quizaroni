@@ -322,8 +322,6 @@ const CreateSet = props => {
                                 {labelOptions}
                             </select>
                         </div>
-                    </div>
-                    <div>
                         <Button
                             variant="contained"
                             onClick={() => createNewSet()}
@@ -333,11 +331,11 @@ const CreateSet = props => {
                                 fontWeight: "bold",
                                 position: "absolute",
                                 right: "2rem",
-                                top: "2rem",
                                 "&:hover": {
                                     background: "rgb(253, 187, 63)",
                                 }
                             }}
+                            size="large"
                             disabled={createSetDisabled}
                         >
                             <Create
@@ -354,6 +352,7 @@ const CreateSet = props => {
                             </Typography>
                         } */}
                     </div>
+
 
                     <IconButton
                         onClick={() => setShowImportModal(true)}

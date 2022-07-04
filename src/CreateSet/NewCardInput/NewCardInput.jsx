@@ -53,6 +53,68 @@ const NewCardInput = props => {
                 >
                     Card {index + 1}
                 </Typography>
+                
+                <div className={createSetStyles.cardActions}>
+                    <Tooltip
+                        title="Change card text color"
+                        placement="top"
+                    >
+                        <IconButton
+                            onClick={() => {
+                                setShowBackgroundColorPicker(false)
+                                setShowTextColorPicker(!showTextColorPicker)
+                            }}
+                        >
+                            <FormatColorText
+                                fontSize="medium"
+                                sx={{
+                                    color: `${localTextColor ? localTextColor : theme.foreground}`
+                                }}
+                            />
+                        </IconButton>
+                    </Tooltip>
+                    {showTextColorPicker &&
+                        <div className={createSetStyles.colorPickerContainer}>
+                            <ChromePicker
+                                className={`${createSetStyles.colorPicker} ${createSetStyles.backgroundPicker}`}
+                                color={localTextColor}
+                                onChange={(e) => {
+                                    onColorChange(e, index);
+                                    setLocalTextColor(e.hex);
+                                }}
+                            />
+                        </div>
+                    }
+
+                    <Tooltip
+                        title="Change background color"
+                        placement="top"
+                    >
+                        <IconButton
+                            onClick={() => {
+                                setShowTextColorPicker(false);
+                                setShowBackgroundColorPicker(!showBackgroundColorPicker);
+                            }}
+                        >
+                            <FormatColorFill
+                                fontSize="medium"
+                                sx={{
+                                    color: `${localBackgroundColor ? localBackgroundColor : theme.foreground}`
+                                }}
+                            />
+                        </IconButton>
+                    </Tooltip>
+                    {showBackgroundColorPicker &&
+                        <ChromePicker
+                            className={`${createSetStyles.colorPicker}`}
+                            color={localBackgroundColor}
+                            onChange={(e) => {
+                                onColorChange(e, index);
+                                setLocalBackgroundColor(e.hex);
+                            }}
+                        />
+                    }
+                </div>
 
                 <div className={createSetStyles.newCardActions}>
                     <Tooltip
@@ -86,6 +148,7 @@ const NewCardInput = props => {
                             onClick={() => fileInputRef.current.click()}
                         >
                             <AddPhotoAlternate
+                                fontSize="medium"
                                 sx={{
                                     color: theme.foreground
                                 }}
@@ -111,69 +174,6 @@ const NewCardInput = props => {
                         placeholder="Enter a term"
                         onChange={(e) => updateCardValue(index, "term", e.target.value)}
                     />
-                </div>
-                <div className={createSetStyles.cardActions}>
-                    <Tooltip
-                        title="Change card text color"
-                        placement="top"
-                        arrow={true}
-                    >
-                        <IconButton
-                            onClick={() => {
-                                setShowBackgroundColorPicker(false)
-                                setShowTextColorPicker(!showTextColorPicker)
-                            }}
-                        >
-                            <FormatColorText
-                                fontSize="large"
-                                sx={{
-                                    color: `${localTextColor ? localTextColor : theme.foreground}`
-                                }}
-                            />
-                        </IconButton>
-                    </Tooltip>
-                    {showTextColorPicker &&
-                        <div className={createSetStyles.colorPickerContainer}>
-                            <ChromePicker
-                                className={`${createSetStyles.colorPicker} ${createSetStyles.backgroundPicker}`}
-                                color={localTextColor}
-                                onChange={(e) => {
-                                    onColorChange(e, index);
-                                    setLocalTextColor(e.hex);
-                                }}
-                            />
-                        </div>
-                    }
-
-                    <Tooltip
-                        title="Change background color"
-                        placement="bottom"
-                        arrow={true}
-                    >
-                        <IconButton
-                            onClick={() => {
-                                setShowTextColorPicker(false);
-                                setShowBackgroundColorPicker(!showBackgroundColorPicker);
-                            }}
-                        >
-                            <FormatColorFill
-                                fontSize="large"
-                                sx={{
-                                    color: `${localBackgroundColor ? localBackgroundColor : theme.foreground}`
-                                }}
-                            />
-                        </IconButton>
-                    </Tooltip>
-                    {showBackgroundColorPicker &&
-                        <ChromePicker
-                            className={`${createSetStyles.colorPicker}`}
-                            color={localBackgroundColor}
-                            onChange={(e) => {
-                                onColorChange(e, index);
-                                setLocalBackgroundColor(e.hex);
-                            }}
-                        />
-                    }
                 </div>
                 <div className={createSetStyles.newCardDefinition}>
                     <Typography

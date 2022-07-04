@@ -1,9 +1,15 @@
+
+.homePage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .flashSets {
-    position: relative;
-    height: fit-content;
+    /* position: relative; */
+    /* height: fit-content; */
+    margin-top: 1.5rem;
     width: 70rem;
-    left: 20rem;
-    top: 4rem;
     padding: 1.25rem;
     border-radius: 0.75rem;
     box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
