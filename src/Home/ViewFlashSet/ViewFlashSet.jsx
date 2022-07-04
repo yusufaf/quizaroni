@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { collection, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { database } from "../../firebase/firebase";
 
-import { Add, ArrowBack, Download, EditNotifications, Email, MenuOpen } from '@mui/icons-material/';
+import { Add, ArrowBack, Download, Edit, EditNotifications, Email, MenuOpen } from '@mui/icons-material/';
 import {
     Button,
     Card,
@@ -15,6 +15,7 @@ import {
     FormControl,
     FormControlLabel,
     IconButton,
+    InputAdornment,
     Menu,
     MenuItem,
     Modal,
@@ -40,12 +41,12 @@ const { BACKGROUND, TEXT } = VIEW_SET;
 const ViewFlashSet = props => {
     const {
         setViewFlashSet,
-        selectedFlashSet,
+        selectedFlashSet: flashset,
         setSelectedFlashSet,
         userAuthState
     } = props;
 
-    console.log("selectedFlashSet = ", selectedFlashSet)
+    console.log("flashset = ", flashset)
 
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
@@ -71,6 +72,13 @@ const ViewFlashSet = props => {
         )
     });
 
+    const [editedDescription, setEditedDescription] = useState(flashset.description ?? "")
+    const [isEditingDescription, setIsEditingDescription] = useState(false)
+    useEffect(() => {
+        console.log({ isEditingDescription })
+    }, [isEditingDescription])
+
+
     // TODO: Increase size of arrow buttons?
     const arrowIconStyling = {
         '&.MuiIconButton-colorPrimary': {
@@ -95,14 +103,14 @@ const ViewFlashSet = props => {
     };
 
     useEffect(() => {
-        const { title } = selectedFlashSet;
+        const { title } = flashset;
         updateBrowserTitle(title);
     }, [])
 
 
     const handleDisableColorToggle = async (type) => {
         const { uid } = userAuthState;
-        const { setID } = selectedFlashSet;
+        const { setID } = flashset;
 
         const flashCollection = collection(database, "flashcards");
         const queryResult = query(flashCollection,
@@ -141,7 +149,7 @@ const ViewFlashSet = props => {
                 definition: ""
         */
         const anchor = document.createElement("a");
-        const cards = selectedFlashSet.cards;
+        const cards = flashset.cards;
         const mappedCards = cards.map((card, index) => ({ [`Card ${index + 1}`]: { term: card.term, definition: card.definition } }));
         const cleanedCards = Object.assign({}, ...mappedCards);
 
@@ -149,7 +157,7 @@ const ViewFlashSet = props => {
 
         const file = new Blob([JSON.stringify(cleanedCards, null, 2)], { type });
         anchor.href = URL.createObjectURL(file);
-        const { title: setTitle } = selectedFlashSet;
+        const { title: setTitle } = flashset;
         anchor.download = `${setTitle}_Set.${type.toLowerCase()}`;
         document.body.appendChild(anchor); // Required for this to work in FireFox
         anchor.click();
@@ -311,8 +319,8 @@ const ViewFlashSet = props => {
     * Render the JSX for all the flash sets
     */
     const renderSetCards = () => {
-        console.log("selectedFlashSet in renderSetCards = ", selectedFlashSet);
-        const { cards } = selectedFlashSet;
+        console.log("flashset in renderSetCards = ", flashset);
+        const { cards } = flashset;
 
         return cards.map((card, index) => {
             return <ViewFlashCard
@@ -332,7 +340,7 @@ const ViewFlashSet = props => {
                 selectedStudyMode === STUDY_MODES.FLASHCARDS ?
                     (
                         <FlashcardsStudy
-                            selectedFlashSet={selectedFlashSet}
+                            selectedFlashSet={flashset}
                             userAuthState={userAuthState}
                             setSelectedStudyMode={setSelectedStudyMode}
                         />
@@ -365,10 +373,18 @@ const ViewFlashSet = props => {
                                                 fontWeight: "bold"
                                             }}
                                         >
-                                            {selectedFlashSet.title}
+                                            {flashset.title}
                                         </Typography>
-
-                                        <Chip label={selectedFlashSet.label ? selectedFlashSet.label : "No label selected"} variant="outlined"
+                                        <Tooltip
+                                            title="Rename title"
+                                            placement="right"
+                                        >
+                                            <IconButton
+                                                onClick={() => setEditTitle(true)}>
+                                                <Edit />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Chip label={flashset.label ? flashset.label : "No label selected"} variant="outlined"
                                             sx={{
                                                 height: "2.5rem",
                                                 color: theme.foreground
@@ -387,12 +403,49 @@ const ViewFlashSet = props => {
                                             </IconButton>
                                         </Tooltip>
 
-                                        {/*  */}
+                                        {/* TODO: 
+                                        - Spacing between description and above stuff
+                                        - Editable description; basically clicking on the description should allow user to edit description intuitively 
+                                        
+                                        */}
                                         <Typography
                                             variant="body1"
                                         >
-                                            {selectedFlashSet.description}
+                                            {flashset.description}
                                         </Typography>
+                                        <TextField
+                                            variant="standard"
+                                            value={editedDescription}
+                                            onChange={e => setEditedDescription(e.target.value)}
+                                            // TODO: Clear editedDescription state in onblur function
+                                            onBlur={() => setIsEditingDescription(false)}
+                                            disabled={!isEditingDescription}
+                                            // readOnly={!isEditingDescription}
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <Tooltip
+                                                            title="Edit description"
+                                                            placement="right"
+                                                        >
+                                                            <IconButton
+                                                                onClick={() => setIsEditingDescription(true)}
+                                                                edge="end"
+                                                            >
+                                                                <Edit />
+                                                            </IconButton>
+                                                        </Tooltip>
+                                                    </InputAdornment>
+                                                )
+                                            }}
+                                            sx={{
+                                                border: "none",
+                                                ".Mui-disabled": {
+                                                    border: "none"
+                                                },
+                                            }}
+                                        />
+
                                         {renderActionBar()}
                                     </div>
                                     <div className={viewFlashStyles.studySection}>
@@ -415,9 +468,10 @@ const ViewFlashSet = props => {
                                     </div>
                                 </div>
                                 <Typography
+                                    className=""
                                     variant="h6"
                                 >
-                                    Number of cards in this study set: {selectedFlashSet.cards.length}
+                                    Number of cards in this study set: {flashset.cards.length}
                                 </Typography>
                                 {renderSetCards()}
                             </div>

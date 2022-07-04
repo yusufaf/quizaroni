@@ -1,16 +1,16 @@
-.viewPage {
-    display: grid;
-    align-items: center;
-    justify-items: center;
-    margin: 0 auto;
-}
-
-
 /* ================ */
 /* View Flashset Page Styling */
 /* ================ */
 
+.viewPage {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    /* margin: 0 auto; */
+}
+
 .viewContainer {
+    margin-top: 1.5rem;
     grid-row: 1;
     height: 25rem;
     width: 70rem;

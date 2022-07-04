@@ -376,7 +376,7 @@ const Home = props => {
             {viewFlashSet && Object.keys(selectedFlashSet).length !== 0 ?
                 <ViewFlashSet {...viewSetProps} />
                 :
-                <>
+                <div className={homeStyles.homePage} >
                     <div className={homeStyles.flashSets} style={{ color: theme.foreground, background: theme.background }}>
                         <Typography
                             variant="h5"
@@ -456,7 +456,7 @@ const Home = props => {
                             </Button>
                         </DialogActions>
                     </Dialog>
-                </>
+                </div>
             }
             {/* Message if no flash sets have bene created */}
             {/* flashSets.length === 0 */}
