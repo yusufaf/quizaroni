@@ -1,102 +1,99 @@
-// import classNames from "classnames";
-// import { withStyles } from "@material-ui/core/styles";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
     IconButton,
     InputAdornment,
     TextField,
     Tooltip,
-    Typography
 } from '@mui/material/';
 import { Edit } from '@mui/icons-material/';
+import { styled } from "@mui/system";
 
-
-const styles = theme => ({
-    container: {
-        display: "flex",
-        flexWrap: "wrap",
-        padding: 50
+const StyledTextField = styled(TextField)({
+    borderBottom: 0,
+    "&:before": {
+        borderBottom: 0
     },
-    textField: {
-        marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit,
-        width: 300,
-        color: "black",
-        fontSize: 30,
+    ".Mui-disabled": {
+        borderBottom: 0,
         opacity: 1,
-        borderBottom: 0,
+        "-webkit-text-fill-color": "rgb(0,0,0,1) !important",
         "&:before": {
             borderBottom: 0
         }
-    },
-    disabled: {
-        color: "black",
-        borderBottom: 0,
-        "&:before": {
-            borderBottom: 0
-        }
-    },
-    btnIcons: {
-        marginLeft: 10
     }
-});
+})
 
 const EditableTextField = props => {
+    const { style = {}, tooltipText = "", value } = props;
 
-    const [editedValue, setEditedValue] = useState("");
+    const [editedValue, setEditedValue] = useState(value);
     const [isEditing, setIsEditing] = useState(false)
     const [mouseOver, setMouseOver] = useState(false)
 
-    handleChange = event => {
-        this.setState({ [event.target.name]: event.target.value });
+    /* Logic for submitting changes to the backend
+        TODO: Pass function down to component to execute in onBlur
+    */
+    const handleOnBlur = () => {
+        setIsEditing(false);
+    }
+
+    const handleChange = event => {
+        setEditedValue(e.target.value);
     };
 
-    const handleMouseOver = event => {
-        if (!mouseOver) {
-            setMouseOver: true });
-        }
-    };
+    // const handleMouseEnter = event => {
+    //     if (!mouseOver) {
+    //         setMouseOver(true);
+    //     }
+    // };
 
-    const handleMouseOut = event => {
-        // The problem is here!!!
-        if (this.state.mouseOver) {
-            this.setState({ mouseOver: false });
-        }
-    };
+    // const handleMouseLeave = event => {
+    //     if (mouseOver) {
+    //         setMouseOver(false);
+    //     }
+    // };
 
     const handleClick = () => {
         setIsEditing(true);
         setMouseOver(false);
+        inputRef.current.focus();
     };
 
 
-    const { classes, value } = this.props;
 
     return (
-        <div className={classes.container}>
-            <TextField
-                name="email"
+        <div>
+            <StyledTextField
+                variant="standard"
                 defaultValue={value}
+                value={editedValue}
                 // error={editedValue === ""}
-                onChange={this.handleChange}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+                // readOnly={!isEditing}
                 disabled={!isEditing}
-                // className={classes.textField}
-                onMouseEnter={this.handleMouseOver}
-                onMouseLeave={this.handleMouseOut}
+                // onMouseEnter={handleMouseEnter}
+                // onMouseLeave={handleMouseLeave}
+                inputRef={input => input && input.focus()}
                 InputProps={{
-                    classes: {
-                        disabled: classes.disabled
-                    },
-                    endAdornment: this.state.mouseOver ? (
+                    endAdornment: (
                         <InputAdornment position="end">
-                            <IconButton onClick={this.handleClick}>
-                                <Edit />
-                            </IconButton>
+                            <Tooltip
+                                title={tooltipText}
+                                placement="right"
+                            >
+                                <IconButton onClick={handleClick}>
+                                    <Edit
+                                        sx={{
+                                            color: isEditing ? "orange" : ""
+                                        }} 
+                                    />
+                                </IconButton>
+                            </Tooltip>
                         </InputAdornment>
-                    ) : (
-                        ""
                     )
                 }}
+                sx={style}
             />
         </div>
     )

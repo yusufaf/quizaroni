@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react"
 import { ThemeProvider as CustomThemeProvider } from "./theme/ThemeProvider";
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { darkTheme, lightTheme } from "./theme/theme";
 import { Provider } from "react-redux";
 import { Routes, Route } from "react-router-dom";
+import Footer from "./Footer/Footer";
 
 import store from "./store";
 
@@ -17,16 +19,15 @@ import ForgotPassword from "./ForgotPassword/ForgotPassword";
 
 /* Styling */
 import { useTheme } from "./theme/useTheme";
-// import * as appStyles from "./App.module.css";
+import * as appStyles from "./App.module.css";
 
 import { handleDesktopZoom } from "./utilities/handleDesktopZoom";
 
 const App = () => {
-  // Wrap component tree with redux store and the theme context
-
   /* TODO: Bring the auth state into a Redux slice / reducer */
   const [userAuthState, setUserAuthState] = useState(null);
 
+  
   useEffect(() => {
     /* If the user info is in localStorage, keep them logged in */
     if (localStorage.getItem("userInfo") !== null) {
@@ -44,60 +45,63 @@ const App = () => {
 
   return (
     <Provider store={store}>
-      <CustomThemeProvider>
-        <div className="App">
-          <NavBar userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
-        </div>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Home userAuthState={userAuthState} />
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <Login userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
-            }
-          />
-          <Route
-            path='/signup'
-            element={
-              <Signup userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
-            }
-          />
-          <Route
-            path="/create"
-            element={
-              <CreateSet userAuthState={userAuthState} />
-            }
-          />
-          <Route
-            path="/forgot"
-            element={
-              <ForgotPassword />
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <Profile userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
-            }
-          />
-          <Route
-            path="/explore"
-            element={
-              <></>
-            }
-          />
-          {/* TODO: Route for view / editing flashsets */}
-          <Route
-            path="/view"
-          />
+      {/* <ThemeProvider> */}
+        <CustomThemeProvider>
+          <div className={appStyles.App}>
+            <NavBar userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
+            <Footer/>
+          </div>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Home userAuthState={userAuthState} />
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <Login userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
+              }
+            />
+            <Route
+              path='/signup'
+              element={
+                <Signup userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
+              }
+            />
+            <Route
+              path="/create"
+              element={
+                <CreateSet userAuthState={userAuthState} />
+              }
+            />
+            <Route
+              path="/forgot"
+              element={
+                <ForgotPassword />
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <Profile userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
+              }
+            />
+            <Route
+              path="/explore"
+              element={
+                <></>
+              }
+            />
+            {/* TODO: Route for view / editing flashsets */}
+            <Route
+              path="/view"
+            />
 
-        </Routes>
-      </CustomThemeProvider>
+          </Routes>
+        </CustomThemeProvider>
+      {/* </ThemeProvider> */}
     </Provider >
   );
 }
