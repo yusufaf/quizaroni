@@ -152,7 +152,7 @@ const Profile = props => {
 
     return (
         <>
-            <>
+            <div className={profileStyles.profilePage}>
                 <ProfileCard userAuthState={userAuthState} />
                 <div className={profileStyles.profileContainer} style={{ color: theme.foreground, background: theme.background }}>
                     <Typography
@@ -343,7 +343,7 @@ const Profile = props => {
                         </DialogActions>
                     </Dialog>
                 </div>
-            </>
+            </div>
         </>
     )
 }

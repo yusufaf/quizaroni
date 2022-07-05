@@ -109,6 +109,11 @@
     flex-grow: 1;
 }
 
+.backButtonContainer {
+    display: flex;
+    align-items: center;
+}
+
 /* ================ */
 /* Fullscreen Study Styling */
 /* ================ */

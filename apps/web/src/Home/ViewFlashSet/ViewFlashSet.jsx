@@ -27,6 +27,7 @@ import {
 } from '@mui/material/';
 
 import ViewFlashCard from "./ViewFlashCard";
+import EditableTextField from "../../components/EditableTextField/EditableTextField";
 
 import * as appStyles from "../../App.module.css";
 import { useTheme } from "../../theme/useTheme";
@@ -355,6 +356,7 @@ const ViewFlashSet = props => {
 
                                     <div className={`${viewFlashStyles.setInfo} ${isDarkMode ? viewFlashStyles.darkBorder : viewFlashStyles.lightBorder}`}
                                     >
+                                        <div className={viewFlashStyles.backButtonContainer}>
                                         <IconButton color="primary"
                                             aria-label="arrow backward" component="span"
                                             sx={arrowIconStyling}
@@ -362,10 +364,12 @@ const ViewFlashSet = props => {
                                         >
                                             <ArrowBack />
                                         </IconButton>
-
-                                        <span>
-                                            Back to Your Flashsets
-                                        </span>
+                                        <Typography
+                                            component="span"
+                                        >
+                                             Back to Your Flashsets
+                                        </Typography>
+                                        </div>
 
                                         <Typography
                                             variant="h5"
@@ -375,15 +379,8 @@ const ViewFlashSet = props => {
                                         >
                                             {flashset.title}
                                         </Typography>
-                                        <Tooltip
-                                            title="Rename title"
-                                            placement="right"
-                                        >
-                                            <IconButton
-                                                onClick={() => setEditTitle(true)}>
-                                                <Edit />
-                                            </IconButton>
-                                        </Tooltip>
+                                        <EditableTextField style={{marginTop: "1rem", width: "fit-content"}} value={flashset.title} tooltipText={"Rename title"}/>
+
                                         <Chip label={flashset.label ? flashset.label : "No label selected"} variant="outlined"
                                             sx={{
                                                 height: "2.5rem",
@@ -402,50 +399,8 @@ const ViewFlashSet = props => {
                                                 <Add />
                                             </IconButton>
                                         </Tooltip>
-
-                                        {/* TODO: 
-                                        - Spacing between description and above stuff
-                                        - Editable description; basically clicking on the description should allow user to edit description intuitively 
                                         
-                                        */}
-                                        <Typography
-                                            variant="body1"
-                                        >
-                                            {flashset.description}
-                                        </Typography>
-                                        <TextField
-                                            variant="standard"
-                                            value={editedDescription}
-                                            onChange={e => setEditedDescription(e.target.value)}
-                                            // TODO: Clear editedDescription state in onblur function
-                                            onBlur={() => setIsEditingDescription(false)}
-                                            disabled={!isEditingDescription}
-                                            // readOnly={!isEditingDescription}
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <Tooltip
-                                                            title="Edit description"
-                                                            placement="right"
-                                                        >
-                                                            <IconButton
-                                                                onClick={() => setIsEditingDescription(true)}
-                                                                edge="end"
-                                                            >
-                                                                <Edit />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    </InputAdornment>
-                                                )
-                                            }}
-                                            sx={{
-                                                border: "none",
-                                                ".Mui-disabled": {
-                                                    border: "none"
-                                                },
-                                            }}
-                                        />
-
+                                        <EditableTextField style={{marginTop: "1rem"}} value={flashset.description} tooltipText={"Edit description"}/>
                                         {renderActionBar()}
                                     </div>
                                     <div className={viewFlashStyles.studySection}>
