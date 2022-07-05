@@ -1,15 +1,6 @@
-/* light: {
-      name: "light",
-      foreground: "#121212",
-      background: "#ffffff",
-      body: "#F5F5F5"
-    },
-    dark: {
-      name: "dark",
-      foreground: "#F5F5F5",
-      background: "#1c1c1c",
-      body: "#121212"
-    }, */
+.App {
+
+}
 
 :root {
   --error-color: red;
@@ -126,14 +117,6 @@
   color        : orange;
 }
 
-/* TODO: 
-- Add generic orang e  button, with the following left up to the individual button
-  - Positioning / spacing / padding
-- Add generic disabled styling which should just be opacity < 0.7
-*/
-
-
-/* TODO: Use this */
 .errorText {
   color    : red;
   font-size: 0.8rem;

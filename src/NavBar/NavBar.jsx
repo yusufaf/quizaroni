@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
-import { NavLink, Link } from "react-router-dom";
-import { Alert, AlertTitle, Tooltip } from '@mui/material/';
+import { NavLink, Link, useNavigate } from "react-router-dom";
+import { Alert, AlertTitle, Button, Tooltip } from '@mui/material/';
 import { getAuth, signOut } from "firebase/auth";
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { AccountCircle, KeyboardArrowDown } from "@mui/icons-material"
@@ -18,6 +18,8 @@ const NavBar = props => {
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     const auth = getAuth();
+    const navigate = useNavigate();
+
     const [showDropdown, setShowDropdown] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState("");
@@ -31,7 +33,6 @@ const NavBar = props => {
 
     /* Applying theme to body */
     useEffect(() => {
-        document.body.style.transition = "0.2s ease";
         document.body.style.backgroundColor = theme.body;
     }, [isDarkMode, theme])
 
@@ -85,13 +86,6 @@ const NavBar = props => {
         });
     }
 
-    // const handleShowDropdown = () => {
-    //     if (userAuthState) {
-    //         console.log("Show the dropdown")
-    //         setShowDropdown(true);
-    //     }
-    // }
-
     return (
         <>
             <nav className={navStyles.navbar}
@@ -143,7 +137,7 @@ const NavBar = props => {
                                 </div>
                                 :
                                 <div >
-                                    <span className="material-icons-outlined">
+                                    {/* <span className="material-icons-outlined">
                                         login
                                     </span>
                                     <NavLink
@@ -152,7 +146,30 @@ const NavBar = props => {
                                         style={activeLinkStyle}
                                     >
                                         Login
-                                    </NavLink>
+                                    </NavLink> */}
+                                    {/* TODO: 
+                                    - Determine if outline or text button is better for log in 
+                                    - Theming, again. 
+                                    */}
+                                    <Button
+                                        variant="outlined"
+                                        sx={{
+                                            textTransform: "none"
+                                        }}
+                                        onClick={() => navigate("/login")}
+                                    >   
+                                        Log in
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        sx={{
+                                            textTransform: "none"
+                                        }}
+                                        onClick={() => navigate("/signup")}
+                                    // sx={{ background: "orange" }}
+                                    >
+                                        Sign up
+                                    </Button>
                                 </div>
                             }
                         </div>
@@ -165,21 +182,27 @@ const NavBar = props => {
                                 style={{ color: isDarkMode ? "yellow" : "#121212", fontSize: "2rem" }}
                             />
                         </Tooltip>
-                        <div
-                            className={navStyles.accountCircle}
-                            onClick={() => setShowDropdown(true)}
-                            ref={dropdownRef}
-                        >
-                            <AccountCircle
-                                style={{ fontSize: "2rem" }}
-                            />
-                            <KeyboardArrowDown
-                                style={{ fontSize: "2rem" }}
-                            />
-                        </div>
-                        <ProfileDropdown userAuthState={userAuthState} showDropdown={showDropdown}
-                            dropdownRef={dropdownRef} setShowDropdown={setShowDropdown}
-                        />
+                        {userAuthState &&
+                            (
+                                <>
+                                    <div
+                                        className={navStyles.accountCircle}
+                                        onClick={() => setShowDropdown(true)}
+                                        ref={dropdownRef}
+                                    >
+                                        <AccountCircle
+                                            style={{ fontSize: "2rem" }}
+                                        />
+                                        <KeyboardArrowDown
+                                            style={{ fontSize: "2rem" }}
+                                        />
+                                    </div>
+                                    <ProfileDropdown userAuthState={userAuthState} showDropdown={showDropdown}
+                                        dropdownRef={dropdownRef} setShowDropdown={setShowDropdown}
+                                    />
+                                </>
+                            )
+                        }
                     </div>
                 </div>
             </nav>
