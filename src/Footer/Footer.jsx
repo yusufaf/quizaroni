@@ -19,11 +19,13 @@ import { styled } from "@mui/system";
 //         }
 //     }
 // })
+
+
+
 const Footer = props => {
 
     return (
         <footer>
-            <div> bruh </div>
         </footer>
     )
 }

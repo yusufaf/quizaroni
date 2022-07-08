@@ -13,8 +13,8 @@ const ProfileDropdown = props => {
     // TODO: Fix this
     const profileMenuStyling = {
         '&.MuiMenu-paper': {
-            color: theme.foreground,
-            backgroundColor: theme.background
+            // color: theme.foreground,
+            // backgroundColor: theme.background
         },
     }
 
@@ -28,8 +28,8 @@ const ProfileDropdown = props => {
             >
                 <MenuItem
                     sx={{
-                        backgroundColor: theme.background,
-                        color: theme.foreground
+                        // backgroundColor: theme.background,
+                        // color: theme.foreground
                     }}
                     onClick={() => setShowDropdown(false)}
                 >
@@ -37,7 +37,7 @@ const ProfileDropdown = props => {
                         className={`${profileStyles.dropdownLink} ${isDarkMode ? appStyles.darkBorder : appStyles.lightBorder}`}
                         to="/profile"
                         style={{
-                            color: `${theme.foreground}`
+                            // color: `${theme.foreground}`
                         }}
                     >
                         Profile
