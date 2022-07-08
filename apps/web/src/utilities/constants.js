@@ -1,3 +1,6 @@
+export const LIGHT = "light";
+export const DARK = "dark";
+
 export const SUCCESS = "success";
 export const SUCCESS_U = "Success";
 export const ERROR = "error";

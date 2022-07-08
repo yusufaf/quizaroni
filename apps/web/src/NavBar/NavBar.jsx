@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react"
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Button, Tooltip } from '@mui/material/';
+import { Alert, AlertTitle, AppBar, Button, Toolbar, Tooltip, useMediaQuery } from '@mui/material/';
 import { getAuth, signOut } from "firebase/auth";
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import { AccountCircle, KeyboardArrowDown } from "@mui/icons-material"
 import { useTheme } from "../theme/useTheme";
+import { styled } from "@mui/system";
 
 import ProfileDropdown from "../Profile/ProfileDropdown";
 import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
@@ -15,7 +16,10 @@ import * as C from "../utilities/constants";
 
 const NavBar = props => {
     const { userAuthState, setUserAuthState } = props;
-    const { isDarkMode, toggleDarkMode, theme } = useTheme();
+    const {isDarkMode, toggleDarkMode, theme} = useTheme();
+
+    // TODO: Verify that a medium breakpoint works to handle mobile cases, can always add more breakpoints
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
     const auth = getAuth();
     const navigate = useNavigate();
@@ -28,13 +32,8 @@ const NavBar = props => {
 
     const activeLinkStyle = ({ isActive }) => ({
         borderBottom: isActive ? '0.2rem solid orange' : 'none',
-        color: `${theme.foreground}`
+        color: `${theme.palette.text.primary}`
     });
-
-    /* Applying theme to body */
-    useEffect(() => {
-        document.body.style.backgroundColor = theme.body;
-    }, [isDarkMode, theme])
 
     /**
      * Display alert showing that the user has successfully logged out
@@ -88,8 +87,13 @@ const NavBar = props => {
 
     return (
         <>
+            {/* TODO: Change theming because the bar shouldn't be yellow */}
+            <AppBar position="static">
+                <Toolbar>
+
+                </Toolbar>
+            </AppBar>
             <nav className={navStyles.navbar}
-                style={{ color: theme.foreground, background: theme.background }}
             >
                 <img
                     className={navStyles.logo}
@@ -127,7 +131,7 @@ const NavBar = props => {
                             {userAuthState ?
                                 <div
                                     className={navStyles.logout}
-                                    style={{ color: `${theme.foreground}` }}
+                                    // style={{ color: `${theme.foreground}` }}
                                     onClick={() => handleLogout()}
                                 >
                                     <span className="material-icons-outlined">
