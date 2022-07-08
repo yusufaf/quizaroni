@@ -50,7 +50,7 @@ const Home = props => {
 
     const warningStyling = {
         "& .MuiPaper-root": {
-            backgroundColor: theme.background,
+            // backgroundColor: theme.background,
         }
     }
 
@@ -139,7 +139,7 @@ const Home = props => {
                             <IconButton
                                 onClick={openActionsMenu}
                                 sx={{
-                                    color: theme.foreground
+                                    // color: theme.foreground
                                 }}
                             >
                                 <MenuOpen />
@@ -192,7 +192,7 @@ const Home = props => {
                                 >
                                     <Delete
                                         sx={{
-                                            color: theme.foreground
+                                            // color: theme.foreground
                                         }}
                                         fontSize="medium"
                                     />
@@ -207,7 +207,7 @@ const Home = props => {
                                 >
                                     <FavoriteBorder
                                         sx={{
-                                            color: theme.foreground
+                                            // color: theme.foreground
                                         }}
                                         fontSize="medium"
                                     />
@@ -377,7 +377,9 @@ const Home = props => {
                 <ViewFlashSet {...viewSetProps} />
                 :
                 <div className={homeStyles.homePage} >
-                    <div className={homeStyles.flashSets} style={{ color: theme.foreground, background: theme.background }}>
+                    <div className={homeStyles.flashSets} 
+                    // style={{ color: theme.foreground, background: theme.background }}
+                    >
                         <Typography
                             variant="h5"
                             sx={{
@@ -402,7 +404,7 @@ const Home = props => {
                                 onRowClick={() => {
                                 }}
                                 sx={{
-                                    color: theme.foreground
+                                    // color: theme.foreground
                                 }}
                             />
                         </div>
@@ -425,13 +427,13 @@ const Home = props => {
                         sx={warningStyling}
                     >
                         <DialogTitle id="alert-dialog-title"
-                            sx={retrieveTextStyling(theme.foreground, "1.75rem")}
+                            // sx={retrieveTextStyling(theme.foreground, "1.75rem")}
                         >
                             {"Duplicate this set?"}
                         </DialogTitle>
                         <DialogContent>
                             <DialogContentText id="alert-dialog-description"
-                                sx={retrieveTextStyling(theme.foreground, "1.5rem")}
+                                // sx={retrieveTextStyling(theme.foreground, "1.5rem")}
                             >
                                 Are you sure you want to duplicate this set?
                             </DialogContentText>

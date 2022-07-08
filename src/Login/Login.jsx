@@ -6,13 +6,11 @@ import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvide
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css';
 
-/* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Button, Card, Typography, TextField, InputAdornment, IconButton} from '@mui/material/';
+import { Alert, AlertTitle, Button, Card, Checkbox, FormControlLabel, Typography, TextField, InputAdornment, IconButton} from '@mui/material/';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 
-/* Styling */
 import { useTheme } from "../theme/useTheme";
 import * as loginStyles from './Login.module.css';
 import * as appStyles from "../App.module.css";
@@ -77,6 +75,11 @@ const Login = props => {
         emailInput: false,
         passInput: false
     })
+
+    const helperTextStyling = {
+        color: "red"
+    }
+
 
     useEffect(() => {
         updateBrowserTitle("Login")
@@ -208,6 +211,8 @@ const Login = props => {
     };
 
     const checkIfInputEmpty = event => {
+        console.log("event in checkIfInputEmpty = ", event);
+        console.log(event.target.name);
         let updatedErrorText = { ...showErrorText };
         updatedErrorText[event.target.name] = event.target.value === "";
         setShowErrorText(updatedErrorText);
@@ -218,7 +223,6 @@ const Login = props => {
         <>
             <div className={loginStyles.loginPage}>
                 <div className={loginStyles.loginContainer}
-                    style={{ color: theme.foreground, background: theme.background }}
                     onKeyPress={enterKeyHandler}
                 >
                     <>
@@ -234,9 +238,12 @@ const Login = props => {
 
                         <TextField
                             label="Email"
+                            name="emailInput"
                             value={enteredEmail}
                             onChange={e => setEnteredEmail(e.target.value)}
+                            onBlur={e => checkIfInputEmpty(e)}
                             helperText={showErrorText.emailInput && "An email is required"}
+                            error={showErrorText.emailInput}
                             size="small"
                         />
 
@@ -247,7 +254,11 @@ const Login = props => {
                             label="Password"
                             type={passVisibility ? 'text' : 'password'}
                             value={enteredPass}
+                            name="passInput"
                             onChange={e => setEnteredPass(e.target.value)}
+                            onBlur={e => checkIfInputEmpty(e)}
+                            helperText={showErrorText.passInput && "A password is required"}
+                            error={showErrorText.passInput}
                             size="small"
                             InputProps={{
                                 endAdornment: (
@@ -274,12 +285,6 @@ const Login = props => {
                             onChange={e => setEnteredEmail(e.target.value)}
                         /> */}
 
-                        {showErrorText.emailInput &&
-                            <span className={loginStyles.emailError}>
-                                An email is required.
-                            </span>
-                        }
-
 {/* 
                         <input
                             className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
@@ -290,11 +295,6 @@ const Login = props => {
                             onBlur={e => checkIfInputEmpty(e)}
                             onChange={e => setEnteredPass(e.target.value)}
                         /> */}
-                        {showErrorText.passInput &&
-                            <span className={loginStyles.passwordError}>
-                                A password is required.
-                            </span>
-                        }
 
                         <Link to="/forgot" className={loginStyles.forgot}>
                             Forgot password?
@@ -315,7 +315,8 @@ const Login = props => {
                                 },
                                 "&.MuiButton-root:hover": {
                                     backgroundColor: "rgb(206, 143, 27)"
-                                }
+                                },
+                                marginTop: "1rem"
                             }}
                         >
                             Log In
@@ -337,7 +338,7 @@ const Login = props => {
                 </div>
                 <div id="firebaseui-auth-container"
                     className={loginStyles.firebaseUI}
-                    style={{ color: theme.foreground, background: theme.background }}
+                    // style={{ color: theme.foreground, background: theme.background }}
                 >
                 </div>
                 <div id="loader">Loading...</div>
