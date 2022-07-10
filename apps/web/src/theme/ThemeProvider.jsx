@@ -12,19 +12,22 @@ export const CustomThemeProvider = (props) => {
     const currentTheme = localStorage.getItem("appTheme") || LIGHT;
     const [themeName, setThemeName] = useState(currentTheme);
 
-    // const [theme, setTheme] = useState(themes.light);
-    const theme = themes[themeName];
+    const [theme, setTheme] = useState(themes[themeName]);
 
     // Wrap setThemeName to store new theme names in localStorage
     const setAppThemeName = (name) => {
         localStorage.setItem('appTheme', name)
         setThemeName(name);
         setIsDarkMode(name === DARK);
+        console.log("Setting theme to = ", name);
+        setTheme(themes[name])
     }
 
     const toggleDarkMode = () => {
-        setIsDarkMode(prevDarkMode => !prevDarkMode);
-        setThemeName(prevTheme => prevTheme === DARK ? LIGHT : DARK);
+        setIsDarkMode(!isDarkMode);
+        const oppositeThemeName = themeName === DARK ? LIGHT : DARK;
+        setThemeName(oppositeThemeName);
+        setTheme(themes[oppositeThemeName]);
     }
 
     const contextValue = {

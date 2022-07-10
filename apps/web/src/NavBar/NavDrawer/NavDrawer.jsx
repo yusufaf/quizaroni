@@ -6,19 +6,8 @@ import {
     ListItem,
     ListItemText,
 } from '@mui/material/';
-// NavLink or Link
-import { Link } from "react-router-dom";
-
-const useStyles = makeStyles(() => ({
-    link: {
-        textDecoration: "none",
-        color: "blue",
-        fontSize: "20px",
-    },
-    icon: {
-        color: "white"
-    }
-}));
+import { NavLink } from "react-router-dom";
+import { styled } from '@mui/system';
 
 const NavDrawer = props => {
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -31,31 +20,38 @@ const NavDrawer = props => {
         setOpenDrawer(!openDrawer)
     }
 
+    const StyledNavLink = styled(NavLink)({
+        borderRadius: "0.15rem",
+        fontSize: "1.25rem",
+        textDecoration: "none",
+        cursor: "pointer",
+        "&:hover": {
+            opacity: "0.6",
+            transition: "0.1s ease",
+        }
+    })
+
     return (
         <>
             <Drawer
+                //anchor="bottom" 
                 open={openDrawer}
                 onClose={handleCloseDrawer}
             >
                 <List>
                     <ListItem onClick={handleCloseDrawer}>
                         <ListItemText>
-                            <Link to="/">Home</Link>
+                            <StyledNavLink to="/">Home</StyledNavLink>
                         </ListItemText>
                     </ListItem>
                     <ListItem onClick={handleCloseDrawer}>
                         <ListItemText>
-                            <Link to="/about">About</Link>
+                            <StyledNavLink to="/create">Create</StyledNavLink>
                         </ListItemText>
                     </ListItem>
                     <ListItem onClick={handleCloseDrawer}>
                         <ListItemText>
-                            <Link to="/contact">Contact</Link>
-                        </ListItemText>
-                    </ListItem>
-                    <ListItem onClick={handleCloseDrawer}>
-                        <ListItemText>
-                            <Link to="/about">Faq</Link>
+                            <StyledNavLink to="/explore">Explore</StyledNavLink>
                         </ListItemText>
                     </ListItem>
                 </List>

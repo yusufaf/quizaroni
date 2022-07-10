@@ -5,7 +5,9 @@ export const light = createTheme({
     palette: {
         mode: "light",
         primary: {
-            main: "#fb8c00"
+            main: "#ffa000",
+            light: "#ffd149",
+            dark: "#c67100",
         }
         // background: {
         //     paper: "#F5F5F5",
@@ -17,15 +19,19 @@ export const light = createTheme({
     // body: "#F5F5F5"
 });
 
+
 export const dark = createTheme({
     palette: {
         mode: "dark",
         primary: {
-            main: "#fb8c00"
-        }
-        // background: {
-        //     paper: "#121212",
-        // },
+            main: "#ffa000",
+            light: "#ffd149",
+            dark: "#c67100",
+            // main: "rgba(255,255,255,0.12)"
+        },
+        background: {
+            paper: "#1c1c1c",
+        },
         // text: {
         //     primary: "#F5F5F5",
         // },
