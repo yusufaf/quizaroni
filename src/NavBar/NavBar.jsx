@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from "react"
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, AppBar, Button, Toolbar, Tooltip, useMediaQuery } from '@mui/material/';
+import { Alert, AlertTitle, AppBar, Button, IconButton, Toolbar, Tooltip, useMediaQuery } from '@mui/material/';
 import { getAuth, signOut } from "firebase/auth";
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import { AccountCircle, KeyboardArrowDown } from "@mui/icons-material"
+import { AccountCircle, DarkMode, LightMode, KeyboardArrowDown } from "@mui/icons-material"
 import { useTheme } from "../theme/useTheme";
 import { styled } from "@mui/system";
 
+import NavDrawer from "./NavDrawer/NavDrawer";
 import ProfileDropdown from "../Profile/ProfileDropdown";
 import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
 
@@ -16,7 +16,7 @@ import * as C from "../utilities/constants";
 
 const NavBar = props => {
     const { userAuthState, setUserAuthState } = props;
-    const {isDarkMode, toggleDarkMode, theme} = useTheme();
+    const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     // TODO: Verify that a medium breakpoint works to handle mobile cases, can always add more breakpoints
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -85,53 +85,107 @@ const NavBar = props => {
         });
     }
 
+    /*
+TODO: Can create a new separate file with these styled components in it
+*/
+
+    const AppLogo = styled("img")({
+        position: " absolute",
+        height: "13rem",
+        width: "13rem",
+        left: "-1rem",
+        marginTop: "1.25rem",
+    })
+
+    const LoginButtonsContainer = styled("div")({
+        display: "flex",
+        gap: "1rem"
+    })
+
+    const StyledNavLink = styled(NavLink)({
+        borderRadius: "0.15rem",
+        fontSize: "1.25rem",
+        textDecoration: "none",
+        cursor: "pointer",
+        "&:hover": {
+            opacity: "0.6",
+            transition: "0.1s ease",
+        }
+    })
+
+    const StyledDarkModeIcon = styled(DarkMode)({
+        cursor: "pointer",
+        color: "#121212",
+        fontSize: "2rem",
+    })
+
+    const StyledLightModeIcon = styled(LightMode)({
+        cursor: "pointer",
+        color: "yellow",
+        fontSize: "2rem",
+    })
+
     return (
         <>
-            {/* TODO: Change theming because the bar shouldn't be yellow */}
-            <AppBar position="static">
+            <AppBar position="static" color="inherit">
                 <Toolbar>
+                    <AppLogo
+                        src={QuizaroniLogo}
+                        alt="Quizaroni logo"
+                    />
+                    {isMobile ?
+                        <NavDrawer />
+                        :
+                        <>
+                            <StyledNavLink to="/" style={activeLinkStyle}>
+                                Home
+                            </StyledNavLink>
+                            <StyledNavLink
+                                to="/create"
+                                style={activeLinkStyle}
+                            >
+                                Create
+                            </StyledNavLink>
+                            <StyledNavLink
+                                to="/explore"
+                                style={activeLinkStyle}
+                            >
+                                Explore
+                            </StyledNavLink>
+                        </>
+                    }
 
                 </Toolbar>
             </AppBar>
-            <nav className={navStyles.navbar}
-            >
-                <img
-                    className={navStyles.logo}
+            <nav className={navStyles.navbar}>
+                <AppLogo
                     src={QuizaroniLogo}
                     alt="Quizaroni logo"
                 />
                 <div className={navStyles.menu}>
                     <div>
-                        <NavLink to="/" className={navStyles.link}
-                            style={activeLinkStyle}
-                        >
+                        <StyledNavLink to="/" style={activeLinkStyle}>
                             Home
-                        </NavLink>
+                        </StyledNavLink>
                     </div>
                     <div >
-                        <NavLink
-                            to="/create"
-                            className={navStyles.link}
-                            style={activeLinkStyle}
-                        >
+                        <StyledNavLink to="/create" style={activeLinkStyle}>
                             Create
-                        </NavLink>
+                        </StyledNavLink>
                     </div>
                     <div >
-                        <NavLink
+                        <StyledNavLink
                             to="/explore"
-                            className={navStyles.link}
                             style={activeLinkStyle}
                         >
                             Explore
-                        </NavLink>
+                        </StyledNavLink>
                     </div>
                     <div className={navStyles.rightActions}>
                         <div>
                             {userAuthState ?
                                 <div
                                     className={navStyles.logout}
-                                    // style={{ color: `${theme.foreground}` }}
                                     onClick={() => handleLogout()}
                                 >
                                     <span className="material-icons-outlined">
@@ -140,28 +194,14 @@ const NavBar = props => {
                                     Logout
                                 </div>
                                 :
-                                <div >
-                                    {/* <span className="material-icons-outlined">
-                                        login
-                                    </span>
-                                    <NavLink
-                                        to="/login"
-                                        className={navStyles.link}
-                                        style={activeLinkStyle}
-                                    >
-                                        Login
-                                    </NavLink> */}
-                                    {/* TODO: 
-                                    - Determine if outline or text button is better for log in 
-                                    - Theming, again. 
-                                    */}
+                                <LoginButtonsContainer>
                                     <Button
                                         variant="outlined"
                                         sx={{
                                             textTransform: "none"
                                         }}
                                         onClick={() => navigate("/login")}
-                                    >   
+                                    >
                                         Log in
                                     </Button>
                                     <Button
@@ -170,21 +210,21 @@ const NavBar = props => {
                                             textTransform: "none"
                                         }}
                                         onClick={() => navigate("/signup")}
-                                    // sx={{ background: "orange" }}
                                     >
                                         Sign up
                                     </Button>
-                                </div>
+                                </LoginButtonsContainer>
                             }
                         </div>
-                        <Tooltip
-                            title="Toggle dark mode"
+                        <Tooltip title="Toggle dark mode"
                         >
-                            <DarkModeIcon
-                                onClick={toggleDarkMode}
-                                className={navStyles.darkModeToggle}
-                                style={{ color: isDarkMode ? "yellow" : "#121212", fontSize: "2rem" }}
-                            />
+                            <IconButton onClick={toggleDarkMode}>
+                                {isDarkMode ?
+                                    <StyledLightModeIcon />
+                                    :
+                                    <StyledDarkModeIcon />
+                                }
+                            </IconButton>
                         </Tooltip>
                         {userAuthState &&
                             (

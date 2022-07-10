@@ -61,27 +61,6 @@
 Profile Dropdown Styles 
 =======================
 */
-.dropdown {
-    position     : absolute;
-    /* left         : 4rem; */
-    /* top          : 2rem; */
-    /* border-radius: 0.75rem; */
-    /* padding      : 1rem; */
-    /* box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2); */
-    /* z-index      : 1000; */
-}
-
-
-.dropdownLink {
-    font-size      : 1.25rem;
-    text-decoration: none;
-}
-
-.heading {
-    display    : flex;
-    align-items: center;
-    gap        : 1rem;
-}
 
 .themeSelect {
     display: flex;

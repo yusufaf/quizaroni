@@ -3,7 +3,6 @@ import { Routes, Route } from "react-router-dom";
 import Footer from "./Footer/Footer";
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { LIGHT, DARK } from "./utilities/constants.js"
-import store from "./store";
 
 /* Component imports */
 import NavBar from "./NavBar/NavBar";
@@ -98,6 +97,8 @@ const App = () => {
         <Route
           path="/view"
         />
+
+        {/* <Route path="*" element={<NotFound />} /> */}
 
       </Routes>
     </>

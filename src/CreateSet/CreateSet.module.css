@@ -216,21 +216,3 @@ Individual Card Input Styling
     cursor  : pointer;
     z-index : 100;
 }
-
-.import {
-    position: absolute;
-    right   : 5rem;
-    top     : 10rem;
-}
-
-.importModal {
-    position : absolute;
-    top      : 50%;
-    left     : 50%;
-    transform: translate(-50%, -50%);
-
-    height: 30rem;
-    width: 50rem;
-
-    padding: 1.5rem;
-}

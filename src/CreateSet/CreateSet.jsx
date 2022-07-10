@@ -6,10 +6,11 @@ import { database } from "../firebase/firebase";
 
 /* Outside Components */
 import { useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Button, IconButton, Modal, Tooltip, Typography } from '@mui/material/';
+import { Alert, AlertTitle, Box, Button, IconButton, Modal, Tooltip, Typography } from '@mui/material/';
 import { Create, UploadFile } from "@mui/icons-material";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import LoginMessage from "../LoginMessage/LoginMessage";
+import ImportSetModal from "./ImportSetModal/ImportSetModal";
 
 /* Styling */
 import { useTheme } from "../theme/useTheme";
@@ -253,8 +254,10 @@ const CreateSet = props => {
     return (
         <>
             <div className={createSetStyles.createPage}>
-                <div className={createSetStyles.createContainer}
-                    style={{ color: theme.foreground, background: theme.background }}
+                <Box className={createSetStyles.createContainer}
+                    sx={{
+                        // background: theme.palette.grey[900]
+                    }}
                 >
                     <Typography
                         variant="h5"
@@ -274,7 +277,7 @@ const CreateSet = props => {
                         >
                             Title
                         </Typography>
-                        {/* <label className={createSetStyles.inputLabel}>Title</label> */}
+
                         <input
                             className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
                             placeholder={CREATE_SET.TITLE_PLACE}
@@ -369,7 +372,7 @@ const CreateSet = props => {
                     >
                         Import cards
                     </Typography>
-                </div>
+                </Box>
                 {renderCreateCards()}
 
                 <Button
@@ -412,30 +415,10 @@ const CreateSet = props => {
                 </button>
             </div>
 
-            <Modal
+            <ImportSetModal
                 open={showImportModal}
                 onClose={() => setShowImportModal(false)}
-            >
-                <div className={createSetStyles.importModal}
-                    style={{ color: theme.foreground, background: theme.background }}
-                >
-                    <Typography
-                        variant="h5"
-                        sx={{
-                            fontWeight: "bold"
-                        }}
-                    >
-                        Import cards
-                    </Typography>
-                    {/* Option to enter the cards like Quizlet has */}
-                    <textarea
-                        className={`${createSetStyles.descInput} ${isDarkMode ? `${createSetStyles.dark} ${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                        placeholder="Enter a description for your new study set"
-                        onChange={e => setEnteredDescription(e.target.value)}
-                    />
-                </div>
-            </Modal>
-
+            />
             {showAlert &&
                 <Alert
                     className={appStyles.alert}
