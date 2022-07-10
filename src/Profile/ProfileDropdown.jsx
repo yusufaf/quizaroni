@@ -1,14 +1,18 @@
 import { Link } from "react-router-dom";
 import { Menu, MenuItem } from '@mui/material/';
-
-/* Styling */
 import { useTheme } from "../theme/useTheme";
+import { styled } from '@mui/system';
+
 import * as profileStyles from './Profile.module.css';
 import * as appStyles from "../App.module.css";
 
 const ProfileDropdown = props => {
     const { dropdownRef, showDropdown, setShowDropdown, userAuthState } = props;
     const { isDarkMode, theme } = useTheme();
+
+    const closeDropdown = () => {
+        setShowDropdown(false);
+    }
 
     // TODO: Fix this
     const profileMenuStyling = {
@@ -18,30 +22,28 @@ const ProfileDropdown = props => {
         },
     }
 
+    const StyledProfileLink = styled(Link)({
+        fontSize: "1.25rem",
+        textDecoration: "none",
+        color: theme.palette.text.primary
+    })
+
     return (
-        <div className={profileStyles.dropdown}>
+        <div>
             <Menu
                 open={showDropdown && userAuthState}
-                onClose={() => setShowDropdown(false)}
+                onClose={closeDropdown}
                 sx={profileMenuStyling}
                 anchorEl={dropdownRef.current}
             >
                 <MenuItem
-                    sx={{
-                        // backgroundColor: theme.background,
-                        // color: theme.foreground
-                    }}
-                    onClick={() => setShowDropdown(false)}
+                    onClick={closeDropdown}
                 >
-                    <Link
-                        className={`${profileStyles.dropdownLink} ${isDarkMode ? appStyles.darkBorder : appStyles.lightBorder}`}
+                    <StyledProfileLink
                         to="/profile"
-                        style={{
-                            // color: `${theme.foreground}`
-                        }}
                     >
                         Profile
-                    </Link>
+                    </StyledProfileLink>
                 </MenuItem>
             </Menu>
         </div>

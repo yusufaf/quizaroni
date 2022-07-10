@@ -8,6 +8,7 @@ import 'firebaseui/dist/firebaseui.css';
 
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, Button, Card, Checkbox, FormControlLabel, Typography, TextField, InputAdornment, IconButton} from '@mui/material/';
+import { styled } from '@mui/system';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 
@@ -17,8 +18,10 @@ import * as appStyles from "../App.module.css";
 import * as C from "../utilities/constants";
 import { updateBrowserTitle } from "../utilities/functions";
 
+
 const Login = props => {
     const { userAuthState, setUserAuthState } = props;
+
     const { isDarkMode, theme } = useTheme();
 
     /* OAuth Variables */
@@ -58,10 +61,8 @@ const Login = props => {
         ],
     };
 
-    /* React-Router function for switching routes */
     let navigate = useNavigate();
 
-    /* Login Input States */
     const [enteredEmail, setEnteredEmail] = useState("");
     const [enteredPass, setEnteredPass] = useState("");
     const [passVisibility, setPassVisibility] = useState(false);
@@ -80,6 +81,10 @@ const Login = props => {
         color: "red"
     }
 
+    const StyledLink = styled(Link)({
+        color: theme.palette.primary.main,
+        textDecoration: "none"
+    })
 
     useEffect(() => {
         updateBrowserTitle("Login")
@@ -247,9 +252,6 @@ const Login = props => {
                             size="small"
                         />
 
-                        {/* TODO: Theme styling for show/hide password icon button
-                            className={`${loginStyles.passToggle} ${isDarkMode && loginStyles.dark}`}
-                        */}
                         <TextField
                             label="Password"
                             type={passVisibility ? 'text' : 'password'}
@@ -275,61 +277,27 @@ const Login = props => {
                             }}
                         />
 
-                        {/* <input
-                            className={
-                                showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                                    : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                            name="emailInput"
-                            placeholder="Type your email address"
-                            onBlur={e => checkIfInputEmpty(e)}
-                            onChange={e => setEnteredEmail(e.target.value)}
-                        /> */}
-
-{/* 
-                        <input
-                            className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                                : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                            name="passInput"
-                            placeholder="Type your password"
-                            type={passVisibility ? "text" : "password"}
-                            onBlur={e => checkIfInputEmpty(e)}
-                            onChange={e => setEnteredPass(e.target.value)}
-                        /> */}
-
-                        <Link to="/forgot" className={loginStyles.forgot}>
+                        <StyledLink to="/forgot" className={loginStyles.forgot}>
                             Forgot password?
-                        </Link>
+                        </StyledLink>
 
-                        {/* Login Button */}
                         <Button
                             variant="contained"
                             disabled={enteredEmail === "" || enteredPass === ""}
                             onClick={() => handleLogin()}
                             sx={{
-                                backgroundColor: "orange",
-                                color: theme.foreground,
                                 fontSize: "1rem",
                                 "&.Mui-disabled": {
                                     backgroundColor: "orange",
                                     cursor: "not-allowed"
-                                },
-                                "&.MuiButton-root:hover": {
-                                    backgroundColor: "rgb(206, 143, 27)"
                                 },
                                 marginTop: "1rem"
                             }}
                         >
                             Log In
                         </Button>
-                        {/* <button
-                                    className={enteredEmail === "" || enteredPass === "" ? `${loginStyles.login} ${loginStyles.disabled}` : `${loginStyles.login}`}
-                                    onClick={() => handleLogin()}
-                                >
-                                    <b>Log In</b>
-                                </button> */}
-                        {/* Signup Link  */}
+ 
                         <Link
-                            className={loginStyles.signupLink}
                             to="/signup"
                         >
                             Don't have an account? Click here to sign up!

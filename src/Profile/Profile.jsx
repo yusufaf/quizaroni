@@ -3,6 +3,8 @@ import { database } from "../firebase/firebase";
 import { deleteDoc, updateDoc, query, where, collection, getDoc, getDocs, limit } from "firebase/firestore";
 import { EmailAuthProvider, getAuth, deleteUser, updatePassword, reauthenticateWithCredential } from "firebase/auth";
 import { Button, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from '@mui/material/';
+import { DarkMode, LightMode, Palette, Password, Person, RemoveCircleOutline } from "@mui/icons-material";
+import { styled } from '@mui/system';
 import LoginMessage from "../LoginMessage/LoginMessage";
 import ProfileCard from "./ProfileCard";
 
@@ -146,6 +148,12 @@ const Profile = props => {
     }
 
 
+    const ActionHeader = styled("div")({
+        display: "flex",
+        alignItems: "center",
+        gap: "0.75rem",
+    })
+
     if (!userAuthState) {
         return <LoginMessage page="profile" />;
     }
@@ -154,7 +162,7 @@ const Profile = props => {
         <>
             <div className={profileStyles.profilePage}>
                 <ProfileCard userAuthState={userAuthState} />
-                <div className={profileStyles.profileContainer} style={{ color: theme.foreground, background: theme.background }}>
+                <div className={profileStyles.profileContainer}>
                     <Typography
                         variant="h5"
                         sx={{
@@ -164,12 +172,10 @@ const Profile = props => {
                         Profile
                     </Typography>
 
-                    <div className={profileStyles.heading}>
-                        <span className="material-icons-outlined">
-                            dark_mode
-                        </span>
-                        <div className={appStyles.smallTitle}>Default Theme</div>
-                    </div>
+                    <ActionHeader>
+                        <Palette />
+                        <Typography variant="h6">Default Theme</Typography>
+                    </ActionHeader>
 
                     <div className={profileStyles.themeSelect}>
                         <Tooltip title="Switch default to Light mode"
@@ -192,12 +198,10 @@ const Profile = props => {
                         </Tooltip>
                     </div>
 
-                    <div className={profileStyles.heading}>
-                        <span className="material-icons-outlined">
-                            person
-                        </span>
-                        <div className={appStyles.smallTitle}>Change Username</div>
-                    </div>
+                    <ActionHeader>
+                        <Person />
+                        <Typography variant="h6">Change Username</Typography>
+                    </ActionHeader>
                     <div className={profileStyles.changeUsernameContainer}>
                         <input
                             className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
@@ -209,10 +213,6 @@ const Profile = props => {
                             variant="contained"
                             onClick={() => handleChangeUsername()}
                             disabled={enteredNewUsername === ""}
-                            sx={{
-                                backgroundColor: "orange",
-                                color: theme.foreground
-                            }}
                         >
                             Submit
                         </Button>
@@ -227,16 +227,16 @@ const Profile = props => {
                         </button> */}
                     </div>
 
-                    <div className={profileStyles.heading}>
-                        <span class="material-icons-outlined">
-                            password
-                        </span>
-                        <div className={appStyles.smallTitle}>Change Password</div>
-                    </div>
+                    <ActionHeader>
+                        <Password />
+                        <Typography variant="h6">Change Password</Typography>
+                    </ActionHeader>
 
                     <div className={profileStyles.changeUsernameContainer}>
                         <div className={profileStyles.changeInputs}>
                             {/* TODO: Add password visibility toggles here */}
+
+
                             <input
                                 className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
                                 placeholder="Enter new password"
@@ -288,12 +288,10 @@ const Profile = props => {
 
                     </div>
 
-                    <div className={profileStyles.heading}>
-                        <span className="material-icons-outlined">
-                            remove_circle
-                        </span>
-                        <div className={appStyles.smallTitle}>Delete Account</div>
-                    </div>
+                    <ActionHeader>
+                        <RemoveCircleOutline />
+                        <Typography variant="h6">Delete Account</Typography>
+                    </ActionHeader>
 
                     <Button
                         variant="outlined"

@@ -51,21 +51,6 @@
     transition   : 0.2s ease;
 }
 
-.error {
-    border: 0.15rem solid red;
-}
-
-.passToggle {
-    position: absolute;
-    top     : 48%;
-    right   : 6%;
-    cursor  : pointer;
-    color: #121212
-}
-
-.passToggle.dark {
-    color: #F5F5F5;
-}
 
 .login {
     background-color: orange;
