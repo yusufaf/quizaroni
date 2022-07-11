@@ -6,7 +6,7 @@ import { database } from "../firebase/firebase";
 
 /* Outside Components */
 import { useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Box, Button, IconButton, Modal, Tooltip, Typography } from '@mui/material/';
+import { Alert, AlertTitle, Box, Button, IconButton, Modal, TextField, Tooltip, Typography } from '@mui/material/';
 import { Create, UploadFile } from "@mui/icons-material";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import LoginMessage from "../LoginMessage/LoginMessage";
@@ -43,6 +43,9 @@ const CreateSet = props => {
     const [labelOptions, setLabelOptions] = useState([]);
 
     const [showImportModal, setShowImportModal] = useState(false);
+
+    useEffect(() => {
+    }, [showImportModal]);
 
     // Store a reference to the HTML file <input>
     const fileInputRef = useRef(null);
@@ -271,16 +274,25 @@ const CreateSet = props => {
                         <Typography
                             variant="subtitle1"
                             sx={{
-                                color: "orange",
+                                color: theme.palette.primary.main,
                                 fontWeight: "bold"
                             }}
                         >
                             Title
                         </Typography>
 
+                        <TextField
+                            variant="standard"
+                            placeholder={CREATE_SET.TITLE_PLACEHOLDER}
+                            // label="Title"
+                            value={enteredTitle}
+                            onChange={e => setEnteredTitle(e.target.value)}
+                            size="small"
+                        />
+
                         <input
                             className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                            placeholder={CREATE_SET.TITLE_PLACE}
+                            placeholder={CREATE_SET.TITLE_PLACEHOLDER}
                             onChange={e => setEnteredTitle(e.target.value)}
                         />
                         <Typography
@@ -293,9 +305,19 @@ const CreateSet = props => {
                             Description
                         </Typography>
                         {/* <label className={createSetStyles.inputLabel}>Description</label> */}
+
+                        <TextField
+                            variant="outlined"
+                            placeholder={CREATE_SET.DESC_PLACEHOLDER}
+                            // label="Title"
+                            value={enteredDescription}
+                            onChange={e => setEnteredDescription(e.target.value)}
+                            size="large"
+                        />
+
                         <textarea
                             className={`${createSetStyles.descInput} ${isDarkMode ? `${createSetStyles.dark} ${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                            placeholder={CREATE_SET.DESC_PLACE}
+                            placeholder={CREATE_SET.DESC_PLACEHOLDER}
                             onChange={e => setEnteredDescription(e.target.value)}
                         />
                         <Typography
@@ -311,7 +333,7 @@ const CreateSet = props => {
                         <div className={createSetStyles.labelInputContainer}>
                             <input
                                 className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                                placeholder={CREATE_SET.LABEL_PLACE}
+                                placeholder={CREATE_SET.LABEL_PLACEHOLDER}
                                 onChange={e => setEnteredLabel(e.target.value)}
                                 disabled={selectedLabel !== ""}
                             />

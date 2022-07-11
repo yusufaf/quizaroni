@@ -297,11 +297,11 @@ const Login = props => {
                             Log In
                         </Button>
  
-                        <Link
+                        <StyledLink
                             to="/signup"
                         >
                             Don't have an account? Click here to sign up!
-                        </Link>
+                        </StyledLink>
                     </>
                 </div>
                 <div id="firebaseui-auth-container"
