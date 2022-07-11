@@ -9,6 +9,7 @@ import 'firebaseui/dist/firebaseui.css';
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, Button, Card, Typography, TextField, InputAdornment, IconButton } from '@mui/material/';
+import { styled } from '@mui/system';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
 
@@ -204,6 +205,11 @@ const Signup = props => {
         );
     }
 
+    const StyledLink = styled(Link)({
+        color: theme.palette.primary.main,
+        textDecoration: "none"
+    })
+
     return (
         <>
             {userAuthState ?
@@ -330,12 +336,11 @@ const Signup = props => {
                             >
                                 Sign Up
                             </Button>
-                            <Link
-                                className={loginStyles.signupLink}
+                            <StyledLink
                                 to="/login"
                             >
                                 Already have an account? Click here to login!
-                            </Link>
+                            </StyledLink>
                         </div>
                         <div id="firebaseui-auth-container"
                             className={loginStyles.firebaseUI}

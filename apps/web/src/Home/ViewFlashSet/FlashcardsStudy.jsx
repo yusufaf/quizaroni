@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 /* Firebase Operations */
 // import { collection, addDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
@@ -41,7 +41,9 @@ const FlashcardsStudy = props => {
     // TODO: Intended to keep track of the number of cards the user has clicked on and actually flipped/viewed
     const [cardsStudied, setCardsStudied] = useState(0);
 
-
+    useEffect(() => {
+        console.log("currentCard = ", currentCard)
+    }, [currentCard])
 
     const [showWarningModal, setShowWarningModal] = useState(false);
 
@@ -53,15 +55,12 @@ const FlashcardsStudy = props => {
         minWidth: "60rem",
         justifyContent: "center",
         "&.MuiCard-root": {
-            color: theme.foreground,
-            backgroundColor: theme.background,
-            transition: "0.5s ease",
+            transition: "0.2s ease",
         }
     }
 
     const warningStyling = {
         "& .MuiPaper-root": {
-            backgroundColor: theme.background,
         }
     }
 
@@ -79,11 +78,6 @@ const FlashcardsStudy = props => {
     }
 
     const arrowIconStyling = {
-        "&:hover": {
-        },
-        '&.MuiIconButton-colorPrimary': {
-            color: theme.foreground,
-        },
     }
 
     const handleArrowClick = (direction) => {
@@ -98,6 +92,7 @@ const FlashcardsStudy = props => {
 
         setCurrentCardIndex(newCardIndex);
         const { cards } = selectedFlashSet;
+        console.log("New card = ", cards[newCardIndex]);
         setCurrentCard(cards[newCardIndex]);
     }
 
@@ -142,23 +137,19 @@ const FlashcardsStudy = props => {
                 sx={warningStyling}
             >
                 <DialogTitle id="alert-dialog-title"
-                    sx={retrieveTextStyling(theme.foreground, "1.75rem")}
+                    sx={{fontSize: "1.75rem"}}
                 >
                     {"Stop studying this set?"}
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description"
-                        sx={retrieveTextStyling(theme.foreground, "1.5rem")}
+                    sx={{fontSize: "1.5rem"}}
                     >
                         You haven't finished studying all the cards in this set, are you sure you want to exit?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseWarning}
-                        sx={{
-                            color: "orange"
-                        }}
-                    >
+                    <Button onClick={handleCloseWarning}>
                         Cancel</Button>
                     <Button
                         onClick={() => {
@@ -166,9 +157,6 @@ const FlashcardsStudy = props => {
                             setSelectedStudyMode("")
                         }}
                         autoFocus
-                        sx={{
-                            color: "orange"
-                        }}
                     >
                         Yes
                     </Button>
@@ -200,7 +188,6 @@ const FlashcardsStudy = props => {
                         sx={arrowIconStyling}
                         onClick={() => handleArrowClick("BACKWARD")}
                     >
-
                         <ArrowBack fontSize="large" />
                     </IconButton>
                 </Tooltip>

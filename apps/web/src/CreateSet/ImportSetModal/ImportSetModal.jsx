@@ -1,5 +1,5 @@
 
-import { Modal, TextField, Typography } from '@mui/material/';
+import { Dialog, Modal, TextField, Typography } from '@mui/material/';
 import { useTheme } from "../../theme/useTheme";
 import { styled } from '@mui/system';
 
@@ -19,7 +19,7 @@ const ImportSetModal = props => {
     })
 
     return (
-        <Modal
+        <Dialog
             open={open}
             onClose={handleClose}
         >
@@ -37,7 +37,7 @@ const ImportSetModal = props => {
                 />
                 {/* TODO: Radio buttons */}
             </ImportSetContainer>
-        </Modal>
+        </Dialog>
     )
 }
 
