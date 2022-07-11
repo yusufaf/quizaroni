@@ -2,11 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { database } from "../firebase/firebase";
 import { deleteDoc, updateDoc, query, where, collection, getDoc, getDocs, limit } from "firebase/firestore";
 import { EmailAuthProvider, getAuth, deleteUser, updatePassword, reauthenticateWithCredential } from "firebase/auth";
-import { Button, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography } from '@mui/material/';
-import { DarkMode, LightMode, Palette, Password, Person, RemoveCircleOutline } from "@mui/icons-material";
+import { Button, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, InputAdornment, Typography, TextField } from '@mui/material/';
+import { DarkMode, LightMode, Palette, Password, Person, RemoveCircleOutline, VisibilityOff, Visibility} from "@mui/icons-material";
 import { styled } from '@mui/system';
 import LoginMessage from "../LoginMessage/LoginMessage";
 import ProfileCard from "./ProfileCard";
+import DeleteAccountDialog from "./DeleteAccountDialog/DeleteAccountDialog";
 
 /* Styling */
 import { useTheme } from "../theme/useTheme";
@@ -24,11 +25,12 @@ const Profile = props => {
     const user = auth.currentUser;
 
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [enteredDeletePass, setEnteredDeletePass] = useState("");
+    const [enteredDeletePassword, setEnteredDeletePassword] = useState("");
 
     const [enteredNewUsername, setEnteredNewUsername] = useState("");
     const [enteredNewPassword, setEnteredNewPassword] = useState("");
     const [enteredConfirmPassword, setEnteredConfirmPassword] = useState("");
+    const [passVisibility, setPassVisibility] = useState(false);
 
     /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
@@ -41,7 +43,7 @@ const Profile = props => {
     if (userAuthState) {
         let credential = EmailAuthProvider.credential(
             user.email,
-            enteredDeletePass
+            enteredDeletePassword
         );
     }
 
@@ -203,10 +205,13 @@ const Profile = props => {
                         <Typography variant="h6">Change Username</Typography>
                     </ActionHeader>
                     <div className={profileStyles.changeUsernameContainer}>
-                        <input
-                            className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
-                            placeholder="Enter new username"
-                            onChange={(e) => setEnteredNewUsername(e.target.value)}
+                        <TextField
+                            variant="standard"
+                            label="Username"
+                            placeholder="Enter new password"
+                            value={enteredNewUsername}
+                            onChange={e => setEnteredNewUsername(e.target.value)}
+                            size="small"
                         />
 
                         <Button
@@ -216,31 +221,40 @@ const Profile = props => {
                         >
                             Submit
                         </Button>
-
-                        {/* <button
-                            tabIndex="0"
-                            className={profileStyles.changeUsername}
-                            onClick={() => handleChangeUsername()}
-                            disabled={enteredNewUsername === ""}
-                        >
-                            Submit
-                        </button> */}
                     </div>
 
                     <ActionHeader>
                         <Password />
                         <Typography variant="h6">Change Password</Typography>
                     </ActionHeader>
-
+                    
                     <div className={profileStyles.changeUsernameContainer}>
                         <div className={profileStyles.changeInputs}>
-                            {/* TODO: Add password visibility toggles here */}
-
-
-                            <input
-                                className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
+                            <TextField
+                                variant="standard"
                                 placeholder="Enter new password"
-                                onChange={(e) => setEnteredNewPassword(e.target.value)}
+                                label="Password"
+                                type={passVisibility ? 'text' : 'password'}
+                                value={enteredNewPassword}
+                                name="passInput"
+                                onChange={e => setEnteredNewPassword(e.target.value)}
+                                // onBlur={e => checkIfInputEmpty(e)}
+                                // helperText={showErrorText.passInput && "A password is required"}
+                                // error={showErrorText.passInput}
+                                size="small"
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={() => setPassVisibility(!passVisibility)}
+                                                edge="end"
+                                            >
+                                                {passVisibility ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
                             />
                             <div className={profileStyles.confirmPassword}>
                                 <input
@@ -276,16 +290,6 @@ const Profile = props => {
                         >
                             Submit
                         </Button>
-
-                        {/* <button
-                            tabIndex="0"
-                            className={profileStyles.changeUsername}
-                            onClick={() => handleChangePassword()}
-                            disabled={enteredNewPassword === "" || enteredConfirmPassword === ""}
-                        >
-                            Submit
-                        </button> */}
-
                     </div>
 
                     <ActionHeader>
@@ -301,45 +305,12 @@ const Profile = props => {
                         Delete Account
                     </Button>
 
-                    <Dialog
+                    <DeleteAccountDialog
                         open={showDeleteDialog}
-                        onClose={() => setShowDeleteDialog(false)}
-                        sx={{
-                            // TODO: WTF IS THIS
-                            "&.MuiDialog-paper": {
-                                backgroundColor: theme.background,
-                            },
-                            bottom: "20rem",
-                        }}
-                    >
-                        <DialogTitle>Delete Account</DialogTitle>
-                        <DialogContent>
-                            <DialogContentText>
-                                {C.DELETE_ACCOUNT_MSG}
-                            </DialogContentText>
-                            <input
-                                className={`${profileStyles.deletePasswordInput} ${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
-                                type="password"
-                                name="passwordInput"
-                                placeholder="Enter your password"
-                                onChange={e => setEnteredDeletePass(e.target.value)}
-                            />
-                        </DialogContent>
-                        <DialogActions>
-                            {/* Redo the Styling for this delete button, possibly using MUI's Button component or just using ideas from work 
-                            Disabled state for the button if no password entered
-                            Have to do verification of that password before closing modal
-                        */}
-                            <Button
-                                variant="contained"
-                                color="error"
-                                onClick={() => handleDeleteAccount()}
-                                disabled={enteredDeletePass === ""}
-                            >
-                                Delete Account
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
+                        handleClose={() => setShowDeleteDialog(false)}
+                        enteredPassword={enteredDeletePassword}
+                        setEnteredPassword={setEnteredDeletePassword}
+                    />    
                 </div>
             </div>
         </>

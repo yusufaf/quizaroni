@@ -125,6 +125,11 @@ TODO: Can create a new separate file with these styled components in it
         fontSize: "2rem",
     })
 
+    const ProfileIconContainer = styled("div")({
+        display: "flex",
+        cursor : "pointer"
+    })
+
     return (
         <>
             <AppBar position="static" color="inherit">

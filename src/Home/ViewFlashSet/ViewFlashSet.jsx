@@ -25,9 +25,11 @@ import {
     Tooltip,
     Typography
 } from '@mui/material/';
+import { styled } from "@mui/system";
 
 import ViewFlashCard from "./ViewFlashCard";
 import EditableTextField from "../../components/EditableTextField/EditableTextField";
+import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
 
 import * as appStyles from "../../App.module.css";
 import { useTheme } from "../../theme/useTheme";
@@ -65,13 +67,6 @@ const ViewFlashSet = props => {
 
     const [showDownloadPopup, setShowDownloadPopup] = useState(false);
     const [downloadFileType, setDownloadFileType] = useState(DOWNLOAD_FILE_TYPES.TXT);
-    const fileDownloadTypes = Object.values(DOWNLOAD_FILE_TYPES).map(value => {
-        return (
-            <MenuItem value={value}>
-                {value}
-            </MenuItem>
-        )
-    });
 
     const [editedDescription, setEditedDescription] = useState(flashset.description ?? "")
     const [isEditingDescription, setIsEditingDescription] = useState(false)
@@ -334,6 +329,24 @@ const ViewFlashSet = props => {
         })
     }
 
+    const StudyModeOption = styled("div")({
+        fontSize: "1.25rem",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+    
+        userSelect: "none",
+        cursor: "pointer",
+    
+        padding: "0.75rem 0.5rem",
+        borderRadius: "0.25rem",
+        "&: hover": {
+            background: theme.palette.action.hover,
+            transition: "0.2s ease",
+        }
+    })
+
     /* TODO: Fix the spacing between the ViewContainer and the (first) ViewCards */
     return (
         <div className={viewFlashStyles.viewPage}>
@@ -357,18 +370,18 @@ const ViewFlashSet = props => {
                                     <div className={`${viewFlashStyles.setInfo} ${isDarkMode ? viewFlashStyles.darkBorder : viewFlashStyles.lightBorder}`}
                                     >
                                         <div className={viewFlashStyles.backButtonContainer}>
-                                        <IconButton color="primary"
-                                            aria-label="arrow backward" component="span"
-                                            sx={arrowIconStyling}
-                                            onClick={() => setViewFlashSet(false)}
-                                        >
-                                            <ArrowBack />
-                                        </IconButton>
-                                        <Typography
-                                            component="span"
-                                        >
-                                             Back to Your Flashsets
-                                        </Typography>
+                                            <IconButton color="primary"
+                                                aria-label="arrow backward" component="span"
+                                                sx={arrowIconStyling}
+                                                onClick={() => setViewFlashSet(false)}
+                                            >
+                                                <ArrowBack />
+                                            </IconButton>
+                                            <Typography
+                                                component="span"
+                                            >
+                                                Back to Your Flashsets
+                                            </Typography>
                                         </div>
 
                                         <Typography
@@ -379,7 +392,7 @@ const ViewFlashSet = props => {
                                         >
                                             {flashset.title}
                                         </Typography>
-                                        <EditableTextField style={{marginTop: "1rem", width: "fit-content"}} value={flashset.title} tooltipText={"Rename title"}/>
+                                        <EditableTextField style={{ marginTop: "1rem", width: "fit-content" }} value={flashset.title} tooltipText={"Rename title"} />
 
                                         <Chip label={flashset.label ? flashset.label : "No label selected"} variant="outlined"
                                             sx={{
@@ -399,8 +412,8 @@ const ViewFlashSet = props => {
                                                 <Add />
                                             </IconButton>
                                         </Tooltip>
-                                        
-                                        <EditableTextField style={{marginTop: "1rem"}} value={flashset.description} tooltipText={"Edit description"}/>
+
+                                        <EditableTextField style={{ marginTop: "1rem" }} value={flashset.description} tooltipText={"Edit description"} />
                                         {renderActionBar()}
                                     </div>
                                     <div className={viewFlashStyles.studySection}>
@@ -413,12 +426,13 @@ const ViewFlashSet = props => {
                                             Study
                                         </Typography>
                                         <div className={viewFlashStyles.studyOptions}>
-                                            <div className={`${viewFlashStyles.studyButton} ${isDarkMode ? appStyles.hoverDark : appStyles.hoverLight}`}
+                                            
+                                            <StudyModeOption
                                                 onClick={() => setSelectedStudyMode(STUDY_MODES.FLASHCARDS)}
                                             >
                                                 <img src={FLASH_CARDS_IMG} height={32} width={32} />
                                                 <span>Flashcards </span>
-                                            </div>
+                                            </StudyModeOption>
                                         </div>
                                     </div>
                                 </div>
@@ -484,32 +498,13 @@ const ViewFlashSet = props => {
                                     </div>
                                 </Card>
                             </Modal>
-                            <Dialog open={showDownloadPopup} onClose={() => setShowDownloadPopup(false)}
-                            >
-                                <DialogTitle>Download flash set</DialogTitle>
-                                <DialogContent>
-                                    <DialogContentText>
-                                        Choose what format you'd like to download the flash set as
-                                    </DialogContentText>
-                                    <FormControl>
-                                        <Select
-                                            onChange={(e) => setDownloadFileType(e.target.value)}
-                                            value={downloadFileType}
-                                            defaultValue=""
-                                        >
-                                            {fileDownloadTypes}
-                                        </Select>
-                                    </FormControl>
-                                </DialogContent>
-                                <DialogActions>
-                                    <Button onClick={() => setShowDownloadPopup(false)}
-                                    >Cancel</Button>
-                                    <Button onClick={() => handleDownloadSet()}
-                                        sx={{ color: "orange" }}
 
-                                    >Download</Button>
-                                </DialogActions>
-                            </Dialog>
+                            <DownloadSetModal
+                                open={showDownloadPopup}
+                                handleClose={() => setShowDownloadPopup(false)}
+                                downloadFileType={downloadFileType}
+                                setDownloadFileType={setDownloadFileType}
+                            />
                         </>
                     )
             }
