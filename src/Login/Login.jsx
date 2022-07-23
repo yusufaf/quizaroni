@@ -11,15 +11,13 @@ import {
     Alert, AlertTitle, Box, Button, Card, Checkbox, FormControlLabel, Typography, TextField, InputAdornment, IconButton,
     Paper,
 } from '@mui/material/';
-import { styled } from '@mui/system';
-import { Visibility, VisibilityOff } from '@mui/icons-material/';
-import { useTheme } from "../theme/useTheme";
+import PasswordToggle from "src/components/PasswordToggle/PasswordToggle"
+import { useTheme } from "src/theme/useTheme";
 import * as loginStyles from './Login.module.css';
 import * as appStyles from "../App.module.css";
-import * as C from "../utilities/constants";
+import * as C from "src/utilities/constants";
 
 import { updateBrowserTitle } from "src/utilities/functions";
-
 import { ForgotPasswordLink, LoginPageContainer, LoginContainer, LoginField, LoginTitle, LoginButton, StyledLink } from "./LoginStyles";
 
 const Login = props => {
@@ -253,17 +251,7 @@ const Login = props => {
                             error={showErrorText.passInput}
                             size="small"
                             InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={() => setPassVisibility(!passVisibility)}
-                                            edge="end"
-                                        >
-                                            {passVisibility ? <VisibilityOff /> : <Visibility />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                )
+                                endAdornment: <PasswordToggle/>
                             }}
                         />
 

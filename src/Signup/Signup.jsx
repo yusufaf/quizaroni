@@ -10,8 +10,7 @@ import 'firebaseui/dist/firebaseui.css';
 import { Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, Button, Card, Paper, Typography, TextField, InputAdornment, IconButton } from '@mui/material/';
 import { styled } from '@mui/system';
-import { Visibility, VisibilityOff } from '@mui/icons-material/';
-import LoginMessage from "../LoginMessage/LoginMessage";
+import PasswordToggle from "src/components/PasswordToggle/PasswordToggle"
 
 /* Styling */
 import { useTheme } from "../theme/useTheme";
@@ -214,12 +213,6 @@ const Signup = props => {
         );
     }
 
-    const StyledLink = styled(Link)({
-        color: theme.palette.primary.main,
-        textDecoration: "none"
-    })
-
-
     return (
         <>
             <SignupPageContainer>
@@ -264,17 +257,7 @@ const Signup = props => {
                             error={showErrorText.passInput}
                             size="small"
                             InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={() => setPassVisibility(!passVisibility)}
-                                            edge="end"
-                                        >
-                                            {passVisibility ? <VisibilityOff /> : <Visibility />}
-                                        </IconButton>
-                                    </InputAdornment>
-                                )
+                                endAdornment: <PasswordToggle/>
                             }}
                         />
                         <SignupButton
