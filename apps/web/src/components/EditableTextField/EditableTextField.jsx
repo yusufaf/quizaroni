@@ -7,7 +7,7 @@ import {
 } from '@mui/material/';
 import { Edit } from '@mui/icons-material/';
 import { styled } from "@mui/system";
-import { useTheme } from "../../theme/useTheme";
+import { useTheme } from "src/theme/useTheme";
 
 const EditableTextField = props => {
     const { style = {}, tooltipText = "", value } = props;
