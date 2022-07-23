@@ -1,5 +1,7 @@
 import { styled } from "@mui/system";
-import { Box, Button, Paper } from "@mui/material";
+import { Box, Button, Paper, TextField, Typography } from "@mui/material";
+import { Link } from "react-router-dom";
+// import { useTheme } from "src/theme/useTheme";
 
 export const LoginPageContainer = styled(Box)({
     display: "flex",
@@ -12,8 +14,41 @@ export const LoginPageContainer = styled(Box)({
 export const LoginContainer = styled(Box)({
     display: "flex",
     flexDirection: "column",
-    gap: "1.25rem",
     borderRadius: "0.25rem",
     padding: "1.25rem",
     textAlign: "center",
+    fontSize: "1rem",
 })
+
+export const LoginTitle = styled(Typography)({
+    fontWeight: "bold",
+    alignSelf: "flex-start"
+})
+
+// TODO: Create a disabled styling in the theme perhaps?
+export const LoginButton = styled(Button)({
+    fontSize: "1rem",
+    margin: "1rem 0",
+    // "&.Mui-disabled": {
+    //     backgroundColor: theme.palette.primary.main,
+    //     cursor: "not-allowed"
+    // },
+})
+
+export const LoginField = styled(TextField)({
+    marginTop: "1rem",
+})
+
+
+export const ForgotPasswordLink = styled(Link)(({ theme }) => ({
+    color: theme.palette.primary.main,
+    textDecoration: "none",
+    display: "flex",
+    alignSelf: "flex-end",
+    marginTop: "0.5rem"
+}));
+
+export const StyledLink = styled(Link)(({ theme }) => ({
+    color: theme.palette.primary.main,
+    textDecoration: "none"
+}));
