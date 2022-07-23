@@ -9,7 +9,6 @@ const ImportSetModal = props => {
 
     // TODO: Use a MUI component instead?
     const ImportSetContainer = styled("div")({
-        position : "absolute",
         top      : "50%",
         left     : "50%",
         transform: "translate(-50%, -50%)",

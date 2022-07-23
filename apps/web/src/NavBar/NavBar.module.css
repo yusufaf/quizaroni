@@ -24,8 +24,6 @@
     padding    : 0.5rem 0;
 }
 
-/* Nav-Bar Link */
-
 .rightActions {
     display       : flex;
     flex-direction: row;

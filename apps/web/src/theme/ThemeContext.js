@@ -27,11 +27,10 @@ export const dark = createTheme({
             main: "#ffa000",
             light: "#ffd149",
             dark: "#c67100",
-            // main: "rgba(255,255,255,0.12)"
         },
-        background: {
-            paper: "#1c1c1c",
-        },
+        // background: {
+        //     paper: "#1c1c1c",
+        // },
         // text: {
         //     primary: "#F5F5F5",
         // },

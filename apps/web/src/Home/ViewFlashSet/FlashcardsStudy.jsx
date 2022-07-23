@@ -142,8 +142,7 @@ const FlashcardsStudy = props => {
                     {"Stop studying this set?"}
                 </DialogTitle>
                 <DialogContent>
-                    <DialogContentText id="alert-dialog-description"
-                    sx={{fontSize: "1.5rem"}}
+                    <DialogContentText id="alert-dialog-description" sx={{fontSize: "1.5rem"}}
                     >
                         You haven't finished studying all the cards in this set, are you sure you want to exit?
                     </DialogContentText>

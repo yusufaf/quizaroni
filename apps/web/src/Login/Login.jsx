@@ -7,17 +7,20 @@ import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css';
 
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Button, Card, Checkbox, FormControlLabel, Typography, TextField, InputAdornment, IconButton} from '@mui/material/';
+import {
+    Alert, AlertTitle, Box, Button, Card, Checkbox, FormControlLabel, Typography, TextField, InputAdornment, IconButton,
+    Paper,
+} from '@mui/material/';
 import { styled } from '@mui/system';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
-import LoginMessage from "../LoginMessage/LoginMessage";
-
 import { useTheme } from "../theme/useTheme";
 import * as loginStyles from './Login.module.css';
 import * as appStyles from "../App.module.css";
 import * as C from "../utilities/constants";
-import { updateBrowserTitle } from "../utilities/functions";
 
+import { updateBrowserTitle } from "src/utilities/functions";
+
+import { LoginPageContainer, LoginContainer } from "./LoginStyles";
 
 const Login = props => {
     const { userAuthState, setUserAuthState } = props;
@@ -226,11 +229,11 @@ const Login = props => {
 
     return (
         <>
-            <div className={loginStyles.loginPage}>
-                <div className={loginStyles.loginContainer}
-                    onKeyPress={enterKeyHandler}
-                >
-                    <>
+            <LoginPageContainer role="page">
+                <Paper elevation={6}>
+                    <LoginContainer
+                        onKeyPress={enterKeyHandler}
+                    >
                         <Typography
                             variant="h5"
                             sx={{
@@ -265,13 +268,13 @@ const Login = props => {
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
-                                      <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={() => setPassVisibility(!passVisibility)}
-                                        edge="end"
-                                      >
-                                        {passVisibility ? <VisibilityOff /> : <Visibility />}
-                                      </IconButton>
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={() => setPassVisibility(!passVisibility)}
+                                            edge="end"
+                                        >
+                                            {passVisibility ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
                                     </InputAdornment>
                                 )
                             }}
@@ -296,22 +299,25 @@ const Login = props => {
                         >
                             Log In
                         </Button>
- 
+
                         <StyledLink
                             to="/signup"
                         >
                             Don't have an account? Click here to sign up!
                         </StyledLink>
-                    </>
-                </div>
+                    </LoginContainer>
+                </Paper>
+
+
+
                 <div id="firebaseui-auth-container"
                     className={loginStyles.firebaseUI}
-                    // style={{ color: theme.foreground, background: theme.background }}
                 >
                 </div>
                 <div id="loader">Loading...</div>
-            </div>
-            {showAlert &&
+            </LoginPageContainer>
+            {
+                showAlert &&
                 returnAlertJSX()
             }
         </>
