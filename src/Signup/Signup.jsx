@@ -21,7 +21,14 @@ import * as appStyles from "../App.module.css";
 import * as C from "src/utilities/constants";
 import { updateBrowserTitle } from "src/utilities/functions";
 
-import { LoginPageContainer, LoginContainer as SignupContainer } from "src/Login/LoginStyles";
+import { 
+    LoginPageContainer as SignupPageContainer, 
+    LoginContainer as SignupContainer, 
+    LoginButton as SignupButton, 
+    LoginField as SignupField, 
+    LoginTitle as SignupTitle, 
+    StyledLink 
+} from "src/Login/LoginStyles";
 
 const Signup = props => {
     const { userAuthState, setUserAuthState } = props;
@@ -215,55 +222,46 @@ const Signup = props => {
 
     return (
         <>
-            <LoginPageContainer>
+            <SignupPageContainer>
                 <Paper elevation={6}>
                     <SignupContainer
                         onKeyPress={enterKeyHandler}
                     >
-                        <Typography
-                            variant="h5"
-                            sx={{
-                                fontWeight: "bold",
-                                alignSelf: "flex-start"
-                            }}
-                        >
+                        <SignupTitle variant="h5">
                             Sign up
-                        </Typography>
+                        </SignupTitle>
 
-                        <TextField
+                        <SignupField
                             label="Email"
+                            name="emailInput"
                             value={enteredEmail}
+                            onBlur={e => checkIfInputEmpty(e)}
                             onChange={e => setEnteredEmail(e.target.value)}
                             helperText={showErrorText.emailInput && "An email is required"}
+                            error={showErrorText.emailInput}
                             size="small"
                         />
 
-                        {showErrorText.emailInput &&
-                            <span className={signupStyles.emailError}>
-                                An email is required.
-                            </span>
-                        }
-
-                        <TextField
+                        <SignupField
                             label="Username"
+                            name="nameInput"
                             value={enteredUsername}
                             onChange={e => setEnteredUsername(e.target.value)}
+                            onBlur={e => checkIfInputEmpty(e)}
                             helperText={showErrorText.nameInput && "A username is required"}
+                            error={showErrorText.nameInput}
                             size="small"
                         />
 
-
-                        {showErrorText.nameInput &&
-                            <span className={signupStyles.nameError}>
-                                A username is required.
-                            </span>
-                        }
-
-                        <TextField
+                        <SignupField
                             label="Password"
+                            name="passInput"
                             type={passVisibility ? 'text' : 'password'}
                             value={enteredPass}
                             onChange={e => setEnteredPass(e.target.value)}
+                            onBlur={e => checkIfInputEmpty(e)}
+                            helperText={showErrorText.passInput && "A password is required"}
+                            error={showErrorText.passInput}
                             size="small"
                             InputProps={{
                                 endAdornment: (
@@ -279,35 +277,14 @@ const Signup = props => {
                                 )
                             }}
                         />
-
-                        {showErrorText.passInput &&
-                            <span className={signupStyles.passwordError}>
-                                A password is required.
-                            </span>
-                        }
-
-                        {/* TODO: Fix this */}
-                        <Button
+                        <SignupButton
                             variant="contained"
                             disabled={enteredEmail === "" || enteredPass === ""}
                             onClick={() => handleSignup()}
-                            sx={{
-                                backgroundColor: "orange",
-                                color: theme.foreground,
-                                fontSize: "1rem",
-                                "&.Mui-disabled": {
-                                    backgroundColor: "orange",
-                                    cursor: "not-allowed"
-                                },
-                                "&.MuiButton-root:hover": {
-                                    backgroundColor: "rgb(206, 143, 27)"
-                                }
-                            }}
                         >
                             Sign Up
-                        </Button>
-                        <StyledLink
-                            to="/login"
+                        </SignupButton>
+                        <StyledLink to="/login"
                         >
                             Already have an account? Click here to login!
                         </StyledLink>
@@ -319,7 +296,7 @@ const Signup = props => {
                 >
                 </div>
                 <div id="loader">Loading...</div>
-            </LoginPageContainer>
+            </SignupPageContainer>
             {showAlert &&
                 returnAlertJSX()
             }

@@ -20,7 +20,7 @@ import * as C from "../utilities/constants";
 
 import { updateBrowserTitle } from "src/utilities/functions";
 
-import { LoginPageContainer, LoginContainer } from "./LoginStyles";
+import { ForgotPasswordLink, LoginPageContainer, LoginContainer, LoginField, LoginTitle, LoginButton, StyledLink } from "./LoginStyles";
 
 const Login = props => {
     const { userAuthState, setUserAuthState } = props;
@@ -78,15 +78,6 @@ const Login = props => {
     const [showErrorText, setShowErrorText] = useState({
         emailInput: false,
         passInput: false
-    })
-
-    const helperTextStyling = {
-        color: "red"
-    }
-
-    const StyledLink = styled(Link)({
-        color: theme.palette.primary.main,
-        textDecoration: "none"
     })
 
     useEffect(() => {
@@ -234,17 +225,13 @@ const Login = props => {
                     <LoginContainer
                         onKeyPress={enterKeyHandler}
                     >
-                        <Typography
+                        <LoginTitle
                             variant="h5"
-                            sx={{
-                                fontWeight: "bold",
-                                alignSelf: "flex-start"
-                            }}
                         >
                             Login
-                        </Typography>
+                        </LoginTitle>
 
-                        <TextField
+                        <LoginField
                             label="Email"
                             name="emailInput"
                             value={enteredEmail}
@@ -255,7 +242,7 @@ const Login = props => {
                             size="small"
                         />
 
-                        <TextField
+                        <LoginField
                             label="Password"
                             type={passVisibility ? 'text' : 'password'}
                             value={enteredPass}
@@ -280,25 +267,17 @@ const Login = props => {
                             }}
                         />
 
-                        <StyledLink to="/forgot" className={loginStyles.forgot}>
+                        <ForgotPasswordLink to="/forgot">
                             Forgot password?
-                        </StyledLink>
+                        </ForgotPasswordLink>
 
-                        <Button
+                        <LoginButton
                             variant="contained"
                             disabled={enteredEmail === "" || enteredPass === ""}
                             onClick={() => handleLogin()}
-                            sx={{
-                                fontSize: "1rem",
-                                "&.Mui-disabled": {
-                                    backgroundColor: "orange",
-                                    cursor: "not-allowed"
-                                },
-                                marginTop: "1rem"
-                            }}
                         >
                             Log In
-                        </Button>
+                        </LoginButton>
 
                         <StyledLink
                             to="/signup"
@@ -307,8 +286,6 @@ const Login = props => {
                         </StyledLink>
                     </LoginContainer>
                 </Paper>
-
-
 
                 <div id="firebaseui-auth-container"
                     className={loginStyles.firebaseUI}
