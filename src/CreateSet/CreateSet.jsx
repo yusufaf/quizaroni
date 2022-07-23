@@ -304,12 +304,10 @@ const CreateSet = props => {
                         >
                             Description
                         </Typography>
-                        {/* <label className={createSetStyles.inputLabel}>Description</label> */}
-
                         <TextField
                             variant="outlined"
                             placeholder={CREATE_SET.DESC_PLACEHOLDER}
-                            // label="Title"
+                            // label="Description"
                             value={enteredDescription}
                             onChange={e => setEnteredDescription(e.target.value)}
                             size="large"
@@ -329,7 +327,6 @@ const CreateSet = props => {
                         >
                             Label
                         </Typography>
-                        {/* <label className={createSetStyles.inputLabel}>Label</label> */}
                         <div className={createSetStyles.labelInputContainer}>
                             <input
                                 className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}

@@ -8,7 +8,7 @@ import 'firebaseui/dist/firebaseui.css';
 
 /* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Button, Card, Typography, TextField, InputAdornment, IconButton } from '@mui/material/';
+import { Alert, AlertTitle, Button, Card, Paper, Typography, TextField, InputAdornment, IconButton } from '@mui/material/';
 import { styled } from '@mui/system';
 import { Visibility, VisibilityOff } from '@mui/icons-material/';
 import LoginMessage from "../LoginMessage/LoginMessage";
@@ -18,8 +18,10 @@ import { useTheme } from "../theme/useTheme";
 import * as loginStyles from '../Login/Login.module.css';
 import * as signupStyles from "./Signup.module.css"
 import * as appStyles from "../App.module.css";
-import * as C from "../utilities/constants";
-import { updateBrowserTitle } from "../utilities/functions";
+import * as C from "src/utilities/constants";
+import { updateBrowserTitle } from "src/utilities/functions";
+
+import { LoginPageContainer, LoginContainer as SignupContainer } from "src/Login/LoginStyles";
 
 const Signup = props => {
     const { userAuthState, setUserAuthState } = props;
@@ -210,147 +212,114 @@ const Signup = props => {
         textDecoration: "none"
     })
 
+
     return (
         <>
-            {userAuthState ?
-                <LoginMessage page="signup" />
-                :
-                (
-                    <>
-                        <div
-                            className={loginStyles.loginContainer}
-                            style={{ color: theme.foreground, background: theme.background }}
-                            onKeyPress={enterKeyHandler}
+            <LoginPageContainer>
+                <Paper elevation={6}>
+                    <SignupContainer
+                        onKeyPress={enterKeyHandler}
+                    >
+                        <Typography
+                            variant="h5"
+                            sx={{
+                                fontWeight: "bold",
+                                alignSelf: "flex-start"
+                            }}
                         >
-                            <Typography
-                                variant="h5"
-                                sx={{
-                                    fontWeight: "bold",
-                                    alignSelf: "flex-start"
-                                }}
-                            >
-                                Sign up
-                            </Typography>
+                            Sign up
+                        </Typography>
 
-                            {/* <input
-                                className={showErrorText.emailInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                                    : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                                name="emailInput"
-                                placeholder="Type your email address"
-                                onBlur={e => checkIfInputEmpty(e)}
-                                onChange={e => setEnteredEmail(e.target.value)}
-                            /> */}
+                        <TextField
+                            label="Email"
+                            value={enteredEmail}
+                            onChange={e => setEnteredEmail(e.target.value)}
+                            helperText={showErrorText.emailInput && "An email is required"}
+                            size="small"
+                        />
 
-                            <TextField
-                                label="Email"
-                                value={enteredEmail}
-                                onChange={e => setEnteredEmail(e.target.value)}
-                                helperText={showErrorText.emailInput && "An email is required"}
-                                size="small"
-                            />
+                        {showErrorText.emailInput &&
+                            <span className={signupStyles.emailError}>
+                                An email is required.
+                            </span>
+                        }
 
-                            {showErrorText.emailInput &&
-                                <span className={signupStyles.emailError}>
-                                    An email is required.
-                                </span>
-                            }
-
-                            {/* <input
-                                className={showErrorText.nameInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                                    : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                                name="nameInput"
-                                placeholder="Type your username"
-                                onBlur={e => checkIfInputEmpty(e)}
-                                onChange={e => setEnteredUsername(e.target.value)}
-                            /> */}
-
-                            <TextField
-                                label="Username"
-                                value={enteredUsername}
-                                onChange={e => setEnteredUsername(e.target.value)}
-                                helperText={showErrorText.nameInput && "A username is required"}
-                                size="small"
-                            />
+                        <TextField
+                            label="Username"
+                            value={enteredUsername}
+                            onChange={e => setEnteredUsername(e.target.value)}
+                            helperText={showErrorText.nameInput && "A username is required"}
+                            size="small"
+                        />
 
 
-                            {showErrorText.nameInput &&
-                                <span className={signupStyles.nameError}>
-                                    A username is required.
-                                </span>
-                            }
+                        {showErrorText.nameInput &&
+                            <span className={signupStyles.nameError}>
+                                A username is required.
+                            </span>
+                        }
 
-                            {/* <input
-                                className={showErrorText.passInput ? `${loginStyles.input} ${loginStyles.error} ${isDarkMode && loginStyles.dark}`
-                                    : `${loginStyles.input} ${isDarkMode && loginStyles.dark}`}
-                                name="passInput"
-                                placeholder="Type your password"
-                                type={passVisibility ? "text" : "password"}
-                                onBlur={e => checkIfInputEmpty(e)}
-                                onChange={e => setEnteredPass(e.target.value)}
-                            /> */}
+                        <TextField
+                            label="Password"
+                            type={passVisibility ? 'text' : 'password'}
+                            value={enteredPass}
+                            onChange={e => setEnteredPass(e.target.value)}
+                            size="small"
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={() => setPassVisibility(!passVisibility)}
+                                            edge="end"
+                                        >
+                                            {passVisibility ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
 
-                            <TextField
-                                label="Password"
-                                type={passVisibility ? 'text' : 'password'}
-                                value={enteredPass}
-                                onChange={e => setEnteredPass(e.target.value)}
-                                size="small"
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label="toggle password visibility"
-                                                onClick={() => setPassVisibility(!passVisibility)}
-                                                edge="end"
-                                            >
-                                                {passVisibility ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    )
-                                }}
-                            />
+                        {showErrorText.passInput &&
+                            <span className={signupStyles.passwordError}>
+                                A password is required.
+                            </span>
+                        }
 
-
-                            {showErrorText.passInput &&
-                                <span className={signupStyles.passwordError}>
-                                    A password is required.
-                                </span>
-                            }
-
-                            <Button
-                                variant="contained"
-                                disabled={enteredEmail === "" || enteredPass === ""}
-                                onClick={() => handleSignup()}
-                                sx={{
+                        {/* TODO: Fix this */}
+                        <Button
+                            variant="contained"
+                            disabled={enteredEmail === "" || enteredPass === ""}
+                            onClick={() => handleSignup()}
+                            sx={{
+                                backgroundColor: "orange",
+                                color: theme.foreground,
+                                fontSize: "1rem",
+                                "&.Mui-disabled": {
                                     backgroundColor: "orange",
-                                    color: theme.foreground,
-                                    fontSize: "1rem",
-                                    "&.Mui-disabled": {
-                                        backgroundColor: "orange",
-                                        cursor: "not-allowed"
-                                    },
-                                    "&.MuiButton-root:hover": {
-                                        backgroundColor: "rgb(206, 143, 27)"
-                                    }
-                                }}
-                            >
-                                Sign Up
-                            </Button>
-                            <StyledLink
-                                to="/login"
-                            >
-                                Already have an account? Click here to login!
-                            </StyledLink>
-                        </div>
-                        <div id="firebaseui-auth-container"
-                            className={loginStyles.firebaseUI}
-                            style={{ color: theme.foreground, background: theme.background }}
+                                    cursor: "not-allowed"
+                                },
+                                "&.MuiButton-root:hover": {
+                                    backgroundColor: "rgb(206, 143, 27)"
+                                }
+                            }}
                         >
-                        </div>
-                        <div id="loader">Loading...</div>
-                    </>
-                )
-            }
+                            Sign Up
+                        </Button>
+                        <StyledLink
+                            to="/login"
+                        >
+                            Already have an account? Click here to login!
+                        </StyledLink>
+                    </SignupContainer>
+                </Paper>
+                <div id="firebaseui-auth-container"
+                    className={loginStyles.firebaseUI}
+                    style={{ color: theme.foreground, background: theme.background }}
+                >
+                </div>
+                <div id="loader">Loading...</div>
+            </LoginPageContainer>
             {showAlert &&
                 returnAlertJSX()
             }

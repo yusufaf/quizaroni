@@ -6,8 +6,10 @@ import {
     ListItem,
     ListItemText,
 } from '@mui/material/';
+import { Menu } from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
 import { styled } from '@mui/system';
+import { StyledNavLink } from "../NavStyles";
 
 const NavDrawer = props => {
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -19,18 +21,7 @@ const NavDrawer = props => {
     const handleToggleDrawer = () => {
         setOpenDrawer(!openDrawer)
     }
-
-    const StyledNavLink = styled(NavLink)({
-        borderRadius: "0.15rem",
-        fontSize: "1.25rem",
-        textDecoration: "none",
-        cursor: "pointer",
-        "&:hover": {
-            opacity: "0.6",
-            transition: "0.1s ease",
-        }
-    })
-
+    
     return (
         <>
             <Drawer
@@ -57,7 +48,7 @@ const NavDrawer = props => {
                 </List>
             </Drawer>
             <IconButton onClick={handleToggleDrawer}>
-                <MenuIcon />
+                <Menu />
             </IconButton>
         </>
     );

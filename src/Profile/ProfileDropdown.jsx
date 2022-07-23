@@ -14,14 +14,6 @@ const ProfileDropdown = props => {
         setShowDropdown(false);
     }
 
-    // TODO: Fix this
-    const profileMenuStyling = {
-        '&.MuiMenu-paper': {
-            // color: theme.foreground,
-            // backgroundColor: theme.background
-        },
-    }
-
     const StyledProfileLink = styled(Link)({
         fontSize: "1.25rem",
         textDecoration: "none",
@@ -33,7 +25,6 @@ const ProfileDropdown = props => {
             <Menu
                 open={showDropdown && userAuthState}
                 onClose={closeDropdown}
-                sx={profileMenuStyling}
                 anchorEl={dropdownRef.current}
             >
                 <MenuItem
