@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, AppBar, Button, IconButton, Toolbar, Tooltip, useMediaQuery } from '@mui/material/';
+import { Alert, AlertTitle, AppBar, Button, IconButton, Toolbar, Tooltip, Typography, useMediaQuery } from '@mui/material/';
 import { getAuth, signOut } from "firebase/auth";
 import { AccountCircle, DarkMode, LightMode, KeyboardArrowDown } from "@mui/icons-material"
 import { useTheme } from "../theme/useTheme";
@@ -13,6 +13,17 @@ import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
 import * as appStyles from '../App.module.css';
 import * as navStyles from './NavBar.module.css';
 import * as C from "../utilities/constants";
+
+// Styled Components
+import {
+    AppLogo,
+    AuthenticationButton,
+    LoginButtonsContainer,
+    NavItemsContainer,
+    StyledNavLink,
+    StyledDarkModeIcon,
+    StyledLightModeIcon
+} from "./NavStyles";
 
 const NavBar = props => {
     const { userAuthState, setUserAuthState } = props;
@@ -89,59 +100,24 @@ const NavBar = props => {
 TODO: Can create a new separate file with these styled components in it
 */
 
-    const AppLogo = styled("img")({
-        position: " absolute",
-        height: "13rem",
-        width: "13rem",
-        left: "-1rem",
-        marginTop: "1.25rem",
-    })
-
-    const LoginButtonsContainer = styled("div")({
-        display: "flex",
-        gap: "1rem"
-    })
-
-    const StyledNavLink = styled(NavLink)({
-        borderRadius: "0.15rem",
-        fontSize: "1.25rem",
-        textDecoration: "none",
-        cursor: "pointer",
-        "&:hover": {
-            opacity: "0.6",
-            transition: "0.1s ease",
-        }
-    })
-
-    const StyledDarkModeIcon = styled(DarkMode)({
-        cursor: "pointer",
-        color: "#121212",
-        fontSize: "2rem",
-    })
-
-    const StyledLightModeIcon = styled(LightMode)({
-        cursor: "pointer",
-        color: "yellow",
-        fontSize: "2rem",
-    })
-
-    const ProfileIconContainer = styled("div")({
-        display: "flex",
-        cursor : "pointer"
-    })
-
     return (
         <>
             <AppBar position="static" color="inherit">
                 <Toolbar>
-                    <AppLogo
+                    {/* <AppLogo
                         src={QuizaroniLogo}
                         alt="Quizaroni logo"
-                    />
+                    /> */}
+                    <Typography
+                        color="primary"
+                        variant="h4"
+                    >
+                        Quizaroni
+                    </Typography>
                     {isMobile ?
                         <NavDrawer />
                         :
-                        <>
+                        <NavItemsContainer>
                             <StyledNavLink to="/" style={activeLinkStyle}>
                                 Home
                             </StyledNavLink>
@@ -157,104 +133,68 @@ TODO: Can create a new separate file with these styled components in it
                             >
                                 Explore
                             </StyledNavLink>
-                        </>
+                            <div className={navStyles.rightActions}>
+                                <div>
+                                    {userAuthState ?
+                                        <div
+                                            className={navStyles.logout}
+                                            onClick={() => handleLogout()}
+                                        >
+                                            <span className="material-icons-outlined">
+                                                logout
+                                            </span>
+                                            Logout
+                                        </div>
+                                        :
+                                        <LoginButtonsContainer>
+                                            <AuthenticationButton
+                                                variant="outlined"
+                                                onClick={() => navigate("/login")}
+                                            >
+                                                Log in
+                                            </AuthenticationButton>
+                                            <AuthenticationButton
+                                                variant="contained"
+                                                onClick={() => navigate("/signup")}
+                                            >
+                                                Sign up
+                                            </AuthenticationButton>
+                                        </LoginButtonsContainer>
+                                    }
+                                </div>
+                                <Tooltip title="Toggle dark mode">
+                                    <IconButton onClick={toggleDarkMode}>
+                                        {isDarkMode ? <StyledLightModeIcon />
+                                            : <StyledDarkModeIcon />
+                                        }
+                                    </IconButton>
+                                </Tooltip>
+                                {userAuthState &&
+                                    (
+                                        <>
+                                            <div
+                                                className={navStyles.accountCircle}
+                                                onClick={() => setShowDropdown(true)}
+                                                ref={dropdownRef}
+                                            >
+                                                <AccountCircle
+                                                    style={{ fontSize: "2rem" }}
+                                                />
+                                                <KeyboardArrowDown
+                                                    style={{ fontSize: "2rem" }}
+                                                />
+                                            </div>
+                                            <ProfileDropdown userAuthState={userAuthState} showDropdown={showDropdown}
+                                                dropdownRef={dropdownRef} setShowDropdown={setShowDropdown}
+                                            />
+                                        </>
+                                    )
+                                }
+                            </div>
+                        </NavItemsContainer>
                     }
-
                 </Toolbar>
             </AppBar>
-            <nav className={navStyles.navbar}>
-                <AppLogo
-                    src={QuizaroniLogo}
-                    alt="Quizaroni logo"
-                />
-                <div className={navStyles.menu}>
-                    <div>
-                        <StyledNavLink to="/" style={activeLinkStyle}>
-                            Home
-                        </StyledNavLink>
-                    </div>
-                    <div >
-                        <StyledNavLink to="/create" style={activeLinkStyle}>
-                            Create
-                        </StyledNavLink>
-                    </div>
-                    <div >
-                        <StyledNavLink
-                            to="/explore"
-                            style={activeLinkStyle}
-                        >
-                            Explore
-                        </StyledNavLink>
-                    </div>
-                    <div className={navStyles.rightActions}>
-                        <div>
-                            {userAuthState ?
-                                <div
-                                    className={navStyles.logout}
-                                    onClick={() => handleLogout()}
-                                >
-                                    <span className="material-icons-outlined">
-                                        logout
-                                    </span>
-                                    Logout
-                                </div>
-                                :
-                                <LoginButtonsContainer>
-                                    <Button
-                                        variant="outlined"
-                                        sx={{
-                                            textTransform: "none"
-                                        }}
-                                        onClick={() => navigate("/login")}
-                                    >
-                                        Log in
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        sx={{
-                                            textTransform: "none"
-                                        }}
-                                        onClick={() => navigate("/signup")}
-                                    >
-                                        Sign up
-                                    </Button>
-                                </LoginButtonsContainer>
-                            }
-                        </div>
-                        <Tooltip title="Toggle dark mode"
-                        >
-                            <IconButton onClick={toggleDarkMode}>
-                                {isDarkMode ?
-                                    <StyledLightModeIcon />
-                                    :
-                                    <StyledDarkModeIcon />
-                                }
-                            </IconButton>
-                        </Tooltip>
-                        {userAuthState &&
-                            (
-                                <>
-                                    <div
-                                        className={navStyles.accountCircle}
-                                        onClick={() => setShowDropdown(true)}
-                                        ref={dropdownRef}
-                                    >
-                                        <AccountCircle
-                                            style={{ fontSize: "2rem" }}
-                                        />
-                                        <KeyboardArrowDown
-                                            style={{ fontSize: "2rem" }}
-                                        />
-                                    </div>
-                                    <ProfileDropdown userAuthState={userAuthState} showDropdown={showDropdown}
-                                        dropdownRef={dropdownRef} setShowDropdown={setShowDropdown}
-                                    />
-                                </>
-                            )
-                        }
-                    </div>
-                </div>
-            </nav>
             {showAlert &&
                 returnAlertJSX()
             }

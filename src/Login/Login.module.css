@@ -1,29 +1,3 @@
-.loginPage {
-    display      : grid;
-    align-items  : center;
-    justify-items: center;
-    margin       : 0 auto;
-    /* display: flex;
-    justify-content: center; */
-}
-
-.loginContainer {
-    position: absolute;
-    width: 22rem;
-    left: 40rem;
-    top: 20vh;
-
-    display       : flex;
-    flex-direction: column;
-    gap           : 1.25rem;
-
-    border-radius: 0.75rem;
-    /* offset-x | offset-y | blur-radius | spread-radius | color */
-    /* LIGHT MODE : gray box shadow to give a "card" effect */
-    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
-    padding      : 1.25rem;
-    text-align: center;
-}
 
 .title {
     align-self : flex-start;
