@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { collection, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { database } from "../../firebase/firebase";
 
-import { Add, ArrowBack, Download, Edit, EditNotifications, Email, MenuOpen } from '@mui/icons-material/';
+import { Add, ArrowBack, Download, Edit, EditNotifications, MenuOpen } from '@mui/icons-material/';
 import {
     Button,
     Card,
@@ -15,10 +15,10 @@ import {
     FormControl,
     FormControlLabel,
     IconButton,
-    InputAdornment,
     Menu,
     MenuItem,
     Modal,
+    Paper,
     Select,
     Switch,
     TextField,
@@ -28,17 +28,29 @@ import {
 import { styled } from "@mui/system";
 
 import ViewFlashCard from "./ViewFlashCard";
-import EditableTextField from "../../components/EditableTextField/EditableTextField";
+import EditableTextField from "src/components/EditableTextField/EditableTextField";
 import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
+import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
 
-import * as appStyles from "../../App.module.css";
-import { useTheme } from "../../theme/useTheme";
+import { useTheme } from "src/theme/useTheme";
 import * as viewFlashStyles from './ViewFlashSet.module.css';
-import { updateBrowserTitle } from "../../utilities/functions";
+import { updateBrowserTitle } from "src/utilities/functions";
 
-import FLASH_CARDS_IMG from "../../resources/images/flash-card.png";
-import { DOWNLOAD_FILE_TYPES, STUDY_MODES, VIEW_SET } from "../../utilities/constants";
+import FLASH_CARDS_IMG from "src/resources/images/flash-card.png";
+import { DOWNLOAD_FILE_TYPES, STUDY_MODES, VIEW_SET } from "src/utilities/constants";
 import FlashcardsStudy from "./FlashcardsStudy";
+import {
+    SimpleFlexContainer
+} from "src/AppStyles"
+import {
+    SetInfo,
+    StudyModeGrid,
+    ViewFlashsetPage, 
+    ViewFlashsetContainer,
+    ViewFlashsetHeader,
+    ViewFlashsetPaper 
+} from "./ViewFlashSetStyles"
+
 const { BACKGROUND, TEXT } = VIEW_SET;
 
 const ViewFlashSet = props => {
@@ -57,7 +69,9 @@ const ViewFlashSet = props => {
 
     const [showNotificationsModal, setShowNotificationsModal] = useState(false);
     const [showControlMenu, setShowControlMenu] = useState(false);
+
     const [showCreateLabelDialog, setShowCreateLabelDialog] = useState(false);
+    const [createLabelName, setCreateLabelName] = useState("");
 
     const [disableTextColor, setDisableTextColor] = useState(false);
     const [disableBackgroundColor, setDisableBackgroundColor] = useState(false);
@@ -80,22 +94,6 @@ const ViewFlashSet = props => {
         '&.MuiIconButton-colorPrimary': {
             color: theme.foreground,
         },
-    };
-
-    const notificationsModalStyling = {
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        display: 'flex',
-        flexDirection: "column",
-        padding: "1.5rem",
-        height: "25rem",
-        width: "50rem",
-        "&.MuiCard-root": {
-            color: theme.foreground,
-            backgroundColor: theme.background,
-        }
     };
 
     useEffect(() => {
@@ -200,9 +198,6 @@ const ViewFlashSet = props => {
                         }}
                     >
                         <Download
-                            sx={{
-                                color: theme.foreground
-                            }}
                         />
                     </IconButton>
                     <Typography
@@ -219,9 +214,6 @@ const ViewFlashSet = props => {
                         }}
                     >
                         <EditNotifications
-                            sx={{
-                                color: theme.foreground
-                            }}
                         />
                     </IconButton>
                     <Typography
@@ -240,9 +232,6 @@ const ViewFlashSet = props => {
                         }}
                     >
                         <MenuOpen
-                            sx={{
-                                color: theme.foreground
-                            }}
                         />
                     </IconButton>
 
@@ -335,10 +324,10 @@ const ViewFlashSet = props => {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-    
+
         userSelect: "none",
         cursor: "pointer",
-    
+
         padding: "0.75rem 0.5rem",
         borderRadius: "0.25rem",
         "&: hover": {
@@ -349,7 +338,7 @@ const ViewFlashSet = props => {
 
     /* TODO: Fix the spacing between the ViewContainer and the (first) ViewCards */
     return (
-        <div className={viewFlashStyles.viewPage}>
+        <ViewFlashsetPage>
             {
                 selectedStudyMode === STUDY_MODES.FLASHCARDS ?
                     (
@@ -361,15 +350,11 @@ const ViewFlashSet = props => {
                     )
                     :
                     (
-                        <>
-                            <div className={viewFlashStyles.viewContainer}
-                                style={{ color: theme.foreground, background: theme.background }}
-                            >
-                                <div className={viewFlashStyles.header}>
-
-                                    <div className={`${viewFlashStyles.setInfo} ${isDarkMode ? viewFlashStyles.darkBorder : viewFlashStyles.lightBorder}`}
-                                    >
-                                        <div className={viewFlashStyles.backButtonContainer}>
+                        <ViewFlashsetPaper elevation={6}>
+                            <ViewFlashsetContainer>
+                                <ViewFlashsetHeader>
+                                    <SetInfo>
+                                        <SimpleFlexContainer>
                                             <IconButton color="primary"
                                                 aria-label="arrow backward" component="span"
                                                 sx={arrowIconStyling}
@@ -377,12 +362,10 @@ const ViewFlashSet = props => {
                                             >
                                                 <ArrowBack />
                                             </IconButton>
-                                            <Typography
-                                                component="span"
-                                            >
+                                            <Typography component="span">
                                                 Back to Your Flashsets
                                             </Typography>
-                                        </div>
+                                        </SimpleFlexContainer>
 
                                         <Typography
                                             variant="h5"
@@ -415,7 +398,7 @@ const ViewFlashSet = props => {
 
                                         <EditableTextField style={{ marginTop: "1rem" }} value={flashset.description} tooltipText={"Edit description"} />
                                         {renderActionBar()}
-                                    </div>
+                                    </SetInfo>
                                     <div className={viewFlashStyles.studySection}>
                                         <Typography
                                             variant="h6"
@@ -425,17 +408,16 @@ const ViewFlashSet = props => {
                                         >
                                             Study
                                         </Typography>
-                                        <div className={viewFlashStyles.studyOptions}>
-                                            
+                                        <StudyModeGrid>
                                             <StudyModeOption
                                                 onClick={() => setSelectedStudyMode(STUDY_MODES.FLASHCARDS)}
                                             >
                                                 <img src={FLASH_CARDS_IMG} height={32} width={32} />
                                                 <span>Flashcards </span>
                                             </StudyModeOption>
-                                        </div>
+                                        </StudyModeGrid>
                                     </div>
-                                </div>
+                                </ViewFlashsetHeader>
                                 <Typography
                                     className=""
                                     variant="h6"
@@ -443,7 +425,7 @@ const ViewFlashSet = props => {
                                     Number of cards in this study set: {flashset.cards.length}
                                 </Typography>
                                 {renderSetCards()}
-                            </div>
+                            </ViewFlashsetContainer>
                             <Dialog open={showCreateLabelDialog} onClose={() => setShowCreateLabelDialog(false)}
                             >
                                 <DialogTitle>Create new label</DialogTitle>
@@ -462,6 +444,7 @@ const ViewFlashSet = props => {
                                         sx={{
                                             color: "orange"
                                         }}
+                                        onChange={e => setCreateLabelName(e.target.value)}
                                     />
                                 </DialogContent>
                                 <DialogActions>
@@ -475,40 +458,20 @@ const ViewFlashSet = props => {
                                     >Create</Button>
                                 </DialogActions>
                             </Dialog>
-                            <Modal
+                            <NotificationsDialog
                                 open={showNotificationsModal}
-                                onClose={() => setShowNotificationsModal(false)}
-                            >
-                                <Card
-                                    sx={notificationsModalStyling}
-                                >
-                                    <Typography
-                                        variant="h5"
-                                    >
-                                        Manage Notifications
-                                    </Typography>
-                                    <div>
-                                        <IconButton
-                                            onClick={() => testEmail().then(data => {
-                                                console.log("Data received from POSTing data")
-                                            })}
-                                        >
-                                            <Email />
-                                        </IconButton>
-                                    </div>
-                                </Card>
-                            </Modal>
-
+                                handleClose={() => setShowNotificationsModal(false)}
+                            />
                             <DownloadSetModal
                                 open={showDownloadPopup}
                                 handleClose={() => setShowDownloadPopup(false)}
                                 downloadFileType={downloadFileType}
                                 setDownloadFileType={setDownloadFileType}
                             />
-                        </>
+                        </ViewFlashsetPaper>
                     )
             }
-        </div>
+        </ViewFlashsetPage>
     )
 }
 
