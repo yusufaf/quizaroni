@@ -13,7 +13,7 @@ import {
     Tooltip,
     Typography
 } from '@mui/material/';
-import { DOWNLOAD_FILE_TYPES } from '../../../utilities/constants';
+import { DOWNLOAD_FILE_TYPES } from 'src/utilities/constants';
 
 const DownloadSetModal = props => {
     const {
@@ -49,13 +49,12 @@ const DownloadSetModal = props => {
                 </FormControl>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose}
-                >Cancel</Button>
+                <Button onClick={handleClose}>Cancel</Button>
                 <Button onClick={() => handleDownloadSet()}>
                     Download
                 </Button>
             </DialogActions>
-        </Dialog >
+        </Dialog>
     )
 }
 
