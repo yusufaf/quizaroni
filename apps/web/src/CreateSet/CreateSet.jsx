@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react"
 import { collection, addDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
 import { database } from "../firebase/firebase";
 
-/* Outside Components */
 import { useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, Box, Button, IconButton, Modal, TextField, Tooltip, Typography } from '@mui/material/';
 import { Create, UploadFile } from "@mui/icons-material";
@@ -12,7 +11,6 @@ import NewCardInput from "./NewCardInput/NewCardInput";
 import LoginMessage from "../LoginMessage/LoginMessage";
 import ImportSetModal from "./ImportSetModal/ImportSetModal";
 
-/* Styling */
 import { useTheme } from "../theme/useTheme";
 import * as createSetStyles from './CreateSet.module.css';
 import * as appStyles from "../App.module.css";
@@ -22,8 +20,10 @@ import {
     ERROR,
     ERROR_U,
     CREATE_SET
-} from "../utilities/constants";
-import { updateBrowserTitle } from "../utilities/functions";
+} from "src/utilities/constants";
+import { updateBrowserTitle } from "src/utilities/functions";
+
+import { CreateSetPage, CreateSetPaper, CreateSetContainer, CreateSetInputsContainer, DescriptionInput, TitleInput } from "./CreateSetStyles";
 
 const CreateSet = props => {
     const { userAuthState } = props;
@@ -256,142 +256,120 @@ const CreateSet = props => {
 
     return (
         <>
-            <div className={createSetStyles.createPage}>
-                <Box className={createSetStyles.createContainer}
-                    sx={{
-                        // background: theme.palette.grey[900]
-                    }}
-                >
-                    <Typography
-                        variant="h5"
-                        sx={{
-                            fontWeight: "bold"
-                        }}
-                    >
-                        {CREATE_SET.TITLE}
-                    </Typography>
-                    <div className={createSetStyles.inputContainer}>
+            <CreateSetPage>
+                <CreateSetPaper elevation={6}>
+                    <CreateSetContainer>
                         <Typography
-                            variant="subtitle1"
+                            variant="h5"
                             sx={{
-                                color: theme.palette.primary.main,
                                 fontWeight: "bold"
                             }}
                         >
-                            Title
+                            {CREATE_SET.TITLE}
                         </Typography>
-
-                        <TextField
-                            variant="standard"
-                            placeholder={CREATE_SET.TITLE_PLACEHOLDER}
-                            // label="Title"
-                            value={enteredTitle}
-                            onChange={e => setEnteredTitle(e.target.value)}
-                            size="small"
-                        />
-
-                        <input
-                            className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                            placeholder={CREATE_SET.TITLE_PLACEHOLDER}
-                            onChange={e => setEnteredTitle(e.target.value)}
-                        />
-                        <Typography
-                            variant="subtitle1"
-                            sx={{
-                                color: "orange",
-                                fontWeight: "bold"
-                            }}
-                        >
-                            Description
-                        </Typography>
-                        <TextField
-                            variant="outlined"
-                            placeholder={CREATE_SET.DESC_PLACEHOLDER}
-                            // label="Description"
-                            value={enteredDescription}
-                            onChange={e => setEnteredDescription(e.target.value)}
-                            size="large"
-                        />
-
-                        <textarea
-                            className={`${createSetStyles.descInput} ${isDarkMode ? `${createSetStyles.dark} ${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                            placeholder={CREATE_SET.DESC_PLACEHOLDER}
-                            onChange={e => setEnteredDescription(e.target.value)}
-                        />
-                        <Typography
-                            variant="subtitle1"
-                            sx={{
-                                color: "orange",
-                                fontWeight: "bold"
-                            }}
-                        >
-                            Label
-                        </Typography>
-                        <div className={createSetStyles.labelInputContainer}>
-                            <input
-                                className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
-                                placeholder={CREATE_SET.LABEL_PLACEHOLDER}
-                                onChange={e => setEnteredLabel(e.target.value)}
-                                disabled={selectedLabel !== ""}
-                            />
-                            <span>or select an existing one</span>
-                            <select
-                                className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`
-                                }
-                                onChange={(e) => setSelectedLabel(e.target.value)}
-                                disabled={enteredLabel !== ""}
-                            >
-                                {labelOptions}
-                            </select>
-                        </div>
-                        <Button
-                            variant="contained"
-                            onClick={() => createNewSet()}
-                            sx={{
-                                backgroundColor: "orange",
-                                color: theme.foreground,
-                                fontWeight: "bold",
-                                position: "absolute",
-                                right: "2rem",
-                                "&:hover": {
-                                    background: "rgb(253, 187, 63)",
-                                }
-                            }}
-                            size="large"
-                            disabled={createSetDisabled}
-                        >
-                            <Create
+                        <CreateSetInputsContainer>
+                            <Typography
+                                variant="subtitle1"
                                 sx={{
-                                    marginRight: "0.5rem"
+                                    /* TODO: Check the color on this */
+                                    color: theme.palette.primary.main,
+                                    fontWeight: "bold"
+                                }}
+                            >
+                                Title
+                            </Typography>
+
+                            <TitleInput
+                                variant="standard"
+                                placeholder={CREATE_SET.TITLE_PLACEHOLDER}
+                                // label="Title"
+                                value={enteredTitle}
+                                onChange={e => setEnteredTitle(e.target.value)}
+                                size="small"
+                            />
+
+                            <Typography
+                                variant="subtitle1"
+                                sx={{
+                                    color: "orange",
+                                    fontWeight: "bold"
+                                }}
+                            >
+                                Description
+                            </Typography>
+                            <DescriptionInput
+                                variant="outlined"
+                                placeholder={CREATE_SET.DESC_PLACEHOLDER}
+                                value={enteredDescription}
+                                onChange={e => setEnteredDescription(e.target.value)}
+                                size="large"
+                            />
+
+                            <Typography
+                                variant="subtitle1"
+                                sx={{
+                                    color: "orange",
+                                    fontWeight: "bold"
+                                }}
+                            >
+                                Label
+                            </Typography>
+                            <div className={createSetStyles.labelInputContainer}>
+                                <input
+                                    className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
+                                    placeholder={CREATE_SET.LABEL_PLACEHOLDER}
+                                    onChange={e => setEnteredLabel(e.target.value)}
+                                    disabled={selectedLabel !== ""}
+                                />
+                                <Typography component="span">or select an existing one</Typography>
+                                <select
+                                    className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`
+                                    }
+                                    onChange={(e) => setSelectedLabel(e.target.value)}
+                                    disabled={enteredLabel !== ""}
+                                >
+                                    {labelOptions}
+                                </select>
+                            </div>
+                            
+                            <Button
+                                variant="contained"
+                                onClick={() => createNewSet()}
+                                sx={{
+                                    position: "absolute",
+                                    right: "2rem",
+                                    display: "flex",
+                                }}
+                                size="large"
+                                disabled={createSetDisabled}
+                            >
+                                <Create
+                                    sx={{
+                                        marginRight: "0.5rem"
+                                    }}
+                                />
+                                Create Set
+                            </Button>
+                        </CreateSetInputsContainer>
+
+
+                        <IconButton
+                            onClick={() => setShowImportModal(true)}
+                        >
+                            <UploadFile
+                                fontSize="large"
+                                sx={{
+                                    color: theme.foreground
                                 }}
                             />
-                            Create Set
-                        </Button>
-                        {/* {createSetDisabled
-                            &&
-                            <Typography>
-                                yo
-                            </Typography>
-                        } */}
-                    </div>
-
-
-                    <IconButton
-                        onClick={() => setShowImportModal(true)}
-                    >
-                        <UploadFile
-                            fontSize="large"
-                            sx={{
-                                color: theme.foreground
-                            }}
-                        />
-                    </IconButton>
-                    <Typography variant="subtitle1"
-                        component="span"
-                    >
-                        Import cards
-                    </Typography>
-                </Box>
+                        </IconButton>
+                        <Typography variant="subtitle1"
+                            component="span"
+                        >
+                            Import cards
+                        </Typography>
+                    </CreateSetContainer>
+                </CreateSetPaper>
                 {renderCreateCards()}
 
                 <Button
@@ -432,7 +410,7 @@ const CreateSet = props => {
                     </i>
                     Add Card
                 </button>
-            </div>
+            </CreateSetPage>
 
             <ImportSetModal
                 open={showImportModal}
