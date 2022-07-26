@@ -378,10 +378,6 @@ const ViewFlashSet = props => {
                                         <EditableTextField style={{ marginTop: "1rem", width: "fit-content" }} value={flashset.title} tooltipText={"Rename title"} />
 
                                         <Chip label={flashset.label ? flashset.label : "No label selected"} variant="outlined"
-                                            sx={{
-                                                height: "2.5rem",
-                                                color: theme.foreground
-                                            }}
                                         />
                                         <Tooltip
                                             title="Create label"
