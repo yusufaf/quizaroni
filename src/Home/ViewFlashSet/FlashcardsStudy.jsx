@@ -20,10 +20,10 @@ import {
 } from '@mui/material/';
 import { ArrowBack, ArrowForward, VolumeUp } from '@mui/icons-material/';
 
+import { useTheme } from "src/theme/useTheme";
 
-/* Styling */
-import { useTheme } from "../../theme/useTheme";
 import * as viewFlashStyles from './ViewFlashSet.module.css';
+import { ViewFlashCardActions } from "./ViewFlashSetStyles";
 
 // import {
 
@@ -69,6 +69,9 @@ const FlashcardsStudy = props => {
             color: theme.foreground
         }
     }
+
+        
+
 
     const retrieveTextStyling = (color, fontSize = "1.5rem") => {
         return {
@@ -136,14 +139,11 @@ const FlashcardsStudy = props => {
                 aria-describedby="alert-dialog-description"
                 sx={warningStyling}
             >
-                <DialogTitle id="alert-dialog-title"
-                    sx={{fontSize: "1.75rem"}}
-                >
+                <DialogTitle id="alert-dialog-title">
                     {"Stop studying this set?"}
                 </DialogTitle>
                 <DialogContent>
-                    <DialogContentText id="alert-dialog-description" sx={{fontSize: "1.5rem"}}
-                    >
+                    <DialogContentText id="alert-dialog-description">
                         You haven't finished studying all the cards in this set, are you sure you want to exit?
                     </DialogContentText>
                 </DialogContent>
@@ -209,18 +209,14 @@ const FlashcardsStudy = props => {
                             <IconButton
                                 onClick={handleAudioPlayback}
                             >
-                                <VolumeUp
-                                    sx={{
-                                        color: theme.foreground
-                                    }}
-                                />
+                                <VolumeUp />
                             </IconButton>
                         </Tooltip>
                     </div>
                 </Card>
                 <Tooltip
                     title={<Typography fontSize="1rem">Go to next card</Typography>}
-                    >
+                >
                     <IconButton color="primary" aria-label="arrow forward" component="span"
                         sx={arrowIconStyling}
                         onClick={() => handleArrowClick("FORWARD")}

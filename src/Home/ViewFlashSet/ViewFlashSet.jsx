@@ -28,6 +28,8 @@ import {
 import { styled } from "@mui/system";
 
 import ViewFlashCard from "./ViewFlashCard";
+import ActionsSection from "./ActionsSection/ActionsSection";
+import CreateLabelDialog from "./CreateLabelDialog/CreateLabelDialog";
 import EditableTextField from "src/components/EditableTextField/EditableTextField";
 import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
 import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
@@ -39,17 +41,20 @@ import { updateBrowserTitle } from "src/utilities/functions";
 import FLASH_CARDS_IMG from "src/resources/images/flash-card.png";
 import { DOWNLOAD_FILE_TYPES, STUDY_MODES, VIEW_SET } from "src/utilities/constants";
 import FlashcardsStudy from "./FlashcardsStudy";
+import { DragDropContext } from "react-beautiful-dnd"
+
 import {
     SimpleFlexContainer
 } from "src/AppStyles"
 import {
     SetInfo,
     StudyModeGrid,
-    ViewFlashsetPage, 
+    ViewFlashsetPage,
     ViewFlashsetContainer,
     ViewFlashsetHeader,
-    ViewFlashsetPaper 
+    ViewFlashsetPaper
 } from "./ViewFlashSetStyles"
+
 
 const { BACKGROUND, TEXT } = VIEW_SET;
 
@@ -84,9 +89,9 @@ const ViewFlashSet = props => {
 
     const [editedDescription, setEditedDescription] = useState(flashset.description ?? "")
     const [isEditingDescription, setIsEditingDescription] = useState(false)
-    useEffect(() => {
-        console.log({ isEditingDescription })
-    }, [isEditingDescription])
+    // useEffect(() => {
+    //     console.log({ isEditingDescription })
+    // }, [isEditingDescription])
 
 
     // TODO: Increase size of arrow buttons?
@@ -187,117 +192,24 @@ const ViewFlashSet = props => {
         // TOOD: Check if the label already exists
     }
 
-    const renderActionBar = () => {
-        return (
-            <>
-                <div style={{ marginTop: "1rem" }}>
-                    <IconButton
-                        onClick={() => setShowDownloadPopup(true)}
-                        sx={{
-                            padding: "0.75rem"
-                        }}
-                    >
-                        <Download
-                        />
-                    </IconButton>
-                    <Typography
-                        component="span"
-                    >
-                        Download
-                    </Typography>
-                </div>
-                <div>
-                    <IconButton
-                        onClick={() => setShowNotificationsModal(true)}
-                        sx={{
-                            padding: "0.75rem"
-                        }}
-                    >
-                        <EditNotifications
-                        />
-                    </IconButton>
-                    <Typography
-                        component="span"
-                    >
-                        Manage Notifications
-                    </Typography>
-                </div>
-                <div
-                    ref={controlAnchorRef}
-                >
-                    <IconButton
-                        onClick={() => setShowControlMenu(true)}
-                        sx={{
-                            padding: "0.75rem"
-                        }}
-                    >
-                        <MenuOpen
-                        />
-                    </IconButton>
+    let actionSectionProps = {
+        controlAnchorRef,
+        disableBackgroundColor,
+        disableTextColor,
+        handleDisableColorToggle,
+        setShowControlMenu,
+        setShowDownloadPopup,
+        setShowNotificationsModal,
+        setStudySetViewable,
+        showControlMenu,
+        studySetViewable,
+    };
 
-                    <Typography
-                        component="span"
-                    >
-                        Control Menu
-                    </Typography>
-                </div>
-                <Menu
-                    open={showControlMenu}
-                    onClose={() => setShowControlMenu(false)}
-                    anchorEl={controlAnchorRef.current}
-                >
-                    <MenuItem>
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    size="small"
-                                    checked={disableTextColor}
-                                    onChange={() => handleDisableColorToggle("TEXT")}
-                                />
-                            } label={
-                                <Typography
-                                    sx={{
-                                        color: disableTextColor ? "red" : "green"
-                                    }}
-                                >
-                                    {`Text Color: ${disableTextColor ? "Disabled" : "Enabled"}`}
-                                </Typography>
-                            }
-                        />
-                    </MenuItem>
-                    <MenuItem>
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    size="small"
-                                    checked={disableBackgroundColor}
-                                    onChange={() => handleDisableColorToggle("BACKGROUND")}
-                                />
-                            }
-                            label={
-                                <Typography
-                                    sx={{
-                                        color: disableBackgroundColor ? "red" : "green"
-                                    }}
-                                >
-                                    {`Background Color: ${disableBackgroundColor ? "Disabled" : "Enabled"}`}
-                                </Typography>
-                            }
-                        />
-                    </MenuItem>
-                    <MenuItem>
-                        <FormControlLabel control={
-                            <Switch
-                                size="small"
-                                checked={studySetViewable}
-                                onChange={() => setStudySetViewable(!studySetViewable)}
-                            />
-                        } label={`Viewable: ${studySetViewable ? "Public" : "Private"}`}
-                        />
-                    </MenuItem>
-                </Menu>
-            </>
-        )
+    let createLabelDialogProps = {
+        createNewLabel,
+        showCreateLabelDialog,
+        setCreateLabelName,
+        setShowCreateLabelDialog,
     }
 
     /**
@@ -350,123 +262,101 @@ const ViewFlashSet = props => {
                     )
                     :
                     (
-                        <ViewFlashsetPaper elevation={6}>
-                            <ViewFlashsetContainer>
-                                <ViewFlashsetHeader>
-                                    <SetInfo>
-                                        <SimpleFlexContainer>
-                                            <IconButton color="primary"
-                                                aria-label="arrow backward" component="span"
-                                                sx={arrowIconStyling}
-                                                onClick={() => setViewFlashSet(false)}
+                        <>
+                            <ViewFlashsetPaper elevation={6}>
+                                <ViewFlashsetContainer>
+                                    <ViewFlashsetHeader>
+                                        <SetInfo>
+                                            <SimpleFlexContainer>
+                                                <IconButton color="primary"
+                                                    aria-label="arrow backward" component="span"
+                                                    sx={arrowIconStyling}
+                                                    onClick={() => setViewFlashSet(false)}
+                                                >
+                                                    <ArrowBack />
+                                                </IconButton>
+                                                <Typography component="span">
+                                                    Back to Your Flashsets
+                                                </Typography>
+                                            </SimpleFlexContainer>
+
+                                            <Typography
+                                                variant="h5"
+                                                sx={{
+                                                    fontWeight: "bold"
+                                                }}
                                             >
-                                                <ArrowBack />
-                                            </IconButton>
-                                            <Typography component="span">
-                                                Back to Your Flashsets
+                                                {flashset.title}
                                             </Typography>
-                                        </SimpleFlexContainer>
+                                            <EditableTextField style={{ marginTop: "1rem", width: "fit-content" }} value={flashset.title} tooltipText={"Rename title"} />
 
-                                        <Typography
-                                            variant="h5"
-                                            sx={{
-                                                fontWeight: "bold"
-                                            }}
-                                        >
-                                            {flashset.title}
-                                        </Typography>
-                                        <EditableTextField style={{ marginTop: "1rem", width: "fit-content" }} value={flashset.title} tooltipText={"Rename title"} />
-
-                                        <Chip label={flashset.label ? flashset.label : "No label selected"} variant="outlined"
-                                        />
-                                        <Tooltip
-                                            title="Create label"
-                                            placement="right"
-                                        >
-                                            <IconButton color="primary"
-                                                aria-label="arrow backward" component="span"
-                                                sx={arrowIconStyling}
-                                                onClick={() => setShowCreateLabelDialog(true)}
+                                            <Chip label={flashset.label ? flashset.label : "No label selected"} variant="outlined"
+                                            />
+                                            <Tooltip
+                                                title="Create label"
+                                                placement="right"
                                             >
-                                                <Add />
-                                            </IconButton>
-                                        </Tooltip>
+                                                <IconButton color="primary"
+                                                    aria-label="arrow backward" component="span"
+                                                    sx={arrowIconStyling}
+                                                    onClick={() => setShowCreateLabelDialog(true)}
+                                                >
+                                                    <Add />
+                                                </IconButton>
+                                            </Tooltip>
 
-                                        <EditableTextField style={{ marginTop: "1rem" }} value={flashset.description} tooltipText={"Edit description"} />
-                                        {renderActionBar()}
-                                    </SetInfo>
-                                    <div className={viewFlashStyles.studySection}>
-                                        <Typography
-                                            variant="h6"
-                                            sx={{
-                                                fontWeight: "bold"
-                                            }}
-                                        >
-                                            Study
-                                        </Typography>
-                                        <StudyModeGrid>
-                                            <StudyModeOption
-                                                onClick={() => setSelectedStudyMode(STUDY_MODES.FLASHCARDS)}
+                                            <EditableTextField style={{ marginTop: "1rem" }} value={flashset.description} tooltipText={"Edit description"} />
+                                            <ActionsSection {...actionSectionProps} />
+                                        </SetInfo>
+                                        <div className={viewFlashStyles.studySection}>
+                                            <Typography
+                                                variant="h6"
+                                                sx={{
+                                                    fontWeight: "bold"
+                                                }}
                                             >
-                                                <img src={FLASH_CARDS_IMG} height={32} width={32} />
-                                                <span>Flashcards </span>
-                                            </StudyModeOption>
-                                        </StudyModeGrid>
-                                    </div>
-                                </ViewFlashsetHeader>
-                                <Typography
-                                    className=""
-                                    variant="h6"
-                                >
-                                    Number of cards in this study set: {flashset.cards.length}
-                                </Typography>
-                                {renderSetCards()}
-                            </ViewFlashsetContainer>
-                            <Dialog open={showCreateLabelDialog} onClose={() => setShowCreateLabelDialog(false)}
+                                                Study
+                                            </Typography>
+                                            <StudyModeGrid>
+                                                <StudyModeOption
+                                                    onClick={() => setSelectedStudyMode(STUDY_MODES.FLASHCARDS)}
+                                                >
+                                                    <img src={FLASH_CARDS_IMG} height={32} width={32} />
+                                                    <span>Flashcards </span>
+                                                </StudyModeOption>
+                                            </StudyModeGrid>
+                                        </div>
+                                    </ViewFlashsetHeader>
+                                </ViewFlashsetContainer>
+                            </ViewFlashsetPaper>
+
+                            <Typography
+                                className=""
+                                variant="h6"
                             >
-                                <DialogTitle>Create new label</DialogTitle>
-                                <DialogContent>
-                                    <DialogContentText>
-                                        Please enter the name of the label you want to create.
-                                    </DialogContentText>
-                                    <TextField
-                                        autoFocus
-                                        margin="dense"
-                                        id="name"
-                                        label="Label Name"
-                                        type="email"
-                                        fullWidth
-                                        variant="standard"
-                                        sx={{
-                                            color: "orange"
-                                        }}
-                                        onChange={e => setCreateLabelName(e.target.value)}
-                                    />
-                                </DialogContent>
-                                <DialogActions>
-                                    {/* Todo: Figure out good color for a cancel button */}
-                                    <Button onClick={() => setShowCreateLabelDialog(false)}
-                                        sx={{ color: "gray" }}
-                                    >Cancel</Button>
-                                    <Button onClick={() => createNewLabel()}
-                                        sx={{ color: "orange" }}
+                                Number of cards in this study set: {flashset.cards.length}
+                            </Typography>
+                            {/* Container for the cards */}
 
-                                    >Create</Button>
-                                </DialogActions>
-                            </Dialog>
+                            {renderSetCards()}
+
+                            <CreateLabelDialog {...createLabelDialogProps} />
+
                             <NotificationsDialog
                                 open={showNotificationsModal}
                                 handleClose={() => setShowNotificationsModal(false)}
                             />
+
                             <DownloadSetModal
                                 open={showDownloadPopup}
                                 handleClose={() => setShowDownloadPopup(false)}
                                 downloadFileType={downloadFileType}
                                 setDownloadFileType={setDownloadFileType}
                             />
-                        </ViewFlashsetPaper>
+                        </>
                     )
             }
+
         </ViewFlashsetPage>
     )
 }
