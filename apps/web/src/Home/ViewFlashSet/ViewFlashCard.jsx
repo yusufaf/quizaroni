@@ -2,10 +2,12 @@
 import { useRef } from "react"
 import { useTheme } from "../../theme/useTheme";
 import * as viewFlashStyles from './ViewFlashSet.module.css';
-import * as appStyles from "../../App.module.css";
 
 import { IconButton, Tooltip, Typography } from '@mui/material/';
-import { VolumeUp } from "@mui/icons-material";
+import { Star, StarBorder, VolumeUp} from "@mui/icons-material";
+
+import { SimpleFlexContainer } from "src/AppStyles";
+import { ViewFlashsetCard, ViewFlashCardActions, ViewCardInfo } from "./ViewFlashSetStyles";
 
 const ViewFlashCard = props => {
     const { cardInfo, disableTextColor, disableBackgroundColor, index } = props;
@@ -30,13 +32,16 @@ const ViewFlashCard = props => {
     }
 
     return (
-        <div className={`${viewFlashStyles.viewFlashCard} ${index === 0 ? viewFlashStyles.firstCard : ""}`}
+        <ViewFlashsetCard
+            elevation={6}
             key={index}
             style={{
-                color: theme.foreground, backgroundColor: `${cardInfo?.backgroundColor && !disableBackgroundColor ? cardInfo.backgroundColor : theme.background}`
+                backgroundColor: `${cardInfo?.backgroundColor && !disableBackgroundColor ? cardInfo.backgroundColor : ""}`,
+                marginTop: `${index === 0 ? "5rem" : ""}`
             }}
+            
         >
-            <div className={viewFlashStyles.cardHeader}>
+            <SimpleFlexContainer>
                 <Typography
                     variant="h5"
                     sx={{
@@ -46,7 +51,7 @@ const ViewFlashCard = props => {
                     Card {index + 1}
                 </Typography>
 
-                <div className={viewFlashStyles.cardActions}>
+                <ViewFlashCardActions>
                     <Tooltip
                         title="Play TTS"
                         placement="top"
@@ -54,49 +59,57 @@ const ViewFlashCard = props => {
                         <IconButton
                             onClick={handleAudioPlayback}
                         >
-                            <VolumeUp
-                                sx={{
-                                    color: theme.foreground
-                                }}
-                            />
+                            <VolumeUp/>
                         </IconButton>
                     </Tooltip>
-                </div>
-            </div>
+                    <Tooltip
+                        title="Mark as important"
+                        placement="top"
+                    >
+                        <IconButton
+                            onClick={() => alert("Not implemented yet")}
+                        >
+                            <StarBorder/>
+                        </IconButton>
+                    </Tooltip>
+                </ViewFlashCardActions>
+            </SimpleFlexContainer>
 
             <div className={viewFlashStyles.viewCardContainer}>
-                <div className={viewFlashStyles.viewCardTerm}>
+                <ViewCardInfo>
                     <Typography
                         variant="h6"
-                        sx={{
-                            color: "orange"
-                        }}
+                        color="primary"
                     >
                         Term
                     </Typography>
-                    {/* <label className={appStyles.inputLabel}>Term</label> */}
-                    <span style={{
-                        color: `${cardInfo?.textColor && !disableTextColor ? cardInfo.textColor : ""}`,
-                    }}>
+                    <Typography
+                        sx={{
+                            color: `${cardInfo?.textColor && !disableTextColor ? cardInfo.textColor : ""}`,
+                        }}
+                    >
                         {cardInfo.term}
-                    </span>
-                </div>
-                <div className={viewFlashStyles.viewCardDefinition}>
+                    </Typography>
+                    {/* TODO: Term image */}
+                </ViewCardInfo>
+                <ViewCardInfo>
                     <Typography
                         variant="h6"
-                        sx={{
-                            color: "orange"
-                        }}
+                        color="primary"
                     >
                         Definition
                     </Typography>
-                    {/* <label className={appStyles.inputLabel}>Definition</label> */}
-                    <span style={{ color: `${cardInfo?.textColor && !disableTextColor ? cardInfo.textColor : ""}` }}>
+                    <Typography
+                        sx={{
+                            color: `${cardInfo?.textColor && !disableTextColor ? cardInfo.textColor : ""}`,
+                        }}
+                    >
                         {cardInfo.definition}
-                    </span>
-                </div>
+                    </Typography>
+                    {/* TODO: Definition image */}
+                </ViewCardInfo>
             </div>
-        </div>
+        </ViewFlashsetCard>
     )
 }
 

@@ -1,5 +1,5 @@
 import { styled } from "@mui/system";
-import { Box, Paper } from "@mui/material";
+import { Box, Card, Paper } from "@mui/material";
 
 export const ViewFlashsetPage = styled(Box)({
     display: "grid",
@@ -33,4 +33,35 @@ export const StudyModeGrid = styled(Box)({
     display: "grid",
     gridTemplateColumns: "15rem 15rem",
     gridTemplateRows: "auto auto",
+})
+
+/* Actions Section */
+
+
+/* Cards */
+
+export const ViewFlashsetCard = styled(Card)({
+    position: "relative",
+    width: "70rem",
+    padding: "1rem 1.25rem 1.25rem 1.25rem",
+    borderRadius: "0.75rem",
+    marginBottom: "2.5rem",
+})
+
+export const ViewFlashCardActions = styled("div")({
+    marginLeft: "auto"
+})
+
+export const ViewCardInfoContainer = styled("div")({
+
+})
+
+export const ViewCardInfo = styled("div")({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    flexWrap: "wrap",
+    flexGrow: "1",
+    width: "10rem",
+    wordWrap: "break-word"
 })
