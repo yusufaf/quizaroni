@@ -42,3 +42,20 @@ export const DescriptionInput = styled(TextField)({
     marginBottom: "1rem"
     // fontFamily  : -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 })
+
+export const LabelInputContainer = styled("div")({
+    display: "flex",
+    alignItems: "center",
+    gap: "1rem",
+})
+
+export const LabelInput = styled(TextField)({
+    width: "18rem"
+})
+
+
+
+
+export const NewCard = styled(Card)({
+    
+})

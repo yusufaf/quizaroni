@@ -6,6 +6,9 @@ export const SUCCESS_U = "Success";
 export const ERROR = "error";
 export const ERROR_U = "Error";
 
+export const DISABLED = "Disabled";
+export const ENABLED = "Enabled";
+
 export const ROUTES = {
     LOGIN: "/login",
     SIGNUP: "/signup",
@@ -51,8 +54,6 @@ export const VIEW_SET = {
 export const STUDY_MODES = {
     FLASHCARDS: "FLASHCARDS"
 }
-
-
 
 export const DOWNLOAD_FILE_TYPES = {
     TXT: "TXT",

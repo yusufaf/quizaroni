@@ -5,7 +5,7 @@ import { collection, addDoc, query, where, getDocs, updateDoc } from "firebase/f
 import { database } from "../firebase/firebase";
 
 import { useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Box, Button, IconButton, Modal, TextField, Tooltip, Typography } from '@mui/material/';
+import { Alert, AlertTitle, Box, Button, FormControl, IconButton, InputLabel, MenuItem, Modal, Select, TextField, Tooltip, Typography } from '@mui/material/';
 import { Create, UploadFile } from "@mui/icons-material";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import LoginMessage from "../LoginMessage/LoginMessage";
@@ -23,7 +23,8 @@ import {
 } from "src/utilities/constants";
 import { updateBrowserTitle } from "src/utilities/functions";
 
-import { CreateSetPage, CreateSetPaper, CreateSetContainer, CreateSetInputsContainer, DescriptionInput, TitleInput } from "./CreateSetStyles";
+import { CreateSetPage, CreateSetPaper, CreateSetContainer, CreateSetInputsContainer, DescriptionInput, TitleInput, LabelInputContainer, LabelInput } from "./CreateSetStyles";
+import { SimpleFlexContainer } from 'src/AppStyles';
 
 const CreateSet = props => {
     const { userAuthState } = props;
@@ -314,24 +315,42 @@ const CreateSet = props => {
                             >
                                 Label
                             </Typography>
-                            <div className={createSetStyles.labelInputContainer}>
-                                <input
-                                    className={`${createSetStyles.labelInput} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`}
+                            <LabelInputContainer>
+                                <LabelInput
+                                    variant="standard"
+                                    size="small"
                                     placeholder={CREATE_SET.LABEL_PLACEHOLDER}
                                     onChange={e => setEnteredLabel(e.target.value)}
                                     disabled={selectedLabel !== ""}
                                 />
                                 <Typography component="span">or select an existing one</Typography>
-                                <select
+
+                                <FormControl variant="standard">
+                                    <InputLabel>Label</InputLabel>
+                                    <Select
+                                        // value={age}
+                                        onChange={(e) => setSelectedLabel(e.target.value)}
+                                        // label="Age"
+                                    >
+                                        <MenuItem value=""></MenuItem>
+                                        <MenuItem value={10}>Ten</MenuItem>
+                                        <MenuItem value={20}>Twenty</MenuItem>
+                                        <MenuItem value={30}>Thirty</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                {/* TODO: Map labelOptions to MenuItem */}
+
+
+                                {/* <select
                                     className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`
                                     }
                                     onChange={(e) => setSelectedLabel(e.target.value)}
                                     disabled={enteredLabel !== ""}
                                 >
                                     {labelOptions}
-                                </select>
-                            </div>
-                            
+                                </select> */}
+                            </LabelInputContainer>
+
                             <Button
                                 variant="contained"
                                 onClick={() => createNewSet()}
@@ -352,22 +371,21 @@ const CreateSet = props => {
                             </Button>
                         </CreateSetInputsContainer>
 
+                        <SimpleFlexContainer>
+                            <IconButton
+                                onClick={() => setShowImportModal(true)}
+                            >
+                                <UploadFile
+                                    fontSize="large"
+                                />
+                            </IconButton>
+                            <Typography variant="subtitle1"
+                                component="span"
+                            >
+                                Import cards
+                            </Typography>
+                        </SimpleFlexContainer>
 
-                        <IconButton
-                            onClick={() => setShowImportModal(true)}
-                        >
-                            <UploadFile
-                                fontSize="large"
-                                sx={{
-                                    color: theme.foreground
-                                }}
-                            />
-                        </IconButton>
-                        <Typography variant="subtitle1"
-                            component="span"
-                        >
-                            Import cards
-                        </Typography>
                     </CreateSetContainer>
                 </CreateSetPaper>
                 {renderCreateCards()}
