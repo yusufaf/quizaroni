@@ -5,6 +5,7 @@ export const ViewFlashsetPage = styled(Box)({
     display: "grid",
     justifyItems: "center",
     alignItems: "center",
+    gap: "2rem"
 })
 
 export const ViewFlashsetPaper = styled(Paper)({
@@ -45,7 +46,6 @@ export const ViewFlashsetCard = styled(Card)({
     width: "70rem",
     padding: "1rem 1.25rem 1.25rem 1.25rem",
     borderRadius: "0.75rem",
-    marginBottom: "2.5rem",
 })
 
 export const ViewFlashCardActions = styled("div")({

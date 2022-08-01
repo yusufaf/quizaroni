@@ -6,7 +6,7 @@ import { database } from "../firebase/firebase";
 
 import { useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, Box, Button, FormControl, IconButton, InputLabel, MenuItem, Modal, Select, TextField, Tooltip, Typography } from '@mui/material/';
-import { Create, UploadFile } from "@mui/icons-material";
+import { AddCircleOutline, Create, UploadFile } from "@mui/icons-material";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import LoginMessage from "../LoginMessage/LoginMessage";
 import ImportSetModal from "./ImportSetModal/ImportSetModal";
@@ -23,7 +23,7 @@ import {
 } from "src/utilities/constants";
 import { updateBrowserTitle } from "src/utilities/functions";
 
-import { CreateSetPage, CreateSetPaper, CreateSetContainer, CreateSetInputsContainer, DescriptionInput, TitleInput, LabelInputContainer, LabelInput } from "./CreateSetStyles";
+import { CreateSetPage, CreateSetPaper, CreateSetContainer, CreateSetInputsContainer, DescriptionInput, TitleInput, LabelInputContainer, LabelInput, AddCardButton } from "./CreateSetStyles";
 import { SimpleFlexContainer } from 'src/AppStyles';
 
 const CreateSet = props => {
@@ -292,7 +292,7 @@ const CreateSet = props => {
                             <Typography
                                 variant="subtitle1"
                                 sx={{
-                                    color: "orange",
+                                    color: theme.palette.primary.main,
                                     fontWeight: "bold"
                                 }}
                             >
@@ -309,7 +309,7 @@ const CreateSet = props => {
                             <Typography
                                 variant="subtitle1"
                                 sx={{
-                                    color: "orange",
+                                    color: theme.palette.primary.main,
                                     fontWeight: "bold"
                                 }}
                             >
@@ -390,24 +390,36 @@ const CreateSet = props => {
                 </CreateSetPaper>
                 {renderCreateCards()}
 
-                <Button
+                {/* 
+    position     : relative;
+    width        : 73rem;
+    left         : 20rem;
+    padding      : 1.25rem;
+    background   : orange;
+    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
+    margin-bottom: 2rem;
+
+    border-radius: 0.75rem;
+    border       : none;
+    outline      : none;
+
+    font-weight   : bold;
+    text-transform: uppercase;
+    transition    : 0.2s ease;
+
+    display        : flex;
+    flex-direction : row;
+    justify-content: center;
+    align-items    : center;
+    gap            : 0.5rem;
+
+    text-align: center;
+    
+                */}
+                <AddCardButton
                     variant="contained"
                     onClick={() => {
                         addCreateCardInput();
-                    }}
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                        backgroundColor: "orange",
-                        color: theme.foreground,
-                        fontWeight: "bold",
-                        position: "absolute",
-                        right: "2rem",
-                        top: "2rem",
-                        "&:hover": {
-                            background: "rgb(253, 187, 63)",
-                        }
                     }}
                 >
                     <i
@@ -415,19 +427,14 @@ const CreateSet = props => {
                         add_circle_outline
                     </i>
                     Add Card
-                </Button>
+                </AddCardButton>
+                {/* 
+                        className={createdSetCards.length !== 0 ? `${createSetStyles.addCard}` : `${createSetStyles.addCard} ${createSetStyles.noInputs}`}
+                        .addCard.noInputs {
+                            margin-top: 28.5rem;
+                        }
+                */}
 
-                <button
-                    className={createdSetCards.length !== 0 ? `${createSetStyles.addCard}` : `${createSetStyles.addCard} ${createSetStyles.noInputs}`}
-                    onClick={() => {
-                        addCreateCardInput();
-                    }}>
-                    <i
-                        className={`material-icons ${createSetStyles.addIcon}`}>
-                        add_circle_outline
-                    </i>
-                    Add Card
-                </button>
             </CreateSetPage>
 
             <ImportSetModal

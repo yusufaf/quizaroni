@@ -37,7 +37,7 @@ const ViewFlashCard = props => {
             key={index}
             style={{
                 backgroundColor: `${cardInfo?.backgroundColor && !disableBackgroundColor ? cardInfo.backgroundColor : ""}`,
-                marginTop: `${index === 0 ? "5rem" : ""}`
+                // marginTop: `${index === 0 ? "5rem" : ""}`
             }}
             
         >
