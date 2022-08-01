@@ -1,12 +1,13 @@
 import { useState, useRef } from "react"
-import { IconButton, Tooltip, Typography } from '@mui/material/';
+import { IconButton, TextField, Tooltip, Typography } from '@mui/material/';
 import { AddPhotoAlternate, Delete, FormatColorText, FormatColorFill } from "@mui/icons-material";
-import { useTheme } from "../../theme/useTheme";
+import { useTheme } from "src/theme/useTheme";
 
 import { ChromePicker } from "react-color";
 
 import * as createSetStyles from '../CreateSet.module.css';
 import * as appStyles from "../../App.module.css";
+import { NewCard } from "../CreateSetStyles";
 
 const NewCardInput = props => {
     const { index, handleDelete, updateCardValue, onFileChange, onColorChange, fileInputRef } = props;
@@ -39,10 +40,10 @@ const NewCardInput = props => {
     }
 
     return (
-        <div
-            className={index === 0 ? `${createSetStyles.newCard} ${createSetStyles.firstCard}` : `${createSetStyles.newCard}`}
+        <NewCard
+            raised
+            // className={index === 0 ? `${createSetStyles.newCard} ${createSetStyles.firstCard}` : `${createSetStyles.newCard}`}
             key={index}
-            style={{ color: theme.foreground, background: theme.background }}
         >
             <div className={createSetStyles.newCardHeader}>
                 <Typography
@@ -53,7 +54,7 @@ const NewCardInput = props => {
                 >
                     Card {index + 1}
                 </Typography>
-                
+
                 <div className={createSetStyles.cardActions}>
                     <Tooltip
                         title="Change card text color"
@@ -125,9 +126,6 @@ const NewCardInput = props => {
                             onClick={() => handleDelete(index)}
                         >
                             <Delete
-                                sx={{
-                                    color: theme.foreground
-                                }}
                                 fontSize="medium"
                             />
                         </IconButton>
@@ -149,9 +147,6 @@ const NewCardInput = props => {
                         >
                             <AddPhotoAlternate
                                 fontSize="medium"
-                                sx={{
-                                    color: theme.foreground
-                                }}
                             />
                         </IconButton>
                     </Tooltip>
@@ -162,37 +157,51 @@ const NewCardInput = props => {
                     <Typography
                         variant="subtitle1"
                         sx={{
-                            color: "orange",
+                            color: theme.palette.primary.main,
                         }}
                     >
                         Term
                     </Typography>
-                    {/* <label className={createSetStyles.inputLabel}>Term</label> */}
-
-                    <input
+                    <TextField
+                        variant="standard"
+                        placeholder={"Enter a title"}
+                        onChange={(e) => updateCardValue(index, "term", e.target.value)}
+                        sx={{
+                            width: "20rem"
+                        }}
+                    />
+                    {/* <input
                         className={isDarkMode ? `${createSetStyles.newCardInput} ${appStyles.darkInput}` : `${createSetStyles.newCardInput} ${appStyles.lightInput}`}
                         placeholder="Enter a term"
                         onChange={(e) => updateCardValue(index, "term", e.target.value)}
-                    />
+                    /> */}
                 </div>
+                {/* TODO: Fix widths */}
                 <div className={createSetStyles.newCardDefinition}>
                     <Typography
                         variant="subtitle1"
                         sx={{
-                            color: "orange",
+                            color: theme.palette.primary.main,
                         }}
                     >
                         Definition
                     </Typography>
-                    {/* <label className={createSetStyles.inputLabel}>Definition</label> */}
-                    <input
+                    <TextField
+                        variant="standard"
+                        placeholder={"Enter a definition"}
+                        onChange={(e) => updateCardValue(index, "definition", e.target.value)}
+                        sx={{
+                            width: "20rem"
+                        }}
+                    />
+                    {/* <input
                         className={isDarkMode ? `${createSetStyles.newCardInput} ${appStyles.darkInput}` : `${createSetStyles.newCardInput} ${appStyles.lightInput}`}
                         placeholder="Enter a definition"
                         onChange={(e) => updateCardValue(index, "definition", e.target.value)}
-                    />
+                    /> */}
                 </div>
             </div>
-        </div >
+        </NewCard>
     )
 }
 

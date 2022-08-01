@@ -17,7 +17,7 @@ export const LoginButtonsContainer = styled("div")({
     gap: "1rem"
 })
 
-export const StyledNavLink = styled(NavLink)({
+export const StyledNavLink = styled(NavLink)(({ theme }) => ({
     borderRadius: "0.15rem",
     fontSize: "1.25rem",
     textDecoration: "none",
@@ -25,8 +25,9 @@ export const StyledNavLink = styled(NavLink)({
     "&:hover": {
         opacity: "0.6",
         transition: "0.1s ease",
-    }
-})
+    },
+    color: theme.palette.text.primary,
+}));
 
 export const StyledDarkModeIcon = styled(DarkMode)({
     cursor: "pointer",

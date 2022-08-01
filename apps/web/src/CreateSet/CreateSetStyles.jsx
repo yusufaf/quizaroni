@@ -2,13 +2,19 @@
 
 
 import { styled } from "@mui/system";
-import { Box, Card, Paper, TextField } from "@mui/material";
+import { Box, Button, Card, Paper, TextField } from "@mui/material";
 
 export const CreateSetPage = styled(Box)({
-    display: "flex",
+    display: "grid",
+    justifyItems: "center",
     alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "column",
+    gridTemplateRows: "auto auto",
+    gap: "2rem",
+
+    // display: "flex",
+    // alignItems: "center",
+    // justifyContent: "center",
+    // flexDirection: "column",
 })
 
 export const CreateSetPaper = styled(Paper)({
@@ -55,7 +61,18 @@ export const LabelInput = styled(TextField)({
 
 
 
-
 export const NewCard = styled(Card)({
-    
+    width: "70rem",
+    padding: "1rem 1.25rem 1.25rem 1.25rem",
+    borderRadius: "0.75rem",
+})
+
+export const AddCardButton = styled(Button)({
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    fontWeight: "bold",
+    // width: "50%",
+    width: "70rem",
+    // marginTop: "2rem",
 })

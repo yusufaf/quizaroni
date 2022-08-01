@@ -290,8 +290,7 @@ const ViewFlashSet = props => {
                                             </Typography>
                                             <EditableTextField style={{ marginTop: "1rem", width: "fit-content" }} value={flashset.title} tooltipText={"Rename title"} />
 
-                                            <Chip label={flashset.label ? flashset.label : "No label selected"} variant="outlined"
-                                            />
+                                            <Chip label={flashset.label ? flashset.label : "No label selected"} variant="outlined"/>
                                             <Tooltip
                                                 title="Create label"
                                                 placement="right"
@@ -333,6 +332,7 @@ const ViewFlashSet = props => {
                             <Typography
                                 className=""
                                 variant="h6"
+                                sx={{marginRight: "41%"}}
                             >
                                 Number of cards in this study set: {flashset.cards.length}
                             </Typography>
