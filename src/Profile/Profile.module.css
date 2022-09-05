@@ -3,7 +3,6 @@
     align-items: center;
     justify-items: center;
     grid-template-columns: auto auto;
-    /* column-gap: 2rem; */
     margin-top: 1.5rem;
 }
 
@@ -17,8 +16,6 @@
     gap           : 1.25rem;
 
     border-radius : 0.75rem;
-    /* offset-x | offset-y | blur-radius | spread-radius | color */
-    /* LIGHT MODE : gray box shadow to give a "card" effect */
     box-shadow    : 0 3px 10px rgb(0 0 0 / 0.2);
     padding       : 1.25rem;
 
@@ -34,8 +31,6 @@
     gap           : 1.25rem;
 
     border-radius : 0.75rem;
-    /* offset-x | offset-y | blur-radius | spread-radius | color */
-    /* LIGHT MODE : gray box shadow to give a "card" effect */
     box-shadow    : 0 3px 10px rgb(0 0 0 / 0.2);
     padding       : 1.25rem;
 }

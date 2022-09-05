@@ -2,20 +2,31 @@ import { useState, useEffect, useRef } from "react";
 import { database } from "../firebase/firebase";
 import { deleteDoc, updateDoc, query, where, collection, getDoc, getDocs, limit } from "firebase/firestore";
 import { EmailAuthProvider, getAuth, deleteUser, updatePassword, reauthenticateWithCredential } from "firebase/auth";
-import { Button, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, InputAdornment, Typography, TextField } from '@mui/material/';
-import { DarkMode, LightMode, Palette, Password, Person, RemoveCircleOutline, VisibilityOff, Visibility} from "@mui/icons-material";
+import {
+    Button,
+    Tooltip,
+    IconButton,
+    InputAdornment,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
+    TextField
+} from '@mui/material/';
+import { DarkMode, LightMode, Palette, Password, Person, RemoveCircleOutline, VisibilityOff, Visibility } from "@mui/icons-material";
 import { styled } from '@mui/system';
 import LoginMessage from "../LoginMessage/LoginMessage";
 import ProfileCard from "./ProfileCard";
 import DeleteAccountDialog from "./DeleteAccountDialog/DeleteAccountDialog";
-
-/* Styling */
-import { useTheme } from "../theme/useTheme";
+import { LIGHT, DARK } from "src/utilities/constants"
+import { useTheme } from "src/theme/useTheme";
 import * as profileStyles from './Profile.module.css';
 import * as appStyles from "../App.module.css";
+import PasswordToggle from "src/components/PasswordToggle/PasswordToggle";
+import {
+    InfoChangeContainer,
+    ProfilePaper
+} from "./ProfileStyles"
 
-import * as C from "../utilities/constants";
-import { color } from "@mui/system";
 
 const Profile = props => {
     const { userAuthState, setUserAuthState } = props;
@@ -26,11 +37,12 @@ const Profile = props => {
 
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [enteredDeletePassword, setEnteredDeletePassword] = useState("");
-
     const [enteredNewUsername, setEnteredNewUsername] = useState("");
     const [enteredNewPassword, setEnteredNewPassword] = useState("");
     const [enteredConfirmPassword, setEnteredConfirmPassword] = useState("");
     const [passVisibility, setPassVisibility] = useState(false);
+    const [newPasswordVisibility, setNewPasswordVisibility] = useState(false);
+
 
     /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
@@ -41,10 +53,11 @@ const Profile = props => {
     const [defaultTheme, setDefaultTheme] = useState(userAuthState?.bruh ?? "dark");
 
     if (userAuthState) {
-        let credential = EmailAuthProvider.credential(
-            user.email,
-            enteredDeletePassword
-        );
+        // let credential = EmailAuthProvider.credential(
+        //     user.email,
+        //     enteredDeletePassword
+        // );
+
     }
 
     const checkIfInputMatches = event => {
@@ -56,14 +69,14 @@ const Profile = props => {
     /**
      * Update user's selected default theme
      */
-    const handleDefaultTheme = async (theme) => {
+    const handleDefaultTheme = async (event, newTheme) => {
         console.log("Entering handleDefaultTheme");
         // TODO: Handling immediately changing based on selection
         // if (theme === "dark" ) {
         //     console.log("TOGGLING DARK MODE");
         //     toggleDarkMode();
         // }
-        setDefaultTheme(theme);
+        setDefaultTheme(newTheme);
 
         /* Update user database with the newly selected theme */
         const { uid } = userAuthState;
@@ -75,7 +88,7 @@ const Profile = props => {
         if (userDoc) {
             const userRef = userDoc.ref;
             updateDoc(userRef, {
-                defaultTheme: theme
+                defaultTheme: newTheme
             });
         }
     }
@@ -104,8 +117,6 @@ const Profile = props => {
             .catch(error => {
                 // TODO: Display alert / text indicating password was wrong
             });
-
-
     }
 
     /**
@@ -156,6 +167,23 @@ const Profile = props => {
         gap: "0.75rem",
     })
 
+    const ActionGridContainer = styled("div")({
+        display: "grid",
+        gridTemplateRows: "auto auto",
+        gap: "1rem",
+        alignItems: "center"
+    })
+
+    const ProfilePageTitle = styled(Typography)({
+        fontWeight: "bold"
+    })
+
+
+    useEffect(() => {
+        console.log({ defaultTheme })
+    }, [defaultTheme])
+
+
     if (!userAuthState) {
         return <LoginMessage page="profile" />;
     }
@@ -164,154 +192,146 @@ const Profile = props => {
         <>
             <div className={profileStyles.profilePage}>
                 <ProfileCard userAuthState={userAuthState} />
-                <div className={profileStyles.profileContainer}>
-                    <Typography
-                        variant="h5"
-                        sx={{
-                            fontWeight: "bold"
-                        }}
-                    >
-                        Profile
-                    </Typography>
+                <ProfilePaper elevation={6}>
+                    <div className={profileStyles.profileContainer}>
+                        <ProfilePageTitle variant="h5">
+                            Profile
+                        </ProfilePageTitle>
 
-                    <ActionHeader>
-                        <Palette />
-                        <Typography variant="h6">Default Theme</Typography>
-                    </ActionHeader>
+                        <ActionHeader>
+                            <Palette />
+                            <Typography variant="h6">Default Theme</Typography>
+                        </ActionHeader>
 
-                    <div className={profileStyles.themeSelect}>
-                        <Tooltip title="Switch default to Light mode"
-                            placement="left"
+                        <ToggleButtonGroup
+                            exclusive
+                            onChange={handleDefaultTheme}
+                            value={defaultTheme}
                         >
-                            <span className={`material-icons-outlined ${defaultTheme === "light" ? profileStyles.themeSelected : ""}`}
-                                onClick={() => handleDefaultTheme("light")}
+                            <Tooltip
+                                title="Switch default to Light mode"
+                                placement="bottom"
                             >
-                                light_mode
-                            </span>
-                        </Tooltip>
-                        <Tooltip title="Switch default to Dark mode"
-                            placement="right"
-                        >
-                            <span className={`material-icons-outlined ${defaultTheme === "dark" ? profileStyles.themeSelected : ""}`}
-                                onClick={() => handleDefaultTheme("dark")}
+                                <ToggleButton value={LIGHT}>
+                                    <LightMode />
+                                </ToggleButton>
+                            </Tooltip>
+                            <Tooltip
+                                title="Switch default to Dark mode"
+                                placement="bottom"
                             >
-                                dark_mode
-                            </span>
-                        </Tooltip>
-                    </div>
+                                <ToggleButton value={DARK}>
+                                    <DarkMode />
+                                </ToggleButton>
+                            </Tooltip>
+                        </ToggleButtonGroup>
 
-                    <ActionHeader>
-                        <Person />
-                        <Typography variant="h6">Change Username</Typography>
-                    </ActionHeader>
-                    <div className={profileStyles.changeUsernameContainer}>
-                        <TextField
-                            variant="standard"
-                            label="Username"
-                            placeholder="Enter new password"
-                            value={enteredNewUsername}
-                            onChange={e => setEnteredNewUsername(e.target.value)}
-                            size="small"
-                        />
+                        <ActionHeader>
+                            <Person />
+                            <Typography variant="h6">Change Username</Typography>
+                        </ActionHeader>
 
-                        <Button
-                            variant="contained"
-                            onClick={() => handleChangeUsername()}
-                            disabled={enteredNewUsername === ""}
-                        >
-                            Submit
-                        </Button>
-                    </div>
-
-                    <ActionHeader>
-                        <Password />
-                        <Typography variant="h6">Change Password</Typography>
-                    </ActionHeader>
-                    
-                    <div className={profileStyles.changeUsernameContainer}>
-                        <div className={profileStyles.changeInputs}>
+                        <InfoChangeContainer>
                             <TextField
                                 variant="standard"
+                                label="Username"
                                 placeholder="Enter new password"
-                                label="Password"
-                                type={passVisibility ? 'text' : 'password'}
-                                value={enteredNewPassword}
-                                name="passInput"
-                                onChange={e => setEnteredNewPassword(e.target.value)}
-                                // onBlur={e => checkIfInputEmpty(e)}
-                                // helperText={showErrorText.passInput && "A password is required"}
-                                // error={showErrorText.passInput}
+                                value={enteredNewUsername}
+                                onChange={e => setEnteredNewUsername(e.target.value)}
                                 size="small"
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                aria-label="toggle password visibility"
-                                                onClick={() => setPassVisibility(!passVisibility)}
-                                                edge="end"
-                                            >
-                                                {passVisibility ? <VisibilityOff /> : <Visibility />}
-                                            </IconButton>
-                                        </InputAdornment>
-                                    )
-                                }}
                             />
-                            <div className={profileStyles.confirmPassword}>
-                                <input
-                                    className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
-                                    name="confirmPassInput"
-                                    placeholder="Confirm new password"
-                                    onChange={(e) => {
-                                        checkIfInputMatches(e);
-                                        setEnteredConfirmPassword(e.target.value)
+                            <Button
+                                variant="contained"
+                                onClick={() => handleChangeUsername()}
+                                disabled={enteredNewUsername === ""}
+                            >
+                                Submit
+                            </Button>
+                        </InfoChangeContainer>
+
+                        <ActionHeader>
+                            <Password />
+                            <Typography variant="h6">Change Password</Typography>
+                        </ActionHeader>
+
+                        <InfoChangeContainer>
+                            <div className={profileStyles.changeInputs}>
+                                <TextField
+                                    variant="standard"
+                                    placeholder="Enter new password"
+                                    label="Password"
+                                    type={newPasswordVisibility ? 'text' : 'password'}
+                                    value={enteredNewPassword}
+                                    name="passInput"
+                                    onChange={e => setEnteredNewPassword(e.target.value)}
+                                    // onBlur={e => checkIfInputEmpty(e)}
+                                    // helperText={showErrorText.passInput && "A password is required"}
+                                    // error={showErrorText.passInput}
+                                    size="small"
+                                    InputProps={{
+                                        endAdornment:
+                                            <PasswordToggle
+                                                passwordVisibility={newPasswordVisibility}
+                                                setPasswordVisibility={setNewPasswordVisibility}
+                                            />
                                     }}
-                                    onBlur={e => checkIfInputMatches(e)}
                                 />
 
-                                {showErrorText.confirmPassInput &&
-                                    <span className={appStyles.errorText}
-                                        style={{ top: "1rem" }}
-                                    >
-                                        Confirmed password doesn't match entered password
-                                    </span>
-                                }
+                                {/* <div className={profileStyles.confirmPassword}>
+                                    <input
+                                        className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
+                                        name="confirmPassInput"
+                                        placeholder="Confirm new password"
+                                        onChange={(e) => {
+                                            checkIfInputMatches(e);
+                                            setEnteredConfirmPassword(e.target.value)
+                                        }}
+                                        onBlur={e => checkIfInputMatches(e)}
+                                    />
+
+                                    {showErrorText.confirmPassInput &&
+                                        <span className={appStyles.errorText}
+                                            style={{ top: "1rem" }}
+                                        >
+                                            Confirmed password doesn't match entered password
+                                        </span>
+                                    }
+                                </div> */}
                             </div>
 
-                        </div>
+                            <Button
+                                variant="contained"
+                                onClick={() => handleChangePassword()}
+                                disabled={enteredNewPassword === "" || enteredConfirmPassword === "" || showErrorText.confirmPassInput}
+                                sx={{
+                                    backgroundColor: "orange",
+                                    color: theme.foreground
+                                }}
+                            >
+                                Submit
+                            </Button>
+                        </InfoChangeContainer>
+
+                        <ActionHeader>
+                            <RemoveCircleOutline />
+                            <Typography variant="h6">Delete Account</Typography>
+                        </ActionHeader>
 
                         <Button
-                            variant="contained"
-                            onClick={() => handleChangePassword()}
-                            disabled={enteredNewPassword === "" || enteredConfirmPassword === "" || showErrorText.confirmPassInput}
-                            sx={{
-                                backgroundColor: "orange",
-                                color: theme.foreground
-                            }}
+                            variant="outlined"
+                            color="error"
+                            onClick={() => setShowDeleteDialog(true)}
                         >
-                            Submit
+                            Delete Account
                         </Button>
+                        <DeleteAccountDialog
+                            open={showDeleteDialog}
+                            handleClose={() => setShowDeleteDialog(false)}
+                            enteredPassword={enteredDeletePassword}
+                            setEnteredPassword={setEnteredDeletePassword}
+                        />
                     </div>
-
-                    <ActionHeader>
-                        <RemoveCircleOutline />
-                        <Typography variant="h6">Delete Account</Typography>
-                    </ActionHeader>
-
-                    <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={() => setShowDeleteDialog(true)}
-                    >
-                        Delete Account
-                    </Button>
-
-                    <DeleteAccountDialog
-                        open={showDeleteDialog}
-                        handleClose={() => setShowDeleteDialog(false)}
-                        enteredPassword={enteredDeletePassword}
-                        setEnteredPassword={setEnteredDeletePassword}
-                    />    
-                </div>
+                </ProfilePaper>
             </div>
         </>
     )

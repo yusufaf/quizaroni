@@ -20,13 +20,13 @@ import * as appStyles from "../App.module.css";
 import * as C from "src/utilities/constants";
 import { updateBrowserTitle } from "src/utilities/functions";
 
-import { 
-    LoginPageContainer as SignupPageContainer, 
-    LoginContainer as SignupContainer, 
-    LoginButton as SignupButton, 
-    LoginField as SignupField, 
-    LoginTitle as SignupTitle, 
-    StyledLink 
+import {
+    LoginPageContainer as SignupPageContainer,
+    LoginContainer as SignupContainer,
+    LoginButton as SignupButton,
+    LoginField as SignupField,
+    LoginTitle as SignupTitle,
+    StyledLink
 } from "src/Login/LoginStyles";
 
 const Signup = props => {
@@ -257,7 +257,11 @@ const Signup = props => {
                             error={showErrorText.passInput}
                             size="small"
                             InputProps={{
-                                endAdornment: <PasswordToggle/>
+                                endAdornment:
+                                    <PasswordToggle
+                                        passwordVisibility={passVisibility}
+                                        setPasswordVisibility={setPassVisibility}
+                                    />
                             }}
                         />
                         <SignupButton

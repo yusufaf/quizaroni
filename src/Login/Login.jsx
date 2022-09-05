@@ -251,7 +251,11 @@ const Login = props => {
                             error={showErrorText.passInput}
                             size="small"
                             InputProps={{
-                                endAdornment: <PasswordToggle/>
+                                endAdornment:
+                                    <PasswordToggle
+                                        passwordVisibility={passVisibility}
+                                        setPasswordVisibility={setPassVisibility}
+                                    />
                             }}
                         />
 

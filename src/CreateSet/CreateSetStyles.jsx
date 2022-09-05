@@ -2,7 +2,7 @@
 
 
 import { styled } from "@mui/system";
-import { Box, Button, Card, Paper, TextField } from "@mui/material";
+import { Box, Button, Card, Paper, Select, TextField } from "@mui/material";
 
 export const CreateSetPage = styled(Box)({
     display: "grid",
@@ -60,7 +60,6 @@ export const LabelInput = styled(TextField)({
 })
 
 
-
 export const NewCard = styled(Card)({
     width: "70rem",
     padding: "1rem 1.25rem 1.25rem 1.25rem",
@@ -75,4 +74,8 @@ export const AddCardButton = styled(Button)({
     // width: "50%",
     width: "70rem",
     // marginTop: "2rem",
+})
+
+export const LabelSelect = styled(Select)({
+    width: "10rem"
 })

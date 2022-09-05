@@ -170,11 +170,6 @@ const NewCardInput = props => {
                             width: "20rem"
                         }}
                     />
-                    {/* <input
-                        className={isDarkMode ? `${createSetStyles.newCardInput} ${appStyles.darkInput}` : `${createSetStyles.newCardInput} ${appStyles.lightInput}`}
-                        placeholder="Enter a term"
-                        onChange={(e) => updateCardValue(index, "term", e.target.value)}
-                    /> */}
                 </div>
                 {/* TODO: Fix widths */}
                 <div className={createSetStyles.newCardDefinition}>
@@ -194,11 +189,6 @@ const NewCardInput = props => {
                             width: "20rem"
                         }}
                     />
-                    {/* <input
-                        className={isDarkMode ? `${createSetStyles.newCardInput} ${appStyles.darkInput}` : `${createSetStyles.newCardInput} ${appStyles.lightInput}`}
-                        placeholder="Enter a definition"
-                        onChange={(e) => updateCardValue(index, "definition", e.target.value)}
-                    /> */}
                 </div>
             </div>
         </NewCard>
