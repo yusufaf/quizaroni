@@ -23,8 +23,19 @@ import {
 } from "src/utilities/constants";
 import { updateBrowserTitle } from "src/utilities/functions";
 
-import { CreateSetPage, CreateSetPaper, CreateSetContainer, CreateSetInputsContainer, DescriptionInput, TitleInput, LabelInputContainer, LabelInput, AddCardButton } from "./CreateSetStyles";
-import { SimpleFlexContainer } from 'src/AppStyles';
+import {
+    CreateSetPage,
+    CreateSetPaper,
+    CreateSetContainer,
+    CreateSetInputsContainer,
+    DescriptionInput,
+    TitleInput,
+    LabelInputContainer,
+    LabelInput,
+    AddCardButton,
+    LabelSelect
+} from "./CreateSetStyles";
+import { BoldHeading, SimpleFlexContainer } from 'src/AppStyles';
 
 const CreateSet = props => {
     const { userAuthState } = props;
@@ -260,25 +271,16 @@ const CreateSet = props => {
             <CreateSetPage>
                 <CreateSetPaper elevation={6}>
                     <CreateSetContainer>
-                        <Typography
-                            variant="h5"
-                            sx={{
-                                fontWeight: "bold"
-                            }}
-                        >
+                        <BoldHeading variant="h5">
                             {CREATE_SET.TITLE}
-                        </Typography>
+                        </BoldHeading>
                         <CreateSetInputsContainer>
-                            <Typography
+                            <BoldHeading
                                 variant="subtitle1"
-                                sx={{
-                                    /* TODO: Check the color on this */
-                                    color: theme.palette.primary.main,
-                                    fontWeight: "bold"
-                                }}
+                                color={theme.palette.primary.main}
                             >
                                 Title
-                            </Typography>
+                            </BoldHeading>
 
                             <TitleInput
                                 variant="standard"
@@ -289,15 +291,12 @@ const CreateSet = props => {
                                 size="small"
                             />
 
-                            <Typography
+                            <BoldHeading
                                 variant="subtitle1"
-                                sx={{
-                                    color: theme.palette.primary.main,
-                                    fontWeight: "bold"
-                                }}
+                                color={theme.palette.primary.main}
                             >
                                 Description
-                            </Typography>
+                            </BoldHeading>
                             <DescriptionInput
                                 variant="outlined"
                                 placeholder={CREATE_SET.DESC_PLACEHOLDER}
@@ -306,15 +305,12 @@ const CreateSet = props => {
                                 size="large"
                             />
 
-                            <Typography
+                            <BoldHeading
                                 variant="subtitle1"
-                                sx={{
-                                    color: theme.palette.primary.main,
-                                    fontWeight: "bold"
-                                }}
+                                color={theme.palette.primary.main}
                             >
                                 Label
-                            </Typography>
+                            </BoldHeading>
                             <LabelInputContainer>
                                 <LabelInput
                                     variant="standard"
@@ -327,16 +323,18 @@ const CreateSet = props => {
 
                                 <FormControl variant="standard">
                                     <InputLabel>Label</InputLabel>
-                                    <Select
-                                        // value={age}
+                                    <LabelSelect
+                                        value={selectedLabel}
+                                        // @ts-ignore
                                         onChange={(e) => setSelectedLabel(e.target.value)}
-                                        // label="Age"
                                     >
-                                        <MenuItem value=""></MenuItem>
-                                        <MenuItem value={10}>Ten</MenuItem>
-                                        <MenuItem value={20}>Twenty</MenuItem>
-                                        <MenuItem value={30}>Thirty</MenuItem>
-                                    </Select>
+                                        {/* Width of 10rem for the MenuItem */}
+                                        <MenuItem value={10} sx={{ width: "10rem" }} >
+                                            <Typography variant="inherit" noWrap>
+                                                TenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTen
+                                            </Typography>
+                                        </MenuItem>
+                                    </LabelSelect>
                                 </FormControl>
                                 {/* TODO: Map labelOptions to MenuItem */}
 
