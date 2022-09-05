@@ -1,18 +1,20 @@
-import { useState } from "react";
 import { IconButton, InputAdornment } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const PasswordToggle = props => {
-    const [passVisibility, setPassVisibility] = useState(false);
+    const {
+        passwordVisibility,
+        setPasswordVisibility
+    } = props;
 
     return (
         <InputAdornment position="end">
             <IconButton
                 aria-label="toggle password visibility"
-                onClick={() => setPassVisibility(!passVisibility)}
+                onClick={() => setPasswordVisibility(!passwordVisibility)}
                 edge="end"
             >
-                {passVisibility ? <VisibilityOff /> : <Visibility />}
+                {passwordVisibility ? <VisibilityOff /> : <Visibility />}
             </IconButton>
         </InputAdornment>
     )
