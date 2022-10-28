@@ -1,31 +1,21 @@
-import { useState, useEffect } from "react"
-
-import { doc, updateDoc, query, where, collection, addDoc } from "firebase/firestore";
-import { firebaseApp, database } from "../firebase/firebase";
-import { getAuth, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import * as firebaseui from 'firebaseui'
+import { createUserWithEmailAndPassword, getAuth, GoogleAuthProvider } from "firebase/auth";
+import { addDoc, collection } from "firebase/firestore";
+import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
+import { useEffect, useState } from "react";
+import { database } from "../firebase/firebase";
 
-/* Outside Components */
-import { Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Button, Card, Paper, Typography, TextField, InputAdornment, IconButton } from '@mui/material/';
-import { styled } from '@mui/system';
-import PasswordToggle from "src/components/PasswordToggle/PasswordToggle"
-
-/* Styling */
-import { useTheme } from "../theme/useTheme";
-import * as loginStyles from '../Login/Login.module.css';
-import * as signupStyles from "./Signup.module.css"
-import * as appStyles from "../App.module.css";
+import { Alert, AlertTitle, Paper } from '@mui/material/';
+import { useNavigate } from "react-router-dom";
+import PasswordToggle from "src/components/PasswordToggle/PasswordToggle";
 import * as C from "src/utilities/constants";
 import { updateBrowserTitle } from "src/utilities/functions";
+import * as appStyles from "../App.module.css";
+import * as loginStyles from '../Login/Login.module.css';
+import { useTheme } from "../theme/useTheme";
 
 import {
-    LoginPageContainer as SignupPageContainer,
-    LoginContainer as SignupContainer,
-    LoginButton as SignupButton,
-    LoginField as SignupField,
-    LoginTitle as SignupTitle,
+    LoginButton as SignupButton, LoginContainer as SignupContainer, LoginField as SignupField, LoginPageContainer as SignupPageContainer, LoginTitle as SignupTitle,
     StyledLink
 } from "src/Login/LoginStyles";
 

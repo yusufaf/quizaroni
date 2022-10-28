@@ -12,3 +12,16 @@ export const SimpleFlexContainer = styled("div")({
 export const BoldHeading = styled(Typography)({
     fontWeight: "bold"
 })
+
+/*
+.alert {
+  position       : absolute;
+  left           : 39vw;
+  top            : 8vh;
+  display        : flex;
+  justify-content: center;
+  align-items    : center;
+  height         : 3rem;
+  width          : 20rem;
+}
+*/

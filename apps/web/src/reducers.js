@@ -1,5 +1,5 @@
 import { combineReducers } from "redux";
-import userAuthReducer from "./reducers/userAuthState";
+import userAuthReducer from "./reducers/global";
 
 const allReducers = combineReducers(
     {

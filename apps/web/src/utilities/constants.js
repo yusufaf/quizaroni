@@ -60,3 +60,7 @@ export const DOWNLOAD_FILE_TYPES = {
     JSON: "JSON",
     CSV: "CSV"
 }
+
+export const PAGES = {
+    CREATE: "Create"
+}
