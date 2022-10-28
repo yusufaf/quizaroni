@@ -14,3 +14,13 @@ body, html {
   min-height: 100vh;
   flex-direction: column;
 }
+
+/* TODO: Global Scrollbar Styling */
+/* ::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ffa000;
+  border-radius: 0.25rem
+} */

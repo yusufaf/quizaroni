@@ -12,14 +12,14 @@ import LoginMessage from "../LoginMessage/LoginMessage";
 import ImportSetModal from "./ImportSetModal/ImportSetModal";
 
 import { useTheme } from "../theme/useTheme";
-import * as createSetStyles from './CreateSet.module.css';
 import * as appStyles from "../App.module.css";
 import {
     SUCCESS,
     SUCCESS_U,
     ERROR,
     ERROR_U,
-    CREATE_SET
+    CREATE_SET,
+    PAGES
 } from "src/utilities/constants";
 import { updateBrowserTitle } from "src/utilities/functions";
 
@@ -33,7 +33,9 @@ import {
     LabelInputContainer,
     LabelInput,
     AddCardButton,
-    LabelSelect
+    LabelSelect,
+    CreateSetButton,
+    AddCardIcon
 } from "./CreateSetStyles";
 import { BoldHeading, SimpleFlexContainer } from 'src/AppStyles';
 
@@ -73,9 +75,11 @@ const CreateSet = props => {
 
     const createSetDisabled = !enteredTitle || !enteredDescription;
 
+    const [pageHeight, setPageHeight] = useState(0);
+
     useEffect(() => {
         renderLabelOptions();
-        updateBrowserTitle("Create");
+        updateBrowserTitle(PAGES.CREATE);
     }, []);
 
     /**
@@ -302,7 +306,8 @@ const CreateSet = props => {
                                 placeholder={CREATE_SET.DESC_PLACEHOLDER}
                                 value={enteredDescription}
                                 onChange={e => setEnteredDescription(e.target.value)}
-                                size="large"
+                                multiline
+                                maxRows={4}
                             />
 
                             <BoldHeading
@@ -328,6 +333,7 @@ const CreateSet = props => {
                                         // @ts-ignore
                                         onChange={(e) => setSelectedLabel(e.target.value)}
                                     >
+                                        {/* TODO: Always leave an empty option so they don't have to pick one */}
                                         {/* Width of 10rem for the MenuItem */}
                                         <MenuItem value={10} sx={{ width: "10rem" }} >
                                             <Typography variant="inherit" noWrap>
@@ -337,36 +343,17 @@ const CreateSet = props => {
                                     </LabelSelect>
                                 </FormControl>
                                 {/* TODO: Map labelOptions to MenuItem */}
-
-
-                                {/* <select
-                                    className={`${createSetStyles.labelDropdown} ${isDarkMode ? `${appStyles.darkInput}` : `${appStyles.lightInput}`}`
-                                    }
-                                    onChange={(e) => setSelectedLabel(e.target.value)}
-                                    disabled={enteredLabel !== ""}
-                                >
-                                    {labelOptions}
-                                </select> */}
                             </LabelInputContainer>
 
-                            <Button
+                            <CreateSetButton
                                 variant="contained"
                                 onClick={() => createNewSet()}
-                                sx={{
-                                    position: "absolute",
-                                    right: "2rem",
-                                    display: "flex",
-                                }}
                                 size="large"
                                 disabled={createSetDisabled}
                             >
-                                <Create
-                                    sx={{
-                                        marginRight: "0.5rem"
-                                    }}
-                                />
+                                <Create />
                                 Create Set
-                            </Button>
+                            </CreateSetButton>
                         </CreateSetInputsContainer>
 
                         <SimpleFlexContainer>
@@ -380,61 +367,22 @@ const CreateSet = props => {
                             <Typography variant="subtitle1"
                                 component="span"
                             >
-                                Import cards
+                                Import Cards
                             </Typography>
                         </SimpleFlexContainer>
-
                     </CreateSetContainer>
                 </CreateSetPaper>
                 {renderCreateCards()}
-
-                {/* 
-    position     : relative;
-    width        : 73rem;
-    left         : 20rem;
-    padding      : 1.25rem;
-    background   : orange;
-    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
-    margin-bottom: 2rem;
-
-    border-radius: 0.75rem;
-    border       : none;
-    outline      : none;
-
-    font-weight   : bold;
-    text-transform: uppercase;
-    transition    : 0.2s ease;
-
-    display        : flex;
-    flex-direction : row;
-    justify-content: center;
-    align-items    : center;
-    gap            : 0.5rem;
-
-    text-align: center;
-    
-                */}
                 <AddCardButton
                     variant="contained"
                     onClick={() => {
                         addCreateCardInput();
                     }}
                 >
-                    <i
-                        className={`material-icons ${createSetStyles.addIcon}`}>
-                        add_circle_outline
-                    </i>
+                    <AddCardIcon/>
                     Add Card
                 </AddCardButton>
-                {/* 
-                        className={createdSetCards.length !== 0 ? `${createSetStyles.addCard}` : `${createSetStyles.addCard} ${createSetStyles.noInputs}`}
-                        .addCard.noInputs {
-                            margin-top: 28.5rem;
-                        }
-                */}
-
             </CreateSetPage>
-
             <ImportSetModal
                 open={showImportModal}
                 onClose={() => setShowImportModal(false)}

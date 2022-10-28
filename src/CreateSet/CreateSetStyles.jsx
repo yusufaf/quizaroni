@@ -2,7 +2,8 @@
 
 
 import { styled } from "@mui/system";
-import { Box, Button, Card, Paper, Select, TextField } from "@mui/material";
+import { Box, Button, Card, Paper, Select, TextField, TextareaAutosize } from "@mui/material";
+import { AddCircleOutline } from "@mui/icons-material";
 
 export const CreateSetPage = styled(Box)({
     display: "grid",
@@ -10,7 +11,7 @@ export const CreateSetPage = styled(Box)({
     alignItems: "center",
     gridTemplateRows: "auto auto",
     gap: "2rem",
-
+    paddingBottom: "2rem",
     // display: "flex",
     // alignItems: "center",
     // justifyContent: "center",
@@ -42,11 +43,8 @@ export const TitleInput = styled(TextField)({
 })
 
 export const DescriptionInput = styled(TextField)({
-    resize: "none",
-    borderRadius: "0.25rem",
     width: "30rem",
-    marginBottom: "1rem"
-    // fontFamily  : -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    marginBottom: "1rem",
 })
 
 export const LabelInputContainer = styled("div")({
@@ -59,6 +57,16 @@ export const LabelInput = styled(TextField)({
     width: "18rem"
 })
 
+export const CreateSetButton = styled(Button)({
+    position: "absolute",
+    right: "2rem",
+    display: "flex",
+    gap: "0.5rem"
+})
+
+/* 
+New Card Styled Components
+*/
 
 export const NewCard = styled(Card)({
     width: "70rem",
@@ -71,11 +79,18 @@ export const AddCardButton = styled(Button)({
     alignItems: "center",
     gap: "0.5rem",
     fontWeight: "bold",
-    // width: "50%",
     width: "70rem",
-    // marginTop: "2rem",
+    fontSize: "1rem"
+})
+
+export const AddCardIcon = styled(AddCircleOutline)({
+    fontSize: "3rem"
 })
 
 export const LabelSelect = styled(Select)({
     width: "10rem"
+})
+
+export const NewCardInputField = styled(TextField)({
+    width: "25rem"
 })

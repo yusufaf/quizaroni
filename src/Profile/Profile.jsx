@@ -24,6 +24,7 @@ import * as appStyles from "../App.module.css";
 import PasswordToggle from "src/components/PasswordToggle/PasswordToggle";
 import {
     InfoChangeContainer,
+    PasswordFieldsContainer,
     ProfilePaper
 } from "./ProfileStyles"
 
@@ -255,11 +256,32 @@ const Profile = props => {
                         </ActionHeader>
 
                         <InfoChangeContainer>
-                            <div className={profileStyles.changeInputs}>
+                            <PasswordFieldsContainer>
                                 <TextField
                                     variant="standard"
                                     placeholder="Enter new password"
                                     label="Password"
+                                    type={newPasswordVisibility ? 'text' : 'password'}
+                                    value={enteredNewPassword}
+                                    name="passInput"
+                                    onChange={e => setEnteredNewPassword(e.target.value)}
+                                    // onBlur={e => checkIfInputEmpty(e)}
+                                    // helperText={showErrorText.passInput && "A password is required"}
+                                    // error={showErrorText.passInput}
+                                    size="small"
+                                    InputProps={{
+                                        endAdornment:
+                                            <PasswordToggle
+                                                passwordVisibility={newPasswordVisibility}
+                                                setPasswordVisibility={setNewPasswordVisibility}
+                                            />
+                                    }}
+                                />
+
+                                <TextField
+                                    variant="standard"
+                                    placeholder="Confirm new password"
+                                    label="Confirm Password"
                                     type={newPasswordVisibility ? 'text' : 'password'}
                                     value={enteredNewPassword}
                                     name="passInput"
@@ -297,7 +319,7 @@ const Profile = props => {
                                         </span>
                                     }
                                 </div> */}
-                            </div>
+                            </PasswordFieldsContainer>
 
                             <Button
                                 variant="contained"
