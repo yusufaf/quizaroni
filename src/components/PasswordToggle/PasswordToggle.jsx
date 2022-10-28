@@ -10,7 +10,7 @@ const PasswordToggle = props => {
     return (
         <InputAdornment position="end">
             <IconButton
-                aria-label="toggle password visibility"
+                aria-label="Toggle password visibility"
                 onClick={() => setPasswordVisibility(!passwordVisibility)}
                 edge="end"
             >
@@ -19,6 +19,5 @@ const PasswordToggle = props => {
         </InputAdornment>
     )
 }
-
 
 export default PasswordToggle;

@@ -11,3 +11,8 @@ export const InfoChangeContainer = styled("div")({
     gap: "2rem",
 })
 
+export const PasswordFieldsContainer = styled("div")({
+    display: "flex",
+    flexDirection: "column",
+    gap: "2rem",
+})

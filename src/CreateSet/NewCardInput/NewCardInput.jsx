@@ -1,13 +1,12 @@
 import { useState, useRef } from "react"
 import { IconButton, TextField, Tooltip, Typography } from '@mui/material/';
-import { AddPhotoAlternate, Delete, FormatColorText, FormatColorFill } from "@mui/icons-material";
+import { AddPhotoAlternate, Delete, FormatColorText, FormatColorFill, SwapHoriz } from "@mui/icons-material";
 import { useTheme } from "src/theme/useTheme";
 
 import { ChromePicker } from "react-color";
 
 import * as createSetStyles from '../CreateSet.module.css';
-import * as appStyles from "../../App.module.css";
-import { NewCard } from "../CreateSetStyles";
+import { NewCard, NewCardInputField } from "../CreateSetStyles";
 
 const NewCardInput = props => {
     const { index, handleDelete, updateCardValue, onFileChange, onColorChange, fileInputRef } = props;
@@ -115,6 +114,19 @@ const NewCardInput = props => {
                             }}
                         />
                     }
+                    {/* TODO: Implement swapping of the term and the definition */}
+                    <Tooltip
+                        title="Swap term and definition"
+                        placement="top"
+                    >
+                        <IconButton
+                            onClick={() => alert("Bruh")}
+                        >
+                            <SwapHoriz
+                                fontSize="medium"
+                            />
+                        </IconButton>
+                    </Tooltip>
                 </div>
 
                 <div className={createSetStyles.newCardActions}>
@@ -125,9 +137,7 @@ const NewCardInput = props => {
                         <IconButton
                             onClick={() => handleDelete(index)}
                         >
-                            <Delete
-                                fontSize="medium"
-                            />
+                            <Delete fontSize="medium"/>
                         </IconButton>
                     </Tooltip>
                     <input
@@ -156,38 +166,32 @@ const NewCardInput = props => {
                 <div className={createSetStyles.newCardTerm}>
                     <Typography
                         variant="subtitle1"
-                        sx={{
-                            color: theme.palette.primary.main,
-                        }}
+                        sx={{color: theme.palette.primary.main}}
                     >
                         Term
                     </Typography>
-                    <TextField
+                    
+                    <NewCardInputField
                         variant="standard"
-                        placeholder={"Enter a title"}
+                        placeholder={"Enter a term"}
                         onChange={(e) => updateCardValue(index, "term", e.target.value)}
-                        sx={{
-                            width: "20rem"
-                        }}
+                        multiline
+                        maxRows={4}
                     />
                 </div>
-                {/* TODO: Fix widths */}
                 <div className={createSetStyles.newCardDefinition}>
                     <Typography
                         variant="subtitle1"
-                        sx={{
-                            color: theme.palette.primary.main,
-                        }}
+                        sx={{color: theme.palette.primary.main}}
                     >
                         Definition
                     </Typography>
-                    <TextField
+                    <NewCardInputField
                         variant="standard"
                         placeholder={"Enter a definition"}
                         onChange={(e) => updateCardValue(index, "definition", e.target.value)}
-                        sx={{
-                            width: "20rem"
-                        }}
+                        multiline
+                        maxRows={4}
                     />
                 </div>
             </div>

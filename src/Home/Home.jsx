@@ -1,12 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from 'react-redux';
-// import { setUserAuthState } from "../reducers/userAuthState";
 import { DataGrid } from '@mui/x-data-grid';
 
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { database } from "../firebase/firebase";
-
-/* Outside Components */
 import { ContentCopy, Delete, Edit, FavoriteBorder, MenuOpen } from "@mui/icons-material";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material/';
 import { useNavigate } from "react-router-dom";
@@ -14,22 +11,16 @@ import { useNavigate } from "react-router-dom";
 import LoginMessage from "../LoginMessage/LoginMessage";
 import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
 import ViewFlashSet from "./ViewFlashSet/ViewFlashSet";
-
-
-/* Styling */
 import * as appStyles from "../App.module.css";
 import { useTheme } from "../theme/useTheme";
 import { updateBrowserTitle } from "../utilities/functions";
 import * as homeStyles from './Home.module.css';
 
-/*
-    Home Component
-*/
 const Home = props => {
     const { userAuthState } = props;
     const { isDarkMode, theme } = useTheme();
 
-    const reduxUserAuthState = useSelector((state) => state.userAuthState);
+    const reduxUserAuthState = useSelector( (state) => state.userAuthState);
 
     let originalFlashSets;
 
@@ -88,7 +79,6 @@ const Home = props => {
         setShowDuplicateConfirmation(false);
     }
 
-    /* React-Router function for switching routes */
     let navigate = useNavigate();
 
     // Store a reference to the HTML file <input>
@@ -100,6 +90,8 @@ const Home = props => {
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState("");
 
+
+    /* TODO: Move columns elsewhere */
     const columns = [
         {
             field: 'title',
@@ -137,9 +129,6 @@ const Home = props => {
                         <Tooltip title="Open actions menu" placement="right">
                             <IconButton
                                 onClick={openActionsMenu}
-                                sx={{
-                                    // color: theme.foreground
-                                }}
                             >
                                 <MenuOpen />
                             </IconButton>
@@ -190,9 +179,6 @@ const Home = props => {
                                     onClick={() => handleDelete(index)}
                                 >
                                     <Delete
-                                        sx={{
-                                            // color: theme.foreground
-                                        }}
                                         fontSize="medium"
                                     />
                                 </IconButton>
@@ -205,9 +191,6 @@ const Home = props => {
                                     onClick={() => handleDelete(index)}
                                 >
                                     <FavoriteBorder
-                                        sx={{
-                                            // color: theme.foreground
-                                        }}
                                         fontSize="medium"
                                     />
                                 </IconButton>

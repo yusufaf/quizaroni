@@ -1,29 +1,29 @@
-import { useState, useEffect } from "react"
-import { Routes, Route } from "react-router-dom";
-import Footer from "./Footer/Footer";
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { LIGHT, DARK } from "./utilities/constants.js"
-
-/* Component imports */
-import NavBar from "./NavBar/NavBar";
+import { useEffect, useState } from "react";
+import { Route, Routes } from "react-router-dom";
+import CreateSet from "./CreateSet/CreateSet";
+import Footer from "./Footer/Footer";
+import ForgotPassword from "./ForgotPassword/ForgotPassword";
 import Home from "./Home/Home";
 import Login from "./Login/Login";
-import Signup from "./Signup/Signup";
-import CreateSet from "./CreateSet/CreateSet";
+import NavBar from "./NavBar/NavBar";
 import Profile from "./Profile/Profile";
-import ForgotPassword from "./ForgotPassword/ForgotPassword";
+import Signup from "./Signup/Signup";
+import { DARK, LIGHT } from "./utilities/constants.js";
 
-import * as appStyles from "./App.module.css";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserAuthState as setReduxUserAuthState } from "src/reducers/global";
 import { useTheme } from "./theme/useTheme.js";
 import { handleDesktopZoom } from "./utilities/handleDesktopZoom";
 
 const App = () => {
-  /* TODO: Bring the auth state into a Redux slice / reducer */
-  const [userAuthState, setUserAuthState] = useState(null);
-
   const { setTheme } = useTheme();
-
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
+  
+  const dispatch = useDispatch();
+  const reduxUserAuthState = useSelector( (state) => state.userAuthState);
+
+  const [userAuthState, setUserAuthState] = useState(null);
 
   useEffect(() => {
     prefersDarkMode
@@ -32,17 +32,17 @@ const App = () => {
   }, [prefersDarkMode])
 
   useEffect(() => {
-    /* If the user info is in localStorage, keep them logged in */
+    /* If the user info is in localStorage, keep them logged in */6
     if (localStorage.getItem("userInfo") !== null) {
       const userInfo = JSON.parse(localStorage.getItem("userInfo"));
       const tokenExpiration = userInfo.stsTokenManager.expirationTime;
 
       /* If the user's token hasn't expired */
       if (Date.now() < tokenExpiration) {
+        dispatch(setReduxUserAuthState(userInfo));
         setUserAuthState(userInfo);
       }
     }
-
     handleDesktopZoom();
   }, []);
 
@@ -99,7 +99,6 @@ const App = () => {
         />
 
         {/* <Route path="*" element={<NotFound />} /> */}
-
       </Routes>
     </>
   );
