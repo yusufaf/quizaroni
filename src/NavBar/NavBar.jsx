@@ -8,6 +8,8 @@ import {
     Logout as LogoutIcon
 } from "@mui/icons-material"
 import { useTheme } from "../theme/useTheme";
+import { useDispatch, useSelector } from "react-redux";
+import { selectAlert, setAlert } from "src/reducers/globalSlice";
 
 import NavDrawer from "./NavDrawer/NavDrawer";
 import ProfileDropdown from "../Profile/ProfileDropdown";
@@ -24,7 +26,9 @@ import {
     StyledNavLink,
     StyledDarkModeIcon,
     StyledLightModeIcon,
-    AccountIconsContainer
+    AccountIconsContainer,
+    RightActionsContainer,
+    NavLinksContainer
 } from "./NavStyles";
 
 const NavBar = props => {
@@ -39,8 +43,12 @@ const NavBar = props => {
     const navigate = useNavigate();
 
     const [showDropdown, setShowDropdown] = useState(false);
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertType, setAlertType] = useState("");
+
+    const dispatch = useDispatch();
+    const globalAlert = useSelector(selectAlert);
+
+    // const [showAlert, setShowAlert] = useState(false);
+    // const [alertType, setAlertType] = useState("");
 
     const dropdownRef = useRef(null);
 
@@ -53,10 +61,22 @@ const NavBar = props => {
      * Display alert showing that the user has successfully logged out
      */
     const displayLogoutAlert = () => {
-        setShowAlert(true);
-        setAlertType(C.SUCCESS);
+        dispatch(
+            setAlert({
+                show: true,
+                type: C.SUCCESS,
+            })
+        )
+
+        // setShowAlert(true);
+        // setAlertType(C.SUCCESS);
         setTimeout(() => {
-            setShowAlert(false);
+            dispatch(
+                setAlert({
+                    show: false,
+                    type: "",
+                })
+            )
         }, 1000);
     }
 
@@ -64,19 +84,19 @@ const NavBar = props => {
     /*
         TODO: Consolidate AlertJSX into a single component for all alerts in the application?
     */
-    const returnAlertJSX = () => {
-        // return (
-        //     <Alert
-        //         className={appStyles.alert}
-        //         severity={alertType}
-        //     >
-        //         <AlertTitle>
-        //             <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
-        //         </AlertTitle>
-        //         {alertType === C.SUCCESS ? C.LOGOUT_SUCCESS_MSG : C.LOGOUT_ERROR_MSG}
-        //     </Alert>
-        // );
-    }
+    // const returnAlertJSX = () => {
+    //     console.log("Entered returnAlertJsx with ", globalAlert)
+    //     return (
+    //         <Alert
+    //             severity={globalAlert.type}
+    //         >
+    //             <AlertTitle>
+    //                 <b>{globalAlert.type === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
+    //             </AlertTitle>
+    //             {globalAlert.type === C.SUCCESS ? C.LOGOUT_SUCCESS_MSG : C.LOGOUT_ERROR_MSG}
+    //         </Alert>
+    //     );
+    // }
 
     /**
     * Handles logging out a user, using Firebase's provided method signOut()
@@ -104,66 +124,69 @@ const NavBar = props => {
         <>
             <AppBar position="static" color="inherit">
                 <Toolbar>
-                    {/* <AppLogo
+                    {/*
+                    TODO: Revisit what to do with logo 
+                    <AppLogo
                         src={QuizaroniLogo}
                         alt="Quizaroni logo"
-                    /> */}
+                    /> */
+                    }
                     <Typography
                         color="primary"
                         variant="h4"
                     >
                         Quizaroni
                     </Typography>
-                    {isMobile ?
+                    {isMobile &&
                         <NavDrawer />
-                        :
+                    }
+                    {!isMobile &&
                         <NavItemsContainer>
-                            <StyledNavLink
-                                to="/"
-                                style={activeLinkStyle}
-                            >
-                                Home
-                            </StyledNavLink>
-                            <StyledNavLink
-                                to="/create"
-                                style={activeLinkStyle}
-                            >
-                                Create
-                            </StyledNavLink>
-                            <StyledNavLink
-                                to="/explore"
-                                style={activeLinkStyle}
-                            >
-                                Explore
-                            </StyledNavLink>
-
-                            <div className={navStyles.rightActions}>
-                                <div>
-                                    {userAuthState ?
+                            <NavLinksContainer>
+                                <StyledNavLink
+                                    to="/"
+                                    style={activeLinkStyle}
+                                >
+                                    Home
+                                </StyledNavLink>
+                                <StyledNavLink
+                                    to="/create"
+                                    style={activeLinkStyle}
+                                >
+                                    Create
+                                </StyledNavLink>
+                                <StyledNavLink
+                                    to="/explore"
+                                    style={activeLinkStyle}
+                                >
+                                    Explore
+                                </StyledNavLink>
+                            </NavLinksContainer>
+                            <RightActionsContainer>
+                                {userAuthState ?
+                                    <AuthenticationButton
+                                        variant="outlined"
+                                        onClick={() => handleLogout()}
+                                    >
+                                        <LogoutIcon />
+                                        Log out
+                                    </AuthenticationButton>
+                                    :
+                                    <LoginButtonsContainer>
                                         <AuthenticationButton
                                             variant="outlined"
-                                            onClick={() => handleLogout()}
+                                            onClick={() => navigate("/login")}
                                         >
-                                            <LogoutIcon />
-                                            Log out
+                                            Log in
                                         </AuthenticationButton>
-                                        :
-                                        <LoginButtonsContainer>
-                                            <AuthenticationButton
-                                                variant="outlined"
-                                                onClick={() => navigate("/login")}
-                                            >
-                                                Log in
-                                            </AuthenticationButton>
-                                            <AuthenticationButton
-                                                variant="contained"
-                                                onClick={() => navigate("/signup")}
-                                            >
-                                                Sign up
-                                            </AuthenticationButton>
-                                        </LoginButtonsContainer>
-                                    }
-                                </div>
+                                        <AuthenticationButton
+                                            variant="contained"
+                                            onClick={() => navigate("/signup")}
+                                        >
+                                            Sign up
+                                        </AuthenticationButton>
+                                    </LoginButtonsContainer>
+                                }
                                 <Tooltip title="Toggle dark mode">
                                     <IconButton onClick={toggleDarkMode}>
                                         {isDarkMode ? <StyledLightModeIcon /> : <StyledDarkModeIcon />}
@@ -188,14 +211,11 @@ const NavBar = props => {
                                         </>
                                     )
                                 }
-                            </div>
+                            </RightActionsContainer>
                         </NavItemsContainer>
                     }
                 </Toolbar>
             </AppBar>
-            {showAlert &&
-                returnAlertJSX()
-            }
         </>
     );
 }
