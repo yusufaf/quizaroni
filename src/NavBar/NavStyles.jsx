@@ -19,7 +19,7 @@ export const LoginButtonsContainer = styled("div")({
 
 export const StyledNavLink = styled(NavLink)(({ theme }) => ({
     borderRadius: "0.15rem",
-    fontSize: "1.25rem",
+    fontSize: "1.5rem",
     textDecoration: "none",
     cursor: "pointer",
     "&:hover": {
@@ -47,18 +47,31 @@ export const ProfileIconContainer = styled("div")({
 export const NavItemsContainer = styled("div")({
     display: "flex",
     alignItems: "center",
-    gap: "2rem",
     height: "5vh",
+    width: "100%",
     marginLeft: "5rem",
     padding: "0.5rem 0",
     transition: "0.2s ease",
     userSelect: "none",
 })
 
-export const AuthenticationButton = styled(Button)({
-    display    : "flex",
+export const NavLinksContainer = styled("div")({
+    display: "flex",
+    gap: "2rem",
+})
+
+export const RightActionsContainer = styled("div")({
+    display: "flex",
+    flexDirection: "row",
     alignItems: "center",
-    cursor     : "pointer",
+    gap: "0.5rem",
+    marginLeft: "auto"
+})
+
+export const AuthenticationButton = styled(Button)({
+    display: "flex",
+    alignItems: "center",
+    cursor: "pointer",
     fontSize: "1.25rem",
     textTransform: "none"
 })

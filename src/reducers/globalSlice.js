@@ -2,21 +2,18 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
     alert: {},
-    
+    userAuthInfo: {}
 }
 
-export const userAuthSlice = createSlice({
-  // Slice has a name, used in action types
-  name: 'userAuthState',
-  // The initial state for the reducer
-  initialState: {},
-  // An object of "case reducers". Key names will be used to generate actions.
+export const globalSlice = createSlice({
+  name: 'global',
+  initialState,
   reducers: {
     setUserAuthState: (state, action) => {
-      state = action.payload;
+      state.userAuthInfo = action.payload;
     },
     setAlert: (state, action) => {
-      state = action.payload;
+      state.alert = action.payload;
     },
     /* Customizing a generated action creator 
      addTodo: {
@@ -39,6 +36,9 @@ export const userAuthSlice = createSlice({
 export const { 
   setUserAuthState,
   setAlert
-} = userAuthSlice.actions
+} = globalSlice.actions
 
-export default userAuthSlice.reducer
+export const selectAlert = (state) => state.global.alert;
+export const selectUserAuthState = (state) => state.global.userAuthInfo;
+
+export default globalSlice.reducer
