@@ -2,19 +2,20 @@ import { useState, useEffect, useRef } from "react"
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { Alert, AlertTitle, AppBar, Button, IconButton, Toolbar, Tooltip, Typography, useMediaQuery } from '@mui/material/';
 import { getAuth, signOut } from "firebase/auth";
-import { AccountCircle, DarkMode, LightMode, KeyboardArrowDown } from "@mui/icons-material"
+import {
+    AccountCircle,
+    KeyboardArrowDown,
+    Logout as LogoutIcon
+} from "@mui/icons-material"
 import { useTheme } from "../theme/useTheme";
-import { styled } from "@mui/system";
 
 import NavDrawer from "./NavDrawer/NavDrawer";
 import ProfileDropdown from "../Profile/ProfileDropdown";
 import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
 
-import * as appStyles from '../App.module.css';
 import * as navStyles from './NavBar.module.css';
 import * as C from "../utilities/constants";
 
-// Styled Components
 import {
     AppLogo,
     AuthenticationButton,
@@ -22,10 +23,12 @@ import {
     NavItemsContainer,
     StyledNavLink,
     StyledDarkModeIcon,
-    StyledLightModeIcon
+    StyledLightModeIcon,
+    AccountIconsContainer
 } from "./NavStyles";
 
 const NavBar = props => {
+    // TODO: Change to use redux slice
     const { userAuthState, setUserAuthState } = props;
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
@@ -57,21 +60,22 @@ const NavBar = props => {
         }, 1000);
     }
 
+
     /*
         TODO: Consolidate AlertJSX into a single component for all alerts in the application?
     */
     const returnAlertJSX = () => {
-        return (
-            <Alert
-                className={appStyles.alert}
-                severity={alertType}
-            >
-                <AlertTitle>
-                    <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
-                </AlertTitle>
-                {alertType === C.SUCCESS ? C.LOGOUT_SUCCESS_MSG : C.LOGOUT_ERROR_MSG}
-            </Alert>
-        );
+        // return (
+        //     <Alert
+        //         className={appStyles.alert}
+        //         severity={alertType}
+        //     >
+        //         <AlertTitle>
+        //             <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
+        //         </AlertTitle>
+        //         {alertType === C.SUCCESS ? C.LOGOUT_SUCCESS_MSG : C.LOGOUT_ERROR_MSG}
+        //     </Alert>
+        // );
     }
 
     /**
@@ -96,10 +100,6 @@ const NavBar = props => {
         });
     }
 
-    /*
-TODO: Can create a new separate file with these styled components in it
-*/
-
     return (
         <>
             <AppBar position="static" color="inherit">
@@ -118,7 +118,10 @@ TODO: Can create a new separate file with these styled components in it
                         <NavDrawer />
                         :
                         <NavItemsContainer>
-                            <StyledNavLink to="/" style={activeLinkStyle}>
+                            <StyledNavLink
+                                to="/"
+                                style={activeLinkStyle}
+                            >
                                 Home
                             </StyledNavLink>
                             <StyledNavLink
@@ -133,18 +136,17 @@ TODO: Can create a new separate file with these styled components in it
                             >
                                 Explore
                             </StyledNavLink>
+
                             <div className={navStyles.rightActions}>
                                 <div>
                                     {userAuthState ?
-                                        <div
-                                            className={navStyles.logout}
+                                        <AuthenticationButton
+                                            variant="outlined"
                                             onClick={() => handleLogout()}
                                         >
-                                            <span className="material-icons-outlined">
-                                                logout
-                                            </span>
-                                            Logout
-                                        </div>
+                                            <LogoutIcon />
+                                            Log out
+                                        </AuthenticationButton>
                                         :
                                         <LoginButtonsContainer>
                                             <AuthenticationButton
@@ -164,28 +166,24 @@ TODO: Can create a new separate file with these styled components in it
                                 </div>
                                 <Tooltip title="Toggle dark mode">
                                     <IconButton onClick={toggleDarkMode}>
-                                        {isDarkMode ? <StyledLightModeIcon />
-                                            : <StyledDarkModeIcon />
-                                        }
+                                        {isDarkMode ? <StyledLightModeIcon /> : <StyledDarkModeIcon />}
                                     </IconButton>
                                 </Tooltip>
                                 {userAuthState &&
                                     (
                                         <>
-                                            <div
-                                                className={navStyles.accountCircle}
+                                            <AccountIconsContainer
                                                 onClick={() => setShowDropdown(true)}
                                                 ref={dropdownRef}
                                             >
-                                                <AccountCircle
-                                                    style={{ fontSize: "2rem" }}
-                                                />
-                                                <KeyboardArrowDown
-                                                    style={{ fontSize: "2rem" }}
-                                                />
-                                            </div>
-                                            <ProfileDropdown userAuthState={userAuthState} showDropdown={showDropdown}
-                                                dropdownRef={dropdownRef} setShowDropdown={setShowDropdown}
+                                                <AccountCircle fontSize="large" />
+                                                <KeyboardArrowDown fontSize="large" />
+                                            </AccountIconsContainer>
+                                            <ProfileDropdown
+                                                userAuthState={userAuthState}
+                                                showDropdown={showDropdown}
+                                                dropdownRef={dropdownRef}
+                                                setShowDropdown={setShowDropdown}
                                             />
                                         </>
                                     )

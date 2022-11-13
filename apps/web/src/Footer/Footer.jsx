@@ -1,5 +1,7 @@
 import { useState } from "react";
 import {
+    Grid,
+    TextField,
     Typography
 } from '@mui/material/';
 import { Edit } from '@mui/icons-material/';
@@ -20,12 +22,27 @@ import { styled } from "@mui/system";
 //     }
 // })
 
+const FooterContainer = styled(Grid)({
+    position: "fixed",
+    bottom: "0",
+    height: "4rem"
+})
 
 
 const Footer = props => {
-
     return (
         <footer>
+            <FooterContainer container>
+                <Grid item>
+
+                </Grid>
+                <Grid item>
+                    
+                </Grid>
+                <Grid item>
+                    
+                </Grid>
+            </FooterContainer>
         </footer>
     )
 }

@@ -1,5 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const initialState = {
+    alert: {},
+    
+}
+
 export const userAuthSlice = createSlice({
   // Slice has a name, used in action types
   name: 'userAuthState',
@@ -8,6 +13,9 @@ export const userAuthSlice = createSlice({
   // An object of "case reducers". Key names will be used to generate actions.
   reducers: {
     setUserAuthState: (state, action) => {
+      state = action.payload;
+    },
+    setAlert: (state, action) => {
       state = action.payload;
     },
     /* Customizing a generated action creator 
@@ -28,6 +36,9 @@ export const userAuthSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { setUserAuthState } = userAuthSlice.actions
+export const { 
+  setUserAuthState,
+  setAlert
+} = userAuthSlice.actions
 
 export default userAuthSlice.reducer
