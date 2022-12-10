@@ -1,27 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { collection, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { database } from "../../firebase/firebase";
-
 import { Add, ArrowBack, Download, Edit, EditNotifications, MenuOpen } from '@mui/icons-material/';
 import {
-    Button,
-    Card,
     Chip,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    FormControl,
-    FormControlLabel,
     IconButton,
-    Menu,
-    MenuItem,
-    Modal,
-    Paper,
-    Select,
-    Switch,
-    TextField,
     Tooltip,
     Typography
 } from '@mui/material/';
@@ -45,7 +28,8 @@ import { DragDropContext } from "react-beautiful-dnd"
 
 import {
     SimpleFlexContainer
-} from "src/AppStyles"
+} from "src/AppStyles";
+
 import {
     SetInfo,
     StudyModeGrid,
@@ -54,7 +38,6 @@ import {
     ViewFlashsetHeader,
     ViewFlashsetPaper
 } from "./ViewFlashSetStyles"
-
 
 const { BACKGROUND, TEXT } = VIEW_SET;
 
@@ -288,9 +271,13 @@ const ViewFlashSet = props => {
                                             >
                                                 {flashset.title}
                                             </Typography>
-                                            <EditableTextField style={{ marginTop: "1rem", width: "fit-content" }} value={flashset.title} tooltipText={"Rename title"} />
+                                            <EditableTextField
+                                                style={{ marginTop: "1rem", width: "fit-content" }}
+                                                value={flashset.title}
+                                                tooltipText={"Rename title"}
+                                            />
 
-                                            <Chip label={flashset.label ? flashset.label : "No label selected"} variant="outlined"/>
+                                            <Chip label={flashset.label ? flashset.label : "No label selected"} variant="outlined" />
                                             <Tooltip
                                                 title="Create label"
                                                 placement="right"
@@ -304,7 +291,11 @@ const ViewFlashSet = props => {
                                                 </IconButton>
                                             </Tooltip>
 
-                                            <EditableTextField style={{ marginTop: "1rem" }} value={flashset.description} tooltipText={"Edit description"} />
+                                            <EditableTextField
+                                                style={{ marginTop: "1rem" }}
+                                                value={flashset.description}
+                                                tooltipText={"Edit description"}
+                                            />
                                             <ActionsSection {...actionSectionProps} />
                                         </SetInfo>
                                         <div className={viewFlashStyles.studySection}>
@@ -332,7 +323,7 @@ const ViewFlashSet = props => {
                             <Typography
                                 className=""
                                 variant="h6"
-                                sx={{marginRight: "41%"}}
+                                sx={{ marginRight: "41%" }}
                             >
                                 Number of cards in this study set: {flashset.cards.length}
                             </Typography>
@@ -341,12 +332,10 @@ const ViewFlashSet = props => {
                             {renderSetCards()}
 
                             <CreateLabelDialog {...createLabelDialogProps} />
-
                             <NotificationsDialog
                                 open={showNotificationsModal}
                                 handleClose={() => setShowNotificationsModal(false)}
                             />
-
                             <DownloadSetModal
                                 open={showDownloadPopup}
                                 handleClose={() => setShowDownloadPopup(false)}

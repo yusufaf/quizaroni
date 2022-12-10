@@ -51,12 +51,39 @@ export const NavItemsContainer = styled("div")({
     alignItems: "center",
     gap: "2rem",
     height: "5vh",
+    width: "100%",
     marginLeft: "5rem",
     padding: "0.5rem 0",
     transition: "0.2s ease",
     userSelect: "none",
 })
 
+export const NavLinksContainer = styled("div")({
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: "2rem",
+})
+
+export const NavRightActions = styled("div")({
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: "0.5rem",
+    marginLeft: "auto",
+})
+
 export const AuthenticationButton = styled(Button)({
-    textTransform: "none"
+    textTransform: "none",
+    display: "flex",
+    alignItems: "center",
+    fontSize: "1rem",
+})
+
+export const StyledAccountIcon = styled(AccountCircle)({
+    fontSize: "2rem",
+})
+
+export const StyledArrowIcon = styled(KeyboardArrowDown)({
+    fontSize: "2rem",
 })
