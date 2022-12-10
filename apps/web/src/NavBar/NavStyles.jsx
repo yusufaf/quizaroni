@@ -1,5 +1,5 @@
 import { styled } from "@mui/system";
-import { Button } from "@mui/material";
+import { Button, Grid } from "@mui/material";
 import { AccountCircle, DarkMode, LightMode, KeyboardArrowDown } from "@mui/icons-material"
 import { NavLink } from "react-router-dom";
 
@@ -19,7 +19,7 @@ export const LoginButtonsContainer = styled("div")({
 
 export const StyledNavLink = styled(NavLink)(({ theme }) => ({
     borderRadius: "0.15rem",
-    fontSize: "1.25rem",
+    fontSize: "1.5rem",
     textDecoration: "none",
     cursor: "pointer",
     "&:hover": {
@@ -30,13 +30,11 @@ export const StyledNavLink = styled(NavLink)(({ theme }) => ({
 }));
 
 export const StyledDarkModeIcon = styled(DarkMode)({
-    cursor: "pointer",
     color: "#121212",
     fontSize: "2rem",
 })
 
 export const StyledLightModeIcon = styled(LightMode)({
-    cursor: "pointer",
     color: "yellow",
     fontSize: "2rem",
 })
@@ -49,7 +47,6 @@ export const ProfileIconContainer = styled("div")({
 export const NavItemsContainer = styled("div")({
     display: "flex",
     alignItems: "center",
-    gap: "2rem",
     height: "5vh",
     width: "100%",
     marginLeft: "5rem",
@@ -86,4 +83,9 @@ export const StyledAccountIcon = styled(AccountCircle)({
 
 export const StyledArrowIcon = styled(KeyboardArrowDown)({
     fontSize: "2rem",
+})
+
+export const AccountIconsContainer = styled("div")({
+    display: "flex",
+    cursor: "pointer"
 })

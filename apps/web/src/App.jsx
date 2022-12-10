@@ -12,7 +12,7 @@ import Signup from "./Signup/Signup";
 import { DARK, LIGHT } from "./utilities/constants.js";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setUserAuthState as setReduxUserAuthState } from "src/reducers/global";
+import { setUserAuthState as setReduxUserAuthState } from "src/reducers/globalSlice";
 import { useTheme } from "./theme/useTheme.js";
 import { handleDesktopZoom } from "./utilities/handleDesktopZoom";
 
@@ -49,7 +49,6 @@ const App = () => {
   return (
     <>
       <NavBar userAuthState={userAuthState} setUserAuthState={setUserAuthState} />
-      <Footer />
       <Routes>
         <Route
           path="/"
@@ -100,6 +99,7 @@ const App = () => {
 
         {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
+      <Footer />
     </>
   );
 }
