@@ -29,6 +29,8 @@ import {
     NavRightActions,
     NavLinksContainer,
 } from "./NavStyles";
+import { useDispatch, useSelector } from "react-redux";
+import { selectAlert, setAlert } from "src/reducers/globalSlice";
 
 const NavBar = props => {
     // TODO: Change to use redux slice

@@ -19,7 +19,7 @@ export const LoginButtonsContainer = styled("div")({
 
 export const StyledNavLink = styled(NavLink)(({ theme }) => ({
     borderRadius: "0.15rem",
-    fontSize: "1.5rem",
+    fontSize: "1.25rem",
     textDecoration: "none",
     cursor: "pointer",
     "&:hover": {
