@@ -15,7 +15,6 @@ import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
 
 import * as C from "../utilities/constants";
 
-// Styled Components
 import {
     AppLogo,
     AuthenticationButton,
@@ -32,6 +31,7 @@ import {
 } from "./NavStyles";
 
 const NavBar = props => {
+    // TODO: Change to use redux slice
     const { userAuthState, setUserAuthState } = props;
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
@@ -42,8 +42,12 @@ const NavBar = props => {
     const navigate = useNavigate();
 
     const [showDropdown, setShowDropdown] = useState(false);
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertType, setAlertType] = useState("");
+
+    const dispatch = useDispatch();
+    const globalAlert = useSelector(selectAlert);
+
+    // const [showAlert, setShowAlert] = useState(false);
+    // const [alertType, setAlertType] = useState("");
 
     const dropdownRef = useRef(null);
 
@@ -56,12 +60,25 @@ const NavBar = props => {
      * Display alert showing that the user has successfully logged out
      */
     const displayLogoutAlert = () => {
-        setShowAlert(true);
-        setAlertType(C.SUCCESS);
+        dispatch(
+            setAlert({
+                show: true,
+                type: C.SUCCESS,
+            })
+        )
+
+        // setShowAlert(true);
+        // setAlertType(C.SUCCESS);
         setTimeout(() => {
-            setShowAlert(false);
+            dispatch(
+                setAlert({
+                    show: false,
+                    type: "",
+                })
+            )
         }, 1000);
     }
+
 
     /*
         TODO: Consolidate AlertJSX into a single component for all alerts in the application?
@@ -110,19 +127,23 @@ const NavBar = props => {
         <>
             <AppBar position="static" color="inherit">
                 <Toolbar>
-                    {/* <AppLogo
+                    {/*
+                    TODO: Revisit what to do with logo 
+                    <AppLogo
                         src={QuizaroniLogo}
                         alt="Quizaroni logo"
-                    /> */}
+                    /> */
+                    }
                     <Typography
                         color="primary"
                         variant="h4"
                     >
                         Quizaroni
                     </Typography>
-                    {isMobile ?
+                    {isMobile &&
                         <NavDrawer />
-                        :
+                    }
+                    {!isMobile &&
                         <NavItemsContainer>
                             <NavLinksContainer>
                                 <StyledNavLink to="/" style={activeLinkStyle}>
