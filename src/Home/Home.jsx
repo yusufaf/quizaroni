@@ -354,7 +354,6 @@ const Home = props => {
 
     return (
         <>
-            {/* ViewFlashset rendered right here? */}
             {viewFlashSet && Object.keys(selectedFlashSet).length !== 0 ?
                 <ViewFlashSet {...viewSetProps} />
                 :
@@ -442,7 +441,7 @@ const Home = props => {
                     </Dialog>
                 </div>
             }
-            {/* Message if no flash sets have bene created */}
+            {/* Message if no flash sets have been created */}
             {/* flashSets.length === 0 */}
         </>
     );

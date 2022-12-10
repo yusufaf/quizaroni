@@ -1,17 +1,18 @@
 import { useState, useEffect, useRef } from "react"
 import { NavLink, Link, useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, AppBar, Button, IconButton, Toolbar, Tooltip, Typography, useMediaQuery } from '@mui/material/';
+import { AppBar, Button, IconButton, Toolbar, Tooltip, Typography, useMediaQuery } from '@mui/material/';
 import { getAuth, signOut } from "firebase/auth";
-import { AccountCircle, DarkMode, LightMode, KeyboardArrowDown } from "@mui/icons-material"
+import {
+    DarkMode,
+    LightMode,
+    Logout as LogoutIcon
+} from "@mui/icons-material"
 import { useTheme } from "../theme/useTheme";
-import { styled } from "@mui/system";
 
-import NavDrawer from "./NavDrawer/NavDrawer";
+import NavDrawer from "./NavDrawer";
 import ProfileDropdown from "../Profile/ProfileDropdown";
 import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
 
-import * as appStyles from '../App.module.css';
-import * as navStyles from './NavBar.module.css';
 import * as C from "../utilities/constants";
 
 // Styled Components
@@ -22,7 +23,12 @@ import {
     NavItemsContainer,
     StyledNavLink,
     StyledDarkModeIcon,
-    StyledLightModeIcon
+    StyledLightModeIcon,
+    StyledAccountIcon,
+    StyledArrowIcon,
+    ProfileIconContainer,
+    NavRightActions,
+    NavLinksContainer,
 } from "./NavStyles";
 
 const NavBar = props => {
@@ -60,19 +66,19 @@ const NavBar = props => {
     /*
         TODO: Consolidate AlertJSX into a single component for all alerts in the application?
     */
-    const returnAlertJSX = () => {
-        return (
-            <Alert
-                className={appStyles.alert}
-                severity={alertType}
-            >
-                <AlertTitle>
-                    <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
-                </AlertTitle>
-                {alertType === C.SUCCESS ? C.LOGOUT_SUCCESS_MSG : C.LOGOUT_ERROR_MSG}
-            </Alert>
-        );
-    }
+    // const returnAlertJSX = () => {
+    //     return (
+    //         <Alert
+    //             className={appStyles.alert}
+    //             severity={alertType}
+    //         >
+    //             <AlertTitle>
+    //                 <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
+    //             </AlertTitle>
+    //             {alertType === C.SUCCESS ? C.LOGOUT_SUCCESS_MSG : C.LOGOUT_ERROR_MSG}
+    //         </Alert>
+    //     );
+    // }
 
     /**
     * Handles logging out a user, using Firebase's provided method signOut()
@@ -90,15 +96,15 @@ const NavBar = props => {
                 localStorage.removeItem("userInfo");
             }
             setUserAuthState(null);
-            displayLogoutAlert();
+            // displayLogoutAlert();
         }).catch((error) => {
             console.error("Something bad happened = ", error);
         });
     }
 
     /*
-TODO: Can create a new separate file with these styled components in it
-*/
+    TODO: Can create a new separate file with these styled components in it
+    */
 
     return (
         <>
@@ -118,86 +124,77 @@ TODO: Can create a new separate file with these styled components in it
                         <NavDrawer />
                         :
                         <NavItemsContainer>
-                            <StyledNavLink to="/" style={activeLinkStyle}>
-                                Home
-                            </StyledNavLink>
-                            <StyledNavLink
-                                to="/create"
-                                style={activeLinkStyle}
-                            >
-                                Create
-                            </StyledNavLink>
-                            <StyledNavLink
-                                to="/explore"
-                                style={activeLinkStyle}
-                            >
-                                Explore
-                            </StyledNavLink>
-                            <div className={navStyles.rightActions}>
-                                <div>
-                                    {userAuthState ?
-                                        <div
-                                            className={navStyles.logout}
-                                            onClick={() => handleLogout()}
+                            <NavLinksContainer>
+                                <StyledNavLink to="/" style={activeLinkStyle}>
+                                    Home
+                                </StyledNavLink>
+                                <StyledNavLink
+                                    to="/create"
+                                    style={activeLinkStyle}
+                                >
+                                    Create
+                                </StyledNavLink>
+                                <StyledNavLink
+                                    to="/explore"
+                                    style={activeLinkStyle}
+                                >
+                                    Explore
+                                </StyledNavLink>
+                            </NavLinksContainer>
+                            <NavRightActions>
+                                {userAuthState ?
+                                    <AuthenticationButton
+                                        variant="text"
+                                        onClick={() => handleLogout()}
+                                        startIcon={<LogoutIcon />}
+                                    >
+                                        Logout
+                                    </AuthenticationButton>
+                                    :
+                                    <LoginButtonsContainer>
+                                        <AuthenticationButton
+                                            variant="outlined"
+                                            onClick={() => navigate("/login")}
                                         >
-                                            <span className="material-icons-outlined">
-                                                logout
-                                            </span>
-                                            Logout
-                                        </div>
-                                        :
-                                        <LoginButtonsContainer>
-                                            <AuthenticationButton
-                                                variant="outlined"
-                                                onClick={() => navigate("/login")}
-                                            >
-                                                Log in
-                                            </AuthenticationButton>
-                                            <AuthenticationButton
-                                                variant="contained"
-                                                onClick={() => navigate("/signup")}
-                                            >
-                                                Sign up
-                                            </AuthenticationButton>
-                                        </LoginButtonsContainer>
-                                    }
-                                </div>
+                                            Log in
+                                        </AuthenticationButton>
+                                        <AuthenticationButton
+                                            variant="contained"
+                                            onClick={() => navigate("/signup")}
+                                        >
+                                            Sign up
+                                        </AuthenticationButton>
+                                    </LoginButtonsContainer>
+                                }
                                 <Tooltip title="Toggle dark mode">
                                     <IconButton onClick={toggleDarkMode}>
-                                        {isDarkMode ? <StyledLightModeIcon />
-                                            : <StyledDarkModeIcon />
-                                        }
+                                        {isDarkMode ? <StyledLightModeIcon /> : <StyledDarkModeIcon />}
                                     </IconButton>
                                 </Tooltip>
                                 {userAuthState &&
                                     (
                                         <>
-                                            <div
-                                                className={navStyles.accountCircle}
+                                            <ProfileIconContainer
                                                 onClick={() => setShowDropdown(true)}
                                                 ref={dropdownRef}
                                             >
-                                                <AccountCircle
-                                                    style={{ fontSize: "2rem" }}
-                                                />
-                                                <KeyboardArrowDown
-                                                    style={{ fontSize: "2rem" }}
-                                                />
-                                            </div>
-                                            <ProfileDropdown userAuthState={userAuthState} showDropdown={showDropdown}
-                                                dropdownRef={dropdownRef} setShowDropdown={setShowDropdown}
+                                                <StyledAccountIcon />
+                                                <StyledArrowIcon />
+                                            </ProfileIconContainer>
+                                            <ProfileDropdown
+                                                userAuthState={userAuthState}
+                                                showDropdown={showDropdown}
+                                                dropdownRef={dropdownRef}
+                                                setShowDropdown={setShowDropdown}
                                             />
                                         </>
                                     )
                                 }
-                            </div>
+                            </NavRightActions>
                         </NavItemsContainer>
                     }
                 </Toolbar>
             </AppBar>
-            {showAlert &&
-                returnAlertJSX()
-            }
         </>
     );
 }

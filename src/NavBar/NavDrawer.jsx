@@ -9,7 +9,7 @@ import {
 import { Menu } from "@mui/icons-material";
 import { NavLink } from "react-router-dom";
 import { styled } from '@mui/system';
-import { StyledNavLink } from "../NavStyles";
+import { StyledNavLink } from "./NavStyles";
 
 const NavDrawer = props => {
     const [openDrawer, setOpenDrawer] = useState(false);
