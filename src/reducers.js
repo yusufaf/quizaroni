@@ -1,9 +1,9 @@
 import { combineReducers } from "redux";
-import userAuthReducer from "./reducers/global";
+import globalReducer from "./reducers/globalSlice";
 
 const allReducers = combineReducers(
     {
-        userAuthState: userAuthReducer
+        global: globalReducer
     }
 );
 
