@@ -36,7 +36,8 @@ import {
     ViewFlashsetPage,
     ViewFlashsetContainer,
     ViewFlashsetHeader,
-    ViewFlashsetPaper
+    ViewFlashsetPaper,
+    StudyModeOption,
 } from "./ViewFlashSetStyles"
 
 const { BACKGROUND, TEXT } = VIEW_SET;
@@ -212,24 +213,6 @@ const ViewFlashSet = props => {
             />
         })
     }
-
-    const StudyModeOption = styled("div")({
-        fontSize: "1.25rem",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-
-        userSelect: "none",
-        cursor: "pointer",
-
-        padding: "0.75rem 0.5rem",
-        borderRadius: "0.25rem",
-        "&: hover": {
-            background: theme.palette.action.hover,
-            transition: "0.2s ease",
-        }
-    })
 
     /* TODO: Fix the spacing between the ViewContainer and the (first) ViewCards */
     return (

@@ -23,9 +23,9 @@ const DownloadSetModal = props => {
         setDownloadFileType,
     } = props
 
-    const fileDownloadTypes = Object.values(DOWNLOAD_FILE_TYPES).map(value => {
+    const fileDownloadTypes = Object.values(DOWNLOAD_FILE_TYPES).map((value, index) => {
         return (
-            <MenuItem value={value}>
+            <MenuItem key={index} value={value}>
                 {value}
             </MenuItem>
         )
