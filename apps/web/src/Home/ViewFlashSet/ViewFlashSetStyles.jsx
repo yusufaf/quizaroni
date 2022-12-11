@@ -65,3 +65,22 @@ export const ViewCardInfo = styled("div")({
     width: "10rem",
     wordWrap: "break-word"
 })
+
+
+export const StudyModeOption = styled("div")(({ theme }) => ({
+    fontSize: "1.25rem",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+
+    userSelect: "none",
+    cursor: "pointer",
+
+    padding: "0.75rem 0.5rem",
+    borderRadius: "0.25rem",
+    "&: hover": {
+        background: theme.palette.action.hover,
+        transition: "0.2s ease",
+    }
+}));

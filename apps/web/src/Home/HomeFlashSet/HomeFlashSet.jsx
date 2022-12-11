@@ -12,11 +12,6 @@ import HomeActionsMenu from "./HomeActionsMenu";
 import {
     Alert,
     AlertTitle,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
     Menu, 
     MenuItem,
     Tooltip,
@@ -28,6 +23,7 @@ import { ArrowBack } from '@mui/icons-material/';
 import { useTheme } from "../../theme/useTheme";
 import * as homeFlashStyles from './HomeFlashSet.module.css';
 import * as appStyles from "../../App.module.css";
+import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
 
 const HomeFlashSet = props => {
     const {
@@ -53,7 +49,6 @@ const HomeFlashSet = props => {
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [isFavorited, setIsFavorited] = useState(false);
     const [showActionsMenu, setShowActionsMenu] = useState(false);
-
 
     useEffect(() => {
         checkIfFavorited();
@@ -175,6 +170,10 @@ const HomeFlashSet = props => {
         }
     }
 
+    const handleCloseDeleteConfirmation = () => {
+        setShowDeleteConfirmation(false);
+    }
+
 
     return (
         <>
@@ -245,40 +244,16 @@ const HomeFlashSet = props => {
 
                 </div>
             </div>
-
-            {showDeleteConfirmation &&
-                <Dialog
-                    open={showDeleteConfirmation}
-                    onClose={() => setShowDeleteConfirmation(false)}
-                    sx={{
-                        '& .MuiDialog-paper': {
-                            bottom: "10rem",
-                            color: theme.foreground,
-                            backgroundColor: theme.background
-                        },
-                    }}
-                >
-                    <DialogTitle>Delete this flashset?</DialogTitle>
-                    <DialogContent>
-                        <DialogContentText
-                            sx={{
-                                color: theme.foreground,
-                                backgroundColor: theme.background
-                            }}
-                        >
-                            This will permanently delete the flashset.
-                        </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                        <div
-                            className={homeFlashStyles.confirmDeleteCard}
-                            onClick={() => handleDeleteSet(setID)}
-                        >
-                            Delete Card
-                        </div>
-                    </DialogActions>
-                </Dialog>
-            }
+            
+            <ConfirmDialog
+                open={showDeleteConfirmation}
+                onClose={handleCloseDeleteConfirmation}
+                title="Delete this flashset?"
+                dialogMessage="This will permanently delete the flashset."
+                // @ts-ignore
+                onConfirm={() => handleDeleteSet(setID)}
+                confirmButtonText="Delete"
+            />
         </>
     )
 }

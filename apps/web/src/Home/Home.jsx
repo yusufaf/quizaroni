@@ -5,7 +5,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { database } from "../firebase/firebase";
 import { ContentCopy, Delete, Edit, FavoriteBorder, MenuOpen } from "@mui/icons-material";
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material/';
+import { Button, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material/';
 import { useNavigate } from "react-router-dom";
 
 import LoginMessage from "../LoginMessage/LoginMessage";
@@ -13,8 +13,9 @@ import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
 import ViewFlashSet from "./ViewFlashSet/ViewFlashSet";
 import * as appStyles from "../App.module.css";
 import { useTheme } from "../theme/useTheme";
-import { updateBrowserTitle } from "../utilities/functions";
+import { updateBrowserTitle } from "src/utilities/functions";
 import * as homeStyles from './Home.module.css';
+import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
 
 const Home = props => {
     const { userAuthState } = props;
@@ -89,7 +90,6 @@ const Home = props => {
     /* Alert Popup */
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState("");
-
 
     /* TODO: Move columns elsewhere */
     const columns = [
@@ -214,12 +214,9 @@ const Home = props => {
 
     useEffect(() => {
         if (enteredSearch === "") {
-            // console.log("originalFlashSets = ", originalFlashSets);
             setFlashSets(originalFlashSets);
         }
         let searchTerm = enteredSearch.toLowerCase();
-        // console.log("searchTerm = ", searchTerm)
-        // console.log("flashSets in Search useEffect = ", flashSets);
         let newFlashSets = flashSets.filter(flashSet => {
             let { title, description } = flashSet;
             title = title.toLowerCase();
@@ -358,9 +355,7 @@ const Home = props => {
                 <ViewFlashSet {...viewSetProps} />
                 :
                 <div className={homeStyles.homePage} >
-                    <div className={homeStyles.flashSets} 
-                    // style={{ color: theme.foreground, background: theme.background }}
-                    >
+                    <div className={homeStyles.flashSets}  >
                         <Typography
                             variant="h5"
                             sx={{
@@ -384,9 +379,6 @@ const Home = props => {
                                 disableSelectionOnClick
                                 onRowClick={() => {
                                 }}
-                                sx={{
-                                    // color: theme.foreground
-                                }}
                             />
                         </div>
 
@@ -400,45 +392,13 @@ const Home = props => {
                             )
                         }
                     </div>
-                    <Dialog
+                    <ConfirmDialog
                         open={showDuplicateConfirmation}
                         onClose={handleCloseDuplicateConfirmation}
-                        aria-labelledby="alert-dialog-title"
-                        aria-describedby="alert-dialog-description"
-                        sx={warningStyling}
-                    >
-                        <DialogTitle id="alert-dialog-title"
-                            // sx={retrieveTextStyling(theme.foreground, "1.75rem")}
-                        >
-                            {"Duplicate this set?"}
-                        </DialogTitle>
-                        <DialogContent>
-                            <DialogContentText id="alert-dialog-description"
-                                // sx={retrieveTextStyling(theme.foreground, "1.5rem")}
-                            >
-                                Are you sure you want to duplicate this set?
-                            </DialogContentText>
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={handleCloseDuplicateConfirmation}
-                                sx={{
-                                    color: "orange"
-                                }}
-                            >
-                                Cancel</Button>
-                            <Button
-                                onClick={() => {
-                                    handleCloseDuplicateConfirmation();
-                                }}
-                                autoFocus
-                                sx={{
-                                    color: "orange"
-                                }}
-                            >
-                                Yes
-                            </Button>
-                        </DialogActions>
-                    </Dialog>
+                        title="Duplicate this set?"
+                        dialogMessage="Are you sure you want to duplicate this set?"
+                        onConfirm={handleCloseDuplicateConfirmation}
+                    />
                 </div>
             }
             {/* Message if no flash sets have been created */}
