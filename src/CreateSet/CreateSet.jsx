@@ -43,8 +43,7 @@ const CreateSet = props => {
     const { userAuthState } = props;
     const { isDarkMode, theme } = useTheme();
 
-    /* React-Router function for switching routes */
-    let navigate = useNavigate();
+    const navigate = useNavigate();
 
     /* Flash Set States */
     const [enteredTitle, setEnteredTitle] = useState("");
@@ -212,7 +211,7 @@ const CreateSet = props => {
      * @param {*} index 
      */
     const handleDelete = (index) => {
-        let newCreatedSetCards = [...createdSetCards];
+        const newCreatedSetCards = [...createdSetCards];
         newCreatedSetCards.splice(index, 1);
         setCreatedSetCards(newCreatedSetCards);
     }
