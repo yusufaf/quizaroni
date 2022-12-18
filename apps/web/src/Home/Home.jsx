@@ -4,8 +4,16 @@ import { DataGrid } from '@mui/x-data-grid';
 
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { database } from "../firebase/firebase";
-import { ContentCopy, Delete, Edit, FavoriteBorder, MenuOpen } from "@mui/icons-material";
-import { Button, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material/';
+import { 
+    ContentCopy as CopyIcon,
+    Delete as DeleteIcon,
+    Edit as EditIcon,
+    FavoriteBorder as FavoriteBorderIcon,
+    GridView as GridViewIcon,
+    MenuOpen as MenuOpenIcon,
+    TableView as TableViewIcon
+} from "@mui/icons-material";
+import { Button, IconButton, Menu, MenuItem, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material/';
 import { useNavigate } from "react-router-dom";
 
 import LoginMessage from "../LoginMessage/LoginMessage";
@@ -16,12 +24,13 @@ import { useTheme } from "../theme/useTheme";
 import { updateBrowserTitle } from "src/utilities/functions";
 import * as homeStyles from './Home.module.css';
 import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
+import { BoldHeading } from "src/AppStyles";
 
 const Home = props => {
     const { userAuthState } = props;
     const { isDarkMode, theme } = useTheme();
 
-    const reduxUserAuthState = useSelector( (state) => state.userAuthState);
+    const reduxUserAuthState = useSelector((state) => state.userAuthState);
 
     let originalFlashSets;
 
@@ -35,9 +44,10 @@ const Home = props => {
     const [showActionsMenu, setShowActionsMenu] = useState(false);
 
     const [showDuplicateConfirmation, setShowDuplicateConfirmation] = useState(false);
-
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [isFavorited, setIsFavorited] = useState(false);
+
+    const [selectedView, setSelectedView] = useState("table");
 
     const warningStyling = {
         "& .MuiPaper-root": {
@@ -130,7 +140,7 @@ const Home = props => {
                             <IconButton
                                 onClick={openActionsMenu}
                             >
-                                <MenuOpen />
+                                <MenuOpenIcon />
                             </IconButton>
                         </Tooltip>
                         <Menu
@@ -138,7 +148,7 @@ const Home = props => {
                             open={showActionsMenu} onClose={hideActionsMenu}
                         >
                             <MenuItem>
-                                <Edit
+                                <EditIcon
                                     sx={{
                                         marginRight: "0.75rem"
                                     }}
@@ -155,7 +165,7 @@ const Home = props => {
                             <MenuItem
                                 onClick={() => setShowDuplicateConfirmation(true)}
                             >
-                                <ContentCopy
+                                <CopyIcon
                                     sx={{
                                         marginRight: "0.75rem"
                                     }}
@@ -178,7 +188,7 @@ const Home = props => {
                                 <IconButton
                                     onClick={() => handleDelete(index)}
                                 >
-                                    <Delete
+                                    <DeleteIcon
                                         fontSize="medium"
                                     />
                                 </IconButton>
@@ -190,7 +200,7 @@ const Home = props => {
                                 <IconButton
                                     onClick={() => handleDelete(index)}
                                 >
-                                    <FavoriteBorder
+                                    <FavoriteBorderIcon
                                         fontSize="medium"
                                     />
                                 </IconButton>
@@ -344,8 +354,13 @@ const Home = props => {
     - Add "Last Viewed" property to flashsets + table 
     */
 
+    const handleViewChange = (event, nextView) => {
+        setSelectedView(nextView)
+    }
 
     if (!userAuthState) {
+
+
         return <LoginMessage page="home" />;
     }
 
@@ -355,19 +370,25 @@ const Home = props => {
                 <ViewFlashSet {...viewSetProps} />
                 :
                 <div className={homeStyles.homePage} >
+                    <ToggleButtonGroup
+                        aria-label="Grid/Table View Toggle"
+                        exclusive
+                        onChange={handleViewChange}
+                        value={selectedView}
+                    >
+                        <ToggleButton value="table" key="left">
+                            <TableViewIcon />
+                        </ToggleButton>,
+                        <ToggleButton value="grid" key="center">
+                            <GridViewIcon />
+                        </ToggleButton>
+                    </ToggleButtonGroup>
                     <div className={homeStyles.flashSets}  >
-                        <Typography
+                        <BoldHeading
                             variant="h5"
-                            sx={{
-                                fontWeight: "bold"
-                            }}
                         >
                             Your Flashsets
-                        </Typography>
-
-                        {renderSearchBar()}
-                        {/* {renderHeader()} */}
-
+                        </BoldHeading>
                         <div className={homeStyles.tableContainer}>
                             {/* TODO: Have loading spinner for when data is loading */}
                             <DataGrid

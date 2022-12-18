@@ -27,9 +27,6 @@ export const globalSlice = createSlice({
     },
     */
   },
-  // A "builder callback" function used to add more reducers, or
-  // an additional object of "case reducers", where the keys should be other
-  // action types
 })
 
 // Action creators are generated for each case reducer function
