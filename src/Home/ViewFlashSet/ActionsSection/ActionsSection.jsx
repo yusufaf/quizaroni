@@ -20,6 +20,14 @@ const ActionsSection = props => {
 
     const { theme } = useTheme();
 
+    const handleOpenControlMenu = () => {
+        setShowControlMenu(true);
+    }
+
+    const handleCloseControlMenu = () => {
+        setShowControlMenu(false);
+    }
+
     return (
         <>
             <div style={{ marginTop: "1rem" }}>
@@ -56,7 +64,7 @@ const ActionsSection = props => {
                 ref={controlAnchorRef}
             >
                 <IconButton
-                    onClick={() => setShowControlMenu(true)}
+                    onClick={handleOpenControlMenu}
                     sx={{
                         padding: "0.75rem"
                     }}
@@ -72,7 +80,7 @@ const ActionsSection = props => {
             </div>
             <Menu
                 open={showControlMenu}
-                onClose={() => setShowControlMenu(false)}
+                onClose={handleCloseControlMenu}
                 anchorEl={controlAnchorRef.current}
             >
                 <MenuItem>
@@ -122,7 +130,6 @@ const ActionsSection = props => {
                             onChange={() => setStudySetViewable(!studySetViewable)}
                         />
                     } label={
-
                         <Typography
                             sx={{
                                 color: studySetViewable ?  theme.palette.success.main : theme.palette.error.main

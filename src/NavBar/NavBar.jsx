@@ -48,9 +48,6 @@ const NavBar = props => {
     const dispatch = useDispatch();
     const globalAlert = useSelector(selectAlert);
 
-    // const [showAlert, setShowAlert] = useState(false);
-    // const [alertType, setAlertType] = useState("");
-
     const dropdownRef = useRef(null);
 
     const activeLinkStyle = ({ isActive }) => ({
@@ -82,23 +79,6 @@ const NavBar = props => {
     }
 
 
-    /*
-        TODO: Consolidate AlertJSX into a single component for all alerts in the application?
-    */
-    // const returnAlertJSX = () => {
-    //     return (
-    //         <Alert
-    //             className={appStyles.alert}
-    //             severity={alertType}
-    //         >
-    //             <AlertTitle>
-    //                 <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
-    //             </AlertTitle>
-    //             {alertType === C.SUCCESS ? C.LOGOUT_SUCCESS_MSG : C.LOGOUT_ERROR_MSG}
-    //         </Alert>
-    //     );
-    // }
-
     /**
     * Handles logging out a user, using Firebase's provided method signOut()
     */
@@ -115,7 +95,6 @@ const NavBar = props => {
                 localStorage.removeItem("userInfo");
             }
             setUserAuthState(null);
-            // displayLogoutAlert();
         }).catch((error) => {
             console.error("Something bad happened = ", error);
         });

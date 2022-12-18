@@ -123,20 +123,6 @@ const Login = props => {
         }
     }
 
-    const returnAlertJSX = () => {
-        return (
-            <Alert
-                className={appStyles.alert}
-                severity={alertType}
-            >
-                <AlertTitle>
-                    <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
-                </AlertTitle>
-                {alertType === C.SUCCESS ? C.LOGIN_SUCCESS_MSG : C.LOGIN_ERROR_MSG}
-            </Alert>
-        );
-    }
-
     /**
      * Update the last time the user signed in on the database
      * @param {*} uid 
@@ -215,6 +201,13 @@ const Login = props => {
         setShowErrorText(updatedErrorText);
     }
 
+    const handleEmailChange = (e) => {
+        setEnteredEmail(e.target.value);
+    }
+
+    const handlePasswordChange = (e) => {
+        setEnteredPass(e.target.value);
+    }
 
     return (
         <>
@@ -233,7 +226,7 @@ const Login = props => {
                             label="Email"
                             name="emailInput"
                             value={enteredEmail}
-                            onChange={e => setEnteredEmail(e.target.value)}
+                            onChange={handleEmailChange}
                             onBlur={e => checkIfInputEmpty(e)}
                             helperText={showErrorText.emailInput && "An email is required"}
                             error={showErrorText.emailInput}
@@ -245,7 +238,7 @@ const Login = props => {
                             type={passVisibility ? 'text' : 'password'}
                             value={enteredPass}
                             name="passInput"
-                            onChange={e => setEnteredPass(e.target.value)}
+                            onChange={handlePasswordChange}
                             onBlur={e => checkIfInputEmpty(e)}
                             helperText={showErrorText.passInput && "A password is required"}
                             error={showErrorText.passInput}
@@ -262,7 +255,6 @@ const Login = props => {
                         <ForgotPasswordLink to="/forgot">
                             Forgot password?
                         </ForgotPasswordLink>
-
                         <LoginButton
                             variant="contained"
                             disabled={enteredEmail === "" || enteredPass === ""}
@@ -285,10 +277,6 @@ const Login = props => {
                 </div>
                 <div id="loader">Loading...</div>
             </LoginPageContainer>
-            {
-                showAlert &&
-                returnAlertJSX()
-            }
         </>
     );
 }

@@ -5,11 +5,11 @@ export const ViewFlashsetPage = styled(Box)({
     display: "grid",
     justifyItems: "center",
     alignItems: "center",
-    gap: "2rem"
+    gap: "2rem",
+    marginTop: "2rem"
 })
 
 export const ViewFlashsetPaper = styled(Paper)({
-    marginTop: "2rem"
 })
 
 export const ViewFlashsetContainer = styled(Box)({
