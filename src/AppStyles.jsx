@@ -13,15 +13,6 @@ export const BoldHeading = styled(Typography)({
     fontWeight: "bold"
 })
 
-/*
-.alert {
-  position       : absolute;
-  left           : 39vw;
-  top            : 8vh;
-  display        : flex;
-  justify-content: center;
-  align-items    : center;
-  height         : 3rem;
-  width          : 20rem;
-}
-*/
+export const BasePage = styled("main")({
+    marginTop: "2rem",
+})
