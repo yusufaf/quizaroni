@@ -1,18 +1,14 @@
 import { useState, useEffect, useRef } from "react"
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AppBar, Button, IconButton, Toolbar, Tooltip, Typography, useMediaQuery } from '@mui/material/';
 import { getAuth, signOut } from "firebase/auth";
 import {
-    DarkMode,
-    LightMode,
     Logout as LogoutIcon
 } from "@mui/icons-material"
 import { useTheme } from "../theme/useTheme";
-
 import NavDrawer from "./NavDrawer";
 import ProfileDropdown from "../Profile/ProfileDropdown";
 import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
-
 import * as C from "../utilities/constants";
 
 import {
@@ -30,7 +26,7 @@ import {
     NavLinksContainer,
 } from "./NavStyles";
 import { useDispatch, useSelector } from "react-redux";
-import { selectAlert, setAlert } from "src/reducers/globalSlice";
+import { selectAlert, setAlert } from "src/slices/globalSlice";
 
 const NavBar = props => {
     // TODO: Change to use redux slice
@@ -65,9 +61,7 @@ const NavBar = props => {
                 type: C.SUCCESS,
             })
         )
-
-        // setShowAlert(true);
-        // setAlertType(C.SUCCESS);
+        /* TODO: Consolidate into a hook? */
         setTimeout(() => {
             dispatch(
                 setAlert({
@@ -77,7 +71,6 @@ const NavBar = props => {
             )
         }, 1000);
     }
-
 
     /**
     * Handles logging out a user, using Firebase's provided method signOut()
@@ -100,104 +93,101 @@ const NavBar = props => {
         });
     }
 
-    /*
-    TODO: Can create a new separate file with these styled components in it
-    */
+    const closeDropdown = () => {
+        setShowDropdown(false);
+    }
 
     return (
-        <>
-            <AppBar position="static" color="inherit">
-                <Toolbar>
-                    {/*
+        <AppBar position="static" color="inherit">
+            <Toolbar>
+                {/*
                     TODO: Revisit what to do with logo 
                     <AppLogo
                         src={QuizaroniLogo}
                         alt="Quizaroni logo"
                     /> */
-                    }
-                    <Typography
-                        color="primary"
-                        variant="h4"
-                    >
-                        Quizaroni
-                    </Typography>
-                    {isMobile &&
-                        <NavDrawer />
-                    }
-                    {!isMobile &&
-                        <NavItemsContainer>
-                            <NavLinksContainer>
-                                <StyledNavLink to="/" style={activeLinkStyle}>
-                                    Home
-                                </StyledNavLink>
-                                <StyledNavLink
-                                    to="/create"
-                                    style={activeLinkStyle}
+                }
+                <Typography
+                    color="primary"
+                    variant="h4"
+                >
+                    Quizaroni
+                </Typography>
+                {isMobile &&
+                    <NavDrawer />
+                }
+                {!isMobile &&
+                    <NavItemsContainer>
+                        <NavLinksContainer>
+                            <StyledNavLink to="/" style={activeLinkStyle}>
+                                Home
+                            </StyledNavLink>
+                            <StyledNavLink
+                                to="/create"
+                                style={activeLinkStyle}
+                            >
+                                Create
+                            </StyledNavLink>
+                            <StyledNavLink
+                                to="/explore"
+                                style={activeLinkStyle}
+                            >
+                                Explore
+                            </StyledNavLink>
+                        </NavLinksContainer>
+                        <NavRightActions>
+                            {userAuthState ?
+                                <AuthenticationButton
+                                    variant="text"
+                                    onClick={() => handleLogout()}
+                                    startIcon={<LogoutIcon />}
                                 >
-                                    Create
-                                </StyledNavLink>
-                                <StyledNavLink
-                                    to="/explore"
-                                    style={activeLinkStyle}
-                                >
-                                    Explore
-                                </StyledNavLink>
-                            </NavLinksContainer>
-                            <NavRightActions>
-                                {userAuthState ?
+                                    Logout
+                                </AuthenticationButton>
+                                :
+                                <LoginButtonsContainer>
                                     <AuthenticationButton
-                                        variant="text"
-                                        onClick={() => handleLogout()}
-                                        startIcon={<LogoutIcon />}
+                                        variant="outlined"
+                                        onClick={() => navigate("/login")}
                                     >
-                                        Logout
+                                        Log in
                                     </AuthenticationButton>
-                                    :
-                                    <LoginButtonsContainer>
-                                        <AuthenticationButton
-                                            variant="outlined"
-                                            onClick={() => navigate("/login")}
+                                    <AuthenticationButton
+                                        variant="contained"
+                                        onClick={() => navigate("/signup")}
+                                    >
+                                        Sign up
+                                    </AuthenticationButton>
+                                </LoginButtonsContainer>
+                            }
+                            <Tooltip title="Toggle dark mode">
+                                <IconButton onClick={toggleDarkMode}>
+                                    {isDarkMode ? <StyledLightModeIcon /> : <StyledDarkModeIcon />}
+                                </IconButton>
+                            </Tooltip>
+                            {userAuthState &&
+                                (
+                                    <>
+                                        <ProfileIconContainer
+                                            onClick={() => setShowDropdown(true)}
+                                            ref={dropdownRef}
                                         >
-                                            Log in
-                                        </AuthenticationButton>
-                                        <AuthenticationButton
-                                            variant="contained"
-                                            onClick={() => navigate("/signup")}
-                                        >
-                                            Sign up
-                                        </AuthenticationButton>
-                                    </LoginButtonsContainer>
-                                }
-                                <Tooltip title="Toggle dark mode">
-                                    <IconButton onClick={toggleDarkMode}>
-                                        {isDarkMode ? <StyledLightModeIcon /> : <StyledDarkModeIcon />}
-                                    </IconButton>
-                                </Tooltip>
-                                {userAuthState &&
-                                    (
-                                        <>
-                                            <ProfileIconContainer
-                                                onClick={() => setShowDropdown(true)}
-                                                ref={dropdownRef}
-                                            >
-                                                <StyledAccountIcon />
-                                                <StyledArrowIcon />
-                                            </ProfileIconContainer>
-                                            <ProfileDropdown
-                                                userAuthState={userAuthState}
-                                                showDropdown={showDropdown}
-                                                dropdownRef={dropdownRef}
-                                                setShowDropdown={setShowDropdown}
-                                            />
-                                        </>
-                                    )
-                                }
-                            </NavRightActions>
-                        </NavItemsContainer>
-                    }
-                </Toolbar>
-            </AppBar>
-        </>
+                                            <StyledAccountIcon />
+                                            <StyledArrowIcon />
+                                        </ProfileIconContainer>
+                                        <ProfileDropdown
+                                            showDropdown={showDropdown}
+                                            dropdownRef={dropdownRef}
+                                            onClose={closeDropdown}
+                                        />
+                                    </>
+                                )
+                            }
+                        </NavRightActions>
+                    </NavItemsContainer>
+                }
+            </Toolbar>
+        </AppBar>
     );
 }
 

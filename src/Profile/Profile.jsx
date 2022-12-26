@@ -6,7 +6,6 @@ import {
     Button,
     Tooltip,
     IconButton,
-    InputAdornment,
     ToggleButton,
     ToggleButtonGroup,
     Typography,
@@ -20,13 +19,13 @@ import DeleteAccountDialog from "./DeleteAccountDialog/DeleteAccountDialog";
 import { LIGHT, DARK } from "src/utilities/constants"
 import { useTheme } from "src/theme/useTheme";
 import * as profileStyles from './Profile.module.css';
-import * as appStyles from "../App.module.css";
 import PasswordToggle from "src/components/PasswordToggle/PasswordToggle";
 import {
     InfoChangeContainer,
     PasswordFieldsContainer,
     ProfilePaper
 } from "./ProfileStyles"
+import { BoldHeading } from 'src/AppStyles';
 
 
 const Profile = props => {
@@ -41,7 +40,6 @@ const Profile = props => {
     const [enteredNewUsername, setEnteredNewUsername] = useState("");
     const [enteredNewPassword, setEnteredNewPassword] = useState("");
     const [enteredConfirmPassword, setEnteredConfirmPassword] = useState("");
-    const [passVisibility, setPassVisibility] = useState(false);
     const [newPasswordVisibility, setNewPasswordVisibility] = useState(false);
 
 
@@ -72,6 +70,7 @@ const Profile = props => {
      */
     const handleDefaultTheme = async (event, newTheme) => {
         console.log("Entering handleDefaultTheme");
+
         // TODO: Handling immediately changing based on selection
         // if (theme === "dark" ) {
         //     console.log("TOGGLING DARK MODE");
@@ -161,6 +160,13 @@ const Profile = props => {
         });
     }
 
+    const handleShowDeleteDialog = () => {
+        setShowDeleteDialog(true);
+    }
+
+    const handleCloseDeleteDialog = () => {
+        setShowDeleteDialog(false);
+    }
 
     const ActionHeader = styled("div")({
         display: "flex",
@@ -175,14 +181,10 @@ const Profile = props => {
         alignItems: "center"
     })
 
-    const ProfilePageTitle = styled(Typography)({
-        fontWeight: "bold"
-    })
 
-
-    useEffect(() => {
-        console.log({ defaultTheme })
-    }, [defaultTheme])
+    // useEffect(() => {
+    //     console.log({ defaultTheme })
+    // }, [defaultTheme])
 
 
     if (!userAuthState) {
@@ -195,16 +197,15 @@ const Profile = props => {
                 <ProfileCard userAuthState={userAuthState} />
                 <ProfilePaper elevation={6}>
                     <div className={profileStyles.profileContainer}>
-                        <ProfilePageTitle variant="h5">
+                        <BoldHeading variant="h5">
                             Profile
-                        </ProfilePageTitle>
-
+                        </BoldHeading>
                         <ActionHeader>
                             <Palette />
                             <Typography variant="h6">Default Theme</Typography>
                         </ActionHeader>
-
                         <ToggleButtonGroup
+                            aria-label="Set default theme"
                             exclusive
                             onChange={handleDefaultTheme}
                             value={defaultTheme}
@@ -298,27 +299,6 @@ const Profile = props => {
                                             />
                                     }}
                                 />
-
-                                {/* <div className={profileStyles.confirmPassword}>
-                                    <input
-                                        className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
-                                        name="confirmPassInput"
-                                        placeholder="Confirm new password"
-                                        onChange={(e) => {
-                                            checkIfInputMatches(e);
-                                            setEnteredConfirmPassword(e.target.value)
-                                        }}
-                                        onBlur={e => checkIfInputMatches(e)}
-                                    />
-
-                                    {showErrorText.confirmPassInput &&
-                                        <span className={appStyles.errorText}
-                                            style={{ top: "1rem" }}
-                                        >
-                                            Confirmed password doesn't match entered password
-                                        </span>
-                                    }
-                                </div> */}
                             </PasswordFieldsContainer>
 
                             <Button
@@ -338,17 +318,16 @@ const Profile = props => {
                             <RemoveCircleOutline />
                             <Typography variant="h6">Delete Account</Typography>
                         </ActionHeader>
-
                         <Button
                             variant="outlined"
                             color="error"
-                            onClick={() => setShowDeleteDialog(true)}
+                            onClick={handleShowDeleteDialog}
                         >
                             Delete Account
                         </Button>
                         <DeleteAccountDialog
                             open={showDeleteDialog}
-                            handleClose={() => setShowDeleteDialog(false)}
+                            handleClose={handleCloseDeleteDialog}
                             enteredPassword={enteredDeletePassword}
                             setEnteredPassword={setEnteredDeletePassword}
                         />

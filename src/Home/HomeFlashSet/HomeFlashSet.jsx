@@ -1,29 +1,35 @@
-import { useState, useEffect } from "react"
-
-/* Firebase Operations */
-
+import { useState, useEffect, useRef } from "react"
 import { addDoc, collection, deleteDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
 import { firebaseApp, database } from "../../firebase/firebase";
-
-/* Outside Components */
 import { Link, useNavigate } from "react-router-dom";
-import HomeActionsMenu from "./HomeActionsMenu";
-
+import HomeActionsMenu from "../SetActionsMenu";
 import {
     Alert,
     AlertTitle,
-    Menu, 
+    Card,
+    Chip,
+    IconButton,
+    Menu,
     MenuItem,
     Tooltip,
+    Typography,
 } from '@mui/material/';
-
-import { ArrowBack } from '@mui/icons-material/';
-
-/* Styling */
-import { useTheme } from "../../theme/useTheme";
+import { ArrowBack, MoreHoriz } from '@mui/icons-material/';
+import { useTheme } from "src/theme/useTheme";
 import * as homeFlashStyles from './HomeFlashSet.module.css';
 import * as appStyles from "../../App.module.css";
 import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
+import {
+    CardBottom,
+    CardContent,
+    CardInfo,
+    CardTitle,
+    HomeSetCard,
+    LabelChip,
+    SpacedContainer,
+    TermsLabel
+} from "../HomeStyles"
+import SetActionsMenu from "../SetActionsMenu";
 
 const HomeFlashSet = props => {
     const {
@@ -48,7 +54,9 @@ const HomeFlashSet = props => {
 
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [isFavorited, setIsFavorited] = useState(false);
-    const [showActionsMenu, setShowActionsMenu] = useState(false);
+
+    const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
+    const actionsMenuRef = useRef(null);
 
     useEffect(() => {
         checkIfFavorited();
@@ -69,13 +77,13 @@ const HomeFlashSet = props => {
         }
     }
 
-
     const handleViewFlashset = e => {
-        let target = e.target;
-        if (target?.innerText !== "delete") {
-            setSelectedFlashSet(flashSet)
-            setViewFlashSet(true);
-        }
+        // let target = e.target;
+        // if (target?.innerText !== "delete") {
+        //     setSelectedFlashSet(flashSet)
+        //     setViewFlashSet(true);
+        // }
+
     }
 
     /* Flipping state */
@@ -130,7 +138,6 @@ const HomeFlashSet = props => {
         );
 
         const docSnap = await getDocs(queryResult);
-
         const numDocs = docSnap.docs.length;
         const setDoc = docSnap.docs[0];
 
@@ -174,10 +181,59 @@ const HomeFlashSet = props => {
         setShowDeleteConfirmation(false);
     }
 
+    const openActionsMenu = () => {
+        setActionsMenuOpen(true);
+    }
+
+    const closeActionsMenu = () => {
+        setActionsMenuOpen(false);
+    }
+
 
     return (
         <>
-            <div
+            <HomeSetCard
+                raised
+                onClick={(e) => {
+                    e.stopPropagation();
+                    alert();
+                }}
+            >
+                <CardContent>
+                    <CardTitle title={title}>{title}</CardTitle>
+                    <CardInfo>
+                        <TermsLabel>{cards.length} Terms</TermsLabel>
+                        <SpacedContainer>
+                            <Typography>Date Created</Typography>
+                            <Typography>{creationDate}</Typography>
+                        </SpacedContainer>
+                        <SpacedContainer>
+                            <Typography>Last viewed</Typography>
+                            <Typography>{creationDate}</Typography>
+                        </SpacedContainer>
+                    </CardInfo>
+                    {/* TODO: Label background color */}
+                    <CardBottom>
+                        <LabelChip label={label ? label : "No label selected"} variant="outlined" />
+                        <IconButton 
+                            onClick={openActionsMenu}
+                            ref={actionsMenuRef}
+                        >
+                            <MoreHoriz />
+                        </IconButton>
+                    </CardBottom>
+                </CardContent>
+            </HomeSetCard>
+            <SetActionsMenu
+                setFlashSets={setFlashSets}
+                flashSet={flashSet}
+                flashSets={flashSets}
+                open={actionsMenuOpen}
+                onClose={closeActionsMenu}
+                ref={actionsMenuRef}
+            />
+
+            {/* <div
                 className={`${homeFlashStyles.flashSet} ${isDarkMode ? `${appStyles.hoverDark} ${appStyles.darkInput}` : `${appStyles.hoverLight} ${appStyles.lightInput}`}`}
                 key={uid}
                 onClick={handleViewFlashset}
@@ -243,8 +299,8 @@ const HomeFlashSet = props => {
                     }
 
                 </div>
-            </div>
-            
+            </div> */}
+
             <ConfirmDialog
                 open={showDeleteConfirmation}
                 onClose={handleCloseDeleteConfirmation}

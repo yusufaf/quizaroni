@@ -41,27 +41,27 @@ const mailjetObj = mailjet.connect(process.env.MAILJET_API_KEY, process.env.MAIL
 REST API Code
 */
 
-const api_app = express();
-api_app.use(cors());
-api_app.use(bodyparser.json());
+const API = express();
+API.use(cors());
+API.use(bodyparser.json());
 
 const PORT = process.env.PORT || 5000;
 
-api_app.listen(PORT, () => {
+API.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`)
 });
 
-api_app.get("/api", (req, res) => {
+API.get("/api", (req, res) => {
   res.send("Yo whats up")
 })
 
-api_app.get('/express_backend', (req, res) => {
+API.get('/express_backend', (req, res) => {
   res.send("<p>Hello yo</p>");
 
   // res.send({ express: 'YOUR EXPRESS BACKEND IS CONNECTED TO REACT' });
 });
 
-api_app.post("/send_email", async (req, res) => {
+API.post("/send_email", async (req, res) => {
   // console.log("request object = ", req);
   const { to, subject, text } = req.body
   console.log("Testing email API route")
@@ -106,4 +106,4 @@ api_app.post("/send_email", async (req, res) => {
     })
 })
 
-export const handler = api_app;
+export const handler = API;
