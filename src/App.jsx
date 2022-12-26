@@ -10,9 +10,8 @@ import NavBar from "./NavBar/NavBar";
 import Profile from "./Profile/Profile";
 import Signup from "./Signup/Signup";
 import { DARK, LIGHT } from "./utilities/constants.js";
-
 import { useDispatch, useSelector } from "react-redux";
-import { setUserAuthState as setReduxUserAuthState } from "src/reducers/globalSlice";
+import { setUserAuthState as setReduxUserAuthState } from "src/slices/globalSlice";
 import { useTheme } from "./theme/useTheme.js";
 import { handleDesktopZoom } from "./utilities/handleDesktopZoom";
 
@@ -32,7 +31,7 @@ const App = () => {
   }, [prefersDarkMode])
 
   useEffect(() => {
-    /* If the user info is in localStorage, keep them logged in */6
+    /* If the user info is in localStorage, keep them logged in */
     if (localStorage.getItem("userInfo") !== null) {
       const userInfo = JSON.parse(localStorage.getItem("userInfo"));
       const tokenExpiration = userInfo.stsTokenManager.expirationTime;

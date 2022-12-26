@@ -1,12 +1,13 @@
 import { styled } from "@mui/system";
 import { Box, Card, Paper } from "@mui/material";
+import { BasePage } from "src/AppStyles";
 
-export const ViewFlashsetPage = styled(Box)({
+
+export const ViewFlashsetPage = styled(BasePage)({
     display: "grid",
     justifyItems: "center",
     alignItems: "center",
     gap: "2rem",
-    marginTop: "2rem"
 })
 
 export const ViewFlashsetPaper = styled(Paper)({

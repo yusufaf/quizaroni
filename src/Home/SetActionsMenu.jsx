@@ -1,31 +1,25 @@
 import { useState, useEffect } from "react"
-
-/* Firebase Operations */
 import { addDoc, collection, deleteDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
-import { database } from "../../firebase/firebase";
-
+import { database } from "../firebase/firebase";
 import {
-    Alert,
-    AlertTitle,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Tooltip,
+    Menu,
+    MenuItem,
+    Typography,
 } from '@mui/material/';
+import {
+    ContentCopy as CopyIcon,
+    Edit as EditIcon,
+} from "@mui/icons-material";
+import { useTheme } from "../theme/useTheme";
 
-/* Styling */
-import { useTheme } from "../../theme/useTheme";
-import * as homeFlashStyles from './HomeFlashSet.module.css';
-import * as appStyles from "../../App.module.css";
-
-const HomeActionsMenu = props => {
+const SetActionsMenu = props => {
     const {
-        userAuthState,
         flashSets,
         setFlashSets,
-        flashSet
+        flashSet,
+        open,
+        onClose,
+        ref,
     } = props;
 
     const {
@@ -113,41 +107,51 @@ const HomeActionsMenu = props => {
         const docSnap = await getDocs(queryResult);
 
         const setDoc = docSnap.docs[0];
-
-
-        if (setDoc) {
-        }
     }
-
 
     return (
         <>
-            <div className={homeFlashStyles.actionsMenu}
-                style={{ color: theme.foreground, background: theme.background }}
+            <Menu
+                anchorEl={ref?.current}
+                open={open}
+                onClose={onClose}
             >
-                <div className={homeFlashStyles.menuItem}>
-                    <i className={`material-icons-outlined ${appStyles.clickIcon}`}
-                        onClick={(e) => handleDuplicateSet(e)}
-                    >
-                        content_copy
-                    </i>
-                    Duplicate
-                </div>
-                <div className={homeFlashStyles.menuItem}>
-                    <i className={`material-icons-outlined ${appStyles.clickIcon}`}
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setShowRenameModal(true);
+                <MenuItem
+                >
+                    <EditIcon
+                        sx={{
+                            marginRight: "0.75rem"
+                        }}
+                    />
+                    <Typography
+                        variant="subtitle1"
+                        sx={{
+                            fontSize: '1.5rem',
                         }}
                     >
-                        edit
-                    </i>
-                    Rename
-                </div>
-            </div>
+                        Rename
+                    </Typography>
+                </MenuItem>
+                <MenuItem
+                    // onClick=
+                >
+                    <CopyIcon
+                        sx={{
+                            marginRight: "0.75rem"
+                        }}
+                    />
+                    <Typography
+                        variant="subtitle1"
+                        sx={{
+                            fontSize: '1.5rem',
+                        }}
+                    >
+                        Duplicate
+                    </Typography>
+                </MenuItem>
+            </Menu>
 
-            {/* Stop Propagation here  */}
-            {showRenameModal &&
+            {/* {showRenameModal &&
                 <Dialog
                     open={showRenameModal}
                     onClose={() => setShowRenameModal(false)}
@@ -179,9 +183,9 @@ const HomeActionsMenu = props => {
                         </div>
                     </DialogActions>
                 </Dialog>
-            }
+            } */}
         </>
     );
 }
 
-export default HomeActionsMenu;
+export default SetActionsMenu;

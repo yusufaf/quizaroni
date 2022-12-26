@@ -1,11 +1,9 @@
 import { useState, useEffect, useRef } from "react"
-
-/* Firebase Operations */
 import { collection, addDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
 import { database } from "../firebase/firebase";
 
 import { useNavigate } from "react-router-dom";
-import { Alert, AlertTitle, Box, Button, FormControl, IconButton, InputLabel, MenuItem, Modal, Select, TextField, Tooltip, Typography } from '@mui/material/';
+import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, Modal, Select, TextField, Tooltip, Typography } from '@mui/material/';
 import { AddCircleOutline, Create, UploadFile } from "@mui/icons-material";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import LoginMessage from "../LoginMessage/LoginMessage";
@@ -22,7 +20,6 @@ import {
     PAGES
 } from "src/utilities/constants";
 import { updateBrowserTitle } from "src/utilities/functions";
-
 import {
     CreateSetPage,
     CreateSetPaper,
@@ -62,9 +59,6 @@ const CreateSet = props => {
 
     // Store a reference to the HTML file <input>
     const fileInputRef = useRef(null);
-
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertType, setAlertType] = useState("");
 
     /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
@@ -177,11 +171,7 @@ const CreateSet = props => {
             }
 
             console.log("Successfully created new flash set");
-
-            setShowAlert(true);
-            setAlertType(SUCCESS);
             setTimeout(() => {
-                setShowAlert(false);
                 navigate("/");
             }, 1000);
         }
@@ -284,7 +274,6 @@ const CreateSet = props => {
                             >
                                 Title
                             </BoldHeading>
-
                             <TitleInput
                                 variant="standard"
                                 placeholder={CREATE_SET.TITLE_PLACEHOLDER}
@@ -293,7 +282,6 @@ const CreateSet = props => {
                                 onChange={e => setEnteredTitle(e.target.value)}
                                 size="small"
                             />
-
                             <BoldHeading
                                 variant="subtitle1"
                                 color={theme.palette.primary.main}
@@ -308,7 +296,6 @@ const CreateSet = props => {
                                 multiline
                                 maxRows={4}
                             />
-
                             <BoldHeading
                                 variant="subtitle1"
                                 color={theme.palette.primary.main}
@@ -324,7 +311,6 @@ const CreateSet = props => {
                                     disabled={selectedLabel !== ""}
                                 />
                                 <Typography component="span">or select an existing one</Typography>
-
                                 <FormControl variant="standard">
                                     <InputLabel>Label</InputLabel>
                                     <LabelSelect
@@ -343,18 +329,16 @@ const CreateSet = props => {
                                 </FormControl>
                                 {/* TODO: Map labelOptions to MenuItem */}
                             </LabelInputContainer>
-
                             <CreateSetButton
                                 variant="contained"
                                 onClick={() => createNewSet()}
                                 size="large"
                                 disabled={createSetDisabled}
+                                startIcon={<Create/>}
                             >
-                                <Create />
                                 Create Set
                             </CreateSetButton>
                         </CreateSetInputsContainer>
-
                         <SimpleFlexContainer>
                             <IconButton
                                 onClick={() => setShowImportModal(true)}
@@ -363,9 +347,7 @@ const CreateSet = props => {
                                     fontSize="large"
                                 />
                             </IconButton>
-                            <Typography variant="subtitle1"
-                                component="span"
-                            >
+                            <Typography>
                                 Import Cards
                             </Typography>
                         </SimpleFlexContainer>
@@ -386,17 +368,6 @@ const CreateSet = props => {
                 open={showImportModal}
                 onClose={() => setShowImportModal(false)}
             />
-            {showAlert &&
-                <Alert
-                    className={appStyles.alert}
-                    severity={alertType}
-                >
-                    <AlertTitle>
-                        <b>{alertType === SUCCESS ? SUCCESS_U : ERROR_U}</b>
-                    </AlertTitle>
-                    {alertType === SUCCESS ? "Set successfully created!" : "Could not create set"}
-                </Alert>
-            }
         </>
     );
 }

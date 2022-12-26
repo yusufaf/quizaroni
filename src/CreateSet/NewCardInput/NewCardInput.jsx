@@ -6,7 +6,7 @@ import { useTheme } from "src/theme/useTheme";
 import { ChromePicker } from "react-color";
 
 import * as createSetStyles from '../CreateSet.module.css';
-import { NewCard, NewCardInputField } from "../CreateSetStyles";
+import { NewCard, NewCardHeader, NewCardInputField } from "../CreateSetStyles";
 
 const NewCardInput = props => {
     const { index, handleDelete, updateCardValue, onFileChange, onColorChange, fileInputRef } = props;
@@ -44,7 +44,7 @@ const NewCardInput = props => {
             // className={index === 0 ? `${createSetStyles.newCard} ${createSetStyles.firstCard}` : `${createSetStyles.newCard}`}
             key={index}
         >
-            <div className={createSetStyles.newCardHeader}>
+            <NewCardHeader>
                 <Typography
                     variant="h6"
                     sx={{
@@ -161,7 +161,7 @@ const NewCardInput = props => {
                         </IconButton>
                     </Tooltip>
                 </div>
-            </div>
+            </NewCardHeader>
             <div className={createSetStyles.newCardInputs}>
                 <div className={createSetStyles.newCardTerm}>
                     <Typography

@@ -1,14 +1,14 @@
 import { useEffect, useState, useRef } from "react";
-
 import { database } from "../firebase/firebase";
 import { query, where, collection, getDocs } from "firebase/firestore";
-
-import { Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
-
-/* Styling */
+import { Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Typography } from '@mui/material/';
+import { AddPhotoAlternate as AddPhotoIcon } from "@mui/icons-material";
 import { useTheme } from "../theme/useTheme";
 import * as profileStyles from './Profile.module.css';
-import * as appStyles from "../App.module.css";
+import {
+    UserInfoContainer,
+    UserInfoHeading
+} from "./ProfileStyles"
 
 const ProfileCard = props => {
     const { userAuthState, setUserAuthState } = props;
@@ -82,6 +82,9 @@ const ProfileCard = props => {
                     // onChange={e => onFileChange(e, index)}
                     style={{ display: "none" }}
                 />
+                {/* <IconButton>                
+                    <AddPhotoIcon fontSize="large" />
+                </IconButton> */}
                 <span
                     className={`material-icons-outlined ${profileStyles.uploadImage}`}
                     onClick={() => profilePicRef.current.click()}
@@ -89,18 +92,19 @@ const ProfileCard = props => {
                     add_photo_alternate
                 </span>
             </div>
-            <div className={profileStyles.info}>
-                <span className={profileStyles.infoHeading}>Username</span>
-                <span>{username}</span>
-            </div>
-            <div className={profileStyles.info}>
-                <span className={profileStyles.infoHeading}># of Flashsets Created</span>
-                <span>{createdSetCount}</span>
-            </div>
-            <div className={profileStyles.info}>
-                <span className={profileStyles.infoHeading}>Account Created</span>
-                <span>{createdDate}</span>
-            </div>
+
+            <UserInfoContainer>
+                <UserInfoHeading>Username</UserInfoHeading>
+                <Typography>{username}</Typography>
+            </UserInfoContainer>
+            <UserInfoContainer>
+                <UserInfoHeading># of Flashsets Created</UserInfoHeading>
+                <Typography>{createdSetCount}</Typography>
+            </UserInfoContainer>
+            <UserInfoContainer>
+                <UserInfoHeading>Account Created</UserInfoHeading>
+                <Typography>{createdDate}</Typography>
+            </UserInfoContainer>
         </div>
     )
 }

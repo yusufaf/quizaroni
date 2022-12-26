@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid';
-
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { database } from "../firebase/firebase";
-import { 
+import {
     ContentCopy as CopyIcon,
     Delete as DeleteIcon,
     Edit as EditIcon,
@@ -19,12 +18,16 @@ import { useNavigate } from "react-router-dom";
 import LoginMessage from "../LoginMessage/LoginMessage";
 import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
 import ViewFlashSet from "./ViewFlashSet/ViewFlashSet";
-import * as appStyles from "../App.module.css";
 import { useTheme } from "../theme/useTheme";
 import { updateBrowserTitle } from "src/utilities/functions";
 import * as homeStyles from './Home.module.css';
 import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
 import { BoldHeading } from "src/AppStyles";
+import {
+    HomePage,
+    HomePaper,
+    HomeSetGrid,
+} from "./HomeStyles";
 
 const Home = props => {
     const { userAuthState } = props;
@@ -48,19 +51,6 @@ const Home = props => {
     const [isFavorited, setIsFavorited] = useState(false);
 
     const [selectedView, setSelectedView] = useState("table");
-
-    const warningStyling = {
-        "& .MuiPaper-root": {
-            // backgroundColor: theme.background,
-        }
-    }
-
-    const retrieveTextStyling = (color, fontSize = "1.5rem") => {
-        return {
-            color,
-            fontSize
-        }
-    }
 
     const viewSetProps = {
         viewFlashSet,
@@ -90,23 +80,25 @@ const Home = props => {
         setShowDuplicateConfirmation(false);
     }
 
-    let navigate = useNavigate();
+    const FLASHSET_VIEWS = {
+        TABLE: "table",
+        GRID: "grid",
+    }
+
+    const navigate = useNavigate();
 
     // Store a reference to the HTML file <input>
     const fileInput = useRef(null);
-
     const actionsMenuRef = useRef(null);
 
-    /* Alert Popup */
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertType, setAlertType] = useState("");
+    const showViewSetPage = viewFlashSet && Object.keys(selectedFlashSet).length !== 0;
 
     /* TODO: Move columns elsewhere */
     const columns = [
         {
             field: 'title',
             headerName: 'Title',
-            width: 100
+            width: 200
         },
         {
             field: 'description',
@@ -145,7 +137,8 @@ const Home = props => {
                         </Tooltip>
                         <Menu
                             anchorEl={actionsMenuRef.current}
-                            open={showActionsMenu} onClose={hideActionsMenu}
+                            open={showActionsMenu}
+                            onClose={hideActionsMenu}
                         >
                             <MenuItem>
                                 <EditIcon
@@ -206,7 +199,6 @@ const Home = props => {
                                 </IconButton>
                             </Tooltip>
                         </div>
-
                     </div>
                 );
             }
@@ -288,127 +280,105 @@ const Home = props => {
 
     }
 
-    /* Render the search bar for the "Your Flashsets" page */
-    const renderSearchBar = () => {
-        return (
-            <div className={homeStyles.searchContainer}>
-                <input
-                    className={`${homeStyles.search} ${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
-                    placeholder="Search for a study set"
-                    onChange={e => setEnteredSearch(e.target.value)}
-                />
-            </div>
-        )
-    }
-
-    /**
-     * Renders the the header for the "Your Flashsets" page
-     */
-    const renderHeader = () => {
-        return (
-            <div className={homeStyles.header}>
-                <span>Title</span>
-                <span>Description</span>
-                <span>Created on</span>
-                <span style={{ marginRight: "7rem" }}>Label</span>
-                {/* TODO: Favorited filter */}
-                <span className={homeStyles.favoriteFilter}>
-                    <input
-                        id="favorite"
-                        type="checkbox"
-                        onChange={() => handleFavoriteFilter()}
-                    />
-                    <label htmlFor="favorite" style={{ marginBottom: "0.3rem" }}>{'\u2605'}</label>
-                </span>
-            </div>
-        )
-    }
-
     /**
      * Renders the flashsets for the "Your Flashsets" page
      */
-    const renderFlashSets = () => {
-        let localFlashSets = [...flashSets];
-
-        return localFlashSets.map((flashSet, index) => {
-            return <HomeFlashSet
-                key={index}
-                flashSet={flashSet}
-                {...homeSetProps}
-            />
-        })
-    }
-
-    // const filterFlashsets = (column) => {
-    //     switch (column) {
-    //         case "Title":
-
-    //             break;
-
-    //         default:
-    //             break;
-    //     }
+    // const renderFlashSets = () => {
+    //     return flashSets.map((flashSet, index) => {
+    //         return (
+    //             <HomeFlashSet
+    //                 key={index}
+    //                 flashSet={flashSet}
+    //                 {...homeSetProps}
+    //             />
+    //         )
+    //     })
     // }
 
     /*  TODO:
     - Add "Last Viewed" property to flashsets + table 
     */
 
-    const handleViewChange = (event, nextView) => {
-        setSelectedView(nextView)
+    const handleViewChange = (event, newView) => {
+        if (newView !== null) {
+            setSelectedView(newView);
+        }
     }
 
     if (!userAuthState) {
-
-
         return <LoginMessage page="home" />;
     }
 
     return (
-        <>
-            {viewFlashSet && Object.keys(selectedFlashSet).length !== 0 ?
+        <HomePage>
+            {showViewSetPage ?
                 <ViewFlashSet {...viewSetProps} />
                 :
-                <div className={homeStyles.homePage} >
+                <HomePaper elevation={6}>
                     <ToggleButtonGroup
                         aria-label="Grid/Table View Toggle"
                         exclusive
                         onChange={handleViewChange}
                         value={selectedView}
                     >
-                        <ToggleButton value="table" key="left">
+                        <ToggleButton value={FLASHSET_VIEWS.TABLE} key="left" title="Table View">
                             <TableViewIcon />
                         </ToggleButton>,
-                        <ToggleButton value="grid" key="center">
+                        <ToggleButton value={FLASHSET_VIEWS.GRID} key="center" title="Grid View">
                             <GridViewIcon />
                         </ToggleButton>
                     </ToggleButtonGroup>
-                    <div className={homeStyles.flashSets}  >
+                    {/* ✅ */}
+                    <div className={homeStyles.flashSets}>
                         <BoldHeading
                             variant="h5"
                         >
                             Your Flashsets
                         </BoldHeading>
                         <div className={homeStyles.tableContainer}>
-                            {/* TODO: Have loading spinner for when data is loading */}
-                            <DataGrid
-                                rows={flashSets ?? []}
-                                columns={columns}
-                                pageSize={5}
-                                rowsPerPageOptions={[5]}
-                                checkboxSelection
-                                disableSelectionOnClick
-                                onRowClick={() => {
-                                }}
-                            />
+                            {
+                                selectedView === FLASHSET_VIEWS.TABLE ?
+                                    (
+                                        <DataGrid
+                                            rows={flashSets ?? []}
+                                            columns={columns}
+                                            pageSize={5}
+                                            rowsPerPageOptions={[5]}
+                                            checkboxSelection
+                                            // disableSelectionOnClick
+                                            onRowClick={() => {
+                                            }}
+                                            onRowDoubleClick={(params, event, details) => {
+                                                console.log({ params, event, details })
+                                                const { id, row } = params;
+                                                setSelectedFlashSet(row);
+                                                setViewFlashSet(true);
+                                            }}
+                                        />
+                                    )
+                                    :
+                                    (
+                                        <HomeSetGrid>
+                                            {flashSets.map((flashSet, index) => {
+                                                return (
+                                                    <HomeFlashSet
+                                                        key={index}
+                                                        flashSet={flashSet}
+                                                        {...homeSetProps}
+                                                    >
+                                                        value
+                                                    </HomeFlashSet>
+                                                )
+                                            })}
+                                        </HomeSetGrid>
+                                    )
+                            }
+
                         </div>
-
-
-                        {/* TODO: Review */}
                         {!viewFlashSet && flashSets?.length > 0 &&
                             (
                                 <>
-                                    {renderFlashSets()}
+                                    {/* {renderFlashSets()} */}
                                 </>
                             )
                         }
@@ -420,11 +390,11 @@ const Home = props => {
                         dialogMessage="Are you sure you want to duplicate this set?"
                         onConfirm={handleCloseDuplicateConfirmation}
                     />
-                </div>
+                </HomePaper>
             }
             {/* Message if no flash sets have been created */}
             {/* flashSets.length === 0 */}
-        </>
+        </HomePage>
     );
 }
 

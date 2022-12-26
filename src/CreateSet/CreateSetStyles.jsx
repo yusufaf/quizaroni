@@ -1,11 +1,9 @@
-
-
-
 import { styled } from "@mui/system";
 import { Box, Button, Card, Paper, Select, TextField, TextareaAutosize } from "@mui/material";
 import { AddCircleOutline } from "@mui/icons-material";
+import { BasePage } from "src/AppStyles";
 
-export const CreateSetPage = styled(Box)({
+export const CreateSetPage = styled(BasePage)({
     display: "grid",
     justifyItems: "center",
     alignItems: "center",
@@ -18,11 +16,9 @@ export const CreateSetPage = styled(Box)({
     // flexDirection: "column",
 })
 
-export const CreateSetPaper = styled(Paper)({
-    marginTop: "2rem"
-})
+export const CreateSetPaper = styled(Paper)({})
 
-export const CreateSetContainer = styled(Box)({
+export const CreateSetContainer = styled("div")({
     height: "fit-content",
     width: "70rem",
     padding: "1.25rem",
@@ -60,8 +56,6 @@ export const LabelInput = styled(TextField)({
 export const CreateSetButton = styled(Button)({
     position: "absolute",
     right: "2rem",
-    display: "flex",
-    gap: "0.5rem"
 })
 
 /* 
@@ -92,5 +86,24 @@ export const LabelSelect = styled(Select)({
 })
 
 export const NewCardInputField = styled(TextField)({
-    width: "25rem"
+    width: "25rem",
+    // '&::-webkit-scrollbar': {
+    //     width: '0.4rem',
+    // },
+    // '&::-webkit-scrollbar-track': {
+    //     background: "#f1f1f1",
+    // },
+    // '&::-webkit-scrollbar-thumb': {
+    //     backgroundColor: '#888',
+    // },
+    // '&::-webkit-scrollbar-thumb:hover': {
+    //     background: '#555'
+    // }
 })
+
+export const NewCardHeader = styled("div")({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+});
+
