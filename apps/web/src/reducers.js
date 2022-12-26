@@ -1,5 +1,5 @@
 import { combineReducers } from "redux";
-import globalReducer from "./reducers/globalSlice";
+import globalReducer from "./slices/globalSlice";
 
 const allReducers = combineReducers(
     {
