@@ -9,6 +9,8 @@ import {
 import {
     ContentCopy as CopyIcon,
     Edit as EditIcon,
+    Delete as DeleteIcon,
+    FavoriteBorder as FavoriteIcon,
 } from "@mui/icons-material";
 import { useTheme } from "../theme/useTheme";
 
@@ -19,7 +21,7 @@ const SetActionsMenu = props => {
         flashSet,
         open,
         onClose,
-        ref,
+        anchorEl,
     } = props;
 
     const {
@@ -33,11 +35,6 @@ const SetActionsMenu = props => {
     } = flashSet;
 
     const { isDarkMode, theme } = useTheme();
-
-    const [showRenameModal, setShowRenameModal] = useState(false);
-    const [enteredRename, setEnteredRename] = useState("");
-
-    console.log("showRenameModal = ", showRenameModal);
 
     const handleDuplicateSet = async (e) => {
         e.stopPropagation();
@@ -109,49 +106,63 @@ const SetActionsMenu = props => {
         const setDoc = docSnap.docs[0];
     }
 
-    return (
-        <>
-            <Menu
-                anchorEl={ref?.current}
-                open={open}
-                onClose={onClose}
-            >
-                <MenuItem
-                >
-                    <EditIcon
-                        sx={{
-                            marginRight: "0.75rem"
-                        }}
-                    />
-                    <Typography
-                        variant="subtitle1"
-                        sx={{
-                            fontSize: '1.5rem',
-                        }}
-                    >
-                        Rename
-                    </Typography>
-                </MenuItem>
-                <MenuItem
-                    // onClick=
-                >
-                    <CopyIcon
-                        sx={{
-                            marginRight: "0.75rem"
-                        }}
-                    />
-                    <Typography
-                        variant="subtitle1"
-                        sx={{
-                            fontSize: '1.5rem',
-                        }}
-                    >
-                        Duplicate
-                    </Typography>
-                </MenuItem>
-            </Menu>
+    const iconStyling = {
+        marginRight: "0.75rem"
+    }
 
-            {/* {showRenameModal &&
+    return (
+        <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={onClose}
+        >
+            <MenuItem
+            >
+                <EditIcon
+                    sx={iconStyling}
+                />
+                <Typography>
+                    Rename
+                </Typography>
+            </MenuItem>
+            <MenuItem
+            // onClick=
+            >
+                <CopyIcon
+                    sx={iconStyling}
+                />
+                <Typography>
+                    Duplicate
+                </Typography>
+            </MenuItem>
+            <MenuItem
+            // onClick=
+            >
+                <DeleteIcon
+                    sx={iconStyling}
+                />
+                <Typography>
+                    Delete
+                </Typography>
+            </MenuItem>
+            <MenuItem
+            // onClick=
+            >
+                <FavoriteIcon
+                    sx={iconStyling}
+                />
+                <Typography>
+                    Favorite
+                </Typography>
+            </MenuItem>
+        </Menu>
+    );
+}
+
+export default SetActionsMenu;
+
+/*
+ { {showRenameModal &&
                 <Dialog
                     open={showRenameModal}
                     onClose={() => setShowRenameModal(false)}
@@ -183,9 +194,6 @@ const SetActionsMenu = props => {
                         </div>
                     </DialogActions>
                 </Dialog>
-            } */}
-        </>
-    );
-}
-
-export default SetActionsMenu;
+            } } 
+            
+*/

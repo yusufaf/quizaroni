@@ -6,13 +6,13 @@ import bodyparser from "body-parser";
 import dotenv from "dotenv";
 import mailjet from "node-mailjet"
 
-
 dotenv.config();
 
 /*
   MongoDB Setup
 */
-const client = new MongoClient(process.env.MONGODB_CONNECTION_STRING, {
+const ATLAS_DB = process.env.MONGODB_CONNECTION_STRING
+const client = new MongoClient(ATLAS_DB, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });

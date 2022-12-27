@@ -4,17 +4,12 @@ import { DataGrid } from '@mui/x-data-grid';
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { database } from "../firebase/firebase";
 import {
-    ContentCopy as CopyIcon,
-    Delete as DeleteIcon,
-    Edit as EditIcon,
-    FavoriteBorder as FavoriteBorderIcon,
     GridView as GridViewIcon,
     MenuOpen as MenuOpenIcon,
     TableView as TableViewIcon
 } from "@mui/icons-material";
 import { Button, IconButton, Menu, MenuItem, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material/';
 import { useNavigate } from "react-router-dom";
-
 import LoginMessage from "../LoginMessage/LoginMessage";
 import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
 import ViewFlashSet from "./ViewFlashSet/ViewFlashSet";
@@ -28,6 +23,7 @@ import {
     HomePaper,
     HomeSetGrid,
 } from "./HomeStyles";
+import SetActionsMenu from "./SetActionsMenu";
 
 const Home = props => {
     const { userAuthState } = props;
@@ -51,6 +47,8 @@ const Home = props => {
     const [isFavorited, setIsFavorited] = useState(false);
 
     const [selectedView, setSelectedView] = useState("table");
+    const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(false);
 
     const viewSetProps = {
         viewFlashSet,
@@ -68,12 +66,14 @@ const Home = props => {
         userAuthState,
     }
 
-    const openActionsMenu = () => {
-        setShowActionsMenu(true);
+    const openActionsMenu = (event) => {
+        setAnchorEl(event.currentTarget);
+        setActionsMenuOpen(true);
     }
 
-    const hideActionsMenu = () => {
-        setShowActionsMenu(false);
+    const closeActionsMenu = () => {
+        setAnchorEl(null)
+        setActionsMenuOpen(false);
     }
 
     const handleCloseDuplicateConfirmation = () => {
@@ -127,53 +127,23 @@ const Home = props => {
             sortable: false,
             renderCell: (cellValues) => {
                 return (
-                    <div ref={actionsMenuRef} className={homeStyles.actionsContainer}>
+                    <div className={homeStyles.actionsContainer}>
                         <Tooltip title="Open actions menu" placement="right">
                             <IconButton
-                                onClick={openActionsMenu}
+                                onClick={(e) => openActionsMenu(e)}
                             >
                                 <MenuOpenIcon />
                             </IconButton>
                         </Tooltip>
-                        <Menu
-                            anchorEl={actionsMenuRef.current}
-                            open={showActionsMenu}
-                            onClose={hideActionsMenu}
-                        >
-                            <MenuItem>
-                                <EditIcon
-                                    sx={{
-                                        marginRight: "0.75rem"
-                                    }}
-                                />
-                                <Typography
-                                    variant="subtitle1"
-                                    sx={{
-                                        fontSize: '1.5rem',
-                                    }}
-                                >
-                                    Rename
-                                </Typography>
-                            </MenuItem>
-                            <MenuItem
-                                onClick={() => setShowDuplicateConfirmation(true)}
-                            >
-                                <CopyIcon
-                                    sx={{
-                                        marginRight: "0.75rem"
-                                    }}
-                                />
-                                <Typography
-                                    variant="subtitle1"
-                                    sx={{
-                                        fontSize: '1.5rem',
-                                    }}
-                                >
-                                    Duplicate
-                                </Typography>
-                            </MenuItem>
-                        </Menu>
-                        <div className={homeStyles.importantActions}>
+                        <SetActionsMenu
+                            setFlashSets={setFlashSets}
+                            flashSet={{}}
+                            flashSets={flashSets}
+                            open={actionsMenuOpen}
+                            onClose={closeActionsMenu}
+                            anchorEl={anchorEl}
+                        />
+                        {/* <div className={homeStyles.importantActions}>
                             <Tooltip
                                 title="Delete this set"
                                 placement="right"
@@ -198,7 +168,7 @@ const Home = props => {
                                     />
                                 </IconButton>
                             </Tooltip>
-                        </div>
+                        </div> */}
                     </div>
                 );
             }
