@@ -17,7 +17,6 @@ export const HomeSetGrid = styled("div")({
     gap: "3rem",
 })
 
-
 /* Grid View - Card Styling */
 export const HomeSetCard = styled(Card)(({theme}) => ({
     height: "12rem", 
