@@ -4,7 +4,6 @@ const initialState = {
     authState: []
 }
 
-
 export const userSlice = createSlice({
     name: "user",
     initialState,
@@ -15,7 +14,7 @@ export const userSlice = createSlice({
     },
 })
 
-export const {setAuthState} = userSlice.actions;
+export const { setAuthState } = userSlice.actions;
 
 export const selectUserAuthState = (state) => state.user.authState;
 

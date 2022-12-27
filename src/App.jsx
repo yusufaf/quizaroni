@@ -9,6 +9,7 @@ import Login from "./Login/Login";
 import NavBar from "./NavBar/NavBar";
 import Profile from "./Profile/Profile";
 import Signup from "./Signup/Signup";
+import FeedbackDialog from './FeedbackDialog';
 import { DARK, LIGHT } from "./utilities/constants.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserAuthState as setReduxUserAuthState } from "src/slices/globalSlice";
@@ -93,12 +94,13 @@ const App = () => {
         />
         {/* TODO: Route for view / editing flashsets */}
         <Route
-          path="/view"
+          path="/view/:id"
         />
 
         {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
       <Footer />
+      <FeedbackDialog />
     </>
   );
 }

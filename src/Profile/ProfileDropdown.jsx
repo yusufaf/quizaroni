@@ -2,10 +2,13 @@ import { Link } from "react-router-dom";
 import { Menu, MenuItem } from '@mui/material/';
 import { useTheme } from "../theme/useTheme";
 import { styled } from '@mui/system';
+import { useDispatch } from "react-redux";
+import { setFeedbackDialogOpen } from "src/slices/globalSlice";
 
 const ProfileDropdown = props => {
     const { dropdownRef, showDropdown, onClose } = props;
     const { isDarkMode, theme } = useTheme();
+    const dispatch = useDispatch();
 
     const StyledProfileLink = styled(Link)({
         fontSize: "1.25rem",
@@ -13,8 +16,10 @@ const ProfileDropdown = props => {
         color: theme.palette.text.primary
     })
 
+    const openFeedbackDialog = () => {
+        dispatch(setFeedbackDialogOpen(true));
+    }
     
-
     return (
         <Menu
             open={showDropdown}
@@ -30,7 +35,9 @@ const ProfileDropdown = props => {
                     Profile
                 </StyledProfileLink>
             </MenuItem>
-            <MenuItem>
+            <MenuItem 
+                onClick={openFeedbackDialog}
+            >
                 Feedback
             </MenuItem>
         </Menu>

@@ -56,7 +56,7 @@ const HomeFlashSet = props => {
     const [isFavorited, setIsFavorited] = useState(false);
 
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
-    const actionsMenuRef = useRef(null);
+    const [anchorEl, setAnchorEl] = useState(false);
 
     useEffect(() => {
         checkIfFavorited();
@@ -181,14 +181,15 @@ const HomeFlashSet = props => {
         setShowDeleteConfirmation(false);
     }
 
-    const openActionsMenu = () => {
+    const openActionsMenu = (event) => {
+        setAnchorEl(event.currentTarget);
         setActionsMenuOpen(true);
     }
 
     const closeActionsMenu = () => {
+        setAnchorEl(null)
         setActionsMenuOpen(false);
     }
-
 
     return (
         <>
@@ -196,7 +197,7 @@ const HomeFlashSet = props => {
                 raised
                 onClick={(e) => {
                     e.stopPropagation();
-                    alert();
+                    // alert();
                 }}
             >
                 <CardContent>
@@ -215,23 +216,22 @@ const HomeFlashSet = props => {
                     {/* TODO: Label background color */}
                     <CardBottom>
                         <LabelChip label={label ? label : "No label selected"} variant="outlined" />
-                        <IconButton 
-                            onClick={openActionsMenu}
-                            ref={actionsMenuRef}
+                        <IconButton
+                            onClick={(e) => openActionsMenu(e)}
                         >
                             <MoreHoriz />
                         </IconButton>
+                        <SetActionsMenu
+                            setFlashSets={setFlashSets}
+                            flashSet={flashSet}
+                            flashSets={flashSets}
+                            open={actionsMenuOpen}
+                            onClose={closeActionsMenu}
+                            anchorEl={anchorEl}
+                        />
                     </CardBottom>
                 </CardContent>
             </HomeSetCard>
-            <SetActionsMenu
-                setFlashSets={setFlashSets}
-                flashSet={flashSet}
-                flashSets={flashSets}
-                open={actionsMenuOpen}
-                onClose={closeActionsMenu}
-                ref={actionsMenuRef}
-            />
 
             {/* <div
                 className={`${homeFlashStyles.flashSet} ${isDarkMode ? `${appStyles.hoverDark} ${appStyles.darkInput}` : `${appStyles.hoverLight} ${appStyles.lightInput}`}`}
