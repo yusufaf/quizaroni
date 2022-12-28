@@ -9,8 +9,10 @@ import { useTheme } from "../theme/useTheme";
 import NavDrawer from "./NavDrawer";
 import ProfileDropdown from "../Profile/ProfileDropdown";
 import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
-import * as C from "../utilities/constants";
-
+import {
+    SUCCESS,
+    ROUTES
+} from "../utilities/constants";
 import {
     AppLogo,
     AuthenticationButton,
@@ -25,8 +27,8 @@ import {
     NavRightActions,
     NavLinksContainer,
 } from "./NavStyles";
-import { useDispatch, useSelector } from "react-redux";
-import { selectAlert, setAlert } from "src/slices/globalSlice";
+import { useDispatch } from "react-redux";
+import { setAlert } from "src/slices/globalSlice";
 
 const NavBar = props => {
     // TODO: Change to use redux slice
@@ -38,12 +40,9 @@ const NavBar = props => {
 
     const auth = getAuth();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const [showDropdown, setShowDropdown] = useState(false);
-
-    const dispatch = useDispatch();
-    const globalAlert = useSelector(selectAlert);
-
     const dropdownRef = useRef(null);
 
     const activeLinkStyle = ({ isActive }) => ({
@@ -51,25 +50,15 @@ const NavBar = props => {
         color: `${theme.palette.text.primary}`
     });
 
-    /**
-     * Display alert showing that the user has successfully logged out
-     */
-    const displayLogoutAlert = () => {
-        dispatch(
-            setAlert({
-                show: true,
-                type: C.SUCCESS,
-            })
-        )
-        /* TODO: Consolidate into a hook? */
-        setTimeout(() => {
-            dispatch(
-                setAlert({
-                    show: false,
-                    type: "",
-                })
-            )
-        }, 1000);
+    const displayLogoutAlert = (type) => {
+        const showLogoutToast = true;
+        const logoutSuccessAlert = {
+            message: "Successfully logged out :)",
+            open: showLogoutToast,
+            type: SUCCESS,
+        };
+        dispatch(setAlert(logoutSuccessAlert));
+        return;
     }
 
     /**
@@ -91,6 +80,10 @@ const NavBar = props => {
         }).catch((error) => {
             console.error("Something bad happened = ", error);
         });
+    }
+
+    const displayDropdown = () => {
+        setShowDropdown(true);
     }
 
     const closeDropdown = () => {
@@ -148,13 +141,13 @@ const NavBar = props => {
                                 <LoginButtonsContainer>
                                     <AuthenticationButton
                                         variant="outlined"
-                                        onClick={() => navigate("/login")}
+                                        onClick={() => navigate(ROUTES.LOGIN)}
                                     >
                                         Log in
                                     </AuthenticationButton>
                                     <AuthenticationButton
                                         variant="contained"
-                                        onClick={() => navigate("/signup")}
+                                        onClick={() => navigate(ROUTES.LOGIN)}
                                     >
                                         Sign up
                                     </AuthenticationButton>
@@ -169,7 +162,7 @@ const NavBar = props => {
                                 (
                                     <>
                                         <ProfileIconContainer
-                                            onClick={() => setShowDropdown(true)}
+                                            onClick={displayDropdown}
                                             ref={dropdownRef}
                                         >
                                             <StyledAccountIcon />

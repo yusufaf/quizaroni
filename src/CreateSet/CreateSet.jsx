@@ -1,16 +1,13 @@
 import { useState, useEffect, useRef } from "react"
 import { collection, addDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
 import { database } from "../firebase/firebase";
-
 import { useNavigate } from "react-router-dom";
 import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, Modal, Select, TextField, Tooltip, Typography } from '@mui/material/';
 import { AddCircleOutline, Create, UploadFile } from "@mui/icons-material";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import LoginMessage from "../LoginMessage/LoginMessage";
 import ImportSetModal from "./ImportSetModal/ImportSetModal";
-
 import { useTheme } from "../theme/useTheme";
-import * as appStyles from "../App.module.css";
 import {
     SUCCESS,
     SUCCESS_U,
@@ -39,7 +36,6 @@ import { BoldHeading, SimpleFlexContainer } from 'src/AppStyles';
 const CreateSet = props => {
     const { userAuthState } = props;
     const { isDarkMode, theme } = useTheme();
-
     const navigate = useNavigate();
 
     /* Flash Set States */
@@ -54,10 +50,6 @@ const CreateSet = props => {
 
     const [showImportModal, setShowImportModal] = useState(false);
 
-    useEffect(() => {
-    }, [showImportModal]);
-
-    // Store a reference to the HTML file <input>
     const fileInputRef = useRef(null);
 
     /* User Input Error Checking */
@@ -67,8 +59,6 @@ const CreateSet = props => {
     })
 
     const createSetDisabled = !enteredTitle || !enteredDescription;
-
-    const [pageHeight, setPageHeight] = useState(0);
 
     useEffect(() => {
         renderLabelOptions();
@@ -262,6 +252,7 @@ const CreateSet = props => {
     return (
         <>
             <CreateSetPage>
+
                 <CreateSetPaper elevation={6}>
                     <CreateSetContainer>
                         <BoldHeading variant="h5">
@@ -353,6 +344,7 @@ const CreateSet = props => {
                         </SimpleFlexContainer>
                     </CreateSetContainer>
                 </CreateSetPaper>
+
                 {renderCreateCards()}
                 <AddCardButton
                     variant="contained"

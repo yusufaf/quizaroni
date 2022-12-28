@@ -4,7 +4,6 @@ import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
 import { useEffect, useState } from "react";
 import { database } from "../firebase/firebase";
-
 import { Alert, AlertTitle, Paper } from '@mui/material/';
 import { useNavigate } from "react-router-dom";
 import PasswordToggle from "src/components/PasswordToggle/PasswordToggle";
@@ -13,7 +12,6 @@ import { updateBrowserTitle } from "src/utilities/functions";
 import * as appStyles from "../App.module.css";
 import * as loginStyles from '../Login/Login.module.css';
 import { useTheme } from "../theme/useTheme";
-
 import {
     LoginButton as SignupButton, LoginContainer as SignupContainer, LoginField as SignupField, LoginPageContainer as SignupPageContainer, LoginTitle as SignupTitle,
     StyledLink
@@ -71,8 +69,7 @@ const Signup = props => {
         ],
     };
 
-    /* React-Router function for switching routes */
-    let navigate = useNavigate();
+    const navigate = useNavigate();
 
     /* Signup Input States */
     const [enteredEmail, setEnteredEmail] = useState("");
@@ -80,9 +77,8 @@ const Signup = props => {
     const [enteredUsername, setEnteredUsername] = useState("");
     const [passVisibility, setPassVisibility] = useState(false);
 
-    /* Alert Popup */
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertType, setAlertType] = useState("");
+    // const [showAlert, setShowAlert] = useState(false);
+    // const [alertType, setAlertType] = useState("");
 
     /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
@@ -107,24 +103,31 @@ const Signup = props => {
    * @param {*} type 
    */
     const displaySignupAlert = (type) => {
-        setShowAlert(true);
+        const showLoginToast = true;
         if (type === C.SUCCESS) {
-            setAlertType(C.SUCCESS);
-            setTimeout(() => {
-                setShowAlert(false);
+            const loginSuccessAlert = {
+                message: "Successfully logged in :)",
+                open: showLoginToast,
+                type: C.SUCCESS,
+            };
+            dispatch(setAlert(loginSuccessAlert));
+            // setAlertType(C.SUCCESS);
+            // setTimeout(() => {
+            //     setShowAlert(false);
 
-                // Redirect user to their home page after
-                navigate("/create", { replace: true });
-            }, 1000);
-            return;
+            //     // Redirect user to their home page after
+            //     navigate("/create", { replace: true });
+            // }, 1000);
+            // return;
         }
         if (type === C.ERROR) {
-            setAlertType(C.ERROR);
-            setTimeout(() => {
-                setShowAlert(false);
-            }, 500);
-            return;
+            // setAlertType(C.ERROR);
+            // setTimeout(() => {
+            //     setShowAlert(false);
+            // }, 500);
+            // return;
         }
+        return;
     }
 
     const checkIfInputEmpty = event => {
@@ -189,20 +192,7 @@ const Signup = props => {
         }
     };
 
-    const returnAlertJSX = () => {
-        return (
-            <Alert
-                className={appStyles.alert}
-                severity={alertType}
-            >
-                <AlertTitle>
-                    <b>{alertType === C.SUCCESS ? C.SUCCESS_U : C.ERROR_U}</b>
-                </AlertTitle>
-                {alertType === C.SUCCESS ? C.SIGNUP_SUCCESS_MSG : C.SIGNUP_ERROR_MSG}
-            </Alert>
-        );
-    }
-
+    /* TODO: See if you can consolidate the Login and Signup into one form / component */
     return (
         <>
             <SignupPageContainer>
@@ -274,9 +264,6 @@ const Signup = props => {
                 </div>
                 <div id="loader">Loading...</div>
             </SignupPageContainer>
-            {showAlert &&
-                returnAlertJSX()
-            }
         </>
     );
 }
