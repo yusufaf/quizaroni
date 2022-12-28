@@ -1,29 +1,46 @@
 import { useState, useEffect, useRef } from "react"
-
 import { doc, updateDoc, query, where, collection, getDocs } from "@firebase/firestore";
 import { database } from "../firebase/firebase";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css';
-
 import { Link, useNavigate } from "react-router-dom";
 import {
-    Alert, AlertTitle, Box, Button, Card, Checkbox, FormControlLabel, Typography, TextField, InputAdornment, IconButton,
+    Alert,
+    AlertTitle,
+    Box,
+    Button,
+    Card,
+    Checkbox,
+    FormControlLabel,
+    Typography,
+    TextField,
+    InputAdornment,
+    IconButton,
     Paper,
 } from '@mui/material/';
 import PasswordToggle from "src/components/PasswordToggle/PasswordToggle"
 import { useTheme } from "src/theme/useTheme";
 import * as loginStyles from './Login.module.css';
-import * as appStyles from "../App.module.css";
 import * as C from "src/utilities/constants";
-
 import { updateBrowserTitle } from "src/utilities/functions";
-import { ForgotPasswordLink, LoginPageContainer, LoginContainer, LoginField, LoginTitle, LoginButton, StyledLink } from "./LoginStyles";
+import { 
+    ForgotPasswordLink, 
+    LoginPageContainer, 
+    LoginContainer, 
+    LoginField, 
+    LoginTitle, 
+    LoginButton, 
+    StyledLink 
+} from "./LoginStyles";
+import { useDispatch } from "react-redux";
+import { setAlert } from "src/slices/globalSlice";
 
 const Login = props => {
     const { userAuthState, setUserAuthState } = props;
-
     const { isDarkMode, theme } = useTheme();
+
+    const dispatch = useDispatch();
 
     /* OAuth Variables */
     const auth = getAuth();
@@ -68,10 +85,6 @@ const Login = props => {
     const [enteredPass, setEnteredPass] = useState("");
     const [passVisibility, setPassVisibility] = useState(false);
 
-    /* Alert Popup */
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertType, setAlertType] = useState("");
-
     /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
         emailInput: false,
@@ -98,29 +111,30 @@ const Login = props => {
     //     }
     // }, [theme])
 
-    /**
-     * Display alert indicating status of login attempt
-     * @param {*} type 
-     */
-    const displayLoginAlert = (type) => {
-        setShowAlert(true);
-        if (type === C.SUCCESS) {
-            setAlertType(C.SUCCESS);
-            setTimeout(() => {
-                setShowAlert(false);
 
-                // Redirect user to their home page after
-                navigate("/");
-            }, 500);
-            return;
+    const displayLoginAlert = (type) => {
+        const showLoginToast = true;
+        if (type === C.SUCCESS) {
+            const loginSuccessAlert = {
+                message: "Successfully logged in :)",
+                open: showLoginToast,
+                type: C.SUCCESS,
+            };
+            dispatch(setAlert(loginSuccessAlert));
+
+            /* Redirect user to the home page after */
+            navigate("/");
         }
+
         if (type === C.ERROR) {
-            setAlertType(C.ERROR);
-            setTimeout(() => {
-                setShowAlert(false);
-            }, 500);
-            return;
+            const loginFailureAlert = {
+                message: "Failed to log in",
+                open: showLoginToast,
+                type: C.ERROR,
+            };
+            dispatch(setAlert(loginFailureAlert));
         }
+        return;
     }
 
     /**
@@ -221,7 +235,6 @@ const Login = props => {
                         >
                             Login
                         </LoginTitle>
-
                         <LoginField
                             label="Email"
                             name="emailInput"
@@ -232,7 +245,6 @@ const Login = props => {
                             error={showErrorText.emailInput}
                             size="small"
                         />
-
                         <LoginField
                             label="Password"
                             type={passVisibility ? 'text' : 'password'}
@@ -251,7 +263,6 @@ const Login = props => {
                                     />
                             }}
                         />
-
                         <ForgotPasswordLink to="/forgot">
                             Forgot password?
                         </ForgotPasswordLink>
@@ -262,7 +273,6 @@ const Login = props => {
                         >
                             Log In
                         </LoginButton>
-
                         <StyledLink
                             to="/signup"
                         >
@@ -271,7 +281,8 @@ const Login = props => {
                     </LoginContainer>
                 </Paper>
 
-                <div id="firebaseui-auth-container"
+                <div 
+                    id="firebaseui-auth-container"
                     className={loginStyles.firebaseUI}
                 >
                 </div>

@@ -1,30 +1,37 @@
-import React, { useEffect, useState } from 'react';
-import { IconButton, Snackbar } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
+import { Alert, IconButton, Snackbar } from "@mui/material";
+import React from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { selectAlert, setAlert } from "src/slices/globalSlice";
 
 const GlobalToast = props => {
+    const dispatch = useDispatch();
     const globalToast = useSelector(selectAlert);
     const {
-        open
+        open,
+        message,
+        duration = 3000,
+        type
     } = globalToast
 
-    useEffect(() => {
-        if (!globalToast && open) {
-            // setOpen(false);
-            return;
-        }
+    // useEffect(() => {
+    //     if (!globalToast && open) {
+    //         // setOpen(false);
+    //         return;
+    //     }
 
-    }, [globalToast])
-
+    // }, [globalToast])
 
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
         }
-
-        // setOpen(false);
+        dispatch(setAlert(
+            {
+                open: false,
+                type: "",
+            }
+        ))
     };
 
     const action = (
@@ -42,14 +49,19 @@ const GlobalToast = props => {
         <div>
             <Snackbar
                 open={open}
-                autoHideDuration={4000}
+                autoHideDuration={duration}
                 onClose={handleClose}
-                message="Note archived"
                 action={action}
-            />
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity={type}
+                >
+                    {message}
+                </Alert>
+            </Snackbar>
         </div>
     );
-
 }
 
 export default GlobalToast;
