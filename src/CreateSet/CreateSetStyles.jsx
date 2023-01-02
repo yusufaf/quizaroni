@@ -1,7 +1,8 @@
 import { styled } from "@mui/system";
-import { Box, Button, Card, Paper, Select, TextField, TextareaAutosize } from "@mui/material";
+import { Box, Button, Card, Paper, Select, TextField, TextareaAutosize, Typography } from "@mui/material";
 import { AddCircleOutline } from "@mui/icons-material";
-import { BasePage } from "src/AppStyles";
+import { BasePage, FlexColumn } from "src/AppStyles";
+import { SimpleFlexContainer } from './../AppStyles';
 
 export const CreateSetPage = styled(BasePage)({
     display: "grid",
@@ -57,6 +58,18 @@ export const CreateSetButton = styled(Button)({
     position: "absolute",
     right: "2rem",
 })
+
+export const AdvancedSection = styled(FlexColumn)({
+})
+
+export const BlankInputsContainer = styled(SimpleFlexContainer)({
+    gap: "0.75rem",
+})
+
+export const BlankInputsField = styled(TextField)({
+    width: "5rem",
+})
+
 
 /* 
 New Card Styled Components

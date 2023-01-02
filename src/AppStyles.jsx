@@ -6,6 +6,11 @@ export const SimpleFlexContainer = styled("div")({
     alignItems: "center",
 })
 
+export const FlexColumn = styled("div")({
+    display: "flex",
+    flexDirection: "column",
+})
+
 export const BoldHeading = styled(Typography)({
     fontWeight: "bold"
 })

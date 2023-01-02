@@ -21,8 +21,10 @@ import { useTheme } from "src/theme/useTheme";
 import * as profileStyles from './Profile.module.css';
 import PasswordToggle from "src/components/PasswordToggle/PasswordToggle";
 import {
+    ActionHeader,
     InfoChangeContainer,
     PasswordFieldsContainer,
+    ProfilePage,
     ProfilePaper
 } from "./ProfileStyles"
 import { BoldHeading } from 'src/AppStyles';
@@ -40,8 +42,11 @@ const Profile = props => {
     const [enteredNewUsername, setEnteredNewUsername] = useState("");
     const [enteredNewPassword, setEnteredNewPassword] = useState("");
     const [enteredConfirmPassword, setEnteredConfirmPassword] = useState("");
+    
     const [newPasswordVisibility, setNewPasswordVisibility] = useState(false);
 
+
+    /* https://firebase.google.com/docs/auth/custom-email-handler#web-version-9 */
 
     /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
@@ -168,24 +173,9 @@ const Profile = props => {
         setShowDeleteDialog(false);
     }
 
-    const ActionHeader = styled("div")({
-        display: "flex",
-        alignItems: "center",
-        gap: "0.75rem",
-    })
-
-    const ActionGridContainer = styled("div")({
-        display: "grid",
-        gridTemplateRows: "auto auto",
-        gap: "1rem",
-        alignItems: "center"
-    })
-
-
     // useEffect(() => {
     //     console.log({ defaultTheme })
     // }, [defaultTheme])
-
 
     if (!userAuthState) {
         return <LoginMessage page="profile" />;
@@ -193,7 +183,7 @@ const Profile = props => {
 
     return (
         <>
-            <div className={profileStyles.profilePage}>
+            <ProfilePage>
                 <ProfileCard userAuthState={userAuthState} />
                 <ProfilePaper elevation={6}>
                     <div className={profileStyles.profileContainer}>
@@ -232,7 +222,6 @@ const Profile = props => {
                             <Person />
                             <Typography variant="h6">Change Username</Typography>
                         </ActionHeader>
-
                         <InfoChangeContainer>
                             <TextField
                                 variant="standard"
@@ -286,7 +275,7 @@ const Profile = props => {
                                     type={newPasswordVisibility ? 'text' : 'password'}
                                     value={enteredNewPassword}
                                     name="passInput"
-                                    onChange={e => setEnteredNewPassword(e.target.value)}
+                                    onChange={e => setEnteredConfirmPassword(e.target.value)}
                                     // onBlur={e => checkIfInputEmpty(e)}
                                     // helperText={showErrorText.passInput && "A password is required"}
                                     // error={showErrorText.passInput}
@@ -333,7 +322,7 @@ const Profile = props => {
                         />
                     </div>
                 </ProfilePaper>
-            </div>
+            </ProfilePage>
         </>
     )
 }

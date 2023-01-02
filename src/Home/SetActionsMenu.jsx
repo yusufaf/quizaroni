@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react"
-import { addDoc, collection, deleteDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
-import { database } from "../firebase/firebase";
 import {
     Menu,
     MenuItem,
@@ -22,7 +20,12 @@ const SetActionsMenu = props => {
         open,
         onClose,
         anchorEl,
+        handleShowDeleteConfirmation
     } = props;
+
+    /* TODO: Pass down handler functions for each of the actions in the menu
+    - Ex: handleDuplicate passed down from Home
+    */
 
     const {
         cards,
@@ -36,75 +39,75 @@ const SetActionsMenu = props => {
 
     const { isDarkMode, theme } = useTheme();
 
-    const handleDuplicateSet = async (e) => {
-        e.stopPropagation();
+    // const handleDuplicateSet = async (e) => {
+    //     e.stopPropagation();
 
-        const { uid } = userAuthState;
+    //     const { uid } = userAuthState;
 
-        const flashCollection = collection(database, "flashcards");
-        const queryResult = query(flashCollection,
-            where("setID", "==", setID),
-            where("uid", "==", uid)
-        );
+    //     const flashCollection = collection(database, "flashcards");
+    //     const queryResult = query(flashCollection,
+    //         where("setID", "==", setID),
+    //         where("uid", "==", uid)
+    //     );
 
-        const docSnap = await getDocs(queryResult);
+    //     const docSnap = await getDocs(queryResult);
 
-        const numDocs = docSnap.docs.length;
-        const setDoc = docSnap.docs[0];
+    //     const numDocs = docSnap.docs.length;
+    //     const setDoc = docSnap.docs[0];
 
-        let fullFlashsetInfo;
+    //     let fullFlashsetInfo;
 
-        if (setDoc) {
-            fullFlashsetInfo = setDoc.data();
+    //     if (setDoc) {
+    //         fullFlashsetInfo = setDoc.data();
 
-            const { title } = fullFlashsetInfo
-            const duplicateTitle = `${title} (${numDocs})`;
-            const creationDate = new Date().toLocaleDateString();
-            const lastViewedDate = new Date().toLocaleDateString();
+    //         const { title } = fullFlashsetInfo
+    //         const duplicateTitle = `${title} (${numDocs})`;
+    //         const creationDate = new Date().toLocaleDateString();
+    //         const lastViewedDate = new Date().toLocaleDateString();
 
-            let modifiedFlashset = {
-                ...fullFlashsetInfo,
-                title: duplicateTitle,
-                creationDate,
-                lastViewedDate
-            }
+    //         let modifiedFlashset = {
+    //             ...fullFlashsetInfo,
+    //             title: duplicateTitle,
+    //             creationDate,
+    //             lastViewedDate
+    //         }
 
-            let cardsRef = await addDoc(flashCollection, modifiedFlashset);
+    //         let cardsRef = await addDoc(flashCollection, modifiedFlashset);
 
-            const newID = cardsRef.id;
-            // Store the Firebase document ID as the set's "id"
-            updateDoc(cardsRef, {
-                setID: newID
-            })
+    //         const newID = cardsRef.id;
+    //         // Store the Firebase document ID as the set's "id"
+    //         updateDoc(cardsRef, {
+    //             setID: newID
+    //         })
 
-            let duplicatedFlashset = {
-                ...modifiedFlashSet,
-                setID: newID
-            }
+    //         let duplicatedFlashset = {
+    //             ...modifiedFlashSet,
+    //             setID: newID
+    //         }
 
-            const currFlashsets = [...flashSets];
-            currFlashsets.push(duplicatedFlashset);
-            setFlashSets(currFlashsets);
-        }
-    }
+    //         const currFlashsets = [...flashSets];
+    //         currFlashsets.push(duplicatedFlashset);
+    //         setFlashSets(currFlashsets);
+    //     }
+    // }
 
-    /**
-     * Renames the selected flash set
-     */
-    const handleRenameSet = async () => {
-        const { uid } = userAuthState;
+    // /**
+    //  * Renames the selected flash set
+    //  */
+    // const handleRenameSet = async () => {
+    //     const { uid } = userAuthState;
 
-        const flashCollection = collection(database, "flashcards");
+    //     const flashCollection = collection(database, "flashcards");
 
-        const queryResult = query(flashCollection,
-            where("setID", "==", setID),
-            where("uid", "==", uid)
-        );
+    //     const queryResult = query(flashCollection,
+    //         where("setID", "==", setID),
+    //         where("uid", "==", uid)
+    //     );
 
-        const docSnap = await getDocs(queryResult);
+    //     const docSnap = await getDocs(queryResult);
 
-        const setDoc = docSnap.docs[0];
-    }
+    //     const setDoc = docSnap.docs[0];
+    // }
 
     const iconStyling = {
         marginRight: "0.75rem"
@@ -112,6 +115,7 @@ const SetActionsMenu = props => {
 
     return (
         <Menu
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             anchorEl={anchorEl}
             open={open}
             onClose={onClose}
@@ -126,7 +130,7 @@ const SetActionsMenu = props => {
                 </Typography>
             </MenuItem>
             <MenuItem
-            // onClick=
+                // onClick={}
             >
                 <CopyIcon
                     sx={iconStyling}
@@ -136,7 +140,7 @@ const SetActionsMenu = props => {
                 </Typography>
             </MenuItem>
             <MenuItem
-            // onClick=
+                onClick={handleShowDeleteConfirmation}
             >
                 <DeleteIcon
                     sx={iconStyling}

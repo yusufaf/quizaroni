@@ -14,6 +14,7 @@ const ConfirmDialog = props => {
         onClose,
         title,
         dialogMessage,
+        onCancel = null,
         onConfirm,
         cancelButtonText = "Cancel",
         confirmButtonText = "Confirm",
@@ -28,9 +29,12 @@ const ConfirmDialog = props => {
     }
 
     return (
-        <Dialog open={open} onClose={onClose}>
+        <Dialog 
+            open={open} 
+            onClose={onClose}
+        >
             <DialogTitle>
-                <Typography>{title}</Typography>
+                {title}
             </DialogTitle>
             <DialogContent>
                 <DialogContentText>
