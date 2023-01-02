@@ -1,56 +1,7 @@
-
-.homePage {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .flashSets {
     margin-top: 1.5rem;
     width: 70rem;
     padding: 1.25rem;
     border-radius: 0.75rem;
     box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
-}
-
-.header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 1.25rem;
-    font-weight: bold;
-
-    margin-top: 1rem;
-}
-
-.favoriteFilter {
-    display: flex;
-    align-items: center;
-}
-
-.searchContainer {
-    display: flex;
-    justify-content: flex-end;
-}
-
-.search {
-    width: 20rem;
-}
-
-.tableContainer {
-    margin-top: 2rem;
-    height: 40rem;
-    width: 100%;
-}
-
-.actionsContainer {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.importantActions {
-    display: flex;
-    flex-direction: column;
 }

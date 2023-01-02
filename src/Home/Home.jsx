@@ -1,29 +1,36 @@
-import { useEffect, useRef, useState } from "react";
-import { useSelector } from 'react-redux';
-import { DataGrid } from '@mui/x-data-grid';
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { database } from "../firebase/firebase";
 import {
     GridView as GridViewIcon,
     MenuOpen as MenuOpenIcon,
     TableView as TableViewIcon
 } from "@mui/icons-material";
-import { Button, IconButton, Menu, MenuItem, ToggleButton, ToggleButtonGroup, Tooltip, Typography } from '@mui/material/';
+import { IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material/';
+import {
+    DataGrid,
+    GridToolbar
+} from '@mui/x-data-grid';
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { useEffect, useRef, useState } from "react";
+import { useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
-import LoginMessage from "../LoginMessage/LoginMessage";
-import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
-import ViewFlashSet from "./ViewFlashSet/ViewFlashSet";
-import { useTheme } from "../theme/useTheme";
-import { updateBrowserTitle } from "src/utilities/functions";
-import * as homeStyles from './Home.module.css';
-import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
 import { BoldHeading } from "src/AppStyles";
+import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
+import { FLASHSET_VIEWS } from "src/utilities/constants";
+import { updateBrowserTitle } from "src/utilities/functions";
+import { database } from "../firebase/firebase";
+import LoginMessage from "../LoginMessage/LoginMessage";
+import { useTheme } from "../theme/useTheme";
+import * as homeStyles from './Home.module.css';
+import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
 import {
     HomePage,
     HomePaper,
     HomeSetGrid,
+    HomeSetsHeading,
+    HomeTableContainer
 } from "./HomeStyles";
+import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
+import ViewFlashSet from "./ViewFlashSet/ViewFlashSet";
 
 const Home = props => {
     const { userAuthState } = props;
@@ -35,12 +42,9 @@ const Home = props => {
 
     const [flashSets, setFlashSets] = useState([]);
     const [searchFilteredSets, setSearchFilteredSets] = useState([]);
-
     const [enteredSearch, setEnteredSearch] = useState("");
-
     const [viewFlashSet, setViewFlashSet] = useState(false);
     const [selectedFlashSet, setSelectedFlashSet] = useState({});
-    const [showActionsMenu, setShowActionsMenu] = useState(false);
 
     const [showDuplicateConfirmation, setShowDuplicateConfirmation] = useState(false);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -80,16 +84,10 @@ const Home = props => {
         setShowDuplicateConfirmation(false);
     }
 
-    const FLASHSET_VIEWS = {
-        TABLE: "table",
-        GRID: "grid",
-    }
-
     const navigate = useNavigate();
 
     // Store a reference to the HTML file <input>
     const fileInput = useRef(null);
-    const actionsMenuRef = useRef(null);
 
     const showViewSetPage = viewFlashSet && Object.keys(selectedFlashSet).length !== 0;
 
@@ -127,7 +125,7 @@ const Home = props => {
             sortable: false,
             renderCell: (cellValues) => {
                 return (
-                    <div className={homeStyles.actionsContainer}>
+                    <>
                         <Tooltip title="Open actions menu" placement="right">
                             <IconButton
                                 onClick={(e) => openActionsMenu(e)}
@@ -143,33 +141,7 @@ const Home = props => {
                             onClose={closeActionsMenu}
                             anchorEl={anchorEl}
                         />
-                        {/* <div className={homeStyles.importantActions}>
-                            <Tooltip
-                                title="Delete this set"
-                                placement="right"
-                            >
-                                <IconButton
-                                    onClick={() => handleDelete(index)}
-                                >
-                                    <DeleteIcon
-                                        fontSize="medium"
-                                    />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip
-                                title="Favorite this card"
-                                placement="right"
-                            >
-                                <IconButton
-                                    onClick={() => handleDelete(index)}
-                                >
-                                    <FavoriteBorderIcon
-                                        fontSize="medium"
-                                    />
-                                </IconButton>
-                            </Tooltip>
-                        </div> */}
-                    </div>
+                    </>
                 );
             }
         }
@@ -196,8 +168,6 @@ const Home = props => {
             console.log("title.includes(searchTerm) || description.includes(searchTerm) = ", title.includes(searchTerm) || description.includes(searchTerm));
             return title.includes(searchTerm) || description.includes(searchTerm);
         })
-
-        console.log("newFlashSets = ", newFlashSets);
 
         /* Display a message when the search didn't have any results? */
         newFlashSets.length === 0 ? setFlashSets(originalFlashSets) : setFlashSets(newFlashSets);
@@ -279,36 +249,28 @@ const Home = props => {
         return <LoginMessage page="home" />;
     }
 
+    /* TODO: View flashset page needs to be rendering based on navigating to a separate route /view */
+
     return (
         <HomePage>
             {showViewSetPage ?
                 <ViewFlashSet {...viewSetProps} />
                 :
                 <HomePaper elevation={6}>
-                    <ToggleButtonGroup
-                        aria-label="Grid/Table View Toggle"
-                        exclusive
-                        onChange={handleViewChange}
-                        value={selectedView}
+                    <HomeSetsHeading
+                        variant="h5"
                     >
-                        <ToggleButton value={FLASHSET_VIEWS.TABLE} key="left" title="Table View">
-                            <TableViewIcon />
-                        </ToggleButton>,
-                        <ToggleButton value={FLASHSET_VIEWS.GRID} key="center" title="Grid View">
-                            <GridViewIcon />
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-                    {/* ✅ */}
+                        Your Flashsets
+                    </HomeSetsHeading>
+                    <HomeToolbar
+                        handleViewChange={handleViewChange}
+                        selectedView={selectedView}
+                    />
                     <div className={homeStyles.flashSets}>
-                        <BoldHeading
-                            variant="h5"
-                        >
-                            Your Flashsets
-                        </BoldHeading>
-                        <div className={homeStyles.tableContainer}>
-                            {
-                                selectedView === FLASHSET_VIEWS.TABLE ?
-                                    (
+                        {
+                            selectedView === FLASHSET_VIEWS.TABLE ?
+                                (
+                                    <HomeTableContainer>
                                         <DataGrid
                                             rows={flashSets ?? []}
                                             columns={columns}
@@ -321,36 +283,34 @@ const Home = props => {
                                             onRowDoubleClick={(params, event, details) => {
                                                 console.log({ params, event, details })
                                                 const { id, row } = params;
+                                                // TODO: Put this in redux if it's going to be a different route?
                                                 setSelectedFlashSet(row);
                                                 setViewFlashSet(true);
                                             }}
+                                            components={{ Toolbar: GridToolbar }}
+                                            componentsProps={{
+                                                toolbar: {
+                                                    showQuickFilter: true,
+                                                    quickFilterProps: { debounceMs: 500 },
+                                                },
+                                            }}
                                         />
-                                    )
-                                    :
-                                    (
-                                        <HomeSetGrid>
-                                            {flashSets.map((flashSet, index) => {
-                                                return (
-                                                    <HomeFlashSet
-                                                        key={index}
-                                                        flashSet={flashSet}
-                                                        {...homeSetProps}
-                                                    >
-                                                        value
-                                                    </HomeFlashSet>
-                                                )
-                                            })}
-                                        </HomeSetGrid>
-                                    )
-                            }
-
-                        </div>
-                        {!viewFlashSet && flashSets?.length > 0 &&
-                            (
-                                <>
-                                    {/* {renderFlashSets()} */}
-                                </>
-                            )
+                                    </HomeTableContainer>
+                                )
+                                :
+                                (
+                                    <HomeSetGrid>
+                                        {flashSets.map((flashSet, index) => {
+                                            return (
+                                                <HomeFlashSet
+                                                    key={index}
+                                                    flashSet={flashSet}
+                                                    {...homeSetProps}
+                                                />
+                                            )
+                                        })}
+                                    </HomeSetGrid>
+                                )
                         }
                     </div>
                     <ConfirmDialog

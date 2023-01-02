@@ -112,7 +112,10 @@ const NavBar = props => {
                 {!isMobile &&
                     <NavItemsContainer>
                         <NavLinksContainer>
-                            <StyledNavLink to="/" style={activeLinkStyle}>
+                            <StyledNavLink 
+                                to="/" 
+                                style={activeLinkStyle}
+                            >
                                 Home
                             </StyledNavLink>
                             <StyledNavLink

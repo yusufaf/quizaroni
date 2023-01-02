@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import { database } from "../firebase/firebase";
 import { query, where, collection, getDocs } from "firebase/firestore";
-import { Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Typography } from '@mui/material/';
+import { Typography } from '@mui/material/';
 import { AddPhotoAlternate as AddPhotoIcon } from "@mui/icons-material";
 import { useTheme } from "../theme/useTheme";
-import * as profileStyles from './Profile.module.css';
 import {
+    ProfilePicture,
+    StyledProfileCard,
+    UploadImageButton,
     UserInfoContainer,
     UserInfoHeading
 } from "./ProfileStyles"
@@ -50,29 +52,13 @@ const ProfileCard = props => {
         setCreatedSetCount(flashSnapshot.docs.length);
     }
 
-    /*
- <div className={createSetStyles.uploadImage}>
-                        <input
-                            type="file"
-                            id="fileInput"
-                            ref={fileInputRef}
-                            accept=".png, .jpg"
-                            onChange={e => onFileChange(e, index)}
-                            style={{ display: "none" }}
-                        />
-                        <i
-                            className="material-icons-outlined"
-                            style={{ fontSize: "2rem" }}
-                            onClick={() => fileInputRef.current.click()}
-                        >
-                            image
-                        </i>
-                    </div>
-    */
-
     return (
-        <div className={profileStyles.profileCard} style={{ color: theme.foreground, background: theme.background }}>
-            <div className={profileStyles.profilePicture} style={{ backgroundImage: "" }}>
+        <StyledProfileCard 
+            elevation={6}
+        >
+            <ProfilePicture 
+                style={{ backgroundImage: "" }}
+            >
                 {/* TODO: In fileChange function, have a switch case that restricts it to images only */}
                 <input
                     type="file"
@@ -82,17 +68,12 @@ const ProfileCard = props => {
                     // onChange={e => onFileChange(e, index)}
                     style={{ display: "none" }}
                 />
-                {/* <IconButton>                
-                    <AddPhotoIcon fontSize="large" />
-                </IconButton> */}
-                <span
-                    className={`material-icons-outlined ${profileStyles.uploadImage}`}
+                <UploadImageButton
                     onClick={() => profilePicRef.current.click()}
-                >
-                    add_photo_alternate
-                </span>
-            </div>
-
+                >                
+                    <AddPhotoIcon fontSize="large" />
+                </UploadImageButton>
+            </ProfilePicture>
             <UserInfoContainer>
                 <UserInfoHeading>Username</UserInfoHeading>
                 <Typography>{username}</Typography>
@@ -105,7 +86,7 @@ const ProfileCard = props => {
                 <UserInfoHeading>Account Created</UserInfoHeading>
                 <Typography>{createdDate}</Typography>
             </UserInfoContainer>
-        </div>
+        </StyledProfileCard>
     )
 }
 

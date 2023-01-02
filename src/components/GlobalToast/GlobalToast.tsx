@@ -22,7 +22,11 @@ const GlobalToast = props => {
 
     // }, [globalToast])
 
-    const handleClose = (event, reason) => {
+    /* TODO: Add logic for handling multiple notifications in quick succession, 
+        just like you did for work
+    */
+
+    const handleClose = (event: React.SyntheticEvent | Event, reason?: string) => {
         if (reason === 'clickaway') {
             return;
         }
@@ -45,9 +49,11 @@ const GlobalToast = props => {
         </React.Fragment>
     );
 
+    
     return (
         <div>
             <Snackbar
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                 open={open}
                 autoHideDuration={duration}
                 onClose={handleClose}

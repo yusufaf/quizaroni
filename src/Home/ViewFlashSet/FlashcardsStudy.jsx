@@ -19,15 +19,14 @@ import {
     Typography
 } from '@mui/material/';
 import { ArrowBack, ArrowForward, VolumeUp } from '@mui/icons-material/';
-
 import { useTheme } from "src/theme/useTheme";
-
 import * as viewFlashStyles from './ViewFlashSet.module.css';
 import { ViewFlashCardActions } from "./ViewFlashSetStyles";
+import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
+import {
+    StudyElements
+} from "./StudyModeStyles";
 
-// import {
-
-// } from "../utilities/constants";
 
 const FlashcardsStudy = props => {
     const { userAuthState, selectedFlashSet, setSelectedStudyMode } = props;
@@ -59,28 +58,10 @@ const FlashcardsStudy = props => {
         }
     }
 
-    const warningStyling = {
-        "& .MuiPaper-root": {
-        }
-    }
-
     const typographyStyling = {
         "&.MuiTypography-root": {
             color: theme.foreground
         }
-    }
-
-        
-
-
-    const retrieveTextStyling = (color, fontSize = "1.5rem") => {
-        return {
-            color,
-            fontSize
-        }
-    }
-
-    const arrowIconStyling = {
     }
 
     const handleArrowClick = (direction) => {
@@ -107,6 +88,11 @@ const FlashcardsStudy = props => {
         setShowWarningModal(false);
     }
 
+    const handleConfirm = () => {
+        handleCloseWarning();
+        setSelectedStudyMode("")
+    }
+
     const handleAudioPlayback = () => {
         // if (timeoutRef.current) {
         //     clearTimeout(timeoutRef.current)
@@ -125,42 +111,23 @@ const FlashcardsStudy = props => {
     return (
         <div>
             {/* TODO: In global App stylings: define back arrow */}
-            <IconButton color="primary"
-                aria-label="arrow backward" component="span"
-                sx={arrowIconStyling}
+            <IconButton 
+                color="primary"
+                aria-label="arrow backward" 
+                component="span"
                 onClick={() => handleMainBackArrow()}
             >
                 <ArrowBack fontSize="large" />
             </IconButton>
-            <Dialog
+            <ConfirmDialog
                 open={showWarningModal}
                 onClose={handleCloseWarning}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-                sx={warningStyling}
-            >
-                <DialogTitle id="alert-dialog-title">
-                    {"Stop studying this set?"}
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        You haven't finished studying all the cards in this set, are you sure you want to exit?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCloseWarning}>
-                        Cancel</Button>
-                    <Button
-                        onClick={() => {
-                            handleCloseWarning();
-                            setSelectedStudyMode("")
-                        }}
-                        autoFocus
-                    >
-                        Yes
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                title="Stop studying this set?"
+                dialogMessage="You haven't finished studying all the cards in this set, are you sure you want to exit?"
+                onConfirm={handleConfirm}
+                cancelButtonText="No"
+                confirmButtonText="Yes"
+            />
             <Typography
                 variant="h6"
                 component="span"
@@ -177,30 +144,34 @@ const FlashcardsStudy = props => {
                 Progress
             </Typography>
             <LinearProgress variant="determinate" value={0} />
-            <div className={viewFlashStyles.studyElements}>
+            <StudyElements>
                 {/* TODO: Figure out how to adjust the font size of the Tooltip */}
                 <Tooltip
                     title={<Typography fontSize="1rem">Go to previous card</Typography>}
                 >
-                    <IconButton color="primary"
-                        aria-label="arrow backward" component="span"
-                        sx={arrowIconStyling}
+                    <IconButton 
+                    color="primary"
+                        aria-label="arrow backward" 
+                        component="span"
                         onClick={() => handleArrowClick("BACKWARD")}
                     >
                         <ArrowBack fontSize="large" />
                     </IconButton>
                 </Tooltip>
-                <Card sx={cardStyling} raised
+                <Card
+                    sx={cardStyling}
+                    raised
                     onClick={() => setCurrentCardSide(!currentCardSide)}
                 >
                     {/* Action Buttons in top right corner of current card */}
-                    <Typography variant="h4" sx={{
-                        alignSelf: "center",
-                    }}>
-
+                    <Typography
+                        variant="h4"
+                        sx={{
+                            alignSelf: "center",
+                        }}
+                    >
                         {currentCard.term}
                     </Typography>
-
                     <div className={viewFlashStyles.cardActions}>
                         <Tooltip
                             title="Play TTS"
@@ -217,14 +188,16 @@ const FlashcardsStudy = props => {
                 <Tooltip
                     title={<Typography fontSize="1rem">Go to next card</Typography>}
                 >
-                    <IconButton color="primary" aria-label="arrow forward" component="span"
-                        sx={arrowIconStyling}
+                    <IconButton
+                        color="primary"
+                        aria-label="arrow forward"
+                        component="span"
                         onClick={() => handleArrowClick("FORWARD")}
                     >
                         <ArrowForward fontSize="large" />
                     </IconButton>
                 </Tooltip>
-            </div>
+            </StudyElements>
         </div >
     );
 }

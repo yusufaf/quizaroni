@@ -1,6 +1,7 @@
 import { Button, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, TextField } from '@mui/material/';
 import * as C from "../../utilities/constants";
 import { styled } from '@mui/system';
+import { deleteUser } from 'firebase/auth';
 
 const DeleteAccountDialog = props => {
     const { open, handleClose, enteredPassword, setEnteredPassword } = props;
@@ -8,6 +9,13 @@ const DeleteAccountDialog = props => {
     const DeletePasswordInput = styled(TextField)({
         marginTop: "1rem"
     })
+
+    // deleteUser(user).then(() => {
+    //     // User deleted.
+    //   }).catch((error) => {
+    //     // An error ocurred
+    //     // ...
+    //   });
 
     return (
         <Dialog
@@ -22,7 +30,6 @@ const DeleteAccountDialog = props => {
                 <DialogContentText>
                     {C.DELETE_ACCOUNT_MSG}
                 </DialogContentText>
-
                 <DeletePasswordInput
                     fullWidth={true}
                     label="Password"
