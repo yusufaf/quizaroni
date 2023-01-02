@@ -1,13 +1,9 @@
-/* Styling */
 import { useRef } from "react"
 import { useTheme } from "../../theme/useTheme";
-import * as viewFlashStyles from './ViewFlashSet.module.css';
-
 import { IconButton, Tooltip, Typography } from '@mui/material/';
 import { Star, StarBorder, VolumeUp} from "@mui/icons-material";
-
 import { SimpleFlexContainer } from "src/AppStyles";
-import { ViewFlashsetCard, ViewFlashCardActions, ViewCardInfo } from "./ViewFlashSetStyles";
+import { ViewFlashsetCard, ViewFlashCardActions, ViewCardInfo, ViewCardContainer } from "./ViewFlashSetStyles";
 
 const ViewFlashCard = props => {
     const { cardInfo, disableTextColor, disableBackgroundColor, index } = props;
@@ -39,7 +35,6 @@ const ViewFlashCard = props => {
                 backgroundColor: `${cardInfo?.backgroundColor && !disableBackgroundColor ? cardInfo.backgroundColor : ""}`,
                 // marginTop: `${index === 0 ? "5rem" : ""}`
             }}
-            
         >
             <SimpleFlexContainer>
                 <Typography
@@ -74,8 +69,7 @@ const ViewFlashCard = props => {
                     </Tooltip>
                 </ViewFlashCardActions>
             </SimpleFlexContainer>
-
-            <div className={viewFlashStyles.viewCardContainer}>
+            <ViewCardContainer>
                 <ViewCardInfo>
                     <Typography
                         variant="h6"
@@ -108,7 +102,7 @@ const ViewFlashCard = props => {
                     </Typography>
                     {/* TODO: Definition image */}
                 </ViewCardInfo>
-            </div>
+            </ViewCardContainer>
         </ViewFlashsetCard>
     )
 }

@@ -68,3 +68,8 @@ export const DOWNLOAD_FILE_TYPES = {
     JSON: "JSON",
     CSV: "CSV"
 }
+
+export const FLASHSET_VIEWS = {
+    TABLE: "table",
+    GRID: "grid",
+}

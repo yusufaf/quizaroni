@@ -3,7 +3,13 @@ import { collection, addDoc, query, where, getDocs, updateDoc } from "firebase/f
 import { database } from "../firebase/firebase";
 import { useNavigate } from "react-router-dom";
 import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, Modal, Select, TextField, Tooltip, Typography } from '@mui/material/';
-import { AddCircleOutline, Create, UploadFile } from "@mui/icons-material";
+import {
+    AddCircleOutline,
+    Create,
+    UploadFile,
+    ExpandMore as ExpandMoreIcon,
+    ExpandLess as ExpandLessIcon,
+} from "@mui/icons-material";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import LoginMessage from "../LoginMessage/LoginMessage";
 import ImportSetModal from "./ImportSetModal/ImportSetModal";
@@ -29,9 +35,12 @@ import {
     AddCardButton,
     LabelSelect,
     CreateSetButton,
-    AddCardIcon
+    AddCardIcon,
+    AdvancedSection,
+    BlankInputsContainer
 } from "./CreateSetStyles";
 import { BoldHeading, SimpleFlexContainer } from 'src/AppStyles';
+import HeaderAdvancedSection from "./HeaderAdvancedSection";
 
 const CreateSet = props => {
     const { userAuthState } = props;
@@ -59,6 +68,11 @@ const CreateSet = props => {
     })
 
     const createSetDisabled = !enteredTitle || !enteredDescription;
+
+    const [advancedExpanded, setAdvancedExpanded] = useState(false);
+    const [blankCardsCount, setBlankCardsCount] = useState(0);
+    // Could do an object for the state instead
+
 
     useEffect(() => {
         renderLabelOptions();
@@ -245,6 +259,29 @@ const CreateSet = props => {
         })
     }
 
+    const toggleAdvancedSection = () => {
+        setAdvancedExpanded(!advancedExpanded);
+    }
+
+    const onBlankInputsChange = (e) => {
+        const newValue = e.target.value;
+        setBlankCardsCount(newValue);
+    }
+
+    const onBlankInputsSubmit = (e) => {
+        let newCreatedSetCards = [...createdSetCards];
+        const newInput = {
+            term: "",
+            definition: ""
+        };
+        for (let i = 0; i < blankCardsCount; i++) {
+            newCreatedSetCards.push(newInput);
+        }
+        setCreatedSetCards(newCreatedSetCards);
+        setBlankCardsCount(0);
+    }
+
+
     if (!userAuthState) {
         return <LoginMessage page="createSet" />;
     }
@@ -325,7 +362,7 @@ const CreateSet = props => {
                                 onClick={() => createNewSet()}
                                 size="large"
                                 disabled={createSetDisabled}
-                                startIcon={<Create/>}
+                                startIcon={<Create />}
                             >
                                 Create Set
                             </CreateSetButton>
@@ -342,6 +379,13 @@ const CreateSet = props => {
                                 Import Cards
                             </Typography>
                         </SimpleFlexContainer>
+                        <HeaderAdvancedSection
+                            blankCardsCount={blankCardsCount}
+                            expanded={advancedExpanded}
+                            onToggleExpanded={toggleAdvancedSection}
+                            onBlankInputsChange={onBlankInputsChange}
+                            onBlankInputsSubmit={onBlankInputsSubmit}
+                        />
                     </CreateSetContainer>
                 </CreateSetPaper>
 
@@ -352,7 +396,7 @@ const CreateSet = props => {
                         addCreateCardInput();
                     }}
                 >
-                    <AddCardIcon/>
+                    <AddCardIcon />
                     Add Card
                 </AddCardButton>
             </CreateSetPage>

@@ -1,5 +1,5 @@
 import { styled } from "@mui/system";
-import { Box, Card, Paper } from "@mui/material";
+import { Box, Card, Paper, Typography } from "@mui/material";
 import { BasePage } from "src/AppStyles";
 
 
@@ -37,6 +37,10 @@ export const StudyModeGrid = styled(Box)({
     gridTemplateRows: "auto auto",
 })
 
+export const CardCount = styled(Typography)({
+    justifySelf: "left",
+})
+
 /* Actions Section */
 
 
@@ -53,8 +57,10 @@ export const ViewFlashCardActions = styled("div")({
     marginLeft: "auto"
 })
 
-export const ViewCardInfoContainer = styled("div")({
-
+export const ViewCardContainer = styled("div")({
+    display: "flex",
+    gap: "25rem",
+    marginTop: "0.5rem",
 })
 
 export const ViewCardInfo = styled("div")({

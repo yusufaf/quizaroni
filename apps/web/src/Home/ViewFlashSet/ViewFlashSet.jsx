@@ -5,31 +5,27 @@ import { Add, ArrowBack, Download, Edit, EditNotifications, MenuOpen } from '@mu
 import {
     Chip,
     IconButton,
+    Tab,
+    Tabs,
     Tooltip,
     Typography
 } from '@mui/material/';
-import { styled } from "@mui/system";
-
 import ViewFlashCard from "./ViewFlashCard";
 import ActionsSection from "./ActionsSection/ActionsSection";
 import CreateLabelDialog from "./CreateLabelDialog/CreateLabelDialog";
 import EditableTextField from "src/components/EditableTextField/EditableTextField";
 import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
 import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
-
 import { useTheme } from "src/theme/useTheme";
 import * as viewFlashStyles from './ViewFlashSet.module.css';
 import { updateBrowserTitle } from "src/utilities/functions";
-
 import FLASH_CARDS_IMG from "src/resources/images/flash-card.png";
 import { DOWNLOAD_FILE_TYPES, STUDY_MODES, VIEW_SET } from "src/utilities/constants";
 import FlashcardsStudy from "./FlashcardsStudy";
 import { DragDropContext } from "react-beautiful-dnd"
-
 import {
     SimpleFlexContainer
 } from "src/AppStyles";
-
 import {
     SetInfo,
     StudyModeGrid,
@@ -38,6 +34,7 @@ import {
     ViewFlashsetHeader,
     ViewFlashsetPaper,
     StudyModeOption,
+    CardCount,
 } from "./ViewFlashSetStyles"
 
 const { BACKGROUND, TEXT } = VIEW_SET;
@@ -51,7 +48,6 @@ const ViewFlashSet = props => {
     } = props;
 
     console.log("flashset = ", flashset)
-
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     const controlAnchorRef = useRef(null);
@@ -218,6 +214,7 @@ const ViewFlashSet = props => {
     return (
         <ViewFlashsetPage>
             {
+                /* */
                 selectedStudyMode === STUDY_MODES.FLASHCARDS ?
                     (
                         <FlashcardsStudy
@@ -295,25 +292,28 @@ const ViewFlashSet = props => {
                                                     onClick={() => setSelectedStudyMode(STUDY_MODES.FLASHCARDS)}
                                                 >
                                                     <img src={FLASH_CARDS_IMG} height={32} width={32} />
-                                                    <span>Flashcards </span>
+                                                    <Typography>Flashcards</Typography>
                                                 </StudyModeOption>
                                             </StudyModeGrid>
                                         </div>
                                     </ViewFlashsetHeader>
                                 </ViewFlashsetContainer>
                             </ViewFlashsetPaper>
-
-                            <Typography
-                                className=""
+                            <CardCount
                                 variant="h6"
-                                sx={{ marginRight: "41%" }}
                             >
                                 Number of cards in this study set: {flashset.cards.length}
-                            </Typography>
+                            </CardCount>
+                            {/* TODO: All or Important */}
+                            <Tabs 
+                                value="All" 
+                                onChange={() => alert()} 
+                            >
+                                <Tab label="All"  value="All"  />
+                                <Tab label="Important" value="Important"/>
+                            </Tabs>
                             {/* Container for the cards */}
-
                             {renderSetCards()}
-
                             <CreateLabelDialog {...createLabelDialogProps} />
                             <NotificationsDialog
                                 open={showNotificationsModal}

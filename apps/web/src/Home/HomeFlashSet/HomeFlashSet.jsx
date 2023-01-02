@@ -177,6 +177,11 @@ const HomeFlashSet = props => {
         }
     }
 
+    const handleShowDeleteConfirmation = () => {
+        console.log("ConfirmDialog should now be showing bruh");
+        setShowDeleteConfirmation(true);
+    }
+
     const handleCloseDeleteConfirmation = () => {
         setShowDeleteConfirmation(false);
     }
@@ -189,6 +194,20 @@ const HomeFlashSet = props => {
     const closeActionsMenu = () => {
         setAnchorEl(null)
         setActionsMenuOpen(false);
+    }
+
+    /* 
+        handleFavoriteSet(setID)
+    */
+
+    const actionMenuProps = {
+        setFlashSets,
+        flashSet,
+        flashSets,
+        open: actionsMenuOpen,
+        onClose: closeActionsMenu,
+        anchorEl: anchorEl,
+        handleShowDeleteConfirmation,
     }
 
     return (
@@ -222,85 +241,11 @@ const HomeFlashSet = props => {
                             <MoreHoriz />
                         </IconButton>
                         <SetActionsMenu
-                            setFlashSets={setFlashSets}
-                            flashSet={flashSet}
-                            flashSets={flashSets}
-                            open={actionsMenuOpen}
-                            onClose={closeActionsMenu}
-                            anchorEl={anchorEl}
+                            {...actionMenuProps}
                         />
                     </CardBottom>
                 </CardContent>
             </HomeSetCard>
-
-            {/* <div
-                className={`${homeFlashStyles.flashSet} ${isDarkMode ? `${appStyles.hoverDark} ${appStyles.darkInput}` : `${appStyles.hoverLight} ${appStyles.lightInput}`}`}
-                key={uid}
-                onClick={handleViewFlashset}
-            >
-                <div className={homeFlashStyles.data}>{title}</div>
-                <div className={homeFlashStyles.data}>{description}</div>
-                <div className={homeFlashStyles.data}>{creationDate}</div>
-                <div className={homeFlashStyles.data}>{label || "N/A"}</div>
-                <div className={homeFlashStyles.actions}>
-                    <div className={homeFlashStyles.mainActions}>
-                        <Tooltip
-                            title="Favorite this card"
-                            placement="right"
-                            arrow={true}
-                        >
-                            <span className={homeFlashStyles.favoriteCard}
-                            >
-                                <i className={`material-icons-outlined ${appStyles.clickIcon}
-                                ${isFavorited && homeFlashStyles.favorited}
-                            `}
-                                    onClick={e => {
-                                        e.stopPropagation();
-                                        handleFavoriteSet(setID)
-                                    }}
-                                >
-                                    star_outline
-                                </i>
-                            </span>
-                        </Tooltip>
-                        <Tooltip
-                            title="Delete this card"
-                            placement="right"
-                            arrow={true}
-                        >
-                            <span
-                                className={homeFlashStyles.deleteCard}
-                            >
-                                <i className={`material-icons-outlined ${appStyles.clickIcon}`}
-                                    onClick={() => setShowDeleteConfirmation(true)}
-                                >
-                                    delete
-                                </i>
-                            </span>
-                        </Tooltip>
-                    </div>
-
-                    <span className={`material-icons-outlined ${appStyles.clickIcon}`}
-                        onClick={e => {
-                            e.stopPropagation();
-                            setShowActionsMenu(!showActionsMenu)
-                        }}
-                    >
-                        more_vert
-                    </span>
-                    
-                    {showActionsMenu &&
-                        <HomeActionsMenu
-                            flashSet={flashSet}
-                            flashSets={flashSets}
-                            setFlashSets={setFlashSets}
-                            userAuthState={userAuthState}
-                        />
-                    }
-
-                </div>
-            </div> */}
-
             <ConfirmDialog
                 open={showDeleteConfirmation}
                 onClose={handleCloseDeleteConfirmation}

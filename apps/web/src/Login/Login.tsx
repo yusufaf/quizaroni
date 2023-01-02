@@ -41,6 +41,7 @@ const Login = props => {
     const { isDarkMode, theme } = useTheme();
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     /* OAuth Variables */
     const auth = getAuth();
@@ -79,13 +80,9 @@ const Login = props => {
         ],
     };
 
-    let navigate = useNavigate();
-
     const [enteredEmail, setEnteredEmail] = useState("");
     const [enteredPass, setEnteredPass] = useState("");
     const [passVisibility, setPassVisibility] = useState(false);
-
-    /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
         emailInput: false,
         passInput: false

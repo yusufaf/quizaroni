@@ -1,24 +1,3 @@
-/* ================ */
-/* View Flashset Page Styling */
-/* ================ */
-
-.viewPage {
-    display: grid;
-    align-items: center;
-    justify-items: center;
-    /* margin: 0 auto; */
-}
-
-.viewContainer {
-    margin-top: 1.5rem;
-    grid-row: 1;
-    height: 25rem;
-    width: 70rem;
-    padding: 1rem 1.25rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
-}
-
 .studySection {
     padding-left: 1rem;
 }
@@ -80,15 +59,4 @@
 .backButtonContainer {
     display: flex;
     align-items: center;
-}
-
-/* ================ */
-/* Fullscreen Study Styling */
-/* ================ */
-
-.studyElements {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    transform: translate(0, 50%);
 }

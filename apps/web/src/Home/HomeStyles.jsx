@@ -1,4 +1,4 @@
-import { BasePage, SimpleFlexContainer } from "src/AppStyles";
+import { BasePage, BoldHeading, SimpleFlexContainer } from "src/AppStyles";
 import styled from "@emotion/styled"
 import { Card, Chip, Paper, Typography } from "@mui/material";
 
@@ -9,6 +9,16 @@ export const HomePage = styled(BasePage)({
 })
 
 export const HomePaper = styled(Paper)({})
+
+export const HomeSetsHeading = styled(BoldHeading)({
+    marginTop: "1.5rem",
+})
+
+export const HomeTableContainer = styled("div")({
+    marginTop: "2rem",
+    height: "40rem",
+    width: "100%",
+})
 
 export const HomeSetGrid = styled("div")({
     display: "grid",
@@ -65,3 +75,5 @@ export const LabelChip = styled(Chip)({
 
 /* Actions Menu Styling */
 // export const 
+
+
