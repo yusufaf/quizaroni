@@ -1,46 +1,19 @@
-import { useState, useEffect, useRef } from "react"
-import { collection, addDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
-import { database } from "../firebase/firebase";
+import { addDoc, collection, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, FormControl, IconButton, InputLabel, MenuItem, Modal, Select, TextField, Tooltip, Typography } from '@mui/material/';
 import {
-    AddCircleOutline,
-    Create,
-    UploadFile,
-    ExpandMore as ExpandMoreIcon,
-    ExpandLess as ExpandLessIcon,
-} from "@mui/icons-material";
-import NewCardInput from "./NewCardInput/NewCardInput";
-import LoginMessage from "../LoginMessage/LoginMessage";
-import ImportSetModal from "./ImportSetModal/ImportSetModal";
-import { useTheme } from "../theme/useTheme";
-import {
-    SUCCESS,
-    SUCCESS_U,
-    ERROR,
-    ERROR_U,
-    CREATE_SET,
     PAGES
 } from "src/utilities/constants";
 import { updateBrowserTitle } from "src/utilities/functions";
+import { database } from "../firebase/firebase";
+import LoginMessage from "../LoginMessage/LoginMessage";
+import { useTheme } from "../theme/useTheme";
+import CreateSetHeader from "./CreateSetHeader";
 import {
-    CreateSetPage,
-    CreateSetPaper,
-    CreateSetContainer,
-    CreateSetInputsContainer,
-    DescriptionInput,
-    TitleInput,
-    LabelInputContainer,
-    LabelInput,
-    AddCardButton,
-    LabelSelect,
-    CreateSetButton,
-    AddCardIcon,
-    AdvancedSection,
-    BlankInputsContainer
+    AddCardButton, AddCardIcon, CreateSetPage
 } from "./CreateSetStyles";
-import { BoldHeading, SimpleFlexContainer } from 'src/AppStyles';
-import HeaderAdvancedSection from "./HeaderAdvancedSection";
+import ImportSetModal from "./ImportSetModal/ImportSetModal";
+import NewCardInput from "./NewCardInput/NewCardInput";
 
 const CreateSet = props => {
     const { userAuthState } = props;
@@ -71,7 +44,6 @@ const CreateSet = props => {
 
     const [advancedExpanded, setAdvancedExpanded] = useState(false);
     const [blankCardsCount, setBlankCardsCount] = useState(0);
-    // Could do an object for the state instead
 
 
     useEffect(() => {
@@ -236,7 +208,7 @@ const CreateSet = props => {
      * 
      * @returns 
      */
-    const onColorChange = (event, index) => {
+    const onColorChange = (event, index) => { 
         updateCardValue(index, "textColor", event.hex);
     }
 
@@ -258,6 +230,25 @@ const CreateSet = props => {
             return <NewCardInput key={index} {...props} />
         })
     }
+
+    /* Create Set Inputs */
+    const onTitleChange = (e) => {
+        setEnteredTitle(e.target.value)
+    }
+
+    const onDescriptionChange = (e) => {
+        setEnteredDescription(e.target.value)
+    }
+
+    const onLabelChange = (e) => {
+        setEnteredLabel(e.target.value)
+    }
+
+    const onSelectedLabelChange = (e) => {
+        setSelectedLabel(e.target.value)
+    }
+
+    /* Advanced Section Functions */
 
     const toggleAdvancedSection = () => {
         setAdvancedExpanded(!advancedExpanded);
@@ -282,6 +273,30 @@ const CreateSet = props => {
     }
 
 
+    
+    const advancedSectionProps = {
+        blankCardsCount,
+        expanded: advancedExpanded,
+        onToggleExpanded: toggleAdvancedSection,
+        onBlankInputsChange: onBlankInputsChange,
+        onBlankInputsSubmit: onBlankInputsSubmit,
+    }
+
+    const headerProps = {
+        advancedSectionProps,
+        createNewSet,
+        description: enteredDescription,
+        label: enteredLabel,
+        onDescriptionChange,
+        onLabelChange,
+        onSelectedLabelChange,
+        onTitleChange,
+        selectedLabel,
+        setShowImportModal,
+        title: enteredTitle,
+    }
+
+
     if (!userAuthState) {
         return <LoginMessage page="createSet" />;
     }
@@ -289,106 +304,9 @@ const CreateSet = props => {
     return (
         <>
             <CreateSetPage>
-
-                <CreateSetPaper elevation={6}>
-                    <CreateSetContainer>
-                        <BoldHeading variant="h5">
-                            {CREATE_SET.TITLE}
-                        </BoldHeading>
-                        <CreateSetInputsContainer>
-                            <BoldHeading
-                                variant="subtitle1"
-                                color={theme.palette.primary.main}
-                            >
-                                Title
-                            </BoldHeading>
-                            <TitleInput
-                                variant="standard"
-                                placeholder={CREATE_SET.TITLE_PLACEHOLDER}
-                                // label="Title"
-                                value={enteredTitle}
-                                onChange={e => setEnteredTitle(e.target.value)}
-                                size="small"
-                            />
-                            <BoldHeading
-                                variant="subtitle1"
-                                color={theme.palette.primary.main}
-                            >
-                                Description
-                            </BoldHeading>
-                            <DescriptionInput
-                                variant="outlined"
-                                placeholder={CREATE_SET.DESC_PLACEHOLDER}
-                                value={enteredDescription}
-                                onChange={e => setEnteredDescription(e.target.value)}
-                                multiline
-                                maxRows={4}
-                            />
-                            <BoldHeading
-                                variant="subtitle1"
-                                color={theme.palette.primary.main}
-                            >
-                                Label
-                            </BoldHeading>
-                            <LabelInputContainer>
-                                <LabelInput
-                                    variant="standard"
-                                    size="small"
-                                    placeholder={CREATE_SET.LABEL_PLACEHOLDER}
-                                    onChange={e => setEnteredLabel(e.target.value)}
-                                    disabled={selectedLabel !== ""}
-                                />
-                                <Typography component="span">or select an existing one</Typography>
-                                <FormControl variant="standard">
-                                    <InputLabel>Label</InputLabel>
-                                    <LabelSelect
-                                        value={selectedLabel}
-                                        // @ts-ignore
-                                        onChange={(e) => setSelectedLabel(e.target.value)}
-                                    >
-                                        {/* TODO: Always leave an empty option so they don't have to pick one */}
-                                        {/* Width of 10rem for the MenuItem */}
-                                        <MenuItem value={10} sx={{ width: "10rem" }} >
-                                            <Typography variant="inherit" noWrap>
-                                                TenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTen
-                                            </Typography>
-                                        </MenuItem>
-                                    </LabelSelect>
-                                </FormControl>
-                                {/* TODO: Map labelOptions to MenuItem */}
-                            </LabelInputContainer>
-                            <CreateSetButton
-                                variant="contained"
-                                onClick={() => createNewSet()}
-                                size="large"
-                                disabled={createSetDisabled}
-                                startIcon={<Create />}
-                            >
-                                Create Set
-                            </CreateSetButton>
-                        </CreateSetInputsContainer>
-                        <SimpleFlexContainer>
-                            <IconButton
-                                onClick={() => setShowImportModal(true)}
-                            >
-                                <UploadFile
-                                    fontSize="large"
-                                />
-                            </IconButton>
-                            <Typography>
-                                Import Cards
-                            </Typography>
-                        </SimpleFlexContainer>
-                        <HeaderAdvancedSection
-                            blankCardsCount={blankCardsCount}
-                            expanded={advancedExpanded}
-                            onToggleExpanded={toggleAdvancedSection}
-                            onBlankInputsChange={onBlankInputsChange}
-                            onBlankInputsSubmit={onBlankInputsSubmit}
-                        />
-                    </CreateSetContainer>
-                </CreateSetPaper>
-
+                <CreateSetHeader
+                    {...headerProps}
+                />
                 {renderCreateCards()}
                 <AddCardButton
                     variant="contained"

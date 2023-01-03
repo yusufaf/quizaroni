@@ -24,7 +24,13 @@ export const CreateSetContainer = styled("div")({
     width: "70rem",
     padding: "1.25rem",
     borderRadius: "0.75rem",
+    display: "grid",
+    gridTemplateColumns: "2fr 1fr",
 })
+
+export const HeaderLeftContainer = styled(FlexColumn)({})
+
+export const HeaderRightContainer = styled(FlexColumn)({})
 
 export const CreateSetInputsContainer = styled(Box)({
     display: "flex",
@@ -55,8 +61,8 @@ export const LabelInput = styled(TextField)({
 })
 
 export const CreateSetButton = styled(Button)({
-    position: "absolute",
-    right: "2rem",
+    // position: "absolute",
+    // right: "2rem",
 })
 
 export const AdvancedSection = styled(FlexColumn)({
