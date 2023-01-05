@@ -3,6 +3,7 @@ import { Alert, IconButton, Snackbar } from "@mui/material";
 import React from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { selectAlert, setAlert } from "src/slices/globalSlice";
+import { SUCCESS } from 'src/utilities/constants';
 
 const GlobalToast = props => {
     const dispatch = useDispatch();
@@ -11,7 +12,7 @@ const GlobalToast = props => {
         open,
         message,
         duration = 3000,
-        type
+        type = SUCCESS
     } = globalToast
 
     // useEffect(() => {

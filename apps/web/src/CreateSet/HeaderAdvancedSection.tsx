@@ -5,6 +5,8 @@ import {
     ExpandMore as ExpandMoreIcon,
     ExpandLess as ExpandLessIcon,
 } from "@mui/icons-material";
+import { setAlert } from "src/slices/globalSlice";
+import { useDispatch } from 'react-redux';
 
 type Props = {
     blankCardsCount: number,
@@ -23,6 +25,18 @@ const HeaderAdvancedSection = (props: Props) => {
         onBlankInputsSubmit = null,
     } = props;
 
+    const dispatch = useDispatch();
+
+    const handleBlankInputsSubmit = () => {
+        onBlankInputsSubmit();
+
+        const successAlert = {
+            message: `${blankCardsCount} cards successfully created!`,
+            open: true,
+        };
+        dispatch(setAlert(successAlert));
+    }
+   
     return (
         <AdvancedSection>
             <SimpleFlexContainer>
@@ -51,7 +65,7 @@ const HeaderAdvancedSection = (props: Props) => {
                         value={blankCardsCount}
                     />
                     <Button 
-                        onClick={onBlankInputsSubmit}
+                        onClick={handleBlankInputsSubmit}
                     >
                         Add
                     </Button>
