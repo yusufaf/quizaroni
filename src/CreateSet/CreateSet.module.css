@@ -107,86 +107,6 @@ Individual Card Input Styling
 =============================
 */
 
-.newCard {
-    position     : relative;
-    width        : 70rem;
-    padding      : 1.25rem;
-    border-radius: 0.75rem;
-    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
-}
-
-.firstCard {
-    margin-top: 22.5%;
-}
-
-.newCardInputs {
-    display             : flex;
-    justify-content     : space-between;
-    /* gap              : 8rem; */
-    margin-top          : 0.5rem;
-}
-
-.newCardTerm,
-.newCardDefinition {
-    display       : flex;
-    flex-direction: column;
-}
-
-.newCardInput {
-    margin-bottom: 1rem;
-    width        : 27.5rem;
-}
-
-.newCardHeader {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.addCard {
-    /* margin-top: 2rem; */
-    position     : relative;
-    width        : 73rem;
-    left         : 20rem;
-    padding      : 1.25rem;
-    background   : orange;
-    box-shadow   : 0 3px 10px rgb(0 0 0 / 0.2);
-    margin-bottom: 2rem;
-
-    border-radius: 0.75rem;
-    border       : none;
-    outline      : none;
-
-    font-weight   : bold;
-    text-transform: uppercase;
-    transition    : 0.2s ease;
-
-    display        : flex;
-    flex-direction : row;
-    justify-content: center;
-    align-items    : center;
-    gap            : 0.5rem;
-
-    text-align: center;
-    cursor    : pointer;
-}
-
-.addCard.noInputs {
-    margin-top: 28.5rem;
-}
-
-.addCard:hover {
-    background: rgb(253, 187, 63);
-}
-
-/* TODO:  */
-.addCard:focus {
-    /* border: 0.2rem solid #f72500; */
-}
-
-.addIcon {
-    font-size: 3rem;
-}
 
 .cardActions {
     position      : relative;
@@ -194,19 +114,6 @@ Individual Card Input Styling
     justify-content: center;
     align-items   : center;
     gap           : 1rem;
-}
-
-.colorPickerIcon {
-    cursor: pointer;
-}
-
-.colorPicker {
-    position: absolute;
-    bottom  : 2.5rem;
-}
-
-.colorPickerContainer {
-    position: absolute;
 }
 
 .colorClose {

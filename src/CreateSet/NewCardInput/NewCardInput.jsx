@@ -1,18 +1,49 @@
 import { useState, useRef } from "react"
 import { IconButton, TextField, Tooltip, Typography } from '@mui/material/';
-import { AddPhotoAlternate, Delete, FormatColorText, FormatColorFill, SwapHoriz } from "@mui/icons-material";
+import { AddPhotoAlternate, Delete, FormatColorText, FormatColorFill, SwapHoriz, Add, ContentCopy } from "@mui/icons-material";
 import { useTheme } from "src/theme/useTheme";
-
 import { ChromePicker } from "react-color";
+import {
+    BgColorPickerContainer,
+    NewCard,
+    NewCardDefinition,
+    NewCardHeader,
+    NewCardInputField,
+    NewCardInputs,
+    RightActions,
+    CenterActions,
+    NewCardTerm,
+    TextColorPickerContainer
+} from "../CreateSetStyles";
 
-import * as createSetStyles from '../CreateSet.module.css';
-import { NewCard, NewCardHeader, NewCardInputField } from "../CreateSetStyles";
+/* 
+type Props = {
+
+}
+*/
+
 
 const NewCardInput = props => {
-    const { index, handleDelete, updateCardValue, onFileChange, onColorChange, fileInputRef } = props;
+    const {
+        index,
+        handleDelete,
+        updateCardValue,
+        onFileChange,
+        onColorChange,
+        fileInputRef,
+        handleSwap,
+        cardValues,
+        handleDuplicateCard,
+    } = props;
+
+    const {
+        term,
+        definition
+    } = cardValues;
+
+
     const { isDarkMode, theme } = useTheme();
 
-    const colorPickerRef = useRef(null);
     const [showTextColorPicker, setShowTextColorPicker] = useState(false);
     const [showBackgroundColorPicker, setShowBackgroundColorPicker] = useState(false);
     const [localTextColor, setLocalTextColor] = useState("");
@@ -38,10 +69,27 @@ const NewCardInput = props => {
         // }
     }
 
+    const onBackgroundColorChange = () => {
+        // TODO
+    }
+
+    const toggleBackgroundColorPicker = () => {
+        setShowTextColorPicker(false);
+        setShowBackgroundColorPicker(!showBackgroundColorPicker);
+    }
+
+    const onTextColorChange = () => {
+        // TODO
+    }
+
+    const toggleTextColorPicker = () => {
+        setShowBackgroundColorPicker(false)
+        setShowTextColorPicker(!showTextColorPicker)
+    }
+
     return (
         <NewCard
             raised
-            // className={index === 0 ? `${createSetStyles.newCard} ${createSetStyles.firstCard}` : `${createSetStyles.newCard}`}
             key={index}
         >
             <NewCardHeader>
@@ -54,16 +102,13 @@ const NewCardInput = props => {
                     Card {index + 1}
                 </Typography>
 
-                <div className={createSetStyles.cardActions}>
+                <CenterActions>
                     <Tooltip
                         title="Change card text color"
                         placement="top"
                     >
                         <IconButton
-                            onClick={() => {
-                                setShowBackgroundColorPicker(false)
-                                setShowTextColorPicker(!showTextColorPicker)
-                            }}
+                            onClick={toggleTextColorPicker}
                         >
                             <FormatColorText
                                 fontSize="medium"
@@ -74,27 +119,23 @@ const NewCardInput = props => {
                         </IconButton>
                     </Tooltip>
                     {showTextColorPicker &&
-                        <div className={createSetStyles.colorPickerContainer}>
+                        <TextColorPickerContainer>
                             <ChromePicker
-                                className={`${createSetStyles.colorPicker} ${createSetStyles.backgroundPicker}`}
                                 color={localTextColor}
                                 onChange={(e) => {
-                                    onColorChange(e, index);
+                                    onColorChange(e, "textColor", index);
                                     setLocalTextColor(e.hex);
                                 }}
-                            />
-                        </div>
-                    }
 
+                            />
+                        </TextColorPickerContainer>
+                    }
                     <Tooltip
                         title="Change background color"
                         placement="top"
                     >
                         <IconButton
-                            onClick={() => {
-                                setShowTextColorPicker(false);
-                                setShowBackgroundColorPicker(!showBackgroundColorPicker);
-                            }}
+                            onClick={toggleBackgroundColorPicker}
                         >
                             <FormatColorFill
                                 fontSize="medium"
@@ -105,14 +146,15 @@ const NewCardInput = props => {
                         </IconButton>
                     </Tooltip>
                     {showBackgroundColorPicker &&
-                        <ChromePicker
-                            className={`${createSetStyles.colorPicker}`}
-                            color={localBackgroundColor}
-                            onChange={(e) => {
-                                onColorChange(e, index);
-                                setLocalBackgroundColor(e.hex);
-                            }}
-                        />
+                        <BgColorPickerContainer >
+                            <ChromePicker
+                                color={localBackgroundColor}
+                                onChange={(e) => {
+                                    onColorChange(e, "backgroundColor", index);
+                                    setLocalBackgroundColor(e.hex);
+                                }}
+                            />
+                        </BgColorPickerContainer>
                     }
                     {/* TODO: Implement swapping of the term and the definition */}
                     <Tooltip
@@ -120,16 +162,29 @@ const NewCardInput = props => {
                         placement="top"
                     >
                         <IconButton
-                            onClick={() => alert("Bruh")}
+                            onClick={() => handleSwap(index)}
                         >
                             <SwapHoriz
                                 fontSize="medium"
                             />
                         </IconButton>
                     </Tooltip>
-                </div>
-
-                <div className={createSetStyles.newCardActions}>
+                    {/* TODO */}
+                    <IconButton>
+                        <Add />
+                    </IconButton>
+                    <Tooltip
+                        title="Duplicate"
+                        placement="top"
+                    >
+                        <IconButton
+                            onClick={() => handleDuplicateCard(index)}
+                        >
+                            <ContentCopy />
+                        </IconButton>
+                    </Tooltip>
+                </CenterActions>
+                <RightActions>
                     <Tooltip
                         title="Delete this card"
                         placement="top"
@@ -137,7 +192,7 @@ const NewCardInput = props => {
                         <IconButton
                             onClick={() => handleDelete(index)}
                         >
-                            <Delete fontSize="medium"/>
+                            <Delete fontSize="medium" />
                         </IconButton>
                     </Tooltip>
                     <input
@@ -160,29 +215,29 @@ const NewCardInput = props => {
                             />
                         </IconButton>
                     </Tooltip>
-                </div>
+                </RightActions>
             </NewCardHeader>
-            <div className={createSetStyles.newCardInputs}>
-                <div className={createSetStyles.newCardTerm}>
+            <NewCardInputs>
+                <NewCardTerm>
                     <Typography
                         variant="subtitle1"
-                        sx={{color: theme.palette.primary.main}}
+                        sx={{ color: theme.palette.primary.main }}
                     >
                         Term
                     </Typography>
-                    
                     <NewCardInputField
                         variant="standard"
                         placeholder={"Enter a term"}
                         onChange={(e) => updateCardValue(index, "term", e.target.value)}
                         multiline
                         maxRows={4}
+                        value={term}
                     />
-                </div>
-                <div className={createSetStyles.newCardDefinition}>
+                </NewCardTerm>
+                <NewCardDefinition>
                     <Typography
                         variant="subtitle1"
-                        sx={{color: theme.palette.primary.main}}
+                        sx={{ color: theme.palette.primary.main }}
                     >
                         Definition
                     </Typography>
@@ -192,10 +247,11 @@ const NewCardInput = props => {
                         onChange={(e) => updateCardValue(index, "definition", e.target.value)}
                         multiline
                         maxRows={4}
+                        value={definition}
                     />
-                </div>
-            </div>
-        </NewCard>
+                </NewCardDefinition>
+            </NewCardInputs>
+        </NewCard >
     )
 }
 

@@ -1,8 +1,9 @@
 import { styled } from "@mui/system";
 import { Box, Button, Card, Paper, Select, TextField, TextareaAutosize, Typography } from "@mui/material";
 import { AddCircleOutline } from "@mui/icons-material";
-import { BasePage, FlexColumn } from "src/AppStyles";
+import { BasePage, FlexColumn, SpacedFlexContainer } from "src/AppStyles";
 import { SimpleFlexContainer } from './../AppStyles';
+import { ChromePicker } from "react-color";
 
 export const CreateSetPage = styled(BasePage)({
     display: "grid",
@@ -76,6 +77,10 @@ export const BlankInputsField = styled(TextField)({
     width: "5rem",
 })
 
+export const LabelSelect = styled(Select)({
+    width: "10rem"
+})
+
 
 /* 
 New Card Styled Components
@@ -85,6 +90,7 @@ export const NewCard = styled(Card)({
     width: "70rem",
     padding: "1rem 1.25rem 1.25rem 1.25rem",
     borderRadius: "0.75rem",
+    overflow: "unset"
 })
 
 export const AddCardButton = styled(Button)({
@@ -100,8 +106,8 @@ export const AddCardIcon = styled(AddCircleOutline)({
     fontSize: "3rem"
 })
 
-export const LabelSelect = styled(Select)({
-    width: "10rem"
+export const NewCardInputs = styled(SpacedFlexContainer)({
+    marginTop: "0.5rem"
 })
 
 export const NewCardInputField = styled(TextField)({
@@ -126,3 +132,25 @@ export const NewCardHeader = styled("div")({
     justifyContent: "space-between",
 });
 
+export const CenterActions = styled(SimpleFlexContainer)({
+    position: "relative",
+    justifyContent: "center",
+    gap: "1rem",
+});
+
+export const RightActions = styled(SimpleFlexContainer)({});
+
+export const NewCardTerm = styled(FlexColumn)({})
+
+export const NewCardDefinition = styled(FlexColumn)({})
+
+export const BgColorPickerContainer = styled("div")({
+    position: "absolute",
+    bottom: "2.5rem",
+    left: "4rem",
+})
+
+export const TextColorPickerContainer = styled("div")({
+    position: "absolute",
+    bottom: "2.5rem",
+})
