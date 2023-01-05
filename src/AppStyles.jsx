@@ -6,6 +6,12 @@ export const SimpleFlexContainer = styled("div")({
     alignItems: "center",
 })
 
+export const SpacedFlexContainer = styled("div")({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between"
+})
+
 export const FlexColumn = styled("div")({
     display: "flex",
     flexDirection: "column",

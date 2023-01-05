@@ -208,8 +208,28 @@ const CreateSet = props => {
      * 
      * @returns 
      */
-    const onColorChange = (event, index) => { 
-        updateCardValue(index, "textColor", event.hex);
+    const onColorChange = (event, property, index) => {
+        updateCardValue(index, property, event.hex);
+    }
+
+    const handleSwap = (index) => {
+        let newCreatedSetCards = [...createdSetCards];
+        let selectedCard = newCreatedSetCards[index];
+        const { term, definition } = selectedCard;
+        selectedCard = {
+            ...selectedCard,
+            term: definition,
+            definition: term,
+        }
+        newCreatedSetCards[index] = selectedCard;
+        setCreatedSetCards(newCreatedSetCards);
+    }
+
+    const handleDuplicateCard = (index) => {
+        let newCreatedSetCards = [...createdSetCards];
+        let selectedCard = newCreatedSetCards[index];
+        newCreatedSetCards.push({...selectedCard});
+        setCreatedSetCards(newCreatedSetCards);
     }
 
     /**
@@ -224,9 +244,12 @@ const CreateSet = props => {
             onFileChange,
             setCreatedSetCards,
             updateCardValue,
+            handleSwap,
+            handleDuplicateCard
         };
         return createdSetCards.map((_, index) => {
-            props.index = index;
+            const cardValues = createdSetCards[index];
+            props = {...props, index, cardValues};
             return <NewCardInput key={index} {...props} />
         })
     }
@@ -273,7 +296,7 @@ const CreateSet = props => {
     }
 
 
-    
+
     const advancedSectionProps = {
         blankCardsCount,
         expanded: advancedExpanded,
