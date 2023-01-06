@@ -1,6 +1,15 @@
 import { useState, useRef } from "react"
 import { IconButton, TextField, Tooltip, Typography } from '@mui/material/';
-import { AddPhotoAlternate, Delete, FormatColorText, FormatColorFill, SwapHoriz, Add, ContentCopy } from "@mui/icons-material";
+import {
+    AddPhotoAlternate,
+    Delete,
+    FormatColorText,
+    FormatColorFill,
+    SwapHoriz,
+    Add,
+    ContentCopy,
+    RestartAlt
+} from "@mui/icons-material";
 import { useTheme } from "src/theme/useTheme";
 import { ChromePicker } from "react-color";
 import {
@@ -13,7 +22,9 @@ import {
     RightActions,
     CenterActions,
     NewCardTerm,
-    TextColorPickerContainer
+    TextColorPickerContainer,
+    ExtraPickerButton,
+    ExtraPickerContainer
 } from "../CreateSetStyles";
 
 /* 
@@ -21,8 +32,6 @@ type Props = {
 
 }
 */
-
-
 const NewCardInput = props => {
     const {
         index,
@@ -40,7 +49,6 @@ const NewCardInput = props => {
         term,
         definition
     } = cardValues;
-
 
     const { isDarkMode, theme } = useTheme();
 
@@ -69,8 +77,9 @@ const NewCardInput = props => {
         // }
     }
 
-    const onBackgroundColorChange = () => {
-        // TODO
+    const onBackgroundColorChange = (e) => {
+        onColorChange(e, "backgroundColor", index);
+        setLocalBackgroundColor(e.hex);
     }
 
     const toggleBackgroundColorPicker = () => {
@@ -78,14 +87,30 @@ const NewCardInput = props => {
         setShowBackgroundColorPicker(!showBackgroundColorPicker);
     }
 
-    const onTextColorChange = () => {
-        // TODO
+    const onTextColorChange = (e) => {
+        onColorChange(e, "textColor", index);
+        setLocalTextColor(e.hex);
     }
 
     const toggleTextColorPicker = () => {
         setShowBackgroundColorPicker(false)
         setShowTextColorPicker(!showTextColorPicker)
     }
+
+    const resetTextColor = () => {
+        updateCardValue(index, "textColor", "");
+        setLocalTextColor("");
+    }
+
+    const resetBackgroundColor = () => {
+        updateCardValue(index, "backgroundColor", "");
+        setLocalBackgroundColor("");
+    }
+
+    const colorPickerActiveStyling = {
+        backgroundColor: theme.palette.action.hover,
+    }
+
 
     return (
         <NewCard
@@ -109,6 +134,7 @@ const NewCardInput = props => {
                     >
                         <IconButton
                             onClick={toggleTextColorPicker}
+                            sx={showTextColorPicker && colorPickerActiveStyling}
                         >
                             <FormatColorText
                                 fontSize="medium"
@@ -122,12 +148,15 @@ const NewCardInput = props => {
                         <TextColorPickerContainer>
                             <ChromePicker
                                 color={localTextColor}
-                                onChange={(e) => {
-                                    onColorChange(e, "textColor", index);
-                                    setLocalTextColor(e.hex);
-                                }}
-
+                                onChange={onTextColorChange}
                             />
+                            <ExtraPickerContainer>
+                                <ExtraPickerButton
+                                    onClick={resetTextColor}
+                                >
+                                    <RestartAlt />
+                                </ExtraPickerButton>
+                            </ExtraPickerContainer>
                         </TextColorPickerContainer>
                     }
                     <Tooltip
@@ -136,6 +165,7 @@ const NewCardInput = props => {
                     >
                         <IconButton
                             onClick={toggleBackgroundColorPicker}
+                            sx={showBackgroundColorPicker && colorPickerActiveStyling}
                         >
                             <FormatColorFill
                                 fontSize="medium"
@@ -149,14 +179,17 @@ const NewCardInput = props => {
                         <BgColorPickerContainer >
                             <ChromePicker
                                 color={localBackgroundColor}
-                                onChange={(e) => {
-                                    onColorChange(e, "backgroundColor", index);
-                                    setLocalBackgroundColor(e.hex);
-                                }}
+                                onChange={onBackgroundColorChange}
                             />
+                            <ExtraPickerContainer>
+                                <ExtraPickerButton
+                                    onClick={resetBackgroundColor}
+                                >
+                                    <RestartAlt />
+                                </ExtraPickerButton>
+                            </ExtraPickerContainer>
                         </BgColorPickerContainer>
                     }
-                    {/* TODO: Implement swapping of the term and the definition */}
                     <Tooltip
                         title="Swap term and definition"
                         placement="top"

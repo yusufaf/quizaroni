@@ -1,5 +1,5 @@
 import { styled } from "@mui/system";
-import { Box, Button, Card, Paper, Select, TextField, TextareaAutosize, Typography } from "@mui/material";
+import { Box, Button, Card, Paper, Select, TextField, TextareaAutosize, Typography, IconButton } from "@mui/material";
 import { AddCircleOutline } from "@mui/icons-material";
 import { BasePage, FlexColumn, SpacedFlexContainer } from "src/AppStyles";
 import { SimpleFlexContainer } from './../AppStyles';
@@ -148,9 +148,22 @@ export const BgColorPickerContainer = styled("div")({
     position: "absolute",
     bottom: "2.5rem",
     left: "4rem",
+    display: "flex",
+    flexDirection:"row"
 })
 
 export const TextColorPickerContainer = styled("div")({
     position: "absolute",
     bottom: "2.5rem",
+    display: "flex",
+    flexDirection:"row"
+})
+
+export const ExtraPickerContainer = styled("div")(({ theme }) => ({
+    background: theme.palette.background.paper,
+    border: `0.125rem solid ${theme.palette.divider}`
+}));
+
+export const ExtraPickerButton = styled(IconButton)({
+    height: "fit-content"
 })

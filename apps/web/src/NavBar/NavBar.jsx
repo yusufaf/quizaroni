@@ -150,7 +150,7 @@ const NavBar = props => {
                                     </AuthenticationButton>
                                     <AuthenticationButton
                                         variant="contained"
-                                        onClick={() => navigate(ROUTES.LOGIN)}
+                                        onClick={() => navigate(ROUTES.SIGNUP)}
                                     >
                                         Sign up
                                     </AuthenticationButton>
