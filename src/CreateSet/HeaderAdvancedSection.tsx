@@ -59,7 +59,7 @@ const HeaderAdvancedSection = (props: Props) => {
                         type="number"
                         size="small"
                         InputProps={{
-                            inputProps: { min: 0 }
+                            inputProps: { min: 0, max: 100}
                         }}
                         onChange={onBlankInputsChange}
                         value={blankCardsCount}

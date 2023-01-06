@@ -44,7 +44,7 @@ const App = () => {
         setUserAuthState(userInfo);
       }
     }
-    handleDesktopZoom();
+    // handleDesktopZoom();
   }, []);
 
   return (

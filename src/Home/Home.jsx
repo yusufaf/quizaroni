@@ -245,6 +245,16 @@ const Home = props => {
         }
     }
 
+    const onRowDoubleClick = (params, event, details) => {
+        console.log({ params, event, details })
+        const { id, row } = params;
+        // TODO: Put this in redux if it's going to be a different route?
+        setSelectedFlashSet(row);
+        // navigate(`/view/${id}`)
+        setViewFlashSet(true);
+    }
+    
+
     if (!userAuthState) {
         return <LoginMessage page="home" />;
     }
@@ -280,13 +290,7 @@ const Home = props => {
                                             // disableSelectionOnClick
                                             onRowClick={() => {
                                             }}
-                                            onRowDoubleClick={(params, event, details) => {
-                                                console.log({ params, event, details })
-                                                const { id, row } = params;
-                                                // TODO: Put this in redux if it's going to be a different route?
-                                                setSelectedFlashSet(row);
-                                                setViewFlashSet(true);
-                                            }}
+                                            onRowDoubleClick={onRowDoubleClick}
                                             components={{ Toolbar: GridToolbar }}
                                             componentsProps={{
                                                 toolbar: {
