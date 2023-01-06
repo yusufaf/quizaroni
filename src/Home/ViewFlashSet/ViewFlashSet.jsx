@@ -4,7 +4,11 @@ import { database } from "../../firebase/firebase";
 import { Add, ArrowBack, Download, Edit, EditNotifications, MenuOpen } from '@mui/icons-material/';
 import {
     Chip,
+    FormControl,
     IconButton,
+    InputLabel,
+    MenuItem,
+    Select,
     Tab,
     Tabs,
     Tooltip,
@@ -68,7 +72,10 @@ const ViewFlashSet = props => {
     const [downloadFileType, setDownloadFileType] = useState(DOWNLOAD_FILE_TYPES.TXT);
 
     const [editedDescription, setEditedDescription] = useState(flashset.description ?? "")
-    const [isEditingDescription, setIsEditingDescription] = useState(false)
+    const [isEditingDescription, setIsEditingDescription] = useState(false);
+
+    const [selectedTab, setSelectedTab] = useState("All");
+
     // useEffect(() => {
     //     console.log({ isEditingDescription })
     // }, [isEditingDescription])
@@ -171,6 +178,12 @@ const ViewFlashSet = props => {
     const createNewLabel = () => {
         // TOOD: Check if the label already exists
     }
+
+    // event: React.SyntheticEvent, newValue: number
+    const onTabChange = (e, newTab) => {
+        setSelectedTab(newTab);
+    };
+
 
     let actionSectionProps = {
         controlAnchorRef,
@@ -305,13 +318,37 @@ const ViewFlashSet = props => {
                                 Number of cards in this study set: {flashset.cards.length}
                             </CardCount>
                             {/* TODO: All or Important */}
-                            <Tabs 
-                                value="All" 
-                                onChange={() => alert()} 
-                            >
-                                <Tab label="All"  value="All"  />
-                                <Tab label="Important" value="Important"/>
-                            </Tabs>
+                            <div>
+                                <Tabs
+                                    value={selectedTab}
+                                    onChange={onTabChange}
+                                >
+                                    <Tab label="All" value="All" />
+                                    <Tab label="Important" value="Important" />
+                                </Tabs>
+
+                                {/* TODO: Sort dropdown for sorting the cards
+                                - Ideas/Notes: Maintain the index? Or is that confusing
+                                */}
+                                <FormControl sx={{ m: 1, minWidth: 80 }}>
+                                    <InputLabel id="sort-label">Age</InputLabel>
+                                    <Select
+                                        labelId="sort-label"
+                                        // value={}
+                                        // onChange={handleChange}
+                                        autoWidth
+                                        label="Age"
+                                    >
+                                        <MenuItem value="">
+                                            <em>None</em>
+                                        </MenuItem>
+                                        <MenuItem value={10}>Twenty</MenuItem>
+                                        <MenuItem value={21}>Twenty one</MenuItem>
+                                        <MenuItem value={22}>Twenty one and a half</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </div>
+
                             {/* Container for the cards */}
                             {renderSetCards()}
                             <CreateLabelDialog {...createLabelDialogProps} />

@@ -177,7 +177,7 @@ const CreateSet = props => {
      * @param {*} index 
      */
     const handleDelete = (index) => {
-        const newCreatedSetCards = [...createdSetCards];
+        let newCreatedSetCards = [...createdSetCards];
         newCreatedSetCards.splice(index, 1);
         setCreatedSetCards(newCreatedSetCards);
     }
@@ -228,7 +228,7 @@ const CreateSet = props => {
     const handleDuplicateCard = (index) => {
         let newCreatedSetCards = [...createdSetCards];
         let selectedCard = newCreatedSetCards[index];
-        newCreatedSetCards.push({...selectedCard});
+        newCreatedSetCards.push({ ...selectedCard });
         setCreatedSetCards(newCreatedSetCards);
     }
 
@@ -249,7 +249,7 @@ const CreateSet = props => {
         };
         return createdSetCards.map((_, index) => {
             const cardValues = createdSetCards[index];
-            props = {...props, index, cardValues};
+            props = { ...props, index, cardValues };
             return <NewCardInput key={index} {...props} />
         })
     }
