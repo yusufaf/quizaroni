@@ -39,6 +39,8 @@ import {
     ViewFlashsetPaper,
     StudyModeOption,
     CardCount,
+    SortCardsDropdown,
+    CardFiltersContainer,
 } from "./ViewFlashSetStyles"
 
 const { BACKGROUND, TEXT } = VIEW_SET;
@@ -74,7 +76,12 @@ const ViewFlashSet = props => {
     const [editedDescription, setEditedDescription] = useState(flashset.description ?? "")
     const [isEditingDescription, setIsEditingDescription] = useState(false);
 
-    const [selectedTab, setSelectedTab] = useState("All");
+    const TABS = {
+        ALL: "ALL",
+        IMPORTANT: "IMPORTANT"
+    }
+
+    const [selectedTab, setSelectedTab] = useState(TABS.ALL);
 
     // useEffect(() => {
     //     console.log({ isEditingDescription })
@@ -184,6 +191,13 @@ const ViewFlashSet = props => {
         setSelectedTab(newTab);
     };
 
+    const renderTabs = () => {
+        /* TODO: Putting this in a render function because want a future functionality of custom tabs */
+        return Object.values(TABS).map((tab) => {
+            return (<Tab label={tab} value={tab} />);
+        })
+    }
+
 
     let actionSectionProps = {
         controlAnchorRef,
@@ -269,7 +283,6 @@ const ViewFlashSet = props => {
                                                 value={flashset.title}
                                                 tooltipText={"Rename title"}
                                             />
-
                                             <Chip label={flashset.label ? flashset.label : "No label selected"} variant="outlined" />
                                             <Tooltip
                                                 title="Create label"
@@ -317,21 +330,19 @@ const ViewFlashSet = props => {
                             >
                                 Number of cards in this study set: {flashset.cards.length}
                             </CardCount>
-                            {/* TODO: All or Important */}
-                            <div>
+                            <CardFiltersContainer>
                                 <Tabs
                                     value={selectedTab}
                                     onChange={onTabChange}
                                 >
-                                    <Tab label="All" value="All" />
-                                    <Tab label="Important" value="Important" />
+                                   {renderTabs()}
                                 </Tabs>
 
                                 {/* TODO: Sort dropdown for sorting the cards
                                 - Ideas/Notes: Maintain the index? Or is that confusing
                                 */}
-                                <FormControl sx={{ m: 1, minWidth: 80 }}>
-                                    <InputLabel id="sort-label">Age</InputLabel>
+                                <SortCardsDropdown>
+                                    <InputLabel id="sort-label">Sort</InputLabel>
                                     <Select
                                         labelId="sort-label"
                                         // value={}
@@ -346,8 +357,8 @@ const ViewFlashSet = props => {
                                         <MenuItem value={21}>Twenty one</MenuItem>
                                         <MenuItem value={22}>Twenty one and a half</MenuItem>
                                     </Select>
-                                </FormControl>
-                            </div>
+                                </SortCardsDropdown>
+                            </CardFiltersContainer>
 
                             {/* Container for the cards */}
                             {renderSetCards()}
@@ -365,7 +376,6 @@ const ViewFlashSet = props => {
                         </>
                     )
             }
-
         </ViewFlashsetPage>
     )
 }

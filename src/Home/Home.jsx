@@ -46,8 +46,9 @@ const Home = props => {
     const [viewFlashSet, setViewFlashSet] = useState(false);
     const [selectedFlashSet, setSelectedFlashSet] = useState({});
 
-    const [showDuplicateConfirmation, setShowDuplicateConfirmation] = useState(false);
-    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [confirmDialogProps, setConfirmDialogProps] = useState({});
+
     const [isFavorited, setIsFavorited] = useState(false);
 
     const [selectedView, setSelectedView] = useState("table");
@@ -80,8 +81,8 @@ const Home = props => {
         setActionsMenuOpen(false);
     }
 
-    const handleCloseDuplicateConfirmation = () => {
-        setShowDuplicateConfirmation(false);
+    const handleCloseConfirmDialog = () => {
+        setShowConfirmDialog(false);
     }
 
     const navigate = useNavigate();
@@ -211,7 +212,7 @@ const Home = props => {
         if (setDoc) {
             const setRef = setDoc.ref;
             deleteDoc(setRef).then((result) => {
-                setShowDeleteConfirmation(false);
+                setShowConfirmDialog(true);
             })
         }
     }
@@ -318,11 +319,11 @@ const Home = props => {
                         }
                     </div>
                     <ConfirmDialog
-                        open={showDuplicateConfirmation}
-                        onClose={handleCloseDuplicateConfirmation}
+                        open={showConfirmDialog}
+                        onClose={handleCloseConfirmDialog}
                         title="Duplicate this set?"
                         dialogMessage="Are you sure you want to duplicate this set?"
-                        onConfirm={handleCloseDuplicateConfirmation}
+                        onConfirm={handleCloseConfirmDialog}
                     />
                 </HomePaper>
             }

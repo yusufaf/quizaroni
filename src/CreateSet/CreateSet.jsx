@@ -295,8 +295,6 @@ const CreateSet = props => {
         setBlankCardsCount(0);
     }
 
-
-
     const advancedSectionProps = {
         blankCardsCount,
         expanded: advancedExpanded,
@@ -333,9 +331,7 @@ const CreateSet = props => {
                 {renderCreateCards()}
                 <AddCardButton
                     variant="contained"
-                    onClick={() => {
-                        addCreateCardInput();
-                    }}
+                    onClick={addCreateCardInput}
                 >
                     <AddCardIcon />
                     Add Card
