@@ -302,7 +302,7 @@ const NewCardInput = props => {
                         maxRows={4}
                         value={term}
                         inputProps={{ 
-                            style: { color: applyTextColor ? localTextColor : undefined } 
+                            style: { color: displayTextColor ? localTextColor : undefined } 
                         }}
                     />
                 </NewCardTerm>
@@ -320,7 +320,7 @@ const NewCardInput = props => {
                         maxRows={4}
                         value={definition}
                         inputProps={{ 
-                            style: { color: applyTextColor ? localTextColor : undefined } 
+                            style: { color: displayTextColor ? localTextColor : undefined } 
                         }}
                     />
                 </NewCardDefinition>

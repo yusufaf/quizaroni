@@ -1,6 +1,6 @@
 import { styled } from "@mui/system";
-import { Box, Card, Paper, Typography } from "@mui/material";
-import { BasePage } from "src/AppStyles";
+import { Box, Card, FormControl, Paper, Typography } from "@mui/material";
+import { BasePage, SpacedFlexContainer } from "src/AppStyles";
 
 
 export const ViewFlashsetPage = styled(BasePage)({
@@ -39,6 +39,14 @@ export const StudyModeGrid = styled(Box)({
 
 export const CardCount = styled(Typography)({
     justifySelf: "left",
+})
+
+export const CardFiltersContainer = styled(SpacedFlexContainer)({
+    width: "100%",
+})
+
+export const SortCardsDropdown = styled(FormControl)({
+    width: "10rem"
 })
 
 /* Actions Section */
