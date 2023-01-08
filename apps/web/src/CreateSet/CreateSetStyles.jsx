@@ -140,6 +140,10 @@ export const CenterActions = styled(SimpleFlexContainer)({
 
 export const RightActions = styled(SimpleFlexContainer)({});
 
+export const NewCardLabel = styled(Typography)(({ theme }) => ({
+    color: theme.palette.primary.main
+}));
+
 export const NewCardTerm = styled(FlexColumn)({})
 
 export const NewCardDefinition = styled(FlexColumn)({})
@@ -159,9 +163,11 @@ export const TextColorPickerContainer = styled("div")({
     flexDirection:"row"
 })
 
-export const ExtraPickerContainer = styled("div")(({ theme }) => ({
+export const ExtraPickerContainer = styled(FlexColumn)(({ theme }) => ({
     background: theme.palette.background.paper,
-    border: `0.125rem solid ${theme.palette.divider}`
+    border: `0.125rem solid ${theme.palette.divider}`,
+    display: "flex",
+    flexDirection: "column"
 }));
 
 export const ExtraPickerButton = styled(IconButton)({

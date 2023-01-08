@@ -8,7 +8,9 @@ import {
     SwapHoriz,
     Add,
     ContentCopy,
-    RestartAlt
+    RestartAlt,
+    Visibility,
+    VisibilityOff
 } from "@mui/icons-material";
 import { useTheme } from "src/theme/useTheme";
 import { ChromePicker } from "react-color";
@@ -24,7 +26,8 @@ import {
     NewCardTerm,
     TextColorPickerContainer,
     ExtraPickerButton,
-    ExtraPickerContainer
+    ExtraPickerContainer,
+    NewCardLabel
 } from "../CreateSetStyles";
 
 /* 
@@ -47,15 +50,21 @@ const NewCardInput = props => {
 
     const {
         term,
-        definition
+        definition,
+        backgroundColor = "",
+        textColor = "",
     } = cardValues;
 
     const { isDarkMode, theme } = useTheme();
 
     const [showTextColorPicker, setShowTextColorPicker] = useState(false);
     const [showBackgroundColorPicker, setShowBackgroundColorPicker] = useState(false);
-    const [localTextColor, setLocalTextColor] = useState("");
-    const [localBackgroundColor, setLocalBackgroundColor] = useState("");
+    const [localTextColor, setLocalTextColor] = useState(textColor);
+    const [localBackgroundColor, setLocalBackgroundColor] = useState(backgroundColor);
+
+    const [applyTextColor, setApplyTextColor] = useState(false);
+    const [applyBackgroundColor, setApplyBackgroundColor] = useState(false);
+
 
     // TODO: Clicking away from ColorPicker
     // useEffect(() => {
@@ -107,15 +116,33 @@ const NewCardInput = props => {
         setLocalBackgroundColor("");
     }
 
+    const toggleApplyTextColor = () => {
+        setApplyTextColor(!applyTextColor);
+    }
+
+    const toggleApplyBackgroundColor = () => {
+        setApplyBackgroundColor(!applyBackgroundColor);
+    }
+
     const colorPickerActiveStyling = {
         backgroundColor: theme.palette.action.hover,
     }
 
+    const displayBackgroundColor = applyBackgroundColor && localBackgroundColor;
+    const displayTextColor = applyTextColor && localTextColor;
+
+    /* TODO/IDEA:
+    - Ability to create named colors, appear in some dropdown in the color picker container you've created
+
+    */
 
     return (
         <NewCard
             raised
             key={index}
+            sx={{
+                background: displayBackgroundColor ? localBackgroundColor : undefined
+            }}
         >
             <NewCardHeader>
                 <Typography
@@ -138,9 +165,9 @@ const NewCardInput = props => {
                         >
                             <FormatColorText
                                 fontSize="medium"
-                                sx={{
-                                    color: `${localTextColor ? localTextColor : theme.foreground}`
-                                }}
+                                // sx={{
+                                //     color: `${localTextColor ? localTextColor : theme.foreground}`
+                                // }}
                             />
                         </IconButton>
                     </Tooltip>
@@ -156,6 +183,11 @@ const NewCardInput = props => {
                                 >
                                     <RestartAlt />
                                 </ExtraPickerButton>
+                                <ExtraPickerButton
+                                    onClick={toggleApplyTextColor}
+                                >
+                                    {applyTextColor ? <Visibility /> : <VisibilityOff />}
+                                </ExtraPickerButton>
                             </ExtraPickerContainer>
                         </TextColorPickerContainer>
                     }
@@ -169,9 +201,9 @@ const NewCardInput = props => {
                         >
                             <FormatColorFill
                                 fontSize="medium"
-                                sx={{
-                                    color: `${localBackgroundColor ? localBackgroundColor : theme.foreground}`
-                                }}
+                                // sx={{
+                                //     color: `${localBackgroundColor ? localBackgroundColor : theme.foreground}`
+                                // }}
                             />
                         </IconButton>
                     </Tooltip>
@@ -186,6 +218,11 @@ const NewCardInput = props => {
                                     onClick={resetBackgroundColor}
                                 >
                                     <RestartAlt />
+                                </ExtraPickerButton>
+                                <ExtraPickerButton
+                                    onClick={toggleApplyBackgroundColor}
+                                >
+                                    {applyBackgroundColor ? <Visibility /> : <VisibilityOff />}
                                 </ExtraPickerButton>
                             </ExtraPickerContainer>
                         </BgColorPickerContainer>
@@ -252,12 +289,11 @@ const NewCardInput = props => {
             </NewCardHeader>
             <NewCardInputs>
                 <NewCardTerm>
-                    <Typography
+                    <NewCardLabel
                         variant="subtitle1"
-                        sx={{ color: theme.palette.primary.main }}
                     >
                         Term
-                    </Typography>
+                    </NewCardLabel>
                     <NewCardInputField
                         variant="standard"
                         placeholder={"Enter a term"}
@@ -265,15 +301,17 @@ const NewCardInput = props => {
                         multiline
                         maxRows={4}
                         value={term}
+                        inputProps={{ 
+                            style: { color: applyTextColor ? localTextColor : undefined } 
+                        }}
                     />
                 </NewCardTerm>
                 <NewCardDefinition>
-                    <Typography
+                    <NewCardLabel
                         variant="subtitle1"
-                        sx={{ color: theme.palette.primary.main }}
                     >
                         Definition
-                    </Typography>
+                    </NewCardLabel>
                     <NewCardInputField
                         variant="standard"
                         placeholder={"Enter a definition"}
@@ -281,6 +319,9 @@ const NewCardInput = props => {
                         multiline
                         maxRows={4}
                         value={definition}
+                        inputProps={{ 
+                            style: { color: applyTextColor ? localTextColor : undefined } 
+                        }}
                     />
                 </NewCardDefinition>
             </NewCardInputs>
