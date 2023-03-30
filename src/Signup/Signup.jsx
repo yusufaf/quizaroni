@@ -8,7 +8,6 @@ import { Alert, AlertTitle, Paper } from '@mui/material/';
 import { useNavigate } from "react-router-dom";
 import PasswordToggle from "src/components/PasswordToggle/PasswordToggle";
 import * as C from "src/utilities/constants";
-import { updateBrowserTitle } from "src/utilities/functions";
 import * as appStyles from "../App.module.css";
 import * as loginStyles from '../Login/Login.module.css';
 import { useTheme } from "../theme/useTheme";
@@ -16,6 +15,7 @@ import {
     LoginButton as SignupButton, LoginContainer as SignupContainer, LoginField as SignupField, LoginPageContainer as SignupPageContainer, LoginTitle as SignupTitle,
     StyledLink
 } from "src/Login/LoginStyles";
+import useBrowserTitle from "src/hooks/useBrowserTitle";
 
 const Signup = props => {
     const { userAuthState, setUserAuthState } = props;
@@ -87,9 +87,7 @@ const Signup = props => {
         passInput: false,
     })
 
-    useEffect(() => {
-        updateBrowserTitle("Sign Up");
-    }, [])
+    useBrowserTitle("Sign Up");
 
     useEffect(() => {
         firebaseUI = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
