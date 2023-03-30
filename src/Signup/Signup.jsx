@@ -15,7 +15,7 @@ import {
     LoginButton as SignupButton, LoginContainer as SignupContainer, LoginField as SignupField, LoginPageContainer as SignupPageContainer, LoginTitle as SignupTitle,
     StyledLink
 } from "src/Login/LoginStyles";
-import useBrowserTitle from "src/hooks/useBrowserTitle";
+import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
 
 const Signup = props => {
     const { userAuthState, setUserAuthState } = props;

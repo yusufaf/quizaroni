@@ -23,7 +23,7 @@ import PasswordToggle from "src/components/PasswordToggle/PasswordToggle"
 import { useTheme } from "src/theme/useTheme";
 import * as loginStyles from './Login.module.css';
 import * as C from "src/utilities/constants";
-import useBrowserTitle from "src/hooks/useBrowserTitle";
+import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
 import { 
     ForgotPasswordLink, 
     LoginPageContainer, 

@@ -41,7 +41,7 @@ import {
     SortCardsDropdown,
     CardFiltersContainer,
 } from "./ViewFlashSetStyles"
-import useBrowserTitle from 'src/hooks/useBrowserTitle';
+import useBrowserTitle from 'src/lib/hooks/useBrowserTitle';
 
 const { BACKGROUND, TEXT } = VIEW_SET;
 
