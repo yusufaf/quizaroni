@@ -1,9 +1,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const initialState = {
+type GlobalSliceState = {
+  alert: any,
+  userAuthInfo: any,
+  feedbackDialogOpen: boolean,
+  dialogOpen: boolean,
+}
+
+const initialState: GlobalSliceState = {
     alert: {},
     userAuthInfo: {},
     feedbackDialogOpen: false,
+    dialogOpen: false,
 }
 
 export const globalSlice = createSlice({
@@ -16,9 +24,13 @@ export const globalSlice = createSlice({
     setAlert: (state, action: PayloadAction<any>) => {
       state.alert = action.payload;
     },
-    setFeedbackDialogOpen: (state, action: PayloadAction<any>) => {
+    setFeedbackDialogOpen: (state, action: PayloadAction<boolean>) => {
       state.feedbackDialogOpen = action.payload;
     },
+    setDialogOpen: (state, action: PayloadAction<boolean>) => {
+      state.dialogOpen = action.payload;
+    },
+
     /* Customizing a generated action creator 
      addTodo: {
       reducer: (state, action) => {
@@ -37,9 +49,11 @@ export const globalSlice = createSlice({
 export const { 
   setUserAuthState,
   setAlert,
-  setFeedbackDialogOpen
+  setFeedbackDialogOpen,
+  setDialogOpen,
 } = globalSlice.actions
 
+/* Selectors */
 export const selectAlert = (state) => state.global.alert;
 export const selectFeedbackDialogOpen = (state) => state.global.feedbackDialogOpen;
 export const selectUserAuthState = (state) => state.global.userAuthInfo;

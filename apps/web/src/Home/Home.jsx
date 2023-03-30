@@ -1,9 +1,7 @@
 import {
-    GridView as GridViewIcon,
     MenuOpen as MenuOpenIcon,
-    TableView as TableViewIcon
 } from "@mui/icons-material";
-import { IconButton, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material/';
+import { IconButton, Tooltip } from '@mui/material/';
 import {
     DataGrid,
     GridToolbar
@@ -14,7 +12,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import { BoldHeading } from "src/AppStyles";
 import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
-import useBrowserTitle from "src/hooks/useBrowserTitle";
+import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
 import { FLASHSET_VIEWS } from "src/utilities/constants";
 import { database } from "../firebase/firebase";
 import LoginMessage from "../LoginMessage/LoginMessage";
@@ -325,8 +323,6 @@ const Home = props => {
                     />
                 </HomePaper>
             }
-            {/* Message if no flash sets have been created */}
-            {/* flashSets.length === 0 */}
         </HomePage>
     );
 }

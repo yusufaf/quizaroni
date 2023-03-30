@@ -14,6 +14,7 @@ export const HomeSetsHeading = styled(BoldHeading)({
     marginTop: "1.5rem",
 })
 
+
 export const HomeTableContainer = styled("div")({
     marginTop: "2rem",
     height: "40rem",
