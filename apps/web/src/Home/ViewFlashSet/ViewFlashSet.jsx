@@ -22,7 +22,6 @@ import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
 import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
 import { useTheme } from "src/theme/useTheme";
 import * as viewFlashStyles from './ViewFlashSet.module.css';
-import { updateBrowserTitle } from "src/utilities/functions";
 import FLASH_CARDS_IMG from "src/resources/images/flash-card.png";
 import { DOWNLOAD_FILE_TYPES, STUDY_MODES, VIEW_SET } from "src/utilities/constants";
 import FlashcardsStudy from "./FlashcardsStudy";
@@ -42,6 +41,7 @@ import {
     SortCardsDropdown,
     CardFiltersContainer,
 } from "./ViewFlashSetStyles"
+import useBrowserTitle from 'src/hooks/useBrowserTitle';
 
 const { BACKGROUND, TEXT } = VIEW_SET;
 
@@ -95,11 +95,8 @@ const ViewFlashSet = props => {
         },
     };
 
-    useEffect(() => {
-        const { title } = flashset;
-        updateBrowserTitle(title);
-    }, [])
-
+    const { title: flashsetTitle } = flashset;
+    useBrowserTitle(flashsetTitle);
 
     const handleDisableColorToggle = async (type) => {
         const { uid } = userAuthState;

@@ -23,7 +23,7 @@ import PasswordToggle from "src/components/PasswordToggle/PasswordToggle"
 import { useTheme } from "src/theme/useTheme";
 import * as loginStyles from './Login.module.css';
 import * as C from "src/utilities/constants";
-import { updateBrowserTitle } from "src/utilities/functions";
+import useBrowserTitle from "src/hooks/useBrowserTitle";
 import { 
     ForgotPasswordLink, 
     LoginPageContainer, 
@@ -88,9 +88,7 @@ const Login = props => {
         passInput: false
     })
 
-    useEffect(() => {
-        updateBrowserTitle("Login")
-    }, [])
+    useBrowserTitle("Login");
 
     useEffect(() => {
         firebaseUI = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
