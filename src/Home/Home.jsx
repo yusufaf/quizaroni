@@ -14,8 +14,8 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import { BoldHeading } from "src/AppStyles";
 import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
+import useBrowserTitle from "src/hooks/useBrowserTitle";
 import { FLASHSET_VIEWS } from "src/utilities/constants";
-import { updateBrowserTitle } from "src/utilities/functions";
 import { database } from "../firebase/firebase";
 import LoginMessage from "../LoginMessage/LoginMessage";
 import { useTheme } from "../theme/useTheme";
@@ -148,9 +148,7 @@ const Home = props => {
         }
     ];
 
-    useEffect(() => {
-        updateBrowserTitle("Home")
-    }, [])
+    useBrowserTitle("Home");
 
     /* */
     useEffect(() => {

@@ -1,10 +1,10 @@
 import { addDoc, collection, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useBrowserTitle from "src/hooks/useBrowserTitle";
 import {
     PAGES
 } from "src/utilities/constants";
-import { updateBrowserTitle } from "src/utilities/functions";
 import { database } from "../firebase/firebase";
 import LoginMessage from "../LoginMessage/LoginMessage";
 import { useTheme } from "../theme/useTheme";
@@ -46,9 +46,10 @@ const CreateSet = props => {
     const [blankCardsCount, setBlankCardsCount] = useState(0);
 
 
+    useBrowserTitle(PAGES.CREATE);
+
     useEffect(() => {
         renderLabelOptions();
-        updateBrowserTitle(PAGES.CREATE);
     }, []);
 
     /**
