@@ -3,15 +3,9 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserAuthState as setReduxUserAuthState } from "src/slices/globalSlice";
 import GlobalToast from './components/GlobalToast/GlobalToast';
-import CreateSet from "./CreateSet/CreateSet";
 import FeedbackDialog from './FeedbackDialog';
 import Footer from "./Footer/Footer";
-import ForgotPassword from "./ForgotPassword/ForgotPassword";
-import Home from "./Home/Home";
-import Login from "./Login/Login";
 import NavBar from "./NavBar/NavBar";
-import Profile from "./Profile/Profile";
-import Signup from "./Signup/Signup";
 import { useTheme } from "./theme/useTheme";
 import { DARK, LIGHT } from "./utilities/constants";
 import { handleDesktopZoom } from "./utilities/handleDesktopZoom";
@@ -25,8 +19,6 @@ const App = () => {
   // const reduxUserAuthState = useSelector( (state) => state.userAuthState);
 
   const [userAuthState, setUserAuthState] = useState(null);
-
-  
 
   useEffect(() => {
     prefersDarkMode
