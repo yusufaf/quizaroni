@@ -10,6 +10,10 @@ import { useTheme } from "./theme/useTheme";
 import { DARK, LIGHT } from "./utilities/constants";
 import { handleDesktopZoom } from "./utilities/handleDesktopZoom";
 import AppRoutes from './AppRoutes';
+// @ts-ignore
+import { Amplify } from 'aws-amplify';
+import awsconfig from './aws-exports';
+Amplify.configure(awsconfig);
 
 const App = () => {
   const { setTheme } = useTheme();

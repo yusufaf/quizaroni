@@ -13,6 +13,7 @@ const PasswordToggle = props => {
                 aria-label="Toggle password visibility"
                 onClick={() => setPasswordVisibility(!passwordVisibility)}
                 edge="end"
+                tabIndex={-1}
             >
                 {passwordVisibility ? <VisibilityOff /> : <Visibility />}
             </IconButton>
