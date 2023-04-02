@@ -2,26 +2,12 @@ import { useState, useEffect, useRef } from "react"
 import { doc, updateDoc, query, where, collection, getDocs } from "@firebase/firestore";
 import { database } from "../firebase/firebase";
 import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import * as firebaseui from 'firebaseui'
-import 'firebaseui/dist/firebaseui.css';
 import { Link, useNavigate } from "react-router-dom";
 import {
-    Alert,
-    AlertTitle,
-    Box,
-    Button,
-    Card,
-    Checkbox,
-    FormControlLabel,
-    Typography,
-    TextField,
-    InputAdornment,
-    IconButton,
     Paper,
 } from '@mui/material/';
 import PasswordToggle from "src/components/PasswordToggle/PasswordToggle"
 import { useTheme } from "src/theme/useTheme";
-import * as loginStyles from './Login.module.css';
 import * as C from "src/utilities/constants";
 import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
 import { 
@@ -39,7 +25,8 @@ import { setAlert } from "src/slices/globalSlice";
 const Login = props => {
     const { userAuthState, setUserAuthState } = props;
     const { isDarkMode, theme } = useTheme();
-
+    
+    useBrowserTitle("Login");
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -48,37 +35,37 @@ const Login = props => {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
-    let firebaseUI;
+    // let firebaseUI;
 
-    let uiConfig = {
-        callbacks: {
-            signInSuccessWithAuthResult: (authResult, redirectUrl) => {
-                const { user } = authResult;
-                const { uid } = user;
+    // let uiConfig = {
+    //     callbacks: {
+    //         signInSuccessWithAuthResult: (authResult, redirectUrl) => {
+    //             const { user } = authResult;
+    //             const { uid } = user;
 
-                // Google Access Token in the authResult object?
+    //             // Google Access Token in the authResult object?
 
-                console.log("authResult = ", authResult);
-                // User successfully signed in.
-                // Return type determines whether we continue the redirect automatically
-                // or whether we leave that to developer to handle.
-                setUserAuthState(user);
-                updateLastSignIn(uid);
-                localStorage.setItem('userInfo', JSON.stringify(user));
-                displayLoginAlert(C.SUCCESS);
-                return false;
-            },
-            uiShown: function () {
-                // The widget is rendered. + Hide the loader
-                document.getElementById('loader').style.display = 'none';
-            }
-        },
-        // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
-        signInFlow: 'popup',
-        signInOptions: [
-            GoogleAuthProvider.PROVIDER_ID,
-        ],
-    };
+    //             console.log("authResult = ", authResult);
+    //             // User successfully signed in.
+    //             // Return type determines whether we continue the redirect automatically
+    //             // or whether we leave that to developer to handle.
+    //             setUserAuthState(user);
+    //             updateLastSignIn(uid);
+    //             localStorage.setItem('userInfo', JSON.stringify(user));
+    //             displayLoginAlert(C.SUCCESS);
+    //             return false;
+    //         },
+    //         uiShown: function () {
+    //             // The widget is rendered. + Hide the loader
+    //             document.getElementById('loader').style.display = 'none';
+    //         }
+    //     },
+    //     // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
+    //     signInFlow: 'popup',
+    //     signInOptions: [
+    //         GoogleAuthProvider.PROVIDER_ID,
+    //     ],
+    // };
 
     const [enteredEmail, setEnteredEmail] = useState("");
     const [enteredPass, setEnteredPass] = useState("");
@@ -88,14 +75,12 @@ const Login = props => {
         passInput: false
     })
 
-    useBrowserTitle("Login");
-
-    useEffect(() => {
-        firebaseUI = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
-        if (firebaseUI && !userAuthState) {
-            firebaseUI.start('#firebaseui-auth-container', uiConfig);
-        }
-    }, [])
+    // useEffect(() => {
+    //     firebaseUI = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
+    //     if (firebaseUI && !userAuthState) {
+    //         firebaseUI.start('#firebaseui-auth-container', uiConfig);
+    //     }
+    // }, [])
 
     // TODO: Possible quality of life styling
     // useEffect(() => {
@@ -275,13 +260,6 @@ const Login = props => {
                         </StyledLink>
                     </LoginContainer>
                 </Paper>
-
-                <div 
-                    id="firebaseui-auth-container"
-                    className={loginStyles.firebaseUI}
-                >
-                </div>
-                <div id="loader">Loading...</div>
             </LoginPageContainer>
         </>
     );
