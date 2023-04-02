@@ -1,18 +1,13 @@
 {
   "authSelections": "userPoolOnly",
-  "resourceName": "quizaronif7599608",
+  "resourceName": "quizaroniafbd19af",
   "serviceType": "imported",
   "region": "us-west-2",
   "aliasAttributes": [
-    "email",
-    "preferred_username"
+    "email"
   ],
-  "authProvidersUserPool": [],
   "requiredAttributes": [
-    "preferred_username",
-    "email",
-    "zoneinfo",
-    "updated_at"
+    "email"
   ],
   "passwordPolicyMinLength": 8,
   "passwordPolicyCharacters": [
