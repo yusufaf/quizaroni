@@ -18,6 +18,7 @@ export const LoginContainer = styled(Box)({
     padding: "1.25rem",
     textAlign: "center",
     fontSize: "1rem",
+    position: "relative"
 })
 
 export const LoginTitle = styled(Typography)({
