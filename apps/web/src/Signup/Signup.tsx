@@ -1,19 +1,5 @@
-import {
-    createUserWithEmailAndPassword,
-    getAuth,
-    GoogleAuthProvider,
-} from "firebase/auth";
-import { addDoc, collection } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { database } from "../firebase/firebase";
-import {
-    Alert,
-    AlertTitle,
-    Box,
-    Paper,
-    Popover,
-    Typography,
-} from "@mui/material/";
+import { Box, Paper, Popover, Typography } from "@mui/material/";
 import { useNavigate } from "react-router-dom";
 import PasswordToggle from "src/components/PasswordToggle/PasswordToggle";
 import * as C from "src/utilities/constants";
@@ -31,7 +17,12 @@ import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
 import { useDispatch } from "react-redux";
 import { setAlert } from "src/slices/globalSlice";
 import { Auth } from "@aws-amplify/auth";
-import { PasswordPolicyBox, PasswordPolicyPaper } from "./styles";
+import {
+    PasswordPolicyBox,
+    PasswordPolicyPaper,
+    RequirementText,
+} from "./styles";
+import axios from "axios";
 
 // Define regex patterns for each requirement
 const REGEX_PATTERNS = {
@@ -137,51 +128,31 @@ const Signup = (props) => {
                     enabled: true,
                 },
             });
-            console.log(user);
-            /* Result of user object:
-            {
-    "username": "lookatme",
-    "pool": {
-        "userPoolId": "us-west-2_Xa6XFcAJY",
-        "clientId": "4u3r3c9f5qgacaftsu7simlj1c",
-        "client": {
-            "endpoint": "https://cognito-idp.us-west-2.amazonaws.com/",
-            "fetchOptions": {}
-        },
-        "advancedSecurityDataCollectionFlag": true,
-        "storage": {
-            "userInfo": "{\"uid\":\"b13MYkG0GlPlSiyENneUM9ZvkJr1\",\"email\":\"evil.elmo5@gmail.com\",\"emailVerified\":false,\"isAnonymous\":false,\"providerData\":[{\"providerId\":\"password\",\"uid\":\"evil.elmo5@gmail.com\",\"displayName\":null,\"email\":\"evil.elmo5@gmail.com\",\"phoneNumber\":null,\"photoURL\":null}],\"stsTokenManager\":{\"refreshToken\":\"APJWN8dxv80_3ufi9uDXOpLzP3TcoOdj6uy_UunyGVpXK_pJwTKefiHANhp8RvuqPGVhZRWrG-PilAmvF4iRBCYhoVBDfHYWvRlBZT0J_KZqpTjd5WabN0WwOLV6Pn36DD1wE5yKFcx1KcO3M-6uYKxh9RkS4C363efe0qZt1jFEFlC6zV_UUMDYZeQ-LJ6iDcjVD4gjIS4m\",\"accessToken\":\"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijk3OWVkMTU1OTdhYjM1Zjc4MjljZTc0NDMwN2I3OTNiN2ViZWIyZjAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vcXVpemFyb25pIiwiYXVkIjoicXVpemFyb25pIiwiYXV0aF90aW1lIjoxNjgwMjMxODE0LCJ1c2VyX2lkIjoiYjEzTVlrRzBHbFBsU2l5RU5uZVVNOVp2a0pyMSIsInN1YiI6ImIxM01Za0cwR2xQbFNpeUVObmVVTTladmtKcjEiLCJpYXQiOjE2ODAyMzE4MTQsImV4cCI6MTY4MDIzNTQxNCwiZW1haWwiOiJldmlsLmVsbW81QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJldmlsLmVsbW81QGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.L9AfKJSFX4LRWZn9fL6dQvVWj5VpTylViMYJyR_Oi2YngR7ky8N_3o9yNxQC1gxYrVjalV9fPCQyfjNzoeFsrpDzAR_xqas6htKsQRYlbzhkHwARi0Mk0JJ9B3EH4zbSwLRA6IEonV37yByKLGVOBKo-0lc1jmhQnWv7OWbCepFy1QUQHfTXEZESXnckLUud0OUpaC5_sTxhehxBvkzf93JAhemdVnsRq_mxgC--lt__oNIDipUqFo6Xh692ep2U_ml6mLdA9tw5CQD-IewnhpGfBmkGHojdCPQGYrpquma4CjNOjumLLcrvFyD3I9kJ8vcAZ76JOIBiMOTy4l1jwA\",\"expirationTime\":1680235414900},\"createdAt\":\"1640382224373\",\"lastLoginAt\":\"1680231814667\",\"apiKey\":\"AIzaSyC2VtoBLdYqJuy1e8e_OlrfgMOdfxRDZzg\",\"appName\":\"[DEFAULT]\"}",
-            "appTheme": "dark",
-            "amplify-auto-sign-in": "true",
-            "debug": "honey:core-sdk:*"
-        }
-    },
-    "Session": null,
-    "client": {
-        "endpoint": "https://cognito-idp.us-west-2.amazonaws.com/",
-        "fetchOptions": {}
-    },
-    "signInUserSession": null,
-    "authenticationFlowType": "USER_SRP_AUTH",
-    "storage": {
-        "userInfo": "{\"uid\":\"b13MYkG0GlPlSiyENneUM9ZvkJr1\",\"email\":\"evil.elmo5@gmail.com\",\"emailVerified\":false,\"isAnonymous\":false,\"providerData\":[{\"providerId\":\"password\",\"uid\":\"evil.elmo5@gmail.com\",\"displayName\":null,\"email\":\"evil.elmo5@gmail.com\",\"phoneNumber\":null,\"photoURL\":null}],\"stsTokenManager\":{\"refreshToken\":\"APJWN8dxv80_3ufi9uDXOpLzP3TcoOdj6uy_UunyGVpXK_pJwTKefiHANhp8RvuqPGVhZRWrG-PilAmvF4iRBCYhoVBDfHYWvRlBZT0J_KZqpTjd5WabN0WwOLV6Pn36DD1wE5yKFcx1KcO3M-6uYKxh9RkS4C363efe0qZt1jFEFlC6zV_UUMDYZeQ-LJ6iDcjVD4gjIS4m\",\"accessToken\":\"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijk3OWVkMTU1OTdhYjM1Zjc4MjljZTc0NDMwN2I3OTNiN2ViZWIyZjAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vcXVpemFyb25pIiwiYXVkIjoicXVpemFyb25pIiwiYXV0aF90aW1lIjoxNjgwMjMxODE0LCJ1c2VyX2lkIjoiYjEzTVlrRzBHbFBsU2l5RU5uZVVNOVp2a0pyMSIsInN1YiI6ImIxM01Za0cwR2xQbFNpeUVObmVVTTladmtKcjEiLCJpYXQiOjE2ODAyMzE4MTQsImV4cCI6MTY4MDIzNTQxNCwiZW1haWwiOiJldmlsLmVsbW81QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJldmlsLmVsbW81QGdtYWlsLmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.L9AfKJSFX4LRWZn9fL6dQvVWj5VpTylViMYJyR_Oi2YngR7ky8N_3o9yNxQC1gxYrVjalV9fPCQyfjNzoeFsrpDzAR_xqas6htKsQRYlbzhkHwARi0Mk0JJ9B3EH4zbSwLRA6IEonV37yByKLGVOBKo-0lc1jmhQnWv7OWbCepFy1QUQHfTXEZESXnckLUud0OUpaC5_sTxhehxBvkzf93JAhemdVnsRq_mxgC--lt__oNIDipUqFo6Xh692ep2U_ml6mLdA9tw5CQD-IewnhpGfBmkGHojdCPQGYrpquma4CjNOjumLLcrvFyD3I9kJ8vcAZ76JOIBiMOTy4l1jwA\",\"expirationTime\":1680235414900},\"createdAt\":\"1640382224373\",\"lastLoginAt\":\"1680231814667\",\"apiKey\":\"AIzaSyC2VtoBLdYqJuy1e8e_OlrfgMOdfxRDZzg\",\"appName\":\"[DEFAULT]\"}",
-        "appTheme": "dark",
-        "amplify-auto-sign-in": "true",
-        "debug": "honey:core-sdk:*"
-    },
-    "keyPrefix": "CognitoIdentityServiceProvider.4u3r3c9f5qgacaftsu7simlj1c",
-    "userDataKey": "CognitoIdentityServiceProvider.4u3r3c9f5qgacaftsu7simlj1c.lookatme.userData"
-}
 
-            */
+            console.log(user);
+
+            // @ts-ignore - pool should exist on a newly created cognito user
+            const { clientId = "" } = user.pool;
+            // @ts-ignore - storage should exist on a newly created cognito user
+            const { userInfo } = user.storage;
+            const { emailVerified, uid } = userInfo;
+            const createdAt = new Date().getTime();
+
+            const newUserData = {
+                createdAt,
+                username,
+                email,
+                emailVerified,
+                clientId,
+                uid,
+            };
+            const response = await axios.post("/api/users/create", newUserData);
+            console.log({ response });
+
+            
         } catch (error) {
             console.log("error signing up:", error);
         }
-
-        /* 
-            On success: Create a new user in Mongo
-            TODO: Create user endpoint
-        */
     };
 
     /**
@@ -269,57 +240,40 @@ const Signup = (props) => {
 
                     <PasswordPolicyBox>
                         <PasswordPolicyPaper elevation={6}>
-                            <BoldHeading variant="subtitle1" sx={{ textAlign: "center" }}>
+                            <BoldHeading
+                                variant="subtitle1"
+                                sx={{ textAlign: "center" }}
+                            >
                                 Password Policy:
                             </BoldHeading>
-                            <Typography
-                                sx={{
-                                    color: requirementState.length
-                                        ? "green"
-                                        : "red",
-                                }}
+                            <RequirementText
+                                isSatisfied={requirementState.length}
                             >
                                 &bull; Must be at least 8 characters long
-                            </Typography>
-                            <Typography
-                                sx={{
-                                    color: requirementState.uppercase
-                                        ? "green"
-                                        : "red",
-                                }}
+                            </RequirementText>
+                            <RequirementText
+                                isSatisfied={requirementState.uppercase}
                             >
                                 &bull; Must contain at least one uppercase
                                 letter
-                            </Typography>
-                            <Typography
-                                sx={{
-                                    color: requirementState.special
-                                        ? "green"
-                                        : "red",
-                                }}
+                            </RequirementText>
+                            <RequirementText
+                                isSatisfied={requirementState.special}
                             >
                                 &bull; Must contain at least one special
                                 character
-                            </Typography>
-                            <Typography
-                                sx={{
-                                    color: requirementState.lowercase
-                                        ? "green"
-                                        : "red",
-                                }}
+                            </RequirementText>
+                            <RequirementText
+                                isSatisfied={requirementState.lowercase}
                             >
                                 &bull; Must contain at least one lowercase
                                 letter
-                            </Typography>
-                            <Typography
-                                sx={{
-                                    color: requirementState.number
-                                        ? "green"
-                                        : "red",
-                                }}
+                            </RequirementText>
+                            <RequirementText
+                                isSatisfied={requirementState.number}
                             >
                                 &bull; Must contain at least one number
-                            </Typography>
+                            </RequirementText>
                         </PasswordPolicyPaper>
                     </PasswordPolicyBox>
                     <SignupButton
