@@ -1,30 +1,30 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import mix from 'vite-plugin-mix'
-import { VitePWA } from 'vite-plugin-pwa'
-import path from "path"
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import mix from "vite-plugin-mix";
+import { VitePWA } from "vite-plugin-pwa";
+import path from "path";
 
 // https://vitejs.dev/config/
 // TODO: https://vite-plugin-pwa.netlify.app/guide/#setup
+
 export default defineConfig({
-  define: {
-    global: {}
-  },
-  plugins: [
-    react(), 
-    VitePWA({ registerType: 'autoUpdate' })
-  ],
-  resolve: {
-    alias: {
-      src: path.resolve('src/'),
+    define: {
+        global: {},
     },
-  }
-  // proxy: {
-  //   "/api": {
-  //     target: 'https://localhost:5000/',
-  //     changeOrigin: true,
-  //     secure: false,
-  //     ws: true,
-  //   }
-  // }
-})
+    plugins: [react(), VitePWA({ registerType: "autoUpdate" })],
+    resolve: {
+        alias: {
+            src: path.resolve("src/"),
+        },
+    },
+    server: {
+        proxy: {
+            "/api": {
+                target: "http://localhost:5000/",
+                changeOrigin: true,
+                secure: false,
+                ws: true,
+            },
+        },
+    },
+});
