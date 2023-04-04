@@ -1,4 +1,4 @@
-import { Box, Paper } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
 import styled from "@emotion/styled";
 
 export const PasswordPolicyBox = styled(Box)({
@@ -12,3 +12,11 @@ export const PasswordPolicyPaper = styled(Paper)({
     padding: "1rem",
     textAlign: "left"
 })
+
+export const RequirementText = styled(Typography)<{ isSatisfied: boolean }>(
+    ({ isSatisfied }) => ({
+      color: isSatisfied ? "green" : "red",
+      transition: "color 0.2s ease"
+    })
+  );
+  
