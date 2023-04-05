@@ -15,7 +15,7 @@ import {
 } from "src/Login/LoginStyles";
 import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
 import { useDispatch } from "react-redux";
-import { setAlert } from "src/slices/globalSlice";
+import { setAlert, setCognitoUser } from "src/slices/globalSlice";
 import { Auth } from "@aws-amplify/auth";
 import {
     PasswordPolicyBox,
@@ -131,25 +131,30 @@ const Signup = (props) => {
 
             console.log(user);
 
-            // @ts-ignore - pool should exist on a newly created cognito user
-            const { clientId = "" } = user.pool;
             // @ts-ignore - storage should exist on a newly created cognito user
             const { userInfo } = user.storage;
-            const { emailVerified, uid } = userInfo;
-            const createdAt = new Date().getTime();
-
+            const { createdAt, emailVerified, uid } = JSON.parse(userInfo);
             const newUserData = {
                 createdAt,
                 username,
                 email,
                 emailVerified,
-                clientId,
                 uid,
             };
+            
+            /* Store newly created cognito user in Redux */
+            dispatch(setCognitoUser({
+                username
+            }));
+
+            /* Send user to confirm email page */
+            navigate("/confirmEmail")
+
             const response = await axios.post("/api/users/create", newUserData);
             console.log({ response });
 
-            
+            // Response.data has message in it 
+
         } catch (error) {
             console.log("error signing up:", error);
         }
