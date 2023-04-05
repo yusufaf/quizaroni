@@ -3,7 +3,6 @@ import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { Alert, AlertTitle, Typography, TextField } from '@mui/material/';
 import { useTheme } from "../theme/useTheme";
 import * as appStyles from "../App.module.css";
-import * as loginStyles from "../Login/Login.module.css";
 import * as forgotPassStyles from "./ForgotPassword.module.css";
 import * as C from "../utilities/constants";
 

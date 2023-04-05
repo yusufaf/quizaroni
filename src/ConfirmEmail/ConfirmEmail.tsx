@@ -1,23 +1,54 @@
 import { useState } from "react";
 import { Paper } from "@mui/material";
 import { Auth } from "@aws-amplify/auth";
-import { ConfirmBtn, ConfirmEmailContainer, ConfirmEmailDesc, ConfirmEmailPage, ConfirmEmailTitle, ConfirmationField } from "./styles";
+import { useSelector } from "react-redux";
+import { selectCognitoUser } from "src/slices/globalSlice";
+import { useNavigate } from "react-router-dom";
+import {
+    ConfirmBtn,
+    ConfirmEmailContainer,
+    ConfirmEmailDesc,
+    ConfirmEmailPage,
+    ConfirmEmailTitle,
+    ConfirmationField,
+} from "./styles";
 
 type Props = {};
 
 const ConfirmEmail = (props: Props) => {
+    const cognitoUser = useSelector(selectCognitoUser);
+    console.log({ cognitoUser });
+    const { username } = cognitoUser;
+
+    const navigate = useNavigate();
 
     const [confirmationCode, setConfirmationCode] = useState<string>("");
 
-    const handleConfirmEmail = () => {
-        // TODO
-    }
+    const handleConfirmEmail = async () => {
+        try {
+            const result = await Auth.confirmSignUp(username, confirmationCode);
+            console.log("Confirmation code sent succcesfully", result);
+
+            /* Send user to login page if successfully confirmed email */
+            navigate("/login");
+        } catch (error) {
+            console.error("Error confirming sign up", error);
+        }
+    };
+
+    const handleResendCode = async () => {
+        try {
+            const result = await Auth.resendSignUp(username);
+            console.log("Code resent succesfully", result);
+        } catch (err) {
+            console.error("error resending code: ", err);
+        }
+    };
 
     const enterKeyHandler = (e: any) => {
         const key = e.key.trim();
         if (key === "Enter") {
-
-            // handleSignup();
+            handleConfirmEmail();
         }
     };
 
@@ -26,35 +57,41 @@ const ConfirmEmail = (props: Props) => {
     return (
         <ConfirmEmailPage>
             <Paper elevation={6}>
-                <ConfirmEmailContainer
-                    onKeyDown={enterKeyHandler}
-                >
-                <ConfirmEmailTitle variant="h5">Confirm Email</ConfirmEmailTitle>
-                <ConfirmEmailDesc variant="body1">
-                    Check your email for a six-digit confirmation code
-                </ConfirmEmailDesc>
-                <ConfirmEmailDesc variant="body1"
-                    sx={{
-                        fontWeight: "600"
-                    }}
-                >
-                    Be sure to check your spam folder.
-                </ConfirmEmailDesc>
-                <ConfirmationField
-                    label="Confirmation Code"
-                    size="small"
-                    required
-                    value={confirmationCode}
-                    onChange={(e) => setConfirmationCode(e.target.value)}
-                />
-                <ConfirmBtn
-                    variant="contained"
-                    disabled={!isValidCode}
-                    onClick={handleConfirmEmail}
-                >
-                    Confirm Email
-                </ConfirmBtn>
-
+                <ConfirmEmailContainer onKeyDown={enterKeyHandler}>
+                    <ConfirmEmailTitle variant="h5">
+                        Confirm Email
+                    </ConfirmEmailTitle>
+                    <ConfirmEmailDesc variant="body1">
+                        Check your email for a six-digit confirmation code
+                    </ConfirmEmailDesc>
+                    <ConfirmEmailDesc
+                        variant="body1"
+                        sx={{
+                            fontWeight: "600",
+                        }}
+                    >
+                        Be sure to check your spam folder.
+                    </ConfirmEmailDesc>
+                    <ConfirmationField
+                        label="Confirmation Code"
+                        size="small"
+                        required
+                        value={confirmationCode}
+                        onChange={(e) => setConfirmationCode(e.target.value)}
+                    />
+                    <ConfirmBtn
+                        variant="contained"
+                        disabled={!isValidCode}
+                        onClick={handleConfirmEmail}
+                    >
+                        Confirm Email
+                    </ConfirmBtn>
+                    <ConfirmBtn 
+                        variant="outlined" 
+                        onClick={handleResendCode}
+                    >
+                        Resend Confirmation Code
+                    </ConfirmBtn>
                 </ConfirmEmailContainer>
             </Paper>
         </ConfirmEmailPage>

@@ -30,8 +30,6 @@ const AppRoutes: React.FC<Props> = ({ userAuthState, setUserAuthState }) => {
                 path="/signup"
                 element={
                     <Signup
-                        userAuthState={userAuthState}
-                        setUserAuthState={setUserAuthState}
                     />
                 }
             />
