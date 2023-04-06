@@ -29,7 +29,7 @@ import {
 
 
 const FlashcardsStudy = props => {
-    const { userAuthState, selectedFlashSet, setSelectedStudyMode } = props;
+    const { selectedFlashSet, setSelectedStudyMode } = props;
     const { theme } = useTheme();
 
     const [currentCard, setCurrentCard] = useState(selectedFlashSet.cards[0]);

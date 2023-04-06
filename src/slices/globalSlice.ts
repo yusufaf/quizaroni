@@ -6,6 +6,7 @@ type GlobalSliceState = {
   feedbackDialogOpen: boolean,
   dialogOpen: boolean,
   cognitoUser: any,
+  authenticated: boolean,
 }
 
 const initialState: GlobalSliceState = {
@@ -14,6 +15,7 @@ const initialState: GlobalSliceState = {
     feedbackDialogOpen: false,
     dialogOpen: false,
     cognitoUser: {},
+    authenticated: false,
 }
 
 export const globalSlice = createSlice({
@@ -34,6 +36,9 @@ export const globalSlice = createSlice({
     },
     setDialogOpen: (state, action: PayloadAction<boolean>) => {
       state.dialogOpen = action.payload;
+    },
+    setAuthenticated: (state, action: PayloadAction<boolean>) => {
+      state.authenticated = action.payload;
     },
 
     /* Customizing a generated action creator 
@@ -56,7 +61,8 @@ export const {
   setAlert,
   setFeedbackDialogOpen,
   setDialogOpen,
-  setCognitoUser
+  setCognitoUser,
+  setAuthenticated
 } = globalSlice.actions
 
 /* Selectors */
@@ -64,5 +70,6 @@ export const selectAlert = (state) => state.global.alert;
 export const selectFeedbackDialogOpen = (state) => state.global.feedbackDialogOpen;
 export const selectUserAuthState = (state) => state.global.userAuthInfo;
 export const selectCognitoUser = (state) => state.global.cognitoUser;
+export const selectAuthenticated = (state) => state.global.authenticated;
 
 export default globalSlice.reducer

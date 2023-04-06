@@ -50,7 +50,6 @@ const initialRequirementState: RequirementState = {
 };
 
 const Signup = (props) => {
-    const { userAuthState, setUserAuthState } = props;
     const { isDarkMode, theme } = useTheme();
 
     // const auth = getAuth();

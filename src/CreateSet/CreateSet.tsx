@@ -20,6 +20,8 @@ import ImportSetModal from "./ImportSetModal/ImportSetModal";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import { SwapHoriz, Sync as SyncIcon } from "@mui/icons-material";
 import { SpacedFlexContainer } from "src/AppStyles";
+import { useSelector } from "react-redux";
+import { selectAuthenticated } from "src/slices/globalSlice";
 
 const EMPTY_CARD = {
     term: "",
@@ -27,9 +29,10 @@ const EMPTY_CARD = {
 };
 
 const CreateSet = (props) => {
-    const { userAuthState } = props;
     const { isDarkMode, theme } = useTheme();
     const navigate = useNavigate();
+
+    const authenticated = useSelector(selectAuthenticated);
 
     /* Flash Set States */
     const [enteredTitle, setEnteredTitle] = useState("");
@@ -66,18 +69,19 @@ const CreateSet = (props) => {
      * Retrieve the user's existing labels for the dropdown
      */
     const retrieveLabels = async () => {
-        if (userAuthState) {
-            const { uid } = userAuthState;
-            const usersCollection = collection(database, "users");
-            const queryResult = query(usersCollection, where("uid", "==", uid));
-            const querySnapshot = await getDocs(queryResult);
+        return [];
+        // if (userAuthState) {
+        //     const { uid } = userAuthState;
+        //     const usersCollection = collection(database, "users");
+        //     const queryResult = query(usersCollection, where("uid", "==", uid));
+        //     const querySnapshot = await getDocs(queryResult);
 
-            const userDoc = querySnapshot.docs[0];
-            if (userDoc) {
-                const userData = userDoc.data();
-                return userData.labels;
-            }
-        }
+        //     const userDoc = querySnapshot.docs[0];
+        //     if (userDoc) {
+        //         const userData = userDoc.data();
+        //         return userData.labels;
+        //     }
+        // }
     };
 
     const renderLabelOptions = () => {
@@ -106,7 +110,7 @@ const CreateSet = (props) => {
 
     const createNewLabel = async () => {
         /* Check database if this label already exists */
-        const { uid } = userAuthState;
+        const uid = "";
         const usersCollection = collection(database, "users");
         const queryResult = query(usersCollection, where("uid", "==", uid));
         const querySnapshot = await getDocs(queryResult);
@@ -141,7 +145,7 @@ const CreateSet = (props) => {
             const creationDate = new Date().toLocaleDateString();
             const lastViewedDate = new Date().toLocaleDateString();
             const label = enteredLabel || "";
-            const { uid } = userAuthState;
+            const uid = "";
 
             const flashCollection = collection(database, "flashcards");
 
@@ -171,16 +175,6 @@ const CreateSet = (props) => {
         } else {
             /* TODO: Display an alert that could not create the set, or just have it disabled wiht some state */
         }
-    };
-
-    /**
-     * Verify that the term or definition input has content before creating study set
-     * @param {*} event
-     */
-    const checkIfInputEmpty = (event) => {
-        let updatedErrorText = { ...showErrorText };
-        updatedErrorText[event.target.name] = event.target.value === "";
-        setShowErrorText(updatedErrorText);
     };
 
     /* Runs everytime the file selected for the image upload changes */
@@ -337,7 +331,7 @@ const CreateSet = (props) => {
         title: enteredTitle,
     };
 
-    if (!userAuthState) {
+    if (!authenticated) {
         return <LoginMessage page="createSet" />;
     }
 
