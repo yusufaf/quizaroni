@@ -1,18 +1,21 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { AppBar, Button, IconButton, Toolbar, Tooltip, Typography, useMediaQuery } from '@mui/material/';
-import { getAuth, signOut } from "firebase/auth";
 import {
-    Logout as LogoutIcon
-} from "@mui/icons-material"
+    AppBar,
+    Button,
+    IconButton,
+    Toolbar,
+    Tooltip,
+    Typography,
+    useMediaQuery,
+} from "@mui/material/";
+import { getAuth, signOut } from "firebase/auth";
+import { Logout as LogoutIcon } from "@mui/icons-material";
 import { useTheme } from "../theme/useTheme";
 import NavDrawer from "./NavDrawer";
 import ProfileDropdown from "../Profile/ProfileDropdown";
 import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
-import {
-    SUCCESS,
-    ROUTES
-} from "../utilities/constants";
+import { SUCCESS, ROUTES } from "../utilities/constants";
 import {
     AppLogo,
     AuthenticationButton,
@@ -27,12 +30,11 @@ import {
     NavRightActions,
     NavLinksContainer,
 } from "./NavStyles";
-import { useDispatch } from "react-redux";
-import { setAlert } from "src/slices/globalSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { setAlert, selectAuthenticated } from "src/slices/globalSlice";
 
-const NavBar = props => {
+const NavBar = (props) => {
     // TODO: Change to use redux slice
-    const { userAuthState, setUserAuthState } = props;
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     // TODO: Verify that a medium breakpoint works to handle mobile cases, can always add more breakpoints
@@ -42,12 +44,14 @@ const NavBar = props => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    const authenticated = useSelector(selectAuthenticated);
+
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
 
     const activeLinkStyle = ({ isActive }) => ({
-        borderBottom: isActive ? '0.2rem solid orange' : 'none',
-        color: `${theme.palette.text.primary}`
+        borderBottom: isActive ? "0.2rem solid orange" : "none",
+        color: `${theme.palette.text.primary}`,
     });
 
     const displayLogoutAlert = (type) => {
@@ -59,36 +63,36 @@ const NavBar = props => {
         };
         dispatch(setAlert(logoutSuccessAlert));
         return;
-    }
+    };
 
     /**
-    * Handles logging out a user, using Firebase's provided method signOut()
-    */
+     * Handles logging out a user, using Firebase's provided method signOut()
+     */
     const handleLogout = () => {
-        console.log("Current user authentication object = ", auth);
 
-        /* Sign out the currently logged in user */
-        signOut(auth).then(() => {
-            // Sign-out successful.
-            console.log("User successfully signed out");
+        // /* Sign out the currently logged in user */
+        // signOut(auth)
+        //     .then(() => {
+        //         // Sign-out successful.
+        //         console.log("User successfully signed out");
 
-            /* TODO: Don't necessarily have to remove the object entirely, just reset its value to null? */
-            if (localStorage.getItem("userInfo") !== null) {
-                localStorage.removeItem("userInfo");
-            }
-            setUserAuthState(null);
-        }).catch((error) => {
-            console.error("Something bad happened = ", error);
-        });
-    }
+        //         /* TODO: Don't necessarily have to remove the object entirely, just reset its value to null? */
+        //         if (localStorage.getItem("userInfo") !== null) {
+        //             localStorage.removeItem("userInfo");
+        //         }
+        //     })
+        //     .catch((error) => {
+        //         console.error("Something bad happened = ", error);
+        //     });
+    };
 
     const displayDropdown = () => {
         setShowDropdown(true);
-    }
+    };
 
     const closeDropdown = () => {
         setShowDropdown(false);
-    }
+    };
 
     return (
         <AppBar position="static" color="inherit">
@@ -98,30 +102,18 @@ const NavBar = props => {
                     <AppLogo
                         src={QuizaroniLogo}
                         alt="Quizaroni logo"
-                    /> */
-                }
-                <Typography
-                    color="primary"
-                    variant="h4"
-                >
+                    /> */}
+                <Typography color="primary" variant="h4">
                     Quizaroni
                 </Typography>
-                {isMobile &&
-                    <NavDrawer />
-                }
-                {!isMobile &&
+                {isMobile && <NavDrawer />}
+                {!isMobile && (
                     <NavItemsContainer>
                         <NavLinksContainer>
-                            <StyledNavLink 
-                                to="/" 
-                                style={activeLinkStyle}
-                            >
+                            <StyledNavLink to="/" style={activeLinkStyle}>
                                 Home
                             </StyledNavLink>
-                            <StyledNavLink
-                                to="/create"
-                                style={activeLinkStyle}
-                            >
+                            <StyledNavLink to="/create" style={activeLinkStyle}>
                                 Create
                             </StyledNavLink>
                             <StyledNavLink
@@ -132,7 +124,7 @@ const NavBar = props => {
                             </StyledNavLink>
                         </NavLinksContainer>
                         <NavRightActions>
-                            {userAuthState ?
+                            {authenticated ? (
                                 <AuthenticationButton
                                     variant="text"
                                     onClick={() => handleLogout()}
@@ -140,7 +132,7 @@ const NavBar = props => {
                                 >
                                     Logout
                                 </AuthenticationButton>
-                                :
+                            ) : (
                                 <LoginButtonsContainer>
                                     <AuthenticationButton
                                         variant="outlined"
@@ -155,36 +147,38 @@ const NavBar = props => {
                                         Sign up
                                     </AuthenticationButton>
                                 </LoginButtonsContainer>
-                            }
+                            )}
                             <Tooltip title="Toggle dark mode">
                                 <IconButton onClick={toggleDarkMode}>
-                                    {isDarkMode ? <StyledLightModeIcon /> : <StyledDarkModeIcon />}
+                                    {isDarkMode ? (
+                                        <StyledLightModeIcon />
+                                    ) : (
+                                        <StyledDarkModeIcon />
+                                    )}
                                 </IconButton>
                             </Tooltip>
-                            {userAuthState &&
-                                (
-                                    <>
-                                        <ProfileIconContainer
-                                            onClick={displayDropdown}
-                                            ref={dropdownRef}
-                                        >
-                                            <StyledAccountIcon />
-                                            <StyledArrowIcon />
-                                        </ProfileIconContainer>
-                                        <ProfileDropdown
-                                            showDropdown={showDropdown}
-                                            dropdownRef={dropdownRef}
-                                            onClose={closeDropdown}
-                                        />
-                                    </>
-                                )
-                            }
+                            {authenticated && (
+                                <>
+                                    <ProfileIconContainer
+                                        onClick={displayDropdown}
+                                        ref={dropdownRef}
+                                    >
+                                        <StyledAccountIcon />
+                                        <StyledArrowIcon />
+                                    </ProfileIconContainer>
+                                    <ProfileDropdown
+                                        showDropdown={showDropdown}
+                                        dropdownRef={dropdownRef}
+                                        onClose={closeDropdown}
+                                    />
+                                </>
+                            )}
                         </NavRightActions>
                     </NavItemsContainer>
-                }
+                )}
             </Toolbar>
         </AppBar>
     );
-}
+};
 
 export default NavBar;

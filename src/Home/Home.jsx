@@ -8,7 +8,6 @@ import {
 } from '@mui/x-data-grid';
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import { BoldHeading } from "src/AppStyles";
 import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
@@ -29,12 +28,13 @@ import {
 import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
 import ViewFlashSet from "./ViewFlashSet/ViewFlashSet";
+import { useSelector } from "react-redux";
+import { selectAuthenticated } from "src/slices/globalSlice";
 
 const Home = props => {
-    const { userAuthState } = props;
     const { isDarkMode, theme } = useTheme();
 
-    const reduxUserAuthState = useSelector((state) => state.userAuthState);
+    const authenticated = useSelector(selectAuthenticated);
 
     let originalFlashSets;
 
@@ -58,7 +58,6 @@ const Home = props => {
         setViewFlashSet,
         selectedFlashSet,
         setSelectedFlashSet,
-        userAuthState
     };
 
     const homeSetProps = {
@@ -66,7 +65,6 @@ const Home = props => {
         setFlashSets,
         setViewFlashSet,
         setSelectedFlashSet,
-        userAuthState,
     }
 
     const openActionsMenu = (event) => {
@@ -150,8 +148,8 @@ const Home = props => {
 
     /* */
     useEffect(() => {
-        retrieveResults();
-    }, [userAuthState])
+        // retrieveResults();
+    }, [])
 
     useEffect(() => {
         if (enteredSearch === "") {
@@ -172,29 +170,29 @@ const Home = props => {
 
     /* Retrieve the created flashsets for the signed-in user */
     const retrieveResults = async () => {
-        if (userAuthState) {
-            /* Query the database for this user's flashcards */
-            const uid = userAuthState.uid;
-            const flashCollection = collection(database, "flashcards");
+        // if (userAuthState) {
+        //     /* Query the database for this user's flashcards */
+        //     const uid = userAuthState.uid;
+        //     const flashCollection = collection(database, "flashcards");
 
-            const queryResult = query(flashCollection, where("uid", "==", uid));
-            const querySnapshot = await getDocs(queryResult);
+        //     const queryResult = query(flashCollection, where("uid", "==", uid));
+        //     const querySnapshot = await getDocs(queryResult);
 
-            let localFlashSets = [];
+        //     let localFlashSets = [];
 
-            querySnapshot.forEach((doc) => {
-                const flashSet = doc.data();
-                if (flashSet.cards) {
-                    localFlashSets.push(flashSet);
-                }
-            });
-            originalFlashSets = localFlashSets;
-            console.log("localFlashSets = ", localFlashSets);
-            localFlashSets.map((set) => {
-                set.id = set.uid;
-            })
-            setFlashSets(localFlashSets);
-        }
+        //     querySnapshot.forEach((doc) => {
+        //         const flashSet = doc.data();
+        //         if (flashSet.cards) {
+        //             localFlashSets.push(flashSet);
+        //         }
+        //     });
+        //     originalFlashSets = localFlashSets;
+        //     console.log("localFlashSets = ", localFlashSets);
+        //     localFlashSets.map((set) => {
+        //         set.id = set.uid;
+        //     })
+        //     setFlashSets(localFlashSets);
+        // }
     }
 
     const handleDeleteSet = async () => {
@@ -252,7 +250,7 @@ const Home = props => {
     }
     
 
-    if (!userAuthState) {
+    if (!authenticated) {
         return <LoginMessage page="home" />;
     }
 

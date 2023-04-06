@@ -28,14 +28,16 @@ import {
     ProfilePaper
 } from "./ProfileStyles"
 import { BoldHeading } from 'src/AppStyles';
-
+import { useSelector } from "react-redux";
+import { selectAuthenticated } from "src/slices/globalSlice";
 
 const Profile = props => {
-    const { userAuthState, setUserAuthState } = props;
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     const auth = getAuth();
     const user = auth.currentUser;
+
+    const authenticated = useSelector(selectAuthenticated);
 
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [enteredDeletePassword, setEnteredDeletePassword] = useState("");
@@ -54,15 +56,8 @@ const Profile = props => {
     })
 
     // Store a property for each user of the theme
-    const [defaultTheme, setDefaultTheme] = useState(userAuthState?.bruh ?? "dark");
+    const [defaultTheme, setDefaultTheme] = useState("dark");
 
-    if (userAuthState) {
-        // let credential = EmailAuthProvider.credential(
-        //     user.email,
-        //     enteredDeletePassword
-        // );
-
-    }
 
     const checkIfInputMatches = event => {
         let updatedErrorText = { ...showErrorText };
@@ -84,7 +79,7 @@ const Profile = props => {
         setDefaultTheme(newTheme);
 
         /* Update user database with the newly selected theme */
-        const { uid } = userAuthState;
+        const uid = "";
         const usersCollection = collection(database, "users");
         const queryResult = query(usersCollection, where("uid", "==", uid));
         const querySnapshot = await getDocs(queryResult);
@@ -100,28 +95,28 @@ const Profile = props => {
 
     /* Make call using Firebase Auth API to delete this user's account, have to sign in, prompt them to enter their password again, kinda like Github messages*/
     const handleDeleteAccount = async () => {
-        reauthenticateWithCredential(user, credential)
-            .then(() => {
-                // User successfully reauthenticated. New ID tokens should be valid.
-                deleteUser(userAuthState).then(() => {
-                    // User deleted.
-                    /* Delete that user's flashcards */
-                    const flashCollection = collection(database, "flashcards");
-                    const queryResult = query(flashCollection, where("uid", "==", uid));
-                    const querySnapshot = getDocs(queryResult);
+        // reauthenticateWithCredential(user, credential)
+        //     .then(() => {
+        //         // User successfully reauthenticated. New ID tokens should be valid.
+        //         deleteUser(userAuthState).then(() => {
+        //             // User deleted.
+        //             /* Delete that user's flashcards */
+        //             const flashCollection = collection(database, "flashcards");
+        //             const queryResult = query(flashCollection, where("uid", "==", uid));
+        //             const querySnapshot = getDocs(queryResult);
 
-                    querySnapshot.forEach((doc) => {
-                        const docRef = doc.ref
-                        const result = deleteDoc(docRef);
-                    });
-                }).catch((error) => {
-                    // An error ocurred
-                    // ...
-                });
-            })
-            .catch(error => {
-                // TODO: Display alert / text indicating password was wrong
-            });
+        //             querySnapshot.forEach((doc) => {
+        //                 const docRef = doc.ref
+        //                 const result = deleteDoc(docRef);
+        //             });
+        //         }).catch((error) => {
+        //             // An error ocurred
+        //             // ...
+        //         });
+        //     })
+        //     .catch(error => {
+        //         // TODO: Display alert / text indicating password was wrong
+        //     });
     }
 
     /**
@@ -131,8 +126,7 @@ const Profile = props => {
         /*  TODO:
         - Imposing some restrictions on the length / type of username
         */
-
-        const { uid } = userAuthState;
+        const uid = "";
         const usersCollection = collection(database, "users");
         const queryResult = query(usersCollection, where("uid", "==", uid));
         const docSnap = await getDocs(queryResult);
@@ -154,15 +148,15 @@ const Profile = props => {
             //TODO: Display alert
         }
 
-        // console.log("userAuthState = ", userAuthState);
         console.log("user object = ", user);
-        updatePassword(user, enteredNewPassword).then(() => {
-            // Update successful.
-            console.log("Successfully changed password")
-        }).catch((error) => {
-            // An error ocurred
-            // ...
-        });
+        // updatePassword(user, enteredNewPassword).then(() => {
+        //     // Update successful.
+        //     console.log("Successfully changed password")
+        // }).catch((error) => {
+        //     // An error ocurred
+        //     // ...
+        // });
+
     }
 
     const handleShowDeleteDialog = () => {
@@ -177,14 +171,14 @@ const Profile = props => {
     //     console.log({ defaultTheme })
     // }, [defaultTheme])
 
-    if (!userAuthState) {
+    if (!authenticated) {
         return <LoginMessage page="profile" />;
     }
 
     return (
         <>
             <ProfilePage>
-                <ProfileCard userAuthState={userAuthState} />
+                <ProfileCard />
                 <ProfilePaper elevation={6}>
                     <div className={profileStyles.profileContainer}>
                         <BoldHeading variant="h5">

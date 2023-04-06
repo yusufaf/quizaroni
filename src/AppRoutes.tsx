@@ -8,21 +8,18 @@ import ForgotPassword from "./ForgotPassword/ForgotPassword";
 import Profile from "./Profile/Profile";
 import ConfirmEmail from "./ConfirmEmail/ConfirmEmail";
 
-interface Props {
-    userAuthState: boolean;
-    setUserAuthState: (state: boolean) => void;
-}
 
-const AppRoutes: React.FC<Props> = ({ userAuthState, setUserAuthState }) => {
+type Props = {};
+
+const AppRoutes = (props: Props) => {
     return (
         <Routes>
-            <Route path="/" element={<Home userAuthState={userAuthState} />} />
+            <Route path="/" element={<Home />} />
             <Route
                 path="/login"
                 element={
                     <Login
-                        userAuthState={userAuthState}
-                        setUserAuthState={setUserAuthState}
+            
                     />
                 }
             />
@@ -35,15 +32,14 @@ const AppRoutes: React.FC<Props> = ({ userAuthState, setUserAuthState }) => {
             />
             <Route
                 path="/create"
-                element={<CreateSet userAuthState={userAuthState} />}
+                element={<CreateSet  />}
             />
             <Route path="/forgot" element={<ForgotPassword />} />
             <Route
                 path="/profile"
                 element={
                     <Profile
-                        userAuthState={userAuthState}
-                        setUserAuthState={setUserAuthState}
+                     
                     />
                 }
             />
