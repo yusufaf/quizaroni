@@ -20,10 +20,10 @@ import {
     StyledLink 
 } from "./LoginStyles";
 import { useDispatch } from "react-redux";
-import { setAlert } from "src/slices/globalSlice";
+import { setAlert, setCognitoUser, setAuthenticated} from "src/slices/globalSlice";
+import { Auth } from "@aws-amplify/auth";
 
 const Login = props => {
-    const { userAuthState, setUserAuthState } = props;
     const { isDarkMode, theme } = useTheme();
     
     useBrowserTitle("Login");
@@ -31,66 +31,16 @@ const Login = props => {
     const navigate = useNavigate();
 
     /* OAuth Variables */
-    const auth = getAuth();
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
-    // let firebaseUI;
-
-    // let uiConfig = {
-    //     callbacks: {
-    //         signInSuccessWithAuthResult: (authResult, redirectUrl) => {
-    //             const { user } = authResult;
-    //             const { uid } = user;
-
-    //             // Google Access Token in the authResult object?
-
-    //             console.log("authResult = ", authResult);
-    //             // User successfully signed in.
-    //             // Return type determines whether we continue the redirect automatically
-    //             // or whether we leave that to developer to handle.
-    //             setUserAuthState(user);
-    //             updateLastSignIn(uid);
-    //             localStorage.setItem('userInfo', JSON.stringify(user));
-    //             displayLoginAlert(C.SUCCESS);
-    //             return false;
-    //         },
-    //         uiShown: function () {
-    //             // The widget is rendered. + Hide the loader
-    //             document.getElementById('loader').style.display = 'none';
-    //         }
-    //     },
-    //     // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
-    //     signInFlow: 'popup',
-    //     signInOptions: [
-    //         GoogleAuthProvider.PROVIDER_ID,
-    //     ],
-    // };
-
-    const [enteredEmail, setEnteredEmail] = useState("");
-    const [enteredPass, setEnteredPass] = useState("");
-    const [passVisibility, setPassVisibility] = useState(false);
+    const [username, setUsername] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [passVisibility, setPassVisibility] = useState<boolean>(false);
     const [showErrorText, setShowErrorText] = useState({
         emailInput: false,
         passInput: false
     })
-
-    // useEffect(() => {
-    //     firebaseUI = firebaseui.auth.AuthUI.getInstance() || new firebaseui.auth.AuthUI(auth);
-    //     if (firebaseUI && !userAuthState) {
-    //         firebaseUI.start('#firebaseui-auth-container', uiConfig);
-    //     }
-    // }, [])
-
-    // TODO: Possible quality of life styling
-    // useEffect(() => {
-    //     let element = document.querySelector(".firebaseui-idp-button");
-    //     if (element) {
-    //         console.log("Setting color to ", theme.foreground);
-    //         element.style.backgroundColor = `${theme.foreground}`;
-    //     }
-    // }, [theme])
-
 
     const displayLoginAlert = (type) => {
         const showLoginToast = true;
@@ -155,28 +105,43 @@ const Login = props => {
     //         });
     // }
 
-    const handleLogin = () => {
-        if (enteredEmail.trim() && enteredPass.trim()) {
-            // Firebase Auth Sign-In
-            signInWithEmailAndPassword(auth, enteredEmail, enteredPass)
-                .then((userCredential) => {
-                    /* If in the then() callback: Successfully signed in */
-                    const user = userCredential.user;
-                    const { uid } = user;
-                    setUserAuthState(user);
-                    updateLastSignIn(uid);
-                    localStorage.setItem('userInfo', JSON.stringify(user));
-                    displayLoginAlert(C.SUCCESS);
-                })
-                .catch((error) => {
-                    /* Could not sign in, error occurred */
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
+    const handleLogin = async () => {
+        try {
+            const user = await Auth.signIn(username, password);
+            console.log("Result of cognito sign in = ", user);
 
-                    console.log(`Couldn't login. Error ${errorCode} = ${errorMessage}`);
-                    displayLoginAlert(C.ERROR);
-                });
+            /* Store cognito user and authenticated in state */
+            dispatch(setCognitoUser(user))
+            dispatch(setAuthenticated(true));
+
+            
+
+          } catch (error) {
+            console.error('Error signing in', error);
         }
+
+
+        // if (enteredEmail.trim() && enteredPass.trim()) {
+        //     // Firebase Auth Sign-In
+        //     signInWithEmailAndPassword(auth, enteredEmail, enteredPass)
+        //         .then((userCredential) => {
+        //             /* If in the then() callback: Successfully signed in */
+        //             const user = userCredential.user;
+        //             const { uid } = user;
+        //             setUserAuthState(user);
+        //             updateLastSignIn(uid);
+        //             localStorage.setItem('userInfo', JSON.stringify(user));
+        //             displayLoginAlert(C.SUCCESS);
+        //         })
+        //         .catch((error) => {
+        //             /* Could not sign in, error occurred */
+        //             const errorCode = error.code;
+        //             const errorMessage = error.message;
+
+        //             console.log(`Couldn't login. Error ${errorCode} = ${errorMessage}`);
+        //             displayLoginAlert(C.ERROR);
+        //         });
+        // }
     }
 
     /* Function to check if "Enter" key was hit and call function */
@@ -187,20 +152,12 @@ const Login = props => {
         }
     };
 
-    const checkIfInputEmpty = event => {
-        console.log("event in checkIfInputEmpty = ", event);
-        console.log(event.target.name);
-        let updatedErrorText = { ...showErrorText };
-        updatedErrorText[event.target.name] = event.target.value === "";
-        setShowErrorText(updatedErrorText);
-    }
-
     const handleEmailChange = (e) => {
-        setEnteredEmail(e.target.value);
+        setUsername(e.target.value);
     }
 
     const handlePasswordChange = (e) => {
-        setEnteredPass(e.target.value);
+        setPassword(e.target.value);
     }
 
     return (
@@ -218,21 +175,17 @@ const Login = props => {
                         <LoginField
                             label="Email"
                             name="emailInput"
-                            value={enteredEmail}
+                            value={username}
                             onChange={handleEmailChange}
-                            onBlur={e => checkIfInputEmpty(e)}
-                            helperText={showErrorText.emailInput && "An email is required"}
                             error={showErrorText.emailInput}
                             size="small"
                         />
                         <LoginField
                             label="Password"
                             type={passVisibility ? 'text' : 'password'}
-                            value={enteredPass}
+                            value={password}
                             name="passInput"
                             onChange={handlePasswordChange}
-                            onBlur={e => checkIfInputEmpty(e)}
-                            helperText={showErrorText.passInput && "A password is required"}
                             error={showErrorText.passInput}
                             size="small"
                             InputProps={{
@@ -248,7 +201,7 @@ const Login = props => {
                         </ForgotPasswordLink>
                         <LoginButton
                             variant="contained"
-                            disabled={enteredEmail === "" || enteredPass === ""}
+                            disabled={!username || !password}
                             onClick={() => handleLogin()}
                         >
                             Log In

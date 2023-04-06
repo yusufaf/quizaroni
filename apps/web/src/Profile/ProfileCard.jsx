@@ -13,7 +13,6 @@ import {
 } from "./ProfileStyles"
 
 const ProfileCard = props => {
-    const { userAuthState, setUserAuthState } = props;
     const { isDarkMode, theme } = useTheme();
 
     const profilePicRef = useRef(null);
@@ -33,8 +32,7 @@ const ProfileCard = props => {
     }
 
     const retrieveMetadata = async () => {
-        const { uid } = userAuthState;
-        console.log(userAuthState);
+        const uid = "";
         const usersCollection = collection(database, "users");
         const queryResult = query(usersCollection, where("uid", "==", uid));
         const querySnapshot = await getDocs(queryResult);

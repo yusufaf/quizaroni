@@ -33,7 +33,6 @@ import SetActionsMenu from "../SetActionsMenu";
 
 const HomeFlashSet = props => {
     const {
-        userAuthState,
         flashSets,
         setFlashSets,
         setSelectedFlashSet,
@@ -128,8 +127,7 @@ const HomeFlashSet = props => {
 
     const handleDuplicateSet = async (e) => {
         e.stopPropagation();
-
-        const { uid } = userAuthState;
+        const uid = "";
 
         const flashCollection = collection(database, "flashcards");
         const queryResult = query(flashCollection,

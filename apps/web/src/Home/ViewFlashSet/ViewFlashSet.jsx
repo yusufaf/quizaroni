@@ -50,7 +50,6 @@ const ViewFlashSet = props => {
         setViewFlashSet,
         selectedFlashSet: flashset,
         setSelectedFlashSet,
-        userAuthState
     } = props;
 
     console.log("flashset = ", flashset)
@@ -99,7 +98,7 @@ const ViewFlashSet = props => {
     useBrowserTitle(flashsetTitle);
 
     const handleDisableColorToggle = async (type) => {
-        const { uid } = userAuthState;
+        const uid = ""
         const { setID } = flashset;
 
         const flashCollection = collection(database, "flashcards");
@@ -243,7 +242,6 @@ const ViewFlashSet = props => {
                     (
                         <FlashcardsStudy
                             selectedFlashSet={flashset}
-                            userAuthState={userAuthState}
                             setSelectedStudyMode={setSelectedStudyMode}
                         />
                     )
