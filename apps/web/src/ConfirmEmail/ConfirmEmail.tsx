@@ -78,6 +78,7 @@ const ConfirmEmail = (props: Props) => {
                         required
                         value={confirmationCode}
                         onChange={(e) => setConfirmationCode(e.target.value)}
+                        error={!isValidCode}
                     />
                     <ConfirmBtn
                         variant="contained"
