@@ -1,37 +1,34 @@
-import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { Logout as LogoutIcon } from "@mui/icons-material";
 import {
     AppBar,
-    Button,
     IconButton,
     Toolbar,
     Tooltip,
     Typography,
-    useMediaQuery,
+    useMediaQuery
 } from "@mui/material/";
-import { getAuth, signOut } from "firebase/auth";
-import { Logout as LogoutIcon } from "@mui/icons-material";
-import { useTheme } from "../theme/useTheme";
-import NavDrawer from "./NavDrawer";
+import { useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { selectAuthenticated, setAlert, setAuthenticated } from "src/slices/globalSlice";
 import ProfileDropdown from "../Profile/ProfileDropdown";
-import QuizaroniLogo from "../resources/images/Quizaroni_Logo.png";
-import { SUCCESS, ROUTES } from "../utilities/constants";
+import { useTheme } from "../theme/useTheme";
+import { ROUTES, SUCCESS } from "../utilities/constants";
+import NavDrawer from "./NavDrawer";
 import {
-    AppLogo,
     AuthenticationButton,
     LoginButtonsContainer,
     NavItemsContainer,
-    StyledNavLink,
-    StyledDarkModeIcon,
-    StyledLightModeIcon,
+    NavLinksContainer,
+    NavRightActions,
+    ProfileIconContainer,
     StyledAccountIcon,
     StyledArrowIcon,
-    ProfileIconContainer,
-    NavRightActions,
-    NavLinksContainer,
+    StyledDarkModeIcon,
+    StyledLightModeIcon,
+    StyledNavLink
 } from "./NavStyles";
-import { useDispatch, useSelector } from "react-redux";
-import { setAlert, selectAuthenticated } from "src/slices/globalSlice";
+import { Auth } from "aws-amplify";
 
 const NavBar = (props) => {
     // TODO: Change to use redux slice
@@ -40,11 +37,10 @@ const NavBar = (props) => {
     // TODO: Verify that a medium breakpoint works to handle mobile cases, can always add more breakpoints
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-    const auth = getAuth();
-    const navigate = useNavigate();
     const dispatch = useDispatch();
-
     const authenticated = useSelector(selectAuthenticated);
+    
+    const navigate = useNavigate();
 
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
@@ -65,25 +61,15 @@ const NavBar = (props) => {
         return;
     };
 
-    /**
-     * Handles logging out a user, using Firebase's provided method signOut()
-     */
-    const handleLogout = () => {
-
-        // /* Sign out the currently logged in user */
-        // signOut(auth)
-        //     .then(() => {
-        //         // Sign-out successful.
-        //         console.log("User successfully signed out");
-
-        //         /* TODO: Don't necessarily have to remove the object entirely, just reset its value to null? */
-        //         if (localStorage.getItem("userInfo") !== null) {
-        //             localStorage.removeItem("userInfo");
-        //         }
-        //     })
-        //     .catch((error) => {
-        //         console.error("Something bad happened = ", error);
-        //     });
+    const handleLogout = async () => {
+          try {
+            const result = await Auth.signOut();
+            console.log("Sign-In Result = ", result);
+            
+            dispatch(setAuthenticated(false));
+        } catch (error) {
+            console.log('error signing out: ', error);
+          }
     };
 
     const displayDropdown = () => {
