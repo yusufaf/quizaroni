@@ -13,10 +13,6 @@ export const CreateSetPage = styled(BasePage)({
     gridTemplateRows: "auto auto",
     gap: "2rem",
     paddingBottom: "2rem",
-    // display: "flex",
-    // alignItems: "center",
-    // justifyContent: "center",
-    // flexDirection: "column",
 })
 
 export const CreateSetPaper = styled(Paper)({})

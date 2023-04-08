@@ -12,8 +12,8 @@ export const ENABLED = "Enabled";
 export const ROUTES = {
     LOGIN: "/login",
     SIGNUP: "/signup",
-    CREATE: "/create"
-}
+    CREATE: "/create",
+};
 
 export const PAGES = {
     CREATE: "Create",
@@ -21,7 +21,7 @@ export const PAGES = {
     SIGNUP: "signup",
     profile: "profile",
     home: "home",
-}
+};
 
 export const DELETE_ACCOUNT_MSG = `We're sad to see you go, but if you're certain you want to delete your account, 
                                     please confirm your password below.`;
@@ -33,43 +33,53 @@ export const LOGOUT_SUCCESS_MSG = "Successfully logged out!";
 export const LOGOUT_ERROR_MSG = "Error when logging out";
 
 export const LOGIN_MESSAGES = {
-    createSet: "Please login or create an account to start creating flash cards!",
+    createSet:
+        "Please login or create an account to start creating flash cards!",
     login: "You're already logged in!",
     signup: "Please log out of your account to create a new account!",
     profile: "Please login to view your profile!",
-    home: "Please login to view your created flash cards!"
-}
+    home: "Please login to view your created flash cards!",
+};
 
 export const FLASHSET_COLUMNS = {
     TITLE: "Title",
-    DESCRIPTION: "Description", 
+    DESCRIPTION: "Description",
     CREATED: "Created on",
-    LABEL: "Label"
-}
+    LABEL: "Label",
+};
 
 export const CREATE_SET = {
     TITLE: "Create a new flash card set",
     TITLE_PLACEHOLDER: "Enter a title for your new study set",
     DESC_PLACEHOLDER: "Enter a description for your new study set",
     LABEL_PLACEHOLDER: "Enter a label for your new study set",
-}
+};
 
 export const VIEW_SET = {
     BACKGROUND: "BACKGROUND",
-    TEXT: "TEXT"
-}
+    TEXT: "TEXT",
+};
 
 export const STUDY_MODES = {
-    FLASHCARDS: "FLASHCARDS"
-}
+    FLASHCARDS: "FLASHCARDS",
+};
 
 export const DOWNLOAD_FILE_TYPES = {
     TXT: "TXT",
     JSON: "JSON",
-    CSV: "CSV"
-}
+    CSV: "CSV",
+};
 
 export const FLASHSET_VIEWS = {
     TABLE: "table",
     GRID: "grid",
-}
+};
+
+// Define regex patterns for each requirement
+export const PWD_REGEX = {
+    uppercase: /(?=.*[A-Z])/,
+    special: /(?=.*[!@#$%^&*])/,
+    lowercase: /(?=.*[a-z])/,
+    number: /(?=.*[0-9])/,
+    length: /^.{8,}$/,
+};

@@ -1,9 +1,16 @@
-import { Create, UploadFile } from "@mui/icons-material"
-import { FormControl, IconButton, InputLabel, MenuItem, Typography } from "@mui/material"
-import { Dispatch, SetStateAction } from "react"
-import { BoldHeading, SimpleFlexContainer } from "src/AppStyles"
-import { useTheme } from "src/theme/useTheme"
-import { CREATE_SET } from "src/utilities/constants"
+import { Create, UploadFile } from "@mui/icons-material";
+import {
+    Button,
+    FormControl,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Typography,
+} from "@mui/material";
+import { Dispatch, SetStateAction } from "react";
+import { BoldHeading, SimpleFlexContainer } from "src/AppStyles";
+import { useTheme } from "src/theme/useTheme";
+import { CREATE_SET } from "src/utilities/constants";
 import {
     CreateSetButton,
     CreateSetContainer,
@@ -15,9 +22,9 @@ import {
     LabelInput,
     LabelInputContainer,
     LabelSelect,
-    TitleInput
-} from "./CreateSetStyles"
-import HeaderAdvancedSection from "./HeaderAdvancedSection"
+    TitleInput,
+} from "./CreateSetStyles";
+import HeaderAdvancedSection from "./HeaderAdvancedSection";
 
 type Props = {
     advancedSectionProps: any;
@@ -57,9 +64,7 @@ const CreateSetHeader = (props: Props) => {
         <CreateSetPaper elevation={6}>
             <CreateSetContainer>
                 <HeaderLeftContainer>
-                    <BoldHeading variant="h5">
-                        {CREATE_SET.TITLE}
-                    </BoldHeading>
+                    <BoldHeading variant="h5">{CREATE_SET.TITLE}</BoldHeading>
                     <CreateSetInputsContainer>
                         <BoldHeading
                             variant="subtitle1"
@@ -103,7 +108,9 @@ const CreateSetHeader = (props: Props) => {
                                 onChange={onLabelChange}
                                 disabled={selectedLabel !== ""}
                             />
-                            <Typography component="span">or select an existing one</Typography>
+                            <Typography component="span">
+                                or select an existing one
+                            </Typography>
                             <FormControl variant="standard">
                                 <InputLabel>Label</InputLabel>
                                 <LabelSelect
@@ -112,7 +119,10 @@ const CreateSetHeader = (props: Props) => {
                                 >
                                     {/* TODO: Always leave an empty option so they don't have to pick one */}
                                     {/* Width of 10rem for the MenuItem */}
-                                    <MenuItem value={10} sx={{ width: "10rem" }} >
+                                    <MenuItem
+                                        value={10}
+                                        sx={{ width: "10rem" }}
+                                    >
                                         <Typography variant="inherit" noWrap>
                                             TenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTen
                                         </Typography>
@@ -121,19 +131,15 @@ const CreateSetHeader = (props: Props) => {
                             </FormControl>
                             {/* TODO: Map labelOptions to MenuItem */}
                         </LabelInputContainer>
-
                     </CreateSetInputsContainer>
                     <SimpleFlexContainer>
-                        <IconButton
+                        <Button
+                            variant="outlined"
+                            startIcon={<UploadFile fontSize="large" />}
                             onClick={() => setShowImportModal(true)}
                         >
-                            <UploadFile
-                                fontSize="large"
-                            />
-                        </IconButton>
-                        <Typography>
                             Import Cards
-                        </Typography>
+                        </Button>
                     </SimpleFlexContainer>
                 </HeaderLeftContainer>
                 <HeaderRightContainer>
@@ -146,13 +152,11 @@ const CreateSetHeader = (props: Props) => {
                     >
                         Create Set
                     </CreateSetButton>
-                    <HeaderAdvancedSection
-                        {...advancedSectionProps}
-                    />
+                    <HeaderAdvancedSection {...advancedSectionProps} />
                 </HeaderRightContainer>
             </CreateSetContainer>
         </CreateSetPaper>
-    )
-}
+    );
+};
 
-export default CreateSetHeader
+export default CreateSetHeader;

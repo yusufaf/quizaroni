@@ -17,37 +17,8 @@ import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
 import { useDispatch } from "react-redux";
 import { setAlert, setCognitoUser } from "src/slices/globalSlice";
 import { Auth } from "@aws-amplify/auth";
-import {
-    PasswordPolicyBox,
-    PasswordPolicyPaper,
-    RequirementText,
-} from "./styles";
 import axios from "axios";
-
-// Define regex patterns for each requirement
-const REGEX_PATTERNS = {
-    uppercase: /(?=.*[A-Z])/,
-    special: /(?=.*[!@#$%^&*])/,
-    lowercase: /(?=.*[a-z])/,
-    number: /(?=.*[0-9])/,
-    length: /^.{8,}$/,
-};
-
-type RequirementState = {
-    length: boolean;
-    lowercase: boolean;
-    number: boolean;
-    special: boolean;
-    uppercase: boolean;
-};
-
-const initialRequirementState: RequirementState = {
-    length: false,
-    lowercase: false,
-    number: false,
-    special: false,
-    uppercase: false,
-};
+import PasswordValidator from "src/PasswordValidator/PasswordValidator";
 
 const Signup = (props) => {
     const { isDarkMode, theme } = useTheme();
@@ -67,9 +38,6 @@ const Signup = (props) => {
     const [username, setUsername] = useState<string>("");
     const [passVisibility, setPassVisibility] = useState<boolean>(false);
 
-    const [requirementState, setRequirementState] = useState<RequirementState>({
-        ...initialRequirementState,
-    });
     const [passwordValid, setPasswordValid] = useState<boolean>(false);
 
     /* User Input Error Checking */
@@ -100,18 +68,8 @@ const Signup = (props) => {
         return;
     };
 
-    const isPasswordValid = (password: string) => {
-        const newReqState = { ...requirementState };
-        Object.keys(REGEX_PATTERNS).forEach((key) => {
-            newReqState[key] = REGEX_PATTERNS[key].test(password);
-        });
-        setRequirementState(newReqState);
-        return Object.values(newReqState).every(Boolean);
-    };
-
     const handlePasswordChange = (e: any) => {
         setPassword(e.target.value);
-        setPasswordValid(isPasswordValid(e.target.value));
     };
 
     const handleSignup = async () => {
@@ -131,6 +89,7 @@ const Signup = (props) => {
             console.log(user);
 
             // @ts-ignore - storage should exist on a newly created cognito user
+            
             const { userInfo } = user.storage;
             const { createdAt, emailVerified, uid } = JSON.parse(userInfo);
             const newUserData = {
@@ -140,20 +99,21 @@ const Signup = (props) => {
                 emailVerified,
                 uid,
             };
-            
+
             /* Store newly created cognito user in Redux */
-            dispatch(setCognitoUser({
-                username
-            }));
+            dispatch(
+                setCognitoUser({
+                    username,
+                })
+            );
 
             /* Send user to confirm email page */
-            navigate("/confirmEmail")
+            navigate("/confirmEmail");
 
             const response = await axios.post("/api/users/create", newUserData);
             console.log({ response });
 
-            // Response.data has message in it 
-
+            // Response.data has message in it
         } catch (error) {
             console.log("error signing up:", error);
         }
@@ -241,45 +201,10 @@ const Signup = (props) => {
                         }}
                         required
                     />
-
-                    <PasswordPolicyBox>
-                        <PasswordPolicyPaper elevation={6}>
-                            <BoldHeading
-                                variant="subtitle1"
-                                sx={{ textAlign: "center" }}
-                            >
-                                Password Policy:
-                            </BoldHeading>
-                            <RequirementText
-                                isSatisfied={requirementState.length}
-                            >
-                                &bull; Must be at least 8 characters long
-                            </RequirementText>
-                            <RequirementText
-                                isSatisfied={requirementState.uppercase}
-                            >
-                                &bull; Must contain at least one uppercase
-                                letter
-                            </RequirementText>
-                            <RequirementText
-                                isSatisfied={requirementState.special}
-                            >
-                                &bull; Must contain at least one special
-                                character
-                            </RequirementText>
-                            <RequirementText
-                                isSatisfied={requirementState.lowercase}
-                            >
-                                &bull; Must contain at least one lowercase
-                                letter
-                            </RequirementText>
-                            <RequirementText
-                                isSatisfied={requirementState.number}
-                            >
-                                &bull; Must contain at least one number
-                            </RequirementText>
-                        </PasswordPolicyPaper>
-                    </PasswordPolicyBox>
+                    <PasswordValidator
+                        setIsPasswordValid={setPasswordValid}
+                        password={password}
+                    />
                     <SignupButton
                         variant="contained"
                         disabled={signUpDisabled}
