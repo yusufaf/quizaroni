@@ -34,7 +34,7 @@ const AppRoutes = (props: Props) => {
                 path="/create"
                 element={<CreateSet  />}
             />
-            <Route path="/forgot" element={<ForgotPassword />} />
+            <Route path="/forgotPassword" element={<ForgotPassword />} />
             <Route
                 path="/profile"
                 element={

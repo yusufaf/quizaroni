@@ -1,17 +1,16 @@
 import { useState } from "react";
-import { useTheme } from "src/theme/useTheme";
 import { useNavigate } from "react-router-dom";
-
-import {
-    ForgotPasswordPage,
-    ForgotPasswordContainer,
-    ForgotPasswordTitle,
-    ForgotPasswordDesc,
-    ForgotPassField,
-    ForgotPassBtn,
-} from "./styles";
 import { Auth } from "@aws-amplify/auth";
 import { Paper } from "@mui/material";
+import {
+    ForgotPassBtn,
+    ForgotPassField,
+    ForgotPasswordContainer,
+    ForgotPasswordDesc,
+    ForgotPasswordPage,
+    ForgotPasswordTitle,
+} from "./styles";
+import PasswordValidator from "src/PasswordValidator/PasswordValidator";
 
 type Props = {};
 
@@ -22,6 +21,7 @@ const ForgotPassword = (props: Props) => {
     const [confirmationCode, setConfirmationCode] = useState<string>("");
     const [codeSent, setCodeSent] = useState<boolean>(false);
     const [newPassword, setNewPassword] = useState<string>("");
+    const [passwordValid, setPasswordValid] = useState<boolean>(false);
 
     const handleForgotPassword = async () => {
         try {
@@ -108,11 +108,15 @@ const ForgotPassword = (props: Props) => {
                                 />
                                 <ForgotPassBtn
                                     variant="contained"
-                                    disabled={!isValidCode || !username}
+                                    disabled={!isValidCode || !username || !passwordValid}
                                     onClick={handleResetPassword}
                                 >
                                     Reset Password
                                 </ForgotPassBtn>
+                                <PasswordValidator
+                                    password={newPassword}
+                                    setIsPasswordValid={setPasswordValid}
+                                />
                             </>
                         ) : (
                             <>
