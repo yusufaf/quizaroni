@@ -21,7 +21,7 @@ import NewCardInput from "./NewCardInput/NewCardInput";
 import { SwapHoriz, Sync as SyncIcon } from "@mui/icons-material";
 import { SpacedFlexContainer } from "src/AppStyles";
 import { useSelector } from "react-redux";
-import { selectAuthenticated } from "src/slices/globalSlice";
+import { selectAuthenticated, selectCognitoUser, selectUserData } from "src/slices/globalSlice";
 
 const EMPTY_CARD = {
     term: "",
@@ -33,12 +33,15 @@ const CreateSet = (props) => {
     const navigate = useNavigate();
 
     const authenticated = useSelector(selectAuthenticated);
+    const cognitoUser = useSelector(selectCognitoUser);
+    const userData = useSelector(selectUserData);
+
 
     /* Flash Set States */
-    const [enteredTitle, setEnteredTitle] = useState("");
-    const [enteredDescription, setEnteredDescription] = useState("");
-    const [enteredLabel, setEnteredLabel] = useState("");
-    const [selectedLabel, setSelectedLabel] = useState("");
+    const [title, setTitle] = useState<string>("");
+    const [description, setDescription] = useState<string>("");
+    const [enteredLabel, setEnteredLabel] = useState<string>("");
+    const [selectedLabel, setSelectedLabel] = useState<string>("");
 
     const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
 
@@ -54,7 +57,7 @@ const CreateSet = (props) => {
         descInput: false,
     });
 
-    const createSetDisabled = !enteredTitle || !enteredDescription;
+    const createSetDisabled = !title || !description;
 
     const [advancedExpanded, setAdvancedExpanded] = useState(false);
     const [blankCardsCount, setBlankCardsCount] = useState(0);
@@ -70,18 +73,6 @@ const CreateSet = (props) => {
      */
     const retrieveLabels = async () => {
         return [];
-        // if (userAuthState) {
-        //     const { uid } = userAuthState;
-        //     const usersCollection = collection(database, "users");
-        //     const queryResult = query(usersCollection, where("uid", "==", uid));
-        //     const querySnapshot = await getDocs(queryResult);
-
-        //     const userDoc = querySnapshot.docs[0];
-        //     if (userDoc) {
-        //         const userData = userDoc.data();
-        //         return userData.labels;
-        //     }
-        // }
     };
 
     const renderLabelOptions = () => {
@@ -132,49 +123,34 @@ const CreateSet = (props) => {
 
     /* Check that length of createdCardObjects is not 0 */
     const createNewSet = async () => {
-        let createdCardObjects = [...createdSetCards];
-        let allCardsHaveContent = createdCardObjects.every(
-            (card) => card.term.trim() && card.definition.trim()
-        );
+        const createdCardObjects = [...createdSetCards];
+        // const allCardsHaveContent = createdCardObjects.every(
+        //     (card) => card.term.trim() && card.definition.trim()
+        // );
 
-        if (
-            enteredTitle.trim() &&
-            enteredDescription.trim() &&
-            allCardsHaveContent
-        ) {
-            const creationDate = new Date().toLocaleDateString();
-            const lastViewedDate = new Date().toLocaleDateString();
-            const label = enteredLabel || "";
-            const uid = "";
+        const creationDate = new Date().getTime();
+        const lastViewedDate = new Date().getTime();
+        const label = enteredLabel || "";
+        const { username } = cognitoUser;
 
-            const flashCollection = collection(database, "flashcards");
-
-            const cardsRef = await addDoc(flashCollection, {
-                title: enteredTitle,
-                description: enteredDescription,
-                uid,
-                creationDate,
-                lastViewed: lastViewedDate,
-                label,
-                cards: createdCardObjects,
-            });
-
-            // Store the Firebase document ID as the set's "id"
-            updateDoc(cardsRef, {
-                setID: cardsRef.id,
-            });
-
-            if (label) {
-                createNewLabel();
-            }
-
-            console.log("Successfully created new flash set");
-            setTimeout(() => {
-                navigate("/");
-            }, 1000);
-        } else {
-            /* TODO: Display an alert that could not create the set, or just have it disabled wiht some state */
+        
+        const studySet = {
+            title,
+            description,
+            label,
+            username,
+            cards: createdCardObjects
         }
+        
+        console.log({ createdCardObjects, cognitoUser, studySet});
+        // if (label) {
+        //     createNewLabel();
+        // }
+
+        console.log("Successfully created new flash set");
+        // setTimeout(() => {
+        //     navigate("/");
+        // }, 1000);
     };
 
     /* Runs everytime the file selected for the image upload changes */
@@ -273,11 +249,11 @@ const CreateSet = (props) => {
 
     /* Create Set Inputs */
     const onTitleChange = (e) => {
-        setEnteredTitle(e.target.value);
+        setTitle(e.target.value);
     };
 
     const onDescriptionChange = (e) => {
-        setEnteredDescription(e.target.value);
+        setDescription(e.target.value);
     };
 
     const onLabelChange = (e) => {
@@ -294,7 +270,7 @@ const CreateSet = (props) => {
         setAdvancedExpanded(!advancedExpanded);
     };
 
-    const onBlankInputsChange = (e) => {
+    const onBlankInputsChange = (e: any) => {
         const newValue = e.target.value;
         setBlankCardsCount(newValue);
     };
@@ -320,7 +296,7 @@ const CreateSet = (props) => {
     const headerProps = {
         advancedSectionProps,
         createNewSet,
-        description: enteredDescription,
+        description: description,
         label: enteredLabel,
         onDescriptionChange,
         onLabelChange,
@@ -328,7 +304,7 @@ const CreateSet = (props) => {
         onTitleChange,
         selectedLabel,
         setShowImportModal,
-        title: enteredTitle,
+        title: title,
     };
 
     if (!authenticated) {

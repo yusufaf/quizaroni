@@ -2,14 +2,19 @@ import { Card, IconButton, Paper, styled, Typography } from "@mui/material";
 import { BasePage } from "src/AppStyles";
 
 export const ProfilePage = styled(BasePage)({
-    /* TODO: This needs work */
+    display: "grid",
+    gridTemplateColumns: "auto 2fr",
+    padding: "0 2rem 2rem 2rem",
+    gap: "4rem"
+})
+
+export const ProfileContainer = styled("div")({
     display: "flex",
-    gap: "4rem",
-    // display: "grid",
-    // alignItems: "center",
-    // justifyItems: "center",
-    gridTemplateColumns: "auto auto",
-    paddingLeft: "4rem",
+    alignItems: "flex-start",
+    flexDirection: "column",
+    gap: "1.25rem",
+    borderRadius: "0.75rem",
+    padding: "1.25rem",
 })
 
 export const ProfilePaper = styled(Paper)({
@@ -37,8 +42,6 @@ export const ActionHeader = styled("div")({
 /* Profile Card Styles */
 
 export const StyledProfileCard = styled(Card)({
-    gridColumn: "1",
-    width: "20rem",
     display: "flex",
     flexDirection: "column",
     gap: "1.25rem",

@@ -1,7 +1,4 @@
 import { useState, useEffect, useRef } from "react"
-import { doc, updateDoc, query, where, collection, getDocs } from "@firebase/firestore";
-import { database } from "../firebase/firebase";
-import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 import {
     Paper,
@@ -20,8 +17,9 @@ import {
     StyledLink 
 } from "./LoginStyles";
 import { useDispatch } from "react-redux";
-import { setAlert, setCognitoUser, setAuthenticated} from "src/slices/globalSlice";
+import { setAlert, setCognitoUser, setAuthenticated, setUserData} from "src/slices/globalSlice";
 import { Auth } from "@aws-amplify/auth";
+import axios from "axios";
 
 const Login = props => {
     const { isDarkMode, theme } = useTheme();
@@ -31,8 +29,8 @@ const Login = props => {
     const navigate = useNavigate();
 
     /* OAuth Variables */
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
+    // const provider = new GoogleAuthProvider();
+    // provider.setCustomParameters({ prompt: 'select_account' });
 
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -71,19 +69,19 @@ const Login = props => {
      * Update the last time the user signed in on the database
      * @param {*} uid 
      */
-    const updateLastSignIn = async (uid) => {
-        const usersCollection = collection(database, "users");
-        const queryResult = query(usersCollection, where("uid", "==", uid));
-        const querySnapshot = await getDocs(queryResult);
+    // const updateLastSignIn = async (uid) => {
+    //     const usersCollection = collection(database, "users");
+    //     const queryResult = query(usersCollection, where("uid", "==", uid));
+    //     const querySnapshot = await getDocs(queryResult);
 
-        const userDoc = querySnapshot.docs[0];
-        if (userDoc) {
-            const userRef = userDoc.ref;
-            updateDoc(userRef, {
-                lastSignInDate: new Date().toLocaleDateString()
-            });
-        }
-    }
+    //     const userDoc = querySnapshot.docs[0];
+    //     if (userDoc) {
+    //         const userRef = userDoc.ref;
+    //         updateDoc(userRef, {
+    //             lastSignInDate: new Date().toLocaleDateString()
+    //         });
+    //     }
+    // }
 
     // const handleGoogleSignIn = () => {
     //     signInWithPopup(auth, provider)
@@ -110,12 +108,22 @@ const Login = props => {
             const user = await Auth.signIn(username, password);
             console.log("Result of cognito sign in = ", user);
 
+            /* Retrieve user data, passing username as a query parameter */
+            const response = await axios.get("/api/users/get", {
+                params: {
+                    username
+                },
+            }
+            );
+            console.log({ response });
+            const userData = response.data;
+
             /* Store cognito user and authenticated in state */
             dispatch(setCognitoUser(user))
             dispatch(setAuthenticated(true));
+            dispatch(setUserData(userData));
 
-            
-
+            navigate("/create");
           } catch (error) {
             console.error('Error signing in', error);
         }
@@ -173,7 +181,7 @@ const Login = props => {
                             Login
                         </LoginTitle>
                         <LoginField
-                            label="Email"
+                            label="Email or username"
                             name="emailInput"
                             value={username}
                             onChange={handleEmailChange}
