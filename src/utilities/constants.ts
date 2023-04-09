@@ -73,6 +73,7 @@ export const DOWNLOAD_FILE_TYPES = {
 export const FLASHSET_VIEWS = {
     TABLE: "table",
     GRID: "grid",
+    TEXT: "text"
 };
 
 // Define regex patterns for each requirement

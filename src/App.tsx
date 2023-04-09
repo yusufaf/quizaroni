@@ -48,7 +48,6 @@ const App = () => {
             console.log({ response });
             const userData = response.data;
             dispatch(setUserData(userData));
-
         } catch (err) {
             console.log(err);
         }

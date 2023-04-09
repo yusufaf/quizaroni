@@ -33,9 +33,6 @@ export const globalSlice = createSlice({
     setAlert: (state, action: PayloadAction<any>) => {
       state.alert = action.payload;
     },
-    setFeedbackDialogOpen: (state, action: PayloadAction<boolean>) => {
-      state.feedbackDialogOpen = action.payload;
-    },
     setDialogOpen: (state, action: PayloadAction<boolean>) => {
       state.dialogOpen = action.payload;
     },
@@ -64,7 +61,6 @@ export const globalSlice = createSlice({
 export const { 
   setUserAuthState,
   setAlert,
-  setFeedbackDialogOpen,
   setDialogOpen,
   setCognitoUser,
   setAuthenticated,
@@ -73,7 +69,7 @@ export const {
 
 /* Selectors */
 export const selectAlert = (state) => state.global.alert;
-export const selectFeedbackDialogOpen = (state) => state.global.feedbackDialogOpen;
+export const selectDialogOpen = (state) => state.global.dialogOpen;
 export const selectUserAuthState = (state) => state.global.userAuthInfo;
 export const selectCognitoUser = (state) => state.global.cognitoUser;
 export const selectAuthenticated = (state) => state.global.authenticated;
