@@ -6,6 +6,7 @@ export const HomePage = styled(BasePage)({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    padding: "0 2rem 2rem 2rem",
 })
 
 export const HomePaper = styled(Paper)({})
@@ -13,7 +14,6 @@ export const HomePaper = styled(Paper)({})
 export const HomeSetsHeading = styled(BoldHeading)({
     marginTop: "1.5rem",
 })
-
 
 export const HomeTableContainer = styled("div")({
     marginTop: "2rem",

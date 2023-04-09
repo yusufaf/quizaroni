@@ -3,7 +3,7 @@ import { Menu, MenuItem } from '@mui/material/';
 import { useTheme } from "../theme/useTheme";
 import { styled } from '@mui/system';
 import { useDispatch } from "react-redux";
-import { setFeedbackDialogOpen } from "src/slices/globalSlice";
+import { setDialogOpen } from "src/slices/globalSlice";
 
 const ProfileDropdown = props => {
     const { dropdownRef, showDropdown, onClose } = props;
@@ -17,7 +17,7 @@ const ProfileDropdown = props => {
     })
 
     const openFeedbackDialog = () => {
-        dispatch(setFeedbackDialogOpen(true));
+        dispatch(setDialogOpen(true));
     }
     
     return (
