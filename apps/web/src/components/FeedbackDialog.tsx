@@ -8,15 +8,15 @@ import {
     DialogTitle
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { selectFeedbackDialogOpen, setFeedbackDialogOpen } from "src/slices/globalSlice";
+import { selectDialogOpen, setDialogOpen } from "src/slices/globalSlice";
 import styled from "@emotion/styled";
 
 const FeedbackDialog = props => {
-    const open = useSelector(selectFeedbackDialogOpen);
+    const open = useSelector(selectDialogOpen);
     const dispatch = useDispatch();
 
     const handleClose = () => {
-        dispatch(setFeedbackDialogOpen(false));
+        dispatch(setDialogOpen(false));
     }
 
     const EmailInput = styled(TextField)({

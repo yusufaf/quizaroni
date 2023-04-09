@@ -21,7 +21,12 @@ import NewCardInput from "./NewCardInput/NewCardInput";
 import { SwapHoriz, Sync as SyncIcon } from "@mui/icons-material";
 import { SpacedFlexContainer } from "src/AppStyles";
 import { useSelector } from "react-redux";
-import { selectAuthenticated, selectCognitoUser, selectUserData } from "src/slices/globalSlice";
+import {
+    selectAuthenticated,
+    selectCognitoUser,
+    selectUserData,
+} from "src/slices/globalSlice";
+import axios from "axios";
 
 const EMPTY_CARD = {
     term: "",
@@ -35,7 +40,6 @@ const CreateSet = (props) => {
     const authenticated = useSelector(selectAuthenticated);
     const cognitoUser = useSelector(selectCognitoUser);
     const userData = useSelector(selectUserData);
-
 
     /* Flash Set States */
     const [title, setTitle] = useState<string>("");
@@ -123,34 +127,47 @@ const CreateSet = (props) => {
 
     /* Check that length of createdCardObjects is not 0 */
     const createNewSet = async () => {
-        const createdCardObjects = [...createdSetCards];
-        // const allCardsHaveContent = createdCardObjects.every(
-        //     (card) => card.term.trim() && card.definition.trim()
-        // );
+        try {
+            const cards = [...createdSetCards];
 
-        const creationDate = new Date().getTime();
-        const lastViewedDate = new Date().getTime();
-        const label = enteredLabel || "";
-        const { username } = cognitoUser;
+            if (cards.length === 0) {
+                return;
+            }
 
-        
-        const studySet = {
-            title,
-            description,
-            label,
-            username,
-            cards: createdCardObjects
-        }
-        
-        console.log({ createdCardObjects, cognitoUser, studySet});
-        // if (label) {
-        //     createNewLabel();
-        // }
+            // const allCardsHaveContent = createdCardObjects.every(
+            //     (card) => card.term.trim() && card.definition.trim()
+            // );
 
-        console.log("Successfully created new flash set");
-        // setTimeout(() => {
-        //     navigate("/");
-        // }, 1000);
+            const createdAt = new Date().getTime();
+            const lastViewed = new Date().getTime();
+            const label = enteredLabel || "";
+            // const { username } = cognitoUser;
+            const { username, uuid: userUUID } = userData;
+
+            const studySet = {
+                cards,
+                createdAt,
+                description,
+                label,
+                lastViewed,
+                title,
+                username,
+                userUUID,
+            };
+
+            console.log({ cards, cognitoUser, studySet });
+            // if (label) {
+            //     createNewLabel();
+            // }
+
+            console.log("Successfully created new flash set");
+            // setTimeout(() => {
+            //     navigate("/");
+            // }, 1000);
+
+            const response = await axios.post("/api/studysets/create", studySet);
+            console.log({ response });
+        } catch (error) {}
     };
 
     /* Runs everytime the file selected for the image upload changes */

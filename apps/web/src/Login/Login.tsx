@@ -1,29 +1,33 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-    Paper,
-} from '@mui/material/';
-import PasswordToggle from "src/components/PasswordToggle/PasswordToggle"
+import { Paper } from "@mui/material/";
+import PasswordToggle from "src/components/PasswordToggle/PasswordToggle";
 import { useTheme } from "src/theme/useTheme";
 import * as C from "src/utilities/constants";
 import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
-import { 
-    ForgotPasswordLink, 
-    LoginPageContainer, 
-    LoginContainer, 
-    LoginField, 
-    LoginTitle, 
-    LoginButton, 
-    StyledLink 
+import {
+    ForgotPasswordLink,
+    LoginPageContainer,
+    LoginContainer,
+    LoginField,
+    LoginTitle,
+    LoginButton,
+    StyledLink,
 } from "./LoginStyles";
 import { useDispatch } from "react-redux";
-import { setAlert, setCognitoUser, setAuthenticated, setUserData} from "src/slices/globalSlice";
+import {
+    setAlert,
+    setCognitoUser,
+    setAuthenticated,
+    setUserData,
+} from "src/slices/globalSlice";
+import { setStudySets } from "src/slices/studysetsSlice";
 import { Auth } from "@aws-amplify/auth";
 import axios from "axios";
 
-const Login = props => {
+const Login = (props) => {
     const { isDarkMode, theme } = useTheme();
-    
+
     useBrowserTitle("Login");
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -37,8 +41,8 @@ const Login = props => {
     const [passVisibility, setPassVisibility] = useState<boolean>(false);
     const [showErrorText, setShowErrorText] = useState({
         emailInput: false,
-        passInput: false
-    })
+        passInput: false,
+    });
 
     const displayLoginAlert = (type) => {
         const showLoginToast = true;
@@ -63,11 +67,11 @@ const Login = props => {
             dispatch(setAlert(loginFailureAlert));
         }
         return;
-    }
+    };
 
     /**
      * Update the last time the user signed in on the database
-     * @param {*} uid 
+     * @param {*} uid
      */
     // const updateLastSignIn = async (uid) => {
     //     const usersCollection = collection(database, "users");
@@ -111,46 +115,33 @@ const Login = props => {
             /* Retrieve user data, passing username as a query parameter */
             const response = await axios.get("/api/users/get", {
                 params: {
-                    username
+                    username,
                 },
-            }
-            );
+            });
             console.log({ response });
             const userData = response.data;
+            const { uuid: userUUID } = userData;
 
             /* Store cognito user and authenticated in state */
-            dispatch(setCognitoUser(user))
+            dispatch(setCognitoUser(user));
             dispatch(setAuthenticated(true));
             dispatch(setUserData(userData));
 
+            /* Fetch the study sets for the user */
+            const studySetsResponse = await axios.get("/api/studysets/get", {
+                params: {
+                    userUUID,
+                },
+            });
+            console.log({ studySetsResponse });
+            const studySets = studySetsResponse.data;
+            dispatch(setStudySets(studySets));
+
             navigate("/create");
-          } catch (error) {
-            console.error('Error signing in', error);
+        } catch (error) {
+            console.error("Error signing in", error);
         }
-
-
-        // if (enteredEmail.trim() && enteredPass.trim()) {
-        //     // Firebase Auth Sign-In
-        //     signInWithEmailAndPassword(auth, enteredEmail, enteredPass)
-        //         .then((userCredential) => {
-        //             /* If in the then() callback: Successfully signed in */
-        //             const user = userCredential.user;
-        //             const { uid } = user;
-        //             setUserAuthState(user);
-        //             updateLastSignIn(uid);
-        //             localStorage.setItem('userInfo', JSON.stringify(user));
-        //             displayLoginAlert(C.SUCCESS);
-        //         })
-        //         .catch((error) => {
-        //             /* Could not sign in, error occurred */
-        //             const errorCode = error.code;
-        //             const errorMessage = error.message;
-
-        //             console.log(`Couldn't login. Error ${errorCode} = ${errorMessage}`);
-        //             displayLoginAlert(C.ERROR);
-        //         });
-        // }
-    }
+    };
 
     /* Function to check if "Enter" key was hit and call function */
     const enterKeyHandler = (e) => {
@@ -162,24 +153,18 @@ const Login = props => {
 
     const handleEmailChange = (e) => {
         setUsername(e.target.value);
-    }
+    };
 
     const handlePasswordChange = (e) => {
         setPassword(e.target.value);
-    }
+    };
 
     return (
         <>
             <LoginPageContainer role="page">
                 <Paper elevation={6}>
-                    <LoginContainer
-                        onKeyPress={enterKeyHandler}
-                    >
-                        <LoginTitle
-                            variant="h5"
-                        >
-                            Login
-                        </LoginTitle>
+                    <LoginContainer onKeyPress={enterKeyHandler}>
+                        <LoginTitle variant="h5">Login</LoginTitle>
                         <LoginField
                             label="Email or username"
                             name="emailInput"
@@ -190,18 +175,21 @@ const Login = props => {
                         />
                         <LoginField
                             label="Password"
-                            type={passVisibility ? 'text' : 'password'}
+                            type={passVisibility ? "text" : "password"}
                             value={password}
                             name="passInput"
                             onChange={handlePasswordChange}
                             error={showErrorText.passInput}
                             size="small"
                             InputProps={{
-                                endAdornment:
+                                endAdornment: (
                                     <PasswordToggle
                                         passwordVisibility={passVisibility}
-                                        setPasswordVisibility={setPassVisibility}
+                                        setPasswordVisibility={
+                                            setPassVisibility
+                                        }
                                     />
+                                ),
                             }}
                         />
                         <ForgotPasswordLink to="/forgot">
@@ -214,9 +202,7 @@ const Login = props => {
                         >
                             Log In
                         </LoginButton>
-                        <StyledLink
-                            to="/signup"
-                        >
+                        <StyledLink to="/signup">
                             Don't have an account? Click here to sign up!
                         </StyledLink>
                     </LoginContainer>
@@ -224,6 +210,6 @@ const Login = props => {
             </LoginPageContainer>
         </>
     );
-}
+};
 
 export default Login;
