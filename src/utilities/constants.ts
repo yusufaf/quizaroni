@@ -84,3 +84,13 @@ export const PWD_REGEX = {
     number: /(?=.*[0-9])/,
     length: /^.{8,}$/,
 };
+
+export const DIALOGS = {
+    DELETE_CONFIRM: "DELETE_CONFIRM",
+}
+
+export const SET_METADATA_FIELDS = {
+    TEXT: "textColorVisible",
+    BACKGROUND: "backgroundColorVisible",
+    PUBLIC: "publiclyViewable",
+}

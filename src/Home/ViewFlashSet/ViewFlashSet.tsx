@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { collection, getDocs, query, updateDoc, where } from "firebase/firestore";
-import { database } from "../../firebase/firebase";
 import { Add, ArrowBack, Download, Edit, EditNotifications, MenuOpen } from '@mui/icons-material/';
 import {
     Chip,
@@ -21,11 +19,9 @@ import EditableTextField from "src/components/EditableTextField/EditableTextFiel
 import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
 import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
 import { useTheme } from "src/theme/useTheme";
-import * as viewFlashStyles from './ViewFlashSet.module.css';
 import FLASH_CARDS_IMG from "src/resources/images/flash-card.png";
 import { DOWNLOAD_FILE_TYPES, STUDY_MODES, VIEW_SET } from "src/utilities/constants";
 import FlashcardsStudy from "./FlashcardsStudy";
-import { DragDropContext } from "react-beautiful-dnd"
 import {
     SimpleFlexContainer
 } from "src/AppStyles";
@@ -42,18 +38,31 @@ import {
     CardFiltersContainer,
 } from "./ViewFlashSetStyles"
 import useBrowserTitle from 'src/lib/hooks/useBrowserTitle';
+import { useNavigate, useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { selectStudySets, selectSelectedStudySet, setSelectedStudySet } from "src/slices/studysetsSlice";
+import { useDispatch } from "react-redux";
+import axios from "axios";
 
 const { BACKGROUND, TEXT } = VIEW_SET;
 
-const ViewFlashSet = props => {
+type Props = {
+
+}
+
+const ViewFlashSet = (props: Props) => {
     const {
-        setViewFlashSet,
-        selectedFlashSet: flashset,
-        setSelectedFlashSet,
+
     } = props;
 
-    console.log("flashset = ", flashset)
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
+
+    const navigate = useNavigate();
+
+    const { id } = useParams(); 
+    const dispatch = useDispatch();
+    const studySets = useSelector(selectStudySets);
+    const selectedStudySet = useSelector(selectSelectedStudySet);
 
     const controlAnchorRef = useRef(null);
 
@@ -63,17 +72,14 @@ const ViewFlashSet = props => {
     const [showCreateLabelDialog, setShowCreateLabelDialog] = useState(false);
     const [createLabelName, setCreateLabelName] = useState("");
 
-    const [disableTextColor, setDisableTextColor] = useState(false);
-    const [disableBackgroundColor, setDisableBackgroundColor] = useState(false);
-    const [studySetViewable, setStudySetViewable] = useState(false);
+    const [disableTextColor, setDisableTextColor] = useState(selectedStudySet?.metadata?.textColorVisible ?? false);
+    const [disableBackgroundColor, setDisableBackgroundColor] = useState(selectedStudySet?.metadata?.backgroundColorVisible ?? false);
+    const [studySetViewable, setStudySetViewable] = useState(selectedStudySet?.metadata?.publiclyViewable ?? false);
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
 
     const [showDownloadPopup, setShowDownloadPopup] = useState(false);
     const [downloadFileType, setDownloadFileType] = useState(DOWNLOAD_FILE_TYPES.TXT);
-
-    const [editedDescription, setEditedDescription] = useState(flashset.description ?? "")
-    const [isEditingDescription, setIsEditingDescription] = useState(false);
 
     const TABS = {
         ALL: "ALL",
@@ -82,74 +88,96 @@ const ViewFlashSet = props => {
 
     const [selectedTab, setSelectedTab] = useState(TABS.ALL);
 
-    // useEffect(() => {
-    //     console.log({ isEditingDescription })
-    // }, [isEditingDescription])
-
-
-    // TODO: Increase size of arrow buttons?
     const arrowIconStyling = {
         '&.MuiIconButton-colorPrimary': {
             color: theme.foreground,
         },
     };
 
-    const { title: flashsetTitle } = flashset;
-    useBrowserTitle(flashsetTitle);
+    // const { title = "" } = selectedStudySet;
+    // useBrowserTitle(title);
 
-    const handleDisableColorToggle = async (type) => {
-        const uid = ""
-        const { setID } = flashset;
-
-        const flashCollection = collection(database, "flashcards");
-        const queryResult = query(flashCollection,
-            where("setID", "==", setID)
-        );
-        const docSnap = await getDocs(queryResult);
-        const flashDoc = docSnap.docs[0];
-
-        if (type === TEXT) {
-            setDisableTextColor(!disableTextColor)
-            if (flashDoc) {
-                const docRef = flashDoc.ref;
-                updateDoc(docRef, {
-                    disableTextColor: !disableTextColor
-                });
+    useEffect(() => {
+        if (!selectedStudySet) {
+            console.log("Finding the study set from the id in URL", {id, selectedStudySet, studySets});
+            const studySet = studySets.find((value) => value.uuid === id);
+            if (studySet) { 
+                dispatch(setSelectedStudySet(studySet))
             }
         }
-        else if (type === BACKGROUND) {
-            setDisableBackgroundColor(!disableBackgroundColor)
-            if (flashDoc) {
-                const docRef = flashDoc.ref;
-                updateDoc(docRef, {
-                    disableBackgroundColor: !disableBackgroundColor
-                });
+    }, [id, selectedStudySet, studySets])
+
+    const updateMetadataField = async (property, newValue) => {
+        try {
+            if (!selectedStudySet) {
+                return;
             }
+            const { uuid } = selectedStudySet;
+            const updateBody = {
+                property,
+                newValue,
+                uuid
+            };
+            const response = await axios.post("/api/studysets/updateMetadata", updateBody);
+            console.log({ response });
         }
+        catch (error) {
+            console.error("Error updating study set metadata")
+        }
+
+        // const uid = ""
+        // const { setID } = flashset;
+
+        // const flashCollection = collection(database, "flashcards");
+        // const queryResult = query(flashCollection,
+        //     where("setID", "==", setID)
+        // );
+        // const docSnap = await getDocs(queryResult);
+        // const flashDoc = docSnap.docs[0];
+
+        // if (type === TEXT) {
+        //     setDisableTextColor(!disableTextColor)
+        //     if (flashDoc) {
+        //         const docRef = flashDoc.ref;
+        //         updateDoc(docRef, {
+        //             disableTextColor: !disableTextColor
+        //         });
+        //     }
+        // }
+        // else if (type === BACKGROUND) {
+        //     setDisableBackgroundColor(!disableBackgroundColor)
+        //     if (flashDoc) {
+        //         const docRef = flashDoc.ref;
+        //         updateDoc(docRef, {
+        //             disableBackgroundColor: !disableBackgroundColor
+        //         });
+        //     }
+        // }
+
     }
 
 
     /* TODO: Using a library like React-pdf? Otherwise just creating a text file w/ comma sep values */
     const handleDownloadSet = () => {
 
-        /* Initial implementation of the following text file structure:
-            Card {index}:
-                term: ""
-                definition: ""
-        */
-        const anchor = document.createElement("a");
-        const cards = flashset.cards;
-        const mappedCards = cards.map((card, index) => ({ [`Card ${index + 1}`]: { term: card.term, definition: card.definition } }));
-        const cleanedCards = Object.assign({}, ...mappedCards);
+        // /* Initial implementation of the following text file structure:
+        //     Card {index}:
+        //         term: ""
+        //         definition: ""
+        // */
+        // const anchor = document.createElement("a");
+        // const cards = flashset.cards;
+        // const mappedCards = cards.map((card, index) => ({ [`Card ${index + 1}`]: { term: card.term, definition: card.definition } }));
+        // const cleanedCards = Object.assign({}, ...mappedCards);
 
-        const type = downloadFileType === DOWNLOAD_FILE_TYPES.TXT ? "text/plain" : "application/json"
+        // const type = downloadFileType === DOWNLOAD_FILE_TYPES.TXT ? "text/plain" : "application/json"
 
-        const file = new Blob([JSON.stringify(cleanedCards, null, 2)], { type });
-        anchor.href = URL.createObjectURL(file);
-        const { title: setTitle } = flashset;
-        anchor.download = `${setTitle}_Set.${type.toLowerCase()}`;
-        document.body.appendChild(anchor); // Required for this to work in FireFox
-        anchor.click();
+        // const file = new Blob([JSON.stringify(cleanedCards, null, 2)], { type });
+        // anchor.href = URL.createObjectURL(file);
+        // const { title: setTitle } = flashset;
+        // anchor.download = `${setTitle}_Set.${type.toLowerCase()}`;
+        // document.body.appendChild(anchor); // Required for this to work in FireFox
+        // anchor.click();
     }
 
     /* TODO: Future future task.
@@ -160,22 +188,7 @@ const ViewFlashSet = props => {
     }
 
     const testEmail = async () => {
-        const data = {
-            to: "yusufafzal12@gmail.com",
-            subject: "Test Email lmao",
-            text: "Test reminder email WOOOOOOOOOOO,"
-        };
-        console.log("JSON.stringify(data) = ", JSON.stringify(data));
-
-        const response = await fetch("http://localhost:5000/send_email", {
-            method: "POST",
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        return response.json();
+ 
     }
 
     const createNewLabel = () => {
@@ -194,12 +207,19 @@ const ViewFlashSet = props => {
         })
     }
 
+    const handleBackClick = () => {
+        navigate("/");
+    }
 
-    let actionSectionProps = {
+
+    const actionSectionProps = {
         controlAnchorRef,
         disableBackgroundColor,
         disableTextColor,
-        handleDisableColorToggle,
+        updateMetadataField,
+        metadata: selectedStudySet?.metadata,
+        setDisableBackgroundColor,
+        setDisableTextColor,
         setShowControlMenu,
         setShowDownloadPopup,
         setShowNotificationsModal,
@@ -208,7 +228,7 @@ const ViewFlashSet = props => {
         studySetViewable,
     };
 
-    let createLabelDialogProps = {
+    const createLabelDialogProps = {
         createNewLabel,
         showCreateLabelDialog,
         setCreateLabelName,
@@ -219,8 +239,10 @@ const ViewFlashSet = props => {
     * Render the JSX for all the flash sets
     */
     const renderSetCards = () => {
-        console.log("flashset in renderSetCards = ", flashset);
-        const { cards } = flashset;
+        if (!selectedStudySet) {
+            return;
+        }
+        const { cards } = selectedStudySet;
 
         return cards.map((card, index) => {
             return <ViewFlashCard
@@ -231,19 +253,17 @@ const ViewFlashSet = props => {
                 disableBackgroundColor={disableBackgroundColor}
             />
         })
+
     }
 
     /* TODO: Fix the spacing between the ViewContainer and the (first) ViewCards */
     return (
         <ViewFlashsetPage>
             {
-                /* */
+                /* TODO: Move this to separate route */
                 selectedStudyMode === STUDY_MODES.FLASHCARDS ?
                     (
-                        <FlashcardsStudy
-                            selectedFlashSet={flashset}
-                            setSelectedStudyMode={setSelectedStudyMode}
-                        />
+                        <FlashcardsStudy />
                     )
                     :
                     (
@@ -256,7 +276,7 @@ const ViewFlashSet = props => {
                                                 <IconButton color="primary"
                                                     aria-label="arrow backward" component="span"
                                                     sx={arrowIconStyling}
-                                                    onClick={() => setViewFlashSet(false)}
+                                                    onClick={handleBackClick}
                                                 >
                                                     <ArrowBack />
                                                 </IconButton>
@@ -271,14 +291,14 @@ const ViewFlashSet = props => {
                                                     fontWeight: "bold"
                                                 }}
                                             >
-                                                {flashset.title}
+                                                {selectedStudySet?.title}
                                             </Typography>
                                             <EditableTextField
                                                 style={{ marginTop: "1rem", width: "fit-content" }}
-                                                value={flashset.title}
+                                                value={selectedStudySet?.title}
                                                 tooltipText={"Rename title"}
                                             />
-                                            <Chip label={flashset.label ? flashset.label : "No label selected"} variant="outlined" />
+                                            <Chip label={selectedStudySet?.label ? selectedStudySet.label : "No label selected"} variant="outlined" />
                                             <Tooltip
                                                 title="Create label"
                                                 placement="right"
@@ -294,12 +314,12 @@ const ViewFlashSet = props => {
 
                                             <EditableTextField
                                                 style={{ marginTop: "1rem" }}
-                                                value={flashset.description}
+                                                value={selectedStudySet?.description}
                                                 tooltipText={"Edit description"}
                                             />
                                             <ActionsSection {...actionSectionProps} />
                                         </SetInfo>
-                                        <div className={viewFlashStyles.studySection}>
+                                        {/* <div className={viewFlashStyles.studySection}>
                                             <Typography
                                                 variant="h6"
                                                 sx={{
@@ -316,14 +336,14 @@ const ViewFlashSet = props => {
                                                     <Typography>Flashcards</Typography>
                                                 </StudyModeOption>
                                             </StudyModeGrid>
-                                        </div>
+                                        </div> */}
                                     </ViewFlashsetHeader>
                                 </ViewFlashsetContainer>
                             </ViewFlashsetPaper>
                             <CardCount
                                 variant="h6"
                             >
-                                Number of cards in this study set: {flashset.cards.length}
+                                Number of cards in this study set: {selectedStudySet?.cards?.length}
                             </CardCount>
                             <CardFiltersContainer>
                                 <Tabs
