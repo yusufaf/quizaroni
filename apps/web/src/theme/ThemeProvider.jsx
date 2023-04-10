@@ -19,7 +19,7 @@ export const CustomThemeProvider = (props) => {
         localStorage.setItem('appTheme', name)
         setThemeName(name);
         setIsDarkMode(name === DARK);
-        console.log("Setting theme to = ", name, themes[name]);
+        // console.log("Setting theme to = ", name, themes[name]);
         setTheme(themes[name])
     }
 

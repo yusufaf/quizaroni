@@ -1,9 +1,4 @@
 import { useEffect, useState } from "react"
-
-/* Firebase Operations */
-// import { collection, addDoc, query, where, getDocs, updateDoc } from "firebase/firestore";
-// import { database } from "../firebase/firebase";
-
 /* Outside Components */
 import {
     Button,
@@ -20,19 +15,22 @@ import {
 } from '@mui/material/';
 import { ArrowBack, ArrowForward, VolumeUp } from '@mui/icons-material/';
 import { useTheme } from "src/theme/useTheme";
-import * as viewFlashStyles from './ViewFlashSet.module.css';
 import { ViewFlashCardActions } from "./ViewFlashSetStyles";
 import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
 import {
     StudyElements
 } from "./StudyModeStyles";
 
+type Props = {
+    
+}
 
-const FlashcardsStudy = props => {
-    const { selectedFlashSet, setSelectedStudyMode } = props;
+const FlashcardsStudy = (props: Props) => {
     const { theme } = useTheme();
 
-    const [currentCard, setCurrentCard] = useState(selectedFlashSet.cards[0]);
+    // const [currentCard, setCurrentCard] = useState(selectedFlashSet.cards[0]);
+    const [currentCard, setCurrentCard] = useState("");
+
     const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
     const [currentCardSide, setCurrentCardSide] = useState(false);
@@ -65,19 +63,20 @@ const FlashcardsStudy = props => {
     }
 
     const handleArrowClick = (direction) => {
-        const length = selectedFlashSet.cards.length;
-        let newCardIndex = currentCardIndex;
-        newCardIndex = direction === "FORWARD" ? newCardIndex + 1 : newCardIndex - 1;
+        // const length = selectedFlashSet.cards.length;
+        // let newCardIndex = currentCardIndex;
+        // newCardIndex = direction === "FORWARD" ? newCardIndex + 1 : newCardIndex - 1;
 
-        if (newCardIndex < 0 || newCardIndex >= length) {
-            return;
-            // TODO: Display page with "Study Again" button and return to home button
-        }
+        // if (newCardIndex < 0 || newCardIndex >= length) {
+        //     return;
+        //     // TODO: Display page with "Study Again" button and return to home button
+        // }
 
-        setCurrentCardIndex(newCardIndex);
-        const { cards } = selectedFlashSet;
-        console.log("New card = ", cards[newCardIndex]);
-        setCurrentCard(cards[newCardIndex]);
+        // setCurrentCardIndex(newCardIndex);
+        // const { cards } = selectedFlashSet;
+        // console.log("New card = ", cards[newCardIndex]);
+        // setCurrentCard(cards[newCardIndex]);
+
     }
 
     const handleMainBackArrow = () => {
@@ -90,7 +89,7 @@ const FlashcardsStudy = props => {
 
     const handleConfirm = () => {
         handleCloseWarning();
-        setSelectedStudyMode("")
+        // setSelectedStudyMode("")
     }
 
     const handleAudioPlayback = () => {
@@ -172,7 +171,7 @@ const FlashcardsStudy = props => {
                     >
                         {currentCard.term}
                     </Typography>
-                    <div className={viewFlashStyles.cardActions}>
+                    {/* <div className={viewFlashStyles.cardActions}>
                         <Tooltip
                             title="Play TTS"
                             placement="top"
@@ -183,7 +182,7 @@ const FlashcardsStudy = props => {
                                 <VolumeUp />
                             </IconButton>
                         </Tooltip>
-                    </div>
+                    </div> */}
                 </Card>
                 <Tooltip
                     title={<Typography fontSize="1rem">Go to next card</Typography>}

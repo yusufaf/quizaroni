@@ -1,6 +1,6 @@
 import { BasePage, BoldHeading, SimpleFlexContainer } from "src/AppStyles";
 import styled from "@emotion/styled"
-import { Card, Chip, Paper, Typography } from "@mui/material";
+import { Box, Card, Chip, Paper, Typography } from "@mui/material";
 
 export const HomePage = styled(BasePage)({
     display: "flex",
@@ -11,14 +11,15 @@ export const HomePage = styled(BasePage)({
 
 export const HomePaper = styled(Paper)({})
 
-export const HomeSetsHeading = styled(BoldHeading)({
-    marginTop: "1.5rem",
+export const HomeContainer = styled(Box)({
+    width: "70rem",
 })
 
-export const HomeTableContainer = styled("div")({
-    marginTop: "2rem",
+export const HomeSetsHeading = styled(BoldHeading)({})
+
+export const HomeSetsContainer = styled(Box)({
     height: "40rem",
-    width: "100%",
+    marginTop: "1rem"
 })
 
 export const HomeSetGrid = styled("div")({
@@ -30,7 +31,7 @@ export const HomeSetGrid = styled("div")({
 
 /* Grid View - Card Styling */
 export const HomeSetCard = styled(Card)(({theme}) => ({
-    height: "12rem", 
+    // height: "14rem", 
     width: "20rem",
     padding: "1rem",
     transition: "0.2s ease",
@@ -48,7 +49,6 @@ export const HomeSetCard = styled(Card)(({theme}) => ({
 export const CardContent = styled("div")({
     display: "flex",
     flexDirection: "column",
-    gap: "1rem",
 })
 
 export const CardTitle = styled(Typography)({
@@ -56,10 +56,19 @@ export const CardTitle = styled(Typography)({
     overflow: "hidden",
     whiteSpace: "nowrap",
     textOverflow: "ellipsis"
-    // maxHeight ?
 });
 
-export const CardInfo = styled("div")({});
+export const CardDesc = styled(Typography)({
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    display: "-webkit-box",
+    WebkitLineClamp: "2",
+    WebkitBoxOrient: "vertical",
+})
+
+export const CardInfo = styled("div")({
+    marginTop: "2rem"
+});
 
 export const TermsLabel = styled(Typography)({
     fontWeight: "bold",

@@ -143,6 +143,7 @@ const CreateSet = (props) => {
             const label = enteredLabel || "";
             // const { username } = cognitoUser;
             const { username, uuid: userUUID } = userData;
+            const metadata = {};
 
             const studySet = {
                 cards,
@@ -150,6 +151,7 @@ const CreateSet = (props) => {
                 description,
                 label,
                 lastViewed,
+                metadata,
                 title,
                 username,
                 userUUID,
