@@ -1,15 +1,39 @@
 
 import { FormControlLabel, IconButton, Menu, MenuItem, Switch, Typography } from '@mui/material/';
 import { Download, EditNotifications, MenuOpen } from '@mui/icons-material/';
-import { DISABLED, ENABLED } from "src/utilities/constants";
+import { 
+    DISABLED, 
+    ENABLED,
+    SET_METADATA_FIELDS
+} from "src/utilities/constants";
 import { useTheme } from "src/theme/useTheme";
 
-const ActionsSection = props => {
+
+type Props = {
+    controlAnchorRef: any;
+    disableBackgroundColor: any;
+    disableTextColor: any;
+    updateMetadataField: any;
+    metadata: any;
+    setDisableBackgroundColor: any;
+    setDisableTextColor: any;
+    setShowControlMenu: any;
+    setShowDownloadPopup: any;
+    setShowNotificationsModal: any;
+    setStudySetViewable: any;
+    showControlMenu: any;
+    studySetViewable: any;
+}
+
+const ActionsSection = (props: Props) => {
     const {
         controlAnchorRef,
         disableBackgroundColor,
         disableTextColor,
-        handleDisableColorToggle,
+        updateMetadataField,
+        metadata = {},
+        setDisableBackgroundColor,
+        setDisableTextColor,
         setShowControlMenu,
         setShowDownloadPopup,
         setShowNotificationsModal,
@@ -17,6 +41,8 @@ const ActionsSection = props => {
         showControlMenu,
         studySetViewable,
     } = props;
+
+    console.log({metadata});
 
     const { theme } = useTheme();
 
@@ -26,6 +52,27 @@ const ActionsSection = props => {
 
     const handleCloseControlMenu = () => {
         setShowControlMenu(false);
+    }
+
+    const updateMetadataState = (property: string) => {
+        let newValue;
+        let setStateCallback;
+        switch (property) {
+            case SET_METADATA_FIELDS.TEXT:
+                newValue = !disableTextColor
+                setStateCallback = setDisableTextColor;
+                break;
+            case SET_METADATA_FIELDS.BACKGROUND:
+                newValue = !disableBackgroundColor
+                setStateCallback = setDisableBackgroundColor;
+                break;
+            case SET_METADATA_FIELDS.PUBLIC:
+                newValue = !studySetViewable
+                setStateCallback = setStudySetViewable;
+                break;
+        }
+        setStateCallback(newValue);
+        updateMetadataField(property, newValue);
     }
 
     return (
@@ -89,7 +136,7 @@ const ActionsSection = props => {
                             <Switch
                                 size="small"
                                 checked={disableTextColor}
-                                onChange={() => handleDisableColorToggle("TEXT")}
+                                onChange={() => updateMetadataState(SET_METADATA_FIELDS.TEXT)}
                             />
                         } label={
                             <Typography
@@ -108,7 +155,7 @@ const ActionsSection = props => {
                             <Switch
                                 size="small"
                                 checked={disableBackgroundColor}
-                                onChange={() => handleDisableColorToggle("BACKGROUND")}
+                                onChange={() => updateMetadataState(SET_METADATA_FIELDS.BACKGROUND)}
                             />
                         }
                         label={
@@ -127,8 +174,8 @@ const ActionsSection = props => {
                         <Switch
                             size="small"
                             checked={studySetViewable}
-                            onChange={() => setStudySetViewable(!studySetViewable)}
-                        />
+                            onChange={() => updateMetadataState(SET_METADATA_FIELDS.PUBLIC)}
+                            />
                     } label={
                         <Typography
                             sx={{

@@ -55,7 +55,7 @@ const EditableTextField = props => {
         ".Mui-disabled": {
             borderBottom: 0,
             opacity: 1,
-            "-webkit-text-fill-color": `${theme.palette.text.primary} !important`,
+            WebkitTextFillColor: `${theme.palette.text.primary} !important`,
             "&:before": {
                 borderBottom: 0
             }
