@@ -42,7 +42,9 @@ export const CardCount = styled(Typography)({
 })
 
 export const CardFiltersContainer = styled(SpacedFlexContainer)({
-    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
 })
 
 export const SortCardsDropdown = styled(FormControl)({

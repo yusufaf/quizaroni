@@ -93,7 +93,7 @@ const Signup = (props) => {
             const { userInfo } = user.storage;
             const { createdAt, emailVerified, uid } = JSON.parse(userInfo);
             const newUserData = {
-                createdAt,
+                createdAt: Number.parseInt(createdAt),
                 username,
                 email,
                 emailVerified,

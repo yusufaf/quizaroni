@@ -1,6 +1,5 @@
 import { Button } from "@mui/material";
 import {
-    addDoc,
     collection,
     getDocs,
     query,
@@ -33,7 +32,15 @@ const EMPTY_CARD = {
     definition: "",
 };
 
-const CreateSet = (props) => {
+type Props = {
+    type?: string;
+}
+
+const CreateSet = (props: Props) => {
+    const {
+        type = "Create"
+    } = props;
+
     const { isDarkMode, theme } = useTheme();
     const navigate = useNavigate();
 
@@ -104,25 +111,7 @@ const CreateSet = (props) => {
     };
 
     const createNewLabel = async () => {
-        /* Check database if this label already exists */
-        const uid = "";
-        const usersCollection = collection(database, "users");
-        const queryResult = query(usersCollection, where("uid", "==", uid));
-        const querySnapshot = await getDocs(queryResult);
 
-        const userDoc = querySnapshot.docs[0];
-        if (userDoc) {
-            const userData = userDoc.data();
-            const userRef = userDoc.ref;
-            /* Add label if it doesn't already exist for current user 
-                TODO: Test if this works
-            */
-            if (!userData.labels.includes(enteredLabel)) {
-                updateDoc(userRef, {
-                    labels: [...userData.labels].push(enteredLabel),
-                });
-            }
-        }
     };
 
     /* Check that length of createdCardObjects is not 0 */

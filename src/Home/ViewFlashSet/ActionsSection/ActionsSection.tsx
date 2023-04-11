@@ -11,12 +11,12 @@ import { useTheme } from "src/theme/useTheme";
 
 type Props = {
     controlAnchorRef: any;
-    disableBackgroundColor: any;
-    disableTextColor: any;
+    enableBackgroundColor: any;
+    enableTextColor: any;
     updateMetadataField: any;
     metadata: any;
-    setDisableBackgroundColor: any;
-    setDisableTextColor: any;
+    setEnableBackgroundColor: any;
+    setEnableTextColor: any;
     setShowControlMenu: any;
     setShowDownloadPopup: any;
     setShowNotificationsModal: any;
@@ -28,12 +28,12 @@ type Props = {
 const ActionsSection = (props: Props) => {
     const {
         controlAnchorRef,
-        disableBackgroundColor,
-        disableTextColor,
+        enableBackgroundColor,
+        enableTextColor,
         updateMetadataField,
         metadata = {},
-        setDisableBackgroundColor,
-        setDisableTextColor,
+        setEnableBackgroundColor,
+        setEnableTextColor,
         setShowControlMenu,
         setShowDownloadPopup,
         setShowNotificationsModal,
@@ -59,12 +59,12 @@ const ActionsSection = (props: Props) => {
         let setStateCallback;
         switch (property) {
             case SET_METADATA_FIELDS.TEXT:
-                newValue = !disableTextColor
-                setStateCallback = setDisableTextColor;
+                newValue = !enableTextColor
+                setStateCallback = setEnableTextColor;
                 break;
             case SET_METADATA_FIELDS.BACKGROUND:
-                newValue = !disableBackgroundColor
-                setStateCallback = setDisableBackgroundColor;
+                newValue = !enableBackgroundColor
+                setStateCallback = setEnableBackgroundColor;
                 break;
             case SET_METADATA_FIELDS.PUBLIC:
                 newValue = !studySetViewable
@@ -135,16 +135,16 @@ const ActionsSection = (props: Props) => {
                         control={
                             <Switch
                                 size="small"
-                                checked={disableTextColor}
+                                checked={enableTextColor}
                                 onChange={() => updateMetadataState(SET_METADATA_FIELDS.TEXT)}
                             />
                         } label={
                             <Typography
                                 sx={{
-                                    color: disableTextColor ? theme.palette.error.main : theme.palette.success.main
+                                    color: enableTextColor ? theme.palette.success.main : theme.palette.error.main 
                                 }}
                             >
-                                {`Text Color: ${disableTextColor ? DISABLED : ENABLED}`}
+                                {`Text Color: ${enableTextColor ? ENABLED : DISABLED}`}
                             </Typography>
                         }
                     />
@@ -154,17 +154,17 @@ const ActionsSection = (props: Props) => {
                         control={
                             <Switch
                                 size="small"
-                                checked={disableBackgroundColor}
+                                checked={enableBackgroundColor}
                                 onChange={() => updateMetadataState(SET_METADATA_FIELDS.BACKGROUND)}
                             />
                         }
                         label={
                             <Typography
                                 sx={{
-                                    color: disableBackgroundColor ? theme.palette.error.main : theme.palette.success.main
+                                    color: enableBackgroundColor ? theme.palette.success.main : theme.palette.error.main 
                                 }}
                             >
-                                {`Background Color: ${disableBackgroundColor ? DISABLED : ENABLED}`}
+                                {`Background Color: ${enableBackgroundColor ? ENABLED : DISABLED}`}
                             </Typography>
                         }
                     />

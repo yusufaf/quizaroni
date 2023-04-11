@@ -1,6 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { database } from "../firebase/firebase";
-import { deleteDoc, updateDoc, query, where, collection, getDoc, getDocs, limit } from "firebase/firestore";
 import {
     Button,
     Tooltip,
@@ -8,13 +6,22 @@ import {
     ToggleButton,
     ToggleButtonGroup,
     Typography,
-    TextField
-} from '@mui/material/';
-import { DarkMode, LightMode, Palette, Password, Person, RemoveCircleOutline, VisibilityOff, Visibility } from "@mui/icons-material";
+    TextField,
+} from "@mui/material/";
+import {
+    DarkMode,
+    LightMode,
+    Palette,
+    Password,
+    Person,
+    RemoveCircleOutline,
+    VisibilityOff,
+    Visibility,
+} from "@mui/icons-material";
 import LoginMessage from "../LoginMessage/LoginMessage";
 import ProfileCard from "./ProfileCard";
 import DeleteAccountDialog from "./DeleteAccountDialog/DeleteAccountDialog";
-import { LIGHT, DARK } from "src/utilities/constants"
+import { LIGHT, DARK } from "src/utilities/constants";
 import { useTheme } from "src/theme/useTheme";
 import PasswordToggle from "src/components/PasswordToggle/PasswordToggle";
 import {
@@ -23,108 +30,117 @@ import {
     PasswordFieldsContainer,
     ProfileContainer,
     ProfilePage,
-    ProfilePaper
-} from "./ProfileStyles"
-import { BoldHeading } from 'src/AppStyles';
-import { useSelector } from "react-redux";
-import { selectCognitoUser, selectAuthenticated } from "src/slices/globalSlice";
+    ProfilePaper,
+} from "./ProfileStyles";
+import { BoldHeading } from "src/AppStyles";
+import { useDispatch, useSelector } from "react-redux";
+import {
+    selectCognitoUser,
+    selectAuthenticated,
+    selectUserData,
+    setUserData,
+} from "src/slices/globalSlice";
+import axios from "axios";
 
-const Profile = props => {
+type Props = {};
+
+const Profile = (props: Props) => {
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
+    const dispatch = useDispatch();
     const authenticated = useSelector(selectAuthenticated);
-    const cognitoUser = useSelector(selectCognitoUser);
+    const userData = useSelector(selectUserData);
 
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [deletePassword, setDeletePassword] = useState<string>("");
     const [enteredNewUsername, setEnteredNewUsername] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
     const [enteredConfirmPassword, setEnteredConfirmPassword] = useState("");
-    
+
     const [newPasswordVisibility, setNewPasswordVisibility] = useState(false);
 
     /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
-        confirmPassInput: false
-    })
+        confirmPassInput: false,
+    });
 
-    // Store a property for each user of the theme
-    const [defaultTheme, setDefaultTheme] = useState("dark");
+    const [defaultTheme, setDefaultTheme] = useState<string>(
+        userData?.metadata?.defaultTheme ?? "dark"
+    );
 
-    const checkIfInputMatches = event => {
+    useEffect(() => {
+        if (userData?.metadata?.defaultTheme) {
+            console.log("Updating default theme in useEffect");
+            setDefaultTheme(userData.metadata.defaultTheme);
+        }
+    }, [userData]);
+
+    const checkIfInputMatches = (event) => {
         let updatedErrorText = { ...showErrorText };
-        updatedErrorText[event.target.name] = event.target.value !== newPassword;
+        updatedErrorText[event.target.name] =
+            event.target.value !== newPassword;
         setShowErrorText(updatedErrorText);
-    }
+    };
 
     /**
      * Update user's selected default theme
      */
     const handleDefaultTheme = async (event, newTheme) => {
-        console.log("Entering handleDefaultTheme");
+        try {
+            const { uuid } = userData;
+            /* Don't take any action if selected theme is the same */
+            if (!uuid || newTheme === null || newTheme === defaultTheme) {
+                return;
+            }
 
-        // TODO: Handling immediately changing based on selection
-        // if (theme === "dark" ) {
-        //     console.log("TOGGLING DARK MODE");
-        //     toggleDarkMode();
-        // }
-        setDefaultTheme(newTheme);
+            const themeUpdateResult = await axios.post(
+                "/api/users/updateDefaultTheme",
+                {
+                    uuid,
+                    newTheme,
+                }
+            );
+            console.log({ themeUpdateResult });
 
-        /* Update user database with the newly selected theme */
-        const uid = "";
-        const usersCollection = collection(database, "users");
-        const queryResult = query(usersCollection, where("uid", "==", uid));
-        const querySnapshot = await getDocs(queryResult);
-
-        const userDoc = querySnapshot.docs[0];
-        if (userDoc) {
-            const userRef = userDoc.ref;
-            updateDoc(userRef, {
-                defaultTheme: newTheme
-            });
+            const newUserData = {
+                ...userData,
+				metadata: {
+					...userData.metaadata,
+					defaultTheme: newTheme,
+				}
+            };
+			console.log({newUserData})
+            dispatch(setUserData(newUserData));
+        } catch (error) {
+            console.error("Error updating default theme");
         }
-    }
+    };
 
     const handleDeleteAccount = async () => {
-    }
+        // TODO
+    };
 
     /**
      * Change username for authenticated user
      */
     const handleChangeUsername = async () => {
- 
-    }
+        // TODO
+    };
 
     /**
      * Change user password if signed up with email / password
      */
     const handleChangePassword = () => {
-        if (newPassword !== enteredConfirmPassword) {
-            //TODO: Display alert
-        }
-
-        // console.log("user object = ", user);
-        // updatePassword(user, enteredNewPassword).then(() => {
-        //     // Update successful.
-        //     console.log("Successfully changed password")
-        // }).catch((error) => {
-        //     // An error ocurred
-        //     // ...
-        // });
-
-    }
+        // TODO
+    };
 
     const handleShowDeleteDialog = () => {
         setShowDeleteDialog(true);
-    }
+    };
 
     const handleCloseDeleteDialog = () => {
         setShowDeleteDialog(false);
-    }
-
-    // useEffect(() => {
-    //     console.log({ defaultTheme })
-    // }, [defaultTheme])
+    };
 
     if (!authenticated) {
         return <LoginMessage page="profile" />;
@@ -136,9 +152,7 @@ const Profile = props => {
                 <ProfileCard />
                 <ProfilePaper elevation={6}>
                     <ProfileContainer>
-                        <BoldHeading variant="h5">
-                            Profile
-                        </BoldHeading>
+                        <BoldHeading variant="h5">Profile</BoldHeading>
                         <ActionHeader>
                             <Palette />
                             <Typography variant="h6">Default Theme</Typography>
@@ -149,27 +163,24 @@ const Profile = props => {
                             onChange={handleDefaultTheme}
                             value={defaultTheme}
                         >
-                            <Tooltip
+                            <ToggleButton
+                                value={LIGHT}
                                 title="Switch default to Light mode"
-                                placement="bottom"
                             >
-                                <ToggleButton value={LIGHT}>
-                                    <LightMode />
-                                </ToggleButton>
-                            </Tooltip>
-                            <Tooltip
+                                <LightMode />
+                            </ToggleButton>
+                            <ToggleButton
+                                value={DARK}
                                 title="Switch default to Dark mode"
-                                placement="bottom"
                             >
-                                <ToggleButton value={DARK}>
-                                    <DarkMode />
-                                </ToggleButton>
-                            </Tooltip>
+                                <DarkMode />
+                            </ToggleButton>
                         </ToggleButtonGroup>
-
                         <ActionHeader>
                             <Person />
-                            <Typography variant="h6">Change Username</Typography>
+                            <Typography variant="h6">
+                                Change Username
+                            </Typography>
                         </ActionHeader>
                         <InfoChangeContainer>
                             <TextField
@@ -177,7 +188,9 @@ const Profile = props => {
                                 label="Username"
                                 placeholder="Enter new password"
                                 value={enteredNewUsername}
-                                onChange={e => setEnteredNewUsername(e.target.value)}
+                                onChange={(e) =>
+                                    setEnteredNewUsername(e.target.value)
+                                }
                                 size="small"
                             />
                             <Button
@@ -191,7 +204,9 @@ const Profile = props => {
 
                         <ActionHeader>
                             <Password />
-                            <Typography variant="h6">Change Password</Typography>
+                            <Typography variant="h6">
+                                Change Password
+                            </Typography>
                         </ActionHeader>
 
                         <InfoChangeContainer>
@@ -200,18 +215,29 @@ const Profile = props => {
                                     variant="standard"
                                     placeholder="Enter new password"
                                     label="Password"
-                                    type={newPasswordVisibility ? 'text' : 'password'}
+                                    type={
+                                        newPasswordVisibility
+                                            ? "text"
+                                            : "password"
+                                    }
                                     value={newPassword}
                                     name="passInput"
-                                    onChange={e => setNewPassword(e.target.value)}
+                                    onChange={(e) =>
+                                        setNewPassword(e.target.value)
+                                    }
                                     // error={showErrorText.passInput}
                                     size="small"
                                     InputProps={{
-                                        endAdornment:
+                                        endAdornment: (
                                             <PasswordToggle
-                                                passwordVisibility={newPasswordVisibility}
-                                                setPasswordVisibility={setNewPasswordVisibility}
+                                                passwordVisibility={
+                                                    newPasswordVisibility
+                                                }
+                                                setPasswordVisibility={
+                                                    setNewPasswordVisibility
+                                                }
                                             />
+                                        ),
                                     }}
                                 />
 
@@ -219,18 +245,31 @@ const Profile = props => {
                                     variant="standard"
                                     placeholder="Confirm new password"
                                     label="Confirm Password"
-                                    type={newPasswordVisibility ? 'text' : 'password'}
+                                    type={
+                                        newPasswordVisibility
+                                            ? "text"
+                                            : "password"
+                                    }
                                     value={newPassword}
                                     name="passInput"
-                                    onChange={e => setEnteredConfirmPassword(e.target.value)}
+                                    onChange={(e) =>
+                                        setEnteredConfirmPassword(
+                                            e.target.value
+                                        )
+                                    }
                                     // error={showErrorText.passInput}
                                     size="small"
                                     InputProps={{
-                                        endAdornment:
+                                        endAdornment: (
                                             <PasswordToggle
-                                                passwordVisibility={newPasswordVisibility}
-                                                setPasswordVisibility={setNewPasswordVisibility}
+                                                passwordVisibility={
+                                                    newPasswordVisibility
+                                                }
+                                                setPasswordVisibility={
+                                                    setNewPasswordVisibility
+                                                }
                                             />
+                                        ),
                                     }}
                                 />
                             </PasswordFieldsContainer>
@@ -238,10 +277,14 @@ const Profile = props => {
                             <Button
                                 variant="contained"
                                 onClick={() => handleChangePassword()}
-                                disabled={newPassword === "" || enteredConfirmPassword === "" || showErrorText.confirmPassInput}
+                                disabled={
+                                    newPassword === "" ||
+                                    enteredConfirmPassword === "" ||
+                                    showErrorText.confirmPassInput
+                                }
                                 sx={{
                                     backgroundColor: "orange",
-                                    color: theme.foreground
+                                    color: theme.foreground,
                                 }}
                             >
                                 Submit
@@ -269,7 +312,7 @@ const Profile = props => {
                 </ProfilePaper>
             </ProfilePage>
         </>
-    )
-}
+    );
+};
 
 export default Profile;
