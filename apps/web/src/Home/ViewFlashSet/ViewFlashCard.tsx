@@ -5,8 +5,15 @@ import { Star, StarBorder, VolumeUp} from "@mui/icons-material";
 import { SimpleFlexContainer } from "src/AppStyles";
 import { ViewFlashsetCard, ViewFlashCardActions, ViewCardInfo, ViewCardContainer } from "./ViewFlashSetStyles";
 
-const ViewFlashCard = props => {
-    const { cardInfo, disableTextColor, disableBackgroundColor, index } = props;
+type Props = {
+    cardInfo: any; // TODO: Type 
+    enableTextColor: boolean;
+    enableBackgroundColor: boolean;
+    index: number;
+}
+
+const ViewFlashCard = (props: Props) => {
+    const { cardInfo, enableTextColor, enableBackgroundColor, index } = props;
     const { isDarkMode, theme } = useTheme();
 
     const timeoutRef = useRef(null);
@@ -32,8 +39,7 @@ const ViewFlashCard = props => {
             elevation={6}
             key={index}
             style={{
-                backgroundColor: `${cardInfo?.backgroundColor && !disableBackgroundColor ? cardInfo.backgroundColor : ""}`,
-                // marginTop: `${index === 0 ? "5rem" : ""}`
+                backgroundColor: `${cardInfo?.backgroundColor && enableBackgroundColor ? cardInfo.backgroundColor : ""}`,
             }}
         >
             <SimpleFlexContainer>
@@ -64,7 +70,7 @@ const ViewFlashCard = props => {
                         <IconButton
                             onClick={() => alert("Not implemented yet")}
                         >
-                            <StarBorder/>
+                             <StarBorder/>
                         </IconButton>
                     </Tooltip>
                 </ViewFlashCardActions>
@@ -79,7 +85,7 @@ const ViewFlashCard = props => {
                     </Typography>
                     <Typography
                         sx={{
-                            color: `${cardInfo?.textColor && !disableTextColor ? cardInfo.textColor : ""}`,
+                            color: `${cardInfo?.textColor && enableTextColor ? cardInfo.textColor : ""}`,
                         }}
                     >
                         {cardInfo.term}
@@ -95,7 +101,7 @@ const ViewFlashCard = props => {
                     </Typography>
                     <Typography
                         sx={{
-                            color: `${cardInfo?.textColor && !disableTextColor ? cardInfo.textColor : ""}`,
+                            color: `${cardInfo?.textColor && enableTextColor ? cardInfo.textColor : ""}`,
                         }}
                     >
                         {cardInfo.definition}
