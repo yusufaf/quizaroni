@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { database } from "../firebase/firebase";
-import { query, where, collection, getDocs } from "firebase/firestore";
+
 import { Typography } from '@mui/material/';
 import { AddPhotoAlternate as AddPhotoIcon } from "@mui/icons-material";
 import { useTheme } from "../theme/useTheme";
@@ -11,11 +10,16 @@ import {
     UserInfoContainer,
     UserInfoHeading
 } from "./ProfileStyles"
+import { useSelector } from "react-redux";
+import { selectUserData } from "src/slices/globalSlice";
 
 const ProfileCard = props => {
     const { isDarkMode, theme } = useTheme();
 
+
+    const userData = useSelector(selectUserData);
     const profilePicRef = useRef(null);
+    console.log({userData})
 
     const [createdSetCount, setCreatedSetCount] = useState(0);
     const [createdDate, setCreatedDate] = useState("");
@@ -24,30 +28,10 @@ const ProfileCard = props => {
     const [username, setUsername] = useState("");
 
     useEffect(() => {
-        retrieveMetadata()
     }, [])
 
     const handleProfilePicture = () => {
 
-    }
-
-    const retrieveMetadata = async () => {
-        const uid = "";
-        const usersCollection = collection(database, "users");
-        const queryResult = query(usersCollection, where("uid", "==", uid));
-        const querySnapshot = await getDocs(queryResult);
-
-        const userDoc = querySnapshot.docs[0];
-        if (userDoc) {
-            const { creationDate, username } = userDoc.data();
-            setCreatedDate(creationDate);
-            setUsername(username);
-        }
-
-        const flashCollection = collection(database, "flashcards");
-        const flashQueryResult = query(flashCollection, where("uid", "==", uid));
-        const flashSnapshot = await getDocs(flashQueryResult);
-        setCreatedSetCount(flashSnapshot.docs.length);
     }
 
     return (
@@ -82,7 +66,7 @@ const ProfileCard = props => {
             </UserInfoContainer>
             <UserInfoContainer>
                 <UserInfoHeading>Account Created</UserInfoHeading>
-                <Typography>{createdDate}</Typography>
+                <Typography>{new Date(userData.createdAt).toLocaleDateString() ?? "N/A"}</Typography>
             </UserInfoContainer>
         </StyledProfileCard>
     )
