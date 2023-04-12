@@ -94,3 +94,8 @@ export const SET_METADATA_FIELDS = {
     BACKGROUND: "backgroundColorVisible",
     PUBLIC: "publiclyViewable",
 }
+
+export const DEFAULT_CATEGORIES = {
+    ALL: "ALL",
+    IMPORTANT: "IMPORTANT",
+};

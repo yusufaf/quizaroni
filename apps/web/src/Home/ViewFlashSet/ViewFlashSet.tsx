@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { Add, ArrowBack } from "@mui/icons-material/";
 import {
-    Add,
-    ArrowBack,
-} from "@mui/icons-material/";
-import {
+    Button,
     Chip,
     FormControl,
     IconButton,
@@ -26,6 +24,7 @@ import {
     DOWNLOAD_FILE_TYPES,
     STUDY_MODES,
     VIEW_SET,
+    DEFAULT_CATEGORIES
 } from "src/utilities/constants";
 import FlashcardsStudy from "./FlashcardsStudy";
 import { SimpleFlexContainer } from "src/AppStyles";
@@ -51,6 +50,7 @@ import {
 } from "src/slices/studysetsSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
+import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
 
 type Props = {};
 
@@ -91,12 +91,11 @@ const ViewFlashSet = (props: Props) => {
         DOWNLOAD_FILE_TYPES.TXT
     );
 
-    const TABS = {
-        ALL: "ALL",
-        IMPORTANT: "IMPORTANT",
-    };
+    const [showManageCategories, setShowManageCategories] = useState<boolean>(false);
+    const [newCategory, setNewCategory] = useState<string>("");
 
-    const [selectedTab, setSelectedTab] = useState(TABS.ALL);
+
+    const [selectedTab, setSelectedTab] = useState(DEFAULT_CATEGORIES.ALL);
 
     const arrowIconStyling = {
         "&.MuiIconButton-colorPrimary": {
@@ -179,7 +178,7 @@ const ViewFlashSet = (props: Props) => {
 
     const renderTabs = () => {
         /* TODO: Putting this in a render function because want a future functionality of custom tabs */
-        return Object.values(TABS).map((tab) => {
+        return Object.values(DEFAULT_CATEGORIES).map((tab) => {
             return <Tab label={tab} value={tab} />;
         });
     };
@@ -240,6 +239,14 @@ const ViewFlashSet = (props: Props) => {
     // )
     // :
 
+    const manageCategoriesProps = {
+        newCategory,
+        open: showManageCategories, 
+        setNewCategory,
+        setOpen: setShowManageCategories
+    }
+
+
     /* TODO: Fix the spacing between the ViewContainer and the (first) ViewCards */
     return (
         <ViewFlashsetPage>
@@ -270,9 +277,7 @@ const ViewFlashSet = (props: Props) => {
                             >
                                 {selectedStudySet?.title}
                             </Typography>
-                            <Typography
-                                variant="subtitle1"
-                            >
+                            <Typography variant="subtitle1">
                                 Created by {selectedStudySet?.username}
                             </Typography>
                             {/* <EditableTextField
@@ -291,9 +296,7 @@ const ViewFlashSet = (props: Props) => {
                                 }
                                 variant="outlined"
                             />
-                            <Typography
-                                variant="body1"
-                            >
+                            <Typography variant="body1">
                                 {selectedStudySet?.description}
                             </Typography>
                             {/* <Tooltip title="Create label" placement="right">
@@ -343,10 +346,19 @@ const ViewFlashSet = (props: Props) => {
                 {selectedStudySet?.cards?.length}
             </CardCount>
             <CardFiltersContainer>
-                <Tabs value={selectedTab} onChange={onTabChange}>
+                <Tabs
+                    value={selectedTab}
+                    onChange={onTabChange}
+                    scrollButtons="auto"
+                >
                     {renderTabs()}
                 </Tabs>
-
+                <Button 
+                    variant="outlined"
+                    onClick={() => setShowManageCategories(true)}
+                >
+                    Manage Categories
+                </Button>
                 {/* TODO: Sort dropdown for sorting the cards
                                 - Ideas/Notes: Maintain the index? Or is that confusing
                                 */}
@@ -381,6 +393,9 @@ const ViewFlashSet = (props: Props) => {
                 handleClose={() => setShowDownloadPopup(false)}
                 downloadFileType={downloadFileType}
                 setDownloadFileType={setDownloadFileType}
+            />
+            <ManageCategoriesDialog
+                {...manageCategoriesProps}
             />
         </ViewFlashsetPage>
     );

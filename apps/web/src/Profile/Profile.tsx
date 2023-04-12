@@ -70,10 +70,9 @@ const Profile = (props: Props) => {
 
     useEffect(() => {
         if (userData?.metadata?.defaultTheme) {
-            console.log("Updating default theme in useEffect");
             setDefaultTheme(userData.metadata.defaultTheme);
         }
-    }, [userData]);
+    }, []);
 
     const checkIfInputMatches = (event) => {
         let updatedErrorText = { ...showErrorText };
@@ -101,6 +100,8 @@ const Profile = (props: Props) => {
                 }
             );
             console.log({ themeUpdateResult });
+
+            setDefaultTheme(newTheme);
 
             const newUserData = {
                 ...userData,
