@@ -11,7 +11,7 @@ import {
     UserInfoHeading
 } from "./ProfileStyles"
 import { useSelector } from "react-redux";
-import { selectUserData } from "src/slices/globalSlice";
+import { selectUserData } from "src/state/slices/globalSlice";
 
 const ProfileCard = props => {
     const { isDarkMode, theme } = useTheme();

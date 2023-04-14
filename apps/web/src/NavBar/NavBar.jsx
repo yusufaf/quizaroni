@@ -10,7 +10,7 @@ import {
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { selectAuthenticated, setAlert, setAuthenticated } from "src/slices/globalSlice";
+import { selectAuthenticated, setAlert, setAuthenticated } from "src/state/slices/globalSlice";
 import ProfileDropdown from "../Profile/ProfileDropdown";
 import { useTheme } from "../theme/useTheme";
 import { ROUTES, SUCCESS } from "../utilities/constants";

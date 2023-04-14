@@ -8,7 +8,7 @@ import {
     DialogTitle
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { selectDialogOpen, setDialogOpen } from "src/slices/globalSlice";
+import { selectDialogOpen, setDialogOpen } from "src/state/slices/globalSlice";
 import styled from "@emotion/styled";
 
 const FeedbackDialog = props => {

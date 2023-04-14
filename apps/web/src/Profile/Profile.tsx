@@ -39,7 +39,7 @@ import {
     selectAuthenticated,
     selectUserData,
     setUserData,
-} from "src/slices/globalSlice";
+} from "src/state/slices/globalSlice";
 import axios from "axios";
 
 type Props = {};
