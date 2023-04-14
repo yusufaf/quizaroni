@@ -7,8 +7,8 @@ import {
     setAuthenticated,
     setCognitoUser,
     setUserData,
-} from "src/slices/globalSlice";
-import { setStudySets } from "src/slices/studysetsSlice";
+} from "src/state/slices/globalSlice";
+import { setStudySets } from "src/state/slices/studysetsSlice";
 
 const AuthProvider = ({ children }) => {
     const dispatch = useDispatch();

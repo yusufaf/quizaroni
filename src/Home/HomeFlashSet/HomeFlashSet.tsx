@@ -19,7 +19,7 @@ import {
 } from "../HomeStyles";
 import SetActionsMenu from "../SetActionsMenu";
 import { useDispatch } from 'react-redux';
-import { setSelectedStudySet } from 'src/slices/studysetsSlice';
+import { setSelectedStudySet } from 'src/state/slices/studysetsSlice';
 import { useNavigate } from 'react-router-dom';
 
 type Props = {

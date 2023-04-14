@@ -22,8 +22,8 @@ import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
 import ViewFlashSet from "./ViewFlashSet/ViewFlashSet";
 import { useDispatch, useSelector } from "react-redux";
-import { selectAuthenticated, selectUserData } from "src/slices/globalSlice";
-import { selectStudySets, setSelectedStudySet, setStudySets } from "src/slices/studysetsSlice";
+import { selectAuthenticated, selectUserData } from "src/state/slices/globalSlice";
+import { selectStudySets, setSelectedStudySet, setStudySets } from "src/state/slices/studysetsSlice";
 import axios from "axios";
 
 const Home = (props) => {

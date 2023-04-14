@@ -1,5 +1,5 @@
 import { styled } from "@mui/system";
-import { Box, Card, FormControl, Paper, Typography } from "@mui/material";
+import { Box, Card, FormControl, Paper, Tabs, Typography } from "@mui/material";
 import { BasePage, SpacedFlexContainer } from "src/AppStyles";
 
 
@@ -35,6 +35,10 @@ export const StudyModeGrid = styled(Box)({
     display: "grid",
     gridTemplateColumns: "15rem 15rem",
     gridTemplateRows: "auto auto",
+})
+
+export const CategoryTabs = styled(Tabs)({
+    maxWidth: "25rem",
 })
 
 export const CardCount = styled(Typography)({

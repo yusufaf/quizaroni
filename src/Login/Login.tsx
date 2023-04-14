@@ -20,8 +20,8 @@ import {
     setCognitoUser,
     setAuthenticated,
     setUserData,
-} from "src/slices/globalSlice";
-import { setStudySets } from "src/slices/studysetsSlice";
+} from "src/state/slices/globalSlice";
+import { setStudySets } from "src/state/slices/studysetsSlice";
 import { Auth } from "@aws-amplify/auth";
 import axios from "axios";
 
