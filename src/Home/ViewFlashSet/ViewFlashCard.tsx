@@ -13,7 +13,12 @@ type Props = {
 }
 
 const ViewFlashCard = (props: Props) => {
-    const { cardInfo, enableTextColor, enableBackgroundColor, index } = props;
+    const { 
+        cardInfo, 
+        enableTextColor, 
+        enableBackgroundColor,
+        index
+    } = props;
     const { isDarkMode, theme } = useTheme();
 
     const timeoutRef = useRef(null);

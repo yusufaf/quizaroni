@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Add, ArrowBack } from "@mui/icons-material/";
 import {
     Button,
@@ -24,7 +24,7 @@ import {
     DOWNLOAD_FILE_TYPES,
     STUDY_MODES,
     VIEW_SET,
-    DEFAULT_CATEGORIES
+    DEFAULT_CATEGORIES,
 } from "src/utilities/constants";
 import FlashcardsStudy from "./FlashcardsStudy";
 import { SimpleFlexContainer } from "src/AppStyles";
@@ -39,6 +39,7 @@ import {
     CardCount,
     SortCardsDropdown,
     CardFiltersContainer,
+    CategoryTabs
 } from "./ViewFlashSetStyles";
 import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
 import { useNavigate, useParams } from "react-router-dom";
@@ -47,7 +48,7 @@ import {
     selectStudySets,
     selectSelectedStudySet,
     setSelectedStudySet,
-} from "src/slices/studysetsSlice";
+} from "src/state/slices/studysetsSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
@@ -91,9 +92,8 @@ const ViewFlashSet = (props: Props) => {
         DOWNLOAD_FILE_TYPES.TXT
     );
 
-    const [showManageCategories, setShowManageCategories] = useState<boolean>(false);
-    const [newCategory, setNewCategory] = useState<string>("");
-
+    const [showManageCategories, setShowManageCategories] =
+        useState<boolean>(false);
 
     const [selectedTab, setSelectedTab] = useState(DEFAULT_CATEGORIES.ALL);
 
@@ -176,12 +176,16 @@ const ViewFlashSet = (props: Props) => {
         setSelectedTab(newTab);
     };
 
-    const renderTabs = () => {
-        /* TODO: Putting this in a render function because want a future functionality of custom tabs */
-        return Object.values(DEFAULT_CATEGORIES).map((tab) => {
+    const categoryTabs = useMemo(() => {
+        const jointCategories = [
+            ...Object.values(DEFAULT_CATEGORIES),
+            ...(selectedStudySet?.categories ?? []),
+        ];
+        return jointCategories.map((tab) => {
             return <Tab label={tab} value={tab} />;
         });
-    };
+    }, [selectedStudySet]);
+
 
     const handleBackClick = () => {
         navigate("/");
@@ -210,16 +214,8 @@ const ViewFlashSet = (props: Props) => {
         setShowCreateLabelDialog,
     };
 
-    /**
-     * Render the JSX for all the flash sets
-     */
-    const renderSetCards = () => {
-        if (!selectedStudySet) {
-            return;
-        }
-        const { cards } = selectedStudySet;
-
-        return cards.map((card, index) => {
+    const viewFlashCards = useMemo(() => {
+        return selectedStudySet?.cards.map((card, index) => {
             return (
                 <ViewFlashCard
                     key={card.uuid}
@@ -230,7 +226,7 @@ const ViewFlashSet = (props: Props) => {
                 />
             );
         });
-    };
+    }, [selectedStudySet]);
 
     /* TODO: Move this to separate route */
     // selectedStudyMode === STUDY_MODES.FLASHCARDS ?
@@ -240,12 +236,9 @@ const ViewFlashSet = (props: Props) => {
     // :
 
     const manageCategoriesProps = {
-        newCategory,
-        open: showManageCategories, 
-        setNewCategory,
-        setOpen: setShowManageCategories
-    }
-
+        open: showManageCategories,
+        setOpen: setShowManageCategories,
+    };
 
     /* TODO: Fix the spacing between the ViewContainer and the (first) ViewCards */
     return (
@@ -346,14 +339,15 @@ const ViewFlashSet = (props: Props) => {
                 {selectedStudySet?.cards?.length}
             </CardCount>
             <CardFiltersContainer>
-                <Tabs
+                <CategoryTabs
                     value={selectedTab}
                     onChange={onTabChange}
+                    variant="scrollable"
                     scrollButtons="auto"
                 >
-                    {renderTabs()}
-                </Tabs>
-                <Button 
+                    {categoryTabs}
+                </CategoryTabs>
+                <Button
                     variant="outlined"
                     onClick={() => setShowManageCategories(true)}
                 >
@@ -382,7 +376,7 @@ const ViewFlashSet = (props: Props) => {
             </CardFiltersContainer>
 
             {/* Container for the cards */}
-            {renderSetCards()}
+            {viewFlashCards}
             <CreateLabelDialog {...createLabelDialogProps} />
             <NotificationsDialog
                 open={showNotificationsModal}
@@ -394,9 +388,7 @@ const ViewFlashSet = (props: Props) => {
                 downloadFileType={downloadFileType}
                 setDownloadFileType={setDownloadFileType}
             />
-            <ManageCategoriesDialog
-                {...manageCategoriesProps}
-            />
+            <ManageCategoriesDialog {...manageCategoriesProps} />
         </ViewFlashsetPage>
     );
 };

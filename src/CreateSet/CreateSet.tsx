@@ -24,7 +24,7 @@ import {
     selectAuthenticated,
     selectCognitoUser,
     selectUserData,
-} from "src/slices/globalSlice";
+} from "src/state/slices/globalSlice";
 import axios from "axios";
 
 const EMPTY_CARD = {

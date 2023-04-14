@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
@@ -8,7 +7,7 @@ import AuthProvider from "./AuthProvider/AuthProvider";
 
 import "./index.css";
 import App from "./App";
-import store from "./store";
+import { store } from "./state/store";
 
 ReactDOM.render(
     <Provider store={store}>

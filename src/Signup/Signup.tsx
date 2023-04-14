@@ -15,7 +15,7 @@ import {
 } from "src/Login/LoginStyles";
 import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
 import { useDispatch } from "react-redux";
-import { setAlert, setCognitoUser } from "src/slices/globalSlice";
+import { setAlert, setCognitoUser } from "src/state/slices/globalSlice";
 import { Auth } from "@aws-amplify/auth";
 import axios from "axios";
 import PasswordValidator from "src/PasswordValidator/PasswordValidator";

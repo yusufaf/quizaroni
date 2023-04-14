@@ -27,3 +27,7 @@ export const CategoriesList = styled(List)({
 export const CategoryButtons = styled(SimpleFlexContainer)({
     gap: "0.5rem",
 });
+
+export const CategoryField = styled(TextField)({
+    marginTop: "1.25rem",
+})
