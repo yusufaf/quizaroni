@@ -12,7 +12,13 @@ import {
     Tabs,
     Tab,
 } from "@mui/material/";
-import React, { Dispatch, ReactNode, SetStateAction, useState } from "react";
+import {
+    Dispatch,
+    ReactNode,
+    SetStateAction,
+    useEffect,
+    useState,
+} from "react";
 import {
     CategoriesList,
     CategoryButtons,
@@ -26,13 +32,16 @@ import axios from "axios";
 const TABS = {
     CREATE: "CREATE",
     MANAGE: "MANAGE",
-    IMPORT: "IMPORT"
+    IMPORT: "IMPORT",
+};
+
+const ACTIONS = {
+    EDIT: "EDIT",
+    DELETE: "DELETE",
 };
 
 type Props = {
-    // newCategory: string;
     open: boolean;
-    // setNewCategory: Dispatch<SetStateAction<string>>;
     setOpen: Dispatch<SetStateAction<boolean>>;
 };
 
@@ -46,12 +55,13 @@ const ManageCategoriesDialog = (props: Props) => {
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
     const [errorInfo, setErrorInfo] = useState(null);
     const [categoryName, setCategoryName] = useState<string>("");
-
     const [editCategoryName, setEditCategoryName] = useState<string>("");
     const [editErrorInfo, setEditErrorInfo] = useState(null);
-    const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+    const [editIndex, setEditIndex] = useState<number | null>(null);
+    const [deleteIndices, setDeleteIndices] = useState<number[]>([]);
+    const [selectedAction, setSelectedAction] = useState<string | null>(null);
 
-    const onClose = () => {
+    const handleClose = () => {
         setOpen(false);
     };
 
@@ -62,7 +72,7 @@ const ManageCategoriesDialog = (props: Props) => {
     const onCreateCategoryChange = (e: any) => {
         const category = e.target.value;
         const isDuplicate = selectedStudySet.categories.includes(category);
-        setCategoryName(e.target.value);
+        setCategoryName(category);
         if (isDuplicate) {
             setErrorInfo({
                 helperText: "Category already exists",
@@ -73,19 +83,24 @@ const ManageCategoriesDialog = (props: Props) => {
     };
 
     const onEditCategoryChange = (e: any) => {
-        const category = e.target.value;
-        const allOtherCategories = [...selectedStudySet.categories].filter((_, index) => index != selectedIndex);
-        const isDuplicate = allOtherCategories.includes(category);
-        console.log({isDuplicate, allOtherCategories})
-        setEditCategoryName(e.target.value);
+        const newCategoryName = e.target.value;
+        const allOtherCategories = [...selectedStudySet.categories].filter(
+            (_, index) => index != editIndex
+        );
+        const isDuplicate = allOtherCategories.includes(newCategoryName);
+        setEditCategoryName(newCategoryName);
         if (isDuplicate) {
             setEditErrorInfo({
                 helperText: "Category already exists",
             });
+        } else if (!newCategoryName) {
+            setEditErrorInfo({
+                helperText: "Category name can't be empty",
+            });
         } else {
             setEditErrorInfo(null);
         }
-    }
+    };
 
     const handleCreate = async () => {
         try {
@@ -105,17 +120,85 @@ const ManageCategoriesDialog = (props: Props) => {
         }
     };
 
-    const handleEditClick = (index) => {
-        setSelectedIndex(index)
+    const handleEditClick = (index: number) => {
+        setDeleteIndices([]);
+        setSelectedAction(ACTIONS.EDIT);
+        setEditIndex(index);
         setEditCategoryName(selectedStudySet.categories[index]);
-    }
+    };
+
+    const handleDeleteClick = (index: number) => {
+        setEditIndex(null);
+        setEditCategoryName("");
+        setEditErrorInfo(null);
+
+        setSelectedAction(ACTIONS.DELETE);
+        if (deleteIndices.includes(index)) {
+            setDeleteIndices(deleteIndices.filter((value) => value !== index));
+        } else {
+            setDeleteIndices(deleteIndices.concat(index));
+        }
+    };
+
+    const handleEditOrDelete = async () => {
+        try {
+            const { categories, uuid } = selectedStudySet;
+            /* Don't need to check categories cause they're paired */
+            if (!uuid) {
+                return;
+            }
+
+            if (selectedAction === ACTIONS.EDIT) {
+                const selectedCategoryName = categories[editIndex];
+                /* Don't make network call if it's unchanged */
+                if (editCategoryName === selectedCategoryName) {
+                    return;
+                }
+
+                const response = await axios.post(
+                    "/api/studysets/editCategory",
+                    {
+                        uuid,
+                        index: editIndex,
+                        newCategory: editCategoryName,
+                    }
+                );
+                console.log({ response });
+            } else if (selectedAction === ACTIONS.DELETE) {
+                for (const index of deleteIndices) {
+                    const categoryToDelete = categories[index];
+                    const response = await axios.post(
+                        "/api/studysets/deleteCategory",
+                        {
+                            uuid,
+                            categoryToDelete,
+                        }
+                    );
+                    console.log({ response });
+                }
+            }
+            /* TODO: Show a toast notification? */
+        } catch (error) {
+            console.error(error);
+        } finally {
+            /* Clear relevant state */
+            if (selectedAction === ACTIONS.EDIT) {
+                setEditIndex(null);
+                setEditCategoryName("");
+            } else {
+                setDeleteIndices([]);
+            }
+            setSelectedAction(null);
+        }
+    };
 
     const isCreateTab = selectedTab === TABS.CREATE;
     const title = isCreateTab ? "Create" : "Manage";
 
     const renderListItems = (): ReactNode[] => {
         return selectedStudySet?.categories?.map((value, index) => {
-            const isSelected = selectedIndex === index;
+            const isEditSelected = editIndex === index;
+            const isDeleteSelected = deleteIndices.includes(index);
             return (
                 <ListItem
                     divider={index !== 1}
@@ -123,17 +206,31 @@ const ManageCategoriesDialog = (props: Props) => {
                     secondaryAction={
                         !isCreateTab && (
                             <CategoryButtons>
-                                <IconButton 
-                                    edge="end" 
+                                <IconButton
+                                    edge="end"
                                     aria-label="edit"
                                     onClick={() => handleEditClick(index)}
                                 >
-                                    <Edit 
-                                        color={isSelected ? "primary" : undefined}
+                                    <Edit
+                                        color={
+                                            isEditSelected
+                                                ? "primary"
+                                                : undefined
+                                        }
                                     />
                                 </IconButton>
-                                <IconButton edge="end" aria-label="delete">
-                                    <Delete />
+                                <IconButton
+                                    edge="end"
+                                    aria-label="delete"
+                                    onClick={() => handleDeleteClick(index)}
+                                >
+                                    <Delete
+                                        color={
+                                            isDeleteSelected
+                                                ? "primary"
+                                                : undefined
+                                        }
+                                    />
                                 </IconButton>
                             </CategoryButtons>
                         )
@@ -146,7 +243,7 @@ const ManageCategoriesDialog = (props: Props) => {
     };
 
     return (
-        <StyledDialog open={open} onClose={onClose}>
+        <StyledDialog open={open} onClose={handleClose}>
             <DialogTitle> {title} Categories</DialogTitle>
             <DialogContent>
                 <Tabs
@@ -179,7 +276,7 @@ const ManageCategoriesDialog = (props: Props) => {
                         helperText={editErrorInfo?.helperText ?? ""}
                         fullWidth
                         value={editCategoryName}
-                        disabled={selectedIndex === null}
+                        disabled={editIndex === null}
                         onChange={onEditCategoryChange}
                     />
                 )}
@@ -189,7 +286,7 @@ const ManageCategoriesDialog = (props: Props) => {
                 </Paper>
             </DialogContent>
             <DialogActions>
-                <Button variant="outlined" onClick={onClose}>
+                <Button variant="outlined" onClick={handleClose}>
                     Close
                 </Button>
                 {isCreateTab ? (
@@ -201,13 +298,22 @@ const ManageCategoriesDialog = (props: Props) => {
                         Create
                     </Button>
                 ) : (
-                    <Button 
-                        variant="contained" 
-                        onClick={onClose}
-                        
-                    >
-                        Save
-                    </Button>
+                    selectedAction && (
+                        <Button
+                            variant="contained"
+                            onClick={handleEditOrDelete}
+                            disabled={
+                                (selectedAction === ACTIONS.EDIT &&
+                                    editErrorInfo) ||
+                                (selectedAction === ACTIONS.DELETE &&
+                                    !deleteIndices.length)
+                            }
+                        >
+                            {selectedAction === ACTIONS.EDIT
+                                ? "Save Edit"
+                                : `Delete (${deleteIndices.length})`}
+                        </Button>
+                    )
                 )}
             </DialogActions>
         </StyledDialog>
