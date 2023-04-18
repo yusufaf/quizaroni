@@ -8,6 +8,7 @@ import {
     InputLabel,
     MenuItem,
     Select,
+    SelectChangeEvent,
     Tab,
     Tabs,
     Tooltip,
@@ -39,7 +40,7 @@ import {
     CardCount,
     SortCardsDropdown,
     CardFiltersContainer,
-    CategoryTabs
+    CategoryTabs,
 } from "./ViewFlashSetStyles";
 import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
 import { useNavigate, useParams } from "react-router-dom";
@@ -71,10 +72,8 @@ const ViewFlashSet = (props: Props) => {
 
     const [showNotificationsModal, setShowNotificationsModal] = useState(false);
     const [showControlMenu, setShowControlMenu] = useState(false);
-
     const [showCreateLabelDialog, setShowCreateLabelDialog] = useState(false);
     const [createLabelName, setCreateLabelName] = useState("");
-
     const [enableTextColor, setEnableTextColor] = useState(
         selectedStudySet?.metadata?.textColorVisible ?? false
     );
@@ -91,11 +90,10 @@ const ViewFlashSet = (props: Props) => {
     const [downloadFileType, setDownloadFileType] = useState(
         DOWNLOAD_FILE_TYPES.TXT
     );
-
     const [showManageCategories, setShowManageCategories] =
         useState<boolean>(false);
-
     const [selectedTab, setSelectedTab] = useState(DEFAULT_CATEGORIES.ALL);
+    const [selectedSort, setSelectedSort] = useState<string>("");
 
     const arrowIconStyling = {
         "&.MuiIconButton-colorPrimary": {
@@ -176,6 +174,10 @@ const ViewFlashSet = (props: Props) => {
         setSelectedTab(newTab);
     };
 
+    const onSortChange = (event: SelectChangeEvent<string>) => {
+        setSelectedSort(event.target.value);
+    };
+
     const categoryTabs = useMemo(() => {
         const jointCategories = [
             ...Object.values(DEFAULT_CATEGORIES),
@@ -185,7 +187,6 @@ const ViewFlashSet = (props: Props) => {
             return <Tab label={tab} value={tab} />;
         });
     }, [selectedStudySet]);
-
 
     const handleBackClick = () => {
         navigate("/");
@@ -247,21 +248,13 @@ const ViewFlashSet = (props: Props) => {
                 <ViewFlashsetContainer>
                     <ViewFlashsetHeader>
                         <SetInfo>
-                            <SimpleFlexContainer>
-                                <IconButton
-                                    color="primary"
-                                    aria-label="arrow backward"
-                                    component="span"
-                                    sx={arrowIconStyling}
-                                    onClick={handleBackClick}
-                                >
-                                    <ArrowBack />
-                                </IconButton>
-                                <Typography component="span">
-                                    Back to Your Flashsets
-                                </Typography>
-                            </SimpleFlexContainer>
+                            <Button
+                                onClick={handleBackClick}
+                                startIcon={<ArrowBack sx={arrowIconStyling} />}
+                            >
+                                                                    Back to Your Flashsets
 
+                            </Button>
                             <Typography
                                 variant="h5"
                                 sx={{
@@ -353,24 +346,22 @@ const ViewFlashSet = (props: Props) => {
                 >
                     Manage Categories
                 </Button>
-                {/* TODO: Sort dropdown for sorting the cards
-                                - Ideas/Notes: Maintain the index? Or is that confusing
-                                */}
                 <SortCardsDropdown>
+                    {/* TODO: Fix label */}
                     <InputLabel id="sort-label">Sort</InputLabel>
                     <Select
                         labelId="sort-label"
-                        // value={}
-                        // onChange={handleChange}
+                        value={selectedSort}
+                        onChange={onSortChange}
                         autoWidth
-                        label="Age"
                     >
                         <MenuItem value="">
                             <em>None</em>
                         </MenuItem>
-                        <MenuItem value={10}>Twenty</MenuItem>
-                        <MenuItem value={21}>Twenty one</MenuItem>
-                        <MenuItem value={22}>Twenty one and a half</MenuItem>
+                        <MenuItem value={10}>Alphabetical - Term</MenuItem>
+                        <MenuItem value={10}>
+                            Alphabetical - Definition
+                        </MenuItem>
                     </Select>
                 </SortCardsDropdown>
             </CardFiltersContainer>
