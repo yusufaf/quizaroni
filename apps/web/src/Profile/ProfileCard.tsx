@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react";
-
 import { Typography } from '@mui/material/';
 import { AddPhotoAlternate as AddPhotoIcon } from "@mui/icons-material";
 import { useTheme } from "../theme/useTheme";
@@ -12,20 +11,16 @@ import {
 } from "./ProfileStyles"
 import { useSelector } from "react-redux";
 import { selectUserData } from "src/state/slices/globalSlice";
+import { selectStudySets } from "src/state/slices/studysetsSlice";
 
 const ProfileCard = props => {
     const { isDarkMode, theme } = useTheme();
 
-
     const userData = useSelector(selectUserData);
+    const studySets = useSelector(selectStudySets);
+
     const profilePicRef = useRef(null);
     console.log({userData})
-
-    const [createdSetCount, setCreatedSetCount] = useState(0);
-    const [createdDate, setCreatedDate] = useState("");
-
-    // TODO: Should this go to the parent component to change based if user changes username in main container
-    const [username, setUsername] = useState("");
 
     useEffect(() => {
     }, [])
@@ -58,11 +53,11 @@ const ProfileCard = props => {
             </ProfilePicture>
             <UserInfoContainer>
                 <UserInfoHeading>Username</UserInfoHeading>
-                <Typography>{username}</Typography>
+                <Typography>{userData?.username ?? "N/A"}</Typography>
             </UserInfoContainer>
             <UserInfoContainer>
                 <UserInfoHeading># of Flashsets Created</UserInfoHeading>
-                <Typography>{createdSetCount}</Typography>
+                <Typography>{studySets?.length ?? 0}</Typography>
             </UserInfoContainer>
             <UserInfoContainer>
                 <UserInfoHeading>Account Created</UserInfoHeading>
