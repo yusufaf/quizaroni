@@ -1,26 +1,32 @@
-import { useRef } from "react"
+import { useRef } from "react";
 import { useTheme } from "../../theme/useTheme";
-import { IconButton, Tooltip, Typography } from '@mui/material/';
-import { Star, StarBorder, VolumeUp} from "@mui/icons-material";
+import { IconButton, Tooltip, Typography } from "@mui/material/";
+import { Star, StarBorder, VolumeUp } from "@mui/icons-material";
 import { SimpleFlexContainer } from "src/AppStyles";
-import { ViewFlashsetCard, ViewFlashCardActions, ViewCardInfo, ViewCardContainer } from "./ViewFlashSetStyles";
+import {
+    ViewFlashsetCard,
+    ViewFlashCardActions,
+    ViewCardInfo,
+    ViewCardContainer,
+} from "./ViewFlashSetStyles";
+import axios from "axios";
 
 type Props = {
-    cardInfo: any; // TODO: Type 
+    card: any; // TODO: Type
     enableTextColor: boolean;
     enableBackgroundColor: boolean;
     index: number;
-}
+};
 
 const ViewFlashCard = (props: Props) => {
     const { 
-        cardInfo, 
+        card, 
         enableTextColor, 
         enableBackgroundColor,
-        index
+        index 
     } = props;
-    const { isDarkMode, theme } = useTheme();
 
+    const { isDarkMode, theme } = useTheme();
     const timeoutRef = useRef(null);
 
     // TODO: Adjust to clear timeout / reset if clicked multiple times
@@ -29,93 +35,105 @@ const ViewFlashCard = (props: Props) => {
         //     clearTimeout(timeoutRef.current)
         // }
         const audio = new SpeechSynthesisUtterance();
-        audio.text = cardInfo.term;
+        audio.text = card.term;
         window.speechSynthesis.speak(audio);
         // Wait half a second before speaking of definition
         timeoutRef.current = setTimeout(() => {
-            audio.text = cardInfo.definition;
+            audio.text = card.definition;
             window.speechSynthesis.speak(audio);
-        }, 500)
+        }, 500);
         // timeoutRef.current = "";
-    }
+    };
+
+    const handleMarkAsImportant = async () => {
+        try {
+            const { uuid } = card;
+            const response = await axios.post(
+                `/api/studysets/markCardAsImportant`,
+                {
+                    uuid,
+                    newValue: true,
+                }
+            );
+            console.log({ response });
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <ViewFlashsetCard
             elevation={6}
             key={index}
             style={{
-                backgroundColor: `${cardInfo?.backgroundColor && enableBackgroundColor ? cardInfo.backgroundColor : ""}`,
+                backgroundColor: `${
+                    card?.backgroundColor && enableBackgroundColor
+                        ? card.backgroundColor
+                        : ""
+                }`,
             }}
         >
             <SimpleFlexContainer>
                 <Typography
                     variant="h5"
                     sx={{
-                        fontWeight: "bold"
+                        fontWeight: "bold",
                     }}
                 >
                     Card {index + 1}
                 </Typography>
 
                 <ViewFlashCardActions>
-                    <Tooltip
-                        title="Play TTS"
-                        placement="top"
-                    >
-                        <IconButton
-                            onClick={handleAudioPlayback}
-                        >
-                            <VolumeUp/>
+                    <Tooltip title="Play TTS" placement="top">
+                        <IconButton onClick={handleAudioPlayback}>
+                            <VolumeUp />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip
-                        title="Mark as important"
-                        placement="top"
-                    >
-                        <IconButton
-                            onClick={() => alert("Not implemented yet")}
-                        >
-                             <StarBorder/>
+                    <Tooltip title="Mark as important" placement="top">
+                        <IconButton onClick={handleMarkAsImportant}>
+                            {card.important ? <Star /> : <StarBorder />}
                         </IconButton>
                     </Tooltip>
                 </ViewFlashCardActions>
             </SimpleFlexContainer>
             <ViewCardContainer>
                 <ViewCardInfo>
-                    <Typography
-                        variant="h6"
-                        color="primary"
-                    >
+                    <Typography variant="h6" color="primary">
                         Term
                     </Typography>
                     <Typography
                         sx={{
-                            color: `${cardInfo?.textColor && enableTextColor ? cardInfo.textColor : ""}`,
+                            color: `${
+                                card?.textColor && enableTextColor
+                                    ? card.textColor
+                                    : ""
+                            }`,
                         }}
                     >
-                        {cardInfo.term}
+                        {card.term}
                     </Typography>
                     {/* TODO: Term image */}
                 </ViewCardInfo>
                 <ViewCardInfo>
-                    <Typography
-                        variant="h6"
-                        color="primary"
-                    >
+                    <Typography variant="h6" color="primary">
                         Definition
                     </Typography>
                     <Typography
                         sx={{
-                            color: `${cardInfo?.textColor && enableTextColor ? cardInfo.textColor : ""}`,
+                            color: `${
+                                card?.textColor && enableTextColor
+                                    ? card.textColor
+                                    : ""
+                            }`,
                         }}
                     >
-                        {cardInfo.definition}
+                        {card.definition}
                     </Typography>
                     {/* TODO: Definition image */}
                 </ViewCardInfo>
             </ViewCardContainer>
         </ViewFlashsetCard>
-    )
-}
+    );
+};
 
 export default ViewFlashCard;

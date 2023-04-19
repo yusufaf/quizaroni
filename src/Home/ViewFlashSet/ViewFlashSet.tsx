@@ -97,7 +97,8 @@ const ViewFlashSet = (props: Props) => {
     const [downloadFileType, setDownloadFileType] = useState(
         DOWNLOAD_FILE_TYPES.TXT
     );
-    const [showManageCategories, setShowManageCategories] = useState<boolean>(false);
+    const [showManageCategories, setShowManageCategories] =
+        useState<boolean>(false);
     const [selectedTab, setSelectedTab] = useState(DEFAULT_CATEGORIES.ALL);
 
     const [selectedSort, setSelectedSort] = useState<string>("");
@@ -233,9 +234,10 @@ const ViewFlashSet = (props: Props) => {
         setShowCreateLabelDialog,
     };
 
+    /* Sorting */
     const sortedViewFlashCards = useMemo(() => {
         const sortModifier = sortDirection === SORT_DIRECTIONS.ASC ? 1 : -1;
-        const sortedCards = [...selectedStudySet?.cards];
+        const sortedCards = [...(selectedStudySet?.cards ?? [])];
         if (selectedSort) {
             sortedCards.sort((a, b) => {
                 if (a[selectedSort] < b[selectedSort]) {
@@ -252,7 +254,7 @@ const ViewFlashSet = (props: Props) => {
             return (
                 <ViewFlashCard
                     key={card.uuid}
-                    cardInfo={card}
+                    card={card}
                     index={index}
                     enableTextColor={enableTextColor}
                     enableBackgroundColor={enableBackgroundColor}
@@ -266,6 +268,19 @@ const ViewFlashSet = (props: Props) => {
         enableTextColor,
         enableBackgroundColor,
     ]);
+
+    /* Filtering */
+    const filteredViewFlashCards = useMemo(() => {
+        switch (selectedTab) {
+            case DEFAULT_CATEGORIES.ALL:
+                return sortedViewFlashCards;
+            case DEFAULT_CATEGORIES.IMPORTANT:
+                return [...sortedViewFlashCards].filter((value) => {
+                    console.log({ value });
+                    return value.props.card.important;
+                });
+        }
+    }, [selectedTab, sortedViewFlashCards]);
 
     /* TODO: Move this to separate route */
     // selectedStudyMode === STUDY_MODES.FLASHCARDS ?
@@ -422,7 +437,7 @@ const ViewFlashSet = (props: Props) => {
             </CardFiltersContainer>
 
             {/* Container for the cards */}
-            {sortedViewFlashCards}
+            {filteredViewFlashCards}
             <CreateLabelDialog {...createLabelDialogProps} />
             <NotificationsDialog
                 open={showNotificationsModal}
