@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Add, ArrowBack } from "@mui/icons-material/";
+import {
+    Add,
+    ArrowBack,
+    ArrowDownward,
+    ArrowUpward,
+} from "@mui/icons-material/";
 import {
     Button,
     Chip,
@@ -26,6 +31,7 @@ import {
     STUDY_MODES,
     VIEW_SET,
     DEFAULT_CATEGORIES,
+    SORT_DIRECTIONS,
 } from "src/utilities/constants";
 import FlashcardsStudy from "./FlashcardsStudy";
 import { SimpleFlexContainer } from "src/AppStyles";
@@ -53,13 +59,14 @@ import {
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
+import { SortDirection } from "src/lib/types";
 
 type Props = {};
 
 const ViewFlashSet = (props: Props) => {
     const {} = props;
 
-    const { isDarkMode, toggleDarkMode, theme } = useTheme();
+    const { isDarkMode, theme } = useTheme();
 
     const navigate = useNavigate();
 
@@ -90,10 +97,13 @@ const ViewFlashSet = (props: Props) => {
     const [downloadFileType, setDownloadFileType] = useState(
         DOWNLOAD_FILE_TYPES.TXT
     );
-    const [showManageCategories, setShowManageCategories] =
-        useState<boolean>(false);
+    const [showManageCategories, setShowManageCategories] = useState<boolean>(false);
     const [selectedTab, setSelectedTab] = useState(DEFAULT_CATEGORIES.ALL);
+
     const [selectedSort, setSelectedSort] = useState<string>("");
+    const [sortDirection, setSortDirection] = useState<SortDirection>(
+        SORT_DIRECTIONS.ASC
+    );
 
     const arrowIconStyling = {
         "&.MuiIconButton-colorPrimary": {
@@ -188,6 +198,14 @@ const ViewFlashSet = (props: Props) => {
         });
     }, [selectedStudySet]);
 
+    const toggleSortDirection = () => {
+        const newSortDirection =
+            sortDirection === SORT_DIRECTIONS.ASC
+                ? SORT_DIRECTIONS.DSC
+                : SORT_DIRECTIONS.ASC;
+        setSortDirection(newSortDirection);
+    };
+
     const handleBackClick = () => {
         navigate("/");
     };
@@ -215,8 +233,22 @@ const ViewFlashSet = (props: Props) => {
         setShowCreateLabelDialog,
     };
 
-    const viewFlashCards = useMemo(() => {
-        return selectedStudySet?.cards.map((card, index) => {
+    const sortedViewFlashCards = useMemo(() => {
+        const sortModifier = sortDirection === SORT_DIRECTIONS.ASC ? 1 : -1;
+        const sortedCards = [...selectedStudySet?.cards];
+        if (selectedSort) {
+            sortedCards.sort((a, b) => {
+                if (a[selectedSort] < b[selectedSort]) {
+                    return -1 * sortModifier;
+                }
+                if (a[selectedSort] > b[selectedSort]) {
+                    return 1 * sortModifier;
+                }
+                return 0;
+            });
+        }
+
+        return sortedCards?.map((card, index) => {
             return (
                 <ViewFlashCard
                     key={card.uuid}
@@ -227,7 +259,13 @@ const ViewFlashSet = (props: Props) => {
                 />
             );
         });
-    }, [selectedStudySet]);
+    }, [
+        selectedStudySet,
+        selectedSort,
+        sortDirection,
+        enableTextColor,
+        enableBackgroundColor,
+    ]);
 
     /* TODO: Move this to separate route */
     // selectedStudyMode === STUDY_MODES.FLASHCARDS ?
@@ -252,8 +290,7 @@ const ViewFlashSet = (props: Props) => {
                                 onClick={handleBackClick}
                                 startIcon={<ArrowBack sx={arrowIconStyling} />}
                             >
-                                                                    Back to Your Flashsets
-
+                                Back to Your Flashsets
                             </Button>
                             <Typography
                                 variant="h5"
@@ -346,28 +383,46 @@ const ViewFlashSet = (props: Props) => {
                 >
                     Manage Categories
                 </Button>
-                <SortCardsDropdown>
-                    {/* TODO: Fix label */}
-                    <InputLabel id="sort-label">Sort</InputLabel>
-                    <Select
-                        labelId="sort-label"
-                        value={selectedSort}
-                        onChange={onSortChange}
-                        autoWidth
+                <SimpleFlexContainer>
+                    <IconButton
+                        color="primary"
+                        onClick={toggleSortDirection}
+                        title="Sort Direction"
                     >
-                        <MenuItem value="">
-                            <em>None</em>
-                        </MenuItem>
-                        <MenuItem value={10}>Alphabetical - Term</MenuItem>
-                        <MenuItem value={10}>
-                            Alphabetical - Definition
-                        </MenuItem>
-                    </Select>
-                </SortCardsDropdown>
+                        {sortDirection === SORT_DIRECTIONS.ASC ? (
+                            <ArrowUpward />
+                        ) : (
+                            <ArrowDownward />
+                        )}
+                    </IconButton>
+                    <SortCardsDropdown>
+                        {/* TODO: Fix label */}
+                        <InputLabel id="sort-label">Sort</InputLabel>
+                        <Select
+                            labelId="sort-label"
+                            value={selectedSort}
+                            onChange={onSortChange}
+                            autoWidth
+                        >
+                            <MenuItem value="">
+                                <em>None</em>
+                            </MenuItem>
+                            <MenuItem value={"term"}>
+                                Alphabetical - Term
+                            </MenuItem>
+                            <MenuItem value={"definition"}>
+                                Alphabetical - Definition
+                            </MenuItem>
+                            <MenuItem value={"label"}>
+                                Alphabetical - Label
+                            </MenuItem>
+                        </Select>
+                    </SortCardsDropdown>
+                </SimpleFlexContainer>
             </CardFiltersContainer>
 
             {/* Container for the cards */}
-            {viewFlashCards}
+            {sortedViewFlashCards}
             <CreateLabelDialog {...createLabelDialogProps} />
             <NotificationsDialog
                 open={showNotificationsModal}
