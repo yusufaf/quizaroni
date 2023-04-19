@@ -1,3 +1,5 @@
+import { SortDirection } from "src/lib/types";
+
 export const LIGHT = "light";
 export const DARK = "dark";
 
@@ -98,4 +100,9 @@ export const SET_METADATA_FIELDS = {
 export const DEFAULT_CATEGORIES = {
     ALL: "ALL",
     IMPORTANT: "IMPORTANT",
+};
+
+export const SORT_DIRECTIONS: { [key: string]: SortDirection } = {
+    ASC: "asc",
+    DSC: "dsc",
 };
