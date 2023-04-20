@@ -1,13 +1,28 @@
-
-import { FormControlLabel, IconButton, Menu, MenuItem, Switch, Typography } from '@mui/material/';
-import { Download, EditNotifications, MenuOpen } from '@mui/icons-material/';
-import { 
-    DISABLED, 
+import {
+    Button,
+    FormControlLabel,
+    IconButton,
+    Menu,
+    MenuItem,
+    Switch,
+    Typography,
+    Tooltip,
+    Paper,
+} from "@mui/material/";
+import {
+    Download,
+    Edit,
+    EditNotifications,
+    MenuOpen,
+} from "@mui/icons-material/";
+import {
+    DISABLED,
     ENABLED,
-    SET_METADATA_FIELDS
+    SET_METADATA_FIELDS,
 } from "src/utilities/constants";
 import { useTheme } from "src/theme/useTheme";
-
+import { ActionButtonsRow } from "../ViewFlashSetStyles";
+import { useNavigate, useParams } from "react-router-dom";
 
 type Props = {
     controlAnchorRef: any;
@@ -23,7 +38,7 @@ type Props = {
     setStudySetViewable: any;
     showControlMenu: any;
     studySetViewable: any;
-}
+};
 
 const ActionsSection = (props: Props) => {
     const {
@@ -42,89 +57,78 @@ const ActionsSection = (props: Props) => {
         studySetViewable,
     } = props;
 
-    console.log({metadata});
+    console.log({ metadata });
 
     const { theme } = useTheme();
+    const navigate = useNavigate();
+    const {id: studysetId} = useParams();
 
     const handleOpenControlMenu = () => {
         setShowControlMenu(true);
-    }
+    };
 
     const handleCloseControlMenu = () => {
         setShowControlMenu(false);
-    }
+    };
 
     const updateMetadataState = (property: string) => {
         let newValue;
         let setStateCallback;
         switch (property) {
             case SET_METADATA_FIELDS.TEXT:
-                newValue = !enableTextColor
+                newValue = !enableTextColor;
                 setStateCallback = setEnableTextColor;
                 break;
             case SET_METADATA_FIELDS.BACKGROUND:
-                newValue = !enableBackgroundColor
+                newValue = !enableBackgroundColor;
                 setStateCallback = setEnableBackgroundColor;
                 break;
             case SET_METADATA_FIELDS.PUBLIC:
-                newValue = !studySetViewable
+                newValue = !studySetViewable;
                 setStateCallback = setStudySetViewable;
                 break;
         }
         setStateCallback(newValue);
         updateMetadataField(property, newValue);
+    };
+
+    const handleEditClick = () => {
+        navigate(`/edit/${studysetId}`);
     }
 
     return (
         <>
-            <div style={{ marginTop: "1rem" }}>
-                <IconButton
-                    onClick={() => setShowDownloadPopup(true)}
-                    sx={{
-                        padding: "0.75rem"
-                    }}
-                >
-                    <Download />
-                </IconButton>
-                <Typography
-                    component="span"
-                >
-                    Download
-                </Typography>
-            </div>
-            <div>
-                <IconButton
-                    onClick={() => setShowNotificationsModal(true)}
-                    sx={{
-                        padding: "0.75rem"
-                    }}
-                >
-                    <EditNotifications />
-                </IconButton>
-                <Typography
-                    component="span"
-                >
-                    Manage Notifications
-                </Typography>
-            </div>
-            <div
-                ref={controlAnchorRef}
-            >
-                <IconButton
-                    onClick={handleOpenControlMenu}
-                    sx={{
-                        padding: "0.75rem"
-                    }}
-                >
-                    <MenuOpen />
-                </IconButton>
+            <ActionButtonsRow >
+                <Tooltip title="Edit Study Set">
+                    <IconButton color="primary"
+                        onClick={handleEditClick}
+                    >
+                        <Edit />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Download">
+                    <IconButton
+                        onClick={() => setShowDownloadPopup(true)}
+                        color="primary"
+                    >
+                        <Download />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Manage Notifications">
+                    <IconButton
+                        onClick={() => setShowNotificationsModal(true)}
+                        color="primary"
+                    >
+                        <EditNotifications />
+                    </IconButton>
+                </Tooltip>
 
-                <Typography
-                    component="span"
-                >
-                    Control Menu
-                </Typography>
-            </div>
+                <Tooltip title="Control Menu" ref={controlAnchorRef}>
+                    <IconButton onClick={handleOpenControlMenu} color="primary">
+                        <MenuOpen />
+                    </IconButton>
+                </Tooltip>
+            </ActionButtonsRow>
             <Menu
                 open={showControlMenu}
                 onClose={handleCloseControlMenu}
@@ -136,15 +140,24 @@ const ActionsSection = (props: Props) => {
                             <Switch
                                 size="small"
                                 checked={enableTextColor}
-                                onChange={() => updateMetadataState(SET_METADATA_FIELDS.TEXT)}
+                                onChange={() =>
+                                    updateMetadataState(
+                                        SET_METADATA_FIELDS.TEXT
+                                    )
+                                }
                             />
-                        } label={
+                        }
+                        label={
                             <Typography
                                 sx={{
-                                    color: enableTextColor ? theme.palette.success.main : theme.palette.error.main 
+                                    color: enableTextColor
+                                        ? theme.palette.success.main
+                                        : theme.palette.error.main,
                                 }}
                             >
-                                {`Text Color: ${enableTextColor ? ENABLED : DISABLED}`}
+                                {`Text Color: ${
+                                    enableTextColor ? ENABLED : DISABLED
+                                }`}
                             </Typography>
                         }
                     />
@@ -155,41 +168,59 @@ const ActionsSection = (props: Props) => {
                             <Switch
                                 size="small"
                                 checked={enableBackgroundColor}
-                                onChange={() => updateMetadataState(SET_METADATA_FIELDS.BACKGROUND)}
+                                onChange={() =>
+                                    updateMetadataState(
+                                        SET_METADATA_FIELDS.BACKGROUND
+                                    )
+                                }
                             />
                         }
                         label={
                             <Typography
                                 sx={{
-                                    color: enableBackgroundColor ? theme.palette.success.main : theme.palette.error.main 
+                                    color: enableBackgroundColor
+                                        ? theme.palette.success.main
+                                        : theme.palette.error.main,
                                 }}
                             >
-                                {`Background Color: ${enableBackgroundColor ? ENABLED : DISABLED}`}
+                                {`Background Color: ${
+                                    enableBackgroundColor ? ENABLED : DISABLED
+                                }`}
                             </Typography>
                         }
                     />
                 </MenuItem>
                 <MenuItem>
-                    <FormControlLabel control={
-                        <Switch
-                            size="small"
-                            checked={studySetViewable}
-                            onChange={() => updateMetadataState(SET_METADATA_FIELDS.PUBLIC)}
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                size="small"
+                                checked={studySetViewable}
+                                onChange={() =>
+                                    updateMetadataState(
+                                        SET_METADATA_FIELDS.PUBLIC
+                                    )
+                                }
                             />
-                    } label={
-                        <Typography
-                            sx={{
-                                color: studySetViewable ?  theme.palette.success.main : theme.palette.error.main
-                            }}
-                        >
-                            {`Viewable: ${studySetViewable ? "Public" : "Private"}`}
-                        </Typography>
-                    }
+                        }
+                        label={
+                            <Typography
+                                sx={{
+                                    color: studySetViewable
+                                        ? theme.palette.success.main
+                                        : theme.palette.error.main,
+                                }}
+                            >
+                                {`Viewable: ${
+                                    studySetViewable ? "Public" : "Private"
+                                }`}
+                            </Typography>
+                        }
                     />
                 </MenuItem>
             </Menu>
         </>
-    )
-}
+    );
+};
 
 export default ActionsSection;

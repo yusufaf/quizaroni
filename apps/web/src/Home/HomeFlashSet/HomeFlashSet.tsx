@@ -47,7 +47,6 @@ const HomeFlashSet = (props: Props) => {
         lastViewed,
         uuid,
     } = studySet;
-    const { isDarkMode, theme } = useTheme();
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
