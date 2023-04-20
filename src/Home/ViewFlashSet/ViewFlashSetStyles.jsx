@@ -56,6 +56,12 @@ export const SortCardsDropdown = styled(FormControl)({
 })
 
 /* Actions Section */
+export const ActionButtonsRow = styled(Paper)({
+    display: "flex",
+    gap: "0.5rem",
+    borderRadius: "0.75rem",
+    paddingLeft: "0.5rem",
+})
 
 
 /* Cards */

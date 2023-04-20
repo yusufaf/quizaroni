@@ -305,7 +305,7 @@ const ViewFlashSet = (props: Props) => {
                                 onClick={handleBackClick}
                                 startIcon={<ArrowBack sx={arrowIconStyling} />}
                             >
-                                Back to Your Flashsets
+                                Back to Your Study Sets
                             </Button>
                             <Typography
                                 variant="h5"
