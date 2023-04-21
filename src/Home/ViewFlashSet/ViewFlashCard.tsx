@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useTheme } from "../../theme/useTheme";
-import { IconButton, Tooltip, Typography } from "@mui/material/";
+import { Chip, IconButton, Tooltip, Typography } from "@mui/material/";
 import { Star, StarBorder, VolumeUp } from "@mui/icons-material";
 import { SimpleFlexContainer } from "src/AppStyles";
 import {
@@ -8,6 +8,7 @@ import {
     ViewFlashCardActions,
     ViewCardInfo,
     ViewCardContainer,
+    CategoryChips,
 } from "./ViewFlashSetStyles";
 import axios from "axios";
 
@@ -19,12 +20,7 @@ type Props = {
 };
 
 const ViewFlashCard = (props: Props) => {
-    const { 
-        card, 
-        enableTextColor, 
-        enableBackgroundColor,
-        index 
-    } = props;
+    const { card, enableTextColor, enableBackgroundColor, index } = props;
 
     const { isDarkMode, theme } = useTheme();
     const timeoutRef = useRef(null);
@@ -82,6 +78,11 @@ const ViewFlashCard = (props: Props) => {
                 >
                     Card {index + 1}
                 </Typography>
+                <CategoryChips>
+                    {["Test", "Test2"].map((category: any, index: number) => (
+                        <Chip key={index} label={category} variant="outlined"/>
+                    ))}
+                </CategoryChips>
 
                 <ViewFlashCardActions>
                     <Tooltip title="Play TTS" placement="top">
@@ -91,7 +92,11 @@ const ViewFlashCard = (props: Props) => {
                     </Tooltip>
                     <Tooltip title="Mark as important" placement="top">
                         <IconButton onClick={handleMarkAsImportant}>
-                            {card.important ? <Star /> : <StarBorder />}
+                            {card.important ? (
+                                <Star sx={{ color: "yellow" }} />
+                            ) : (
+                                <StarBorder />
+                            )}
                         </IconButton>
                     </Tooltip>
                 </ViewFlashCardActions>

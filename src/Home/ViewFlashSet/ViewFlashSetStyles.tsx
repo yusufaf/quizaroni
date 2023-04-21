@@ -1,6 +1,6 @@
 import { styled } from "@mui/system";
 import { Box, Card, FormControl, Paper, Tabs, Typography } from "@mui/material";
-import { BasePage, SpacedFlexContainer } from "src/AppStyles";
+import { BasePage, SimpleFlexContainer, SpacedFlexContainer } from "src/AppStyles";
 
 
 export const ViewFlashsetPage = styled(BasePage)({
@@ -72,6 +72,11 @@ export const ViewFlashsetCard = styled(Card)({
     padding: "1rem 1.25rem 1.25rem 1.25rem",
     borderRadius: "0.75rem",
 })
+
+export const CategoryChips = styled(SimpleFlexContainer)({
+    marginLeft: "1rem",
+    gap: "0.5rem"
+});
 
 export const ViewFlashCardActions = styled("div")({
     marginLeft: "auto"

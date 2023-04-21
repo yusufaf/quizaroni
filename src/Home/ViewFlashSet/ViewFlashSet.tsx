@@ -124,9 +124,27 @@ const ViewFlashSet = (props: Props) => {
             const studySet = studySets.find((value) => value.uuid === id);
             if (studySet) {
                 dispatch(setSelectedStudySet(studySet));
+                updateLastViewed(studySet);
             }
         }
     }, [id, selectedStudySet, studySets]);
+
+
+    const updateLastViewed = async (studySet: any) => {
+        try {
+            const { uuid } = studySet;
+            if (!uuid) {
+                return; 
+            }
+            const response = await axios.post("/api/studysets/updateLastViewed", {
+                uuid,
+            });
+            console.log({response})
+            console.log('Study set last viewed timestamp updated successfully');
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const updateMetadataField = async (property, newValue) => {
         try {
