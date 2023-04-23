@@ -43,12 +43,12 @@ const ViewFlashCard = (props: Props) => {
 
     const handleMarkAsImportant = async () => {
         try {
-            const { uuid } = card;
+            const { important, uuid } = card;
             const response = await axios.post(
                 `/api/studysets/markCardAsImportant`,
                 {
                     uuid,
-                    newValue: true,
+                    newValue: !important,
                 }
             );
             console.log({ response });

@@ -14,16 +14,18 @@ import {
     LoginButton,
     StyledLink,
 } from "./LoginStyles";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
     setAlert,
     setCognitoUser,
     setAuthenticated,
     setUserData,
+    selectUserData,
 } from "src/state/slices/globalSlice";
-import { setStudySets } from "src/state/slices/studysetsSlice";
+import { selectStudySets, setStudySets } from "src/state/slices/studysetsSlice";
 import { Auth } from "@aws-amplify/auth";
 import axios from "axios";
+import { useGetStudysetsQuery } from "src/state/api/studysets";
 
 const Login = (props) => {
     const { isDarkMode, theme } = useTheme();
@@ -31,6 +33,17 @@ const Login = (props) => {
     useBrowserTitle("Login");
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const { uuid: userUUID = "" } = useSelector(selectUserData);
+
+    /* Skip option prevents hook from running when userUUID is undefined */
+    const { data: studySetsData } = useGetStudysetsQuery(userUUID ?? "", {
+        skip: !userUUID,
+    });
+
+    useEffect(() => {
+        dispatch(setStudySets(studySetsData));
+    }, [studySetsData]);
 
     /* OAuth Variables */
     // const provider = new GoogleAuthProvider();
@@ -126,16 +139,6 @@ const Login = (props) => {
             dispatch(setCognitoUser(user));
             dispatch(setAuthenticated(true));
             dispatch(setUserData(userData));
-
-            /* Fetch the study sets for the user */
-            const studySetsResponse = await axios.get("/api/studysets/get", {
-                params: {
-                    userUUID,
-                },
-            });
-            console.log({ studySetsResponse });
-            const studySets = studySetsResponse.data;
-            dispatch(setStudySets(studySets));
 
             navigate("/create");
         } catch (error) {

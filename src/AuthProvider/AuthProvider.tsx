@@ -4,16 +4,29 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     selectAuthenticated,
+    selectUserData,
     setAuthenticated,
     setCognitoUser,
     setUserData,
 } from "src/state/slices/globalSlice";
 import { setStudySets } from "src/state/slices/studysetsSlice";
+import { useGetStudysetsQuery } from "src/state/api/studysets";
 
 const AuthProvider = ({ children }) => {
     const dispatch = useDispatch();
 
     const authenticated = useSelector(selectAuthenticated);
+    const { uuid: userUUID = ""} = useSelector(selectUserData);
+
+    /* Skip option prevents hook from running when userUUID is undefined */
+    const { data: studySets = [] } = useGetStudysetsQuery(
+        userUUID ?? "", 
+        { skip: !userUUID }
+    );
+
+    useEffect(() => {
+        dispatch(setStudySets(studySets));
+    }, [studySets]);
 
     const checkAuthState = async () => {
         try {
@@ -36,18 +49,6 @@ const AuthProvider = ({ children }) => {
             console.log({ response });
             const userData = response.data;
             dispatch(setUserData(userData));
-
-            /* Re-fetch study set data */
-
-            /* Fetch the study sets for the user */
-            const studySetsResponse = await axios.get("/api/studysets/get", {
-                params: {
-                    userUUID: userData.uuid,
-                },
-            });
-
-            const returnedStudySets = studySetsResponse.data;
-            dispatch(setStudySets(returnedStudySets));
         } catch (err) {
             console.log(err);
         }
