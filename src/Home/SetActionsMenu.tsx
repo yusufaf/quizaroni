@@ -14,7 +14,6 @@ import { useTheme } from "../theme/useTheme";
 
 
 type Props = {
-    flashSets: any;
     studySet: any;
     open: any;
     onClose: any;
@@ -24,7 +23,6 @@ type Props = {
 
 const SetActionsMenu = (props: Props) => {
     const {
-        flashSets,
         studySet,
         open,
         onClose,

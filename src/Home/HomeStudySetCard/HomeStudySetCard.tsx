@@ -23,17 +23,12 @@ import { setSelectedStudySet } from 'src/state/slices/studysetsSlice';
 import { useNavigate } from 'react-router-dom';
 
 type Props = {
-    flashSets: any;
-    setFlashSets: any;
-    setSelectedFlashSet: any;
     studySet: any;
     handleDeleteSet: any;
 }
 
 const HomeFlashSet = (props: Props) => {
     const {
-        flashSets,
-        setFlashSets,
         studySet,
         handleDeleteSet,
     } = props;
@@ -81,9 +76,7 @@ const HomeFlashSet = (props: Props) => {
     }
 
     const actionMenuProps = {
-        setFlashSets,
         studySet,
-        flashSets,
         open: actionsMenuOpen,
         onClose: closeActionsMenu,
         anchorEl: anchorEl,
@@ -120,7 +113,10 @@ const HomeFlashSet = (props: Props) => {
                     <CardBottom>
                         <LabelChip label={label ? label : "No label selected"} variant="outlined" />
                         <IconButton
-                            onClick={(e) => openActionsMenu(e)}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                openActionsMenu(e)
+                            }}
                         >
                             <MoreHoriz />
                         </IconButton>

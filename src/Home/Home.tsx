@@ -1,15 +1,29 @@
 import { MenuOpen as MenuOpenIcon } from "@mui/icons-material";
 import { IconButton, Tooltip } from "@mui/material/";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import axios from "axios";
 import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { BoldHeading } from "src/AppStyles";
 import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
 import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
+import {
+    useDeleteStudysetMutation,
+    useGetStudysetsQuery,
+} from "src/state/api/studysets";
+import {
+    selectAuthenticated,
+    selectUserData,
+} from "src/state/slices/globalSlice";
+import {
+    selectStudySets,
+    setSelectedStudySet,
+    setStudySets,
+} from "src/state/slices/studysetsSlice";
 import { FLASHSET_VIEWS } from "src/utilities/constants";
 import LoginMessage from "../LoginMessage/LoginMessage";
 import { useTheme } from "../theme/useTheme";
-import HomeFlashSet from "./HomeFlashSet/HomeFlashSet";
+import HomeFlashSet from "./HomeStudySetCard/HomeStudySetCard";
 import {
     HomeContainer,
     HomePage,
@@ -20,27 +34,35 @@ import {
 } from "./HomeStyles";
 import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
-import ViewFlashSet from "./ViewFlashSet/ViewFlashSet";
-import { useDispatch, useSelector } from "react-redux";
-import { selectAuthenticated, selectUserData } from "src/state/slices/globalSlice";
-import { selectStudySets, setSelectedStudySet, setStudySets } from "src/state/slices/studysetsSlice";
-import axios from "axios";
 
 const Home = (props) => {
+    /* Hooks / Redux */
     const { isDarkMode, theme } = useTheme();
 
     const dispatch = useDispatch();
     const authenticated = useSelector(selectAuthenticated);
-    const userData = useSelector(selectUserData);
+    const { uuid: userUUID = "" } = useSelector(selectUserData);
     const studySets = useSelector(selectStudySets);
 
-    console.log("User data in Home component = ", { userData });
-    console.log("Study sets data in Home component = ", studySets);
+    /* Skip option prevents hook from running when userUUID is undefined */
+    const { data: studySetsData } = useGetStudysetsQuery(userUUID ?? "", {
+        skip: !userUUID,
+    });
 
-    const [flashSets, setFlashSets] = useState([]);
+    const [
+        deleteStudySet,
+        { isLoading: isDeletingStudySet, isError: deleteStudySetError },
+    ] = useDeleteStudysetMutation();
+
+    useEffect(() => {
+        dispatch(setStudySets(studySetsData));
+    }, [studySetsData]);
+
+    useBrowserTitle("Home");
+
+    /* State */
     const [searchFilteredSets, setSearchFilteredSets] = useState([]);
     const [enteredSearch, setEnteredSearch] = useState("");
-    const [selectedFlashSet, setSelectedFlashSet] = useState({});
 
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [confirmDialogProps, setConfirmDialogProps] = useState({});
@@ -51,6 +73,7 @@ const Home = (props) => {
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(false);
 
+    /* Functions */
     const openActionsMenu = (event) => {
         setAnchorEl(event.currentTarget);
         setActionsMenuOpen(true);
@@ -110,66 +133,17 @@ const Home = (props) => {
                             </IconButton>
                         </Tooltip>
                         <SetActionsMenu
-                            studySet={{}}
-                            flashSets={flashSets}
+                            studySet={cellValues.row}
                             open={actionsMenuOpen}
                             onClose={closeActionsMenu}
                             anchorEl={anchorEl}
+                            handleShowDeleteConfirmation={() => {}}
                         />
                     </>
                 );
             },
         },
     ];
-
-    useBrowserTitle("Home");
-
-    const fetchStudySets = async () => {
-        try {
-            const { uuid: userUUID } = userData;
-            if (!userUUID) {
-                return;
-            }
-
-            /* Fetch the study sets for the user */
-            const studySetsResponse = await axios.get("/api/studysets/get", {
-                params: {
-                    userUUID,
-                },
-            });
-
-            const returnedStudySets = studySetsResponse.data;
-            if (returnedStudySets.length === 0) {
-                // TODO: Display message?
-            }
-            console.log({ returnedStudySets, studySetsResponse });
-
-            dispatch(setStudySets(returnedStudySets));
-        } catch (error) {
-            console.log("Error retrieivng study sets for user = ", error);
-        }
-    };
-    
-    /* Fetch user's study sets if it isn't already set */
-    useEffect(() => {
-        console.log("Entering useEffect on mount = ", studySets);
-        if (studySets.length === 0) {
-            console.log("Fetching study sets on mount of Home component")
-            fetchStudySets();
-        }
-    }, [userData]);
-
-
-    const handleDeleteSet = async () => {
-        try {
-            const studySetUUID = "";
-            const response = await axios.post(
-                "/api/studysets/delete",
-                studySetUUID
-            );
-            console.log({ response });
-        } catch (error) {}
-    };
 
     const handleFavoriteFilter = () => {};
 
@@ -182,30 +156,19 @@ const Home = (props) => {
     const onRowDoubleClick = (params, event, details) => {
         console.log({ params, event, details });
         const { row } = params;
-        dispatch(setSelectedStudySet(row))
-        navigate(`/view/${row.uuid}`)
+        dispatch(setSelectedStudySet(row));
+        navigate(`/view/${row.uuid}`);
     };
-
 
     // TODO: Replace this
     if (!authenticated) {
         return <LoginMessage page="home" />;
     }
 
-    const homeSetProps = {
-        flashSets,
-        setFlashSets,
-        setSelectedFlashSet,
-        handleDeleteSet
-    };
-
     return (
         <HomePage>
             <HomePaper elevation={6}>
-                <HomeContainer 
-                    p={2}
-                    borderRadius={5}    
-                >
+                <HomeContainer p={2} borderRadius={5}>
                     <HomeSetsHeading variant="h5">
                         Your Flashsets
                     </HomeSetsHeading>
@@ -242,7 +205,7 @@ const Home = (props) => {
                                         <HomeFlashSet
                                             key={studySet.uuid}
                                             studySet={studySet}
-                                            {...homeSetProps}
+                                            handleDeleteSet={() => {}}
                                         />
                                     );
                                 })}

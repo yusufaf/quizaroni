@@ -1,16 +1,8 @@
 import { Button } from "@mui/material";
-import {
-    collection,
-    getDocs,
-    query,
-    updateDoc,
-    where,
-} from "firebase/firestore";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
 import { PAGES } from "src/utilities/constants";
-import { database } from "../firebase/firebase";
 import LoginMessage from "../LoginMessage/LoginMessage";
 import { useTheme } from "../theme/useTheme";
 import CreateSetHeader from "./CreateSetHeader";

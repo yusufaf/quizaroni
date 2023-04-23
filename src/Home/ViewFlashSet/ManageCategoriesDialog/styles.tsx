@@ -10,6 +10,8 @@ import {
     Icon,
     Paper,
     IconButton,
+    FormControl,
+    MenuItem,
 } from "@mui/material/";
 import styled from "@emotion/styled";
 import { SimpleFlexContainer } from "src/AppStyles";
@@ -30,4 +32,19 @@ export const CategoryButtons = styled(SimpleFlexContainer)({
 
 export const CategoryField = styled(TextField)({
     marginTop: "1.25rem",
+})
+
+export const AssignCategoryContainer = styled(SimpleFlexContainer)({
+    flexDirection: "column",
+    alignItems: "flex-start",
+    marginTop: "2rem",
+    gap: "1rem",
+});
+
+export const AssignCategoryFormControl = styled(FormControl)({
+    width: "20rem",
+})
+
+export const StyledMenuItem = styled(MenuItem)({
+    width: "20rem",
 })

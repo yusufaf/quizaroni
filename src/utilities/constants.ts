@@ -51,7 +51,7 @@ export const FLASHSET_COLUMNS = {
 };
 
 export const CREATE_SET = {
-    TITLE: "Create a new flash card set",
+    TITLE: "Create a new study set",
     TITLE_PLACEHOLDER: "Enter a title for your new study set",
     DESC_PLACEHOLDER: "Enter a description for your new study set",
     LABEL_PLACEHOLDER: "Enter a label for your new study set",
