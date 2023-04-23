@@ -60,20 +60,29 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
 import { SortDirection } from "src/lib/types";
+import { useUpdateStudysetMetadataMutation } from "src/state/api/studysets";
 
 type Props = {};
 
 const ViewFlashSet = (props: Props) => {
     const {} = props;
 
+    /* Hooks / Redux */
     const { isDarkMode, theme } = useTheme();
 
     const navigate = useNavigate();
-
     const { id } = useParams();
     const dispatch = useDispatch();
     const studySets = useSelector(selectStudySets);
+    console.log({studySets})
     const selectedStudySet = useSelector(selectSelectedStudySet);
+
+    const [ updateStudysetMetadata,
+        {
+            isSuccess: isUpdateMetadataSuccess,
+            isError: isUpdateMetadataError,
+        }
+    ] = useUpdateStudysetMetadataMutation();
 
     const controlAnchorRef = useRef(null);
 
@@ -146,7 +155,7 @@ const ViewFlashSet = (props: Props) => {
         }
     };
 
-    const updateMetadataField = async (property, newValue) => {
+    const updateMetadataField = (property, newValue) => {
         try {
             if (!selectedStudySet) {
                 return;
@@ -157,11 +166,7 @@ const ViewFlashSet = (props: Props) => {
                 newValue,
                 uuid,
             };
-            const response = await axios.post(
-                "/api/studysets/updateMetadata",
-                updateBody
-            );
-            console.log({ response });
+            updateStudysetMetadata(updateBody);
         } catch (error) {
             console.error("Error updating study set metadata");
         }

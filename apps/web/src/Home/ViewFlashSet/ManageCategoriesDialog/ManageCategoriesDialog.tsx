@@ -11,6 +11,11 @@ import {
     IconButton,
     Tabs,
     Tab,
+    Select,
+    Typography,
+    InputLabel,
+    FormControl,
+    MenuItem,
 } from "@mui/material/";
 import {
     Dispatch,
@@ -20,19 +25,43 @@ import {
     useState,
 } from "react";
 import {
+    AssignCategoryContainer,
+    AssignCategoryFormControl,
     CategoriesList,
     CategoryButtons,
     CategoryField,
     StyledDialog,
+    StyledMenuItem,
 } from "./styles";
 import { useSelector } from "react-redux";
 import { selectSelectedStudySet } from "src/state/slices/studysetsSlice";
 import axios from "axios";
+import {
+    useCreateCategoryMutation,
+    useDeleteCategoryMutation,
+    useEditCategoryMutation,
+} from "src/state/api/studysets";
 
 const TABS = {
+    ASSIGN: "ASSIGN",
     CREATE: "CREATE",
     MANAGE: "MANAGE",
     IMPORT: "IMPORT",
+};
+
+const TAB_PROPERTIES = {
+    [TABS.ASSIGN]: {
+        title: "Assign Categories",
+    },
+    [TABS.CREATE]: {
+        title: "Create Categories",
+    },
+    [TABS.MANAGE]: {
+        title: "Manage Categories",
+    },
+    [TABS.IMPORT]: {
+        title: "Import Categories",
+    },
 };
 
 const ACTIONS = {
@@ -48,7 +77,12 @@ type Props = {
 const ManageCategoriesDialog = (props: Props) => {
     const { open, setOpen } = props;
 
+    /* Hooks / Redux */
     const selectedStudySet = useSelector(selectSelectedStudySet);
+
+    const [createCategory] = useCreateCategoryMutation();
+    const [editCategory] = useEditCategoryMutation();
+    const [deleteCategory] = useDeleteCategoryMutation();
 
     console.log({ selectedStudySet });
 
@@ -60,6 +94,8 @@ const ManageCategoriesDialog = (props: Props) => {
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [deleteIndices, setDeleteIndices] = useState<number[]>([]);
     const [selectedAction, setSelectedAction] = useState<string | null>(null);
+
+    const isCreateTab = selectedTab === TABS.CREATE;
 
     const handleClose = () => {
         setOpen(false);
@@ -192,9 +228,6 @@ const ManageCategoriesDialog = (props: Props) => {
         }
     };
 
-    const isCreateTab = selectedTab === TABS.CREATE;
-    const title = isCreateTab ? "Create" : "Manage";
-
     const renderListItems = (): ReactNode[] => {
         return selectedStudySet?.categories?.map((value, index) => {
             const isEditSelected = editIndex === index;
@@ -242,20 +275,11 @@ const ManageCategoriesDialog = (props: Props) => {
         });
     };
 
-    return (
-        <StyledDialog open={open} onClose={handleClose}>
-            <DialogTitle> {title} Categories</DialogTitle>
-            <DialogContent>
-                <Tabs
-                    value={selectedTab}
-                    onChange={onTabChange}
-                    scrollButtons="auto"
-                >
-                    <Tab label="Create" value={TABS.CREATE} />
-                    <Tab label="Manage" value={TABS.MANAGE} />
-                    <Tab label="Import" value={TABS.IMPORT} />
-                </Tabs>
-                {isCreateTab ? (
+    const renderTabView = (): ReactNode => {
+        const jsx = [];
+        switch (selectedTab) {
+            case TABS.CREATE:
+                jsx.push(
                     <CategoryField
                         margin="dense"
                         label="Category Name"
@@ -266,7 +290,10 @@ const ManageCategoriesDialog = (props: Props) => {
                         value={categoryName}
                         onChange={onCreateCategoryChange}
                     />
-                ) : (
+                );
+                break;
+            case TABS.MANAGE:
+                jsx.push(
                     <CategoryField
                         margin="dense"
                         label="Edit Category Name"
@@ -279,17 +306,63 @@ const ManageCategoriesDialog = (props: Props) => {
                         disabled={editIndex === null}
                         onChange={onEditCategoryChange}
                     />
-                )}
+                );
+                jsx.push(
+                    <Paper elevation={6}>
+                        <CategoriesList>{renderListItems()}</CategoriesList>
+                    </Paper>
+                );
+                break;
+            case TABS.IMPORT:
+                break;
+            case TABS.ASSIGN:
+                const { cards, categories } = selectedStudySet;
+                jsx.push(
+                    <AssignCategoryContainer>
+                        <AssignCategoryFormControl fullWidth>
+                            <InputLabel id="card-select-label">Card</InputLabel>
+                            <Select labelId="card-select-label" label="Card">
+                                {cards.map((card, index) => {
+                                    const text = `Term: ${card.term} | Definition: ${card.definition}`;
+                                    return (
+                                        <StyledMenuItem
+                                            key={card.uuid}
+                                            value={index}
+                                            title={text}
+                                        >
+                                            <Typography
+                                                variant="inherit"
+                                                noWrap
+                                                title={text}
+                                            >
+                                                {text}
+                                            </Typography>
+                                        </StyledMenuItem>
+                                    );
+                                })}
+                            </Select>
+                        </AssignCategoryFormControl>
+                        <AssignCategoryFormControl>
+                            <InputLabel id="card-select-label">
+                                Categories
+                            </InputLabel>
+                            <Select
+                                labelId="card-select-label"
+                                label="Card"
+                                value={[]}
+                            />
+                        </AssignCategoryFormControl>
+                    </AssignCategoryContainer>
+                );
+                break;
+        }
+        return jsx;
+    };
 
-                <Paper elevation={6}>
-                    <CategoriesList>{renderListItems()}</CategoriesList>
-                </Paper>
-            </DialogContent>
-            <DialogActions>
-                <Button variant="outlined" onClick={handleClose}>
-                    Close
-                </Button>
-                {isCreateTab ? (
+    const renderDialogButton = (): ReactNode => {
+        switch (selectedTab) {
+            case TABS.CREATE:
+                return (
                     <Button
                         variant="contained"
                         onClick={handleCreate}
@@ -297,24 +370,50 @@ const ManageCategoriesDialog = (props: Props) => {
                     >
                         Create
                     </Button>
-                ) : (
+                );
+            case TABS.MANAGE:
+                const disabled =
+                    (selectedAction === ACTIONS.EDIT && editErrorInfo) ||
+                    (selectedAction === ACTIONS.DELETE &&
+                        !deleteIndices.length);
+                const buttonText =
+                    selectedAction === ACTIONS.EDIT
+                        ? "Save Edit"
+                        : `Delete (${deleteIndices.length})`;
+                return (
                     selectedAction && (
                         <Button
                             variant="contained"
                             onClick={handleEditOrDelete}
-                            disabled={
-                                (selectedAction === ACTIONS.EDIT &&
-                                    editErrorInfo) ||
-                                (selectedAction === ACTIONS.DELETE &&
-                                    !deleteIndices.length)
-                            }
+                            disabled={disabled}
                         >
-                            {selectedAction === ACTIONS.EDIT
-                                ? "Save Edit"
-                                : `Delete (${deleteIndices.length})`}
+                            {buttonText}
                         </Button>
                     )
-                )}
+                );
+        }
+    };
+
+    return (
+        <StyledDialog open={open} onClose={handleClose}>
+            <DialogTitle>{TAB_PROPERTIES[selectedTab].title}</DialogTitle>
+            <DialogContent>
+                <Tabs
+                    value={selectedTab}
+                    onChange={onTabChange}
+                    scrollButtons="auto"
+                >
+                    {[...Object.values(TABS)].map((tab, index) => (
+                        <Tab key={index} label={tab} value={tab} />
+                    ))}
+                </Tabs>
+                {renderTabView()}
+            </DialogContent>
+            <DialogActions>
+                <Button variant="outlined" onClick={handleClose}>
+                    Close
+                </Button>
+                {renderDialogButton()}
             </DialogActions>
         </StyledDialog>
     );
