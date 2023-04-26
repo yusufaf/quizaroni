@@ -1,5 +1,10 @@
 import { api } from "./api";
 import { UUID, Studyset } from "src/lib/types";
+import {
+    setSelectedStudySet,
+    selectSelectedStudySet,
+} from "src/state/slices/studysetsSlice"
+import { store } from "src/state/store";
 
 type UpdateMetadataParams = {
     uuid: UUID;
@@ -8,24 +13,51 @@ type UpdateMetadataParams = {
 };
 
 /* Endpoints
-    router.post("/api/studysets/create", createStudySet);
-    router.get("/api/studysets/get", getStudySets);
-    router.post("/api/studysets/delete", deleteStudySet);
-    router.post("/api/studysets/updateMetadata", updateStudySetMetadata);
-    router.post("/api/studysets/createCategory", createStudySetCategory);
-    router.post("/api/studysets/editCategory", editStudySetCategory);
-    router.post("/api/studysets/deleteCategory", deleteStudySetCategory);
-    router.post("/api/studysets/updateLastViewed", updateLastViewed);
-    router.post("/api/studysets/markCardAsImportant", markCardAsImportant);
+	router.post("/api/studysets/create", createStudySet);
+	router.get("/api/studysets/get", getStudySets);
+	router.post("/api/studysets/delete", deleteStudySet);
+	router.post("/api/studysets/updateMetadata", updateStudySetMetadata);
+	router.post("/api/studysets/createCategory", createStudySetCategory);
+	router.post("/api/studysets/editCategory", editStudySetCategory);
+	router.post("/api/studysets/deleteCategory", deleteStudySetCategory);
+	router.post("/api/studysets/updateLastViewed", updateLastViewed);
+	router.post("/api/studysets/markCardAsImportant", markCardAsImportant);
+	router.post("/api/studysets/assignCardCategories", assignCardCategories)
 */
+
+/* */
+const selectedStudySetMutation = {
+    transformResponse: (response, meta, arg) => {
+        console.log("Transform response = ", { response, meta, arg });
+        // your transformation logic goes here
+
+        const state = store.getState();
+        const selectedStudySet = selectSelectedStudySet(state);
+        
+        // If a mutation is being made on a study set, update the selected study set in the Redux store.
+        if (selectedStudySet && arg.uuid === selectedStudySet.uuid) {
+            
+        }
+
+        return response;
+    },
+};
 
 export const studysetsApi = api.injectEndpoints({
     endpoints: (build) => ({
-        getStudysets: build.query<Studyset[], UUID>({
+        getAllStudysets: build.query<Studyset[], UUID>({
             query: (userUUID) => ({
-                url: "studysets/get",
+                url: "studysets/getAll",
                 method: "GET",
                 params: { userUUID },
+            }),
+            providesTags: ["Studysets"],
+        }),
+        getStudyset: build.query<Studyset, UUID>({
+            query: (uuid) => ({
+                url: "studysets/get",
+                method: "GET",
+                params: { uuid },
             }),
             providesTags: ["Studysets"],
         }),
@@ -41,7 +73,7 @@ export const studysetsApi = api.injectEndpoints({
             query: (UUID) => ({
                 url: "studysets/delete",
                 method: "POST",
-                body: {UUID},
+                body: { UUID },
             }),
             invalidatesTags: ["Studysets"],
         }),
@@ -86,7 +118,7 @@ export const studysetsApi = api.injectEndpoints({
             query: (uuid) => ({
                 url: "studysets/updateLastViewed",
                 method: "POST",
-                body: {uuid},
+                body: { uuid },
             }),
             invalidatesTags: ["Studysets"],
         }),
@@ -98,11 +130,21 @@ export const studysetsApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Studysets"],
         }),
+        assignCardCategories: build.mutation<void, any>({
+            query: ({ uuid, categories }) => ({
+                url: "studysets/assignCardCategories",
+                method: "POST",
+                body: { uuid, categories },
+            }),
+            invalidatesTags: ["Studysets"],
+            ...selectedStudySetMutation,
+        }),
     }),
 });
 
 export const {
-    useGetStudysetsQuery,
+    useGetAllStudysetsQuery,
+    useGetStudysetQuery,
     useCreateStudysetMutation,
     useDeleteStudysetMutation,
     useUpdateStudysetMetadataMutation,
@@ -111,4 +153,5 @@ export const {
     useDeleteCategoryMutation,
     useUpdateLastViewedMutation,
     useMarkCardAsImportantMutation,
+    useAssignCardCategoriesMutation,
 } = studysetsApi;

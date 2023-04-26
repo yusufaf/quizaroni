@@ -9,6 +9,9 @@ export const store = configureStore({
         global: globalReducer,
         studySets: studySetsReducer,
     },
+    middleware: (getDefaultMiddleware) => {
+        return getDefaultMiddleware().concat(api.middleware);
+    },
     devTools: process.env.NODE_ENV !== "production",
 });
 

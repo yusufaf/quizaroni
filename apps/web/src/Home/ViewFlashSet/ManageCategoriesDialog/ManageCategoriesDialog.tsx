@@ -33,14 +33,19 @@ import {
     StyledDialog,
     StyledMenuItem,
 } from "./styles";
-import { useSelector } from "react-redux";
-import { selectSelectedStudySet } from "src/state/slices/studysetsSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectSelectedStudySet, setSelectedStudySet } from "src/state/slices/studysetsSlice";
 import axios from "axios";
 import {
+    useAssignCardCategoriesMutation,
     useCreateCategoryMutation,
     useDeleteCategoryMutation,
     useEditCategoryMutation,
+    useGetAllStudysetsQuery,
 } from "src/state/api/studysets";
+import { Card, Studyset } from "src/lib/types";
+import { selectUserData } from "src/state/slices/globalSlice";
+import { useParams } from "react-router-dom";
 
 const TABS = {
     ASSIGN: "ASSIGN",
@@ -72,17 +77,46 @@ const ACTIONS = {
 type Props = {
     open: boolean;
     setOpen: Dispatch<SetStateAction<boolean>>;
+    selectedStudySet: Studyset;
 };
 
 const ManageCategoriesDialog = (props: Props) => {
-    const { open, setOpen } = props;
+    const { 
+        open, 
+        setOpen,
+        selectedStudySet, 
+    } = props;
 
     /* Hooks / Redux */
-    const selectedStudySet = useSelector(selectSelectedStudySet);
+
+    const { id: studySetUUID } = useParams();
+
+    const dispatch = useDispatch();
+    // const selectedStudySet = useSelector(selectSelectedStudySet);
+
+    const { uuid: userUUID = "" } = useSelector(selectUserData);
+
+    /* Skip option prevents hook from running when userUUID is undefined */
+    const { data: studySetsData, refetch } = useGetAllStudysetsQuery(
+        userUUID ?? "",
+        {
+            skip: !userUUID,
+        }
+    );
 
     const [createCategory] = useCreateCategoryMutation();
     const [editCategory] = useEditCategoryMutation();
     const [deleteCategory] = useDeleteCategoryMutation();
+    const [assignCardCategories, {isSuccess}] = useAssignCardCategoriesMutation();
+
+    useEffect(() => {
+        if (isSuccess) {
+            refetch();
+            setTimeout(() => {
+                dispatch(setSelectedStudySet(studySetsData));
+            }, 1000);
+        }
+    }, [isSuccess]);
 
     console.log({ selectedStudySet });
 
@@ -94,6 +128,7 @@ const ManageCategoriesDialog = (props: Props) => {
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [deleteIndices, setDeleteIndices] = useState<number[]>([]);
     const [selectedAction, setSelectedAction] = useState<string | null>(null);
+    const [selectedCardUUID, setSelectedCardUUID] = useState<string>("");
 
     const isCreateTab = selectedTab === TABS.CREATE;
 
@@ -228,6 +263,20 @@ const ManageCategoriesDialog = (props: Props) => {
         }
     };
 
+    const onAssignedCategoriesChange = (e: any) => {
+        assignCardCategories({
+            uuid: selectedCardUUID,
+            categories: e.target.value,
+        }).unwrap()
+        // .then((response) => {
+        //     console.log({ response });
+        // })
+        // .catch((error) => {
+        //     console.error(error);
+        // });
+        // refetch();
+    };
+
     const renderListItems = (): ReactNode[] => {
         return selectedStudySet?.categories?.map((value, index) => {
             const isEditSelected = editIndex === index;
@@ -317,17 +366,28 @@ const ManageCategoriesDialog = (props: Props) => {
                 break;
             case TABS.ASSIGN:
                 const { cards, categories } = selectedStudySet;
+                const selectedCardCategories =
+                    cards?.find((card) => card.uuid === selectedCardUUID)
+                        ?.categories ?? [];
+                console.log({ categories });
                 jsx.push(
                     <AssignCategoryContainer>
                         <AssignCategoryFormControl fullWidth>
                             <InputLabel id="card-select-label">Card</InputLabel>
-                            <Select labelId="card-select-label" label="Card">
+                            <Select
+                                labelId="card-select-label"
+                                label="Card"
+                                value={selectedCardUUID}
+                                onChange={(e) =>
+                                    setSelectedCardUUID(e.target.value)
+                                }
+                            >
                                 {cards.map((card, index) => {
                                     const text = `Term: ${card.term} | Definition: ${card.definition}`;
                                     return (
                                         <StyledMenuItem
                                             key={card.uuid}
-                                            value={index}
+                                            value={card.uuid}
                                             title={text}
                                         >
                                             <Typography
@@ -342,16 +402,31 @@ const ManageCategoriesDialog = (props: Props) => {
                                 })}
                             </Select>
                         </AssignCategoryFormControl>
-                        <AssignCategoryFormControl>
-                            <InputLabel id="card-select-label">
-                                Categories
-                            </InputLabel>
-                            <Select
-                                labelId="card-select-label"
-                                label="Card"
-                                value={[]}
-                            />
-                        </AssignCategoryFormControl>
+                        {selectedCardUUID && (
+                            <AssignCategoryFormControl fullWidth>
+                                <InputLabel id="category-select-label">
+                                    Categories
+                                </InputLabel>
+                                <Select
+                                    labelId="category-select-label"
+                                    label="Category"
+                                    multiple
+                                    value={selectedCardCategories}
+                                    onChange={onAssignedCategoriesChange}
+                                >
+                                    {categories.map((category, index) => {
+                                        return (
+                                            <StyledMenuItem
+                                                key={category}
+                                                value={category}
+                                            >
+                                                {category}
+                                            </StyledMenuItem>
+                                        );
+                                    })}
+                                </Select>
+                            </AssignCategoryFormControl>
+                        )}
                     </AssignCategoryContainer>
                 );
                 break;

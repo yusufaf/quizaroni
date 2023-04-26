@@ -10,7 +10,7 @@ import {
     setUserData,
 } from "src/state/slices/globalSlice";
 import { setStudySets } from "src/state/slices/studysetsSlice";
-import { useGetStudysetsQuery } from "src/state/api/studysets";
+import { useGetAllStudysetsQuery } from "src/state/api/studysets";
 
 const AuthProvider = ({ children }) => {
     const dispatch = useDispatch();
@@ -19,7 +19,7 @@ const AuthProvider = ({ children }) => {
     const { uuid: userUUID = ""} = useSelector(selectUserData);
 
     /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: studySets = [] } = useGetStudysetsQuery(
+    const { data: studySets = [] } = useGetAllStudysetsQuery(
         userUUID ?? "", 
         { skip: !userUUID }
     );

@@ -23,45 +23,32 @@ import {
 import { useTheme } from "src/theme/useTheme";
 import { ActionButtonsRow } from "../ViewFlashSetStyles";
 import { useNavigate, useParams } from "react-router-dom";
+import { Studyset } from "src/lib/types";
 
 type Props = {
     controlAnchorRef: any;
-    enableBackgroundColor: any;
-    enableTextColor: any;
     updateMetadataField: any;
-    metadata: any;
-    setEnableBackgroundColor: any;
-    setEnableTextColor: any;
     setShowControlMenu: any;
     setShowDownloadPopup: any;
     setShowNotificationsModal: any;
-    setStudySetViewable: any;
     showControlMenu: any;
-    studySetViewable: any;
+    selectedStudySet: Studyset;
 };
 
 const ActionsSection = (props: Props) => {
     const {
         controlAnchorRef,
-        enableBackgroundColor,
-        enableTextColor,
         updateMetadataField,
-        metadata = {},
-        setEnableBackgroundColor,
-        setEnableTextColor,
         setShowControlMenu,
         setShowDownloadPopup,
         setShowNotificationsModal,
-        setStudySetViewable,
         showControlMenu,
-        studySetViewable,
+        selectedStudySet,
     } = props;
-
-    console.log({ metadata });
 
     const { theme } = useTheme();
     const navigate = useNavigate();
-    const {id: studysetId} = useParams();
+    const { id: studySetUUID } = useParams();
 
     const handleOpenControlMenu = () => {
         setShowControlMenu(true);
@@ -71,38 +58,37 @@ const ActionsSection = (props: Props) => {
         setShowControlMenu(false);
     };
 
+    const { metadata = {} } = selectedStudySet || {};
+    
+    const {
+        // @ts-ignore
+        backgroundColorVisible = false,
+        // @ts-ignore
+        publiclyViewable = false,
+        // @ts-ignore
+        textColorVisible = false,
+    } = metadata;
+    console.log({ metadata });
+
     const updateMetadataState = (property: string) => {
         let newValue;
-        let setStateCallback;
         switch (property) {
-            case SET_METADATA_FIELDS.TEXT:
-                newValue = !enableTextColor;
-                setStateCallback = setEnableTextColor;
-                break;
-            case SET_METADATA_FIELDS.BACKGROUND:
-                newValue = !enableBackgroundColor;
-                setStateCallback = setEnableBackgroundColor;
-                break;
-            case SET_METADATA_FIELDS.PUBLIC:
-                newValue = !studySetViewable;
-                setStateCallback = setStudySetViewable;
+            default:
+                newValue = !selectedStudySet.metadata[property];
                 break;
         }
-        setStateCallback(newValue);
         updateMetadataField(property, newValue);
     };
 
     const handleEditClick = () => {
-        navigate(`/edit/${studysetId}`);
-    }
+        navigate(`/edit/${studySetUUID}`);
+    };
 
     return (
         <>
-            <ActionButtonsRow >
+            <ActionButtonsRow>
                 <Tooltip title="Edit Study Set">
-                    <IconButton color="primary"
-                        onClick={handleEditClick}
-                    >
+                    <IconButton color="primary" onClick={handleEditClick}>
                         <Edit />
                     </IconButton>
                 </Tooltip>
@@ -139,7 +125,7 @@ const ActionsSection = (props: Props) => {
                         control={
                             <Switch
                                 size="small"
-                                checked={enableTextColor}
+                                checked={textColorVisible}
                                 onChange={() =>
                                     updateMetadataState(
                                         SET_METADATA_FIELDS.TEXT
@@ -150,13 +136,13 @@ const ActionsSection = (props: Props) => {
                         label={
                             <Typography
                                 sx={{
-                                    color: enableTextColor
+                                    color: textColorVisible
                                         ? theme.palette.success.main
                                         : theme.palette.error.main,
                                 }}
                             >
                                 {`Text Color: ${
-                                    enableTextColor ? ENABLED : DISABLED
+                                    textColorVisible ? ENABLED : DISABLED
                                 }`}
                             </Typography>
                         }
@@ -167,7 +153,7 @@ const ActionsSection = (props: Props) => {
                         control={
                             <Switch
                                 size="small"
-                                checked={enableBackgroundColor}
+                                checked={backgroundColorVisible}
                                 onChange={() =>
                                     updateMetadataState(
                                         SET_METADATA_FIELDS.BACKGROUND
@@ -178,13 +164,13 @@ const ActionsSection = (props: Props) => {
                         label={
                             <Typography
                                 sx={{
-                                    color: enableBackgroundColor
+                                    color: backgroundColorVisible
                                         ? theme.palette.success.main
                                         : theme.palette.error.main,
                                 }}
                             >
                                 {`Background Color: ${
-                                    enableBackgroundColor ? ENABLED : DISABLED
+                                    backgroundColorVisible ? ENABLED : DISABLED
                                 }`}
                             </Typography>
                         }
@@ -195,7 +181,7 @@ const ActionsSection = (props: Props) => {
                         control={
                             <Switch
                                 size="small"
-                                checked={studySetViewable}
+                                checked={publiclyViewable}
                                 onChange={() =>
                                     updateMetadataState(
                                         SET_METADATA_FIELDS.PUBLIC
@@ -206,13 +192,13 @@ const ActionsSection = (props: Props) => {
                         label={
                             <Typography
                                 sx={{
-                                    color: studySetViewable
+                                    color: publiclyViewable
                                         ? theme.palette.success.main
                                         : theme.palette.error.main,
                                 }}
                             >
                                 {`Viewable: ${
-                                    studySetViewable ? "Public" : "Private"
+                                    publiclyViewable ? "Public" : "Private"
                                 }`}
                             </Typography>
                         }
