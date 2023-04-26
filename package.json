@@ -20,7 +20,7 @@
     "@mui/icons-material": "^5.2.1",
     "@mui/material": "^5.2.3",
     "@mui/x-data-grid": "^5.8.0",
-    "@reduxjs/toolkit": "^1.7.0",
+    "@reduxjs/toolkit": "^1.9.5",
     "@sendgrid/mail": "^7.6.2",
     "@types/react": "^17.0.55",
     "amazon-cognito-identity-js": "^6.2.0",

@@ -25,7 +25,7 @@ import {
 import { selectStudySets, setStudySets } from "src/state/slices/studysetsSlice";
 import { Auth } from "@aws-amplify/auth";
 import axios from "axios";
-import { useGetStudysetsQuery } from "src/state/api/studysets";
+import { useGetAllStudysetsQuery } from "src/state/api/studysets";
 
 const Login = (props) => {
     const { isDarkMode, theme } = useTheme();
@@ -37,7 +37,7 @@ const Login = (props) => {
     const { uuid: userUUID = "" } = useSelector(selectUserData);
 
     /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: studySetsData } = useGetStudysetsQuery(userUUID ?? "", {
+    const { data: studySetsData } = useGetAllStudysetsQuery(userUUID ?? "", {
         skip: !userUUID,
     });
 
