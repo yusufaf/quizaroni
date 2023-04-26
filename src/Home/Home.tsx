@@ -9,7 +9,7 @@ import ConfirmDialog from "src/components/ConfirmDialog/ConfirmDialog";
 import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
 import {
     useDeleteStudysetMutation,
-    useGetStudysetsQuery,
+    useGetAllStudysetsQuery,
 } from "src/state/api/studysets";
 import {
     selectAuthenticated,
@@ -45,7 +45,7 @@ const Home = (props) => {
     const studySets = useSelector(selectStudySets);
 
     /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: studySetsData } = useGetStudysetsQuery(userUUID ?? "", {
+    const { data: studySetsData } = useGetAllStudysetsQuery(userUUID ?? "", {
         skip: !userUUID,
     });
 

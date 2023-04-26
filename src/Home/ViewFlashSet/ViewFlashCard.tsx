@@ -11,16 +11,20 @@ import {
     CategoryChips,
 } from "./ViewFlashSetStyles";
 import axios from "axios";
+import { Card, Studyset } from "src/lib/types";
 
 type Props = {
-    card: any; // TODO: Type
-    enableTextColor: boolean;
-    enableBackgroundColor: boolean;
+    card: Card; // TODO: Type
     index: number;
+    selectedStudySet: Studyset
 };
 
 const ViewFlashCard = (props: Props) => {
-    const { card, enableTextColor, enableBackgroundColor, index } = props;
+    const { 
+        card, 
+        index,
+        selectedStudySet,
+    } = props;
 
     const { isDarkMode, theme } = useTheme();
     const timeoutRef = useRef(null);
@@ -63,7 +67,7 @@ const ViewFlashCard = (props: Props) => {
             key={index}
             style={{
                 backgroundColor: `${
-                    card?.backgroundColor && enableBackgroundColor
+                    card?.backgroundColor && selectedStudySet?.metadata?.backgroundColorVisible
                         ? card.backgroundColor
                         : ""
                 }`,
@@ -79,7 +83,7 @@ const ViewFlashCard = (props: Props) => {
                     Card {index + 1}
                 </Typography>
                 <CategoryChips>
-                    {["Test", "Test2"].map((category: any, index: number) => (
+                    {card?.categories?.map((category: any, index: number) => (
                         <Chip key={index} label={category} variant="outlined"/>
                     ))}
                 </CategoryChips>
@@ -109,7 +113,7 @@ const ViewFlashCard = (props: Props) => {
                     <Typography
                         sx={{
                             color: `${
-                                card?.textColor && enableTextColor
+                                card?.textColor && selectedStudySet?.metadata?.textColorVisible
                                     ? card.textColor
                                     : ""
                             }`,
@@ -126,7 +130,7 @@ const ViewFlashCard = (props: Props) => {
                     <Typography
                         sx={{
                             color: `${
-                                card?.textColor && enableTextColor
+                                card?.textColor && selectedStudySet?.metadata?.textColorVisible
                                     ? card.textColor
                                     : ""
                             }`,

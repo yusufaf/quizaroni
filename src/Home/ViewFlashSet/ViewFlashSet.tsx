@@ -60,7 +60,10 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
 import { SortDirection } from "src/lib/types";
-import { useUpdateStudysetMetadataMutation } from "src/state/api/studysets";
+import {
+    useGetStudysetQuery,
+    useUpdateStudysetMetadataMutation,
+} from "src/state/api/studysets";
 
 type Props = {};
 
@@ -71,18 +74,28 @@ const ViewFlashSet = (props: Props) => {
     const { isDarkMode, theme } = useTheme();
 
     const navigate = useNavigate();
-    const { id } = useParams();
+    const { id: studySetUUID } = useParams();
     const dispatch = useDispatch();
     const studySets = useSelector(selectStudySets);
-    console.log({studySets})
-    const selectedStudySet = useSelector(selectSelectedStudySet);
-
-    const [ updateStudysetMetadata,
+    console.log({ studySets });
+    // const selectedStudySet = useSelector(selectSelectedStudySet);
+    
+    const {
+        data: selectedStudySet,
+        isLoading: isStudySetLoading,
+        isSuccess: isStudySetSuccess,
+    } = useGetStudysetQuery(studySetUUID ?? "");
+    
+    const [
+        updateStudysetMetadata,
         {
+            isLoading: isUpdateMetadataLoading,
             isSuccess: isUpdateMetadataSuccess,
             isError: isUpdateMetadataError,
-        }
+        },
     ] = useUpdateStudysetMetadataMutation();
+
+    console.log({ selectedStudySet, isStudySetLoading });
 
     const controlAnchorRef = useRef(null);
 
@@ -90,15 +103,6 @@ const ViewFlashSet = (props: Props) => {
     const [showControlMenu, setShowControlMenu] = useState(false);
     const [showCreateLabelDialog, setShowCreateLabelDialog] = useState(false);
     const [createLabelName, setCreateLabelName] = useState("");
-    const [enableTextColor, setEnableTextColor] = useState(
-        selectedStudySet?.metadata?.textColorVisible ?? false
-    );
-    const [enableBackgroundColor, setEnableBackgroundColor] = useState(
-        selectedStudySet?.metadata?.backgroundColorVisible ?? false
-    );
-    const [studySetViewable, setStudySetViewable] = useState(
-        selectedStudySet?.metadata?.publiclyViewable ?? false
-    );
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
 
@@ -124,32 +128,22 @@ const ViewFlashSet = (props: Props) => {
     useBrowserTitle(selectedStudySet?.title ?? "");
 
     useEffect(() => {
-        if (!selectedStudySet) {
-            console.log("Finding the study set from the id in URL", {
-                id,
-                selectedStudySet,
-                studySets,
-            });
-            const studySet = studySets.find((value) => value.uuid === id);
-            if (studySet) {
-                dispatch(setSelectedStudySet(studySet));
-                updateLastViewed(studySet);
-            }
-        }
-    }, [id, selectedStudySet, studySets]);
+        updateLastViewed();
+    }, [selectedStudySet]);
 
-
-    const updateLastViewed = async (studySet: any) => {
+    const updateLastViewed = async () => {
         try {
-            const { uuid } = studySet;
-            if (!uuid) {
-                return; 
+            if (!studySetUUID) {
+                return;
             }
-            const response = await axios.post("/api/studysets/updateLastViewed", {
-                uuid,
-            });
-            console.log({response})
-            console.log('Study set last viewed timestamp updated successfully');
+            const response = await axios.post(
+                "/api/studysets/updateLastViewed",
+                {
+                    uuid: studySetUUID,
+                }
+            );
+            console.log({ response });
+            console.log("Study set last viewed timestamp updated successfully");
         } catch (error) {
             console.error(error);
         }
@@ -236,18 +230,12 @@ const ViewFlashSet = (props: Props) => {
 
     const actionSectionProps = {
         controlAnchorRef,
-        enableBackgroundColor,
-        enableTextColor,
         updateMetadataField,
-        metadata: selectedStudySet?.metadata,
-        setEnableBackgroundColor,
-        setEnableTextColor,
         setShowControlMenu,
         setShowDownloadPopup,
         setShowNotificationsModal,
-        setStudySetViewable,
         showControlMenu,
-        studySetViewable,
+        selectedStudySet,
     };
 
     const createLabelDialogProps = {
@@ -279,8 +267,8 @@ const ViewFlashSet = (props: Props) => {
                     key={card.uuid}
                     card={card}
                     index={index}
-                    enableTextColor={enableTextColor}
-                    enableBackgroundColor={enableBackgroundColor}
+                    selectedStudySet={selectedStudySet}
+                   
                 />
             );
         });
@@ -288,8 +276,6 @@ const ViewFlashSet = (props: Props) => {
         selectedStudySet,
         selectedSort,
         sortDirection,
-        enableTextColor,
-        enableBackgroundColor,
     ]);
 
     /* Filtering */
@@ -315,6 +301,7 @@ const ViewFlashSet = (props: Props) => {
     const manageCategoriesProps = {
         open: showManageCategories,
         setOpen: setShowManageCategories,
+        selectedStudySet,
     };
 
     /* TODO: Fix the spacing between the ViewContainer and the (first) ViewCards */
