@@ -76,8 +76,8 @@ const ViewFlashSet = (props: Props) => {
     const navigate = useNavigate();
     const { id: studySetUUID } = useParams();
     const dispatch = useDispatch();
-    const studySets = useSelector(selectStudySets);
-    console.log({ studySets });
+    // const studySets = useSelector(selectStudySets);
+    // console.log({ studySets });
     // const selectedStudySet = useSelector(selectSelectedStudySet);
     
     const {
@@ -149,7 +149,7 @@ const ViewFlashSet = (props: Props) => {
         }
     };
 
-    const updateMetadataField = (property, newValue) => {
+    const updateMetadataField = (property: string, newValue: any) => {
         try {
             if (!selectedStudySet) {
                 return;
@@ -198,7 +198,7 @@ const ViewFlashSet = (props: Props) => {
     };
 
     // event: React.SyntheticEvent, newValue: number
-    const onTabChange = (e, newTab) => {
+    const onTabChange = (e: any, newTab: any) => {
         setSelectedTab(newTab);
     };
 

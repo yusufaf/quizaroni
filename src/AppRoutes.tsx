@@ -3,9 +3,9 @@ import Home from "./Home/Home";
 import Login from "./Login/Login";
 import Signup from "./Signup/Signup";
 import CreateSet from "./CreateSet/CreateSet";
-import ForgotPassword from "./ForgotPassword/ForgotPassword";
+import ForgotPassword from "./views/ForgotPassword/ForgotPassword";
 import Profile from "./Profile/Profile";
-import ConfirmEmail from "./ConfirmEmail/ConfirmEmail";
+import ConfirmEmail from "./views/ConfirmEmail/ConfirmEmail";
 import ViewFlashSet from "./Home/ViewFlashSet/ViewFlashSet";
 import EditFlashSet from "./EditFlashSet/EditFlashSet";
 
