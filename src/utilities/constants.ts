@@ -1,4 +1,4 @@
-import { SortDirection } from "src/lib/types";
+import { SortDirection } from "lib/types";
 
 export const LIGHT = "light";
 export const DARK = "dark";

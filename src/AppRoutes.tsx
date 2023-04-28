@@ -1,13 +1,12 @@
 import { Routes, Route } from "react-router-dom";
-import Home from "./Home/Home";
-import Login from "./Login/Login";
-import Signup from "./Signup/Signup";
-import CreateSet from "./CreateSet/CreateSet";
-import ForgotPassword from "./views/ForgotPassword/ForgotPassword";
-import Profile from "./Profile/Profile";
-import ConfirmEmail from "./views/ConfirmEmail/ConfirmEmail";
-import ViewFlashSet from "./Home/ViewFlashSet/ViewFlashSet";
-import EditFlashSet from "./EditFlashSet/EditFlashSet";
+import Home from "views/Home/Home";
+import Login from "views/Login/Login";
+import Signup from "views/Signup/Signup";
+import CreateSet from "views/Create/CreateSet";
+import ForgotPassword from "views/ForgotPassword/ForgotPassword";
+import Profile from "views/Profile/Profile";
+import ConfirmEmail from "views/ConfirmEmail/ConfirmEmail";
+import ViewFlashSet from "views/Home/ViewFlashSet/ViewFlashSet";
 
 type Props = {};
 

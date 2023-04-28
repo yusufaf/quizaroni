@@ -8,10 +8,13 @@ import {
     DialogTitle
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { selectDialogOpen, setDialogOpen } from "src/state/slices/globalSlice";
+import { selectDialogOpen, setDialogOpen } from "state/slices/globalSlice";
 import styled from "@emotion/styled";
 
-const FeedbackDialog = props => {
+type Props = {
+}
+
+const FeedbackDialog = (props: Props) => {
     const open = useSelector(selectDialogOpen);
     const dispatch = useDispatch();
 

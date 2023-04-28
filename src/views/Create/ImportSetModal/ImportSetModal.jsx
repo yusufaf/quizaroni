@@ -1,6 +1,6 @@
 
 import { Button, Dialog, DialogActions, TextField, Typography } from '@mui/material/';
-import { useTheme } from "../../theme/useTheme";
+import { useTheme } from "theme/useTheme";
 import { styled } from '@mui/system';
 import { BoldHeading } from 'src/AppStyles';
 

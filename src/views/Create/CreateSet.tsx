@@ -1,10 +1,10 @@
 import { Button } from "@mui/material";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
-import { PAGES } from "src/utilities/constants";
-import LoginMessage from "../LoginMessage/LoginMessage";
-import { useTheme } from "../theme/useTheme";
+import useBrowserTitle from "lib/hooks/useBrowserTitle";
+import { PAGES } from "utilities/constants";
+import LoginMessage from "views/LoginMessage/LoginMessage";
+import { useTheme } from "theme/useTheme";
 import CreateSetHeader from "./CreateSetHeader";
 import { AddCardButton, AddCardIcon, CreateSetPage } from "./CreateSetStyles";
 import ImportSetModal from "./ImportSetModal/ImportSetModal";
@@ -16,7 +16,7 @@ import {
     selectAuthenticated,
     selectCognitoUser,
     selectUserData,
-} from "src/state/slices/globalSlice";
+} from "state/slices/globalSlice";
 import axios from "axios";
 
 const EMPTY_CARD = {
