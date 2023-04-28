@@ -8,11 +8,15 @@ import {
     setAuthenticated,
     setCognitoUser,
     setUserData,
-} from "src/state/slices/globalSlice";
-import { setStudySets } from "src/state/slices/studysetsSlice";
-import { useGetAllStudysetsQuery } from "src/state/api/studysets";
+} from "state/slices/globalSlice";
+import { setStudySets } from "state/slices/studysetsSlice";
+import { useGetAllStudysetsQuery } from "state/api/studysets";
 
-const AuthProvider = ({ children }) => {
+type Props = {
+    children: any;
+}
+
+const AuthProvider = ({ children }: Props) => {
     const dispatch = useDispatch();
 
     const authenticated = useSelector(selectAuthenticated);

@@ -1,0 +1,7 @@
+type Props = {}
+
+const Explore = (props: Props) => {
+  return (
+    <div>Explore</div>
+  )
+}

@@ -15,6 +15,13 @@ export default defineConfig({
     resolve: {
         alias: {
             src: path.resolve("src/"),
+            components: path.resolve("src/components/"),
+            views: path.resolve("src/views/"),
+            state: path.resolve("src/state/"),
+            lib: path.resolve("src/lib/"),
+            resources: path.resolve("src/resources/"),
+            utilities: path.resolve("src/utilities/"),
+            theme: path.resolve("src/theme/"),
         },
     },
     server: {

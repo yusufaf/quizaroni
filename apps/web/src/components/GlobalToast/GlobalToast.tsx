@@ -2,10 +2,13 @@ import { Close as CloseIcon } from "@mui/icons-material";
 import { Alert, IconButton, Snackbar } from "@mui/material";
 import React from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { selectAlert, setAlert } from "src/state/slices/globalSlice";
-import { SUCCESS } from 'src/utilities/constants';
+import { selectAlert, setAlert } from "state/slices/globalSlice";
+import { SUCCESS } from 'utilities/constants';
 
-const GlobalToast = props => {
+type Props = {
+}
+
+const GlobalToast = (props: Props) => {
     const dispatch = useDispatch();
     const globalToast = useSelector(selectAlert);
     const {

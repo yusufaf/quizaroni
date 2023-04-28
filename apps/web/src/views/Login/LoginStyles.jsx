@@ -1,7 +1,6 @@
 import { styled } from "@mui/system";
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-// import { useTheme } from "src/theme/useTheme";
 
 export const LoginPageContainer = styled(Box)({
     display: "flex",

@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
-import globalReducer from "src/state/slices/globalSlice";
-import studySetsReducer from "src/state/slices/studysetsSlice";
+import globalReducer from "state/slices/globalSlice";
+import studySetsReducer from "state/slices/studysetsSlice";
 import { api } from "./api/api";
 
 export const store = configureStore({

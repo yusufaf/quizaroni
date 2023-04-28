@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Paper } from "@mui/material/";
-import PasswordToggle from "src/components/PasswordToggle/PasswordToggle";
-import { useTheme } from "src/theme/useTheme";
-import * as C from "src/utilities/constants";
-import useBrowserTitle from "src/lib/hooks/useBrowserTitle";
+import PasswordToggle from "components/PasswordToggle/PasswordToggle";
+import { useTheme } from "theme/useTheme";
+import * as C from "utilities/constants";
+import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import {
     ForgotPasswordLink,
     LoginPageContainer,
@@ -21,13 +21,15 @@ import {
     setAuthenticated,
     setUserData,
     selectUserData,
-} from "src/state/slices/globalSlice";
-import { selectStudySets, setStudySets } from "src/state/slices/studysetsSlice";
+} from "state/slices/globalSlice";
+import { selectStudySets, setStudySets } from "state/slices/studysetsSlice";
 import { Auth } from "@aws-amplify/auth";
 import axios from "axios";
-import { useGetAllStudysetsQuery } from "src/state/api/studysets";
+import { useGetAllStudysetsQuery } from "state/api/studysets";
 
-const Login = (props) => {
+type Props = {};
+
+const Login = (props: Props) => {
     const { isDarkMode, theme } = useTheme();
 
     useBrowserTitle("Login");

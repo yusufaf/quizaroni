@@ -10,7 +10,7 @@ import {
     ForgotPasswordPage,
     ForgotPasswordTitle,
 } from "./styles";
-import PasswordValidator from "src/PasswordValidator/PasswordValidator";
+import PasswordValidator from "components/PasswordValidator/PasswordValidator";
 
 type Props = {};
 
