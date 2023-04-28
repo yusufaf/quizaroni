@@ -9,8 +9,8 @@ import {
 } from "@mui/material";
 import { Dispatch, SetStateAction } from "react";
 import { BoldHeading, SimpleFlexContainer } from "src/AppStyles";
-import { useTheme } from "src/theme/useTheme";
-import { CREATE_SET } from "src/utilities/constants";
+import { useTheme } from "theme/useTheme";
+import { CREATE_SET } from "utilities/constants";
 import {
     CreateSetButton,
     CreateSetContainer,

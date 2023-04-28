@@ -1,10 +1,10 @@
 import { api } from "./api";
-import { UUID, Studyset } from "src/lib/types";
+import { UUID, Studyset } from "lib/types";
 import {
     setSelectedStudySet,
     selectSelectedStudySet,
-} from "src/state/slices/studysetsSlice"
-import { store } from "src/state/store";
+} from "state/slices/studysetsSlice"
+import { store } from "state/store";
 
 type UpdateMetadataParams = {
     uuid: UUID;

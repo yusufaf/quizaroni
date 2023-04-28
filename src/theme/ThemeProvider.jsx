@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ThemeContext, themes } from "./ThemeContext";
 import { ThemeProvider } from '@mui/material/styles';
-import { LIGHT, DARK } from "../utilities/constants";
+import { LIGHT, DARK } from "utilities/constants";
 
 export const CustomThemeProvider = (props) => {
     const { children } = props;

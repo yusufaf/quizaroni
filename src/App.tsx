@@ -1,12 +1,12 @@
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useEffect, useState } from "react";
-import GlobalToast from "./components/GlobalToast/GlobalToast";
-import FeedbackDialog from "./components/FeedbackDialog";
-import Footer from "./Footer/Footer";
-import NavBar from "./NavBar/NavBar";
+import GlobalToast from "components/GlobalToast/GlobalToast";
+import FeedbackDialog from "components/FeedbackDialog";
+import Footer from "views/Footer/Footer";
+import NavBar from "views/NavBar/NavBar";
 import { useTheme } from "./theme/useTheme";
-import { DARK, LIGHT } from "./utilities/constants";
-import { handleDesktopZoom } from "./utilities/handleDesktopZoom";
+import { DARK, LIGHT } from "utilities/constants";
+import { handleDesktopZoom } from "utilities/handleDesktopZoom";
 import AppRoutes from "./AppRoutes";
 // @ts-ignore
 import { Amplify } from "aws-amplify";
