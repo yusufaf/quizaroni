@@ -34,8 +34,10 @@ import {
     StyledMenuItem,
 } from "./styles";
 import { useDispatch, useSelector } from "react-redux";
-import { selectSelectedStudySet, setSelectedStudySet } from "state/slices/studysetsSlice";
-import axios from "axios";
+import {
+    selectSelectedStudySet,
+    setSelectedStudySet,
+} from "state/slices/studysetsSlice";
 import {
     useAssignCardCategoriesMutation,
     useCreateCategoryMutation,
@@ -46,6 +48,8 @@ import {
 import { Card, Studyset } from "lib/types";
 import { selectUserData } from "state/slices/globalSlice";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { LoadingButton } from "@mui/lab";
 
 const TABS = {
     ASSIGN: "ASSIGN",
@@ -81,19 +85,13 @@ type Props = {
 };
 
 const ManageCategoriesDialog = (props: Props) => {
-    const { 
-        open, 
-        setOpen,
-        selectedStudySet, 
-    } = props;
+    const { open, setOpen, selectedStudySet } = props;
 
     /* Hooks / Redux */
 
     const { id: studySetUUID } = useParams();
 
     const dispatch = useDispatch();
-    // const selectedStudySet = useSelector(selectSelectedStudySet);
-
     const { uuid: userUUID = "" } = useSelector(selectUserData);
 
     /* Skip option prevents hook from running when userUUID is undefined */
@@ -104,21 +102,95 @@ const ManageCategoriesDialog = (props: Props) => {
         }
     );
 
-    const [createCategory] = useCreateCategoryMutation();
-    const [editCategory] = useEditCategoryMutation();
-    const [deleteCategory] = useDeleteCategoryMutation();
-    const [assignCardCategories, {isSuccess}] = useAssignCardCategoriesMutation();
+    const [
+        createCategory,
+        {
+            isLoading: isCreatingCategory,
+            isSuccess: isCreateSuccess,
+            isError: isCreateError,
+        },
+    ] = useCreateCategoryMutation();
+    const [
+        editCategory,
+        {
+            isLoading: isEditingCategory,
+            isSuccess: isEditSuccess,
+            isError: isEditError,
+        },
+    ] = useEditCategoryMutation();
+    const [
+        deleteCategory,
+        {
+            isLoading: isDeletingCategory,
+            isSuccess: isDeleteSuccess,
+            isError: isDeleteError,
+        },
+    ] = useDeleteCategoryMutation();
+
+    const [
+        assignCardCategories,
+        {
+            isLoading: isAssigningCategories,
+            isSuccess: isAssignSuccess,
+            isError: isAssignError,
+        },
+    ] = useAssignCardCategoriesMutation();
 
     useEffect(() => {
-        if (isSuccess) {
-            refetch();
-            setTimeout(() => {
-                dispatch(setSelectedStudySet(studySetsData));
-            }, 1000);
+        if (isCreateSuccess) {
+            setCategoryName("");
+            toast.success("Successfully created category", {
+                position: toast.POSITION.BOTTOM_LEFT,
+            });
         }
-    }, [isSuccess]);
+        if (isCreateError) {
+            toast.error("Error creating category", {
+                position: toast.POSITION.BOTTOM_LEFT,
+            });
+        }
+    }, [isCreateSuccess, isCreateError]);
 
-    console.log({ selectedStudySet });
+    useEffect(() => {
+        if (isEditSuccess) {
+            setEditCategoryName("");
+            setEditIndex(null);
+            toast.success("Successfully edited category", {
+                position: toast.POSITION.BOTTOM_LEFT,
+            });
+        }
+        if (isEditError) {
+            toast.error("Error editing category", {
+                position: toast.POSITION.BOTTOM_LEFT,
+            });
+        }
+    }, [isEditSuccess, isEditError]);
+
+    useEffect(() => {
+        if (isDeleteSuccess) {
+            setDeleteIndices([]);
+            toast.success("Successfully deleted category", {
+                position: toast.POSITION.BOTTOM_LEFT,
+            });
+        }
+        if (isDeleteError) {
+            toast.error("Error deleting category", {
+                position: toast.POSITION.BOTTOM_LEFT,
+            });
+        }
+    }, [isDeleteSuccess, isDeleteError]);
+
+    useEffect(() => {
+        if (isAssignSuccess) {
+            toast.success("Categories assigned to cards", {
+                position: toast.POSITION.BOTTOM_LEFT,
+            });
+        }
+        if (isAssignError) {
+            toast.error("Error assigning categories to cards", {
+                position: toast.POSITION.BOTTOM_LEFT,
+            });
+        }
+    }, [isAssignSuccess, isAssignError]);
 
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
     const [errorInfo, setErrorInfo] = useState(null);
@@ -131,6 +203,9 @@ const ManageCategoriesDialog = (props: Props) => {
     const [selectedCardUUID, setSelectedCardUUID] = useState<string>("");
 
     const isCreateTab = selectedTab === TABS.CREATE;
+
+    /* */
+    useEffect(() => {}, []);
 
     const handleClose = () => {
         setOpen(false);
@@ -174,21 +249,13 @@ const ManageCategoriesDialog = (props: Props) => {
     };
 
     const handleCreate = async () => {
-        try {
-            const { uuid } = selectedStudySet;
-            const response = await axios.post("/api/studysets/createCategory", {
-                uuid,
-                category: categoryName,
-            });
-            console.log({ response });
-
-            /* Clear the text field */
-            setCategoryName("");
-
-            /* TODO: Show a toast notification? */
-        } catch (error) {
-            console.error(error);
+        if (!studySetUUID) {
+            return;
         }
+        createCategory({
+            uuid: studySetUUID,
+            category: categoryName,
+        });
     };
 
     const handleEditClick = (index: number) => {
@@ -219,46 +286,30 @@ const ManageCategoriesDialog = (props: Props) => {
                 return;
             }
 
-            if (selectedAction === ACTIONS.EDIT) {
+            if (selectedAction === ACTIONS.EDIT && editIndex !== null) {
                 const selectedCategoryName = categories[editIndex];
                 /* Don't make network call if it's unchanged */
                 if (editCategoryName === selectedCategoryName) {
                     return;
                 }
 
-                const response = await axios.post(
-                    "/api/studysets/editCategory",
-                    {
-                        uuid,
-                        index: editIndex,
-                        newCategory: editCategoryName,
-                    }
-                );
-                console.log({ response });
+                editCategory({
+                    uuid,
+                    index: editIndex,
+                    newCategory: editCategoryName,
+                });
             } else if (selectedAction === ACTIONS.DELETE) {
                 for (const index of deleteIndices) {
                     const categoryToDelete = categories[index];
-                    const response = await axios.post(
-                        "/api/studysets/deleteCategory",
-                        {
-                            uuid,
-                            categoryToDelete,
-                        }
-                    );
-                    console.log({ response });
+                    deleteCategory({
+                        uuid,
+                        categoryToDelete,
+                    });
                 }
             }
-            /* TODO: Show a toast notification? */
         } catch (error) {
             console.error(error);
         } finally {
-            /* Clear relevant state */
-            if (selectedAction === ACTIONS.EDIT) {
-                setEditIndex(null);
-                setEditCategoryName("");
-            } else {
-                setDeleteIndices([]);
-            }
             setSelectedAction(null);
         }
     };
@@ -267,14 +318,7 @@ const ManageCategoriesDialog = (props: Props) => {
         assignCardCategories({
             uuid: selectedCardUUID,
             categories: e.target.value,
-        }).unwrap()
-        // .then((response) => {
-        //     console.log({ response });
-        // })
-        // .catch((error) => {
-        //     console.error(error);
-        // });
-        // refetch();
+        });
     };
 
     const renderListItems = (): ReactNode[] => {
@@ -286,36 +330,30 @@ const ManageCategoriesDialog = (props: Props) => {
                     divider={index !== 1}
                     key={index}
                     secondaryAction={
-                        !isCreateTab && (
-                            <CategoryButtons>
-                                <IconButton
-                                    edge="end"
-                                    aria-label="edit"
-                                    onClick={() => handleEditClick(index)}
-                                >
-                                    <Edit
-                                        color={
-                                            isEditSelected
-                                                ? "primary"
-                                                : undefined
-                                        }
-                                    />
-                                </IconButton>
-                                <IconButton
-                                    edge="end"
-                                    aria-label="delete"
-                                    onClick={() => handleDeleteClick(index)}
-                                >
-                                    <Delete
-                                        color={
-                                            isDeleteSelected
-                                                ? "primary"
-                                                : undefined
-                                        }
-                                    />
-                                </IconButton>
-                            </CategoryButtons>
-                        )
+                        <CategoryButtons>
+                            <IconButton
+                                edge="end"
+                                aria-label="edit"
+                                onClick={() => handleEditClick(index)}
+                            >
+                                <Edit
+                                    color={
+                                        isEditSelected ? "primary" : undefined
+                                    }
+                                />
+                            </IconButton>
+                            <IconButton
+                                edge="end"
+                                aria-label="delete"
+                                onClick={() => handleDeleteClick(index)}
+                            >
+                                <Delete
+                                    color={
+                                        isDeleteSelected ? "primary" : undefined
+                                    }
+                                />
+                            </IconButton>
+                        </CategoryButtons>
                     }
                 >
                     {value}
@@ -413,6 +451,7 @@ const ManageCategoriesDialog = (props: Props) => {
                                     multiple
                                     value={selectedCardCategories}
                                     onChange={onAssignedCategoriesChange}
+                                    disabled={isAssigningCategories}
                                 >
                                     {categories.map((category, index) => {
                                         return (
@@ -438,13 +477,14 @@ const ManageCategoriesDialog = (props: Props) => {
         switch (selectedTab) {
             case TABS.CREATE:
                 return (
-                    <Button
+                    <LoadingButton
                         variant="contained"
                         onClick={handleCreate}
                         disabled={!categoryName || errorInfo}
+                        loading={isCreatingCategory}
                     >
                         Create
-                    </Button>
+                    </LoadingButton>
                 );
             case TABS.MANAGE:
                 const disabled =
