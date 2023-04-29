@@ -9,6 +9,8 @@ import "./index.css";
 import App from "./App";
 import { store } from "./state/store";
 
+const rootElement = document.getElementById("root");
+
 ReactDOM.render(
     <Provider store={store}>
         <BrowserRouter>
@@ -20,5 +22,5 @@ ReactDOM.render(
             </CustomThemeProvider>
         </BrowserRouter>
     </Provider>,
-    document.getElementById("root")
+    rootElement
 );

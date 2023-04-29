@@ -6,7 +6,7 @@ import CreateSet from "views/Create/CreateSet";
 import ForgotPassword from "views/ForgotPassword/ForgotPassword";
 import Profile from "views/Profile/Profile";
 import ConfirmEmail from "views/ConfirmEmail/ConfirmEmail";
-import ViewFlashSet from "views/Home/ViewFlashSet/ViewFlashSet";
+import ViewStudySet from "views/ViewStudySet/ViewStudySet";
 
 type Props = {};
 
@@ -21,7 +21,7 @@ const AppRoutes = (props: Props) => {
             <Route path="/profile" element={<Profile />} />
             <Route path="/explore" element={<></>} />
             {/* TODO: Route for view / editing flashsets */}
-            <Route path="/view/:id" element={<ViewFlashSet />} />
+            <Route path="/view/:id" element={<ViewStudySet />} />
             <Route path="/edit/:id" element={<CreateSet type="Edit" />} />
 
             {/* <Route path="*" element={<NotFound />} /> */}

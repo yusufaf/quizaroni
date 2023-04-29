@@ -10,24 +10,22 @@ import {
     ViewCardContainer,
     CategoryChips,
 } from "./ViewFlashSetStyles";
-import axios from "axios";
 import { Card, Studyset } from "lib/types";
+import { useMarkCardAsImportantMutation } from "state/api/studysets";
 
 type Props = {
     card: Card; // TODO: Type
     index: number;
-    selectedStudySet: Studyset
+    selectedStudySet: Studyset;
 };
 
 const ViewFlashCard = (props: Props) => {
-    const { 
-        card, 
-        index,
-        selectedStudySet,
-    } = props;
+    const { card, index, selectedStudySet } = props;
 
     const { isDarkMode, theme } = useTheme();
     const timeoutRef = useRef(null);
+
+    const [markCardAsImportant] = useMarkCardAsImportantMutation();
 
     // TODO: Adjust to clear timeout / reset if clicked multiple times
     const handleAudioPlayback = () => {
@@ -46,19 +44,11 @@ const ViewFlashCard = (props: Props) => {
     };
 
     const handleMarkAsImportant = async () => {
-        try {
-            const { important, uuid } = card;
-            const response = await axios.post(
-                `/api/studysets/markCardAsImportant`,
-                {
-                    uuid,
-                    newValue: !important,
-                }
-            );
-            console.log({ response });
-        } catch (error) {
-            console.error(error);
-        }
+        const { important, uuid } = card;
+        markCardAsImportant({
+            uuid,
+            newValue: !important,
+        });
     };
 
     return (
@@ -67,7 +57,8 @@ const ViewFlashCard = (props: Props) => {
             key={index}
             style={{
                 backgroundColor: `${
-                    card?.backgroundColor && selectedStudySet?.metadata?.backgroundColorVisible
+                    card?.backgroundColor &&
+                    selectedStudySet?.metadata?.backgroundColorVisible
                         ? card.backgroundColor
                         : ""
                 }`,
@@ -84,7 +75,7 @@ const ViewFlashCard = (props: Props) => {
                 </Typography>
                 <CategoryChips>
                     {card?.categories?.map((category: any, index: number) => (
-                        <Chip key={index} label={category} variant="outlined"/>
+                        <Chip key={index} label={category} variant="outlined" />
                     ))}
                 </CategoryChips>
 
@@ -113,7 +104,8 @@ const ViewFlashCard = (props: Props) => {
                     <Typography
                         sx={{
                             color: `${
-                                card?.textColor && selectedStudySet?.metadata?.textColorVisible
+                                card?.textColor &&
+                                selectedStudySet?.metadata?.textColorVisible
                                     ? card.textColor
                                     : ""
                             }`,
@@ -130,7 +122,8 @@ const ViewFlashCard = (props: Props) => {
                     <Typography
                         sx={{
                             color: `${
-                                card?.textColor && selectedStudySet?.metadata?.textColorVisible
+                                card?.textColor &&
+                                selectedStudySet?.metadata?.textColorVisible
                                     ? card.textColor
                                     : ""
                             }`,
