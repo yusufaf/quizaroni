@@ -72,10 +72,7 @@ export const selectAlert = (state) => state.global.alert;
 export const selectDialogOpen = (state) => state.global.dialogOpen;
 export const selectUserAuthState = (state) => state.global.userAuthInfo;
 export const selectCognitoUser = (state) => state.global.cognitoUser;
-export const selectAuthenticated = (state) => {
-    console.log({ state });
-    return state.global.authenticated;
-};
+export const selectAuthenticated = (state) => state.global.authenticated;
 export const selectUserData = (state) => state.global.userData;
 
 export default globalSlice.reducer;

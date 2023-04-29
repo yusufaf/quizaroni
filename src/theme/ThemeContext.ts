@@ -8,7 +8,7 @@ export const light = createTheme({
             main: "#ffa000",
             light: "#ffd149",
             dark: "#c67100",
-        }
+        },
         // background: {
         //     paper: "#F5F5F5",
         // },
@@ -18,7 +18,6 @@ export const light = createTheme({
     },
     // body: "#F5F5F5"
 });
-
 
 export const dark = createTheme({
     palette: {
@@ -40,8 +39,8 @@ export const dark = createTheme({
 
 export const themes = {
     light,
-    dark
-}
+    dark,
+};
 
 // export const themes = {
 //     light: {

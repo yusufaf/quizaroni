@@ -16,9 +16,11 @@
   "dependencies": {
     "@aws-amplify/auth": "^5.2.1",
     "@emailjs/browser": "^3.4.0",
-    "@emotion/styled": "^11.8.1",
+    "@emotion/react": "^11.10.8",
+    "@emotion/styled": "^11.10.8",
     "@mui/icons-material": "^5.2.1",
-    "@mui/material": "^5.2.3",
+    "@mui/lab": "^5.0.0-alpha.128",
+    "@mui/material": "^5.12.2",
     "@mui/x-data-grid": "^5.8.0",
     "@reduxjs/toolkit": "^1.9.5",
     "@sendgrid/mail": "^7.6.2",
@@ -44,6 +46,7 @@
     "react-firebaseui": "^6.0.0",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.0.2",
+    "react-toastify": "^9.1.2",
     "smtp-server": "^3.10.0",
     "typescript": "^5.0.3",
     "uuid": "^8.3.2"

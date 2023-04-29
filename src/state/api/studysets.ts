@@ -1,16 +1,19 @@
 import { api } from "./api";
-import { UUID, Studyset } from "lib/types";
+import {
+    UUID,
+    Studyset,
+    CreateCategoryParams,
+    UpdateMetadataParams,
+    DeleteCategoryParams,
+    EditCategoryParams,
+    MarkCardAsImportantParams,
+    DeleteStudysetParams,
+} from "lib/types";
 import {
     setSelectedStudySet,
     selectSelectedStudySet,
-} from "state/slices/studysetsSlice"
+} from "state/slices/studysetsSlice";
 import { store } from "state/store";
-
-type UpdateMetadataParams = {
-    uuid: UUID;
-    property: string;
-    newValue: any;
-};
 
 /* Endpoints
 	router.post("/api/studysets/create", createStudySet);
@@ -33,10 +36,9 @@ const selectedStudySetMutation = {
 
         const state = store.getState();
         const selectedStudySet = selectSelectedStudySet(state);
-        
+
         // If a mutation is being made on a study set, update the selected study set in the Redux store.
         if (selectedStudySet && arg.uuid === selectedStudySet.uuid) {
-            
         }
 
         return response;
@@ -69,11 +71,11 @@ export const studysetsApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Studysets"],
         }),
-        deleteStudyset: build.mutation<void, UUID>({
-            query: (UUID) => ({
+        deleteStudyset: build.mutation<void, DeleteStudysetParams>({
+            query: ({ uuid }) => ({
                 url: "studysets/delete",
                 method: "POST",
-                body: { UUID },
+                body: { uuid },
             }),
             invalidatesTags: ["Studysets"],
         }),
@@ -89,28 +91,27 @@ export const studysetsApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Studysets"],
         }),
-        createCategory: build.mutation<Studyset, Studyset>({
-            query: (body) => ({
+        createCategory: build.mutation<Studyset, CreateCategoryParams>({
+            query: ({ uuid, category }) => ({
                 url: "studysets/createCategory",
                 method: "POST",
-                body,
+                body: { uuid, category },
             }),
             invalidatesTags: ["Studysets"],
         }),
-
-        editCategory: build.mutation<Studyset, Studyset>({
-            query: (body) => ({
+        editCategory: build.mutation<Studyset, EditCategoryParams>({
+            query: ({ uuid, index, newCategory }) => ({
                 url: "studysets/editCategory",
                 method: "POST",
-                body,
+                body: { uuid, index, newCategory },
             }),
             invalidatesTags: ["Studysets"],
         }),
-        deleteCategory: build.mutation<Studyset, Studyset>({
-            query: (body) => ({
+        deleteCategory: build.mutation<Studyset, DeleteCategoryParams>({
+            query: ({ uuid, categoryToDelete }) => ({
                 url: "studysets/deleteCategory",
                 method: "POST",
-                body,
+                body: { uuid, categoryToDelete },
             }),
             invalidatesTags: ["Studysets"],
         }),
@@ -122,11 +123,11 @@ export const studysetsApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Studysets"],
         }),
-        markCardAsImportant: build.mutation<Studyset, Studyset>({
-            query: (body) => ({
+        markCardAsImportant: build.mutation<Studyset, MarkCardAsImportantParams>({
+            query: ({uuid, newValue}) => ({
                 url: "studysets/markCardAsImportant",
                 method: "POST",
-                body,
+                body: {uuid, newValue},
             }),
             invalidatesTags: ["Studysets"],
         }),

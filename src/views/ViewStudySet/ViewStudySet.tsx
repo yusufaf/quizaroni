@@ -59,7 +59,7 @@ import {
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
-import { SortDirection } from "lib/types";
+import { Card, SortDirection } from "lib/types";
 import {
     useGetStudysetQuery,
     useUpdateStudysetMetadataMutation,
@@ -250,7 +250,7 @@ const ViewFlashSet = (props: Props) => {
         const sortModifier = sortDirection === SORT_DIRECTIONS.ASC ? 1 : -1;
         const sortedCards = [...(selectedStudySet?.cards ?? [])];
         if (selectedSort) {
-            sortedCards.sort((a, b) => {
+            sortedCards.sort((a: Card, b: Card) => {
                 if (a[selectedSort] < b[selectedSort]) {
                     return -1 * sortModifier;
                 }
@@ -285,8 +285,11 @@ const ViewFlashSet = (props: Props) => {
                 return sortedViewFlashCards;
             case DEFAULT_CATEGORIES.IMPORTANT:
                 return [...sortedViewFlashCards].filter((value) => {
-                    console.log({ value });
                     return value.props.card.important;
+                });
+            default:
+                return [...sortedViewFlashCards].filter((value) => {
+                    return value.props.card.categories.includes(selectedTab);
                 });
         }
     }, [selectedTab, sortedViewFlashCards]);
