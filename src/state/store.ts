@@ -3,9 +3,11 @@ import globalReducer from "state/slices/globalSlice";
 import studySetsReducer from "state/slices/studysetsSlice";
 import { api } from "./api/api";
 
+const apiPath = api.reducerPath;
+
 export const store = configureStore({
     reducer: {
-        [api.reducerPath]: api.reducer,
+        [apiPath]: api.reducer,
         global: globalReducer,
         studySets: studySetsReducer,
     },
