@@ -26,6 +26,7 @@ export const ViewFlashsetHeader = styled(Box)({
     gridTemplateColumns: "30rem auto",
 })
 
+
 export const SetInfo = styled(Box)(({ theme }) => ({
     borderRight: `0.1rem solid ${theme.palette.text.primary}`,
 }));
@@ -67,10 +68,10 @@ export const ActionButtonsRow = styled(Paper)({
 /* Cards */
 
 export const ViewFlashsetCard = styled(Card)({
-    position: "relative",
     width: "70rem",
     padding: "1rem 1.25rem 1.25rem 1.25rem",
     borderRadius: "0.75rem",
+    transition: "0.2s ease",
 })
 
 export const CategoryChips = styled(SimpleFlexContainer)({
@@ -97,6 +98,10 @@ export const ViewCardInfo = styled("div")({
     width: "10rem",
     wordWrap: "break-word"
 })
+
+export const ViewCardText = styled(Typography)({
+
+});
 
 
 export const StudyModeOption = styled("div")(({ theme }) => ({

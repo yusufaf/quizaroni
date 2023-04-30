@@ -1,6 +1,6 @@
 import { Button } from "@mui/material";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import { PAGES } from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";
@@ -18,21 +18,30 @@ import {
     selectUserData,
 } from "state/slices/globalSlice";
 import axios from "axios";
+import { useGetStudysetQuery } from "state/api/studysets";
+import {
+    CREATE_PAGE_TYPES
+} from "utilities/constants";
+
 
 const EMPTY_CARD = {
     term: "",
     definition: "",
 };
 
+
 type Props = {
-    type?: string;
-}
+    pageType?: string;
+};
 
 const CreateSet = (props: Props) => {
-    const {
-        type = "Create"
-    } = props;
+    const { pageType = "Create" } = props;
 
+    const isCreatePage = pageType === CREATE_PAGE_TYPES.CREATE;
+    const isEditPage = pageType === CREATE_PAGE_TYPES.EDIT;
+
+    /* Hooks / Redux */
+    const { id: studySetUUID } = useParams();
     const { isDarkMode, theme } = useTheme();
     const navigate = useNavigate();
 
@@ -40,12 +49,31 @@ const CreateSet = (props: Props) => {
     const cognitoUser = useSelector(selectCognitoUser);
     const userData = useSelector(selectUserData);
 
+    const {
+        data: selectedStudySet,
+        isLoading: isStudySetLoading,
+        isSuccess: isStudySetSuccess,
+        isError: isStudySetError,
+    } = useGetStudysetQuery(studySetUUID ?? "", {
+        skip: !studySetUUID,
+    });
+
+
+    useEffect(() => {
+        if (isStudySetSuccess) {
+            const { label, title, description, cards } = selectedStudySet;
+            setEnteredLabel(label);
+            setTitle(title);
+            setDescription(description);
+            setCreatedSetCards(cards);
+        }
+    }, [selectedStudySet])
+
     /* Flash Set States */
     const [title, setTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [enteredLabel, setEnteredLabel] = useState<string>("");
     const [selectedLabel, setSelectedLabel] = useState<string>("");
-
     const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
 
     const [labelOptions, setLabelOptions] = useState([]);
@@ -102,9 +130,7 @@ const CreateSet = (props: Props) => {
             });
     };
 
-    const createNewLabel = async () => {
-
-    };
+    const createNewLabel = async () => {};
 
     /* Check that length of createdCardObjects is not 0 */
     const createNewSet = async () => {
@@ -148,7 +174,10 @@ const CreateSet = (props: Props) => {
             //     navigate("/");
             // }, 1000);
 
-            const response = await axios.post("/api/studysets/create", studySet);
+            const response = await axios.post(
+                "/api/studysets/create",
+                studySet
+            );
             console.log({ response });
         } catch (error) {}
     };
@@ -289,8 +318,8 @@ const CreateSet = (props: Props) => {
         blankCardsCount,
         expanded: advancedExpanded,
         onToggleExpanded: toggleAdvancedSection,
-        onBlankInputsChange: onBlankInputsChange,
-        onBlankInputsSubmit: onBlankInputsSubmit,
+        onBlankInputsChange,
+        onBlankInputsSubmit,
     };
 
     const headerProps = {
@@ -305,6 +334,7 @@ const CreateSet = (props: Props) => {
         selectedLabel,
         setShowImportModal,
         title: title,
+        pageType
     };
 
     if (!authenticated) {
