@@ -50,6 +50,7 @@ import { selectUserData } from "state/slices/globalSlice";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
+import useCustomMutation from "lib/hooks/useCustomMutation";
 
 const TABS = {
     ASSIGN: "ASSIGN",
@@ -88,7 +89,6 @@ const ManageCategoriesDialog = (props: Props) => {
     const { open, setOpen, selectedStudySet } = props;
 
     /* Hooks / Redux */
-
     const { id: studySetUUID } = useParams();
 
     const dispatch = useDispatch();
@@ -102,95 +102,59 @@ const ManageCategoriesDialog = (props: Props) => {
         }
     );
 
-    const [
-        createCategory,
-        {
-            isLoading: isCreatingCategory,
-            isSuccess: isCreateSuccess,
-            isError: isCreateError,
-        },
-    ] = useCreateCategoryMutation();
-    const [
-        editCategory,
-        {
-            isLoading: isEditingCategory,
-            isSuccess: isEditSuccess,
-            isError: isEditError,
-        },
-    ] = useEditCategoryMutation();
-    const [
-        deleteCategory,
-        {
-            isLoading: isDeletingCategory,
-            isSuccess: isDeleteSuccess,
-            isError: isDeleteError,
-        },
-    ] = useDeleteCategoryMutation();
-
-    const [
-        assignCardCategories,
-        {
-            isLoading: isAssigningCategories,
-            isSuccess: isAssignSuccess,
-            isError: isAssignError,
-        },
-    ] = useAssignCardCategoriesMutation();
-
-    useEffect(() => {
-        if (isCreateSuccess) {
+    const {
+        mutate: createCategory,
+        isLoading: isCreatingCategory,
+        isSuccess: isCreateSuccess,
+        isError: isCreateError,
+    } = useCustomMutation({
+        mutation: useCreateCategoryMutation,
+        successMessage: "Successfully created category",
+        errorMessage: "Error creating category",
+        onSuccess: () => {
             setCategoryName("");
-            toast.success("Successfully created category", {
-                position: toast.POSITION.BOTTOM_LEFT,
-            });
-        }
-        if (isCreateError) {
-            toast.error("Error creating category", {
-                position: toast.POSITION.BOTTOM_LEFT,
-            });
-        }
-    }, [isCreateSuccess, isCreateError]);
+        },
+    });
 
-    useEffect(() => {
-        if (isEditSuccess) {
+    const {
+        mutate: editCategory,
+        isLoading: isEditingCategory,
+        isSuccess: isEditSuccess,
+        isError: isEditError,
+    } = useCustomMutation({
+        mutation: useEditCategoryMutation,
+        successMessage: "Successfully created category",
+        errorMessage: "Error creating category",
+        onSuccess: () => {
             setEditCategoryName("");
             setEditIndex(null);
-            toast.success("Successfully edited category", {
-                position: toast.POSITION.BOTTOM_LEFT,
-            });
-        }
-        if (isEditError) {
-            toast.error("Error editing category", {
-                position: toast.POSITION.BOTTOM_LEFT,
-            });
-        }
-    }, [isEditSuccess, isEditError]);
+        },
+    });
 
-    useEffect(() => {
-        if (isDeleteSuccess) {
+    const {
+        mutate: deleteCategory,
+        isLoading: isDeletingCategory,
+        isSuccess: isDeleteSuccess,
+        isError: isDeleteError,
+    } = useCustomMutation({
+        mutation: useDeleteCategoryMutation,
+        successMessage: "Successfully deleted category",
+        errorMessage: "Error deleting category",
+        onSuccess: () => {
             setDeleteIndices([]);
-            toast.success("Successfully deleted category", {
-                position: toast.POSITION.BOTTOM_LEFT,
-            });
-        }
-        if (isDeleteError) {
-            toast.error("Error deleting category", {
-                position: toast.POSITION.BOTTOM_LEFT,
-            });
-        }
-    }, [isDeleteSuccess, isDeleteError]);
+        },
+    });
 
-    useEffect(() => {
-        if (isAssignSuccess) {
-            toast.success("Categories assigned to cards", {
-                position: toast.POSITION.BOTTOM_LEFT,
-            });
-        }
-        if (isAssignError) {
-            toast.error("Error assigning categories to cards", {
-                position: toast.POSITION.BOTTOM_LEFT,
-            });
-        }
-    }, [isAssignSuccess, isAssignError]);
+    const {
+        mutate: assignCardCategories,
+        isLoading: isAssigningCategories,
+        isSuccess: isAssignSuccess,
+        isError: isAssignError,
+    } = useCustomMutation({
+        mutation: useAssignCardCategoriesMutation,
+        successMessage: "Categories assigned to cards",
+        errorMessage: "Error assigning categories to cards",
+    });
 
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
     const [errorInfo, setErrorInfo] = useState(null);

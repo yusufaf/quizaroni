@@ -9,11 +9,6 @@ import {
     MarkCardAsImportantParams,
     DeleteStudysetParams,
 } from "lib/types";
-import {
-    setSelectedStudySet,
-    selectSelectedStudySet,
-} from "state/slices/studysetsSlice";
-import { store } from "state/store";
 
 /* Endpoints
 	router.post("/api/studysets/create", createStudySet);
@@ -29,22 +24,6 @@ import { store } from "state/store";
 */
 
 /* */
-const selectedStudySetMutation = {
-    transformResponse: (response, meta, arg) => {
-        console.log("Transform response = ", { response, meta, arg });
-        // your transformation logic goes here
-
-        const state = store.getState();
-        const selectedStudySet = selectSelectedStudySet(state);
-
-        // If a mutation is being made on a study set, update the selected study set in the Redux store.
-        if (selectedStudySet && arg.uuid === selectedStudySet.uuid) {
-        }
-
-        return response;
-    },
-};
-
 export const studysetsApi = api.injectEndpoints({
     endpoints: (build) => ({
         getAllStudysets: build.query<Studyset[], UUID>({
@@ -138,7 +117,6 @@ export const studysetsApi = api.injectEndpoints({
                 body: { uuid, categories },
             }),
             invalidatesTags: ["Studysets"],
-            ...selectedStudySetMutation,
         }),
     }),
 });
