@@ -11,11 +11,6 @@ import AppRoutes from "./AppRoutes";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// @ts-ignore
-import { Amplify } from "aws-amplify";
-import awsconfig from "./aws-exports";
-Amplify.configure(awsconfig);
-
 const App = () => {
     const { setTheme, theme } = useTheme();
     const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
