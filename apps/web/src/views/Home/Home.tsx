@@ -1,7 +1,6 @@
 import { MenuOpen as MenuOpenIcon } from "@mui/icons-material";
 import { IconButton, Tooltip } from "@mui/material/";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -77,6 +76,7 @@ const Home = (props: Props) => {
 
     /* Functions */
     const openActionsMenu = (event) => {
+        event.stopPropagation();
         setAnchorEl(event.currentTarget);
         setActionsMenuOpen(true);
     };
@@ -149,7 +149,7 @@ const Home = (props: Props) => {
 
     const handleFavoriteFilter = () => {};
 
-    const handleViewChange = (event, newView) => {
+    const handleViewChange = (event: any, newView: string | null) => {
         if (newView !== null) {
             setSelectedView(newView);
         }
@@ -172,7 +172,7 @@ const Home = (props: Props) => {
             <HomePaper elevation={6}>
                 <HomeContainer p={2} borderRadius={5}>
                     <HomeSetsHeading variant="h5">
-                        Your Flashsets
+                        Your Study Sets
                     </HomeSetsHeading>
                     <HomeToolbar
                         handleViewChange={handleViewChange}

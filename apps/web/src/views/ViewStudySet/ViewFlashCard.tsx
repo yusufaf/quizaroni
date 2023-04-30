@@ -14,7 +14,7 @@ import { Card, Studyset } from "lib/types";
 import { useMarkCardAsImportantMutation } from "state/api/studysets";
 
 type Props = {
-    card: Card; // TODO: Type
+    card: Card; 
     index: number;
     selectedStudySet: Studyset;
 };
@@ -78,7 +78,6 @@ const ViewFlashCard = (props: Props) => {
                         <Chip key={index} label={category} variant="outlined" />
                     ))}
                 </CategoryChips>
-
                 <ViewFlashCardActions>
                     <Tooltip title="Play TTS" placement="top">
                         <IconButton onClick={handleAudioPlayback}>

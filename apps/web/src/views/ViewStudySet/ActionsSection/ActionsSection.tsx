@@ -14,6 +14,7 @@ import {
     Edit,
     EditNotifications,
     MenuOpen,
+    Print,
 } from "@mui/icons-material/";
 import {
     DISABLED,
@@ -108,10 +109,14 @@ const ActionsSection = (props: Props) => {
                         <EditNotifications />
                     </IconButton>
                 </Tooltip>
-
                 <Tooltip title="Control Menu" ref={controlAnchorRef}>
                     <IconButton onClick={handleOpenControlMenu} color="primary">
                         <MenuOpen />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Print">
+                    <IconButton color="primary">
+                        <Print />
                     </IconButton>
                 </Tooltip>
             </ActionButtonsRow>

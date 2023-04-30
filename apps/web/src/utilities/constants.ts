@@ -75,7 +75,7 @@ export const DOWNLOAD_FILE_TYPES = {
 export const FLASHSET_VIEWS = {
     TABLE: "table",
     GRID: "grid",
-    TEXT: "text"
+    TEXT: "text",
 };
 
 // Define regex patterns for each requirement
@@ -89,13 +89,13 @@ export const PWD_REGEX = {
 
 export const DIALOGS = {
     DELETE_CONFIRM: "DELETE_CONFIRM",
-}
+};
 
 export const SET_METADATA_FIELDS = {
     TEXT: "textColorVisible",
     BACKGROUND: "backgroundColorVisible",
     PUBLIC: "publiclyViewable",
-}
+};
 
 export const DEFAULT_CATEGORIES = {
     ALL: "ALL",
@@ -105,4 +105,20 @@ export const DEFAULT_CATEGORIES = {
 export const SORT_DIRECTIONS: { [key: string]: SortDirection } = {
     ASC: "asc",
     DSC: "dsc",
+};
+
+export const CREATE_PAGE_TYPES: { [key: string]: string } = {
+    CREATE: "Create",
+    EDIT: "Edit",
+};
+
+export const CREATE_PAGE_PROPS: { [key: string]: any } = {
+    [CREATE_PAGE_TYPES.CREATE]: {
+        TITLE: "Create a new study set",
+        BUTTON: "Create Set",
+    },
+    [CREATE_PAGE_TYPES.EDIT]: {
+        TITLE: "Edit your study set",
+        BUTTON: "Save Changes",
+    },
 };

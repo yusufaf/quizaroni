@@ -197,7 +197,7 @@ const Login = (props: Props) => {
                                 ),
                             }}
                         />
-                        <ForgotPasswordLink to="/forgot">
+                        <ForgotPasswordLink to="/forgotPassword">
                             Forgot password?
                         </ForgotPasswordLink>
                         <LoginButton

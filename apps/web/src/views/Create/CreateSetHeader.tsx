@@ -10,7 +10,11 @@ import {
 import { Dispatch, SetStateAction } from "react";
 import { BoldHeading, SimpleFlexContainer } from "src/AppStyles";
 import { useTheme } from "theme/useTheme";
-import { CREATE_SET } from "utilities/constants";
+import { 
+    CREATE_SET,
+    CREATE_PAGE_TYPES,
+    CREATE_PAGE_PROPS
+} from "utilities/constants";
 import {
     CreateSetButton,
     CreateSetContainer,
@@ -38,7 +42,8 @@ type Props = {
     selectedLabel: string;
     title: string;
     setShowImportModal: Dispatch<SetStateAction<boolean>>;
-}; /* use `interface` if exporting so that consumers can extend */
+    pageType: string;
+}; 
 
 const CreateSetHeader = (props: Props) => {
     const {
@@ -53,6 +58,7 @@ const CreateSetHeader = (props: Props) => {
         selectedLabel,
         setShowImportModal,
         title,
+        pageType = ""
     } = props;
 
     const { theme } = useTheme();
@@ -64,7 +70,7 @@ const CreateSetHeader = (props: Props) => {
         <CreateSetPaper elevation={6}>
             <CreateSetContainer>
                 <HeaderLeftContainer>
-                    <BoldHeading variant="h5">{CREATE_SET.TITLE}</BoldHeading>
+                    <BoldHeading variant="h5">{CREATE_PAGE_PROPS[pageType].TITLE}</BoldHeading>
                     <CreateSetInputsContainer>
                         <BoldHeading
                             variant="subtitle1"
@@ -150,7 +156,7 @@ const CreateSetHeader = (props: Props) => {
                         disabled={createSetDisabled}
                         startIcon={<Create />}
                     >
-                        Create Set
+                        {CREATE_PAGE_PROPS[pageType].BUTTON}
                     </CreateSetButton>
                     <HeaderAdvancedSection {...advancedSectionProps} />
                 </HeaderRightContainer>
