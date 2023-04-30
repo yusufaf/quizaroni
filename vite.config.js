@@ -11,7 +11,10 @@ export default defineConfig({
     define: {
         global: {},
     },
-    plugins: [react(), VitePWA({ registerType: "autoUpdate" })],
+    plugins: [
+        react(), 
+        // VitePWA({ registerType: "autoUpdate" })
+    ],
     resolve: {
         alias: {
             src: path.resolve("src/"),
