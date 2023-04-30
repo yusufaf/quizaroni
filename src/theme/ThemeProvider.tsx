@@ -3,7 +3,11 @@ import { ThemeContext, themes } from "./ThemeContext";
 import { ThemeProvider } from '@mui/material/styles';
 import { LIGHT, DARK } from "utilities/constants";
 
-export const CustomThemeProvider = (props) => {
+type Props = {
+    children: any;
+};
+
+export const CustomThemeProvider = (props: Props) => {
     const { children } = props;
 
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -15,7 +19,7 @@ export const CustomThemeProvider = (props) => {
     const [theme, setTheme] = useState(themes[themeName]);
 
     // Wrap setThemeName to store new theme names in localStorage
-    const setAppThemeName = (name) => {
+    const setAppThemeName = (name: string) => {
         localStorage.setItem('appTheme', name)
         setThemeName(name);
         setIsDarkMode(name === DARK);
