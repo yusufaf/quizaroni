@@ -1,4 +1,4 @@
-import { api } from "./api";
+import api from "./api";
 import {
     UUID,
     Studyset,
@@ -8,6 +8,10 @@ import {
     EditCategoryParams,
     MarkCardAsImportantParams,
     DeleteStudysetParams,
+    UpdateLastViewedParams,
+    GetAllStudysetsParams,
+    GetStudysetParams,
+    AssignCardCategoriesParams,
 } from "lib/types";
 
 /* Endpoints
@@ -26,16 +30,16 @@ import {
 /* */
 export const studysetsApi = api.injectEndpoints({
     endpoints: (build) => ({
-        getAllStudysets: build.query<Studyset[], UUID>({
-            query: (userUUID) => ({
+        getAllStudysets: build.query<Studyset[], GetAllStudysetsParams>({
+            query: ({ userUUID }) => ({
                 url: "studysets/getAll",
                 method: "GET",
                 params: { userUUID },
             }),
             providesTags: ["Studysets"],
         }),
-        getStudyset: build.query<Studyset, UUID>({
-            query: (uuid) => ({
+        getStudyset: build.query<Studyset, GetStudysetParams>({
+            query: ({ uuid }) => ({
                 url: "studysets/get",
                 method: "GET",
                 params: { uuid },
@@ -94,27 +98,30 @@ export const studysetsApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Studysets"],
         }),
-        updateLastViewed: build.mutation<Studyset, UUID>({
-            query: (uuid) => ({
+        updateLastViewed: build.mutation<Studyset, UpdateLastViewedParams>({
+            query: ({ uuid }) => ({
                 url: "studysets/updateLastViewed",
                 method: "POST",
                 body: { uuid },
             }),
             invalidatesTags: ["Studysets"],
         }),
-        markCardAsImportant: build.mutation<Studyset, MarkCardAsImportantParams>({
-            query: ({uuid, newValue}) => ({
+        markCardAsImportant: build.mutation<
+            Studyset,
+            MarkCardAsImportantParams
+        >({
+            query: ({ cardUUID, newValue }) => ({
                 url: "studysets/markCardAsImportant",
                 method: "POST",
-                body: {uuid, newValue},
+                body: { cardUUID, newValue },
             }),
             invalidatesTags: ["Studysets"],
         }),
-        assignCardCategories: build.mutation<void, any>({
-            query: ({ uuid, categories }) => ({
+        assignCardCategories: build.mutation<void, AssignCardCategoriesParams>({
+            query: ({ cardUUID, categories }) => ({
                 url: "studysets/assignCardCategories",
                 method: "POST",
-                body: { uuid, categories },
+                body: { cardUUID, categories },
             }),
             invalidatesTags: ["Studysets"],
         }),

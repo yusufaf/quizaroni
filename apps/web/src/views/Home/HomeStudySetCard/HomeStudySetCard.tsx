@@ -27,7 +27,7 @@ type Props = {
     handleDeleteSet: any;
 }
 
-const HomeFlashSet = (props: Props) => {
+const HomeStudySetCard = (props: Props) => {
     const {
         studySet,
         handleDeleteSet,
@@ -76,7 +76,7 @@ const HomeFlashSet = (props: Props) => {
     }
 
     const actionMenuProps = {
-        studySet,
+        studyset: studySet,
         open: actionsMenuOpen,
         onClose: closeActionsMenu,
         anchorEl: anchorEl,
@@ -139,4 +139,4 @@ const HomeFlashSet = (props: Props) => {
     )
 }
 
-export default HomeFlashSet;
+export default HomeStudySetCard;

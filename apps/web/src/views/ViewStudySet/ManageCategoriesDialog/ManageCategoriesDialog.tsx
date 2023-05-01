@@ -280,7 +280,7 @@ const ManageCategoriesDialog = (props: Props) => {
 
     const onAssignedCategoriesChange = (e: any) => {
         assignCardCategories({
-            uuid: selectedCardUUID,
+            cardUUID: selectedCardUUID,
             categories: e.target.value,
         });
     };

@@ -34,6 +34,14 @@ export type Studyset = {
 
 /* RTK Query Types */
 
+export type GetAllStudysetsParams = {
+    userUUID: UUID;
+};
+
+export type GetStudysetParams = {
+    uuid: UUID;
+};  
+
 export type CreateStudysetParams = {
 // TODO
 };
@@ -64,9 +72,18 @@ export type EditCategoryParams = {
     newCategory: string;
 };
 
+export type AssignCardCategoriesParams = {
+    cardUUID: UUID;
+    categories: string[];
+}
+
 export type MarkCardAsImportantParams = {
-    uuid: UUID;
+    cardUUID: UUID;
     newValue: boolean;
+}
+
+export type UpdateLastViewedParams = {
+    uuid: UUID;
 }
 
 export type SortDirection = "asc" | "dsc";
