@@ -47,7 +47,7 @@ import {
     SortCardsDropdown,
     CardFiltersContainer,
     CategoryTabs,
-} from "./ViewFlashSetStyles";
+} from "./styles";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -62,6 +62,7 @@ import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDia
 import { Card, SortDirection } from "lib/types";
 import {
     useGetStudysetQuery,
+    useUpdateLastViewedMutation,
     useUpdateStudysetMetadataMutation,
 } from "state/api/studysets";
 
@@ -79,13 +80,15 @@ const ViewFlashSet = (props: Props) => {
     // const studySets = useSelector(selectStudySets);
     // console.log({ studySets });
     // const selectedStudySet = useSelector(selectSelectedStudySet);
-    
+
     const {
         data: selectedStudySet,
         isLoading: isStudySetLoading,
         isSuccess: isStudySetSuccess,
-    } = useGetStudysetQuery(studySetUUID ?? "");
-    
+    } = useGetStudysetQuery({
+        uuid: studySetUUID ?? "",
+    });
+
     const [
         updateStudysetMetadata,
         {
@@ -95,9 +98,13 @@ const ViewFlashSet = (props: Props) => {
         },
     ] = useUpdateStudysetMetadataMutation();
 
+    const [updateLastViewed] = useUpdateLastViewedMutation();
+
     console.log({ selectedStudySet, isStudySetLoading });
 
     const controlAnchorRef = useRef(null);
+
+    const updatedViewTimestamp = useRef<boolean>(false);
 
     const [showNotificationsModal, setShowNotificationsModal] = useState(false);
     const [showControlMenu, setShowControlMenu] = useState(false);
@@ -127,27 +134,15 @@ const ViewFlashSet = (props: Props) => {
 
     useBrowserTitle(selectedStudySet?.title ?? "");
 
+    // TODO: This leads to an infinite loop. Need to figure out why.
     useEffect(() => {
-        updateLastViewed();
-    }, [selectedStudySet]);
-
-    const updateLastViewed = async () => {
-        try {
-            if (!studySetUUID) {
-                return;
-            }
-            const response = await axios.post(
-                "/api/studysets/updateLastViewed",
-                {
-                    uuid: studySetUUID,
-                }
-            );
-            console.log({ response });
-            console.log("Study set last viewed timestamp updated successfully");
-        } catch (error) {
-            console.error(error);
+        if (!updatedViewTimestamp.current) {
+            updateLastViewed({
+                uuid: selectedStudySet?.uuid ?? "",
+            });
+            updatedViewTimestamp.current = true;
         }
-    };
+    }, [selectedStudySet]);
 
     const updateMetadataField = (property: string, newValue: any) => {
         try {
@@ -211,8 +206,8 @@ const ViewFlashSet = (props: Props) => {
             ...Object.values(DEFAULT_CATEGORIES),
             ...(selectedStudySet?.categories ?? []),
         ];
-        return jointCategories.map((tab) => {
-            return <Tab label={tab} value={tab} />;
+        return jointCategories.map((tab, index) => {
+            return <Tab key={index} label={tab} value={tab} />;
         });
     }, [selectedStudySet]);
 
@@ -268,15 +263,10 @@ const ViewFlashSet = (props: Props) => {
                     card={card}
                     index={index}
                     selectedStudySet={selectedStudySet}
-                   
                 />
             );
         });
-    }, [
-        selectedStudySet,
-        selectedSort,
-        sortDirection,
-    ]);
+    }, [selectedStudySet, selectedSort, sortDirection]);
 
     /* Filtering */
     const filteredViewFlashCards = useMemo(() => {
@@ -331,14 +321,6 @@ const ViewFlashSet = (props: Props) => {
                             <Typography variant="subtitle1">
                                 Created by {selectedStudySet?.username}
                             </Typography>
-                            {/* <EditableTextField
-                                style={{
-                                    marginTop: "1rem",
-                                    width: "fit-content",
-                                }}
-                                value={selectedStudySet?.title}
-                                tooltipText={"Rename title"}
-                            /> */}
                             <Chip
                                 label={
                                     selectedStudySet?.label
@@ -350,7 +332,7 @@ const ViewFlashSet = (props: Props) => {
                             <Typography variant="body1">
                                 {selectedStudySet?.description}
                             </Typography>
-                            {/* <Tooltip title="Create label" placement="right">
+                            <Tooltip title="Create label" placement="right">
                                 <IconButton
                                     color="primary"
                                     aria-label="arrow backward"
@@ -362,13 +344,7 @@ const ViewFlashSet = (props: Props) => {
                                 >
                                     <Add />
                                 </IconButton>
-                            </Tooltip> */}
-
-                            {/* <EditableTextField
-                                style={{ marginTop: "1rem" }}
-                                value={selectedStudySet?.description}
-                                tooltipText={"Edit description"}
-                            /> */}
+                            </Tooltip>
                             <ActionsSection {...actionSectionProps} />
                         </SetInfo>
                         {/* <div className={viewFlashStyles.studySection}>
@@ -397,20 +373,22 @@ const ViewFlashSet = (props: Props) => {
                 {selectedStudySet?.cards?.length}
             </CardCount>
             <CardFiltersContainer>
-                <CategoryTabs
-                    value={selectedTab}
-                    onChange={onTabChange}
-                    variant="scrollable"
-                    scrollButtons="auto"
-                >
-                    {categoryTabs}
-                </CategoryTabs>
-                <Button
-                    variant="outlined"
-                    onClick={() => setShowManageCategories(true)}
-                >
-                    Manage Categories
-                </Button>
+                <SimpleFlexContainer style={{ gap: "1rem" }}>
+                    <CategoryTabs
+                        value={selectedTab}
+                        onChange={onTabChange}
+                        variant="scrollable"
+                        scrollButtons="auto"
+                    >
+                        {categoryTabs}
+                    </CategoryTabs>
+                    <Button
+                        variant="outlined"
+                        onClick={() => setShowManageCategories(true)}
+                    >
+                        Manage Categories
+                    </Button>
+                </SimpleFlexContainer>
                 <SimpleFlexContainer>
                     <IconButton
                         color="primary"

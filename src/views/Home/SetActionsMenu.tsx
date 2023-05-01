@@ -1,9 +1,5 @@
-import { useState, useEffect } from "react"
-import {
-    Menu,
-    MenuItem,
-    Typography,
-} from '@mui/material/';
+import { useState, useEffect } from "react";
+import { Menu, MenuItem, Typography } from "@mui/material/";
 import {
     ContentCopy as CopyIcon,
     Edit as EditIcon,
@@ -12,125 +8,59 @@ import {
 } from "@mui/icons-material";
 import { useTheme } from "theme/useTheme";
 
-
 type Props = {
-    studySet: any;
+    studyset: any;
     open: any;
     onClose: any;
     anchorEl: any;
-    handleShowDeleteConfirmation: any;
-}
+    handleShowConfirmDialog: any;
+};
 
 const SetActionsMenu = (props: Props) => {
-    const {
-        studySet,
-        open,
-        onClose,
-        anchorEl,
-        handleShowDeleteConfirmation
-    } = props;
-
-    const {
-        cards,
-        creationDate,
-        title,
-        description,
-        label,
-        setID,
-        uid
-    } = studySet;
+    const { studyset, open, onClose, anchorEl, handleShowConfirmDialog } =
+        props;
 
     const { isDarkMode, theme } = useTheme();
 
     const iconStyling = {
-        marginRight: "0.75rem"
-    }
+        marginRight: "0.75rem",
+    };
 
     return (
         <Menu
-            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
             anchorEl={anchorEl}
             open={open}
             onClose={onClose}
         >
-            <MenuItem
-            >
-                <EditIcon
-                    sx={iconStyling}
-                />
-                <Typography>
-                    Rename
-                </Typography>
+            <MenuItem onClick={(e) => e.stopPropagation()}>
+                <EditIcon sx={iconStyling} />
+                <Typography>Rename</Typography>
             </MenuItem>
             <MenuItem
-                // onClick={}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    handleShowConfirmDialog("RESET", studyset);
+                }}
             >
-                <CopyIcon
-                    sx={iconStyling}
-                />
-                <Typography>
-                    Duplicate
-                </Typography>
+                <CopyIcon sx={iconStyling} />
+                <Typography>Duplicate</Typography>
             </MenuItem>
             <MenuItem
-                onClick={handleShowDeleteConfirmation}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    handleShowConfirmDialog("DELETE", studyset);
+                }}
             >
-                <DeleteIcon
-                    sx={iconStyling}
-                />
-                <Typography>
-                    Delete
-                </Typography>
+                <DeleteIcon sx={iconStyling} />
+                <Typography>Delete</Typography>
             </MenuItem>
-            <MenuItem
-            // onClick=
-            >
-                <FavoriteIcon
-                    sx={iconStyling}
-                />
-                <Typography>
-                    Favorite
-                </Typography>
+            <MenuItem onClick={(e) => e.stopPropagation()}>
+                <FavoriteIcon sx={iconStyling} />
+                <Typography>Favorite</Typography>
             </MenuItem>
         </Menu>
     );
-}
+};
 
 export default SetActionsMenu;
-
-/*
- { {showRenameModal &&
-                <Dialog
-                    open={showRenameModal}
-                    onClose={() => setShowRenameModal(false)}
-                    sx={{
-                        '& .MuiDialog-paper': {
-                            bottom: "10rem",
-                            color: theme.foreground,
-                            backgroundColor: theme.background
-                        },
-                    }}
-                >
-                    <DialogTitle>Rename this flashset?</DialogTitle>
-                    <DialogContent>
-                        <input
-                            className={`${isDarkMode ? appStyles.darkInput : appStyles.lightInput}`}
-                            placeholder="Enter the new name for the study set"
-                            onChange={e => {
-                                e.stopPropagation();
-                                setEnteredRename(e.target.value)
-                            }}
-                        />
-                    </DialogContent>
-                    <DialogActions>
-                        <div
-                            className={`${homeFlashStyles.renameCard} ${appStyles.textButton} ${isDarkMode ? `${appStyles.hoverDark}` : `${appStyles.hoverLight}`}`}
-                            onClick={() => handleRenameSet(setID)}
-                        >
-                            Rename Flash Set
-                        </div>
-                    </DialogActions>
-                </Dialog>
-            } } 
-            
-*/

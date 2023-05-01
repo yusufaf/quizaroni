@@ -39,9 +39,10 @@ const Login = (props: Props) => {
     const { uuid: userUUID = "" } = useSelector(selectUserData);
 
     /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: studySetsData } = useGetAllStudysetsQuery(userUUID ?? "", {
-        skip: !userUUID,
-    });
+    const { data: studySetsData = [] } = useGetAllStudysetsQuery(
+        { userUUID: userUUID ?? "" },
+        { skip: !userUUID }
+    );
 
     useEffect(() => {
         dispatch(setStudySets(studySetsData));

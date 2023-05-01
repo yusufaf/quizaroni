@@ -7,7 +7,7 @@ const baseQuery = fetchBaseQuery({
 
 // const retryBaseQuery = retry(baseQuery, { maxRetries: 2 });
 
-export const api = createApi({
+const api = createApi({
 	reducerPath: "api",
 	baseQuery: baseQuery,
 	tagTypes: ["Studysets", "Users"],
@@ -18,3 +18,4 @@ export const api = createApi({
 	*/
 	endpoints: () => ({}),
 });
+export default api;

@@ -22,7 +22,7 @@ import {
     SET_METADATA_FIELDS,
 } from "utilities/constants";
 import { useTheme } from "theme/useTheme";
-import { ActionButtonsRow } from "../ViewFlashSetStyles";
+import { ActionButtonsRow } from "../styles";
 import { useNavigate, useParams } from "react-router-dom";
 import { Studyset } from "lib/types";
 

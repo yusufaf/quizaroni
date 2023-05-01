@@ -7,51 +7,79 @@ import {
     Typography,
     DialogContent,
 } from '@mui/material/';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectDialogProps, setDialogProps } from 'state/slices/globalSlice';
 
-const ConfirmDialog = props => {
-    const {
-        open,
-        onClose,
-        title,
-        dialogMessage,
-        onCancel = null,
-        onConfirm,
-        cancelButtonText = "Cancel",
-        confirmButtonText = "Confirm",
-    } = props;
+
+type Props = {
+    // open: boolean;
+    // onClose: () => void;
+    // title: string;
+    // dialogMessage: string;
+    // onCancel?: () => void;
+    // onConfirm: () => void;
+    // cancelButtonText?: string;
+    // confirmButtonText?: string;
+}
+
+const initialDialogProps = {
+    open: false,
+    title: "",
+    dialogMessage: "",
+};
+
+const ConfirmDialog = (props: Props) => {
+    // const {
+    //     open,
+    //     onClose,
+    //     title,
+    //     dialogMessage,
+    //     onCancel = null,
+    //     onConfirm,
+    //     cancelButtonText = "Cancel",
+    //     confirmButtonText = "Confirm",
+    // } = props;
+
+    const dispatch = useDispatch();
+    const dialogProps = useSelector(selectDialogProps);
+
+    const onClose = () => {
+        dispatch(setDialogProps({...initialDialogProps}));
+    }
 
     const handleClose = () => {
         onClose();
     }
 
     const handleConfirm = () => {
-        onConfirm();
+        dialogProps?.onConfirm();
+        onClose();
     }
 
     return (
         <Dialog 
-            open={open} 
-            onClose={onClose}
+            open={dialogProps?.open} 
+            onClose={dialogProps?.onClose}
         >
             <DialogTitle>
-                {title}
+                {dialogProps?.title}
             </DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    <Typography>{dialogMessage}</Typography>
+                    <Typography>{dialogProps?.dialogMessage}</Typography>
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
                 <Button
                     onClick={handleClose}
                 >
-                    {cancelButtonText}
+                    {dialogProps?.cancelButtonText || "Cancel"}
                 </Button>
                 <Button
                     variant="contained"
                     onClick={handleConfirm}
                 >
-                    {confirmButtonText}
+                    {dialogProps?.confirmButtonText || "Confirm"}
                 </Button>
             </DialogActions>
         </Dialog>

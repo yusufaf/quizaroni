@@ -4,10 +4,16 @@ import { BasePage, SimpleFlexContainer, SpacedFlexContainer } from "src/AppStyle
 
 
 export const ViewFlashsetPage = styled(BasePage)({
+    height: "100%",
+    // display: "grid",
+    // justifyItems: "center",
+    // alignItems: "center",
     display: "grid",
-    justifyItems: "center",
-    alignItems: "center",
+    flexDirection: "column",
+    // justifyContent: "center",
+    // alignItems: "center",
     gap: "2rem",
+    padding: "0rem 22rem"
 })
 
 export const ViewFlashsetPaper = styled(Paper)({
@@ -16,7 +22,7 @@ export const ViewFlashsetPaper = styled(Paper)({
 export const ViewFlashsetContainer = styled(Box)({
     gridRow: "1",
     height: "25rem",
-    width: "70rem",
+    // width: "70rem",
     padding: "1rem 1.25rem",
     borderRadius: "0.75rem",
 })
@@ -49,7 +55,7 @@ export const CardCount = styled(Typography)({
 export const CardFiltersContainer = styled(SpacedFlexContainer)({
     display: "flex",
     alignItems: "center",
-    justifyContent: "flex-end",
+    // justifyContent: "flex-end",
 })
 
 export const SortCardsDropdown = styled(FormControl)({
@@ -68,7 +74,7 @@ export const ActionButtonsRow = styled(Paper)({
 /* Cards */
 
 export const ViewFlashsetCard = styled(Card)({
-    width: "70rem",
+    // width: "70rem",
     padding: "1rem 1.25rem 1.25rem 1.25rem",
     borderRadius: "0.75rem",
     transition: "0.2s ease",
