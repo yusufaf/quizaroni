@@ -9,7 +9,7 @@ import {
     ViewCardInfo,
     ViewCardContainer,
     CategoryChips,
-} from "./ViewFlashSetStyles";
+} from "./styles";
 import { Card, Studyset } from "lib/types";
 import { useMarkCardAsImportantMutation } from "state/api/studysets";
 
@@ -44,10 +44,9 @@ const ViewFlashCard = (props: Props) => {
     };
 
     const handleMarkAsImportant = async () => {
-        const { important, uuid } = card;
         markCardAsImportant({
-            uuid,
-            newValue: !important,
+            cardUUID: card.uuid ?? "",
+            newValue: !card.important,
         });
     };
 

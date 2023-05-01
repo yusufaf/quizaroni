@@ -12,8 +12,8 @@ export default defineConfig({
         global: {},
     },
     plugins: [
-        react(), 
-        // VitePWA({ registerType: "autoUpdate" })
+        react(),
+        // VitePWA({ registerType: "autoUpdate" }),
     ],
     resolve: {
         alias: {

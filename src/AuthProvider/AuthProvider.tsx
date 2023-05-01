@@ -14,17 +14,19 @@ import { useGetAllStudysetsQuery } from "state/api/studysets";
 
 type Props = {
     children: any;
-}
+};
 
 const AuthProvider = ({ children }: Props) => {
     const dispatch = useDispatch();
 
     const authenticated = useSelector(selectAuthenticated);
-    const { uuid: userUUID = ""} = useSelector(selectUserData);
+    const { uuid: userUUID = "" } = useSelector(selectUserData);
 
     /* Skip option prevents hook from running when userUUID is undefined */
     const { data: studySets = [] } = useGetAllStudysetsQuery(
-        userUUID ?? "", 
+        {
+            userUUID: userUUID ?? "",
+        },
         { skip: !userUUID }
     );
 

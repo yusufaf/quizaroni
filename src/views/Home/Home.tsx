@@ -13,6 +13,7 @@ import {
 import {
     selectAuthenticated,
     selectUserData,
+    setDialogProps,
 } from "state/slices/globalSlice";
 import {
     selectStudySets,
@@ -22,7 +23,7 @@ import {
 import { FLASHSET_VIEWS } from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";
 import { useTheme } from "theme/useTheme";
-import HomeFlashSet from "./HomeStudySetCard/HomeStudySetCard";
+import HomeStudySetCard from "./HomeStudySetCard/HomeStudySetCard";
 import {
     HomeContainer,
     HomePage,
@@ -33,6 +34,8 @@ import {
 } from "./HomeStyles";
 import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
+import { Studyset } from "lib/types";
+import useCustomMutation from "lib/hooks/useCustomMutation";
 
 type Props = {};
 
@@ -46,14 +49,21 @@ const Home = (props: Props) => {
     const studySets = useSelector(selectStudySets);
 
     /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: studySetsData } = useGetAllStudysetsQuery(userUUID ?? "", {
-        skip: !userUUID,
-    });
+    const { data: studySetsData = [] } = useGetAllStudysetsQuery(
+        { userUUID: userUUID ?? "" },
+        { skip: !userUUID }
+    );
 
-    const [
-        deleteStudySet,
-        { isLoading: isDeletingStudySet, isError: deleteStudySetError },
-    ] = useDeleteStudysetMutation();
+    const {
+        mutate: deleteStudySet,
+        isLoading: isDeletingStudySet,
+        isSuccess: isDeleteStudySetSuccess,
+        isError: isDeleteStudySetError,
+    } = useCustomMutation({
+        mutation: useDeleteStudysetMutation,
+        successMessage: "Successfully deleted study set",
+        errorMessage: "Error deleting study set",
+    });
 
     useEffect(() => {
         dispatch(setStudySets(studySetsData));
@@ -86,11 +96,33 @@ const Home = (props: Props) => {
         setActionsMenuOpen(false);
     };
 
-    const handleCloseConfirmDialog = () => {
-        setShowConfirmDialog(false);
-    };
-
     const navigate = useNavigate();
+
+    const handleShowConfirmDialog = (type: string, studyset: Studyset) => {
+        let dialogProps = {};
+        switch (type) {
+            case "DUPLICATE":
+                dialogProps = {
+                    open: true,
+                    title: "Duplicate this study set?",
+                    dialogMessage:
+                        "Are you sure you want to duplicate this set?",
+                    onConfirm: () => {},
+                };
+                break;
+            case "DELETE":
+                dialogProps = {
+                    open: true,
+                    title: "Delete this study set?",
+                    dialogMessage: "Are you sure you want to delete this set?",
+                    onConfirm: () => {
+                        // deleteStudySet();
+                    },
+                };
+                break;
+        }
+        dispatch(setDialogProps(dialogProps));
+    };
 
     // Store a reference to the HTML file <input>
     const fileInput = useRef(null);
@@ -126,7 +158,8 @@ const Home = (props: Props) => {
             width: 75,
             editable: false,
             sortable: false,
-            renderCell: (cellValues) => {
+            renderCell: (cellValues: any) => {
+                console.log({ cellValues })
                 return (
                     <>
                         <Tooltip title="Open actions menu" placement="right">
@@ -139,7 +172,7 @@ const Home = (props: Props) => {
                             open={actionsMenuOpen}
                             onClose={closeActionsMenu}
                             anchorEl={anchorEl}
-                            handleShowDeleteConfirmation={() => {}}
+                            handleShowConfirmDialog={handleShowConfirmDialog}
                         />
                     </>
                 );
@@ -202,9 +235,9 @@ const Home = (props: Props) => {
                             />
                         ) : (
                             <HomeSetGrid>
-                                {studySets.map((studySet) => {
+                                {studySets.map((studySet: Studyset) => {
                                     return (
-                                        <HomeFlashSet
+                                        <HomeStudySetCard
                                             key={studySet.uuid}
                                             studySet={studySet}
                                             handleDeleteSet={() => {}}
@@ -214,13 +247,7 @@ const Home = (props: Props) => {
                             </HomeSetGrid>
                         )}
                     </HomeSetsContainer>
-                    <ConfirmDialog
-                        open={showConfirmDialog}
-                        onClose={handleCloseConfirmDialog}
-                        title="Duplicate this set?"
-                        dialogMessage="Are you sure you want to duplicate this set?"
-                        onConfirm={handleCloseConfirmDialog}
-                    />
+                    <ConfirmDialog />
                 </HomeContainer>
             </HomePaper>
         </HomePage>
