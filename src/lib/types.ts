@@ -50,6 +50,10 @@ export type DeleteStudysetParams = {
     uuid: UUID;
 };
 
+export type DuplicateStudysetParams = {
+    uuid: UUID;
+};
+
 export type UpdateMetadataParams = {
     uuid: UUID;
     property: string;

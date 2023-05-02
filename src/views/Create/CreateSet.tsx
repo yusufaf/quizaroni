@@ -18,17 +18,18 @@ import {
     selectUserData,
 } from "state/slices/globalSlice";
 import axios from "axios";
-import { useGetStudysetQuery } from "state/api/studysets";
 import {
-    CREATE_PAGE_TYPES
-} from "utilities/constants";
-
+    useCreateStudysetMutation,
+    useGetStudysetQuery,
+} from "state/api/studysets";
+import { CREATE_PAGE_TYPES } from "utilities/constants";
+import useCustomMutation from "lib/hooks/useCustomMutation";
+import { toast } from "react-toastify";
 
 const EMPTY_CARD = {
     term: "",
     definition: "",
 };
-
 
 type Props = {
     pageType?: string;
@@ -58,6 +59,7 @@ const CreateSet = (props: Props) => {
         skip: !studySetUUID,
     });
 
+    const [createStudySet] = useCreateStudysetMutation();
 
     useEffect(() => {
         if (isStudySetSuccess) {
@@ -67,7 +69,7 @@ const CreateSet = (props: Props) => {
             setDescription(description);
             setCreatedSetCards(cards);
         }
-    }, [selectedStudySet])
+    }, [selectedStudySet]);
 
     /* Flash Set States */
     const [title, setTitle] = useState<string>("");
@@ -170,15 +172,21 @@ const CreateSet = (props: Props) => {
             // }
 
             console.log("Successfully created new flash set");
-            // setTimeout(() => {
-            //     navigate("/");
-            // }, 1000);
 
-            const response = await axios.post(
-                "/api/studysets/create",
-                studySet
-            );
-            console.log({ response });
+            createStudySet(studySet)
+                .unwrap()
+                .then((response: any) => {
+                    console.log({ response });
+                    toast.success("Successfully created new flash set", {
+                        position: toast.POSITION.BOTTOM_LEFT,
+                    });
+                })
+                .catch((error) => {
+                    console.log({ error });
+                    toast.error("Error creating new flash set", {
+                        position: toast.POSITION.BOTTOM_LEFT,
+                    });
+                });
         } catch (error) {}
     };
 
@@ -334,7 +342,7 @@ const CreateSet = (props: Props) => {
         selectedLabel,
         setShowImportModal,
         title: title,
-        pageType
+        pageType,
     };
 
     if (!authenticated) {
