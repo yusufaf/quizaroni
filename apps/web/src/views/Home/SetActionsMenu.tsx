@@ -9,7 +9,7 @@ import {
 import { useTheme } from "theme/useTheme";
 
 type Props = {
-    studyset: any;
+    studySet: any;
     open: any;
     onClose: any;
     anchorEl: any;
@@ -17,7 +17,7 @@ type Props = {
 };
 
 const SetActionsMenu = (props: Props) => {
-    const { studyset, open, onClose, anchorEl, handleShowConfirmDialog } =
+    const { studySet, open, onClose, anchorEl, handleShowConfirmDialog } =
         props;
 
     const { isDarkMode, theme } = useTheme();
@@ -40,7 +40,7 @@ const SetActionsMenu = (props: Props) => {
             <MenuItem
                 onClick={(e) => {
                     e.stopPropagation();
-                    handleShowConfirmDialog("RESET", studyset);
+                    handleShowConfirmDialog("DUPLICATE", studySet);
                 }}
             >
                 <CopyIcon sx={iconStyling} />
@@ -49,7 +49,7 @@ const SetActionsMenu = (props: Props) => {
             <MenuItem
                 onClick={(e) => {
                     e.stopPropagation();
-                    handleShowConfirmDialog("DELETE", studyset);
+                    handleShowConfirmDialog("DELETE", studySet);
                 }}
             >
                 <DeleteIcon sx={iconStyling} />
