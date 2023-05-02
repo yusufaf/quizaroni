@@ -8,6 +8,7 @@ import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import {
     useDeleteStudysetMutation,
+    useDuplicateStudysetMutation,
     useGetAllStudysetsQuery,
 } from "state/api/studysets";
 import {
@@ -65,6 +66,17 @@ const Home = (props: Props) => {
         errorMessage: "Error deleting study set",
     });
 
+    const {
+        mutate: duplicateStudySet,
+        isLoading: isDuplicatingStudySet,
+        isSuccess: isDuplicateStudySetSuccess,
+        isError: isDuplicateStudySetError,
+    } = useCustomMutation({
+        mutation: useDuplicateStudysetMutation,
+        successMessage: "Successfully duplicated study set",
+        errorMessage: "Error duplicating study set",
+    });
+
     useEffect(() => {
         dispatch(setStudySets(studySetsData));
     }, [studySetsData]);
@@ -107,7 +119,9 @@ const Home = (props: Props) => {
                     title: "Duplicate this study set?",
                     dialogMessage:
                         "Are you sure you want to duplicate this set?",
-                    onConfirm: () => {},
+                    onConfirm: () => {
+                        duplicateStudySet({ uuid: studyset.uuid });
+                    },
                 };
                 break;
             case "DELETE":
@@ -116,7 +130,7 @@ const Home = (props: Props) => {
                     title: "Delete this study set?",
                     dialogMessage: "Are you sure you want to delete this set?",
                     onConfirm: () => {
-                        // deleteStudySet();
+                        deleteStudySet({ uuid: studyset.uuid });
                     },
                 };
                 break;
@@ -159,7 +173,6 @@ const Home = (props: Props) => {
             editable: false,
             sortable: false,
             renderCell: (cellValues: any) => {
-                console.log({ cellValues })
                 return (
                     <>
                         <Tooltip title="Open actions menu" placement="right">

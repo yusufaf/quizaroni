@@ -12,6 +12,7 @@ import {
     GetAllStudysetsParams,
     GetStudysetParams,
     AssignCardCategoriesParams,
+    DuplicateStudysetParams,
 } from "lib/types";
 
 /* Endpoints
@@ -57,6 +58,14 @@ export const studysetsApi = api.injectEndpoints({
         deleteStudyset: build.mutation<void, DeleteStudysetParams>({
             query: ({ uuid }) => ({
                 url: "studysets/delete",
+                method: "POST",
+                body: { uuid },
+            }),
+            invalidatesTags: ["Studysets"],
+        }),
+        duplicateStudyset: build.mutation<void, DuplicateStudysetParams>({
+            query: ({ uuid }) => ({
+                url: "studysets/duplicate",
                 method: "POST",
                 body: { uuid },
             }),
@@ -133,6 +142,7 @@ export const {
     useGetStudysetQuery,
     useCreateStudysetMutation,
     useDeleteStudysetMutation,
+    useDuplicateStudysetMutation,
     useUpdateStudysetMetadataMutation,
     useCreateCategoryMutation,
     useEditCategoryMutation,
