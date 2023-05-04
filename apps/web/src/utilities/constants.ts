@@ -72,6 +72,13 @@ export const DOWNLOAD_FILE_TYPES = {
     CSV: "CSV",
 };
 
+export const MIME_TYPES: { [key: string]: string } = {
+    [DOWNLOAD_FILE_TYPES.TXT]: "text/plain",
+    [DOWNLOAD_FILE_TYPES.JSON]: "application/json",
+    [DOWNLOAD_FILE_TYPES.CSV]: "text/csv",
+}
+
+
 export const FLASHSET_VIEWS = {
     TABLE: "table",
     GRID: "grid",

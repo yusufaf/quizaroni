@@ -106,7 +106,7 @@ const Profile = (props: Props) => {
             const newUserData = {
                 ...userData,
 				metadata: {
-					...userData.metaadata,
+					...userData.metadata,
 					defaultTheme: newTheme,
 				}
             };

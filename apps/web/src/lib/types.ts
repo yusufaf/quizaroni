@@ -91,3 +91,14 @@ export type UpdateLastViewedParams = {
 }
 
 export type SortDirection = "asc" | "dsc";
+
+export type ConfirmDialogProps = {
+    cancelButtonText?: string;
+    confirmButtonText?: string;
+    dialogMessage?: string;
+    onCancel?: () => void;
+    onClose?: () => void;
+    onConfirm: () => void;
+    open: boolean;
+    title: string;
+}

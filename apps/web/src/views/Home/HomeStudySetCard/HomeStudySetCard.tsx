@@ -24,13 +24,11 @@ import { useNavigate } from 'react-router-dom';
 
 type Props = {
     studySet: any;
-    handleDeleteSet: any;
 }
 
 const HomeStudySetCard = (props: Props) => {
     const {
         studySet,
-        handleDeleteSet,
     } = props;
 
     const {
@@ -126,15 +124,7 @@ const HomeStudySetCard = (props: Props) => {
                     </CardBottom>
                 </CardContent>
             </HomeSetCard>
-            <ConfirmDialog
-                open={showDeleteConfirmation}
-                onClose={handleCloseDeleteConfirmation}
-                title="Delete this study set?"
-                dialogMessage="This will permanently delete the study set"
-                // @ts-ignore
-                onConfirm={() => handleDeleteSet(uuid)}
-                confirmButtonText="Delete"
-            />
+            <ConfirmDialog />
         </>
     )
 }

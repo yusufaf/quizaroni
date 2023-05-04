@@ -1,11 +1,13 @@
 import { MenuOpen as MenuOpenIcon } from "@mui/icons-material";
 import { IconButton, Tooltip } from "@mui/material/";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
+import useBrowserTitle from "lib/hooks/useBrowserTitle";
+import useCustomMutation from "lib/hooks/useCustomMutation";
+import { Studyset } from "lib/types";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
-import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import {
     useDeleteStudysetMutation,
     useDuplicateStudysetMutation,
@@ -21,22 +23,19 @@ import {
     setSelectedStudySet,
     setStudySets,
 } from "state/slices/studysetsSlice";
+import { useTheme } from "theme/useTheme";
 import { FLASHSET_VIEWS } from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";
-import { useTheme } from "theme/useTheme";
-import HomeStudySetCard from "./HomeStudySetCard/HomeStudySetCard";
+import HomeGridView from "./HomeGridView";
 import {
     HomeContainer,
     HomePage,
     HomePaper,
-    HomeSetGrid,
     HomeSetsContainer,
-    HomeSetsHeading,
+    HomeSetsHeading
 } from "./HomeStyles";
 import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
-import { Studyset } from "lib/types";
-import useCustomMutation from "lib/hooks/useCustomMutation";
 
 type Props = {};
 
@@ -86,9 +85,6 @@ const Home = (props: Props) => {
     /* State */
     const [searchFilteredSets, setSearchFilteredSets] = useState([]);
     const [enteredSearch, setEnteredSearch] = useState("");
-
-    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-    const [confirmDialogProps, setConfirmDialogProps] = useState({});
 
     const [isFavorited, setIsFavorited] = useState(false);
 
@@ -229,8 +225,8 @@ const Home = (props: Props) => {
                             <DataGrid
                                 rows={studySets}
                                 columns={columns}
-                                pageSize={5}
-                                rowsPerPageOptions={[5]}
+                                pageSize={10}
+                                rowsPerPageOptions={[10]}
                                 checkboxSelection
                                 // disableSelectionOnClick
                                 onRowClick={() => {}}
@@ -247,17 +243,9 @@ const Home = (props: Props) => {
                                 getRowId={(row) => row.uuid}
                             />
                         ) : (
-                            <HomeSetGrid>
-                                {studySets.map((studySet: Studyset) => {
-                                    return (
-                                        <HomeStudySetCard
-                                            key={studySet.uuid}
-                                            studySet={studySet}
-                                            handleDeleteSet={() => {}}
-                                        />
-                                    );
-                                })}
-                            </HomeSetGrid>
+                            <HomeGridView
+                                studySets={studySets}
+                            />
                         )}
                     </HomeSetsContainer>
                     <ConfirmDialog />

@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Menu, MenuItem, Typography } from "@mui/material/";
 import {
     ContentCopy as CopyIcon,
@@ -10,15 +9,20 @@ import { useTheme } from "theme/useTheme";
 
 type Props = {
     studySet: any;
-    open: any;
+    open: boolean;
     onClose: any;
     anchorEl: any;
     handleShowConfirmDialog: any;
 };
 
 const SetActionsMenu = (props: Props) => {
-    const { studySet, open, onClose, anchorEl, handleShowConfirmDialog } =
-        props;
+    const { 
+        studySet, 
+        open, 
+        onClose, 
+        anchorEl, 
+        handleShowConfirmDialog 
+    } = props;
 
     const { isDarkMode, theme } = useTheme();
 
