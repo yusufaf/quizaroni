@@ -177,13 +177,16 @@ const CreateSet = (props: Props) => {
                 .unwrap()
                 .then((response: any) => {
                     console.log({ response });
-                    toast.success("Successfully created new flash set", {
+                    toast.success("Successfully created new study set", {
                         position: toast.POSITION.BOTTOM_LEFT,
                     });
+                    const { studySet } = response;
+                    const { uuid } = studySet;
+                    navigate(`/view/${uuid}`);
                 })
                 .catch((error) => {
                     console.log({ error });
-                    toast.error("Error creating new flash set", {
+                    toast.error("Error creating new study set", {
                         position: toast.POSITION.BOTTOM_LEFT,
                     });
                 });
