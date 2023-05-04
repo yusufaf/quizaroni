@@ -9,37 +9,20 @@ import {
 } from '@mui/material/';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectDialogProps, setDialogProps } from 'state/slices/globalSlice';
-
+import {
+    ConfirmDialogProps
+} from "lib/types"
 
 type Props = {
-    // open: boolean;
-    // onClose: () => void;
-    // title: string;
-    // dialogMessage: string;
-    // onCancel?: () => void;
-    // onConfirm: () => void;
-    // cancelButtonText?: string;
-    // confirmButtonText?: string;
 }
 
-const initialDialogProps = {
+const initialDialogProps: Partial<ConfirmDialogProps> = {
     open: false,
     title: "",
     dialogMessage: "",
 };
 
 const ConfirmDialog = (props: Props) => {
-    // const {
-    //     open,
-    //     onClose,
-    //     title,
-    //     dialogMessage,
-    //     onCancel = null,
-    //     onConfirm,
-    //     cancelButtonText = "Cancel",
-    //     confirmButtonText = "Confirm",
-    // } = props;
-
     const dispatch = useDispatch();
     const dialogProps = useSelector(selectDialogProps);
 

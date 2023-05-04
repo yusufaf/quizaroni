@@ -113,8 +113,8 @@ const ViewFlashSet = (props: Props) => {
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
 
-    const [showDownloadPopup, setShowDownloadPopup] = useState(false);
-    const [downloadFileType, setDownloadFileType] = useState(
+    const [showDownloadPopup, setShowDownloadPopup] = useState<boolean>(false);
+    const [downloadFileType, setDownloadFileType] = useState<string>(
         DOWNLOAD_FILE_TYPES.TXT
     );
     const [showManageCategories, setShowManageCategories] =
@@ -159,26 +159,6 @@ const ViewFlashSet = (props: Props) => {
         } catch (error) {
             console.error("Error updating study set metadata");
         }
-    };
-
-    /* TODO: Using a library like React-pdf? Otherwise just creating a text file w/ comma sep values */
-    const handleDownloadSet = () => {
-        // /* Initial implementation of the following text file structure:
-        //     Card {index}:
-        //         term: ""
-        //         definition: ""
-        // */
-        // const anchor = document.createElement("a");
-        // const cards = flashset.cards;
-        // const mappedCards = cards.map((card, index) => ({ [`Card ${index + 1}`]: { term: card.term, definition: card.definition } }));
-        // const cleanedCards = Object.assign({}, ...mappedCards);
-        // const type = downloadFileType === DOWNLOAD_FILE_TYPES.TXT ? "text/plain" : "application/json"
-        // const file = new Blob([JSON.stringify(cleanedCards, null, 2)], { type });
-        // anchor.href = URL.createObjectURL(file);
-        // const { title: setTitle } = flashset;
-        // anchor.download = `${setTitle}_Set.${type.toLowerCase()}`;
-        // document.body.appendChild(anchor); // Required for this to work in FireFox
-        // anchor.click();
     };
 
     /* TODO: Future future task.
@@ -439,6 +419,7 @@ const ViewFlashSet = (props: Props) => {
                 handleClose={() => setShowDownloadPopup(false)}
                 downloadFileType={downloadFileType}
                 setDownloadFileType={setDownloadFileType}
+                studySet={selectedStudySet}
             />
             <ManageCategoriesDialog {...manageCategoriesProps} />
         </ViewFlashsetPage>

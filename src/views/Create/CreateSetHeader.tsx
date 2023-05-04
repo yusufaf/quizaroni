@@ -10,10 +10,10 @@ import {
 import { Dispatch, SetStateAction } from "react";
 import { BoldHeading, SimpleFlexContainer } from "src/AppStyles";
 import { useTheme } from "theme/useTheme";
-import { 
+import {
     CREATE_SET,
     CREATE_PAGE_TYPES,
-    CREATE_PAGE_PROPS
+    CREATE_PAGE_PROPS,
 } from "utilities/constants";
 import {
     CreateSetButton,
@@ -29,6 +29,8 @@ import {
     TitleInput,
 } from "./CreateSetStyles";
 import HeaderAdvancedSection from "./HeaderAdvancedSection";
+import { useSelector } from "react-redux";
+import { selectUserData } from "state/slices/globalSlice";
 
 type Props = {
     advancedSectionProps: any;
@@ -43,7 +45,7 @@ type Props = {
     title: string;
     setShowImportModal: Dispatch<SetStateAction<boolean>>;
     pageType: string;
-}; 
+};
 
 const CreateSetHeader = (props: Props) => {
     const {
@@ -58,19 +60,36 @@ const CreateSetHeader = (props: Props) => {
         selectedLabel,
         setShowImportModal,
         title,
-        pageType = ""
+        pageType = "",
     } = props;
 
     const { theme } = useTheme();
 
+    const userData = useSelector(selectUserData);
+
     /* TODO: Make sure there's at least one card in the set ? */
     const createSetDisabled = !title || !description;
+
+    const renderLabelOptions = () => {
+        const { labels = [] } = userData;
+        return labels.map((label: any, index: number) => {
+            return (
+                <MenuItem key={index} value={label} sx={{width: "10rem"}}>
+                    <Typography variant="inherit" noWrap>
+                        {label}
+                    </Typography>
+                </MenuItem>
+            );
+        });
+    };
 
     return (
         <CreateSetPaper elevation={6}>
             <CreateSetContainer>
                 <HeaderLeftContainer>
-                    <BoldHeading variant="h5">{CREATE_PAGE_PROPS[pageType].TITLE}</BoldHeading>
+                    <BoldHeading variant="h5">
+                        {CREATE_PAGE_PROPS[pageType].TITLE}
+                    </BoldHeading>
                     <CreateSetInputsContainer>
                         <BoldHeading
                             variant="subtitle1"
@@ -125,14 +144,8 @@ const CreateSetHeader = (props: Props) => {
                                 >
                                     {/* TODO: Always leave an empty option so they don't have to pick one */}
                                     {/* Width of 10rem for the MenuItem */}
-                                    <MenuItem
-                                        value={10}
-                                        sx={{ width: "10rem" }}
-                                    >
-                                        <Typography variant="inherit" noWrap>
-                                            TenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTenTen
-                                        </Typography>
-                                    </MenuItem>
+
+                                    {renderLabelOptions()}
                                 </LabelSelect>
                             </FormControl>
                             {/* TODO: Map labelOptions to MenuItem */}

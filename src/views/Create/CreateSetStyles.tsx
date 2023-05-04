@@ -47,9 +47,7 @@ export const DescriptionInput = styled(TextField)({
     marginBottom: "1rem",
 })
 
-export const LabelInputContainer = styled("div")({
-    display: "flex",
-    alignItems: "center",
+export const LabelInputContainer = styled(SimpleFlexContainer)({
     gap: "1rem",
 })
 
