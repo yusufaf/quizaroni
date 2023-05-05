@@ -8,9 +8,6 @@ import path from "path";
 // TODO: https://vite-plugin-pwa.netlify.app/guide/#setup
 
 export default defineConfig({
-    define: {
-        global: {},
-    },
     plugins: [
         react(),
         // VitePWA({ registerType: "autoUpdate" }),
