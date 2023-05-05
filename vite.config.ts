@@ -1,6 +1,5 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import mix from "vite-plugin-mix";
 import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
 
