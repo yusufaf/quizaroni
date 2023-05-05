@@ -4,10 +4,11 @@ import studySetsReducer from "state/slices/studysetsSlice";
 import api from "./api/api";
 
 const apiPath = api.reducerPath;
+// console.log({apiPath});
 
 export const store = configureStore({
     reducer: {
-        [apiPath]: api.reducer,
+        "api": api.reducer,
         global: globalReducer,
         studySets: studySetsReducer,
     },
