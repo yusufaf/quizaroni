@@ -382,10 +382,10 @@ const ViewFlashSet = (props: Props) => {
                         )}
                     </IconButton>
                     <SortCardsDropdown>
-                        {/* TODO: Fix label */}
                         <InputLabel id="sort-label">Sort</InputLabel>
                         <Select
                             labelId="sort-label"
+                            label="Sort"
                             value={selectedSort}
                             onChange={onSortChange}
                             autoWidth

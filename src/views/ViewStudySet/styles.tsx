@@ -59,7 +59,7 @@ export const CardFiltersContainer = styled(SpacedFlexContainer)({
 })
 
 export const SortCardsDropdown = styled(FormControl)({
-    width: "10rem"
+    width: "14rem"
 })
 
 /* Actions Section */

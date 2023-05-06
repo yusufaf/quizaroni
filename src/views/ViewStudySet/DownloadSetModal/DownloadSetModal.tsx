@@ -54,7 +54,7 @@ const DownloadSetModal = (props: Props) => {
 
         let url = "";
 
-        const downloadTimestamp = new Date().toLocaleString();
+        const downloadTimestamp = new Date().toLocaleString().replace(',','')
 
         switch (downloadFileType) {
             case DOWNLOAD_FILE_TYPES.CSV:

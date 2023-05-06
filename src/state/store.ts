@@ -8,7 +8,7 @@ const {reducerPath: apiPath, reducer: apiReducer} = api;
 export const store = configureStore({
     reducer: {
         [apiPath]: apiReducer,
-        global: globalReducer,
+        globalState: globalReducer,
         studySets: studySetsReducer,
     },
     middleware: (getDefaultMiddleware) => {

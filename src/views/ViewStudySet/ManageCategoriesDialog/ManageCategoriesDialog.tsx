@@ -28,9 +28,12 @@ import {
     AssignCategoryContainer,
     AssignCategoryFormControl,
     CategoriesList,
+    CategoriesListContainer,
+    CategoriesListPaper,
     CategoryButtons,
     CategoryField,
     StyledDialog,
+    StyledDialogContent,
     StyledMenuItem,
 } from "./styles";
 import { useDispatch, useSelector } from "react-redux";
@@ -93,14 +96,6 @@ const ManageCategoriesDialog = (props: Props) => {
 
     const dispatch = useDispatch();
     const { uuid: userUUID = "" } = useSelector(selectUserData);
-
-    /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: studySetsData, refetch } = useGetAllStudysetsQuery(
-        userUUID ?? "",
-        {
-            skip: !userUUID,
-        }
-    );
 
     const {
         mutate: createCategory,
@@ -167,6 +162,7 @@ const ManageCategoriesDialog = (props: Props) => {
     const [selectedCardUUID, setSelectedCardUUID] = useState<string>("");
 
     const isCreateTab = selectedTab === TABS.CREATE;
+    const isManageTab = selectedTab === TABS.MANAGE;
 
     /* */
     useEffect(() => {}, []);
@@ -285,39 +281,45 @@ const ManageCategoriesDialog = (props: Props) => {
         });
     };
 
-    const renderListItems = (): ReactNode[] => {
+    const renderCategoriesList = (): ReactNode[] => {
         return selectedStudySet?.categories?.map((value, index) => {
             const isEditSelected = editIndex === index;
             const isDeleteSelected = deleteIndices.includes(index);
             return (
                 <ListItem
-                    divider={index !== 1}
+                    divider
                     key={index}
                     secondaryAction={
-                        <CategoryButtons>
-                            <IconButton
-                                edge="end"
-                                aria-label="edit"
-                                onClick={() => handleEditClick(index)}
-                            >
-                                <Edit
-                                    color={
-                                        isEditSelected ? "primary" : undefined
-                                    }
-                                />
-                            </IconButton>
-                            <IconButton
-                                edge="end"
-                                aria-label="delete"
-                                onClick={() => handleDeleteClick(index)}
-                            >
-                                <Delete
-                                    color={
-                                        isDeleteSelected ? "primary" : undefined
-                                    }
-                                />
-                            </IconButton>
-                        </CategoryButtons>
+                        isManageTab && (
+                            <CategoryButtons>
+                                <IconButton
+                                    edge="end"
+                                    aria-label="edit"
+                                    onClick={() => handleEditClick(index)}
+                                >
+                                    <Edit
+                                        color={
+                                            isEditSelected
+                                                ? "primary"
+                                                : undefined
+                                        }
+                                    />
+                                </IconButton>
+                                <IconButton
+                                    edge="end"
+                                    aria-label="delete"
+                                    onClick={() => handleDeleteClick(index)}
+                                >
+                                    <Delete
+                                        color={
+                                            isDeleteSelected
+                                                ? "primary"
+                                                : undefined
+                                        }
+                                    />
+                                </IconButton>
+                            </CategoryButtons>
+                        )
                     }
                 >
                     {value}
@@ -358,11 +360,6 @@ const ManageCategoriesDialog = (props: Props) => {
                         onChange={onEditCategoryChange}
                     />
                 );
-                jsx.push(
-                    <Paper elevation={6}>
-                        <CategoriesList>{renderListItems()}</CategoriesList>
-                    </Paper>
-                );
                 break;
             case TABS.IMPORT:
                 break;
@@ -371,7 +368,6 @@ const ManageCategoriesDialog = (props: Props) => {
                 const selectedCardCategories =
                     cards?.find((card) => card.uuid === selectedCardUUID)
                         ?.categories ?? [];
-                console.log({ categories });
                 jsx.push(
                     <AssignCategoryContainer>
                         <AssignCategoryFormControl fullWidth>
@@ -411,7 +407,7 @@ const ManageCategoriesDialog = (props: Props) => {
                                 </InputLabel>
                                 <Select
                                     labelId="category-select-label"
-                                    label="Category"
+                                    label="Categories"
                                     multiple
                                     value={selectedCardCategories}
                                     onChange={onAssignedCategoriesChange}
@@ -474,20 +470,29 @@ const ManageCategoriesDialog = (props: Props) => {
     };
 
     return (
-        <StyledDialog open={open} onClose={handleClose}>
+        <StyledDialog open={open} onClose={handleClose} fullWidth maxWidth="lg">
             <DialogTitle>{TAB_PROPERTIES[selectedTab].title}</DialogTitle>
-            <DialogContent>
-                <Tabs
-                    value={selectedTab}
-                    onChange={onTabChange}
-                    scrollButtons="auto"
-                >
-                    {[...Object.values(TABS)].map((tab, index) => (
-                        <Tab key={index} label={tab} value={tab} />
-                    ))}
-                </Tabs>
-                {renderTabView()}
-            </DialogContent>
+            <StyledDialogContent>
+                <div>
+                    <Tabs
+                        value={selectedTab}
+                        onChange={onTabChange}
+                        scrollButtons="auto"
+                    >
+                        {[...Object.values(TABS)].map((tab, index) => (
+                            <Tab key={index} label={tab} value={tab} />
+                        ))}
+                    </Tabs>
+                    {renderTabView()}
+                </div>
+                <CategoriesListContainer>
+                    <CategoriesListPaper elevation={6}>
+                        <CategoriesList>
+                            {renderCategoriesList()}
+                        </CategoriesList>
+                    </CategoriesListPaper>
+                </CategoriesListContainer>
+            </StyledDialogContent>
             <DialogActions>
                 <Button variant="outlined" onClick={handleClose}>
                     Close
