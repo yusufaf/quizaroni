@@ -1,12 +1,14 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
-import { VitePWA } from "vite-plugin-pwa";
 import path from "path";
 
 // https://vitejs.dev/config/
 // TODO: https://vite-plugin-pwa.netlify.app/guide/#setup
 
 export default defineConfig({
+    define: {
+        global: {},
+    },
     plugins: [
         react(),
         // VitePWA({ registerType: "autoUpdate" }),
@@ -32,5 +34,6 @@ export default defineConfig({
                 ws: true,
             },
         },
+        port: 3000,
     },
 });
