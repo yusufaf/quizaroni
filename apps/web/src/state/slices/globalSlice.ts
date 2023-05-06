@@ -25,8 +25,10 @@ const initialState: GlobalSliceState = {
     dialogProps: {},
 };
 
+const sliceName = "globalState";
+
 export const globalSlice = createSlice({
-    name: "global",
+    name: sliceName,
     initialState,
     reducers: {
         setUserAuthState: (state, action: PayloadAction<any>) => {
@@ -50,22 +52,9 @@ export const globalSlice = createSlice({
         setDialogProps: (state, action: PayloadAction<any>) => {
             state.dialogProps = action.payload;
         },
-
-        /* Customizing a generated action creator 
-     addTodo: {
-      reducer: (state, action) => {
-        state.push(action.payload)
-      },
-      prepare: (text) => {
-        const id = nanoid()
-        return { payload: { id, text } }
-      },
-    },
-    */
     },
 });
 
-// Action creators are generated for each case reducer function
 export const {
     setUserAuthState,
     setAlert,
@@ -77,12 +66,12 @@ export const {
 } = globalSlice.actions;
 
 /* Selectors */
-export const selectAlert = (state: RootState) => state.global.alert;
-export const selectDialogOpen = (state: RootState) => state.global.dialogOpen;
-export const selectUserAuthState = (state: RootState) => state.global.userAuthInfo;
-export const selectCognitoUser = (state: RootState) => state.global.cognitoUser;
-export const selectAuthenticated = (state: RootState) => state.global.authenticated;
-export const selectUserData = (state: RootState) => state.global.userData;
-export const selectDialogProps = (state: RootState) => state.global.dialogProps;
+export const selectAlert = (state: RootState) => state[sliceName].alert;
+export const selectDialogOpen = (state: RootState) => state[sliceName].dialogOpen;
+export const selectUserAuthState = (state: RootState) => state[sliceName].userAuthInfo;
+export const selectCognitoUser = (state: RootState) => state[sliceName].cognitoUser;
+export const selectAuthenticated = (state: RootState) => state[sliceName].authenticated;
+export const selectUserData = (state: RootState) => state[sliceName].userData;
+export const selectDialogProps = (state: RootState) => state[sliceName].dialogProps;
 
 export default globalSlice.reducer;
