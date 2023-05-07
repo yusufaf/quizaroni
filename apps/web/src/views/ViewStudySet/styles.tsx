@@ -1,7 +1,6 @@
 import { styled } from "@mui/system";
-import { Box, Card, FormControl, Paper, Tabs, Typography } from "@mui/material";
+import { Box, Card, FormControl, Paper, Tabs, Typography, Tab } from "@mui/material";
 import { BasePage, SimpleFlexContainer, SpacedFlexContainer } from "src/AppStyles";
-
 
 export const ViewFlashsetPage = styled(BasePage)({
     height: "100%",
@@ -42,6 +41,10 @@ export const StudyModeGrid = styled(Box)({
     display: "grid",
     gridTemplateColumns: "15rem 15rem",
     gridTemplateRows: "auto auto",
+})
+
+export const CategoryTab = styled(Tab)({
+    textTransform: "none",
 })
 
 export const CategoryTabs = styled(Tabs)({

@@ -37,7 +37,16 @@ export const studysetsApi = api.injectEndpoints({
                 method: "GET",
                 params: { userUUID },
             }),
-            providesTags: ["Studysets"],
+            providesTags: (result) =>
+                result
+                    ? [
+                          ...result.map(({ uuid }) => ({
+                              type: "Studyset" as const,
+                              uuid,
+                          })),
+                          { type: "Studyset", id: "LIST" },
+                      ]
+                    : [{ type: "Studyset", id: "LIST" }],
         }),
         getStudyset: build.query<Studyset, GetStudysetParams>({
             query: ({ uuid }) => ({
@@ -45,7 +54,10 @@ export const studysetsApi = api.injectEndpoints({
                 method: "GET",
                 params: { uuid },
             }),
-            providesTags: ["Studysets"],
+            // providesTags: ["Studyset"],
+            providesTags: (result, error, arg) => [
+                { type: "Studyset", id: result?.uuid },
+            ],
         }),
         createStudyset: build.mutation<Studyset, any>({
             query: (body) => ({
@@ -53,7 +65,8 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body,
             }),
-            invalidatesTags: ["Studysets"],
+            // invalidatesTags: ["Studyset"],
+            invalidatesTags: [{ type: "Studyset", id: "LIST" }],
         }),
         deleteStudyset: build.mutation<void, DeleteStudysetParams>({
             query: ({ uuid }) => ({
@@ -61,7 +74,8 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body: { uuid },
             }),
-            invalidatesTags: ["Studysets"],
+            // invalidatesTags: ["Studyset"],
+            invalidatesTags: [{ type: "Studyset", id: "LIST" }],
         }),
         duplicateStudyset: build.mutation<void, DuplicateStudysetParams>({
             query: ({ uuid }) => ({
@@ -69,7 +83,8 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body: { uuid },
             }),
-            invalidatesTags: ["Studysets"],
+            // invalidatesTags: ["Studyset"],
+            invalidatesTags: [{ type: "Studyset", id: "LIST" }],
         }),
         updateStudysetMetadata: build.mutation<void, UpdateMetadataParams>({
             query: ({ property, newValue, uuid }) => ({
@@ -81,7 +96,7 @@ export const studysetsApi = api.injectEndpoints({
                     uuid,
                 },
             }),
-            invalidatesTags: ["Studysets"],
+            invalidatesTags: ["Studyset"],
         }),
         createCategory: build.mutation<Studyset, CreateCategoryParams>({
             query: ({ uuid, category }) => ({
@@ -89,7 +104,7 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body: { uuid, category },
             }),
-            invalidatesTags: ["Studysets"],
+            invalidatesTags: ["Studyset"],
         }),
         editCategory: build.mutation<Studyset, EditCategoryParams>({
             query: ({ uuid, index, newCategory }) => ({
@@ -97,7 +112,7 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body: { uuid, index, newCategory },
             }),
-            invalidatesTags: ["Studysets"],
+            invalidatesTags: ["Studyset"],
         }),
         deleteCategory: build.mutation<Studyset, DeleteCategoryParams>({
             query: ({ uuid, categoryToDelete }) => ({
@@ -105,7 +120,7 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body: { uuid, categoryToDelete },
             }),
-            invalidatesTags: ["Studysets"],
+            invalidatesTags: ["Studyset"],
         }),
         updateLastViewed: build.mutation<Studyset, UpdateLastViewedParams>({
             query: ({ uuid }) => ({
@@ -113,7 +128,7 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body: { uuid },
             }),
-            invalidatesTags: ["Studysets"],
+            invalidatesTags: ["Studyset"],
         }),
         markCardAsImportant: build.mutation<
             Studyset,
@@ -124,7 +139,7 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body: { cardUUID, newValue },
             }),
-            invalidatesTags: ["Studysets"],
+            invalidatesTags: ["Studyset"],
         }),
         assignCardCategories: build.mutation<void, AssignCardCategoriesParams>({
             query: ({ cardUUID, categories }) => ({
@@ -132,7 +147,7 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body: { cardUUID, categories },
             }),
-            invalidatesTags: ["Studysets"],
+            invalidatesTags: ["Studyset"],
         }),
     }),
 });

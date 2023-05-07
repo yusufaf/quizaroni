@@ -19,7 +19,7 @@ import { SimpleFlexContainer } from "src/AppStyles";
 export const StyledDialog = styled(Dialog)({
     "& .MuiDialog-paper": {
         // width: "60rem",
-        height: "28rem",
+        height: "32rem",
     },
 });
 
@@ -31,7 +31,6 @@ export const StyledDialogContent = styled(DialogContent)({
 
 export const CategoriesListContainer = styled("div")(({ theme }) => ({
     maxHeight: "20rem",
-    marginTop: "4rem",
     overflowY: "auto",
     "&::-webkit-scrollbar": {
         width: "0.5rem",
@@ -45,7 +44,7 @@ export const CategoriesListContainer = styled("div")(({ theme }) => ({
 
 export const CategoriesListPaper = styled(Paper)({});
 
-export const CategoriesList = styled(List)({});
+export const StyledCategoriesList = styled(List)({});
 
 export const CategoryButtons = styled(SimpleFlexContainer)({
     gap: "0.5rem",
@@ -55,14 +54,14 @@ export const CategoryField = styled(TextField)({
     marginTop: "1.25rem",
 });
 
-export const AssignCategoryContainer = styled(SimpleFlexContainer)({
+export const CategoryInputsContainer = styled(SimpleFlexContainer)({
     flexDirection: "column",
     alignItems: "flex-start",
     marginTop: "1rem",
     gap: "1rem",
 });
 
-export const AssignCategoryFormControl = styled(FormControl)({
+export const CategoryFormControl = styled(FormControl)({
     width: "20rem",
 });
 

@@ -10,7 +10,7 @@ const baseQuery = fetchBaseQuery({
 const api = createApi({
 	reducerPath: "api",
 	baseQuery: baseQuery,
-	tagTypes: ["Studysets", "Users"],
+	tagTypes: ["Studyset", "Users"],
 	/*
 		This API has the endpoints injected in adjacent files.
 		The endpoints are defined in the adjacent files, and then

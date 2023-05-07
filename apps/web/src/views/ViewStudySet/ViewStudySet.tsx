@@ -47,6 +47,7 @@ import {
     SortCardsDropdown,
     CardFiltersContainer,
     CategoryTabs,
+    CategoryTab,
 } from "./styles";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import { useNavigate, useParams } from "react-router-dom";
@@ -61,10 +62,13 @@ import axios from "axios";
 import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
 import { Card, SortDirection } from "lib/types";
 import {
+    useGetAllStudysetsQuery,
     useGetStudysetQuery,
     useUpdateLastViewedMutation,
     useUpdateStudysetMetadataMutation,
 } from "state/api/studysets";
+import { selectUserData } from "state/slices/globalSlice";
+import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 
 type Props = {};
 
@@ -75,18 +79,27 @@ const ViewFlashSet = (props: Props) => {
     const { isDarkMode, theme } = useTheme();
 
     const navigate = useNavigate();
-    const { id: studySetUUID } = useParams();
+    const { id: studySetUUID = "" } = useParams();
     const dispatch = useDispatch();
     // const studySets = useSelector(selectStudySets);
     // console.log({ studySets });
     // const selectedStudySet = useSelector(selectSelectedStudySet);
+    const { uuid: userUUID = "" } = useSelector(selectUserData);
+
+    const {
+        data: studySets = [],
+        isLoading: isStudySetsLoading,
+        isSuccess: isStudySetsSuccess,
+    } = useGetAllStudysetsQuery({
+        userUUID,
+    });
 
     const {
         data: selectedStudySet,
         isLoading: isStudySetLoading,
         isSuccess: isStudySetSuccess,
     } = useGetStudysetQuery({
-        uuid: studySetUUID ?? "",
+        uuid: studySetUUID,
     });
 
     const [
@@ -187,7 +200,7 @@ const ViewFlashSet = (props: Props) => {
             ...(selectedStudySet?.categories ?? []),
         ];
         return jointCategories.map((tab, index) => {
-            return <Tab key={index} label={tab} value={tab} />;
+            return <CategoryTab key={index} label={tab} value={tab} />;
         });
     }, [selectedStudySet]);
 
@@ -275,6 +288,7 @@ const ViewFlashSet = (props: Props) => {
         open: showManageCategories,
         setOpen: setShowManageCategories,
         selectedStudySet,
+        studySets,
     };
 
     /* TODO: Fix the spacing between the ViewContainer and the (first) ViewCards */
@@ -422,6 +436,7 @@ const ViewFlashSet = (props: Props) => {
                 studySet={selectedStudySet}
             />
             <ManageCategoriesDialog {...manageCategoriesProps} />
+            <ScrollToTopFab />
         </ViewFlashsetPage>
     );
 };

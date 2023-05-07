@@ -105,8 +105,8 @@ export const SET_METADATA_FIELDS = {
 };
 
 export const DEFAULT_CATEGORIES = {
-    ALL: "ALL",
-    IMPORTANT: "IMPORTANT",
+    ALL: "All",
+    IMPORTANT: "Important",
 };
 
 export const SORT_DIRECTIONS: { [key: string]: SortDirection } = {
