@@ -27,6 +27,12 @@ const downloadTypeItems = Object.values(DOWNLOAD_FILE_TYPES).map(
     }
 );
 
+type DownloadFileParams = {
+    data: any;
+    fileName: string;
+    fileType: string;
+}
+
 type Props = {
     downloadFileType: string;
     handleClose: () => void;
@@ -44,20 +50,33 @@ const DownloadSetModal = (props: Props) => {
         studySet,
     } = props;
 
+    const downloadFile = ({ data, fileName, fileType }: DownloadFileParams) => {
+        const blob = new Blob([data], { type: MIME_TYPES[fileType] });
+        const anchor = document.createElement("a");
+        anchor.download = fileName;
+        anchor.href = window.URL.createObjectURL(blob);
+        anchor.click();
+        anchor.remove();
+    };
+
     const handleDownloadSet = () => {
         const { description, label, title, cards } = studySet;
-        const anchor = document.createElement("a");
         const fileExtension = downloadFileType.toLowerCase();
-        const mimeType = MIME_TYPES[downloadFileType];
-        const fileName = `${title}_Studyset.${fileExtension}`
-        anchor.download = fileName;
+        const fileName = `${title}_Studyset.${fileExtension}`;
+        const downloadTimestamp = new Date().toLocaleString().replace(",", "");
 
-        let url = "";
-
-        const downloadTimestamp = new Date().toLocaleString().replace(',','')
+        let blobData: any = null;
 
         switch (downloadFileType) {
             case DOWNLOAD_FILE_TYPES.CSV:
+                const headers = ["Term, Definition"];
+                const cardsCSV = cards.reduce((acc: string[], card: Card) => {
+                    const { term, definition } = card;
+                    acc.push([term, definition].join(","));
+                    return acc;
+                }, []);
+                const csvData = [...headers, ...cardsCSV].join("\n");
+                blobData = csvData;
                 break;
             case DOWNLOAD_FILE_TYPES.TXT: {
                 const metadataText = `Title: ${title}\nDescription: ${description}\nLabel: ${label}\nDownloaded on: ${downloadTimestamp} \n\n`;
@@ -69,11 +88,8 @@ const DownloadSetModal = (props: Props) => {
                         index + 1
                     }:\n\t ${termString} \n\t ${definitionString} \n`;
                 });
-                const text = `${metadataText}${cardText.join("\n")}`;
-                const blob = new Blob([text], {
-                    type: mimeType,
-                });
-                url = URL.createObjectURL(blob);
+                const textData = `${metadataText}${cardText.join("\n")}`;
+                blobData = textData;
                 break;
             }
             case DOWNLOAD_FILE_TYPES.JSON: {
@@ -96,22 +112,15 @@ const DownloadSetModal = (props: Props) => {
                 const studysetJson = {
                     metadata,
                     cards: cleanedCards,
-                }
-                const blobParts = [JSON.stringify(studysetJson, null, 4)];
-                const blob = new Blob(blobParts, {
-                    type: mimeType,
-                });
-                url = URL.createObjectURL(blob);
+                };
+                blobData = JSON.stringify(studysetJson, null, 4);
                 break;
             }
             default:
                 break;
         }
 
-        anchor.href = url;
-        document.body.appendChild(anchor);
-        anchor.click();
-        document.body.removeChild(anchor);
+        downloadFile({ data: blobData, fileName, fileType: downloadFileType });
         handleClose();
     };
 
@@ -122,7 +131,7 @@ const DownloadSetModal = (props: Props) => {
                 <DialogContentText>
                     Choose what format you'd like to download the study set as:
                 </DialogContentText>
-                <FormControl 
+                <FormControl
                     sx={{
                         marginTop: "1rem",
                     }}
