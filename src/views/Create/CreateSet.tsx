@@ -25,6 +25,7 @@ import {
 import { CREATE_PAGE_TYPES } from "utilities/constants";
 import useCustomMutation from "lib/hooks/useCustomMutation";
 import { toast } from "react-toastify";
+import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 
 const EMPTY_CARD = {
     term: "",
@@ -356,6 +357,7 @@ const CreateSet = (props: Props) => {
         <>
             <CreateSetPage>
                 <CreateSetHeader {...headerProps} />
+                {/* TODO: Move into subcomponent? */}
                 <SpacedFlexContainer style={{ gap: "2rem" }}>
                     <Button
                         variant="outlined"
@@ -372,6 +374,7 @@ const CreateSet = (props: Props) => {
                         Reverse Cards
                     </Button>
                 </SpacedFlexContainer>
+                {/* TODO: Virtual Scroll */}
                 {cardInputs}
                 <AddCardButton variant="contained" onClick={addCreateCardInput}>
                     <AddCardIcon />
@@ -382,6 +385,7 @@ const CreateSet = (props: Props) => {
                 open={showImportModal}
                 onClose={() => setShowImportModal(false)}
             />
+            <ScrollToTopFab />
         </>
     );
 };
