@@ -31,7 +31,7 @@ type DownloadFileParams = {
     data: any;
     fileName: string;
     fileType: string;
-}
+};
 
 type Props = {
     downloadFileType: string;
@@ -68,7 +68,7 @@ const DownloadSetModal = (props: Props) => {
         let blobData: any = null;
 
         switch (downloadFileType) {
-            case DOWNLOAD_FILE_TYPES.CSV:
+            case DOWNLOAD_FILE_TYPES.CSV: {
                 const headers = ["Term, Definition"];
                 const cardsCSV = cards.reduce((acc: string[], card: Card) => {
                     const { term, definition } = card;
@@ -78,6 +78,7 @@ const DownloadSetModal = (props: Props) => {
                 const csvData = [...headers, ...cardsCSV].join("\n");
                 blobData = csvData;
                 break;
+            }
             case DOWNLOAD_FILE_TYPES.TXT: {
                 const metadataText = `Title: ${title}\nDescription: ${description}\nLabel: ${label}\nDownloaded on: ${downloadTimestamp} \n\n`;
                 const cardText = cards.map((card: Card, index: number) => {
@@ -114,6 +115,16 @@ const DownloadSetModal = (props: Props) => {
                     cards: cleanedCards,
                 };
                 blobData = JSON.stringify(studysetJson, null, 4);
+                break;
+            }
+            case DOWNLOAD_FILE_TYPES.MD: {
+                const metadataText = `# ${title}\n\n## Description\n${description}\n\n## Label\n${label}\n\n## Downloaded on\n${downloadTimestamp}\n\n`;
+                const cardText = cards.map((card: Card, index: number) => {
+                    const { definition, term } = card;
+                    return `## Card ${index + 1}\n\n**Term:** ${term}\n\n**Definition:** ${definition}\n\n`;
+                  });
+                const mdData = `${metadataText}${cardText.join("\n")}`;
+                blobData = mdData;
                 break;
             }
             default:

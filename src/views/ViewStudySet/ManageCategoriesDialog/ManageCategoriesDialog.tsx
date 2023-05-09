@@ -253,7 +253,7 @@ const ManageCategoriesDialog = (props: Props) => {
 
     const onAssignedCategoriesChange = (e: any) => {
         assignCardCategories({
-            cardUUID: selectedStudysetUUID,
+            cardUUID: selectedCardUUID,
             categories: e.target.value,
         });
     };
@@ -367,7 +367,7 @@ const ManageCategoriesDialog = (props: Props) => {
             case TABS.ASSIGN:
                 const { cards, categories } = selectedStudySet;
                 const selectedCardCategories =
-                    cards?.find((card) => card.uuid === selectedStudysetUUID)
+                    cards?.find((card) => card.uuid === selectedCardUUID)
                         ?.categories ?? [];
                 jsx.push(
                     <CategoryInputsContainer>
@@ -376,7 +376,7 @@ const ManageCategoriesDialog = (props: Props) => {
                             <Select
                                 labelId="card-select-label"
                                 label="Card"
-                                value={selectedStudysetUUID}
+                                value={selectedCardUUID}
                                 onChange={(e) =>
                                     setSelectedCardUUID(e.target.value)
                                 }
@@ -401,7 +401,7 @@ const ManageCategoriesDialog = (props: Props) => {
                                 })}
                             </Select>
                         </CategoryFormControl>
-                        {selectedStudysetUUID && (
+                        {selectedCardUUID && (
                             <CategoryFormControl fullWidth>
                                 <InputLabel id="category-select-label">
                                     Categories
