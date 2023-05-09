@@ -70,12 +70,14 @@ export const DOWNLOAD_FILE_TYPES = {
     TXT: "TXT",
     JSON: "JSON",
     CSV: "CSV",
+    MD: "MD",
 };
 
 export const MIME_TYPES: { [key: string]: string } = {
     [DOWNLOAD_FILE_TYPES.TXT]: "text/plain",
     [DOWNLOAD_FILE_TYPES.JSON]: "application/json",
     [DOWNLOAD_FILE_TYPES.CSV]: "text/csv",
+    [DOWNLOAD_FILE_TYPES.MD]: "text/markdown",
 }
 
 
