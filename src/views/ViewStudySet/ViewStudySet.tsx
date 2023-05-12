@@ -1,4 +1,3 @@
-import { useEffect, useMemo, useRef, useState } from "react";
 import {
     Add,
     ArrowBack,
@@ -8,59 +7,21 @@ import {
 import {
     Button,
     Chip,
-    FormControl,
     IconButton,
     InputLabel,
     MenuItem,
     Select,
     SelectChangeEvent,
-    Tab,
-    Tabs,
     Tooltip,
-    Typography,
+    Typography
 } from "@mui/material/";
-import ViewFlashCard from "./ViewFlashCard";
-import ActionsSection from "./ActionsSection/ActionsSection";
-import CreateLabelDialog from "./CreateLabelDialog/CreateLabelDialog";
-import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
-import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
-import { useTheme } from "theme/useTheme";
-import FLASH_CARDS_IMG from "resources/images/flash-card.png";
-import {
-    DOWNLOAD_FILE_TYPES,
-    STUDY_MODES,
-    VIEW_SET,
-    DEFAULT_CATEGORIES,
-    SORT_DIRECTIONS,
-} from "utilities/constants";
-import FlashcardsStudy from "./FlashcardsStudy";
-import { SimpleFlexContainer } from "src/AppStyles";
-import {
-    SetInfo,
-    StudyModeGrid,
-    ViewFlashsetPage,
-    ViewFlashsetContainer,
-    ViewFlashsetHeader,
-    ViewFlashsetPaper,
-    StudyModeOption,
-    CardCount,
-    SortCardsDropdown,
-    CardFiltersContainer,
-    CategoryTabs,
-    CategoryTab,
-} from "./styles";
+import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import { useNavigate, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
-import {
-    selectStudySets,
-    selectSelectedStudySet,
-    setSelectedStudySet,
-} from "state/slices/studysetsSlice";
-import { useDispatch } from "react-redux";
-import axios from "axios";
-import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
 import { Card, SortDirection } from "lib/types";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { SimpleFlexContainer } from "src/AppStyles";
 import {
     useGetAllStudysetsQuery,
     useGetStudysetQuery,
@@ -68,11 +29,34 @@ import {
     useUpdateStudysetMetadataMutation,
 } from "state/api/studysets";
 import { selectUserData } from "state/slices/globalSlice";
-import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
+import { useTheme } from "theme/useTheme";
+import {
+    DEFAULT_CATEGORIES,
+    DOWNLOAD_FILE_TYPES,
+    SORT_DIRECTIONS
+} from "utilities/constants";
+import ActionsSection from "./ActionsSection/ActionsSection";
+import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
+import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
+import ManageLabelsDialog from "./ManageLabelsDialog/ManageLabelsDialog";
+import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
+import ViewFlashCard from "./ViewFlashCard";
+import {
+    CardCount,
+    CardFiltersContainer,
+    CategoryTab,
+    CategoryTabs,
+    SetInfo,
+    SortCardsDropdown,
+    ViewFlashsetContainer,
+    ViewFlashsetHeader,
+    ViewFlashsetPage,
+    ViewFlashsetPaper
+} from "./styles";
 
 type Props = {};
 
-const ViewFlashSet = (props: Props) => {
+const ViewStudySet = (props: Props) => {
     const {} = props;
 
     /* Hooks / Redux */
@@ -121,7 +105,7 @@ const ViewFlashSet = (props: Props) => {
 
     const [showNotificationsModal, setShowNotificationsModal] = useState(false);
     const [showControlMenu, setShowControlMenu] = useState(false);
-    const [showCreateLabelDialog, setShowCreateLabelDialog] = useState(false);
+    const [showManageLabelsDialog, setShowManageLabelsDialog] = useState<boolean>(false);
     const [createLabelName, setCreateLabelName] = useState("");
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
@@ -226,11 +210,11 @@ const ViewFlashSet = (props: Props) => {
         selectedStudySet,
     };
 
-    const createLabelDialogProps = {
+    const manageLabelsDialogProps = {
         createNewLabel,
-        showCreateLabelDialog,
+        open: showManageLabelsDialog,
         setCreateLabelName,
-        setShowCreateLabelDialog,
+        onClose: () => setShowManageLabelsDialog(false),
     };
 
     /* Sorting */
@@ -277,6 +261,8 @@ const ViewFlashSet = (props: Props) => {
         }
     }, [selectedTab, sortedViewFlashCards]);
 
+    console.log({filteredViewFlashCards})
+
     /* TODO: Move this to separate route */
     // selectedStudyMode === STUDY_MODES.FLASHCARDS ?
     // (
@@ -322,6 +308,7 @@ const ViewFlashSet = (props: Props) => {
                                         : "No label selected"
                                 }
                                 variant="outlined"
+                                onClick={() => setShowCreateLabelDialog(true)}
                             />
                             <Typography variant="body1">
                                 {selectedStudySet?.description}
@@ -421,9 +408,16 @@ const ViewFlashSet = (props: Props) => {
                 </SimpleFlexContainer>
             </CardFiltersContainer>
 
-            {/* Container for the cards */}
+            {/* Testing out virtual scrolling */}
+            {/* <Virtuoso
+                style={{
+                    height: "20rem",
+                }}
+                totalCount={filteredViewFlashCards.length}
+                itemContent={(index) => filteredViewFlashCards[index]}
+            /> */}
             {filteredViewFlashCards}
-            <CreateLabelDialog {...createLabelDialogProps} />
+            <ManageLabelsDialog {...manageLabelsDialogProps} />
             <NotificationsDialog
                 open={showNotificationsModal}
                 handleClose={() => setShowNotificationsModal(false)}
@@ -441,4 +435,4 @@ const ViewFlashSet = (props: Props) => {
     );
 };
 
-export default ViewFlashSet;
+export default ViewStudySet;

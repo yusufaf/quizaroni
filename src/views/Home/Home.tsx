@@ -245,6 +245,7 @@ const Home = (props: Props) => {
                         ) : (
                             <HomeGridView
                                 studySets={studySets}
+                                handleShowConfirmDialog={handleShowConfirmDialog}
                             />
                         )}
                     </HomeSetsContainer>
