@@ -30,7 +30,11 @@ import {
 } from "./NavStyles";
 import { Auth } from "aws-amplify";
 
-const NavBar = (props) => {
+type Props = {
+
+};
+
+const NavBar = (props: Props) => {
     // TODO: Change to use redux slice
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
@@ -49,17 +53,6 @@ const NavBar = (props) => {
         borderBottom: isActive ? "0.2rem solid orange" : "none",
         color: `${theme.palette.text.primary}`,
     });
-
-    const displayLogoutAlert = (type) => {
-        const showLogoutToast = true;
-        const logoutSuccessAlert = {
-            message: "Successfully logged out :)",
-            open: showLogoutToast,
-            type: SUCCESS,
-        };
-        dispatch(setAlert(logoutSuccessAlert));
-        return;
-    };
 
     const handleLogout = async () => {
           try {

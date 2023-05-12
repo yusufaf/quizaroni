@@ -29,6 +29,7 @@ type Props = {
 const HomeStudySetCard = (props: Props) => {
     const {
         studySet,
+        
     } = props;
 
     const {

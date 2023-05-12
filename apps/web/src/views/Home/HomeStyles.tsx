@@ -22,16 +22,17 @@ export const HomeSetsContainer = styled(Box)({
     marginTop: "1rem"
 })
 
+// TODO:
 export const HomeSetGrid = styled("div")({
     display: "grid",
-    gridTemplateRows: "repeat(3, auto)",
+    gridTemplateRows: "repeat(auto-fit, minmax(15rem, auto))", // modified
     gridTemplateColumns: "repeat(3, auto)",
-    gap: "3rem",
+    height: "calc(100vh - 20rem)", // add a fixed height to prevent movement of the Pagination component
 })
 
 /* Grid View - Card Styling */
 export const HomeSetCard = styled(Card)(({theme}) => ({
-    // height: "14rem", 
+    maxHeight: "15rem",
     width: "20rem",
     padding: "1rem",
     transition: "0.2s ease",

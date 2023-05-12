@@ -72,6 +72,7 @@ const CreateSetHeader = (props: Props) => {
 
     const renderLabelOptions = () => {
         const { labels = [] } = userData;
+        console.log({userData})
         return labels.map((label: any, index: number) => {
             return (
                 <MenuItem key={index} value={label} sx={{width: "10rem"}}>
