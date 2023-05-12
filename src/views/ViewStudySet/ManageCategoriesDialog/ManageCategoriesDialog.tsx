@@ -21,6 +21,7 @@ import {
     Dispatch,
     ReactNode,
     SetStateAction,
+    SyntheticEvent,
     useEffect,
     useState,
 } from "react";
@@ -148,7 +149,7 @@ const ManageCategoriesDialog = (props: Props) => {
         setOpen(false);
     };
 
-    const onTabChange = (e, newTab) => {
+    const onTabChange = (e: SyntheticEvent, newTab: string) => {
         setSelectedTab(newTab);
     };
 

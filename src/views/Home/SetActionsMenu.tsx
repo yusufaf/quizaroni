@@ -6,9 +6,11 @@ import {
     FavoriteBorder as FavoriteIcon,
 } from "@mui/icons-material";
 import { useTheme } from "theme/useTheme";
+import { useNavigate } from "react-router-dom";
+import { Studyset } from "lib/types";
 
 type Props = {
-    studySet: any;
+    studySet: Studyset;
     open: boolean;
     onClose: any;
     anchorEl: any;
@@ -30,6 +32,8 @@ const SetActionsMenu = (props: Props) => {
         marginRight: "0.75rem",
     };
 
+    const navigate = useNavigate();
+
     return (
         <Menu
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -37,9 +41,9 @@ const SetActionsMenu = (props: Props) => {
             open={open}
             onClose={onClose}
         >
-            <MenuItem onClick={(e) => e.stopPropagation()}>
+            <MenuItem onClick={() => navigate(`/edit/${studySet.uuid}`)}>
                 <EditIcon sx={iconStyling} />
-                <Typography>Rename</Typography>
+                <Typography>Edit</Typography>
             </MenuItem>
             <MenuItem
                 onClick={(e) => {

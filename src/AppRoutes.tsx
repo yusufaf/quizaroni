@@ -20,7 +20,6 @@ const AppRoutes = (props: Props) => {
             <Route path="/forgotPassword" element={<ForgotPassword />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/explore" element={<></>} />
-            {/* TODO: Route for view / editing flashsets */}
             <Route path="/view/:id" element={<ViewStudySet />} />
             <Route path="/edit/:id" element={<CreateSet pageType="Edit" />} />
 

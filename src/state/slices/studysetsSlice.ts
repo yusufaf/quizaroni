@@ -1,9 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {
+  Studyset
+} from "lib/types";
 
-// TODO: Type this
 type StudySetsSliceState = {
-  studySets: any[];
-  selectedStudySet: any;
+  studySets: Studyset[];
+  selectedStudySet: Studyset | null;
 }
 
 const initialState: StudySetsSliceState = {
@@ -24,7 +26,6 @@ export const studysetsSlice = createSlice({
   },
 })
 
-// Action creators are generated for each case reducer function
 export const { 
     setStudySets,
     setSelectedStudySet
