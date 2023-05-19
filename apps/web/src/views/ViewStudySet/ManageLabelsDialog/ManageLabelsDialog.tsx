@@ -19,36 +19,40 @@ import {
     Tooltip,
     Typography,
 } from "@mui/material/";
-import { useTheme } from "theme/useTheme";
 import { TABS } from "./constants";
+import {
+    StyledDialog,
+    StyledDialogContent,
+} from "./styles"
+
 
 type Props = {
     open: boolean;
     onClose: Dispatch<SetStateAction<boolean>>;
 };
-
 const ManageLabelsDialog = (props: Props) => {
     const {
         createNewLabel,
         open,
-        showCreateLabelDialog,
         setCreateLabelName,
-        setShowCreateLabelDialog,
         onClose
     } = props;
 
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
 
-    const onTabChange = (e: SyntheticEvent, newTab: string) => {
+    const onTabChange = (_e: SyntheticEvent, newTab: string) => {
         setSelectedTab(newTab);
     };
 
     return (
-        <Dialog
+        <StyledDialog
             open={open}
             onClose={onClose}
         >
-            <DialogTitle>Create new label</DialogTitle>
+            <DialogTitle>
+                Labels
+                {/* {TAB_PROPERTIES[selectedTab].title} */}
+            </DialogTitle>
             <DialogContent>
                 <div>
                     <Tabs
@@ -89,7 +93,7 @@ const ManageLabelsDialog = (props: Props) => {
                     Create
                 </Button>
             </DialogActions>
-        </Dialog>
+        </StyledDialog>
     );
 };
 

@@ -29,13 +29,11 @@ import {
     ExtraPickerContainer,
     NewCardLabel
 } from "../CreateSetStyles";
+import { TODO } from "lib/types";
 
-/* 
-type Props = {
 
-}
-*/
-const NewCardInput = props => {
+type Props = TODO;
+const NewCardInput = (props: Props) => {
     const {
         index,
         handleDelete,
@@ -57,13 +55,13 @@ const NewCardInput = props => {
 
     const { isDarkMode, theme } = useTheme();
 
-    const [showTextColorPicker, setShowTextColorPicker] = useState(false);
-    const [showBackgroundColorPicker, setShowBackgroundColorPicker] = useState(false);
+    const [showTextColorPicker, setShowTextColorPicker] = useState<boolean>(false);
+    const [showBackgroundColorPicker, setShowBackgroundColorPicker] = useState<boolean>(false);
     const [localTextColor, setLocalTextColor] = useState(textColor);
     const [localBackgroundColor, setLocalBackgroundColor] = useState(backgroundColor);
 
-    const [applyTextColor, setApplyTextColor] = useState(false);
-    const [applyBackgroundColor, setApplyBackgroundColor] = useState(false);
+    const [applyTextColor, setApplyTextColor] = useState<boolean>(false);
+    const [applyBackgroundColor, setApplyBackgroundColor] = useState<boolean>(false);
 
 
     // TODO: Clicking away from ColorPicker

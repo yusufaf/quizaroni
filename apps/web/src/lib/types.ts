@@ -1,5 +1,13 @@
+export type TODO = any;
+
 export type UUID = string;
 export type Timestamp = number;
+
+export type InitialCard = {
+    term: string;
+    definition: string;
+    uuid: UUID;
+}
 
 export type Card = {
     term: string;
