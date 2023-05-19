@@ -26,10 +26,15 @@ import { CREATE_PAGE_TYPES } from "utilities/constants";
 import useCustomMutation from "lib/hooks/useCustomMutation";
 import { toast } from "react-toastify";
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
+import { v4 as uuidv4 } from "uuid";
+import {
+    InitialCard
+} from "lib/types"
 
-const EMPTY_CARD = {
+const EMPTY_CARD: InitialCard = {
     term: "",
     definition: "",
+    uuid: uuidv4()
 };
 
 type Props = {
@@ -210,7 +215,7 @@ const CreateSet = (props: Props) => {
     /* Adding a new card input box with a term input and description input */
     const addCreateCardInput = () => {
         const newCreatedSetCards = [...createdSetCards];
-        newCreatedSetCards.push({ ...EMPTY_CARD });
+        newCreatedSetCards.push({ ...EMPTY_CARD, uuid: uuidv4() });
         setCreatedSetCards(newCreatedSetCards);
     };
 
