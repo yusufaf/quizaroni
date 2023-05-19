@@ -13,7 +13,7 @@ import {
     Select,
     SelectChangeEvent,
     Tooltip,
-    Typography
+    Typography,
 } from "@mui/material/";
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
@@ -33,7 +33,7 @@ import { useTheme } from "theme/useTheme";
 import {
     DEFAULT_CATEGORIES,
     DOWNLOAD_FILE_TYPES,
-    SORT_DIRECTIONS
+    SORT_DIRECTIONS,
 } from "utilities/constants";
 import ActionsSection from "./ActionsSection/ActionsSection";
 import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
@@ -51,7 +51,7 @@ import {
     ViewFlashsetContainer,
     ViewFlashsetHeader,
     ViewFlashsetPage,
-    ViewFlashsetPaper
+    ViewFlashsetPaper,
 } from "./styles";
 
 type Props = {};
@@ -105,7 +105,8 @@ const ViewStudySet = (props: Props) => {
 
     const [showNotificationsModal, setShowNotificationsModal] = useState(false);
     const [showControlMenu, setShowControlMenu] = useState(false);
-    const [showManageLabelsDialog, setShowManageLabelsDialog] = useState<boolean>(false);
+    const [showManageLabelsDialog, setShowManageLabelsDialog] =
+        useState<boolean>(false);
     const [createLabelName, setCreateLabelName] = useState("");
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
@@ -261,7 +262,7 @@ const ViewStudySet = (props: Props) => {
         }
     }, [selectedTab, sortedViewFlashCards]);
 
-    console.log({filteredViewFlashCards})
+    console.log({ filteredViewFlashCards });
 
     /* TODO: Move this to separate route */
     // selectedStudyMode === STUDY_MODES.FLASHCARDS ?
@@ -301,15 +302,22 @@ const ViewStudySet = (props: Props) => {
                             <Typography variant="subtitle1">
                                 Created by {selectedStudySet?.username}
                             </Typography>
-                            <Chip
-                                label={
-                                    selectedStudySet?.label
-                                        ? selectedStudySet.label
-                                        : "No label selected"
-                                }
-                                variant="outlined"
-                                onClick={() => setShowCreateLabelDialog(true)}
-                            />
+                            <Tooltip
+                                title="Manage labels"
+                                placement="right"
+                            >
+                                <Chip
+                                    label={
+                                        selectedStudySet?.label
+                                            ? selectedStudySet.label
+                                            : "No label selected"
+                                    }
+                                    variant="outlined"
+                                    onClick={() =>
+                                        setShowManageLabelsDialog(true)
+                                    }
+                                />
+                            </Tooltip>
                             <Typography variant="body1">
                                 {selectedStudySet?.description}
                             </Typography>
