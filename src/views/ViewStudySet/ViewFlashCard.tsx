@@ -72,8 +72,9 @@ const ViewFlashCard = (props: Props) => {
                 >
                     Card {index + 1}
                 </Typography>
+                {/* TODO: Handle when there's too many categories, max width or a tooltip on a singular one? */}
                 <CategoryChips>
-                    {card?.categories?.map((category: any, index: number) => (
+                    {card?.categories?.map((category: string, index: number) => (
                         <Chip key={index} label={category} variant="outlined" />
                     ))}
                 </CategoryChips>

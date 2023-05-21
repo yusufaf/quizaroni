@@ -12,6 +12,7 @@ import {
     IconButton,
     FormControl,
     MenuItem,
+    Typography,
 } from "@mui/material/";
 import styled from "@emotion/styled";
 import { SimpleFlexContainer } from "src/AppStyles";
@@ -29,7 +30,14 @@ export const StyledDialogContent = styled(DialogContent)({
     gap: "1rem",
 });
 
-export const CategoriesListContainer = styled("div")(({ theme }) => ({
+export const DeleteLabelWarning = styled(Typography)({
+    position: "absolute",
+    bottom: "10%",
+    whiteSpace: "pre-line",
+    textAlign: "right",
+})
+
+export const LabelsListContainer = styled("div")(({ theme }) => ({
     maxHeight: "20rem",
     overflowY: "auto",
     "&::-webkit-scrollbar": {
@@ -44,22 +52,22 @@ export const LabelsListPaper = styled(Paper)({});
 
 export const StyledLabelsList = styled(List)({});
 
-export const CategoryButtons = styled(SimpleFlexContainer)({
+export const LabelButtons = styled(SimpleFlexContainer)({
     gap: "0.5rem",
 });
 
-export const CategoryField = styled(TextField)({
+export const LabelField = styled(TextField)({
     marginTop: "1.25rem",
 });
 
-export const CategoryInputsContainer = styled(SimpleFlexContainer)({
+export const LabelInputsContainer = styled(SimpleFlexContainer)({
     flexDirection: "column",
     alignItems: "flex-start",
     marginTop: "1rem",
     gap: "1rem",
 });
 
-export const CategoryFormControl = styled(FormControl)({
+export const LabelFormControl = styled(FormControl)({
     width: "20rem",
 });
 
