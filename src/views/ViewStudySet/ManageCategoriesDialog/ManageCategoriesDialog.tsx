@@ -1,14 +1,7 @@
-import { Edit, Delete } from "@mui/icons-material";
 import {
     DialogTitle,
     DialogActions,
-    DialogContent,
     Button,
-    List,
-    ListItem,
-    Icon,
-    Paper,
-    IconButton,
     Tabs,
     Tab,
     Select,
@@ -18,6 +11,7 @@ import {
     MenuItem,
 } from "@mui/material/";
 import {
+    ChangeEvent,
     Dispatch,
     ReactNode,
     SetStateAction,
@@ -28,19 +22,12 @@ import {
 import {
     CategoryInputsContainer,
     CategoryFormControl,
-    CategoriesListContainer,
-    CategoriesListPaper,
-    CategoryButtons,
     CategoryField,
     StyledDialog,
     StyledDialogContent,
     StyledMenuItem,
 } from "./styles";
 import { useDispatch, useSelector } from "react-redux";
-import {
-    selectSelectedStudySet,
-    setSelectedStudySet,
-} from "state/slices/studysetsSlice";
 import {
     useAssignCardCategoriesMutation,
     useCreateCategoryMutation,
@@ -51,7 +38,6 @@ import {
 import { Card, Studyset } from "lib/types";
 import { selectUserData } from "state/slices/globalSlice";
 import { useParams } from "react-router-dom";
-import { toast } from "react-toastify";
 import { LoadingButton } from "@mui/lab";
 import useCustomMutation from "lib/hooks/useCustomMutation";
 import { TABS, ACTIONS, TAB_PROPERTIES } from "./constants";
@@ -142,9 +128,6 @@ const ManageCategoriesDialog = (props: Props) => {
     const isCreateTab = selectedTab === TABS.CREATE;
     const isManageTab = selectedTab === TABS.MANAGE;
 
-    /* */
-    useEffect(() => {}, []);
-
     const handleClose = () => {
         setOpen(false);
     };
@@ -153,7 +136,7 @@ const ManageCategoriesDialog = (props: Props) => {
         setSelectedTab(newTab);
     };
 
-    const onCreateCategoryChange = (e: any) => {
+    const onCreateCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
         const category = e.target.value;
         const isDuplicate = selectedStudySet.categories.includes(category);
         setCategoryName(category);
@@ -166,7 +149,7 @@ const ManageCategoriesDialog = (props: Props) => {
         }
     };
 
-    const onEditCategoryChange = (e: any) => {
+    const onEditCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
         const newCategoryName = e.target.value;
         const allOtherCategories = [...selectedStudySet.categories].filter(
             (_, index) => index != editIndex
@@ -288,7 +271,7 @@ const ManageCategoriesDialog = (props: Props) => {
                         margin="dense"
                         label="Category Name"
                         type="text"
-                        error={errorInfo}
+                        error={Boolean(errorInfo)}
                         helperText={errorInfo?.helperText ?? ""}
                         fullWidth
                         value={categoryName}
@@ -303,7 +286,7 @@ const ManageCategoriesDialog = (props: Props) => {
                         label="Edit Category Name"
                         type="text"
                         variant="standard"
-                        error={editErrorInfo}
+                        error={Boolean(editErrorInfo)}
                         helperText={editErrorInfo?.helperText ?? ""}
                         fullWidth
                         value={editCategoryName}

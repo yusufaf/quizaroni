@@ -68,7 +68,7 @@ const ViewStudySet = (props: Props) => {
     // const studySets = useSelector(selectStudySets);
     // console.log({ studySets });
     // const selectedStudySet = useSelector(selectSelectedStudySet);
-    const { uuid: userUUID = "" } = useSelector(selectUserData);
+    const { uuid: userUUID = "", labels = [] } = useSelector(selectUserData);
 
     const {
         data: studySets = [],
@@ -107,7 +107,6 @@ const ViewStudySet = (props: Props) => {
     const [showControlMenu, setShowControlMenu] = useState(false);
     const [showManageLabelsDialog, setShowManageLabelsDialog] =
         useState<boolean>(false);
-    const [createLabelName, setCreateLabelName] = useState("");
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
 
@@ -166,10 +165,6 @@ const ViewStudySet = (props: Props) => {
 
     const testEmail = async () => {};
 
-    const createNewLabel = () => {
-        // TOOD: Check if the label already exists
-    };
-
     // event: React.SyntheticEvent, newValue: number
     const onTabChange = (e: any, newTab: any) => {
         setSelectedTab(newTab);
@@ -212,9 +207,8 @@ const ViewStudySet = (props: Props) => {
     };
 
     const manageLabelsDialogProps = {
-        createNewLabel,
+        labels,
         open: showManageLabelsDialog,
-        setCreateLabelName,
         onClose: () => setShowManageLabelsDialog(false),
     };
 
@@ -321,19 +315,6 @@ const ViewStudySet = (props: Props) => {
                             <Typography variant="body1">
                                 {selectedStudySet?.description}
                             </Typography>
-                            <Tooltip title="Create label" placement="right">
-                                <IconButton
-                                    color="primary"
-                                    aria-label="arrow backward"
-                                    component="span"
-                                    sx={arrowIconStyling}
-                                    onClick={() =>
-                                        setShowCreateLabelDialog(true)
-                                    }
-                                >
-                                    <Add />
-                                </IconButton>
-                            </Tooltip>
                             <ActionsSection {...actionSectionProps} />
                         </SetInfo>
                         {/* <div className={viewFlashStyles.studySection}>
