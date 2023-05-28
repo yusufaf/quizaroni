@@ -13,6 +13,7 @@ import {
     GetStudysetParams,
     AssignCardCategoriesParams,
     DuplicateStudysetParams,
+    CreateLabelParams,
 } from "lib/types";
 
 /* Endpoints
@@ -149,6 +150,14 @@ export const studysetsApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Studyset"],
         }),
+        createLabel: build.mutation<void, CreateLabelParams>({
+            query: (body) => ({
+                url: "studysets/createLabel",
+                method: "POST",
+                body,
+            }),
+            invalidatesTags: ["Studyset"],
+        }),
     }),
 });
 
@@ -165,4 +174,5 @@ export const {
     useUpdateLastViewedMutation,
     useMarkCardAsImportantMutation,
     useAssignCardCategoriesMutation,
+    useCreateLabelMutation,
 } = studysetsApi;

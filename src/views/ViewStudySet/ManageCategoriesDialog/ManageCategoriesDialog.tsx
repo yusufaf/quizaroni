@@ -37,7 +37,6 @@ import {
 } from "state/api/studysets";
 import { Card, Studyset } from "lib/types";
 import { selectUserData } from "state/slices/globalSlice";
-import { useParams } from "react-router-dom";
 import { LoadingButton } from "@mui/lab";
 import useCustomMutation from "lib/hooks/useCustomMutation";
 import { TABS, ACTIONS, TAB_PROPERTIES } from "./constants";
@@ -51,10 +50,14 @@ type Props = {
 };
 
 const ManageCategoriesDialog = (props: Props) => {
-    const { open, setOpen, selectedStudySet, studySets } = props;
+    const { 
+        open, 
+        setOpen, 
+        selectedStudySet, 
+        studySets 
+    } = props;
 
-    /* Hooks / Redux */
-    const { id: studySetUUID } = useParams();
+    const { uuid: studySetUUID = ""} = selectedStudySet || {};
 
     const dispatch = useDispatch();
     const { uuid: userUUID = "" } = useSelector(selectUserData);
