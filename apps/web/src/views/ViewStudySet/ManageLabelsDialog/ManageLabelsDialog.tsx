@@ -9,11 +9,13 @@ import {
 } from "react";
 import {
     Button,
+    Checkbox,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
+    FormControlLabel,
     Tab,
     Tabs,
     TextField,
@@ -30,6 +32,9 @@ import {
 import { LoadingButton } from "@mui/lab";
 import LabelsList from "./LabelsList";
 import { capitalizeFirstLetter } from "utilities/functions";
+import { Studyset } from "lib/types";
+import { useCreateLabelMutation } from "state/api/studysets";
+import useCustomMutation from "lib/hooks/useCustomMutation";
 
 type ErrorInfo = {
     helperText: string;
@@ -39,9 +44,33 @@ type Props = {
     labels: string[];
     onClose: Dispatch<SetStateAction<boolean>>;
     open: boolean;
+    selectedStudySet?: Studyset;
+    userUUID: string;
 };
 const ManageLabelsDialog = (props: Props) => {
-    const { labels = [], onClose, open } = props;
+    const { 
+        labels = [], 
+        onClose, 
+        open,
+        selectedStudySet,
+        userUUID,
+    } = props;
+
+    const { uuid: studySetUUID = ""} = selectedStudySet || {};
+
+    const {
+        mutate: createLabel,
+        isLoading: isCreatingLabel,
+        isSuccess: isCreateSuccess,
+        isError: isCreateError,
+    } = useCustomMutation({
+        mutation: useCreateLabelMutation,
+        successMessage: "Successfully created label",
+        errorMessage: "Error creating label",
+        onSuccess: () => {
+            setLabelName("");
+        },
+    });
 
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
     const [labelName, setLabelName] = useState<string>("");
@@ -54,6 +83,9 @@ const ManageLabelsDialog = (props: Props) => {
     const [deleteIndices, setDeleteIndices] = useState<number[]>([]);
     const [showDeleteConfirmation, setShowDeleteConfirmation] =
         useState<boolean>(false);
+    const [shouldUpdateLabel, setShouldUpdateLabel] = useState<boolean>(true);
+
+    const isCreateTab = selectedTab === TABS.CREATE;
 
     const onTabChange = (_e: SyntheticEvent, newTab: string) => {
         setSelectedTab(newTab);
@@ -134,8 +166,17 @@ const ManageLabelsDialog = (props: Props) => {
         }
     };
 
-    const handleCreate = () => {
-        // TODO:
+
+    const handleCreate = async () => {
+        if (!userUUID) {
+            return;
+        }
+        createLabel({
+            userUUID,
+            label: labelName,
+            studysetUUID: studySetUUID,
+            updateStudysetLabel: shouldUpdateLabel 
+        });
     };
 
     const renderTabView = (): ReactNode => {
@@ -243,6 +284,19 @@ const ManageLabelsDialog = (props: Props) => {
                 />
             </StyledDialogContent>
             <DialogActions>
+                {isCreateTab && (
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={shouldUpdateLabel}
+                                onChange={() =>
+                                    setShouldUpdateLabel(!shouldUpdateLabel)
+                                }
+                            />
+                        }
+                        label="Apply new label to current study set"
+                    />
+                )}
                 {showDeleteConfirmation && (
                     <DeleteLabelWarning variant="body2" color="error">
                         Are you sure you want to delete these labels? This will

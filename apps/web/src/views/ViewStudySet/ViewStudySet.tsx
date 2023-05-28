@@ -210,6 +210,8 @@ const ViewStudySet = (props: Props) => {
         labels,
         open: showManageLabelsDialog,
         onClose: () => setShowManageLabelsDialog(false),
+        selectedStudySet,
+        userUUID,
     };
 
     /* Sorting */
