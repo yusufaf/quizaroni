@@ -98,6 +98,13 @@ export type UpdateLastViewedParams = {
     uuid: UUID;
 }
 
+export type CreateLabelParams = {
+    userUUID: UUID;
+    label: string;
+    updateStudysetLabel: boolean;
+    studysetUUID?: UUID;
+}
+
 export type SortDirection = "asc" | "dsc";
 
 export type ConfirmDialogProps = {
