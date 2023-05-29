@@ -73,6 +73,13 @@ export const DOWNLOAD_FILE_TYPES = {
     MD: "MD",
 };
 
+export const DOWNLOAD_FILE_TITLES = {
+    [DOWNLOAD_FILE_TYPES.TXT]: "Text File",
+    [DOWNLOAD_FILE_TYPES.JSON]: "JavaScript Object Notation",
+    [DOWNLOAD_FILE_TYPES.CSV]: "Comma Separated Values",
+    [DOWNLOAD_FILE_TYPES.MD]: "Markdown File",
+}
+
 export const MIME_TYPES: { [key: string]: string } = {
     [DOWNLOAD_FILE_TYPES.TXT]: "text/plain",
     [DOWNLOAD_FILE_TYPES.JSON]: "application/json",

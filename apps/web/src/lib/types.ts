@@ -118,6 +118,11 @@ export type EditLabelParams = {
     newLabel: string;
 }
 
+export type ChangeLabelParams = {
+    studysetUUID: UUID;
+    newLabel: string;
+}
+
 export type SortDirection = "asc" | "dsc";
 
 export type ConfirmDialogProps = {

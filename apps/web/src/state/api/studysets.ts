@@ -16,6 +16,7 @@ import {
     CreateLabelParams,
     DeleteLabelParams,
     EditLabelParams,
+    ChangeLabelParams,
 } from "lib/types";
 
 /* Endpoints
@@ -158,7 +159,7 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body,
             }),
-            invalidatesTags: ["Studyset"],
+            invalidatesTags: ["Studyset", "User"],
         }),
         deleteLabel: build.mutation<void, DeleteLabelParams>({
             query: ({ userUUID, labelToDelete }) => ({
@@ -166,13 +167,21 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body: { userUUID, labelToDelete },
             }),
-            invalidatesTags: ["Studyset"],
+            invalidatesTags: ["Studyset", "User"],
         }),
         editLabel: build.mutation<void, EditLabelParams>({
             query: ({ userUUID, index, newLabel, oldLabel }) => ({
                 url: "studysets/editLabel",
                 method: "POST",
                 body: { userUUID, index, newLabel, oldLabel },
+            }),
+            invalidatesTags: ["Studyset", "User"],
+        }),
+        changeLabel: build.mutation<void, ChangeLabelParams>({
+            query: ({ studysetUUID, newLabel }) => ({
+                url: "studysets/changeLabel",
+                method: "POST",
+                body: { studysetUUID, newLabel },
             }),
             invalidatesTags: ["Studyset"],
         }),
@@ -195,4 +204,5 @@ export const {
     useCreateLabelMutation,
     useDeleteLabelMutation,
     useEditLabelMutation,
+    useChangeLabelMutation
 } = studysetsApi;

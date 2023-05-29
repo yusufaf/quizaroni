@@ -13,6 +13,7 @@ import {
     FormControl,
     MenuItem,
     Typography,
+    ListItemButton,
 } from "@mui/material/";
 import styled from "@emotion/styled";
 import { SimpleFlexContainer } from "src/AppStyles";
@@ -35,7 +36,7 @@ export const DeleteLabelWarning = styled(Typography)({
     bottom: "10%",
     whiteSpace: "pre-line",
     textAlign: "right",
-})
+});
 
 export const LabelsListContainer = styled("div")(({ theme }) => ({
     maxHeight: "20rem",
@@ -51,6 +52,19 @@ export const LabelsListContainer = styled("div")(({ theme }) => ({
 export const LabelsListPaper = styled(Paper)({});
 
 export const StyledLabelsList = styled(List)({});
+
+interface StyledListButtonProps {
+    isChangeTab: boolean;
+}
+
+export const StyledListButton = styled(ListItemButton)<StyledListButtonProps>(
+    ({ isChangeTab }) => ({
+        "&:hover": {
+            background: isChangeTab ? undefined : "transparent",
+            cursor: isChangeTab ? undefined : "default",
+        },
+    })
+);
 
 export const LabelButtons = styled(SimpleFlexContainer)({
     gap: "0.5rem",
