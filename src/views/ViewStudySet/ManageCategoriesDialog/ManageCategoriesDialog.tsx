@@ -218,15 +218,16 @@ const ManageCategoriesDialog = (props: Props) => {
                 }
 
                 editCategory({
-                    uuid,
+                    studysetUUID: uuid,
                     index: editIndex,
                     newCategory: editCategoryName,
+                    oldCategory: selectedCategoryName,
                 });
             } else if (selectedAction === ACTIONS.DELETE) {
                 for (const index of deleteIndices) {
                     const categoryToDelete = categories[index];
                     deleteCategory({
-                        uuid,
+                        studysetUUID: uuid,
                         categoryToDelete,
                     });
                 }
