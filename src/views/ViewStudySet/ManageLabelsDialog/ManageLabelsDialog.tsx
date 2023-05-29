@@ -33,7 +33,11 @@ import { LoadingButton } from "@mui/lab";
 import LabelsList from "./LabelsList";
 import { capitalizeFirstLetter } from "utilities/functions";
 import { Studyset } from "lib/types";
-import { useCreateLabelMutation } from "state/api/studysets";
+import {
+    useCreateLabelMutation,
+    useDeleteLabelMutation,
+    useEditLabelMutation
+} from "state/api/studysets";
 import useCustomMutation from "lib/hooks/useCustomMutation";
 
 type ErrorInfo = {
@@ -48,15 +52,9 @@ type Props = {
     userUUID: string;
 };
 const ManageLabelsDialog = (props: Props) => {
-    const { 
-        labels = [], 
-        onClose, 
-        open,
-        selectedStudySet,
-        userUUID,
-    } = props;
+    const { labels = [], onClose, open, selectedStudySet, userUUID } = props;
 
-    const { uuid: studySetUUID = ""} = selectedStudySet || {};
+    const { uuid: studySetUUID = "" } = selectedStudySet || {};
 
     const {
         mutate: createLabel,
@@ -69,6 +67,20 @@ const ManageLabelsDialog = (props: Props) => {
         errorMessage: "Error creating label",
         onSuccess: () => {
             setLabelName("");
+        },
+    });
+
+    const {
+        mutate: deleteLabel,
+        isLoading: isDeletingLabel,
+        isSuccess: isDeleteSuccess,
+        isError: isDeleteError,
+    } = useCustomMutation({
+        mutation: useDeleteLabelMutation,
+        successMessage: "Successfully deleted label",
+        errorMessage: "Error deleting label",
+        onSuccess: () => {
+            setDeleteIndices([]);
         },
     });
 
@@ -150,7 +162,13 @@ const ManageLabelsDialog = (props: Props) => {
     };
 
     const handleDeleteConfirmation = () => {
-        // TODO: Confirm delete
+        for (const index of deleteIndices) {
+            const labelToDelete = labels[index];
+            deleteLabel({
+                userUUID,
+                labelToDelete,
+            });
+        }
     };
 
     const handleEditOrDelete = () => {
@@ -158,14 +176,23 @@ const ManageLabelsDialog = (props: Props) => {
         // TODO:
         switch (selectedAction) {
             case ACTIONS.EDIT:
+                if (!editIndex) {
+                    return;
+                }
+
+                // TODO: Move this logic into the validation function
+                const selectedLabelName = labels[editIndex];
+                if (editLabelName === selectedLabelName) {
+                    return;
+                }
+
+
                 break;
             case ACTIONS.DELETE:
-                console.log("Showing delete confirm");
                 setShowDeleteConfirmation(true);
                 break;
         }
     };
-
 
     const handleCreate = async () => {
         if (!userUUID) {
@@ -175,7 +202,7 @@ const ManageLabelsDialog = (props: Props) => {
             userUUID,
             label: labelName,
             studysetUUID: studySetUUID,
-            updateStudysetLabel: shouldUpdateLabel 
+            updateStudysetLabel: shouldUpdateLabel,
         });
     };
 

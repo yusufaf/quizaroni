@@ -14,6 +14,8 @@ import {
     AssignCardCategoriesParams,
     DuplicateStudysetParams,
     CreateLabelParams,
+    DeleteLabelParams,
+    EditLabelParams,
 } from "lib/types";
 
 /* Endpoints
@@ -108,18 +110,18 @@ export const studysetsApi = api.injectEndpoints({
             invalidatesTags: ["Studyset"],
         }),
         editCategory: build.mutation<Studyset, EditCategoryParams>({
-            query: ({ uuid, index, newCategory }) => ({
+            query: ({ studysetUUID, index, newCategory, oldCategory }) => ({
                 url: "studysets/editCategory",
                 method: "POST",
-                body: { uuid, index, newCategory },
+                body: { studysetUUID, index, newCategory, oldCategory },
             }),
             invalidatesTags: ["Studyset"],
         }),
         deleteCategory: build.mutation<Studyset, DeleteCategoryParams>({
-            query: ({ uuid, categoryToDelete }) => ({
+            query: ({ studysetUUID, categoryToDelete }) => ({
                 url: "studysets/deleteCategory",
                 method: "POST",
-                body: { uuid, categoryToDelete },
+                body: { studysetUUID, categoryToDelete },
             }),
             invalidatesTags: ["Studyset"],
         }),
@@ -158,6 +160,22 @@ export const studysetsApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Studyset"],
         }),
+        deleteLabel: build.mutation<void, DeleteLabelParams>({
+            query: ({ userUUID, labelToDelete }) => ({
+                url: "studysets/createLabel",
+                method: "POST",
+                body: { userUUID, labelToDelete },
+            }),
+            invalidatesTags: ["Studyset"],
+        }),
+        editLabel: build.mutation<void, EditLabelParams>({
+            query: ({ userUUID, index, newLabel, oldLabel }) => ({
+                url: "studysets/editLabel",
+                method: "POST",
+                body: { userUUID, index, newLabel, oldLabel },
+            }),
+            invalidatesTags: ["Studyset"],
+        }),
     }),
 });
 
@@ -175,4 +193,6 @@ export const {
     useMarkCardAsImportantMutation,
     useAssignCardCategoriesMutation,
     useCreateLabelMutation,
+    useDeleteLabelMutation,
+    useEditLabelMutation,
 } = studysetsApi;
