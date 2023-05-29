@@ -15,12 +15,12 @@ import {
 } from "@mui/material/";
 import { Card, Studyset } from "lib/types";
 import { Dispatch, SetStateAction } from "react";
-import { DOWNLOAD_FILE_TYPES, MIME_TYPES } from "utilities/constants";
+import { DOWNLOAD_FILE_TYPES, MIME_TYPES, DOWNLOAD_FILE_TITLES } from "utilities/constants";
 
 const downloadTypeItems = Object.values(DOWNLOAD_FILE_TYPES).map(
     (value, index) => {
         return (
-            <MenuItem key={index} value={value}>
+            <MenuItem key={index} value={value} title={DOWNLOAD_FILE_TITLES[value]} >
                 {value}
             </MenuItem>
         );
@@ -136,7 +136,10 @@ const DownloadSetModal = (props: Props) => {
     };
 
     return (
-        <Dialog open={open} onClose={handleClose}>
+        <Dialog 
+            open={open} 
+            onClose={handleClose}
+        >
             <DialogTitle>Download Study Set</DialogTitle>
             <DialogContent>
                 <DialogContentText>

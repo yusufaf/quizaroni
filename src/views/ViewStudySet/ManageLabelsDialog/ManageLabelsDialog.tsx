@@ -36,7 +36,8 @@ import { Studyset } from "lib/types";
 import {
     useCreateLabelMutation,
     useDeleteLabelMutation,
-    useEditLabelMutation
+    useEditLabelMutation,
+    useChangeLabelMutation,
 } from "state/api/studysets";
 import useCustomMutation from "lib/hooks/useCustomMutation";
 
@@ -84,6 +85,17 @@ const ManageLabelsDialog = (props: Props) => {
         },
     });
 
+    const {
+        mutate: changeLabel,
+        isLoading: isChangingLabel,
+        isSuccess: isChangeSuccess,
+        isError: isChangeError,
+    } = useCustomMutation({
+        mutation: useChangeLabelMutation,
+        successMessage: "Successfully updated label",
+        errorMessage: "Error updated label",
+    });
+
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
     const [labelName, setLabelName] = useState<string>("");
     const [errorInfo, setErrorInfo] = useState(null);
@@ -98,11 +110,13 @@ const ManageLabelsDialog = (props: Props) => {
     const [shouldUpdateLabel, setShouldUpdateLabel] = useState<boolean>(true);
 
     const isCreateTab = selectedTab === TABS.CREATE;
+    const isEditActionSelected = selectedAction === ACTIONS.EDIT;
 
     const onTabChange = (_e: SyntheticEvent, newTab: string) => {
         setSelectedTab(newTab);
         if (newTab === TABS.CREATE) {
             setShowDeleteConfirmation(false);
+            setSelectedAction(null);
         }
     };
 
@@ -186,7 +200,6 @@ const ManageLabelsDialog = (props: Props) => {
                     return;
                 }
 
-
                 break;
             case ACTIONS.DELETE:
                 setShowDeleteConfirmation(true);
@@ -195,7 +208,7 @@ const ManageLabelsDialog = (props: Props) => {
     };
 
     const handleCreate = async () => {
-        if (!userUUID) {
+        if (!userUUID || !isCreateTab) {
             return;
         }
         createLabel({
@@ -203,6 +216,17 @@ const ManageLabelsDialog = (props: Props) => {
             label: labelName,
             studysetUUID: studySetUUID,
             updateStudysetLabel: shouldUpdateLabel,
+        });
+    };
+
+    const handleChangeCurrentLabel = (newLabel: string) => {
+        if (!studySetUUID) {
+            return;
+        }
+
+        changeLabel({
+            studysetUUID: studySetUUID,
+            newLabel,
         });
     };
 
@@ -243,18 +267,26 @@ const ManageLabelsDialog = (props: Props) => {
         return jsx;
     };
 
-    const renderDialogButton = () => {
+    const renderDialogButtons = () => {
         switch (selectedTab) {
             case TABS.CREATE:
                 return (
-                    <LoadingButton
-                        variant="contained"
-                        onClick={handleCreate}
-                        disabled={!labelName || Boolean(errorInfo)}
-                        // loading={}
-                    >
-                        Create
-                    </LoadingButton>
+                    <>
+                        <Button
+                            variant="contained"
+                            onClick={() => handleChangeCurrentLabel("")}
+                        >
+                            Remove Current Label
+                        </Button>
+                        <LoadingButton
+                            variant="contained"
+                            onClick={handleCreate}
+                            disabled={!labelName || Boolean(errorInfo)}
+                            // loading={}
+                        >
+                            Create
+                        </LoadingButton>
+                    </>
                 );
             case TABS.MANAGE:
                 const disabled =
@@ -308,6 +340,8 @@ const ManageLabelsDialog = (props: Props) => {
                     handleDeleteClick={handleDeleteClick}
                     editIndex={editIndex}
                     deleteIndices={deleteIndices}
+                    currentLabel={selectedStudySet?.label}
+                    handleChangeCurrentLabel={handleChangeCurrentLabel}
                 />
             </StyledDialogContent>
             <DialogActions>
@@ -324,6 +358,13 @@ const ManageLabelsDialog = (props: Props) => {
                         label="Apply new label to current study set"
                     />
                 )}
+                {isEditActionSelected && (
+                    <DeleteLabelWarning variant="body2" color="error">
+                        Editing this label will change the labels for all of
+                        your study sets. Proceed with caution.
+                    </DeleteLabelWarning>
+                )}
+
                 {showDeleteConfirmation && (
                     <DeleteLabelWarning variant="body2" color="error">
                         Are you sure you want to delete these labels? This will
@@ -335,7 +376,7 @@ const ManageLabelsDialog = (props: Props) => {
                 <Button onClick={onClose} variant="outlined">
                     Close
                 </Button>
-                {renderDialogButton()}
+                {renderDialogButtons()}
             </DialogActions>
         </StyledDialog>
     );
