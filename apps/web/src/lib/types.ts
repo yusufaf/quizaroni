@@ -74,14 +74,15 @@ export type CreateCategoryParams = {
 };
 
 export type DeleteCategoryParams = {
-    uuid: UUID;
+    studysetUUID: UUID;
     categoryToDelete: string;
 };
 
 export type EditCategoryParams = {
-    uuid: UUID;
+    studysetUUID: UUID;
     index: number;
     newCategory: string;
+    oldCategory: string;
 };
 
 export type AssignCardCategoriesParams = {
@@ -103,6 +104,18 @@ export type CreateLabelParams = {
     label: string;
     updateStudysetLabel: boolean;
     studysetUUID?: UUID;
+}
+
+export type DeleteLabelParams = {
+    userUUID: UUID;
+    labelToDelete: string;
+}
+
+export type EditLabelParams = {
+    userUUID: UUID;
+    index: number;
+    oldLabel: string;
+    newLabel: string;
 }
 
 export type SortDirection = "asc" | "dsc";
