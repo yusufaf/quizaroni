@@ -10,7 +10,7 @@ import { AddCardButton, AddCardIcon, CreateSetPage } from "./CreateSetStyles";
 import ImportSetModal from "./ImportSetModal/ImportSetModal";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import { SwapHoriz, Sync as SyncIcon } from "@mui/icons-material";
-import { SpacedFlexContainer } from "src/AppStyles";
+import { SpacedFlexContainer } from "common/AppStyles";
 import { useSelector } from "react-redux";
 import {
     selectAuthenticated,

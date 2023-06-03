@@ -21,7 +21,7 @@ import { Card, SortDirection } from "lib/types";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { SimpleFlexContainer } from "src/AppStyles";
+import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import {
     useGetAllStudysetsQuery,
     useGetStudysetQuery,
@@ -63,7 +63,7 @@ const ViewStudySet = (props: Props) => {
     const { isDarkMode, theme } = useTheme();
 
     const navigate = useNavigate();
-    const { id: studySetUUID = "" } = useParams();
+    const { id: studysetUUID = "" } = useParams();
     const dispatch = useDispatch();
     // const studySets = useSelector(selectStudySets);
     // console.log({ studySets });
@@ -71,19 +71,19 @@ const ViewStudySet = (props: Props) => {
     const { uuid: userUUID = "", labels = [] } = useSelector(selectUserData);
 
     const {
-        data: studySets = [],
-        isLoading: isStudySetsLoading,
-        isSuccess: isStudySetsSuccess,
+        data: studysets = [],
+        isLoading: isStudysetsLoading,
+        isSuccess: isStudysetsSuccess,
     } = useGetAllStudysetsQuery({
         userUUID,
     });
 
     const {
-        data: selectedStudySet,
+        data: selectedStudyset,
         isLoading: isStudySetLoading,
         isSuccess: isStudySetSuccess,
     } = useGetStudysetQuery({
-        uuid: studySetUUID,
+        uuid: studysetUUID,
     });
 
     const [
@@ -97,19 +97,15 @@ const ViewStudySet = (props: Props) => {
 
     const [updateLastViewed] = useUpdateLastViewedMutation();
 
-    console.log({ selectedStudySet, isStudySetLoading });
-
     const controlAnchorRef = useRef(null);
-
     const updatedViewTimestamp = useRef<boolean>(false);
 
-    const [showNotificationsModal, setShowNotificationsModal] = useState(false);
-    const [showControlMenu, setShowControlMenu] = useState(false);
+    const [showNotificationsModal, setShowNotificationsModal] = useState<boolean>(false);
+    const [showControlMenu, setShowControlMenu] = useState<boolean>(false);
     const [showManageLabelsDialog, setShowManageLabelsDialog] =
         useState<boolean>(false);
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
-
     const [showDownloadPopup, setShowDownloadPopup] = useState<boolean>(false);
     const [downloadFileType, setDownloadFileType] = useState<string>(
         DOWNLOAD_FILE_TYPES.TXT
@@ -117,36 +113,29 @@ const ViewStudySet = (props: Props) => {
     const [showManageCategories, setShowManageCategories] =
         useState<boolean>(false);
     const [selectedTab, setSelectedTab] = useState(DEFAULT_CATEGORIES.ALL);
-
     const [selectedSort, setSelectedSort] = useState<string>("");
     const [sortDirection, setSortDirection] = useState<SortDirection>(
         SORT_DIRECTIONS.ASC
     );
 
-    const arrowIconStyling = {
-        "&.MuiIconButton-colorPrimary": {
-            color: theme.foreground,
-        },
-    };
-
-    useBrowserTitle(selectedStudySet?.title ?? "");
+    useBrowserTitle(selectedStudyset?.title ?? "");
 
     // TODO: This leads to an infinite loop. Need to figure out why.
     useEffect(() => {
         if (!updatedViewTimestamp.current) {
             updateLastViewed({
-                uuid: selectedStudySet?.uuid ?? "",
+                uuid: selectedStudyset?.uuid ?? "",
             });
             updatedViewTimestamp.current = true;
         }
-    }, [selectedStudySet]);
+    }, [selectedStudyset]);
 
     const updateMetadataField = (property: string, newValue: any) => {
         try {
-            if (!selectedStudySet) {
+            if (!selectedStudyset) {
                 return;
             }
-            const { uuid } = selectedStudySet;
+            const { uuid } = selectedStudyset;
             const updateBody = {
                 property,
                 newValue,
@@ -165,8 +154,7 @@ const ViewStudySet = (props: Props) => {
 
     const testEmail = async () => {};
 
-    // event: React.SyntheticEvent, newValue: number
-    const onTabChange = (e: any, newTab: any) => {
+    const onTabChange = (_e: SyntheticEvent, newTab: string) => {
         setSelectedTab(newTab);
     };
 
@@ -177,12 +165,12 @@ const ViewStudySet = (props: Props) => {
     const categoryTabs = useMemo(() => {
         const jointCategories = [
             ...Object.values(DEFAULT_CATEGORIES),
-            ...(selectedStudySet?.categories ?? []),
+            ...(selectedStudyset?.categories ?? []),
         ];
         return jointCategories.map((tab, index) => {
             return <CategoryTab key={index} label={tab} value={tab} />;
         });
-    }, [selectedStudySet]);
+    }, [selectedStudyset]);
 
     const toggleSortDirection = () => {
         const newSortDirection =
@@ -203,21 +191,21 @@ const ViewStudySet = (props: Props) => {
         setShowDownloadPopup,
         setShowNotificationsModal,
         showControlMenu,
-        selectedStudySet,
+        selectedStudySet: selectedStudyset,
     };
 
     const manageLabelsDialogProps = {
         labels,
         open: showManageLabelsDialog,
         onClose: () => setShowManageLabelsDialog(false),
-        selectedStudySet,
+        selectedStudySet: selectedStudyset,
         userUUID,
     };
 
     /* Sorting */
     const sortedViewFlashCards = useMemo(() => {
         const sortModifier = sortDirection === SORT_DIRECTIONS.ASC ? 1 : -1;
-        const sortedCards = [...(selectedStudySet?.cards ?? [])];
+        const sortedCards = [...(selectedStudyset?.cards ?? [])];
         if (selectedSort) {
             sortedCards.sort((a: Card, b: Card) => {
                 if (a[selectedSort] < b[selectedSort]) {
@@ -236,11 +224,11 @@ const ViewStudySet = (props: Props) => {
                     key={card.uuid}
                     card={card}
                     index={index}
-                    selectedStudySet={selectedStudySet}
+                    selectedStudyset={selectedStudyset}
                 />
             );
         });
-    }, [selectedStudySet, selectedSort, sortDirection]);
+    }, [selectedStudyset, selectedSort, sortDirection]);
 
     /* Filtering */
     const filteredViewFlashCards = useMemo(() => {
@@ -258,7 +246,6 @@ const ViewStudySet = (props: Props) => {
         }
     }, [selectedTab, sortedViewFlashCards]);
 
-    console.log({ filteredViewFlashCards });
 
     /* TODO: Move this to separate route */
     // selectedStudyMode === STUDY_MODES.FLASHCARDS ?
@@ -270,8 +257,9 @@ const ViewStudySet = (props: Props) => {
     const manageCategoriesProps = {
         open: showManageCategories,
         setOpen: setShowManageCategories,
-        selectedStudySet,
-        studySets,
+        onClose: () => setShowManageCategories(false),
+        selectedStudyset,
+        studysets,
     };
 
     /* TODO: Fix the spacing between the ViewContainer and the (first) ViewCards */
@@ -283,20 +271,17 @@ const ViewStudySet = (props: Props) => {
                         <SetInfo>
                             <Button
                                 onClick={handleBackClick}
-                                startIcon={<ArrowBack sx={arrowIconStyling} />}
+                                startIcon={<ArrowBack color="primary" />}
                             >
                                 Back to Your Study Sets
                             </Button>
-                            <Typography
+                            <BoldTypography
                                 variant="h5"
-                                sx={{
-                                    fontWeight: "bold",
-                                }}
                             >
-                                {selectedStudySet?.title}
-                            </Typography>
+                                {selectedStudyset?.title}
+                            </BoldTypography>
                             <Typography variant="subtitle1">
-                                Created by {selectedStudySet?.username}
+                                Created by {selectedStudyset?.username}
                             </Typography>
                             <Tooltip
                                 title="Manage labels"
@@ -304,8 +289,8 @@ const ViewStudySet = (props: Props) => {
                             >
                                 <Chip
                                     label={
-                                        selectedStudySet?.label
-                                            ? selectedStudySet.label
+                                        selectedStudyset?.label
+                                            ? selectedStudyset.label
                                             : "No label selected"
                                     }
                                     variant="outlined"
@@ -315,7 +300,7 @@ const ViewStudySet = (props: Props) => {
                                 />
                             </Tooltip>
                             <Typography variant="body1">
-                                {selectedStudySet?.description}
+                                {selectedStudyset?.description}
                             </Typography>
                             <ActionsSection {...actionSectionProps} />
                         </SetInfo>
@@ -342,7 +327,7 @@ const ViewStudySet = (props: Props) => {
             </ViewFlashsetPaper>
             <CardCount variant="h6">
                 Number of cards in this study set:{" "}
-                {selectedStudySet?.cards?.length}
+                {selectedStudyset?.cards?.length}
             </CardCount>
             <CardFiltersContainer>
                 <SimpleFlexContainer style={{ gap: "1rem" }}>
@@ -418,7 +403,7 @@ const ViewStudySet = (props: Props) => {
                 handleClose={() => setShowDownloadPopup(false)}
                 downloadFileType={downloadFileType}
                 setDownloadFileType={setDownloadFileType}
-                studySet={selectedStudySet}
+                studySet={selectedStudyset}
             />
             <ManageCategoriesDialog {...manageCategoriesProps} />
             <ScrollToTopFab />

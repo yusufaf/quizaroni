@@ -23,6 +23,7 @@ export default defineConfig({
             resources: path.resolve("src/resources/"),
             utilities: path.resolve("src/utilities/"),
             theme: path.resolve("src/theme/"),
+            common: path.resolve("src/common/"),
         },
     },
     server: {

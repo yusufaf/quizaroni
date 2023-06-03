@@ -32,7 +32,7 @@ import {
     ProfilePage,
     ProfilePaper,
 } from "./ProfileStyles";
-import { BoldHeading } from "src/AppStyles";
+import { BoldTypography } from "common/AppStyles";
 import { useDispatch, useSelector } from "react-redux";
 import {
     selectCognitoUser,
@@ -153,7 +153,7 @@ const Profile = (props: Props) => {
                 <ProfileCard />
                 <ProfilePaper elevation={6}>
                     <ProfileContainer>
-                        <BoldHeading variant="h5">Profile</BoldHeading>
+                        <BoldTypography variant="h5">Profile</BoldTypography>
                         <ActionHeader>
                             <Palette />
                             <Typography variant="h6">Default Theme</Typography>

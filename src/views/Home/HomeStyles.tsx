@@ -1,4 +1,4 @@
-import { BasePage, BoldHeading, SimpleFlexContainer } from "src/AppStyles";
+import { BasePage, BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import styled from "@emotion/styled"
 import { Box, Card, Chip, Paper, Typography } from "@mui/material";
 
@@ -15,7 +15,7 @@ export const HomeContainer = styled(Box)({
     width: "70rem",
 })
 
-export const HomeSetsHeading = styled(BoldHeading)({})
+export const HomeSetsHeading = styled(BoldTypography)({})
 
 export const HomeSetsContainer = styled(Box)({
     height: "40rem",

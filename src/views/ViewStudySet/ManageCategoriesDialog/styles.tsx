@@ -14,13 +14,21 @@ import {
     MenuItem,
 } from "@mui/material/";
 import styled from "@emotion/styled";
-import { SimpleFlexContainer } from "src/AppStyles";
+import { SimpleFlexContainer } from "common/AppStyles";
 
 export const StyledDialog = styled(Dialog)({
     "& .MuiDialog-paper": {
         // width: "60rem",
         height: "32rem",
     },
+});
+
+export const StyledDialogTitle = styled(DialogTitle)({
+    display: "flex",
+});
+
+export const CloseButton = styled(IconButton)({
+    marginLeft: "auto",
 });
 
 export const StyledDialogContent = styled(DialogContent)({

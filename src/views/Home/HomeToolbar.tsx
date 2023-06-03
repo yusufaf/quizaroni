@@ -10,7 +10,7 @@ import {
     TableView as TableViewIcon,
 } from "@mui/icons-material";
 import { FLASHSET_VIEWS } from "utilities/constants";
-import { SpacedFlexContainer } from "src/AppStyles";
+import { SpacedFlexContainer } from "common/AppStyles";
 
 type Props = {
     handleViewChange: any;

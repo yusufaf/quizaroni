@@ -1,6 +1,6 @@
 import { styled } from "@mui/system";
 import { Box, Card, FormControl, Paper, Tabs, Typography, Tab } from "@mui/material";
-import { BasePage, SimpleFlexContainer, SpacedFlexContainer } from "src/AppStyles";
+import { BasePage, SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
 
 export const ViewFlashsetPage = styled(BasePage)({
     height: "100%",

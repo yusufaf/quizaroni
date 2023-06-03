@@ -16,18 +16,22 @@ import {
     DialogContentText,
     DialogTitle,
     FormControlLabel,
+    IconButton,
     Tab,
     Tabs,
     TextField,
     Tooltip,
     Typography,
 } from "@mui/material/";
+import { Close as CloseIcon } from "@mui/icons-material/";
 import { TABS, ACTIONS } from "./constants";
 import {
+    CloseButton,
     DeleteLabelWarning,
     LabelField,
     StyledDialog,
     StyledDialogContent,
+    StyledDialogTitle,
 } from "./styles";
 import { LoadingButton } from "@mui/lab";
 import LabelsList from "./LabelsList";
@@ -40,6 +44,7 @@ import {
     useChangeLabelMutation,
 } from "state/api/studysets";
 import useCustomMutation from "lib/hooks/useCustomMutation";
+import LabelsDialogTabView from "./LabelsDialogTabView";
 
 type ErrorInfo = {
     helperText: string;
@@ -47,7 +52,7 @@ type ErrorInfo = {
 
 type Props = {
     labels: string[];
-    onClose: Dispatch<SetStateAction<boolean>>;
+    onClose: () => void;
     open: boolean;
     selectedStudySet?: Studyset;
     userUUID: string;
@@ -82,6 +87,21 @@ const ManageLabelsDialog = (props: Props) => {
         errorMessage: "Error deleting label",
         onSuccess: () => {
             setDeleteIndices([]);
+        },
+    });
+
+    const {
+        mutate: editLabel,
+        isLoading: isEditingLabel,
+        isSuccess: isEditSuccess,
+        isError: isEditError,
+    } = useCustomMutation({
+        mutation: useEditLabelMutation,
+        successMessage: "Successfully edited label",
+        errorMessage: "Error editing label",
+        onSuccess: () => {
+            setEditIndex(null);
+            setEditLabelName("");
         },
     });
 
@@ -193,13 +213,17 @@ const ManageLabelsDialog = (props: Props) => {
                 if (!editIndex) {
                     return;
                 }
-
                 // TODO: Move this logic into the validation function
                 const selectedLabelName = labels[editIndex];
                 if (editLabelName === selectedLabelName) {
                     return;
                 }
-
+                editLabel({
+                    userUUID,
+                    index: editIndex,
+                    oldLabel: selectedLabelName,
+                    newLabel: editLabelName,
+                });
                 break;
             case ACTIONS.DELETE:
                 setShowDeleteConfirmation(true);
@@ -230,43 +254,6 @@ const ManageLabelsDialog = (props: Props) => {
         });
     };
 
-    const renderTabView = (): ReactNode => {
-        const jsx = [];
-        switch (selectedTab) {
-            case TABS.CREATE:
-                jsx.push(
-                    <LabelField
-                        margin="dense"
-                        label="Label Name"
-                        type="text"
-                        error={Boolean(errorInfo)}
-                        helperText={errorInfo?.helperText ?? ""}
-                        fullWidth
-                        value={labelName}
-                        onChange={onCreateLabelChange}
-                    />
-                );
-                break;
-            case TABS.MANAGE:
-                jsx.push(
-                    <LabelField
-                        margin="dense"
-                        label="Edit Label Name"
-                        type="text"
-                        variant="standard"
-                        error={Boolean(editErrorInfo)}
-                        helperText={editErrorInfo?.helperText ?? ""}
-                        fullWidth
-                        value={editLabelName}
-                        disabled={editIndex === null}
-                        onChange={onEditLabelChange}
-                    />
-                );
-                break;
-        }
-        return jsx;
-    };
-
     const renderDialogButtons = () => {
         switch (selectedTab) {
             case TABS.CREATE:
@@ -290,7 +277,8 @@ const ManageLabelsDialog = (props: Props) => {
                 );
             case TABS.MANAGE:
                 const disabled =
-                    (selectedAction === ACTIONS.EDIT && editErrorInfo) ||
+                    (selectedAction === ACTIONS.EDIT &&
+                        Boolean(editErrorInfo)) ||
                     (selectedAction === ACTIONS.DELETE &&
                         !deleteIndices.length);
                 const isEdit = selectedAction === ACTIONS.EDIT;
@@ -321,9 +309,12 @@ const ManageLabelsDialog = (props: Props) => {
 
     return (
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
-            <DialogTitle>
+            <StyledDialogTitle>
                 {capitalizeFirstLetter(selectedTab.toLowerCase())} Labels
-            </DialogTitle>
+                <CloseButton aria-label="close" title="Close" onClick={onClose}>
+                    <CloseIcon />
+                </CloseButton>
+            </StyledDialogTitle>
             <StyledDialogContent>
                 <div>
                     <Tabs value={selectedTab} onChange={onTabChange}>
@@ -331,7 +322,16 @@ const ManageLabelsDialog = (props: Props) => {
                             <Tab key={index} label={tab} value={tab} />
                         ))}
                     </Tabs>
-                    {renderTabView()}
+                    <LabelsDialogTabView
+                        editErrorInfo={editErrorInfo}
+                        editIndex={editIndex}
+                        editLabelName={editLabelName}
+                        errorInfo={errorInfo}
+                        labelName={labelName}
+                        onCreateLabelChange={onCreateLabelChange}
+                        onEditLabelChange={onEditLabelChange}
+                        selectedTab={selectedTab}
+                    />
                 </div>
                 <LabelsList
                     labels={labels}
@@ -373,9 +373,6 @@ const ManageLabelsDialog = (props: Props) => {
                         This action cannot be undone.
                     </DeleteLabelWarning>
                 )}
-                <Button onClick={onClose} variant="outlined">
-                    Close
-                </Button>
                 {renderDialogButtons()}
             </DialogActions>
         </StyledDialog>

@@ -1,5 +1,5 @@
 import { Card, IconButton, Paper, styled, Typography } from "@mui/material";
-import { BasePage } from "src/AppStyles";
+import { BasePage } from "common/AppStyles";
 
 export const ProfilePage = styled(BasePage)({
     display: "grid",
