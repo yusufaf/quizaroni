@@ -129,6 +129,7 @@ const Login = (props: Props) => {
             console.log("Result of cognito sign in = ", user);
 
             /* Retrieve user data, passing username as a query parameter */
+            
             const response = await axios.get("/api/users/get", {
                 params: {
                     username,
