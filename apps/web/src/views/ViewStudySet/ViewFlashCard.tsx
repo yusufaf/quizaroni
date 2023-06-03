@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { useTheme } from "theme/useTheme";
 import { Chip, IconButton, Tooltip, Typography } from "@mui/material/";
 import { Star, StarBorder, VolumeUp } from "@mui/icons-material";
-import { SimpleFlexContainer } from "src/AppStyles";
+import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import {
     ViewFlashsetCard,
     ViewFlashCardActions,
@@ -16,11 +16,11 @@ import { useMarkCardAsImportantMutation } from "state/api/studysets";
 type Props = {
     card: Card; 
     index: number;
-    selectedStudySet: Studyset;
+    selectedStudyset: Studyset;
 };
 
 const ViewFlashCard = (props: Props) => {
-    const { card, index, selectedStudySet } = props;
+    const { card, index, selectedStudyset } = props;
 
     const { isDarkMode, theme } = useTheme();
     const timeoutRef = useRef(null);
@@ -57,21 +57,19 @@ const ViewFlashCard = (props: Props) => {
             style={{
                 backgroundColor: `${
                     card?.backgroundColor &&
-                    selectedStudySet?.metadata?.backgroundColorVisible
+                    selectedStudyset?.metadata?.backgroundColorVisible
                         ? card.backgroundColor
                         : ""
                 }`,
             }}
+            tabIndex={index}
         >
             <SimpleFlexContainer>
-                <Typography
+                <BoldTypography
                     variant="h5"
-                    sx={{
-                        fontWeight: "bold",
-                    }}
                 >
                     Card {index + 1}
-                </Typography>
+                </BoldTypography>
                 {/* TODO: Handle when there's too many categories, max width or a tooltip on a singular one? */}
                 <CategoryChips>
                     {card?.categories?.map((category: string, index: number) => (
@@ -104,7 +102,7 @@ const ViewFlashCard = (props: Props) => {
                         sx={{
                             color: `${
                                 card?.textColor &&
-                                selectedStudySet?.metadata?.textColorVisible
+                                selectedStudyset?.metadata?.textColorVisible
                                     ? card.textColor
                                     : ""
                             }`,
@@ -122,7 +120,7 @@ const ViewFlashCard = (props: Props) => {
                         sx={{
                             color: `${
                                 card?.textColor &&
-                                selectedStudySet?.metadata?.textColorVisible
+                                selectedStudyset?.metadata?.textColorVisible
                                     ? card.textColor
                                     : ""
                             }`,

@@ -17,7 +17,7 @@ export const FlexColumn = styled("div")({
     flexDirection: "column",
 })
 
-export const BoldHeading = styled(Typography)({
+export const BoldTypography = styled(Typography)({
     fontWeight: "bold"
 })
 

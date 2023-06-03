@@ -1,63 +1,53 @@
+import { Close as CloseIcon } from "@mui/icons-material/";
+import { LoadingButton } from "@mui/lab";
 import {
-    DialogTitle,
-    DialogActions,
     Button,
-    Tabs,
+    DialogActions,
+    SelectChangeEvent,
     Tab,
-    Select,
-    Typography,
-    InputLabel,
-    FormControl,
-    MenuItem,
+    Tabs
 } from "@mui/material/";
+import useCustomMutation from "lib/hooks/useCustomMutation";
+import { Studyset } from "lib/types";
 import {
     ChangeEvent,
-    Dispatch,
     ReactNode,
-    SetStateAction,
     SyntheticEvent,
-    useEffect,
-    useState,
+    useState
 } from "react";
-import {
-    CategoryInputsContainer,
-    CategoryFormControl,
-    CategoryField,
-    StyledDialog,
-    StyledDialogContent,
-    StyledMenuItem,
-} from "./styles";
 import { useDispatch, useSelector } from "react-redux";
 import {
     useAssignCardCategoriesMutation,
     useCreateCategoryMutation,
     useDeleteCategoryMutation,
     useEditCategoryMutation,
-    useGetAllStudysetsQuery,
 } from "state/api/studysets";
-import { Card, Studyset } from "lib/types";
 import { selectUserData } from "state/slices/globalSlice";
-import { LoadingButton } from "@mui/lab";
-import useCustomMutation from "lib/hooks/useCustomMutation";
-import { TABS, ACTIONS, TAB_PROPERTIES } from "./constants";
+import { capitalizeFirstLetter } from "utilities/functions";
+import AssignTabView from "./AssignTabView";
 import CategoriesList from "./CategoriesList";
+import CreateTabView from "./CreateTabView";
+import ImportTabView from "./ImportTabView";
+import ManageTabView from "./ManageTabView";
+import { ACTIONS, TABS } from "./constants";
+import {
+    CloseButton,
+    StyledDialog,
+    StyledDialogContent,
+    StyledDialogTitle
+} from "./styles";
 
 type Props = {
     open: boolean;
-    setOpen: Dispatch<SetStateAction<boolean>>;
-    selectedStudySet: Studyset;
-    studySets: Studyset[];
+    onClose: () => void;
+    selectedStudyset: Studyset;
+    studysets: Studyset[];
 };
 
 const ManageCategoriesDialog = (props: Props) => {
-    const { 
-        open, 
-        setOpen, 
-        selectedStudySet, 
-        studySets 
-    } = props;
+    const { open, onClose, selectedStudyset, studysets } = props;
 
-    const { uuid: studySetUUID = ""} = selectedStudySet || {};
+    const { uuid: studySetUUID = "" } = selectedStudyset || {};
 
     const dispatch = useDispatch();
     const { uuid: userUUID = "" } = useSelector(selectUserData);
@@ -83,8 +73,8 @@ const ManageCategoriesDialog = (props: Props) => {
         isError: isEditError,
     } = useCustomMutation({
         mutation: useEditCategoryMutation,
-        successMessage: "Successfully created category",
-        errorMessage: "Error creating category",
+        successMessage: "Successfully edited category",
+        errorMessage: "Error editing category",
         onSuccess: () => {
             setEditCategoryName("");
             setEditIndex(null);
@@ -130,10 +120,8 @@ const ManageCategoriesDialog = (props: Props) => {
 
     const isCreateTab = selectedTab === TABS.CREATE;
     const isManageTab = selectedTab === TABS.MANAGE;
-
-    const handleClose = () => {
-        setOpen(false);
-    };
+    const isImportTab = selectedTab === TABS.IMPORT;
+    const isAssignTab = selectedTab === TABS.ASSIGN;
 
     const onTabChange = (e: SyntheticEvent, newTab: string) => {
         setSelectedTab(newTab);
@@ -141,7 +129,7 @@ const ManageCategoriesDialog = (props: Props) => {
 
     const onCreateCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
         const category = e.target.value;
-        const isDuplicate = selectedStudySet.categories.includes(category);
+        const isDuplicate = selectedStudyset.categories.includes(category);
         setCategoryName(category);
         if (isDuplicate) {
             setErrorInfo({
@@ -154,7 +142,7 @@ const ManageCategoriesDialog = (props: Props) => {
 
     const onEditCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
         const newCategoryName = e.target.value;
-        const allOtherCategories = [...selectedStudySet.categories].filter(
+        const allOtherCategories = [...selectedStudyset.categories].filter(
             (_, index) => index != editIndex
         );
         const isDuplicate = allOtherCategories.includes(newCategoryName);
@@ -186,7 +174,7 @@ const ManageCategoriesDialog = (props: Props) => {
         setDeleteIndices([]);
         setSelectedAction(ACTIONS.EDIT);
         setEditIndex(index);
-        setEditCategoryName(selectedStudySet.categories[index]);
+        setEditCategoryName(selectedStudyset.categories[index]);
     };
 
     const handleDeleteClick = (index: number) => {
@@ -204,7 +192,7 @@ const ManageCategoriesDialog = (props: Props) => {
 
     const handleEditOrDelete = async () => {
         try {
-            const { categories, uuid } = selectedStudySet;
+            const { categories, uuid } = selectedStudyset;
             /* Don't need to check categories cause they're paired */
             if (!uuid) {
                 return;
@@ -239,7 +227,7 @@ const ManageCategoriesDialog = (props: Props) => {
         }
     };
 
-    const onAssignedCategoriesChange = (e: any) => {
+    const onAssignedCategoriesChange = (e: SelectChangeEvent) => {
         assignCardCategories({
             cardUUID: selectedCardUUID,
             categories: e.target.value,
@@ -251,12 +239,13 @@ const ManageCategoriesDialog = (props: Props) => {
             return;
         }
         const importSetCategories =
-            studySets.find((studySet) => studySet.uuid === selectedStudysetUUID)
+            studysets.find((studySet) => studySet.uuid === selectedStudysetUUID)
                 ?.categories ?? [];
 
         // Ensure no duplicates, filter out categories that already exist
         const categoriesToImport = importSetCategories.filter(
-            (category) => !selectedStudySet.categories.includes(category));
+            (category) => !selectedStudyset.categories.includes(category)
+        );
 
         for (const category of categoriesToImport) {
             createCategory({
@@ -264,162 +253,6 @@ const ManageCategoriesDialog = (props: Props) => {
                 category,
             });
         }
-    };
-
-    const renderTabView = (): ReactNode => {
-        const jsx = [];
-        switch (selectedTab) {
-            case TABS.CREATE:
-                jsx.push(
-                    <CategoryField
-                        margin="dense"
-                        label="Category Name"
-                        type="text"
-                        error={Boolean(errorInfo)}
-                        helperText={errorInfo?.helperText ?? ""}
-                        fullWidth
-                        value={categoryName}
-                        onChange={onCreateCategoryChange}
-                    />
-                );
-                break;
-            case TABS.MANAGE:
-                jsx.push(
-                    <CategoryField
-                        margin="dense"
-                        label="Edit Category Name"
-                        type="text"
-                        variant="standard"
-                        error={Boolean(editErrorInfo)}
-                        helperText={editErrorInfo?.helperText ?? ""}
-                        fullWidth
-                        value={editCategoryName}
-                        disabled={editIndex === null}
-                        onChange={onEditCategoryChange}
-                    />
-                );
-                break;
-            case TABS.IMPORT:
-                const filteredStudySets = studySets.filter(
-                    (set) => set.uuid !== selectedStudySet.uuid
-                );
-                const importSetCategories =
-                    filteredStudySets.find(
-                        (studySet) => studySet.uuid === selectedStudysetUUID
-                    )?.categories ?? [];
-                jsx.push(
-                    <CategoryInputsContainer>
-                        <CategoryFormControl fullWidth>
-                            <InputLabel id="study-set-select-label">
-                                Study Set
-                            </InputLabel>
-                            <Select
-                                labelId="study-set-select-label"
-                                label="Study Set"
-                                value={selectedStudysetUUID}
-                                onChange={(e) =>
-                                    setSelectedStudysetUUID(e.target.value)
-                                }
-                            >
-                                {filteredStudySets.map((studySet, index) => (
-                                    <StyledMenuItem
-                                        key={studySet.uuid}
-                                        value={studySet.uuid}
-                                    >
-                                        <Typography
-                                            variant="inherit"
-                                            noWrap
-                                            title={studySet.title}
-                                        >
-                                            {studySet.title}
-                                        </Typography>
-                                    </StyledMenuItem>
-                                ))}
-                            </Select>
-                        </CategoryFormControl>
-                        <Typography variant="caption">
-                            Categories from the selected study set will be
-                            imported into this study set. Duplicates will be
-                            ignored.
-                        </Typography>
-                        {selectedStudysetUUID && (
-                            <CategoriesList
-                                categories={importSetCategories}
-                                selectedTab={selectedTab}
-                                type={TABS.IMPORT}
-                            />
-                        )}
-                    </CategoryInputsContainer>
-                );
-                break;
-            case TABS.ASSIGN:
-                const { cards, categories } = selectedStudySet;
-                const selectedCardCategories =
-                    cards?.find((card) => card.uuid === selectedCardUUID)
-                        ?.categories ?? [];
-                jsx.push(
-                    <CategoryInputsContainer>
-                        <CategoryFormControl fullWidth>
-                            <InputLabel id="card-select-label">Card</InputLabel>
-                            <Select
-                                labelId="card-select-label"
-                                label="Card"
-                                value={selectedCardUUID}
-                                onChange={(e) =>
-                                    setSelectedCardUUID(e.target.value)
-                                }
-                            >
-                                {cards.map((card, index) => {
-                                    const text = `Term: ${card.term} | Definition: ${card.definition}`;
-                                    return (
-                                        <StyledMenuItem
-                                            key={card.uuid}
-                                            value={card.uuid}
-                                            title={text}
-                                        >
-                                            <Typography
-                                                variant="inherit"
-                                                noWrap
-                                                title={text}
-                                            >
-                                                {text}
-                                            </Typography>
-                                        </StyledMenuItem>
-                                    );
-                                })}
-                            </Select>
-                        </CategoryFormControl>
-                        {selectedCardUUID && (
-                            <CategoryFormControl fullWidth>
-                                <InputLabel id="category-select-label">
-                                    Categories
-                                </InputLabel>
-                                <Select
-                                    labelId="category-select-label"
-                                    label="Categories"
-                                    multiple
-                                    value={selectedCardCategories}
-                                    onChange={onAssignedCategoriesChange}
-                                    disabled={isAssigningCategories}
-                                >
-                                    {categories.map((category, index) => {
-                                        return (
-                                            <StyledMenuItem
-                                                key={category}
-                                                value={category}
-                                            >
-                                                {category}
-                                            </StyledMenuItem>
-                                        );
-                                    })}
-                                </Select>
-                            </CategoryFormControl>
-                        )}
-                    </CategoryInputsContainer>
-                );
-                break;
-        }
-        return jsx;
     };
 
     const renderDialogButton = (): ReactNode => {
@@ -470,8 +303,13 @@ const ManageCategoriesDialog = (props: Props) => {
     };
 
     return (
-        <StyledDialog open={open} onClose={handleClose} fullWidth maxWidth="lg">
-            <DialogTitle>{TAB_PROPERTIES[selectedTab].title}</DialogTitle>
+        <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
+            <StyledDialogTitle>
+                {capitalizeFirstLetter(selectedTab.toLowerCase())} Categories
+                <CloseButton aria-label="close" onClick={onClose} title="Close">
+                    <CloseIcon />
+                </CloseButton>
+            </StyledDialogTitle>
             <StyledDialogContent>
                 <div>
                     <Tabs
@@ -483,10 +321,41 @@ const ManageCategoriesDialog = (props: Props) => {
                             <Tab key={index} label={tab} value={tab} />
                         ))}
                     </Tabs>
-                    {renderTabView()}
+                    {isCreateTab && (
+                        <CreateTabView
+                            categoryName={categoryName}
+                            errorInfo={errorInfo}
+                            onCreateCategoryChange={onCreateCategoryChange}
+                        />
+                    )}
+                    {isManageTab && (
+                        <ManageTabView
+                            editErrorInfo={editErrorInfo}
+                            editCategoryName={editCategoryName}
+                            editIndex={editIndex}
+                            onEditCategoryChange={onEditCategoryChange}
+                        />
+                    )}
+                    {isImportTab && (
+                        <ImportTabView
+                            selectedStudysetUUID={selectedStudysetUUID}
+                            studysets={studysets}
+                            selectedStudyset={selectedStudyset}
+                            setSelectedStudysetUUID={setSelectedStudysetUUID}
+                        />
+                    )}
+                    {isAssignTab && (
+                        <AssignTabView
+                            selectedCardUUID={selectedCardUUID}
+                            setSelectedCardUUID={setSelectedCardUUID}
+                            selectedStudyset={selectedStudyset}
+                            onAssignedCategoriesChange={onAssignedCategoriesChange}
+                            isAssigningCategories={isAssigningCategories}
+                        />
+                    )}
                 </div>
                 <CategoriesList
-                    categories={selectedStudySet?.categories ?? []}
+                    categories={selectedStudyset?.categories ?? []}
                     selectedTab={selectedTab}
                     editIndex={editIndex}
                     deleteIndices={deleteIndices}
@@ -494,12 +363,7 @@ const ManageCategoriesDialog = (props: Props) => {
                     handleDeleteClick={handleDeleteClick}
                 />
             </StyledDialogContent>
-            <DialogActions>
-                <Button variant="outlined" onClick={handleClose}>
-                    Close
-                </Button>
-                {renderDialogButton()}
-            </DialogActions>
+            <DialogActions>{renderDialogButton()}</DialogActions>
         </StyledDialog>
     );
 };

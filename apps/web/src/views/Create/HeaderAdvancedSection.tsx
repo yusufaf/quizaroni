@@ -1,5 +1,5 @@
 import { Button, IconButton, TextField, Typography } from "@mui/material";
-import { BoldHeading, SimpleFlexContainer } from "src/AppStyles"
+import { BoldTypography, SimpleFlexContainer } from "common/AppStyles"
 import { AdvancedSection, BlankInputsContainer, BlankInputsField } from "./CreateSetStyles"
 import {
     ExpandMore as ExpandMoreIcon,
@@ -40,9 +40,9 @@ const HeaderAdvancedSection = (props: Props) => {
     return (
         <AdvancedSection>
             <SimpleFlexContainer>
-                <BoldHeading>
+                <BoldTypography>
                     Advanced
-                </BoldHeading>
+                </BoldTypography>
                 <IconButton onClick={onToggleExpanded}>
                     {expanded ?
                         <ExpandLessIcon /> :

@@ -1,4 +1,4 @@
-import { SimpleFlexContainer } from "src/AppStyles";
+import { SimpleFlexContainer } from "common/AppStyles";
 import styled from "@emotion/styled";
 
 export const StudyElements = styled(SimpleFlexContainer)({

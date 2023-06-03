@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import PasswordToggle from "components/PasswordToggle/PasswordToggle";
 import * as C from "utilities/constants";
 import { useTheme } from "theme/useTheme";
-import { BoldHeading } from "src/AppStyles";
+import { BoldTypography } from "common/AppStyles";
 import {
     LoginButton as SignupButton,
     LoginContainer as SignupContainer,

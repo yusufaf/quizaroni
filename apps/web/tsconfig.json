@@ -107,6 +107,7 @@
       "utilites/*": ["./utilites/*"],
       "resources/*": ["./resources/*"],
       "theme/*": ["./theme/*"],
+      "common/*": ["./common/*"],
     },
   },
   "include": [

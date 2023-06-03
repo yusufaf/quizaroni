@@ -6,7 +6,7 @@ import {
     PasswordPolicyPaper,
     RequirementText,
 } from "./styles";
-import { BoldHeading } from "src/AppStyles";
+import { BoldTypography } from "common/AppStyles";
 
 type RequirementState = {
     length: boolean;
@@ -55,9 +55,9 @@ const PasswordValidator = (props: Props) => {
     return (
         <PasswordPolicyBox>
             <PasswordPolicyPaper elevation={6}>
-                <BoldHeading variant="subtitle1" sx={{ textAlign: "center" }}>
+                <BoldTypography variant="subtitle1" sx={{ textAlign: "center" }}>
                     Password Policy:
-                </BoldHeading>
+                </BoldTypography>
                 <RequirementText isSatisfied={requirementState.length}>
                     &bull; Must be at least 8 characters long
                 </RequirementText>

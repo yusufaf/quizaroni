@@ -8,7 +8,7 @@ import {
     Typography,
 } from "@mui/material";
 import { Dispatch, SetStateAction } from "react";
-import { BoldHeading, SimpleFlexContainer } from "src/AppStyles";
+import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import { useTheme } from "theme/useTheme";
 import {
     CREATE_SET,
@@ -88,16 +88,16 @@ const CreateSetHeader = (props: Props) => {
         <CreateSetPaper elevation={6}>
             <CreateSetContainer>
                 <HeaderLeftContainer>
-                    <BoldHeading variant="h5">
+                    <BoldTypography variant="h5">
                         {CREATE_PAGE_PROPS[pageType].TITLE}
-                    </BoldHeading>
+                    </BoldTypography>
                     <CreateSetInputsContainer>
-                        <BoldHeading
+                        <BoldTypography
                             variant="subtitle1"
                             color={theme.palette.primary.main}
                         >
                             Title
-                        </BoldHeading>
+                        </BoldTypography>
                         <TitleInput
                             variant="standard"
                             placeholder={CREATE_SET.TITLE_PLACEHOLDER}
@@ -106,12 +106,12 @@ const CreateSetHeader = (props: Props) => {
                             onChange={onTitleChange}
                             size="small"
                         />
-                        <BoldHeading
+                        <BoldTypography
                             variant="subtitle1"
                             color={theme.palette.primary.main}
                         >
                             Description
-                        </BoldHeading>
+                        </BoldTypography>
                         <DescriptionInput
                             variant="outlined"
                             placeholder={CREATE_SET.DESC_PLACEHOLDER}
@@ -120,12 +120,12 @@ const CreateSetHeader = (props: Props) => {
                             multiline
                             maxRows={4}
                         />
-                        <BoldHeading
+                        <BoldTypography
                             variant="subtitle1"
                             color={theme.palette.primary.main}
                         >
                             Label
-                        </BoldHeading>
+                        </BoldTypography>
                         <LabelInputContainer>
                             <LabelInput
                                 variant="standard"
