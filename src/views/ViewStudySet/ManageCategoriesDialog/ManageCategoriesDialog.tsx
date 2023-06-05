@@ -69,8 +69,6 @@ const ManageCategoriesDialog = (props: Props) => {
     const {
         mutate: editCategory,
         isLoading: isEditingCategory,
-        isSuccess: isEditSuccess,
-        isError: isEditError,
     } = useCustomMutation({
         mutation: useEditCategoryMutation,
         successMessage: "Successfully edited category",
@@ -84,8 +82,6 @@ const ManageCategoriesDialog = (props: Props) => {
     const {
         mutate: deleteCategory,
         isLoading: isDeletingCategory,
-        isSuccess: isDeleteSuccess,
-        isError: isDeleteError,
     } = useCustomMutation({
         mutation: useDeleteCategoryMutation,
         successMessage: "Successfully deleted category",
@@ -98,8 +94,6 @@ const ManageCategoriesDialog = (props: Props) => {
     const {
         mutate: assignCardCategories,
         isLoading: isAssigningCategories,
-        isSuccess: isAssignSuccess,
-        isError: isAssignError,
     } = useCustomMutation({
         mutation: useAssignCardCategoriesMutation,
         successMessage: "Categories assigned to cards",
@@ -107,10 +101,10 @@ const ManageCategoriesDialog = (props: Props) => {
     });
 
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
-    const [errorInfo, setErrorInfo] = useState(null);
+    const [errorInfo, setErrorInfo] = useState<any>(null);
     const [categoryName, setCategoryName] = useState<string>("");
     const [editCategoryName, setEditCategoryName] = useState<string>("");
-    const [editErrorInfo, setEditErrorInfo] = useState(null);
+    const [editErrorInfo, setEditErrorInfo] = useState<any>(null);
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [deleteIndices, setDeleteIndices] = useState<number[]>([]);
     const [selectedAction, setSelectedAction] = useState<string | null>(null);
@@ -123,7 +117,7 @@ const ManageCategoriesDialog = (props: Props) => {
     const isImportTab = selectedTab === TABS.IMPORT;
     const isAssignTab = selectedTab === TABS.ASSIGN;
 
-    const onTabChange = (e: SyntheticEvent, newTab: string) => {
+    const onTabChange = (_e: SyntheticEvent, newTab: string) => {
         setSelectedTab(newTab);
     };
 
@@ -262,7 +256,7 @@ const ManageCategoriesDialog = (props: Props) => {
                     <LoadingButton
                         variant="contained"
                         onClick={handleCreate}
-                        disabled={!categoryName || errorInfo}
+                        disabled={!categoryName || Boolean(errorInfo)}
                         loading={isCreatingCategory}
                     >
                         Create

@@ -23,13 +23,12 @@ import { setSelectedStudySet } from 'state/slices/studysetsSlice';
 import { useNavigate } from 'react-router-dom';
 
 type Props = {
-    studySet: any;
+    studyset: any;
 }
 
 const HomeStudySetCard = (props: Props) => {
     const {
-        studySet,
-        
+        studyset,
     } = props;
 
     const {
@@ -40,7 +39,7 @@ const HomeStudySetCard = (props: Props) => {
         label,
         lastViewed,
         uuid,
-    } = studySet;
+    } = studyset;
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -52,7 +51,7 @@ const HomeStudySetCard = (props: Props) => {
     const [anchorEl, setAnchorEl] = useState(false);
 
     const onCardClick = () => {
-        dispatch(setSelectedStudySet(studySet));
+        dispatch(setSelectedStudySet(studyset));
         navigate(`/view/${uuid}`);
     }
 
@@ -75,7 +74,7 @@ const HomeStudySetCard = (props: Props) => {
     }
 
     const actionMenuProps = {
-        studyset: studySet,
+        studyset,
         open: actionsMenuOpen,
         onClose: closeActionsMenu,
         anchorEl: anchorEl,
