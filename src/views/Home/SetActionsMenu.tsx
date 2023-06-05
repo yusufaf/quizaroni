@@ -8,9 +8,10 @@ import {
 import { useTheme } from "theme/useTheme";
 import { useNavigate } from "react-router-dom";
 import { Studyset } from "lib/types";
+import { CONFIRM_DIALOGS } from "utilities/constants";
 
 type Props = {
-    studySet: Studyset;
+    studyset: Studyset;
     open: boolean;
     onClose: any;
     anchorEl: any;
@@ -19,7 +20,7 @@ type Props = {
 
 const SetActionsMenu = (props: Props) => {
     const { 
-        studySet, 
+        studyset, 
         open, 
         onClose, 
         anchorEl, 
@@ -41,14 +42,14 @@ const SetActionsMenu = (props: Props) => {
             open={open}
             onClose={onClose}
         >
-            <MenuItem onClick={() => navigate(`/edit/${studySet.uuid}`)}>
+            <MenuItem onClick={() => navigate(`/edit/${studyset.uuid}`)}>
                 <EditIcon sx={iconStyling} />
                 <Typography>Edit</Typography>
             </MenuItem>
             <MenuItem
                 onClick={(e) => {
                     e.stopPropagation();
-                    handleShowConfirmDialog("DUPLICATE", studySet);
+                    handleShowConfirmDialog(CONFIRM_DIALOGS.DUPLICATE, studyset);
                 }}
             >
                 <CopyIcon sx={iconStyling} />
@@ -57,7 +58,7 @@ const SetActionsMenu = (props: Props) => {
             <MenuItem
                 onClick={(e) => {
                     e.stopPropagation();
-                    handleShowConfirmDialog("DELETE", studySet);
+                    handleShowConfirmDialog(CONFIRM_DIALOGS.DELETE, studyset);
                 }}
             >
                 <DeleteIcon sx={iconStyling} />

@@ -103,8 +103,9 @@ export const PWD_REGEX = {
     length: /^.{8,}$/,
 };
 
-export const DIALOGS = {
-    DELETE_CONFIRM: "DELETE_CONFIRM",
+export const CONFIRM_DIALOGS = {
+    DELETE: "DELETE",
+    DUPLICATE: "DUPLICATE",
 };
 
 export const SET_METADATA_FIELDS = {
@@ -138,3 +139,11 @@ export const CREATE_PAGE_PROPS: { [key: string]: any } = {
         BUTTON: "Save Changes",
     },
 };
+
+export const STUDYSET_TERMINOLOGIES = {
+    TERM_DEFINITION: "Term/Definition",
+    QUESTION_ANSWER: "Question/Answer",
+    PROMPT_RESPONSE: "Prompt/Response",
+    WORD_MEANING: "Word/Meaning",
+    FACT_EXPLANATION: "Fact/Explanation",
+}

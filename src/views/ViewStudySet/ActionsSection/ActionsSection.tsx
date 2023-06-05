@@ -10,30 +10,31 @@ import {
     Paper,
 } from "@mui/material/";
 import {
+    Delete,
     Download,
     Edit,
     EditNotifications,
     MenuOpen,
     Print,
+    Settings,
 } from "@mui/icons-material/";
-import {
-    DISABLED,
-    ENABLED,
-    SET_METADATA_FIELDS,
-} from "utilities/constants";
+import { DISABLED, ENABLED, SET_METADATA_FIELDS } from "utilities/constants";
 import { useTheme } from "theme/useTheme";
 import { ActionButtonsRow } from "../styles";
 import { useNavigate, useParams } from "react-router-dom";
 import { Studyset } from "lib/types";
+import { Dispatch, SetStateAction } from "react";
 
 type Props = {
     controlAnchorRef: any;
     updateMetadataField: any;
-    setShowControlMenu: any;
-    setShowDownloadPopup: any;
-    setShowNotificationsModal: any;
+    setShowControlMenu: Dispatch<SetStateAction<boolean>>;
+    setShowDownloadPopup: Dispatch<SetStateAction<boolean>>;
+    setShowNotificationsModal: Dispatch<SetStateAction<boolean>>;
     showControlMenu: any;
-    selectedStudySet: Studyset;
+    selectedStudyset: Studyset;
+    handleDeleteStudyset: () => void;
+    setShowStudysetSettings: Dispatch<SetStateAction<boolean>>;
 };
 
 const ActionsSection = (props: Props) => {
@@ -44,7 +45,9 @@ const ActionsSection = (props: Props) => {
         setShowDownloadPopup,
         setShowNotificationsModal,
         showControlMenu,
-        selectedStudySet,
+        selectedStudyset,
+        handleDeleteStudyset,
+        setShowStudysetSettings,
     } = props;
 
     const { theme } = useTheme();
@@ -59,8 +62,8 @@ const ActionsSection = (props: Props) => {
         setShowControlMenu(false);
     };
 
-    const { metadata = {} } = selectedStudySet || {};
-    
+    const { metadata = {} } = selectedStudyset || {};
+
     const {
         // @ts-ignore
         backgroundColorVisible = false,
@@ -75,7 +78,7 @@ const ActionsSection = (props: Props) => {
         let newValue;
         switch (property) {
             default:
-                newValue = !selectedStudySet.metadata[property];
+                newValue = !selectedStudyset.metadata[property];
                 break;
         }
         updateMetadataField(property, newValue);
@@ -117,6 +120,22 @@ const ActionsSection = (props: Props) => {
                 <Tooltip title="Print">
                     <IconButton color="primary">
                         <Print />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete Study Set">
+                    <IconButton
+                        color="primary"
+                        onClick={() => handleDeleteStudyset()}
+                    >
+                        <Delete />
+                    </IconButton>
+                </Tooltip>
+                <Tooltip title="Study Set Settings">
+                    <IconButton 
+                        color="primary"
+                        onClick={() => setShowStudysetSettings(true)}
+                    >
+                        <Settings />
                     </IconButton>
                 </Tooltip>
             </ActionButtonsRow>

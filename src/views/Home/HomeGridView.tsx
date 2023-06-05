@@ -5,14 +5,14 @@ import { Studyset } from "lib/types";
 import HomeStudySetCard from "./HomeStudySetCard/HomeStudySetCard";
 
 type Props = {
-    studySets: Studyset[];
+    studysets: Studyset[];
     handleShowConfirmDialog: any;
 };
 
 const cardsPerPage = 6;
 
 const HomeGridView = (props: Props) => {
-    const { studySets, handleShowConfirmDialog } = props;
+    const { studysets, handleShowConfirmDialog } = props;
 
     const [page, setPage] = useState<number>(1);
 
@@ -20,10 +20,10 @@ const HomeGridView = (props: Props) => {
         setPage(value);
     };
 
-    const numPages = Math.ceil(studySets.length / cardsPerPage);
+    const numPages = Math.ceil(studysets.length / cardsPerPage);
 
     // Paginate the study sets
-    const paginatedStudySets = studySets.slice(
+    const paginatedStudySets = studysets.slice(
         (page - 1) * cardsPerPage,
         page * cardsPerPage
     );
@@ -31,8 +31,8 @@ const HomeGridView = (props: Props) => {
     return (
         <>
             <HomeSetGrid>
-                {paginatedStudySets.map((studySet) => (
-                    <HomeStudySetCard key={studySet.uuid} studySet={studySet} />
+                {paginatedStudySets.map((studyset) => (
+                    <HomeStudySetCard key={studyset.uuid} studyset={studyset} />
                 ))}
             </HomeSetGrid>
             <Pagination onChange={onPageChange} count={numPages} page={page} />

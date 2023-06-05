@@ -24,7 +24,7 @@ import {
     setStudySets,
 } from "state/slices/studysetsSlice";
 import { useTheme } from "theme/useTheme";
-import { FLASHSET_VIEWS } from "utilities/constants";
+import { CONFIRM_DIALOGS, FLASHSET_VIEWS } from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";
 import HomeGridView from "./HomeGridView";
 import {
@@ -32,7 +32,7 @@ import {
     HomePage,
     HomePaper,
     HomeSetsContainer,
-    HomeSetsHeading
+    HomeSetsHeading,
 } from "./HomeStyles";
 import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
@@ -46,7 +46,7 @@ const Home = (props: Props) => {
     const dispatch = useDispatch();
     const authenticated = useSelector(selectAuthenticated);
     const { uuid: userUUID = "" } = useSelector(selectUserData);
-    const studySets = useSelector(selectStudySets);
+    const studysets = useSelector(selectStudySets);
 
     /* Skip option prevents hook from running when userUUID is undefined */
     const { data: studySetsData = [] } = useGetAllStudysetsQuery(
@@ -63,17 +63,6 @@ const Home = (props: Props) => {
         mutation: useDeleteStudysetMutation,
         successMessage: "Successfully deleted study set",
         errorMessage: "Error deleting study set",
-    });
-
-    const {
-        mutate: duplicateStudySet,
-        isLoading: isDuplicatingStudySet,
-        isSuccess: isDuplicateStudySetSuccess,
-        isError: isDuplicateStudySetError,
-    } = useCustomMutation({
-        mutation: useDuplicateStudysetMutation,
-        successMessage: "Successfully duplicated study set",
-        errorMessage: "Error duplicating study set",
     });
 
     useEffect(() => {
@@ -109,25 +98,25 @@ const Home = (props: Props) => {
     const handleShowConfirmDialog = (type: string, studyset: Studyset) => {
         let dialogProps = {};
         switch (type) {
-            case "DUPLICATE":
+            case CONFIRM_DIALOGS.DUPLICATE:
                 dialogProps = {
                     open: true,
                     title: "Duplicate this study set?",
                     dialogMessage:
                         "Are you sure you want to duplicate this set?",
-                    onConfirm: () => {
-                        duplicateStudySet({ uuid: studyset.uuid });
+                    type,
+                    props: {
+                        uuid: studyset.uuid,
                     },
                 };
                 break;
-            case "DELETE":
+            case CONFIRM_DIALOGS.DELETE:
                 dialogProps = {
                     open: true,
                     title: "Delete this study set?",
                     dialogMessage: "Are you sure you want to delete this set?",
-                    onConfirm: () => {
-                        deleteStudySet({ uuid: studyset.uuid });
-                    },
+                    props: { uuid: studyset.uuid },
+                    type,
                 };
                 break;
         }
@@ -177,7 +166,7 @@ const Home = (props: Props) => {
                             </IconButton>
                         </Tooltip>
                         <SetActionsMenu
-                            studySet={cellValues.row}
+                            studyset={cellValues.row}
                             open={actionsMenuOpen}
                             onClose={closeActionsMenu}
                             anchorEl={anchorEl}
@@ -223,7 +212,7 @@ const Home = (props: Props) => {
                     <HomeSetsContainer>
                         {selectedView === FLASHSET_VIEWS.TABLE ? (
                             <DataGrid
-                                rows={studySets}
+                                rows={studysets}
                                 columns={columns}
                                 pageSize={10}
                                 rowsPerPageOptions={[10]}
@@ -244,8 +233,10 @@ const Home = (props: Props) => {
                             />
                         ) : (
                             <HomeGridView
-                                studySets={studySets}
-                                handleShowConfirmDialog={handleShowConfirmDialog}
+                                studysets={studysets}
+                                handleShowConfirmDialog={
+                                    handleShowConfirmDialog
+                                }
                             />
                         )}
                     </HomeSetsContainer>

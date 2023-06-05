@@ -17,7 +17,7 @@ import {
 } from "@mui/material/";
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import { Card, SortDirection } from "lib/types";
+import { Card, SortDirection, Studyset } from "lib/types";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -28,18 +28,20 @@ import {
     useUpdateLastViewedMutation,
     useUpdateStudysetMetadataMutation,
 } from "state/api/studysets";
-import { selectUserData } from "state/slices/globalSlice";
+import { selectUserData, setDialogProps } from "state/slices/globalSlice";
 import { useTheme } from "theme/useTheme";
 import {
     DEFAULT_CATEGORIES,
     DOWNLOAD_FILE_TYPES,
     SORT_DIRECTIONS,
+    CONFIRM_DIALOGS,
 } from "utilities/constants";
 import ActionsSection from "./ActionsSection/ActionsSection";
 import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
 import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
 import ManageLabelsDialog from "./ManageLabelsDialog/ManageLabelsDialog";
 import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
+import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import ViewFlashCard from "./ViewFlashCard";
 import {
     CardCount,
@@ -53,6 +55,8 @@ import {
     ViewFlashsetPage,
     ViewFlashsetPaper,
 } from "./styles";
+import useCustomMutation from "lib/hooks/useCustomMutation";
+import StudysetSettings from "./StudysetSettings/StudysetSettings";
 
 type Props = {};
 
@@ -100,10 +104,12 @@ const ViewStudySet = (props: Props) => {
     const controlAnchorRef = useRef(null);
     const updatedViewTimestamp = useRef<boolean>(false);
 
-    const [showNotificationsModal, setShowNotificationsModal] = useState<boolean>(false);
+    const [showNotificationsModal, setShowNotificationsModal] =
+        useState<boolean>(false);
     const [showControlMenu, setShowControlMenu] = useState<boolean>(false);
     const [showManageLabelsDialog, setShowManageLabelsDialog] =
         useState<boolean>(false);
+    const [showStudysetSettings, setShowStudysetSettings] = useState<boolean>(false);
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
     const [showDownloadPopup, setShowDownloadPopup] = useState<boolean>(false);
@@ -145,6 +151,19 @@ const ViewStudySet = (props: Props) => {
         } catch (error) {
             console.error("Error updating study set metadata");
         }
+    };
+
+    const handleDeleteStudyset = () => {
+        const dialogProps = {
+            open: true,
+            title: "Delete this study set?",
+            dialogMessage: "Are you sure you want to delete this set?",
+            type: CONFIRM_DIALOGS.DELETE,
+            props: {
+                uuid: selectedStudyset?.uuid ?? "",
+            },
+        };
+        dispatch(setDialogProps(dialogProps));
     };
 
     /* TODO: Future future task.
@@ -191,7 +210,9 @@ const ViewStudySet = (props: Props) => {
         setShowDownloadPopup,
         setShowNotificationsModal,
         showControlMenu,
-        selectedStudySet: selectedStudyset,
+        selectedStudyset,
+        handleDeleteStudyset,
+        setShowStudysetSettings,
     };
 
     const manageLabelsDialogProps = {
@@ -246,7 +267,6 @@ const ViewStudySet = (props: Props) => {
         }
     }, [selectedTab, sortedViewFlashCards]);
 
-
     /* TODO: Move this to separate route */
     // selectedStudyMode === STUDY_MODES.FLASHCARDS ?
     // (
@@ -275,18 +295,13 @@ const ViewStudySet = (props: Props) => {
                             >
                                 Back to Your Study Sets
                             </Button>
-                            <BoldTypography
-                                variant="h5"
-                            >
+                            <BoldTypography variant="h5">
                                 {selectedStudyset?.title}
                             </BoldTypography>
                             <Typography variant="subtitle1">
                                 Created by {selectedStudyset?.username}
                             </Typography>
-                            <Tooltip
-                                title="Manage labels"
-                                placement="right"
-                            >
+                            <Tooltip title="Manage labels" placement="right">
                                 <Chip
                                     label={
                                         selectedStudyset?.label
@@ -406,6 +421,12 @@ const ViewStudySet = (props: Props) => {
                 studySet={selectedStudyset}
             />
             <ManageCategoriesDialog {...manageCategoriesProps} />
+            <StudysetSettings
+                open={showStudysetSettings}
+                onClose={() => setShowStudysetSettings(false)}
+                studyset={selectedStudyset}
+            />
+            <ConfirmDialog />
             <ScrollToTopFab />
         </ViewFlashsetPage>
     );
