@@ -72,10 +72,9 @@ const CreateSetHeader = (props: Props) => {
 
     const renderLabelOptions = () => {
         const { labels = [] } = userData;
-        console.log({userData})
         return labels.map((label: any, index: number) => {
             return (
-                <MenuItem key={index} value={label} sx={{width: "10rem"}}>
+                <MenuItem key={index} value={label} sx={{width: "10rem"}} title={label}>
                     <Typography variant="inherit" noWrap>
                         {label}
                     </Typography>
@@ -145,11 +144,9 @@ const CreateSetHeader = (props: Props) => {
                                 >
                                     {/* TODO: Always leave an empty option so they don't have to pick one */}
                                     {/* Width of 10rem for the MenuItem */}
-
                                     {renderLabelOptions()}
                                 </LabelSelect>
                             </FormControl>
-                            {/* TODO: Map labelOptions to MenuItem */}
                         </LabelInputContainer>
                     </CreateSetInputsContainer>
                     <SimpleFlexContainer>

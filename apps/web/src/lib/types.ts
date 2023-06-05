@@ -129,9 +129,7 @@ export type ConfirmDialogProps = {
     cancelButtonText?: string;
     confirmButtonText?: string;
     dialogMessage?: string;
-    onCancel?: () => void;
-    onClose?: () => void;
-    onConfirm: () => void;
     open: boolean;
     title: string;
+    type: string;
 }
