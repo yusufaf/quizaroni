@@ -38,7 +38,7 @@ type Props = {
     handleClose: () => void;
     open: boolean;
     setDownloadFileType: Dispatch<SetStateAction<string>>;
-    studySet: Studyset;
+    studyset: Studyset;
 };
 
 const DownloadSetModal = (props: Props) => {
@@ -47,7 +47,7 @@ const DownloadSetModal = (props: Props) => {
         handleClose,
         downloadFileType,
         setDownloadFileType,
-        studySet,
+        studyset,
     } = props;
 
     const downloadFile = ({ data, fileName, fileType }: DownloadFileParams) => {
@@ -60,7 +60,7 @@ const DownloadSetModal = (props: Props) => {
     };
 
     const handleDownloadSet = () => {
-        const { description, label, title, cards } = studySet;
+        const { description, label, title, cards } = studyset;
         const fileExtension = downloadFileType.toLowerCase();
         const fileName = `${title}_Studyset.${fileExtension}`;
         const downloadTimestamp = new Date().toLocaleString().replace(",", "");

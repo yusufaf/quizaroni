@@ -1,4 +1,3 @@
-import { Close as CloseIcon } from "@mui/icons-material/";
 import { LoadingButton } from "@mui/lab";
 import {
     Button,
@@ -31,11 +30,11 @@ import ImportTabView from "./ImportTabView";
 import ManageTabView from "./ManageTabView";
 import { ACTIONS, TABS } from "./constants";
 import {
-    CloseButton,
     StyledDialog,
     StyledDialogContent,
-    StyledDialogTitle
 } from "./styles";
+import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 
 type Props = {
     open: boolean;
@@ -300,9 +299,7 @@ const ManageCategoriesDialog = (props: Props) => {
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
             <StyledDialogTitle>
                 {capitalizeFirstLetter(selectedTab.toLowerCase())} Categories
-                <CloseButton aria-label="close" onClick={onClose} title="Close">
-                    <CloseIcon />
-                </CloseButton>
+                <CloseDialogButton onClose={onClose} />
             </StyledDialogTitle>
             <StyledDialogContent>
                 <div>

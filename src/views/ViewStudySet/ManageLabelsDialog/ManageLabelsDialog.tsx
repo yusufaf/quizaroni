@@ -10,18 +10,10 @@ import {
 import {
     Button,
     Checkbox,
-    Dialog,
     DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
     FormControlLabel,
-    IconButton,
     Tab,
     Tabs,
-    TextField,
-    Tooltip,
-    Typography,
 } from "@mui/material/";
 import { Close as CloseIcon } from "@mui/icons-material/";
 import { TABS, ACTIONS } from "./constants";
@@ -31,7 +23,6 @@ import {
     LabelField,
     StyledDialog,
     StyledDialogContent,
-    StyledDialogTitle,
 } from "./styles";
 import { LoadingButton } from "@mui/lab";
 import LabelsList from "./LabelsList";
@@ -45,6 +36,8 @@ import {
 } from "state/api/studysets";
 import useCustomMutation from "lib/hooks/useCustomMutation";
 import LabelsDialogTabView from "./LabelsDialogTabView";
+import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 
 type ErrorInfo = {
     helperText: string;
@@ -311,9 +304,7 @@ const ManageLabelsDialog = (props: Props) => {
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
             <StyledDialogTitle>
                 {capitalizeFirstLetter(selectedTab.toLowerCase())} Labels
-                <CloseButton aria-label="close" title="Close" onClick={onClose}>
-                    <CloseIcon />
-                </CloseButton>
+                <CloseDialogButton onClose={onClose} />
             </StyledDialogTitle>
             <StyledDialogContent>
                 <div>
