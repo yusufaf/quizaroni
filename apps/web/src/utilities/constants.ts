@@ -140,10 +140,13 @@ export const CREATE_PAGE_PROPS: { [key: string]: any } = {
     },
 };
 
+export const DEFAULT_TERMINOLOGY = "Term/Definition";
+
 export const STUDYSET_TERMINOLOGIES = {
     TERM_DEFINITION: "Term/Definition",
     QUESTION_ANSWER: "Question/Answer",
     PROMPT_RESPONSE: "Prompt/Response",
     WORD_MEANING: "Word/Meaning",
     FACT_EXPLANATION: "Fact/Explanation",
+    CUSTOM: "Custom",
 }

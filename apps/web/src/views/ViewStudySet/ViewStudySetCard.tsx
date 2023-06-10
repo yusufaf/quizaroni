@@ -12,18 +12,29 @@ import {
 } from "./styles";
 import { Card, Studyset } from "lib/types";
 import { useMarkCardAsImportantMutation } from "state/api/studysets";
+import {
+    DEFAULT_TERMINOLOGY,
+    STUDYSET_TERMINOLOGIES,
+} from "utilities/constants";
 
 type Props = {
-    card: Card; 
+    card: Card;
     index: number;
     selectedStudyset: Studyset;
 };
 
-const ViewFlashCard = (props: Props) => {
+const ViewStudySetCard = (props: Props) => {
     const { card, index, selectedStudyset } = props;
 
     const { isDarkMode, theme } = useTheme();
     const timeoutRef = useRef(null);
+
+    const selectedTerminology =
+        selectedStudyset?.metadata?.terminology ?? DEFAULT_TERMINOLOGY;
+    const [terminology1, terminology2] =
+        selectedTerminology === STUDYSET_TERMINOLOGIES.CUSTOM
+            ? selectedStudyset?.metadata?.customTerminology?.split("/") ?? []
+            : selectedTerminology.split("/");
 
     const [markCardAsImportant] = useMarkCardAsImportantMutation();
 
@@ -65,16 +76,18 @@ const ViewFlashCard = (props: Props) => {
             tabIndex={index}
         >
             <SimpleFlexContainer>
-                <BoldTypography
-                    variant="h5"
-                >
-                    Card {index + 1}
-                </BoldTypography>
+                <BoldTypography variant="h5">Card {index + 1}</BoldTypography>
                 {/* TODO: Handle when there's too many categories, max width or a tooltip on a singular one? */}
                 <CategoryChips>
-                    {card?.categories?.map((category: string, index: number) => (
-                        <Chip key={index} label={category} variant="outlined" />
-                    ))}
+                    {card?.categories?.map(
+                        (category: string, index: number) => (
+                            <Chip
+                                key={index}
+                                label={category}
+                                variant="outlined"
+                            />
+                        )
+                    )}
                 </CategoryChips>
                 <ViewFlashCardActions>
                     <Tooltip title="Play TTS" placement="top">
@@ -96,7 +109,7 @@ const ViewFlashCard = (props: Props) => {
             <ViewCardContainer>
                 <ViewCardInfo>
                     <Typography variant="h6" color="primary">
-                        Term
+                        {terminology1 ?? "Term"}
                     </Typography>
                     <Typography
                         sx={{
@@ -114,7 +127,7 @@ const ViewFlashCard = (props: Props) => {
                 </ViewCardInfo>
                 <ViewCardInfo>
                     <Typography variant="h6" color="primary">
-                        Definition
+                        {terminology2 ?? "Definition"}
                     </Typography>
                     <Typography
                         sx={{
@@ -135,4 +148,4 @@ const ViewFlashCard = (props: Props) => {
     );
 };
 
-export default ViewFlashCard;
+export default ViewStudySetCard;

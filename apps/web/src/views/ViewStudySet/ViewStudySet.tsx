@@ -42,7 +42,7 @@ import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDia
 import ManageLabelsDialog from "./ManageLabelsDialog/ManageLabelsDialog";
 import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
 import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
-import ViewFlashCard from "./ViewFlashCard";
+import ViewStudySetCard from "./ViewStudySetCard";
 import {
     CardCount,
     CardFiltersContainer,
@@ -241,7 +241,7 @@ const ViewStudySet = (props: Props) => {
 
         return sortedCards?.map((card, index) => {
             return (
-                <ViewFlashCard
+                <ViewStudySetCard
                     key={card.uuid}
                     card={card}
                     index={index}
@@ -418,7 +418,7 @@ const ViewStudySet = (props: Props) => {
                 handleClose={() => setShowDownloadPopup(false)}
                 downloadFileType={downloadFileType}
                 setDownloadFileType={setDownloadFileType}
-                studySet={selectedStudyset}
+                studyset={selectedStudyset}
             />
             <ManageCategoriesDialog {...manageCategoriesProps} />
             <StudysetSettings

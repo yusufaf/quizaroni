@@ -1,5 +1,5 @@
 import { styled } from "@mui/system";
-import { Typography } from '@mui/material/';
+import { DialogTitle, IconButton, Typography } from '@mui/material/';
 
 export const SimpleFlexContainer = styled("div")({
     display: "flex",
@@ -24,3 +24,13 @@ export const BoldTypography = styled(Typography)({
 export const BasePage = styled("main")({
     marginTop: "2rem",
 })
+
+export const FlexDialogTitle = styled(DialogTitle)({
+    display: "flex",
+})
+
+export const RightAlignedCloseButton = styled(IconButton)(
+    {
+        marginLeft: "auto",
+    }
+)
