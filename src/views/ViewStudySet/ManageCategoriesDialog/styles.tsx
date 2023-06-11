@@ -14,7 +14,7 @@ import {
     MenuItem,
 } from "@mui/material/";
 import styled from "@emotion/styled";
-import { SimpleFlexContainer } from "common/AppStyles";
+import { FlexColumn, SimpleFlexContainer } from "common/AppStyles";
 
 export const StyledDialog = styled(Dialog)({
     "& .MuiDialog-paper": {
@@ -75,4 +75,12 @@ export const CategoryFormControl = styled(FormControl)({
 
 export const StyledMenuItem = styled(MenuItem)({
     width: "20rem",
+});
+
+export const ManageTabContainer = styled(FlexColumn)({
+    gap: "1rem",
+})
+
+export const ManageTabButton = styled(Button)({
+    width: "16rem",
 });

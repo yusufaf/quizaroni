@@ -9,12 +9,7 @@ export const light = createTheme({
             light: "#ffd149",
             dark: "#c67100",
         },
-        // background: {
-        //     paper: "#F5F5F5",
-        // },
-        // text: {
-        //     primary: "#121212",
-        // },
+        
     },
     // body: "#F5F5F5"
 });
@@ -27,12 +22,6 @@ export const dark = createTheme({
             light: "#ffd149",
             dark: "#c67100",
         },
-        // background: {
-        //     paper: "#1c1c1c",
-        // },
-        // text: {
-        //     primary: "#F5F5F5",
-        // },
     },
     // body: "#121212"
 });
@@ -42,6 +31,12 @@ export const themes = {
     dark,
 };
 
+// background: {
+//     paper: "#F5F5F5",
+// },
+// text: {
+//     primary: "#121212",
+// },
 // export const themes = {
 //     light: {
 //       name: "light",
@@ -56,5 +51,11 @@ export const themes = {
 //       body: "#121212"
 //     },
 // };
+// background: {
+//     paper: "#1c1c1c",
+// },
+// text: {
+//     primary: "#F5F5F5",
+// },
 
 export const ThemeContext = createContext();

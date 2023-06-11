@@ -1,35 +1,30 @@
-import { Button } from "@mui/material";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import { PAGES } from "utilities/constants";
-import LoginMessage from "views/LoginMessage/LoginMessage";
-import { useTheme } from "theme/useTheme";
-import CreateSetHeader from "./CreateSetHeader";
-import { AddCardButton, AddCardIcon, CreateSetPage } from "./CreateSetStyles";
-import ImportSetModal from "./ImportSetModal/ImportSetModal";
-import NewCardInput from "./NewCardInput/NewCardInput";
-import { SwapHoriz, Sync as SyncIcon } from "@mui/icons-material";
-import { SpacedFlexContainer } from "common/AppStyles";
+import {
+    InitialCard
+} from "lib/types";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+    useCreateStudysetMutation,
+    useGetStudysetQuery,
+} from "state/api/studysets";
 import {
     selectAuthenticated,
     selectCognitoUser,
     selectUserData,
 } from "state/slices/globalSlice";
-import axios from "axios";
-import {
-    useCreateStudysetMutation,
-    useGetStudysetQuery,
-} from "state/api/studysets";
-import { CREATE_PAGE_TYPES } from "utilities/constants";
-import useCustomMutation from "lib/hooks/useCustomMutation";
-import { toast } from "react-toastify";
-import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
+import { useTheme } from "theme/useTheme";
+import { CREATE_PAGE_TYPES, PAGES } from "utilities/constants";
 import { v4 as uuidv4 } from "uuid";
-import {
-    InitialCard
-} from "lib/types"
+import LoginMessage from "views/LoginMessage/LoginMessage";
+import CreateSetHeader from "./CreateSetHeader";
+import { AddCardButton, AddCardIcon, CreateSetPage } from "./CreateSetStyles";
+import ImportSetModal from "./ImportSetModal/ImportSetModal";
+import NewCardInput from "./NewCardInput/NewCardInput";
+import SetModificationButtons from "./SetModificationButtons";
 
 const EMPTY_CARD: InitialCard = {
     term: "",
@@ -68,7 +63,7 @@ const CreateSet = (props: Props) => {
     const [createStudySet] = useCreateStudysetMutation();
 
     useEffect(() => {
-        if (isStudySetSuccess) {
+        if (isStudySetSuccess && selectedStudySet) {
             const { label, title, description, cards } = selectedStudySet;
             setEnteredLabel(label);
             setTitle(title);
@@ -77,7 +72,6 @@ const CreateSet = (props: Props) => {
         }
     }, [selectedStudySet]);
 
-    /* Flash Set States */
     const [title, setTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [enteredLabel, setEnteredLabel] = useState<string>("");
@@ -103,42 +97,7 @@ const CreateSet = (props: Props) => {
 
     useBrowserTitle(PAGES.CREATE);
 
-    useEffect(() => {
-        renderLabelOptions();
-    }, []);
-
     /**
-     * Retrieve the user's existing labels for the dropdown
-     */
-    const retrieveLabels = async () => {
-        return [];
-    };
-
-    const renderLabelOptions = () => {
-        const labelsResult = retrieveLabels();
-
-        labelsResult
-            .then((labels) => {
-                let blankOption = [<option key={"blank"} />];
-
-                let labelsArray = labels.map((label, index) => {
-                    return (
-                        <option key={index} value={label}>
-                            {label}
-                        </option>
-                    );
-                });
-
-                const combined = [...blankOption, labelsArray];
-
-                setLabelOptions(combined);
-            })
-            .catch((error) => {
-                console.log("Error caught");
-            });
-    };
-
-    const createNewLabel = async () => {};
 
     /* Check that length of createdCardObjects is not 0 */
     const createNewSet = async () => {
@@ -245,26 +204,10 @@ const CreateSet = (props: Props) => {
         setCreatedSetCards(newCreatedSetCards);
     };
 
-    const handleSwapAll = () => {
-        const newCreatedSetCards = createdSetCards.map((card) => {
-            const { definition, term } = card;
-            return {
-                ...card,
-                term: definition,
-                definition: term,
-            };
-        });
-        setCreatedSetCards(newCreatedSetCards);
-    };
-
     const handleDuplicateCard = (index: number) => {
         const newCreatedSetCards = [...createdSetCards];
         const duplicateCard = { ...newCreatedSetCards[index] };
         setCreatedSetCards(newCreatedSetCards.concat(duplicateCard));
-    };
-
-    const handleReverse = () => {
-        setCreatedSetCards([...createdSetCards].reverse());
     };
 
     /**
@@ -293,6 +236,7 @@ const CreateSet = (props: Props) => {
         });
     }, [createdSetCards]);
 
+    
     /* Create Set Inputs */
     const onTitleChange = (e) => {
         setTitle(e.target.value);
@@ -362,23 +306,10 @@ const CreateSet = (props: Props) => {
         <>
             <CreateSetPage>
                 <CreateSetHeader {...headerProps} />
-                {/* TODO: Move into subcomponent? */}
-                <SpacedFlexContainer style={{ gap: "2rem" }}>
-                    <Button
-                        variant="outlined"
-                        startIcon={<SwapHoriz fontSize="medium" />}
-                        onClick={handleSwapAll}
-                    >
-                        Swap All
-                    </Button>
-                    <Button
-                        variant="outlined"
-                        startIcon={<SyncIcon fontSize="medium" />}
-                        onClick={handleReverse}
-                    >
-                        Reverse Cards
-                    </Button>
-                </SpacedFlexContainer>
+                <SetModificationButtons
+                    studysetCards={createdSetCards}
+                    setCardsCallback={setCreatedSetCards}
+                />
                 {/* TODO: Virtual Scroll */}
                 {cardInputs}
                 <AddCardButton variant="contained" onClick={addCreateCardInput}>

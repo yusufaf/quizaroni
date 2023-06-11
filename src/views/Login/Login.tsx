@@ -135,7 +135,7 @@ const Login = (props: Props) => {
                     username,
                 },
             });
-            console.log({ response });
+            console.log({ response, user });
             const userData = response.data;
             const { uuid: userUUID } = userData;
 
