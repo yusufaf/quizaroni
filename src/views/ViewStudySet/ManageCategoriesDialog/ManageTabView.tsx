@@ -1,11 +1,12 @@
 import { ChangeEvent } from "react";
-import { CategoryField } from "./styles";
+import { CategoryField, ManageTabContainer, ManageTabButton } from "./styles";
 
 type Props = {
     editErrorInfo: any;
     editCategoryName: string;
     editIndex: number | null;
     onEditCategoryChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    deleteUnusedCategories: () => void;
 };
 
 const ManageTabView = (props: Props) => {
@@ -13,22 +14,33 @@ const ManageTabView = (props: Props) => {
         editErrorInfo, 
         editCategoryName, 
         editIndex, 
-        onEditCategoryChange 
+        onEditCategoryChange,
+        deleteUnusedCategories
     } = props;
 
     return (
-        <CategoryField
-            margin="dense"
-            label="Edit Category Name"
-            type="text"
-            variant="standard"
-            error={Boolean(editErrorInfo)}
-            helperText={editErrorInfo?.helperText ?? ""}
-            fullWidth
-            value={editCategoryName}
-            disabled={editIndex === null}
-            onChange={onEditCategoryChange}
-        />
+        <ManageTabContainer>
+            <CategoryField
+                margin="dense"
+                label="Edit Category Name"
+                type="text"
+                variant="standard"
+                error={Boolean(editErrorInfo)}
+                helperText={editErrorInfo?.helperText ?? ""}
+                fullWidth
+                value={editCategoryName}
+                disabled={editIndex === null}
+                onChange={onEditCategoryChange}
+            />
+            <ManageTabButton
+                variant="outlined"
+                color="primary"
+                onClick={() => deleteUnusedCategories()}
+            >
+                Delete Unused Categories
+            </ManageTabButton>
+        </ManageTabContainer>
+
     );
 };
 

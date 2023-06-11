@@ -48,7 +48,7 @@ import {
     CardFiltersContainer,
     CategoryTab,
     CategoryTabs,
-    SetInfo,
+    StudysetInfo,
     SortCardsDropdown,
     ViewFlashsetContainer,
     ViewFlashsetHeader,
@@ -288,7 +288,7 @@ const ViewStudySet = (props: Props) => {
             <ViewFlashsetPaper elevation={6}>
                 <ViewFlashsetContainer>
                     <ViewFlashsetHeader>
-                        <SetInfo>
+                        <StudysetInfo>
                             <Button
                                 onClick={handleBackClick}
                                 startIcon={<ArrowBack color="primary" />}
@@ -318,7 +318,7 @@ const ViewStudySet = (props: Props) => {
                                 {selectedStudyset?.description}
                             </Typography>
                             <ActionsSection {...actionSectionProps} />
-                        </SetInfo>
+                        </StudysetInfo>
                         {/* <div className={viewFlashStyles.studySection}>
                                             <Typography
                                                 variant="h6"
@@ -411,7 +411,7 @@ const ViewStudySet = (props: Props) => {
             <ManageLabelsDialog {...manageLabelsDialogProps} />
             <NotificationsDialog
                 open={showNotificationsModal}
-                handleClose={() => setShowNotificationsModal(false)}
+                onClose={() => setShowNotificationsModal(false)}
             />
             <DownloadSetModal
                 open={showDownloadPopup}

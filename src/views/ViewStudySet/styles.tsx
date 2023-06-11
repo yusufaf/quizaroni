@@ -31,8 +31,7 @@ export const ViewFlashsetHeader = styled(Box)({
     gridTemplateColumns: "30rem auto",
 })
 
-
-export const SetInfo = styled(Box)(({ theme }) => ({
+export const StudysetInfo = styled("div")(({ theme }) => ({
     borderRight: `0.1rem solid ${theme.palette.text.primary}`,
 }));
 

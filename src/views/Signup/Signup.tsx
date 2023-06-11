@@ -103,11 +103,11 @@ const Signup = (props: Props) => {
             };
 
             /* Store newly created cognito user in Redux */
-            dispatch(
-                setCognitoUser({
-                    username,
-                })
-            );
+            // dispatch(
+            //     setCognitoUser({
+            //         username,
+            //     })
+            // );
 
             /* Send user to confirm email page */
             navigate("/confirmEmail");

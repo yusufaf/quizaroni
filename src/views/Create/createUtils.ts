@@ -9,7 +9,7 @@ type DeleteCardParams = {
 /**
  * Handles the deletion of a card from the created set.
  */
-const deleteCard = ({
+export const deleteCard = ({
     index,
     createdSetCards,
     setStateCallback,
@@ -27,7 +27,7 @@ type AddCreateCardInputParams = {
 /**
  * Handles the addition of a new card input
  */
-const addCreateCardInput = ({
+export const addCreateCardInput = ({
     createdSetCards,
     EMPTY_CARD,
     setStateCallback,
@@ -44,7 +44,7 @@ type DuplicateCardParams = {
 /**
  * Handles the duplication of a card
  */
-const handleDuplicateCard = ({
+export const handleDuplicateCard = ({
     index,
     createdSetCards,
     setStateCallback
@@ -60,7 +60,7 @@ type HandleReverseParams = {
 /**
  * Handles the reversal of the created set cards
 */
-const handleReverse = ({
+export const handleReverse = ({
     createdSetCards,
     setStateCallback,
 }: HandleReverseParams) => {
@@ -75,7 +75,7 @@ type HandleSwapAllParams = {
 /**
  * Handles the swapping of all the cards 
 */
-const handleSwapAll = ({
+export const handleSwapAll = ({
     createdSetCards,
     setStateCallback,
 }: HandleSwapAllParams) => {
