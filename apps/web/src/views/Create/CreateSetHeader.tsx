@@ -93,7 +93,6 @@ const CreateSetHeader = (props: Props) => {
                     <CreateSetInputsContainer>
                         <BoldTypography
                             variant="subtitle1"
-                            color={theme.palette.primary.main}
                         >
                             Title
                         </BoldTypography>
@@ -107,7 +106,6 @@ const CreateSetHeader = (props: Props) => {
                         />
                         <BoldTypography
                             variant="subtitle1"
-                            color={theme.palette.primary.main}
                         >
                             Description
                         </BoldTypography>
@@ -121,7 +119,6 @@ const CreateSetHeader = (props: Props) => {
                         />
                         <BoldTypography
                             variant="subtitle1"
-                            color={theme.palette.primary.main}
                         >
                             Label
                         </BoldTypography>
@@ -129,7 +126,7 @@ const CreateSetHeader = (props: Props) => {
                             <LabelInput
                                 variant="standard"
                                 size="small"
-                                placeholder={CREATE_SET.LABEL_PLACEHOLDER}
+                                placeholder={"Enter a label for your new study set"}
                                 onChange={onLabelChange}
                                 disabled={selectedLabel !== ""}
                             />

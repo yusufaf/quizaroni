@@ -4,16 +4,11 @@ import {
     DialogActions,
     SelectChangeEvent,
     Tab,
-    Tabs
+    Tabs,
 } from "@mui/material/";
 import useCustomMutation from "lib/hooks/useCustomMutation";
 import { Studyset } from "lib/types";
-import {
-    ChangeEvent,
-    ReactNode,
-    SyntheticEvent,
-    useState
-} from "react";
+import { ChangeEvent, ReactNode, SyntheticEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     useAssignCardCategoriesMutation,
@@ -29,10 +24,7 @@ import CreateTabView from "./CreateTabView";
 import ImportTabView from "./ImportTabView";
 import ManageTabView from "./ManageTabView";
 import { ACTIONS, TABS } from "./constants";
-import {
-    StyledDialog,
-    StyledDialogContent,
-} from "./styles";
+import { StyledDialog, StyledDialogContent } from "./styles";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 
@@ -65,39 +57,33 @@ const ManageCategoriesDialog = (props: Props) => {
         },
     });
 
-    const {
-        mutate: editCategory,
-        isLoading: isEditingCategory,
-    } = useCustomMutation({
-        mutation: useEditCategoryMutation,
-        successMessage: "Successfully edited category",
-        errorMessage: "Error editing category",
-        onSuccess: () => {
-            setEditCategoryName("");
-            setEditIndex(null);
-        },
-    });
+    const { mutate: editCategory, isLoading: isEditingCategory } =
+        useCustomMutation({
+            mutation: useEditCategoryMutation,
+            successMessage: "Successfully edited category",
+            errorMessage: "Error editing category",
+            onSuccess: () => {
+                setEditCategoryName("");
+                setEditIndex(null);
+            },
+        });
 
-    const {
-        mutate: deleteCategory,
-        isLoading: isDeletingCategory,
-    } = useCustomMutation({
-        mutation: useDeleteCategoryMutation,
-        successMessage: "Successfully deleted category",
-        errorMessage: "Error deleting category",
-        onSuccess: () => {
-            setDeleteIndices([]);
-        },
-    });
+    const { mutate: deleteCategory, isLoading: isDeletingCategory } =
+        useCustomMutation({
+            mutation: useDeleteCategoryMutation,
+            successMessage: "Successfully deleted category",
+            errorMessage: "Error deleting category",
+            onSuccess: () => {
+                setDeleteIndices([]);
+            },
+        });
 
-    const {
-        mutate: assignCardCategories,
-        isLoading: isAssigningCategories,
-    } = useCustomMutation({
-        mutation: useAssignCardCategoriesMutation,
-        successMessage: "Categories assigned to cards",
-        errorMessage: "Error assigning categories to cards",
-    });
+    const { mutate: assignCardCategories, isLoading: isAssigningCategories } =
+        useCustomMutation({
+            mutation: useAssignCardCategoriesMutation,
+            successMessage: "Categories assigned to cards",
+            errorMessage: "Error assigning categories to cards",
+        });
 
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
     const [errorInfo, setErrorInfo] = useState<any>(null);
@@ -248,6 +234,20 @@ const ManageCategoriesDialog = (props: Props) => {
         }
     };
 
+    const deleteUnusedCategories = () => {
+        const { cards, categories, uuid } = selectedStudyset;
+        const categoriesToDelete: string[] = categories.filter((category) => {
+            return !cards.some((card) => card.categories.includes(category));
+        });
+
+        for (const category of categoriesToDelete) {
+            deleteCategory({
+                studysetUUID: uuid,
+                categoryToDelete: category,
+            });
+        }
+    };
+
     const renderDialogButton = (): ReactNode => {
         switch (selectedTab) {
             case TABS.CREATE:
@@ -325,6 +325,7 @@ const ManageCategoriesDialog = (props: Props) => {
                             editCategoryName={editCategoryName}
                             editIndex={editIndex}
                             onEditCategoryChange={onEditCategoryChange}
+                            deleteUnusedCategories={deleteUnusedCategories}
                         />
                     )}
                     {isImportTab && (
@@ -340,7 +341,9 @@ const ManageCategoriesDialog = (props: Props) => {
                             selectedCardUUID={selectedCardUUID}
                             setSelectedCardUUID={setSelectedCardUUID}
                             selectedStudyset={selectedStudyset}
-                            onAssignedCategoriesChange={onAssignedCategoriesChange}
+                            onAssignedCategoriesChange={
+                                onAssignedCategoriesChange
+                            }
                             isAssigningCategories={isAssigningCategories}
                         />
                     )}

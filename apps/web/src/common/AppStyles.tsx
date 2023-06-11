@@ -27,6 +27,7 @@ export const BasePage = styled("main")({
 
 export const FlexDialogTitle = styled(DialogTitle)({
     display: "flex",
+    alignItems: "center",
 })
 
 export const RightAlignedCloseButton = styled(IconButton)(
