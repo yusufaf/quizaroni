@@ -1,8 +1,8 @@
 import { styled } from "@mui/system";
-import { Box, Card, FormControl, Paper, Tabs, Typography, Tab } from "@mui/material";
+import { Box, Card, FormControl, Paper, Tabs, Typography, Tab, Chip } from "@mui/material";
 import { BasePage, SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
 
-export const ViewFlashsetPage = styled(BasePage)({
+export const ViewStudysetPage = styled(BasePage)({
     height: "100%",
     // display: "grid",
     // justifyItems: "center",
@@ -18,7 +18,7 @@ export const ViewFlashsetPage = styled(BasePage)({
 export const ViewFlashsetPaper = styled(Paper)({
 })
 
-export const ViewFlashsetContainer = styled(Box)({
+export const ViewStudysetContainer = styled(Box)({
     gridRow: "1",
     height: "25rem",
     // width: "70rem",
@@ -26,7 +26,7 @@ export const ViewFlashsetContainer = styled(Box)({
     borderRadius: "0.75rem",
 })
 
-export const ViewFlashsetHeader = styled(Box)({
+export const ViewStudysetHeader = styled(Box)({
     display: "grid",
     gridTemplateColumns: "30rem auto",
 })
@@ -85,6 +85,10 @@ export const ViewFlashsetCard = styled(Card)({
 export const CategoryChips = styled(SimpleFlexContainer)({
     marginLeft: "1rem",
     gap: "0.5rem"
+});
+
+export const CategoryChip = styled(Chip)({
+    maxWidth: "10rem",
 });
 
 export const ViewFlashCardActions = styled("div")({

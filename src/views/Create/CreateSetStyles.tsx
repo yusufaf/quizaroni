@@ -93,7 +93,8 @@ export const AddCardButton = styled(Button)({
     gap: "0.5rem",
     fontWeight: "bold",
     width: "70rem",
-    fontSize: "1rem"
+    fontSize: "1rem",
+    marginTop: "0.5rem",
 })
 
 export const AddCardIcon = styled(AddCircleOutline)({
@@ -101,7 +102,8 @@ export const AddCardIcon = styled(AddCircleOutline)({
 })
 
 export const NewCardInputs = styled(SpacedFlexContainer)({
-    marginTop: "0.5rem"
+    marginTop: "0.5rem",
+    position: "relative",
 })
 
 export const NewCardInputField = styled(TextField)({
@@ -133,6 +135,17 @@ export const CenterActions = styled(SimpleFlexContainer)({
 });
 
 export const RightActions = styled(SimpleFlexContainer)({});
+
+export const BottomActions = styled(SimpleFlexContainer)({
+    position: "absolute",
+    top: "100%",
+    left: "47.5%",
+});
+
+export const AddCardBelowButton = styled(IconButton)(({ theme }) => ({
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.background.paper
+}));
 
 export const NewCardLabel = styled(Typography)(({ theme }) => ({
     color: theme.palette.primary.main

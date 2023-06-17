@@ -50,9 +50,9 @@ import {
     CategoryTabs,
     StudysetInfo,
     SortCardsDropdown,
-    ViewFlashsetContainer,
-    ViewFlashsetHeader,
-    ViewFlashsetPage,
+    ViewStudysetContainer,
+    ViewStudysetHeader,
+    ViewStudysetPage,
     ViewFlashsetPaper,
 } from "./styles";
 import useCustomMutation from "lib/hooks/useCustomMutation";
@@ -282,12 +282,11 @@ const ViewStudySet = (props: Props) => {
         studysets,
     };
 
-    /* TODO: Fix the spacing between the ViewContainer and the (first) ViewCards */
     return (
-        <ViewFlashsetPage>
+        <ViewStudysetPage>
             <ViewFlashsetPaper elevation={6}>
-                <ViewFlashsetContainer>
-                    <ViewFlashsetHeader>
+                <ViewStudysetContainer>
+                    <ViewStudysetHeader>
                         <StudysetInfo>
                             <Button
                                 onClick={handleBackClick}
@@ -301,7 +300,7 @@ const ViewStudySet = (props: Props) => {
                             <Typography variant="subtitle1">
                                 Created by {selectedStudyset?.username}
                             </Typography>
-                            <Tooltip title="Manage labels" placement="right">
+                            <Tooltip title="Manage Labels" placement="right">
                                 <Chip
                                     label={
                                         selectedStudyset?.label
@@ -337,8 +336,8 @@ const ViewStudySet = (props: Props) => {
                                                 </StudyModeOption>
                                             </StudyModeGrid>
                                         </div> */}
-                    </ViewFlashsetHeader>
-                </ViewFlashsetContainer>
+                    </ViewStudysetHeader>
+                </ViewStudysetContainer>
             </ViewFlashsetPaper>
             <CardCount variant="h6">
                 Number of cards in this study set:{" "}
@@ -428,7 +427,7 @@ const ViewStudySet = (props: Props) => {
             />
             <ConfirmDialog />
             <ScrollToTopFab />
-        </ViewFlashsetPage>
+        </ViewStudysetPage>
     );
 };
 
