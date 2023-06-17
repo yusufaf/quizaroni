@@ -134,7 +134,6 @@ const CreateSetHeader = (props: Props) => {
                                 or select an existing one
                             </Typography>
                             <FormControl variant="standard">
-                                <InputLabel>Label</InputLabel>
                                 <LabelSelect
                                     value={selectedLabel}
                                     onChange={onSelectedLabelChange}
