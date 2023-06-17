@@ -1,9 +1,7 @@
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import {
-    InitialCard
-} from "lib/types";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { InitialCard } from "lib/types";
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -29,7 +27,7 @@ import SetModificationButtons from "./SetModificationButtons";
 const EMPTY_CARD: InitialCard = {
     term: "",
     definition: "",
-    uuid: uuidv4()
+    uuid: uuidv4(),
 };
 
 type Props = {
@@ -210,6 +208,12 @@ const CreateSet = (props: Props) => {
         setCreatedSetCards(newCreatedSetCards.concat(duplicateCard));
     };
 
+    const handleAddCardBelow = (index: number) => {
+        const newCreatedSetCards = [...createdSetCards];
+        newCreatedSetCards.splice(index + 1, 0, { ...EMPTY_CARD });
+        setCreatedSetCards(newCreatedSetCards);
+    };
+
     /**
      * Render the JSX for all the card inputs
        Re-compute the JSX array when the "createdSetCards" prop changes. 
@@ -228,6 +232,7 @@ const CreateSet = (props: Props) => {
                 updateCardValue,
                 handleSwap,
                 handleDuplicateCard,
+                handleAddCardBelow,
                 index,
                 cardValues,
                 key: index,
@@ -236,13 +241,12 @@ const CreateSet = (props: Props) => {
         });
     }, [createdSetCards]);
 
-    
     /* Create Set Inputs */
-    const onTitleChange = (e) => {
+    const onTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setTitle(e.target.value);
     };
 
-    const onDescriptionChange = (e) => {
+    const onDescriptionChange = (e: ChangeEvent<HTMLInputElement>) => {
         setDescription(e.target.value);
     };
 

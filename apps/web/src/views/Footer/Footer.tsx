@@ -5,11 +5,12 @@ import {
 
 import { FooterContainer } from "./styles";
 
-const Footer = props => {
+type Props = { };
+
+const Footer = (props: Props) => {
     return (
         <footer>
-            <FooterContainer>
-            </FooterContainer>
+            <FooterContainer></FooterContainer>
         </footer>
     )
 }

@@ -1,6 +1,5 @@
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useEffect, useState } from "react";
-import GlobalToast from "components/GlobalToast/GlobalToast";
 import FeedbackDialog from "components/FeedbackDialog/FeedbackDialog";
 import Footer from "views/Footer/Footer";
 import NavBar from "views/NavBar/NavBar";
@@ -27,7 +26,6 @@ const App = () => {
             <AppRoutes />
             <Footer />
             <FeedbackDialog />
-            <GlobalToast />
             <ToastContainer 
                 theme={theme}
             />

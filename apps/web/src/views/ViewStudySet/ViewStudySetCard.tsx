@@ -9,6 +9,7 @@ import {
     ViewCardInfo,
     ViewCardContainer,
     CategoryChips,
+    CategoryChip,
 } from "./styles";
 import { Card, Studyset } from "lib/types";
 import { useMarkCardAsImportantMutation } from "state/api/studysets";
@@ -81,10 +82,11 @@ const ViewStudySetCard = (props: Props) => {
                 <CategoryChips>
                     {card?.categories?.map(
                         (category: string, index: number) => (
-                            <Chip
+                            <CategoryChip
                                 key={index}
                                 label={category}
                                 variant="outlined"
+                                title={category}
                             />
                         )
                     )}
