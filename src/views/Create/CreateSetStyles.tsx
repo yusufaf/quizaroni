@@ -1,6 +1,6 @@
 
 import { styled } from "@mui/system";
-import { Box, Button, Card, Paper, Select, TextField, TextareaAutosize, Typography, IconButton } from "@mui/material";
+import { Box, Button, Card, Paper, Select, TextField, TextareaAutosize, Typography, IconButton, MenuItem } from "@mui/material";
 import { AddCircleOutline } from "@mui/icons-material";
 import { BasePage, FlexColumn, SpacedFlexContainer, SimpleFlexContainer } from "common/AppStyles";
 import { ChromePicker } from "react-color";
@@ -74,6 +74,10 @@ export const BlankInputsField = styled(TextField)({
 export const LabelSelect = styled(Select)({
     width: "10rem"
 })
+
+export const LabelMenuItem = styled(MenuItem)({
+    width: "10rem"
+});
 
 
 /* 

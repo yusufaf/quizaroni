@@ -1,10 +1,19 @@
 import { Button, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, TextField } from '@mui/material/';
 import * as C from "utilities/constants";
 import { styled } from '@mui/system';
-import { deleteUser } from 'firebase/auth';
+import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
+import { Dispatch, SetStateAction } from 'react';
 
-const DeleteAccountDialog = props => {
-    const { open, handleClose, enteredPassword, setEnteredPassword } = props;
+type Props = {
+    open: boolean;
+    handleClose: () => void;
+    deletePassword: string;
+    setDeletePassword: Dispatch<SetStateAction<string>>;
+}
+
+const DeleteAccountDialog = (props: Props) => {
+    const { open, handleClose, deletePassword, setDeletePassword } = props;
 
     const DeletePasswordInput = styled(TextField)({
         marginTop: "1rem"
@@ -17,6 +26,10 @@ const DeleteAccountDialog = props => {
     //     // ...
     //   });
 
+    const handleDeleteAccount = () => {
+        // TODO
+    }
+
     return (
         <Dialog
             open={open}
@@ -25,7 +38,10 @@ const DeleteAccountDialog = props => {
                 bottom: "20rem",
             }}
         >
-            <DialogTitle>Delete Account</DialogTitle>
+            <StyledDialogTitle>
+                Delete Account
+                <CloseDialogButton onClose={handleClose} />
+            </StyledDialogTitle>
             <DialogContent>
                 <DialogContentText>
                     {C.DELETE_ACCOUNT_MSG}
@@ -34,9 +50,9 @@ const DeleteAccountDialog = props => {
                     fullWidth={true}
                     label="Password"
                     placeholder="Enter your password"
-                    value={enteredPassword}
+                    value={deletePassword}
                     name="passwordInput"
-                    onChange={e => setEnteredPassword(e.target.value)}
+                    onChange={e => setDeletePassword(e.target.value)}
                     // onBlur={e => checkIfInputEmpty(e)}
                     // helperText={showErrorText.passInput && "A password is required"}
                     // error={showErrorText.passInput}
@@ -48,7 +64,7 @@ const DeleteAccountDialog = props => {
                     variant="contained"
                     color="error"
                     onClick={() => handleDeleteAccount()}
-                    disabled={enteredPassword === ""}
+                    disabled={deletePassword === ""}
                 >
                     Delete Account
                 </Button>

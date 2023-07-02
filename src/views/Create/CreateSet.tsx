@@ -313,6 +313,7 @@ const CreateSet = (props: Props) => {
                 <SetModificationButtons
                     studysetCards={createdSetCards}
                     setCardsCallback={setCreatedSetCards}
+                    setShowImportModal={setShowImportModal}
                 />
                 {/* TODO: Virtual Scroll */}
                 {cardInputs}
