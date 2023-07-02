@@ -25,6 +25,7 @@ import {
     HeaderRightContainer,
     LabelInput,
     LabelInputContainer,
+    LabelMenuItem,
     LabelSelect,
     TitleInput,
 } from "./CreateSetStyles";
@@ -58,7 +59,6 @@ const CreateSetHeader = (props: Props) => {
         onSelectedLabelChange,
         onTitleChange,
         selectedLabel,
-        setShowImportModal,
         title,
         pageType = "",
     } = props;
@@ -72,15 +72,31 @@ const CreateSetHeader = (props: Props) => {
 
     const renderLabelOptions = () => {
         const { labels = [] } = userData;
-        return labels.map((label: any, index: number) => {
+        const labelJsx = [];
+
+        labelJsx.push(
+            <LabelMenuItem key="" value="" sx={{ width: "10rem" }}>
+                <Typography variant="inherit" noWrap color="primary">
+                    None
+                </Typography>
+            </LabelMenuItem>
+        );
+
+        labelJsx.push(...labels.map((label: any, index: number) => {
             return (
-                <MenuItem key={index} value={label} sx={{width: "10rem"}} title={label}>
+                <LabelMenuItem
+                    key={index}
+                    value={label}
+                    sx={{ width: "10rem" }}
+                    title={label}
+                >
                     <Typography variant="inherit" noWrap>
                         {label}
                     </Typography>
-                </MenuItem>
+                </LabelMenuItem>
             );
-        });
+        }))
+        return labelJsx;
     };
 
     return (
@@ -91,9 +107,7 @@ const CreateSetHeader = (props: Props) => {
                         {CREATE_PAGE_PROPS[pageType].TITLE}
                     </BoldTypography>
                     <CreateSetInputsContainer>
-                        <BoldTypography
-                            variant="subtitle1"
-                        >
+                        <BoldTypography variant="subtitle1">
                             Title
                         </BoldTypography>
                         <TitleInput
@@ -104,9 +118,7 @@ const CreateSetHeader = (props: Props) => {
                             onChange={onTitleChange}
                             size="small"
                         />
-                        <BoldTypography
-                            variant="subtitle1"
-                        >
+                        <BoldTypography variant="subtitle1">
                             Description
                         </BoldTypography>
                         <DescriptionInput
@@ -117,16 +129,16 @@ const CreateSetHeader = (props: Props) => {
                             multiline
                             maxRows={4}
                         />
-                        <BoldTypography
-                            variant="subtitle1"
-                        >
+                        <BoldTypography variant="subtitle1">
                             Label
                         </BoldTypography>
                         <LabelInputContainer>
                             <LabelInput
                                 variant="standard"
                                 size="small"
-                                placeholder={"Enter a label for your new study set"}
+                                placeholder={
+                                    "Enter a label for your new study set"
+                                }
                                 onChange={onLabelChange}
                                 disabled={selectedLabel !== ""}
                             />
@@ -138,22 +150,11 @@ const CreateSetHeader = (props: Props) => {
                                     value={selectedLabel}
                                     onChange={onSelectedLabelChange}
                                 >
-                                    {/* TODO: Always leave an empty option so they don't have to pick one */}
-                                    {/* Width of 10rem for the MenuItem */}
                                     {renderLabelOptions()}
                                 </LabelSelect>
                             </FormControl>
                         </LabelInputContainer>
                     </CreateSetInputsContainer>
-                    <SimpleFlexContainer>
-                        <Button
-                            variant="outlined"
-                            startIcon={<UploadFile fontSize="large" />}
-                            onClick={() => setShowImportModal(true)}
-                        >
-                            Import Cards
-                        </Button>
-                    </SimpleFlexContainer>
                 </HeaderLeftContainer>
                 <HeaderRightContainer>
                     <CreateSetButton

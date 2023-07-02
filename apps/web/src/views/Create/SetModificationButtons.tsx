@@ -1,4 +1,5 @@
-import { SwapHoriz, Sync} from "@mui/icons-material";
+import { Dispatch, SetStateAction } from "react";
+import { SwapHoriz, Sync, UploadFile } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { SpacedFlexContainer } from "common/AppStyles";
 import { handleReverse, handleSwapAll } from "./createUtils";
@@ -6,13 +7,11 @@ import { handleReverse, handleSwapAll } from "./createUtils";
 type Props = {
     studysetCards: any;
     setCardsCallback: any;
+    setShowImportModal: Dispatch<SetStateAction<boolean>>;
 };
 
 const SetModificationButtons = (props: Props) => {
-    const {
-        studysetCards = [],
-        setCardsCallback = () => {},
-    } = props;
+    const { studysetCards = [], setCardsCallback = () => {}, setShowImportModal } = props;
 
     const onSwapAllClick = (_e: any) => {
         handleSwapAll({
@@ -30,6 +29,13 @@ const SetModificationButtons = (props: Props) => {
 
     return (
         <SpacedFlexContainer style={{ gap: "2rem" }}>
+            <Button
+                variant="outlined"
+                startIcon={<UploadFile fontSize="medium" />}
+                onClick={() => setShowImportModal(true)}
+            >
+                Import Cards
+            </Button>
             <Button
                 variant="outlined"
                 startIcon={<SwapHoriz fontSize="medium" />}
