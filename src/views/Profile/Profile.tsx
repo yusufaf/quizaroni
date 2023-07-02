@@ -278,15 +278,11 @@ const Profile = (props: Props) => {
                             <Button
                                 variant="contained"
                                 onClick={() => handleChangePassword()}
-                                disabled={
-                                    newPassword === "" ||
-                                    enteredConfirmPassword === "" ||
-                                    showErrorText.confirmPassInput
-                                }
-                                sx={{
-                                    backgroundColor: "orange",
-                                    color: theme.foreground,
-                                }}
+                                // disabled={
+                                //     newPassword === "" ||
+                                //     enteredConfirmPassword === "" ||
+                                //     showErrorText.confirmPassInput
+                                // }
                             >
                                 Submit
                             </Button>
@@ -306,8 +302,8 @@ const Profile = (props: Props) => {
                         <DeleteAccountDialog
                             open={showDeleteDialog}
                             handleClose={handleCloseDeleteDialog}
-                            enteredPassword={deletePassword}
-                            setEnteredPassword={setDeletePassword}
+                            deletePassword={deletePassword}
+                            setDeletePassword={setDeletePassword}
                         />
                     </ProfileContainer>
                 </ProfilePaper>

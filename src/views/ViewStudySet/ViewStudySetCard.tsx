@@ -30,6 +30,8 @@ const ViewStudySetCard = (props: Props) => {
     const { isDarkMode, theme } = useTheme();
     const timeoutRef = useRef(null);
 
+    console.log({theme})
+
     const selectedTerminology =
         selectedStudyset?.metadata?.terminology ?? DEFAULT_TERMINOLOGY;
     const [terminology1, terminology2] =
@@ -100,7 +102,7 @@ const ViewStudySetCard = (props: Props) => {
                     <Tooltip title="Mark as important" placement="top">
                         <IconButton onClick={handleMarkAsImportant}>
                             {card.important ? (
-                                <Star sx={{ color: "yellow" }} />
+                                <Star sx={{ color: theme.palette.other.gold }} />
                             ) : (
                                 <StarBorder />
                             )}

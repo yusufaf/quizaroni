@@ -32,12 +32,12 @@ type Props = {
     setShowDownloadPopup: Dispatch<SetStateAction<boolean>>;
     setShowNotificationsModal: Dispatch<SetStateAction<boolean>>;
     showControlMenu: any;
-    selectedStudyset: Studyset;
+    selectedStudyset: Studyset | undefined;
     handleDeleteStudyset: () => void;
     setShowStudysetSettings: Dispatch<SetStateAction<boolean>>;
 };
 
-const ActionsSection = (props: Props) => {
+const StudysetActions = (props: Props) => {
     const {
         controlAnchorRef,
         updateMetadataField,
@@ -233,4 +233,4 @@ const ActionsSection = (props: Props) => {
     );
 };
 
-export default ActionsSection;
+export default StudysetActions;

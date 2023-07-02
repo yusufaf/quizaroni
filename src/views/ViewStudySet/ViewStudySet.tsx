@@ -36,7 +36,7 @@ import {
     SORT_DIRECTIONS,
     CONFIRM_DIALOGS,
 } from "utilities/constants";
-import ActionsSection from "./ActionsSection/ActionsSection";
+import StudysetActions from "./StudysetActions/StudysetActions";
 import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
 import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
 import ManageLabelsDialog from "./ManageLabelsDialog/ManageLabelsDialog";
@@ -57,6 +57,10 @@ import {
 } from "./styles";
 import useCustomMutation from "lib/hooks/useCustomMutation";
 import StudysetSettings from "./StudysetSettings/StudysetSettings";
+import ViewStudysetFilters from "./ViewStudysetFilters/ViewStudysetFilters";
+import useSortViewCards from "lib/hooks/useSortViewCards";
+import useFlas from "lib/hooks/useFil";
+import useFilterViewCards from "lib/hooks/useFilterViewCards";
 
 type Props = {};
 
@@ -64,7 +68,6 @@ const ViewStudySet = (props: Props) => {
     const {} = props;
 
     /* Hooks / Redux */
-    const { isDarkMode, theme } = useTheme();
 
     const navigate = useNavigate();
     const { id: studysetUUID = "" } = useParams();
@@ -101,6 +104,8 @@ const ViewStudySet = (props: Props) => {
 
     const [updateLastViewed] = useUpdateLastViewedMutation();
 
+    useBrowserTitle(selectedStudyset?.title ?? "");
+
     const controlAnchorRef = useRef(null);
     const updatedViewTimestamp = useRef<boolean>(false);
 
@@ -123,8 +128,6 @@ const ViewStudySet = (props: Props) => {
     const [sortDirection, setSortDirection] = useState<SortDirection>(
         SORT_DIRECTIONS.ASC
     );
-
-    useBrowserTitle(selectedStudyset?.title ?? "");
 
     // TODO: This leads to an infinite loop. Need to figure out why.
     useEffect(() => {
@@ -223,49 +226,16 @@ const ViewStudySet = (props: Props) => {
         userUUID,
     };
 
-    /* Sorting */
-    const sortedViewFlashCards = useMemo(() => {
-        const sortModifier = sortDirection === SORT_DIRECTIONS.ASC ? 1 : -1;
-        const sortedCards = [...(selectedStudyset?.cards ?? [])];
-        if (selectedSort) {
-            sortedCards.sort((a: Card, b: Card) => {
-                if (a[selectedSort] < b[selectedSort]) {
-                    return -1 * sortModifier;
-                }
-                if (a[selectedSort] > b[selectedSort]) {
-                    return 1 * sortModifier;
-                }
-                return 0;
-            });
-        }
+    const sortedViewFlashCards = useSortViewCards({
+        selectedSort,
+        sortDirection,
+        studyset: selectedStudyset,
+    })
 
-        return sortedCards?.map((card, index) => {
-            return (
-                <ViewStudySetCard
-                    key={card.uuid}
-                    card={card}
-                    index={index}
-                    selectedStudyset={selectedStudyset}
-                />
-            );
-        });
-    }, [selectedStudyset, selectedSort, sortDirection]);
-
-    /* Filtering */
-    const filteredViewFlashCards = useMemo(() => {
-        switch (selectedTab) {
-            case DEFAULT_CATEGORIES.ALL:
-                return sortedViewFlashCards;
-            case DEFAULT_CATEGORIES.IMPORTANT:
-                return [...sortedViewFlashCards].filter((value) => {
-                    return value.props.card.important;
-                });
-            default:
-                return [...sortedViewFlashCards].filter((value) => {
-                    return value.props.card.categories.includes(selectedTab);
-                });
-        }
-    }, [selectedTab, sortedViewFlashCards]);
+    const filteredViewFlashCards = useFilterViewCards({
+        selectedTab,
+        sortedViewFlashCards,
+    });
 
     /* TODO: Move this to separate route */
     // selectedStudyMode === STUDY_MODES.FLASHCARDS ?
@@ -316,7 +286,7 @@ const ViewStudySet = (props: Props) => {
                             <Typography variant="body1">
                                 {selectedStudyset?.description}
                             </Typography>
-                            <ActionsSection {...actionSectionProps} />
+                            <StudysetActions {...actionSectionProps} />
                         </StudysetInfo>
                         {/* <div className={viewFlashStyles.studySection}>
                                             <Typography
@@ -343,7 +313,18 @@ const ViewStudySet = (props: Props) => {
                 Number of cards in this study set:{" "}
                 {selectedStudyset?.cards?.length}
             </CardCount>
-            <CardFiltersContainer>
+            <ViewStudysetFilters
+                selectedTab={selectedTab}
+                setSelectedTab={setSelectedTab}
+                selectedSort={selectedSort}
+                setSelectedSort={setSelectedSort}
+                selectedStudyset={selectedStudyset}
+                setSortDirection={setSortDirection}
+                sortDirection={sortDirection}
+                setShowManageCategories={setShowManageCategories}
+            />
+
+            {/* <CardFiltersContainer>
                 <SimpleFlexContainer style={{ gap: "1rem" }}>
                     <CategoryTabs
                         value={selectedTab}
@@ -396,7 +377,7 @@ const ViewStudySet = (props: Props) => {
                         </Select>
                     </SortCardsDropdown>
                 </SimpleFlexContainer>
-            </CardFiltersContainer>
+            </CardFiltersContainer> */}
 
             {/* Testing out virtual scrolling */}
             {/* <Virtuoso
@@ -406,7 +387,17 @@ const ViewStudySet = (props: Props) => {
                 totalCount={filteredViewFlashCards.length}
                 itemContent={(index) => filteredViewFlashCards[index]}
             /> */}
-            {filteredViewFlashCards}
+            {filteredViewFlashCards.map((card, index) => {
+                    return (
+                        <ViewStudySetCard
+                            key={card.uuid}
+                            card={card}
+                            index={index}
+                            selectedStudyset={selectedStudyset}
+                        />
+                    )
+                })
+            }
             <ManageLabelsDialog {...manageLabelsDialogProps} />
             <NotificationsDialog
                 open={showNotificationsModal}

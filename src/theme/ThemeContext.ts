@@ -1,6 +1,20 @@
 import { createContext } from "react";
 import { createTheme } from "@mui/material/styles";
 
+declare module "@mui/material/styles" {
+    interface Theme {
+        palette: Palette;
+    }
+
+    interface Palette {
+        other: any;
+    }
+
+    interface PaletteOptions {
+        other: any;
+    }
+}
+
 export const light = createTheme({
     palette: {
         mode: "light",
@@ -9,7 +23,9 @@ export const light = createTheme({
             light: "#ffd149",
             dark: "#c67100",
         },
-        
+        other: {
+            gold: "#FFDF00",
+        },
     },
     // body: "#F5F5F5"
 });
@@ -21,6 +37,9 @@ export const dark = createTheme({
             main: "#ffa000",
             light: "#ffd149",
             dark: "#c67100",
+        },
+        other: {
+            gold: "#FFDF00",
         },
     },
     // body: "#121212"
