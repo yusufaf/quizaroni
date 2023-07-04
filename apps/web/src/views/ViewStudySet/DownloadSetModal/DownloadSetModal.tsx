@@ -4,23 +4,28 @@ import {
     DialogActions,
     DialogContent,
     DialogContentText,
-    DialogTitle,
     FormControl,
     MenuItem,
     Select,
-    Switch,
-    TextField,
-    Tooltip,
-    Typography,
 } from "@mui/material/";
 import { Card, Studyset } from "lib/types";
 import { Dispatch, SetStateAction } from "react";
-import { DOWNLOAD_FILE_TYPES, MIME_TYPES, DOWNLOAD_FILE_TITLES } from "utilities/constants";
+import {
+    DOWNLOAD_FILE_TYPES,
+    MIME_TYPES,
+    DOWNLOAD_FILE_TITLES,
+} from "utilities/constants";
+import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 
 const downloadTypeItems = Object.values(DOWNLOAD_FILE_TYPES).map(
     (value, index) => {
         return (
-            <MenuItem key={index} value={value} title={DOWNLOAD_FILE_TITLES[value]} >
+            <MenuItem
+                key={index}
+                value={value}
+                title={DOWNLOAD_FILE_TITLES[value]}
+            >
                 {value}
             </MenuItem>
         );
@@ -35,20 +40,15 @@ type DownloadFileParams = {
 
 type Props = {
     downloadFileType: string;
-    handleClose: () => void;
+    onClose: () => void;
     open: boolean;
     setDownloadFileType: Dispatch<SetStateAction<string>>;
     studyset: Studyset;
 };
 
 const DownloadSetModal = (props: Props) => {
-    const {
-        open,
-        handleClose,
-        downloadFileType,
-        setDownloadFileType,
-        studyset,
-    } = props;
+    const { open, onClose, downloadFileType, setDownloadFileType, studyset } =
+        props;
 
     const downloadFile = ({ data, fileName, fileType }: DownloadFileParams) => {
         const blob = new Blob([data], { type: MIME_TYPES[fileType] });
@@ -121,8 +121,10 @@ const DownloadSetModal = (props: Props) => {
                 const metadataText = `# ${title}\n\n## Description\n${description}\n\n## Label\n${label}\n\n## Downloaded on\n${downloadTimestamp}\n\n`;
                 const cardText = cards.map((card: Card, index: number) => {
                     const { definition, term } = card;
-                    return `## Card ${index + 1}\n\n**Term:** ${term}\n\n**Definition:** ${definition}\n\n`;
-                  });
+                    return `## Card ${
+                        index + 1
+                    }\n\n**Term:** ${term}\n\n**Definition:** ${definition}\n\n`;
+                });
                 const mdData = `${metadataText}${cardText.join("\n")}`;
                 blobData = mdData;
                 break;
@@ -132,15 +134,15 @@ const DownloadSetModal = (props: Props) => {
         }
 
         downloadFile({ data: blobData, fileName, fileType: downloadFileType });
-        handleClose();
+        onClose();
     };
 
     return (
-        <Dialog 
-            open={open} 
-            onClose={handleClose}
-        >
-            <DialogTitle>Download Study Set</DialogTitle>
+        <Dialog open={open} onClose={onClose}>
+            <StyledDialogTitle>
+                Download Study Set
+                <CloseDialogButton onClose={onClose} />
+            </StyledDialogTitle>
             <DialogContent>
                 <DialogContentText>
                     Choose what format you'd like to download the study set as:
@@ -159,7 +161,7 @@ const DownloadSetModal = (props: Props) => {
                 </FormControl>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose} variant="outlined">
+                <Button onClick={onClose} variant="outlined">
                     Cancel
                 </Button>
                 <Button onClick={handleDownloadSet} variant="contained">

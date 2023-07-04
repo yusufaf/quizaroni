@@ -1,16 +1,20 @@
-import { Logout as LogoutIcon } from "@mui/icons-material";
+import { GitHub, LinkedIn, Logout as LogoutIcon } from "@mui/icons-material";
 import {
     AppBar,
     IconButton,
     Toolbar,
     Tooltip,
     Typography,
-    useMediaQuery
+    useMediaQuery,
 } from "@mui/material/";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { selectAuthenticated, setAlert, setAuthenticated } from "state/slices/globalSlice";
+import {
+    selectAuthenticated,
+    setAlert,
+    setAuthenticated,
+} from "state/slices/globalSlice";
 import ProfileDropdown from "views/Profile/ProfileDropdown";
 import { useTheme } from "theme/useTheme";
 import { ROUTES, SUCCESS } from "utilities/constants";
@@ -26,16 +30,13 @@ import {
     StyledArrowIcon,
     StyledDarkModeIcon,
     StyledLightModeIcon,
-    StyledNavLink
+    StyledNavLink,
 } from "./NavStyles";
 import { Auth } from "aws-amplify";
 
-type Props = {
-
-};
+type Props = {};
 
 const NavBar = (props: Props) => {
-    // TODO: Change to use redux slice
     const { isDarkMode, toggleDarkMode, theme } = useTheme();
 
     // TODO: Verify that a medium breakpoint works to handle mobile cases, can always add more breakpoints
@@ -43,7 +44,7 @@ const NavBar = (props: Props) => {
 
     const dispatch = useDispatch();
     const authenticated = useSelector(selectAuthenticated);
-    
+
     const navigate = useNavigate();
 
     const [showDropdown, setShowDropdown] = useState(false);
@@ -55,14 +56,14 @@ const NavBar = (props: Props) => {
     });
 
     const handleLogout = async () => {
-          try {
+        try {
             const result = await Auth.signOut();
             console.log("Sign-In Result = ", result);
-            
+
             dispatch(setAuthenticated(false));
         } catch (error) {
-            console.log('error signing out: ', error);
-          }
+            console.log("error signing out: ", error);
+        }
     };
 
     const displayDropdown = () => {
@@ -104,13 +105,28 @@ const NavBar = (props: Props) => {
                         </NavLinksContainer>
                         <NavRightActions>
                             {authenticated ? (
-                                <AuthenticationButton
-                                    variant="text"
-                                    onClick={() => handleLogout()}
-                                    startIcon={<LogoutIcon />}
-                                >
-                                    Logout
-                                </AuthenticationButton>
+                                <>
+                                    <AuthenticationButton
+                                        variant="text"
+                                        onClick={() => handleLogout()}
+                                        startIcon={<LogoutIcon />}
+                                    >
+                                        Logout
+                                    </AuthenticationButton>
+                                    {/* TODO: Move these buttons to revamped footer */}
+                                    <IconButton 
+                                        href="https://github.com/yusufaf"
+                                        target="_blank"
+                                    >
+                                        <GitHub />
+                                    </IconButton>
+                                    <IconButton
+                                        href="https://www.linkedin.com/in/yusuf-afzal/"
+                                        target="_blank"
+                                    >
+                                        <LinkedIn />
+                                    </IconButton>
+                                </>
                             ) : (
                                 <LoginButtonsContainer>
                                     <AuthenticationButton

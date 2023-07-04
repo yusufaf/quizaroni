@@ -5,14 +5,14 @@ import {
     DialogActions,
     DialogContent,
     DialogContentText,
-    DialogTitle
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { selectDialogOpen, setDialogOpen } from "state/slices/globalSlice";
 import styled from "@emotion/styled";
+import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 
-type Props = {
-}
+type Props = {};
 
 const FeedbackDialog = (props: Props) => {
     const open = useSelector(selectDialogOpen);
@@ -20,20 +20,24 @@ const FeedbackDialog = (props: Props) => {
 
     const handleClose = () => {
         dispatch(setDialogOpen(false));
-    }
+    };
 
     const EmailInput = styled(TextField)({
         marginTop: "1rem",
         marginBottom: "1.5rem",
-    })
+    });
 
     return (
         <div>
             <Dialog open={open} onClose={handleClose}>
-                <DialogTitle>Submit Feedback</DialogTitle>
+                <StyledDialogTitle>
+                    Submit Feedback
+                    <CloseDialogButton onClose={handleClose} />
+                </StyledDialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Submit any feedback you have about your experience with Quizaroni.
+                        Submit any feedback you have about your experience with
+                        Quizaroni.
                     </DialogContentText>
                     <EmailInput
                         autoFocus
@@ -51,8 +55,12 @@ const FeedbackDialog = (props: Props) => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="text" onClick={handleClose}>Cancel</Button>
-                    <Button variant="contained" onClick={handleClose}>Submit</Button>
+                    <Button variant="text" onClick={handleClose}>
+                        Cancel
+                    </Button>
+                    <Button variant="contained" onClick={handleClose}>
+                        Submit
+                    </Button>
                 </DialogActions>
             </Dialog>
         </div>

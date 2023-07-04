@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useTheme } from "theme/useTheme";
 import { Chip, IconButton, Tooltip, Typography } from "@mui/material/";
-import { Star, StarBorder, VolumeUp } from "@mui/icons-material";
+import { SpeakerNotes, Star, StarBorder, VolumeUp } from "@mui/icons-material";
 import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import {
     ViewFlashsetCard,
@@ -106,6 +106,15 @@ const ViewStudySetCard = (props: Props) => {
                             ) : (
                                 <StarBorder />
                             )}
+                        </IconButton>
+                    </Tooltip>
+                    {/* TODO */}
+                    <Tooltip
+                        title="Open notes"
+                        placement="top"
+                    >
+                        <IconButton>
+                            <SpeakerNotes />
                         </IconButton>
                     </Tooltip>
                 </ViewFlashCardActions>
