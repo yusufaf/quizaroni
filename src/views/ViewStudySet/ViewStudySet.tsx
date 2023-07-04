@@ -29,12 +29,12 @@ import {
     useUpdateStudysetMetadataMutation,
 } from "state/api/studysets";
 import { selectUserData, setDialogProps } from "state/slices/globalSlice";
-import { useTheme } from "theme/useTheme";
 import {
     DEFAULT_CATEGORIES,
     DOWNLOAD_FILE_TYPES,
     SORT_DIRECTIONS,
     CONFIRM_DIALOGS,
+    VIEW_SET_DIALOGS
 } from "utilities/constants";
 import StudysetActions from "./StudysetActions/StudysetActions";
 import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
@@ -59,8 +59,8 @@ import useCustomMutation from "lib/hooks/useCustomMutation";
 import StudysetSettings from "./StudysetSettings/StudysetSettings";
 import ViewStudysetFilters from "./ViewStudysetFilters/ViewStudysetFilters";
 import useSortViewCards from "lib/hooks/useSortViewCards";
-import useFlas from "lib/hooks/useFil";
 import useFilterViewCards from "lib/hooks/useFilterViewCards";
+import { selectSelectedDialog, setSelectedDialog } from "state/slices/viewSetsSlice";
 
 type Props = {};
 
@@ -76,6 +76,8 @@ const ViewStudySet = (props: Props) => {
     // console.log({ studySets });
     // const selectedStudySet = useSelector(selectSelectedStudySet);
     const { uuid: userUUID = "", labels = [] } = useSelector(selectUserData);
+
+    const selectedDialog = useSelector(selectSelectedDialog);
 
     const {
         data: studysets = [],
@@ -109,20 +111,12 @@ const ViewStudySet = (props: Props) => {
     const controlAnchorRef = useRef(null);
     const updatedViewTimestamp = useRef<boolean>(false);
 
-    const [showNotificationsModal, setShowNotificationsModal] =
-        useState<boolean>(false);
     const [showControlMenu, setShowControlMenu] = useState<boolean>(false);
-    const [showManageLabelsDialog, setShowManageLabelsDialog] =
-        useState<boolean>(false);
-    const [showStudysetSettings, setShowStudysetSettings] = useState<boolean>(false);
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
-    const [showDownloadPopup, setShowDownloadPopup] = useState<boolean>(false);
     const [downloadFileType, setDownloadFileType] = useState<string>(
         DOWNLOAD_FILE_TYPES.TXT
     );
-    const [showManageCategories, setShowManageCategories] =
-        useState<boolean>(false);
     const [selectedTab, setSelectedTab] = useState(DEFAULT_CATEGORIES.ALL);
     const [selectedSort, setSelectedSort] = useState<string>("");
     const [sortDirection, setSortDirection] = useState<SortDirection>(
@@ -176,32 +170,6 @@ const ViewStudySet = (props: Props) => {
 
     const testEmail = async () => {};
 
-    const onTabChange = (_e: SyntheticEvent, newTab: string) => {
-        setSelectedTab(newTab);
-    };
-
-    const onSortChange = (event: SelectChangeEvent<string>) => {
-        setSelectedSort(event.target.value);
-    };
-
-    const categoryTabs = useMemo(() => {
-        const jointCategories = [
-            ...Object.values(DEFAULT_CATEGORIES),
-            ...(selectedStudyset?.categories ?? []),
-        ];
-        return jointCategories.map((tab, index) => {
-            return <CategoryTab key={index} label={tab} value={tab} />;
-        });
-    }, [selectedStudyset]);
-
-    const toggleSortDirection = () => {
-        const newSortDirection =
-            sortDirection === SORT_DIRECTIONS.ASC
-                ? SORT_DIRECTIONS.DSC
-                : SORT_DIRECTIONS.ASC;
-        setSortDirection(newSortDirection);
-    };
-
     const handleBackClick = () => {
         navigate("/");
     };
@@ -210,20 +178,9 @@ const ViewStudySet = (props: Props) => {
         controlAnchorRef,
         updateMetadataField,
         setShowControlMenu,
-        setShowDownloadPopup,
-        setShowNotificationsModal,
         showControlMenu,
         selectedStudyset,
         handleDeleteStudyset,
-        setShowStudysetSettings,
-    };
-
-    const manageLabelsDialogProps = {
-        labels,
-        open: showManageLabelsDialog,
-        onClose: () => setShowManageLabelsDialog(false),
-        selectedStudySet: selectedStudyset,
-        userUUID,
     };
 
     const sortedViewFlashCards = useSortViewCards({
@@ -244,13 +201,13 @@ const ViewStudySet = (props: Props) => {
     // )
     // :
 
-    const manageCategoriesProps = {
-        open: showManageCategories,
-        setOpen: setShowManageCategories,
-        onClose: () => setShowManageCategories(false),
-        selectedStudyset,
-        studysets,
-    };
+    const handleShowManageLabelsDialog = () => {
+        dispatch(setSelectedDialog(VIEW_SET_DIALOGS.LABELS));
+    }
+
+    const onDialogClose = () => {
+        dispatch(setSelectedDialog(""));
+    }
 
     return (
         <ViewStudysetPage>
@@ -278,9 +235,7 @@ const ViewStudySet = (props: Props) => {
                                             : "No label selected"
                                     }
                                     variant="outlined"
-                                    onClick={() =>
-                                        setShowManageLabelsDialog(true)
-                                    }
+                                    onClick={handleShowManageLabelsDialog}
                                 />
                             </Tooltip>
                             <Typography variant="body1">
@@ -311,7 +266,7 @@ const ViewStudySet = (props: Props) => {
             </ViewFlashsetPaper>
             <CardCount variant="h6">
                 Number of cards in this study set:{" "}
-                {selectedStudyset?.cards?.length}
+                {selectedStudyset?.cards.length ?? "N/A"}
             </CardCount>
             <ViewStudysetFilters
                 selectedTab={selectedTab}
@@ -321,64 +276,7 @@ const ViewStudySet = (props: Props) => {
                 selectedStudyset={selectedStudyset}
                 setSortDirection={setSortDirection}
                 sortDirection={sortDirection}
-                setShowManageCategories={setShowManageCategories}
             />
-
-            {/* <CardFiltersContainer>
-                <SimpleFlexContainer style={{ gap: "1rem" }}>
-                    <CategoryTabs
-                        value={selectedTab}
-                        onChange={onTabChange}
-                        variant="scrollable"
-                        scrollButtons="auto"
-                    >
-                        {categoryTabs}
-                    </CategoryTabs>
-                    <Button
-                        variant="outlined"
-                        onClick={() => setShowManageCategories(true)}
-                    >
-                        Manage Categories
-                    </Button>
-                </SimpleFlexContainer>
-                <SimpleFlexContainer>
-                    <IconButton
-                        color="primary"
-                        onClick={toggleSortDirection}
-                        title="Sort Direction"
-                    >
-                        {sortDirection === SORT_DIRECTIONS.ASC ? (
-                            <ArrowUpward />
-                        ) : (
-                            <ArrowDownward />
-                        )}
-                    </IconButton>
-                    <SortCardsDropdown>
-                        <InputLabel id="sort-label">Sort</InputLabel>
-                        <Select
-                            labelId="sort-label"
-                            label="Sort"
-                            value={selectedSort}
-                            onChange={onSortChange}
-                            autoWidth
-                        >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            <MenuItem value={"term"}>
-                                Alphabetical - Term
-                            </MenuItem>
-                            <MenuItem value={"definition"}>
-                                Alphabetical - Definition
-                            </MenuItem>
-                            <MenuItem value={"label"}>
-                                Alphabetical - Label
-                            </MenuItem>
-                        </Select>
-                    </SortCardsDropdown>
-                </SimpleFlexContainer>
-            </CardFiltersContainer> */}
-
             {/* Testing out virtual scrolling */}
             {/* <Virtuoso
                 style={{
@@ -398,22 +296,33 @@ const ViewStudySet = (props: Props) => {
                     )
                 })
             }
-            <ManageLabelsDialog {...manageLabelsDialogProps} />
+            <ManageLabelsDialog
+                labels={labels}
+                open={selectedDialog === VIEW_SET_DIALOGS.LABELS}
+                onClose={onDialogClose}
+                selectedStudySet={selectedStudyset}
+                userUUID={userUUID}
+            />
             <NotificationsDialog
-                open={showNotificationsModal}
-                onClose={() => setShowNotificationsModal(false)}
+                open={selectedDialog === VIEW_SET_DIALOGS.NOTIFICATIONS}
+                onClose={onDialogClose}
             />
             <DownloadSetModal
-                open={showDownloadPopup}
-                handleClose={() => setShowDownloadPopup(false)}
+                open={selectedDialog === VIEW_SET_DIALOGS.DOWNLOAD}
+                onClose={onDialogClose}
                 downloadFileType={downloadFileType}
                 setDownloadFileType={setDownloadFileType}
                 studyset={selectedStudyset}
             />
-            <ManageCategoriesDialog {...manageCategoriesProps} />
+            <ManageCategoriesDialog 
+                open={selectedDialog === VIEW_SET_DIALOGS.CATEGORIES}
+                onClose={onDialogClose}
+                selectedStudyset={selectedStudyset}
+                studysets={studysets}
+            />
             <StudysetSettings
-                open={showStudysetSettings}
-                onClose={() => setShowStudysetSettings(false)}
+                open={selectedDialog === VIEW_SET_DIALOGS.SETTINGS}
+                onClose={onDialogClose}
                 studyset={selectedStudyset}
             />
             <ConfirmDialog />

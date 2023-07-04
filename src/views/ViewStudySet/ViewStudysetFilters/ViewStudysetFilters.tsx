@@ -6,7 +6,7 @@ import {
     SortCardsDropdown,
 } from "../styles";
 import { SimpleFlexContainer } from "common/AppStyles";
-import { DEFAULT_CATEGORIES, SORT_DIRECTIONS } from "utilities/constants";
+import { DEFAULT_CATEGORIES, SORT_DIRECTIONS, VIEW_SET_DIALOGS } from "utilities/constants";
 import { Studyset, SortDirection } from "lib/types";
 import {
     Button,
@@ -17,6 +17,8 @@ import {
     SelectChangeEvent,
 } from "@mui/material";
 import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
+import { useDispatch } from "react-redux";
+import { setSelectedDialog } from "state/slices/viewSetsSlice";
 
 type Props = {
     selectedTab: string;
@@ -24,7 +26,6 @@ type Props = {
     selectedStudyset: Studyset | undefined;
     sortDirection: SortDirection;
     setSortDirection: Dispatch<SetStateAction<SortDirection>>;
-    setShowManageCategories: Dispatch<SetStateAction<boolean>>;
     selectedSort: string;
     setSelectedSort: Dispatch<SetStateAction<string>>;
 };
@@ -36,10 +37,11 @@ const ViewStudysetFilters = (props: Props) => {
         selectedStudyset,
         sortDirection,
         setSortDirection,
-        setShowManageCategories,
         selectedSort,
         setSelectedSort,
     } = props;
+
+    const dispatch = useDispatch();
 
     const categoryTabs = useMemo(() => {
         const jointCategories = [
@@ -67,6 +69,10 @@ const ViewStudysetFilters = (props: Props) => {
         setSelectedSort(event.target.value);
     };
 
+    const handleShowCategoriesDialog = () => {
+        dispatch(setSelectedDialog(VIEW_SET_DIALOGS.CATEGORIES));
+    }
+
     return (
         <CardFiltersContainer>
             <SimpleFlexContainer style={{ gap: "1rem" }}>
@@ -80,7 +86,7 @@ const ViewStudysetFilters = (props: Props) => {
                 </CategoryTabs>
                 <Button
                     variant="outlined"
-                    onClick={() => setShowManageCategories(true)}
+                    onClick={handleShowCategoriesDialog}
                 >
                     Manage Categories
                 </Button>

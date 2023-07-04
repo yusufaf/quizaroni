@@ -1,7 +1,6 @@
 import {
     Button,
     Dialog,
-    DialogTitle,
     DialogContentText,
     DialogActions,
     Typography,
@@ -15,6 +14,9 @@ import {
 import { CONFIRM_DIALOGS } from 'utilities/constants';
 import useCustomMutation from "lib/hooks/useCustomMutation";
 import { useDeleteStudysetMutation, useDuplicateStudysetMutation } from "state/api/studysets";
+import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
 }
@@ -26,6 +28,8 @@ const initialDialogProps: Partial<ConfirmDialogProps> = {
 };
 
 const ConfirmDialog = (props: Props) => {
+
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const dialogProps = useSelector(selectDialogProps);
 
@@ -55,9 +59,11 @@ const ConfirmDialog = (props: Props) => {
         switch (dialogProps.type) {
             case CONFIRM_DIALOGS.DELETE:
                 deleteStudySet({...dialogProps.props});
+                navigate("/");
                 break;
             case CONFIRM_DIALOGS.DUPLICATE:
-
+                duplicateStudySet({...dialogProps.props});
+                break;
         }
         onClose();
     }
@@ -71,9 +77,10 @@ const ConfirmDialog = (props: Props) => {
             open={dialogProps?.open} 
             onClose={onClose}
         >
-            <DialogTitle>
+            <StyledDialogTitle>
                 {dialogProps?.title}
-            </DialogTitle>
+                <CloseDialogButton onClose={onClose} />
+            </StyledDialogTitle>
             <DialogContent>
                 <DialogContentText>
                     <Typography>{dialogProps?.dialogMessage}</Typography>

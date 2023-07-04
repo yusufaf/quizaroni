@@ -4,13 +4,8 @@ import { BasePage, SimpleFlexContainer, SpacedFlexContainer } from "common/AppSt
 
 export const ViewStudysetPage = styled(BasePage)({
     height: "100%",
-    // display: "grid",
-    // justifyItems: "center",
-    // alignItems: "center",
-    display: "grid",
+    display: "flex",
     flexDirection: "column",
-    // justifyContent: "center",
-    // alignItems: "center",
     gap: "2rem",
     padding: "0rem 22rem 2rem 22rem"
 })
@@ -33,6 +28,7 @@ export const ViewStudysetHeader = styled(Box)({
 
 export const StudysetInfo = styled("div")(({ theme }) => ({
     borderRight: `0.1rem solid ${theme.palette.text.primary}`,
+    overflowY: "auto",
 }));
 
 export const StudyModeGrid = styled(Box)({

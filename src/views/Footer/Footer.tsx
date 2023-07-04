@@ -3,15 +3,14 @@ import {
     Typography
 } from '@mui/material/';
 
-import { FooterContainer } from "./styles";
+import { StyledFooter } from "./styles";
 
 type Props = { };
 
 const Footer = (props: Props) => {
     return (
-        <footer>
-            <FooterContainer></FooterContainer>
-        </footer>
+        <StyledFooter>
+        </StyledFooter>
     )
 }
 

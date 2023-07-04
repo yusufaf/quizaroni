@@ -1,7 +1,10 @@
 import { styled } from "@mui/system";
 
-export const FooterContainer = styled("div")({
-    position: "fixed",
+export const StyledFooter = styled("footer")({
+    display: "flex",
+    alignItems: "center",
     bottom: "0",
-    height: "4rem"
+    height: "4rem",
+    width: "100%",
+    marginTop: "auto",
 })

@@ -150,3 +150,11 @@ export const STUDYSET_TERMINOLOGIES = {
     FACT_EXPLANATION: "Fact/Explanation",
     CUSTOM: "Custom",
 }
+
+export const VIEW_SET_DIALOGS: { [key: string]: string } = {
+    LABELS: "LABELS",
+    NOTIFICATIONS: "NOTIFICATIONS",
+    DOWNLOAD: "DOWNLOAD",
+    CATEGORIES: "CATEGORIES",
+    SETTINGS: "SETTINGS",
+}
