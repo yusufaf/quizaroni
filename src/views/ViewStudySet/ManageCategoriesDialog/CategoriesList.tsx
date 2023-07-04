@@ -85,9 +85,8 @@ const CategoriesList = (props: Props) => {
 
     return (
         <CategoriesListContainer style={listStyle}>
-            {/* TODO: Improve styling */}
             {categories.length === 0 ? (
-                <Typography variant="h6">No categories to import</Typography>
+                <Typography variant="subtitle1">No categories to import</Typography>
             ) : (
                 <CategoriesListPaper elevation={6}>
                     <StyledCategoriesList>

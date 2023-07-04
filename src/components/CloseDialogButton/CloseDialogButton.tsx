@@ -12,7 +12,7 @@ const CloseDialogButton = (props: Props) => {
         <CloseButton 
             aria-label="close" 
             title="Close"
-                onClick={onClose} 
+            onClick={onClose} 
         >
             <CloseIcon />
         </CloseButton>

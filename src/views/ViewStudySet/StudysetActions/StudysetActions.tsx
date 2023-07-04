@@ -18,23 +18,22 @@ import {
     Print,
     Settings,
 } from "@mui/icons-material/";
-import { DISABLED, ENABLED, SET_METADATA_FIELDS } from "utilities/constants";
+import { DISABLED, ENABLED, SET_METADATA_FIELDS, VIEW_SET_DIALOGS } from "utilities/constants";
 import { useTheme } from "theme/useTheme";
 import { ActionButtonsRow } from "../styles";
 import { useNavigate, useParams } from "react-router-dom";
 import { Studyset } from "lib/types";
 import { Dispatch, SetStateAction } from "react";
+import { useDispatch } from "react-redux";
+import { setSelectedDialog } from "state/slices/viewSetsSlice";
 
 type Props = {
     controlAnchorRef: any;
     updateMetadataField: any;
     setShowControlMenu: Dispatch<SetStateAction<boolean>>;
-    setShowDownloadPopup: Dispatch<SetStateAction<boolean>>;
-    setShowNotificationsModal: Dispatch<SetStateAction<boolean>>;
     showControlMenu: any;
     selectedStudyset: Studyset | undefined;
     handleDeleteStudyset: () => void;
-    setShowStudysetSettings: Dispatch<SetStateAction<boolean>>;
 };
 
 const StudysetActions = (props: Props) => {
@@ -42,17 +41,16 @@ const StudysetActions = (props: Props) => {
         controlAnchorRef,
         updateMetadataField,
         setShowControlMenu,
-        setShowDownloadPopup,
-        setShowNotificationsModal,
         showControlMenu,
         selectedStudyset,
         handleDeleteStudyset,
-        setShowStudysetSettings,
     } = props;
 
     const { theme } = useTheme();
     const navigate = useNavigate();
     const { id: studySetUUID } = useParams();
+    const dispatch = useDispatch();
+
 
     const handleOpenControlMenu = () => {
         setShowControlMenu(true);
@@ -88,6 +86,10 @@ const StudysetActions = (props: Props) => {
         navigate(`/edit/${studySetUUID}`);
     };
 
+    const handleShowDialog = (dialog: string) => {
+        dispatch(setSelectedDialog(dialog));
+    };
+
     return (
         <>
             <ActionButtonsRow>
@@ -98,16 +100,16 @@ const StudysetActions = (props: Props) => {
                 </Tooltip>
                 <Tooltip title="Download">
                     <IconButton
-                        onClick={() => setShowDownloadPopup(true)}
                         color="primary"
+                        onClick={() => handleShowDialog(VIEW_SET_DIALOGS.DOWNLOAD)}
                     >
                         <Download />
                     </IconButton>
                 </Tooltip>
                 <Tooltip title="Manage Notifications">
                     <IconButton
-                        onClick={() => setShowNotificationsModal(true)}
                         color="primary"
+                        onClick={() => handleShowDialog(VIEW_SET_DIALOGS.NOTIFICATIONS)}
                     >
                         <EditNotifications />
                     </IconButton>
@@ -133,7 +135,7 @@ const StudysetActions = (props: Props) => {
                 <Tooltip title="Study Set Settings">
                     <IconButton 
                         color="primary"
-                        onClick={() => setShowStudysetSettings(true)}
+                        onClick={() => handleShowDialog(VIEW_SET_DIALOGS.SETTINGS)}
                     >
                         <Settings />
                     </IconButton>
