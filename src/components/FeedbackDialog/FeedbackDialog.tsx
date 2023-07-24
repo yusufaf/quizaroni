@@ -11,6 +11,7 @@ import { selectDialogOpen, setDialogOpen } from "state/slices/globalSlice";
 import styled from "@emotion/styled";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
+import { toast } from "react-toastify";
 
 type Props = {};
 
@@ -26,6 +27,11 @@ const FeedbackDialog = (props: Props) => {
         marginTop: "1rem",
         marginBottom: "1.5rem",
     });
+
+    const onSubmit = () => {
+        
+        
+    }
 
     return (
         <div>

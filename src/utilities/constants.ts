@@ -157,4 +157,5 @@ export const VIEW_SET_DIALOGS: { [key: string]: string } = {
     DOWNLOAD: "DOWNLOAD",
     CATEGORIES: "CATEGORIES",
     SETTINGS: "SETTINGS",
+    PRINT: "PRINT",
 }
