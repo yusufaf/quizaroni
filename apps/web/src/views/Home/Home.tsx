@@ -130,12 +130,12 @@ const Home = (props: Props) => {
         {
             field: "title",
             headerName: "Title",
-            width: 200,
+            width: 300,
         },
         {
             field: "description",
             headerName: "Description",
-            width: 150,
+            width: 250,
             editable: false,
         },
         {
@@ -148,7 +148,7 @@ const Home = (props: Props) => {
         {
             field: "label",
             headerName: "Label",
-            width: 100,
+            width: 200,
             editable: false,
         },
         {

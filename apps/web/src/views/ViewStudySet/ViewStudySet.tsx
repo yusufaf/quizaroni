@@ -1,27 +1,22 @@
 import {
-    Add,
-    ArrowBack,
-    ArrowDownward,
-    ArrowUpward,
+    ArrowBack
 } from "@mui/icons-material/";
 import {
     Button,
     Chip,
-    IconButton,
-    InputLabel,
-    MenuItem,
-    Select,
-    SelectChangeEvent,
     Tooltip,
-    Typography,
+    Typography
 } from "@mui/material/";
+import { BoldTypography } from "common/AppStyles";
+import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import { Card, SortDirection, Studyset } from "lib/types";
-import { useEffect, useMemo, useRef, useState } from "react";
+import useFilterViewCards from "lib/hooks/useFilterViewCards";
+import useSortViewCards from "lib/hooks/useSortViewCards";
+import { SortDirection } from "lib/types";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import {
     useGetAllStudysetsQuery,
     useGetStudysetQuery,
@@ -30,37 +25,33 @@ import {
 } from "state/api/studysets";
 import { selectUserData, setDialogProps } from "state/slices/globalSlice";
 import {
+    selectSelectedDialog,
+    setSelectedDialog,
+} from "state/slices/viewSetsSlice";
+import {
+    CONFIRM_DIALOGS,
     DEFAULT_CATEGORIES,
     DOWNLOAD_FILE_TYPES,
     SORT_DIRECTIONS,
-    CONFIRM_DIALOGS,
-    VIEW_SET_DIALOGS
+    VIEW_SET_DIALOGS,
 } from "utilities/constants";
-import StudysetActions from "./StudysetActions/StudysetActions";
 import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
 import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
 import ManageLabelsDialog from "./ManageLabelsDialog/ManageLabelsDialog";
 import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
-import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
+import PrintDialog from "./PrintDialog.tsx/PrintDialog";
+import StudysetActions from "./StudysetActions/StudysetActions";
+import StudysetSettings from "./StudysetSettings/StudysetSettings";
 import ViewStudySetCard from "./ViewStudySetCard";
+import ViewStudysetFilters from "./ViewStudysetFilters/ViewStudysetFilters";
 import {
     CardCount,
-    CardFiltersContainer,
-    CategoryTab,
-    CategoryTabs,
     StudysetInfo,
-    SortCardsDropdown,
+    ViewFlashsetPaper,
     ViewStudysetContainer,
     ViewStudysetHeader,
-    ViewStudysetPage,
-    ViewFlashsetPaper,
+    ViewStudysetPage
 } from "./styles";
-import useCustomMutation from "lib/hooks/useCustomMutation";
-import StudysetSettings from "./StudysetSettings/StudysetSettings";
-import ViewStudysetFilters from "./ViewStudysetFilters/ViewStudysetFilters";
-import useSortViewCards from "lib/hooks/useSortViewCards";
-import useFilterViewCards from "lib/hooks/useFilterViewCards";
-import { selectSelectedDialog, setSelectedDialog } from "state/slices/viewSetsSlice";
 
 type Props = {};
 
@@ -163,13 +154,6 @@ const ViewStudySet = (props: Props) => {
         dispatch(setDialogProps(dialogProps));
     };
 
-    /* TODO: Future future task.
-    Ideally: Displaying a modal where a checkbox whether you want a reminder to study this flashset 
-    */
-    const handleEmailReminders = () => {};
-
-    const testEmail = async () => {};
-
     const handleBackClick = () => {
         navigate("/");
     };
@@ -187,7 +171,7 @@ const ViewStudySet = (props: Props) => {
         selectedSort,
         sortDirection,
         studyset: selectedStudyset,
-    })
+    });
 
     const filteredViewFlashCards = useFilterViewCards({
         selectedTab,
@@ -203,47 +187,52 @@ const ViewStudySet = (props: Props) => {
 
     const handleShowManageLabelsDialog = () => {
         dispatch(setSelectedDialog(VIEW_SET_DIALOGS.LABELS));
-    }
+    };
 
     const onDialogClose = () => {
         dispatch(setSelectedDialog(""));
-    }
+    };
 
     return (
-        <ViewStudysetPage>
-            <ViewFlashsetPaper elevation={6}>
-                <ViewStudysetContainer>
-                    <ViewStudysetHeader>
-                        <StudysetInfo>
-                            <Button
-                                onClick={handleBackClick}
-                                startIcon={<ArrowBack color="primary" />}
-                            >
-                                Back to Your Study Sets
-                            </Button>
-                            <BoldTypography variant="h5">
-                                {selectedStudyset?.title}
-                            </BoldTypography>
-                            <Typography variant="subtitle1">
-                                Created by {selectedStudyset?.username}
-                            </Typography>
-                            <Tooltip title="Manage Labels" placement="right">
-                                <Chip
-                                    label={
-                                        selectedStudyset?.label
-                                            ? selectedStudyset.label
-                                            : "No label selected"
-                                    }
-                                    variant="outlined"
-                                    onClick={handleShowManageLabelsDialog}
-                                />
-                            </Tooltip>
-                            <Typography variant="body1">
-                                {selectedStudyset?.description}
-                            </Typography>
-                            <StudysetActions {...actionSectionProps} />
-                        </StudysetInfo>
-                        {/* <div className={viewFlashStyles.studySection}>
+        <>
+            <ViewStudysetPage>
+                <ViewFlashsetPaper elevation={6}>
+                    <ViewStudysetContainer>
+                        <ViewStudysetHeader>
+                            <StudysetInfo>
+                                <Button
+                                    onClick={handleBackClick}
+                                    // href={`/edit/${selectedStudyset?.uuid}`}
+                                    startIcon={<ArrowBack color="primary" />}
+                                >
+                                    Back to Your Study Sets
+                                </Button>
+                                <BoldTypography variant="h5">
+                                    {selectedStudyset?.title}
+                                </BoldTypography>
+                                <Typography variant="subtitle1">
+                                    Created by {selectedStudyset?.username}
+                                </Typography>
+                                <Tooltip
+                                    title="Manage Labels"
+                                    placement="right"
+                                >
+                                    <Chip
+                                        label={
+                                            selectedStudyset?.label
+                                                ? selectedStudyset.label
+                                                : "No label selected"
+                                        }
+                                        variant="outlined"
+                                        onClick={handleShowManageLabelsDialog}
+                                    />
+                                </Tooltip>
+                                <Typography variant="body1">
+                                    {selectedStudyset?.description}
+                                </Typography>
+                                <StudysetActions {...actionSectionProps} />
+                            </StudysetInfo>
+                            {/* <div className={viewFlashStyles.studySection}>
                                             <Typography
                                                 variant="h6"
                                                 sx={{
@@ -261,31 +250,31 @@ const ViewStudySet = (props: Props) => {
                                                 </StudyModeOption>
                                             </StudyModeGrid>
                                         </div> */}
-                    </ViewStudysetHeader>
-                </ViewStudysetContainer>
-            </ViewFlashsetPaper>
-            <CardCount variant="h6">
-                Number of cards in this study set:{" "}
-                {selectedStudyset?.cards.length ?? "N/A"}
-            </CardCount>
-            <ViewStudysetFilters
-                selectedTab={selectedTab}
-                setSelectedTab={setSelectedTab}
-                selectedSort={selectedSort}
-                setSelectedSort={setSelectedSort}
-                selectedStudyset={selectedStudyset}
-                setSortDirection={setSortDirection}
-                sortDirection={sortDirection}
-            />
-            {/* Testing out virtual scrolling */}
-            {/* <Virtuoso
+                        </ViewStudysetHeader>
+                    </ViewStudysetContainer>
+                </ViewFlashsetPaper>
+                <CardCount variant="h6">
+                    Number of cards in this study set:{" "}
+                    {selectedStudyset?.cards.length ?? "N/A"}
+                </CardCount>
+                <ViewStudysetFilters
+                    selectedTab={selectedTab}
+                    setSelectedTab={setSelectedTab}
+                    selectedSort={selectedSort}
+                    setSelectedSort={setSelectedSort}
+                    selectedStudyset={selectedStudyset}
+                    setSortDirection={setSortDirection}
+                    sortDirection={sortDirection}
+                />
+                {/* Testing out virtual scrolling */}
+                {/* <Virtuoso
                 style={{
                     height: "20rem",
                 }}
                 totalCount={filteredViewFlashCards.length}
                 itemContent={(index) => filteredViewFlashCards[index]}
             /> */}
-            {filteredViewFlashCards.map((card, index) => {
+                {filteredViewFlashCards.map((card, index) => {
                     return (
                         <ViewStudySetCard
                             key={card.uuid}
@@ -293,9 +282,9 @@ const ViewStudySet = (props: Props) => {
                             index={index}
                             selectedStudyset={selectedStudyset}
                         />
-                    )
-                })
-            }
+                    );
+                })}
+            </ViewStudysetPage>
             <ManageLabelsDialog
                 labels={labels}
                 open={selectedDialog === VIEW_SET_DIALOGS.LABELS}
@@ -314,7 +303,7 @@ const ViewStudySet = (props: Props) => {
                 setDownloadFileType={setDownloadFileType}
                 studyset={selectedStudyset}
             />
-            <ManageCategoriesDialog 
+            <ManageCategoriesDialog
                 open={selectedDialog === VIEW_SET_DIALOGS.CATEGORIES}
                 onClose={onDialogClose}
                 selectedStudyset={selectedStudyset}
@@ -325,9 +314,14 @@ const ViewStudySet = (props: Props) => {
                 onClose={onDialogClose}
                 studyset={selectedStudyset}
             />
+            <PrintDialog
+                open={selectedDialog === VIEW_SET_DIALOGS.PRINT}
+                onClose={onDialogClose}
+                studyset={selectedStudyset}
+            />
             <ConfirmDialog />
             <ScrollToTopFab />
-        </ViewStudysetPage>
+        </>
     );
 };
 

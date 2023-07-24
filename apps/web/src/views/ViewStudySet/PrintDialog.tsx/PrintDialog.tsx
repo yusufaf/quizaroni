@@ -12,7 +12,6 @@ type Props = {
 const PrintDialog = (props: Props) => {
     const { open, onClose, studyset } = props;
 
-
     return (
         <Dialog
             open={open}

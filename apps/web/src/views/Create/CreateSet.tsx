@@ -76,8 +76,6 @@ const CreateSet = (props: Props) => {
     const [selectedLabel, setSelectedLabel] = useState<string>("");
     const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
 
-    const [labelOptions, setLabelOptions] = useState([]);
-
     const [showImportModal, setShowImportModal] = useState<boolean>(false);
 
     const fileInputRef = useRef(null);
@@ -94,8 +92,6 @@ const CreateSet = (props: Props) => {
     const [blankCardsCount, setBlankCardsCount] = useState(0);
 
     useBrowserTitle(PAGES.CREATE);
-
-    /**
 
     /* Check that length of createdCardObjects is not 0 */
     const createNewSet = async () => {
