@@ -13,7 +13,7 @@ const ImportSetModal = (props) => {
     const { open, onClose } = props;
 
     return (
-        <Dialog open={open} onClose={onClose}>
+        <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
             <StyledDialogTitle>
                 Import Cards
                 <CloseDialogButton onClose={onClose} />

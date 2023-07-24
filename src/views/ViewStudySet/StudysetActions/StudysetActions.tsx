@@ -27,6 +27,8 @@ import { Dispatch, SetStateAction } from "react";
 import { useDispatch } from "react-redux";
 import { setSelectedDialog } from "state/slices/viewSetsSlice";
 
+import CustomIconButton from "components/CustomIconButton/CustomIconButton";
+
 type Props = {
     controlAnchorRef: any;
     updateMetadataField: any;
@@ -90,56 +92,66 @@ const StudysetActions = (props: Props) => {
         dispatch(setSelectedDialog(dialog));
     };
 
+    /*
+        Former Implementation of tooltip buttons:
+        <Tooltip title="Edit Study Set">
+            <IconButton color="primary" onClick={handleEditClick}>
+                <Edit />
+            </IconButton>
+        </Tooltip
+    */
+
     return (
         <>
             <ActionButtonsRow>
-                <Tooltip title="Edit Study Set">
-                    <IconButton color="primary" onClick={handleEditClick}>
-                        <Edit />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="Download">
-                    <IconButton
-                        color="primary"
-                        onClick={() => handleShowDialog(VIEW_SET_DIALOGS.DOWNLOAD)}
-                    >
-                        <Download />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="Manage Notifications">
-                    <IconButton
-                        color="primary"
-                        onClick={() => handleShowDialog(VIEW_SET_DIALOGS.NOTIFICATIONS)}
-                    >
-                        <EditNotifications />
-                    </IconButton>
-                </Tooltip>
+                <CustomIconButton
+                    title={"Edit Study Set"}
+                    color="primary"
+                    icon={<Edit />}
+                    onClick={handleEditClick}
+                />
+                <CustomIconButton
+                    title={"Download"}
+                    color="primary"
+                    icon={<Download />}
+                    onClick={() => handleShowDialog(VIEW_SET_DIALOGS.DOWNLOAD)}
+                />
+                <CustomIconButton
+                    title={"Manage Notifications"}
+                    color="primary"
+                    icon={<EditNotifications />}
+                    onClick={() => handleShowDialog(VIEW_SET_DIALOGS.NOTIFICATIONS)}
+                />
+                {/* <CustomIconButton
+                    title={"Control Menu"}
+                    color="primary"
+                    icon={<MenuOpen />}
+                    onClick={handleOpenControlMenu}
+                    ref={controlAnchorRef}
+                /> */}
                 <Tooltip title="Control Menu" ref={controlAnchorRef}>
                     <IconButton onClick={handleOpenControlMenu} color="primary">
                         <MenuOpen />
                     </IconButton>
                 </Tooltip>
-                <Tooltip title="Print">
-                    <IconButton color="primary">
-                        <Print />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="Delete Study Set">
-                    <IconButton
-                        color="primary"
-                        onClick={() => handleDeleteStudyset()}
-                    >
-                        <Delete />
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="Study Set Settings">
-                    <IconButton 
-                        color="primary"
-                        onClick={() => handleShowDialog(VIEW_SET_DIALOGS.SETTINGS)}
-                    >
-                        <Settings />
-                    </IconButton>
-                </Tooltip>
+                <CustomIconButton
+                    title={"Print"}
+                    color="primary"
+                    icon={<Print />}
+                    onClick={() => handleShowDialog(VIEW_SET_DIALOGS.PRINT)}
+                />
+                <CustomIconButton
+                    title={"Delete Study Set"}
+                    color="primary"
+                    icon={<Delete />}
+                    onClick={() => handleDeleteStudyset()}
+                />
+                <CustomIconButton
+                    title={"Study Set Settings"}
+                    color="primary"
+                    icon={<Settings />}
+                    onClick={() => handleShowDialog(VIEW_SET_DIALOGS.SETTINGS)}
+                />
             </ActionButtonsRow>
             <Menu
                 open={showControlMenu}
