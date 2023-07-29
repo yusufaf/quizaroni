@@ -25,6 +25,8 @@ export type StudysetMetadata = {
     publiclyViewable: boolean;
     terminology: string;
     customTerminology: string;
+    labelTerminology: string;
+    customLabelTerminology: string;
 };
 
 export type Studyset = {
