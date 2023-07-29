@@ -15,7 +15,7 @@ import { Card, Studyset } from "lib/types";
 import { useMarkCardAsImportantMutation } from "state/api/studysets";
 import {
     DEFAULT_TERMINOLOGY,
-    STUDYSET_TERMINOLOGIES,
+    FORMAT_TERMINOLOGIES,
 } from "utilities/constants";
 
 type Props = {
@@ -35,7 +35,7 @@ const ViewStudySetCard = (props: Props) => {
     const selectedTerminology =
         selectedStudyset?.metadata?.terminology ?? DEFAULT_TERMINOLOGY;
     const [terminology1, terminology2] =
-        selectedTerminology === STUDYSET_TERMINOLOGIES.CUSTOM
+        selectedTerminology === FORMAT_TERMINOLOGIES.CUSTOM
             ? selectedStudyset?.metadata?.customTerminology?.split("/") ?? []
             : selectedTerminology.split("/");
 
