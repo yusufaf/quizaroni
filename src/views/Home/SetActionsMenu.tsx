@@ -1,4 +1,4 @@
-import { Menu, MenuItem, Typography } from "@mui/material/";
+import { Menu, MenuItem, PopoverPosition, PopoverReference, Typography } from "@mui/material/";
 import {
     ContentCopy as CopyIcon,
     Edit as EditIcon,
@@ -11,11 +11,14 @@ import { Studyset } from "lib/types";
 import { CONFIRM_DIALOGS } from "utilities/constants";
 
 type Props = {
-    studyset: Studyset;
+    studyset: Studyset | null;
     open: boolean;
     onClose: any;
     anchorEl: any;
     handleShowConfirmDialog: any;
+    anchorReference?: PopoverReference;
+    anchorPosition?: PopoverPosition;
+    slotProps?: any;
 };
 
 const SetActionsMenu = (props: Props) => {
@@ -24,7 +27,10 @@ const SetActionsMenu = (props: Props) => {
         open, 
         onClose, 
         anchorEl, 
-        handleShowConfirmDialog 
+        handleShowConfirmDialog,
+        anchorReference,
+        anchorPosition,
+        slotProps
     } = props;
 
     const { isDarkMode, theme } = useTheme();
@@ -41,8 +47,11 @@ const SetActionsMenu = (props: Props) => {
             anchorEl={anchorEl}
             open={open}
             onClose={onClose}
+            anchorReference={anchorReference}
+            anchorPosition={anchorPosition}
+            slotProps={slotProps}
         >
-            <MenuItem onClick={() => navigate(`/edit/${studyset.uuid}`)}>
+            <MenuItem onClick={() => navigate(`/edit/${studyset?.uuid}`)}>
                 <EditIcon sx={iconStyling} />
                 <Typography>Edit</Typography>
             </MenuItem>
