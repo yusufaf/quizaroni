@@ -1,19 +1,12 @@
-import {
-    ArrowBack
-} from "@mui/icons-material/";
-import {
-    Button,
-    Chip,
-    Tooltip,
-    Typography
-} from "@mui/material/";
+import { ArrowBack } from "@mui/icons-material/";
+import { Button, Chip, Tooltip, Typography } from "@mui/material/";
 import { BoldTypography } from "common/AppStyles";
 import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import useFilterViewCards from "lib/hooks/useFilterViewCards";
 import useSortViewCards from "lib/hooks/useSortViewCards";
-import { SortDirection } from "lib/types";
+import { OpenCardNotes, SortDirection, UUID } from "lib/types";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -50,8 +43,9 @@ import {
     ViewFlashsetPaper,
     ViewStudysetContainer,
     ViewStudysetHeader,
-    ViewStudysetPage
+    ViewStudysetPage,
 } from "./styles";
+import NotesDrawer from "./NotesDrawer/NotesDrawer";
 
 type Props = {};
 
@@ -202,7 +196,6 @@ const ViewStudySet = (props: Props) => {
                             <StudysetInfo>
                                 <Button
                                     onClick={handleBackClick}
-                                    // href={`/edit/${selectedStudyset?.uuid}`}
                                     startIcon={<ArrowBack color="primary" />}
                                 >
                                     Back to Your Study Sets
@@ -284,6 +277,10 @@ const ViewStudySet = (props: Props) => {
                         />
                     );
                 })}
+                <NotesDrawer
+                    open={true}
+                    selectedStudyset={selectedStudyset}
+                />
             </ViewStudysetPage>
             <ManageLabelsDialog
                 labels={labels}
