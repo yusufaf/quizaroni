@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { useTheme } from "theme/useTheme";
 import { Chip, IconButton, Tooltip, Typography } from "@mui/material/";
 import { SpeakerNotes, Star, StarBorder, VolumeUp } from "@mui/icons-material";
@@ -11,7 +11,7 @@ import {
     CategoryChips,
     CategoryChip,
 } from "./styles";
-import { Card, Studyset } from "lib/types";
+import { Card, OpenCardNotes, Studyset, UUID } from "lib/types";
 import { useMarkCardAsImportantMutation } from "state/api/studysets";
 import {
     DEFAULT_TERMINOLOGY,
@@ -40,7 +40,9 @@ const ViewStudySetCard = (props: Props) => {
     const { isDarkMode, theme } = useTheme();
     const { speak, cancel } = useSpeechSynthesis();
 
-    const [chipsToShowMap, setChipsToShowMap] = useState<{ [key: string]: number }>({});
+    const [chipsToShowMap, setChipsToShowMap] = useState<{
+        [key: string]: number;
+    }>({});
     const [isViewAllOpen, setIsViewAllOpen] = useState(false);
 
     const timeoutRef = useRef(null);
@@ -68,9 +70,13 @@ const ViewStudySetCard = (props: Props) => {
         const updateChipsDisplay = () => {
             if (chipContainerRef.current) {
                 // @ts-ignore
-                const chips = chipContainerRef.current.querySelectorAll(".MuiChip-root") || [];
+                const chips =
+                    chipContainerRef.current.querySelectorAll(
+                        ".MuiChip-root"
+                    ) || [];
                 //@ts-ignore
-                const availableWidth = chipContainerRef.current.parentElement.offsetWidth;
+                const availableWidth =
+                    chipContainerRef.current.parentElement.offsetWidth;
 
                 let currentCard = "";
                 let visibleChips = 0;
@@ -79,7 +85,7 @@ const ViewStudySetCard = (props: Props) => {
 
                 chips.forEach((chip: Element) => {
                     // @ts-ignore
-                    const chipWidth = chip.offsetWidth
+                    const chipWidth = chip.offsetWidth;
 
                     if (currentCard !== chip.id) {
                         currentCard = chip.id;
@@ -128,8 +134,12 @@ const ViewStudySetCard = (props: Props) => {
         // timeoutRef.current = "";
     };
 
+    /**
+     * Marks a card as important, making an API call to do so
+     * @returns {void}
+     */
     const handleMarkAsImportant = async () => {
-        markCardAsImportant({
+        await markCardAsImportant({
             cardUUID: card.uuid ?? "",
             newValue: !card.important,
         });
@@ -192,12 +202,6 @@ const ViewStudySetCard = (props: Props) => {
                             ) : (
                                 <StarBorder />
                             )}
-                        </IconButton>
-                    </Tooltip>
-                    {/* TODO */}
-                    <Tooltip title="Open notes" placement="top">
-                        <IconButton>
-                            <SpeakerNotes />
                         </IconButton>
                     </Tooltip>
                 </ViewFlashCardActions>

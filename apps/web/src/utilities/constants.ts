@@ -170,3 +170,8 @@ export const VIEW_SET_DIALOGS: { [key: string]: string } = {
     SETTINGS: "SETTINGS",
     PRINT: "PRINT",
 }
+
+export const NOTES_DRAWER_POSITIONS = {
+    LEFT: "left",
+    RIGHT: "right",
+}

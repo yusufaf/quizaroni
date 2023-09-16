@@ -137,3 +137,7 @@ export type ConfirmDialogProps = {
     title: string;
     type: string;
 }
+
+// export type ViewSetDialog = 
+
+export type OpenCardNotes = Set<UUID>;
