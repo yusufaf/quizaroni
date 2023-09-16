@@ -4,6 +4,9 @@ import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import FormatTerminologies from "./FormatTerminologies";
 import LabelTerminologies from "./LabelTerminologies";
+import { ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import { NOTES_DRAWER_POSITIONS } from "utilities/constants";
+import { useUpdateStudysetMetadataMutation } from "state/api/studysets";
 
 type Props = {
     open: boolean;
@@ -14,6 +17,22 @@ type Props = {
 const StudysetSettings = (props: Props) => {
     const { open, onClose, studyset } = props;
 
+    const [updateStudysetMetadata, { isLoading: isUpdatingTerminology }] =
+        useUpdateStudysetMetadataMutation();
+
+    const handleAlignmentChange = (
+        event: React.MouseEvent<HTMLElement>,
+        newAlignment: string | null,
+      ) => {
+        updateStudysetMetadata({
+            property: "notesDrawerPosition",
+            newValue: newAlignment,
+            uuid: studyset?.uuid ?? "",
+        });
+        // setAlignment(newAlignment);
+    };
+    
+
     return (
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
             <StyledDialogTitle>
@@ -23,6 +42,27 @@ const StudysetSettings = (props: Props) => {
             <StyledDialogContent>
                 <FormatTerminologies studyset={studyset} />
                 <LabelTerminologies studyset={studyset} />
+                <div>
+                    <Typography
+                        variant="subtitle1"
+                    >
+                        Notes Drawer Alignment
+                    </Typography>
+                    <ToggleButtonGroup
+                        value={NOTES_DRAWER_POSITIONS.LEFT}
+                        // value={studyset?.metadata?.notesDrawerPosition ?? "left"}
+                        exclusive
+                        aria-label="notes drawer alignment"
+                        onChange={handleAlignmentChange}
+                    >
+                        <ToggleButton value="left" aria-label="left anchored">
+                            Left
+                        </ToggleButton>
+                        <ToggleButton value="right" aria-label="right anchored">
+                            Right
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                </div>
             </StyledDialogContent>
         </StyledDialog>
     );
