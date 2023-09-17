@@ -4,17 +4,28 @@ import {
     AccordionDetails,
     AccordionSummary,
     Button,
+    Fab,
+    IconButton,
+    Tooltip,
     Typography,
 } from "@mui/material/";
 import { Card, OpenCardNotes, Studyset, UUID } from "lib/types";
 import { StyledDrawer } from "./styles";
-import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
+import {
+    BoldTypography,
+    FlexColumn,
+    SimpleFlexContainer,
+} from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import { useState } from "react";
 import {
     Add as AddIcon,
+    Edit as EditIcon,
+    Delete as DeleteIcon,
     ExpandMore as ExpandMoreIcon,
+    MenuOpen as MenuOpenIcon,
 } from "@mui/icons-material";
+import EditableTextField from "components/EditableTextField/EditableTextField";
 
 type Props = {
     open: boolean;
@@ -27,10 +38,13 @@ const NotesDrawer = (props: Props) => {
     const { open, selectedStudyset } = props;
 
     const { uuid: studySetUUID = "" } = selectedStudyset || {};
-    const [notesDrawerHidden, setNotesDrawerHidden] = useState<boolean>(false);
+    const [hidden, setHidden] = useState<boolean>(false);
     const [openNotes, setOpenNotes] = useState<OpenCardNotes>(new Set());
+    const [isEditing, setIsEditing] = useState<boolean>(false);
 
-    const onClose = () => {};
+    const onClose = () => {
+        setHidden(true);
+    };
 
     /**
      * Toggle the notes for this card being open
@@ -49,16 +63,24 @@ const NotesDrawer = (props: Props) => {
             toggleNotesOpen(cardUUID, isExpanded);
         };
 
-    return (
+    return hidden ? (
+        <>
+            <Fab
+                onClick={() => setHidden(false)}
+                color="primary"
+                size="small"
+                aria-label="Open notes menu"
+                title="Open notes menu"
+                sx={{
+                    position: "absolute",
+                    right: "2rem"
+                }}
+            >
+                <MenuOpenIcon fontSize="medium" />
+            </Fab>  
+        </>
+    ) : (
         <StyledDrawer
-            // sx={{
-            //     width: drawerWidth,
-            //     flexShrink: 0,
-            //     "& .MuiDrawer-paper": {
-            //         width: drawerWidth,
-            //         boxSizing: "border-box",
-            //     },
-            // }}
             variant="persistent"
             anchor="right"
             open={true}
@@ -77,6 +99,7 @@ const NotesDrawer = (props: Props) => {
                         expanded={openNotes.has(card.uuid)}
                         onChange={handleAccordionChange(card.uuid)}
                         TransitionProps={{ unmountOnExit: true }}
+                        key={card.uuid}
                     >
                         <AccordionSummary
                             expandIcon={<ExpandMoreIcon />}
@@ -87,11 +110,46 @@ const NotesDrawer = (props: Props) => {
                             </BoldTypography>
                         </AccordionSummary>
                         <AccordionDetails>
-                            <Typography>
-                                Nulla facilisi. Phasellus sollicitudin nulla et
-                                quam mattis feugiat. Aliquam eget maximus est,
-                                id dignissim quam.
-                            </Typography>
+                            <SimpleFlexContainer>
+                                <EditableTextField
+                                    isEditing={isEditing}
+                                    value="testtesttesttesttesttesttesttesttesttesttesttesttesttesttest"
+                                    setIsEditing={setIsEditing}
+                                />
+                                <SimpleFlexContainer
+                                    sx={{
+                                        height: "fit-content",
+                                    }}
+                                >
+                                    <Tooltip
+                                        title="Edit this note"
+                                        placement="top"
+                                    >
+                                        <IconButton
+                                            onClick={() =>
+                                                setIsEditing(!isEditing)
+                                            }
+                                        >
+                                            <EditIcon
+                                                fontSize="small"
+                                                color={
+                                                    isEditing
+                                                        ? "primary"
+                                                        : undefined
+                                                }
+                                            />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip
+                                        title="Delete this note"
+                                        placement="top"
+                                    >
+                                        <IconButton>
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    </Tooltip>
+                                </SimpleFlexContainer>
+                            </SimpleFlexContainer>
                             <Button
                                 startIcon={<AddIcon />}
                                 variant="outlined"
