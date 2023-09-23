@@ -17,6 +17,9 @@ import {
     DeleteLabelParams,
     EditLabelParams,
     ChangeLabelParams,
+    CreateNoteParams,
+    DeleteNoteParams,
+    EditNoteParams,
 } from "lib/types";
 
 /* Endpoints
@@ -30,6 +33,8 @@ import {
 	router.post("/api/studysets/updateLastViewed", updateLastViewed);
 	router.post("/api/studysets/markCardAsImportant", markCardAsImportant);
 	router.post("/api/studysets/assignCardCategories", assignCardCategories)
+    router.post("/api/studysets/createNote", createNote);
+
 */
 
 /* */
@@ -153,6 +158,30 @@ export const studysetsApi = api.injectEndpoints({
             }),
             invalidatesTags: ["Studyset"],
         }),
+        createNote: build.mutation<void, CreateNoteParams>({
+            query: ({ cardUUID }) => ({
+                url: "studysets/createNote",
+                method: "POST",
+                body: { cardUUID },
+            }),
+            invalidatesTags: ["Studyset"],
+        }),
+        deleteNote: build.mutation<void, DeleteNoteParams>({
+            query: ({ cardUUID, noteUUID }) => ({
+                url: "studysets/createNote",
+                method: "POST",
+                body: { cardUUID, noteUUID },
+            }),
+            invalidatesTags: ["Studyset"],
+        }),
+        editNote: build.mutation<void, EditNoteParams>({
+            query: ({ cardUUID, noteUUID, text }) => ({
+                url: "studysets/createNote",
+                method: "POST",
+                body: { cardUUID, noteUUID, text },
+            }),
+            invalidatesTags: ["Studyset"],
+        }),
         createLabel: build.mutation<void, CreateLabelParams>({
             query: (body) => ({
                 url: "studysets/createLabel",
@@ -204,5 +233,8 @@ export const {
     useCreateLabelMutation,
     useDeleteLabelMutation,
     useEditLabelMutation,
-    useChangeLabelMutation
+    useChangeLabelMutation,
+    useCreateNoteMutation,
+    useDeleteNoteMutation,
+    useEditNoteMutation,
 } = studysetsApi;

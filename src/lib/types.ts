@@ -9,6 +9,11 @@ export type InitialCard = {
     uuid: UUID;
 }
 
+export type Note = {
+    uuid: UUID;
+    text: string;
+}
+
 export type Card = {
     term: string;
     definition: string;
@@ -17,6 +22,7 @@ export type Card = {
     important: boolean;
     uuid: UUID;
     categories: string[];
+    notes: Note[];
 };
 
 export type StudysetMetadata = {
@@ -97,6 +103,21 @@ export type AssignCardCategoriesParams = {
 export type MarkCardAsImportantParams = {
     cardUUID: UUID;
     newValue: boolean;
+}
+
+export type CreateNoteParams = {
+    cardUUID: UUID;
+}
+
+export type DeleteNoteParams = {
+    cardUUID: UUID;
+    noteUUID: UUID;
+}
+
+export type EditNoteParams = {
+    cardUUID: UUID;
+    noteUUID: UUID;
+    text: string;
 }
 
 export type UpdateLastViewedParams = {
