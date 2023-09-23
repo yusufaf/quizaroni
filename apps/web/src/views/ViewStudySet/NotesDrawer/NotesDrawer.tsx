@@ -9,7 +9,7 @@ import {
     Tooltip,
     Typography,
 } from "@mui/material/";
-import { Card, OpenCardNotes, Studyset, UUID } from "lib/types";
+import { Card, Note, OpenCardNotes, Studyset, UUID } from "lib/types";
 import { StyledDrawer } from "./styles";
 import {
     BoldTypography,
@@ -26,6 +26,9 @@ import {
     MenuOpen as MenuOpenIcon,
 } from "@mui/icons-material";
 import EditableTextField from "components/EditableTextField/EditableTextField";
+import { useCreateNoteMutation, useDeleteNoteMutation, useEditNoteMutation } from "state/api/studysets";
+import useCustomMutation from "lib/hooks/useCustomMutation";
+import { EMPTY_NOTE_PLACEHOLDER } from "utilities/constants";
 
 type Props = {
     open: boolean;
@@ -41,6 +44,41 @@ const NotesDrawer = (props: Props) => {
     const [hidden, setHidden] = useState<boolean>(false);
     const [openNotes, setOpenNotes] = useState<OpenCardNotes>(new Set());
     const [isEditing, setIsEditing] = useState<boolean>(false);
+
+    const [noteActionsStack, setNoteActionsStack] = useState([]);
+
+    const {
+        mutate: createNote,
+        isLoading: isCreateNoteLoading,
+        isSuccess: isCreateNoteSuccess,
+        isError: isCreateNoteError,
+    } = useCustomMutation({
+        mutation: useCreateNoteMutation,
+        successMessage: "Successfully created note",
+        errorMessage: "Error creating note",
+    });
+
+    const {
+        mutate: deleteNote,
+        isLoading: isDeleteNoteLoading,
+        isSuccess: isDeleteNoteSuccess,
+        isError: isDeleteNoteError,
+    } = useCustomMutation({
+        mutation: useDeleteNoteMutation,
+        successMessage: "Successfully deleted note",
+        errorMessage: "Error deleting note",
+    });
+
+    const {
+        mutate: editNote,
+        isLoading: isEditNoteLoading,
+        isSuccess: isEditNoteSuccess,
+        isError: isEditNoteError,
+    } = useCustomMutation({
+        mutation: useEditNoteMutation,
+        successMessage: "Successfully edited note",
+        errorMessage: "Error editing note",
+    });
 
     const onClose = () => {
         setHidden(true);
@@ -63,6 +101,10 @@ const NotesDrawer = (props: Props) => {
             toggleNotesOpen(cardUUID, isExpanded);
         };
 
+    const handleEditingNoteToggle = (editing: boolean) => {
+
+    }
+
     return hidden ? (
         <>
             <Fab
@@ -73,11 +115,11 @@ const NotesDrawer = (props: Props) => {
                 title="Open notes menu"
                 sx={{
                     position: "absolute",
-                    right: "2rem"
+                    right: "2rem",
                 }}
             >
                 <MenuOpenIcon fontSize="medium" />
-            </Fab>  
+            </Fab>
         </>
     ) : (
         <StyledDrawer
@@ -110,50 +152,65 @@ const NotesDrawer = (props: Props) => {
                             </BoldTypography>
                         </AccordionSummary>
                         <AccordionDetails>
-                            <SimpleFlexContainer>
-                                <EditableTextField
-                                    isEditing={isEditing}
-                                    value="testtesttesttesttesttesttesttesttesttesttesttesttesttesttest"
-                                    setIsEditing={setIsEditing}
-                                />
-                                <SimpleFlexContainer
-                                    sx={{
-                                        height: "fit-content",
-                                    }}
-                                >
-                                    <Tooltip
-                                        title="Edit this note"
-                                        placement="top"
+                            {card.notes?.map((note: Note, index: number) => {
+                                return (
+                                    <SimpleFlexContainer 
+                                        key={note.uuid}
+                                        style={{
+                                            gap: "1rem"
+                                        }}
                                     >
-                                        <IconButton
-                                            onClick={() =>
-                                                setIsEditing(!isEditing)
-                                            }
+                                        <EditableTextField
+                                            isEditing={isEditing}
+                                            value={note.text ?? "EMPTY"}
+                                            setIsEditing={setIsEditing}
+                                            placeholder={EMPTY_NOTE_PLACEHOLDER}
+                                        />
+                                        <SimpleFlexContainer
+                                            sx={{
+                                                height: "fit-content",
+                                            }}
                                         >
-                                            <EditIcon
-                                                fontSize="small"
-                                                color={
-                                                    isEditing
-                                                        ? "primary"
-                                                        : undefined
-                                                }
-                                            />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip
-                                        title="Delete this note"
-                                        placement="top"
-                                    >
-                                        <IconButton>
-                                            <DeleteIcon fontSize="small" />
-                                        </IconButton>
-                                    </Tooltip>
-                                </SimpleFlexContainer>
-                            </SimpleFlexContainer>
+                                            <Tooltip
+                                                title="Edit this note"
+                                                placement="top"
+                                            >
+                                                <IconButton
+                                                    onClick={() =>
+                                                        setIsEditing(!isEditing)
+                                                    }
+                                                >
+                                                    <EditIcon
+                                                        fontSize="small"
+                                                        color={
+                                                            isEditing
+                                                                ? "primary"
+                                                                : undefined
+                                                        }
+                                                    />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip
+                                                title="Delete this note"
+                                                placement="top"
+                                            >
+                                                <IconButton>
+                                                    <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </SimpleFlexContainer>
+                                    </SimpleFlexContainer>
+                                );
+                            })}
                             <Button
                                 startIcon={<AddIcon />}
                                 variant="outlined"
-                                sx={{ width: "100%" }}
+                                sx={{ width: "100%", marginTop: "1rem" }}
+                                onClick={() => {
+                                    createNote({
+                                        cardUUID: card.uuid,
+                                    });
+                                }}
                             >
                                 Add Note
                             </Button>
