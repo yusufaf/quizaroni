@@ -9,11 +9,18 @@ type Props = {
     isEditing: boolean;
     style?: Object;
     value: string;
-    setIsEditing: Dispatch<SetStateAction<boolean>>;
+    setIsEditing: (editing: boolean) => void;
+    placeholder?: string;
 }
 
 const EditableTextField = (props: Props) => {
-    const { isEditing, style = {}, value, setIsEditing } = props;
+    const { 
+        isEditing, 
+        style = {}, 
+        value, 
+        setIsEditing,
+        placeholder
+    } = props;
 
     const { isDarkMode, theme } = useTheme();
 
@@ -48,8 +55,15 @@ const EditableTextField = (props: Props) => {
     return (
         <>
             {!isEditing ? (
-                <Typography sx={{wordBreak: "break-word", width: "100%"}}>
-                    {value}
+                <Typography 
+                    sx={{
+                        wordBreak: "break-word", 
+                        width: "100%",
+                        opacity: value ? 1 : 0.5, // Adjust opacity
+                    }}
+
+                >
+                    {value || placeholder}
                 </Typography>
             ) : (
                 <TextField
@@ -60,6 +74,7 @@ const EditableTextField = (props: Props) => {
                     defaultValue={value}
                     value={editedValue}
                     // error={editedValue === ""}
+                    placeholder={placeholder}
                     onBlur={handleOnBlur}
                     onChange={handleChange}
                     sx={style}

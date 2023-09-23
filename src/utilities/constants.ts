@@ -175,3 +175,5 @@ export const NOTES_DRAWER_POSITIONS = {
     LEFT: "left",
     RIGHT: "right",
 }
+
+export const EMPTY_NOTE_PLACEHOLDER = "Enter text for the note";
