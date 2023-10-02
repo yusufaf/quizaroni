@@ -59,7 +59,7 @@ export const CardTitle = styled(Typography)({
     textOverflow: "ellipsis"
 });
 
-export const CardDesc = styled(Typography)({
+export const CardDescription = styled(Typography)({
     overflow: "hidden",
     textOverflow: "ellipsis",
     display: "-webkit-box",
