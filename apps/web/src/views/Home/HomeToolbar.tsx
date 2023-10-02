@@ -43,7 +43,7 @@ const HomeToolbar = (props: Props) => {
                 exclusive
                 onChange={handleViewChange}
                 value={selectedView}
-                sx={{ marginLeft: "auto", marginRight: "1rem" }}
+                sx={{ marginLeft: "auto" }}
             >
                 <ToggleButton
                     value={FLASHSET_VIEWS.TABLE}
