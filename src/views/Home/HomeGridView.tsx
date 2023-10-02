@@ -32,7 +32,11 @@ const HomeGridView = (props: Props) => {
         <>
             <HomeSetGrid>
                 {paginatedStudySets.map((studyset) => (
-                    <HomeStudySetCard key={studyset.uuid} studyset={studyset} />
+                    <HomeStudySetCard 
+                        key={studyset.uuid} 
+                        studyset={studyset} 
+                        handleShowConfirmDialog={handleShowConfirmDialog}
+                    />
                 ))}
             </HomeSetGrid>
             <Pagination onChange={onPageChange} count={numPages} page={page} />

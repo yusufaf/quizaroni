@@ -1,4 +1,4 @@
-import { DataGrid, GridEventListener } from "@mui/x-data-grid";
+import { DataGrid, GridEventListener, GridSortModel } from "@mui/x-data-grid";
 import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import useCustomMutation from "lib/hooks/useCustomMutation";
@@ -11,6 +11,7 @@ import {
     useDuplicateStudysetMutation,
     useGetAllStudysetsQuery,
 } from "state/api/studysets";
+import { useUpdateUserMetadataMutation } from "state/api/users";
 import {
     selectAuthenticated,
     selectUserData,
@@ -63,6 +64,15 @@ const Home = (props: Props) => {
         errorMessage: "Error deleting study set",
     });
 
+    const [
+        updateUserMetadata,
+        {
+            isLoading: isUpdateMetadataLoading,
+            isSuccess: isUpdateMetadataSuccess,
+            isError: isUpdateMetadataError,
+        },
+    ] = useUpdateUserMetadataMutation();
+
     useEffect(() => {
         dispatch(setStudySets(studySetsData));
     }, [studySetsData]);
@@ -76,15 +86,19 @@ const Home = (props: Props) => {
     const [isFavorited, setIsFavorited] = useState(false);
 
     const [selectedView, setSelectedView] = useState("table");
-    const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
-    const [anchorEl, setAnchorEl] = useState(false);
 
-    const [contextMenuStudyset, setContextMenuStudyset] = useState<Studyset | null>(null);
-
+    const [contextMenuStudyset, setContextMenuStudyset] =
+        useState<Studyset | null>(null);
     const [contextMenu, setContextMenu] = useState<{
         mouseX: number;
         mouseY: number;
     } | null>(null);
+    const [sortModel, setSortModel] = useState<GridSortModel>([
+        {
+            field: "lastViewed",
+            sort: "desc",
+        }
+    ]);
 
     const navigate = useNavigate();
 
@@ -93,14 +107,14 @@ const Home = (props: Props) => {
         switch (type) {
             case CONFIRM_DIALOGS.DUPLICATE:
                 dialogProps = {
-                    title: "Duplicate this study set?",
+                    title: `Duplicate the study set "${studyset.title}"?`,
                     dialogMessage:
                         "Are you sure you want to duplicate this set?",
                 };
                 break;
             case CONFIRM_DIALOGS.DELETE:
                 dialogProps = {
-                    title: "Delete this study set?",
+                    title: `Delete the study set "${studyset.title}"?`,
                     dialogMessage: "Are you sure you want to delete this set?",
                 };
                 break;
@@ -140,37 +154,61 @@ const Home = (props: Props) => {
             valueGetter: ({ value }) => value && new Date(value),
         },
         {
+            field: "lastViewed",
+            headerName: "Last Viewed",
+            type: "date",
+            width: 150,
+            editable: false,
+            valueGetter: ({ value }) => value && new Date(value),
+        },
+        {
+            field: "numberOfCards",
+            headerName: "# of Cards",
+            width: 100,
+            valueGetter: (params) => {
+                return params.row?.cards?.length;
+            },
+        },
+        {
             field: "label",
             headerName: "Label",
             width: 200,
             editable: false,
-        }
+        },
     ];
 
     const handleFavoriteFilter = () => {};
 
-    const handleViewChange = (event: any, newView: string | null) => {
+    const handleViewChange = (_event: any, newView: string | null) => {
         if (newView !== null) {
+            updateUserMetadata({
+                uuid: userUUID,
+                property: "homeView",
+                newValue: newView,
+            });
             setSelectedView(newView);
         }
     };
 
-    const onRowDoubleClick: GridEventListener<'rowDoubleClick'> = (
-        params,  // GridRowParams
-        event,   // MuiEvent<React.MouseEvent<HTMLElement>>
-        details, // GridCallbackDetails
-      ) => {
+    const onRowDoubleClick: GridEventListener<"rowDoubleClick"> = (
+        params, // GridRowParams
+        event, // MuiEvent<React.MouseEvent<HTMLElement>>
+        details // GridCallbackDetails
+    ) => {
         console.log({ params, event, details });
         const { row } = params;
         dispatch(setSelectedStudySet(row));
         navigate(`/view/${row.uuid}`);
-    }
+    };
 
     const handleContextMenu = (event: React.MouseEvent) => {
         console.log("HELP = ", { event });
         event.preventDefault();
-        
-        const localStudyset = studySetsData.find((studyset: Studyset) => studyset.uuid === event.currentTarget.getAttribute('data-id'))
+
+        const localStudyset = studySetsData.find(
+            (studyset: Studyset) =>
+                studyset.uuid === event.currentTarget.getAttribute("data-id")
+        );
         if (localStudyset) {
             setContextMenuStudyset(localStudyset);
         }
@@ -209,6 +247,8 @@ const Home = (props: Props) => {
                                     rows={studysets}
                                     columns={columns}
                                     pageSizeOptions={[10, 25, 100]}
+                                    sortModel={sortModel}
+                                    onSortModelChange={(model) => setSortModel(model)}
                                     checkboxSelection
                                     // disableSelectionOnClick
                                     onRowDoubleClick={onRowDoubleClick}
@@ -235,30 +275,31 @@ const Home = (props: Props) => {
                                     getRowId={(row) => row.uuid}
                                 />
                                 <SetActionsMenu
-                                     anchorPosition={
-                                         contextMenu !== null
-                                             ? {
-                                                   top: contextMenu.mouseY,
-                                                   left: contextMenu.mouseX,
-                                               }
-                                             : undefined
-                                     }
-                                     anchorReference="anchorPosition"
-                                     onClose={handleCloseContextMenu}
-                                     open={contextMenu !== null}
-                                     slotProps={{
-                                         root: {
-                                             onContextMenu: (e) => {
-                                                 e.preventDefault();
-                                                 handleCloseContextMenu();
-                                             },
-                                         },
-                                     }}
-                                     studyset={contextMenuStudyset}
-                                     anchorEl={null}
-                                     handleShowConfirmDialog={handleShowConfirmDialog}
+                                    anchorPosition={
+                                        contextMenu !== null
+                                            ? {
+                                                  top: contextMenu.mouseY,
+                                                  left: contextMenu.mouseX,
+                                              }
+                                            : undefined
+                                    }
+                                    anchorReference="anchorPosition"
+                                    onClose={handleCloseContextMenu}
+                                    open={contextMenu !== null}
+                                    slotProps={{
+                                        root: {
+                                            onContextMenu: (e) => {
+                                                e.preventDefault();
+                                                handleCloseContextMenu();
+                                            },
+                                        },
+                                    }}
+                                    studyset={contextMenuStudyset}
+                                    anchorEl={null}
+                                    handleShowConfirmDialog={
+                                        handleShowConfirmDialog
+                                    }
                                 />
-
                             </>
                         ) : (
                             <HomeGridView

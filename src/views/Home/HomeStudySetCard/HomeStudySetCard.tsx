@@ -9,7 +9,7 @@ import { useTheme } from "theme/useTheme";
 import {
     CardBottom,
     CardContent,
-    CardDesc,
+    CardDescription,
     CardInfo,
     CardTitle,
     HomeSetCard,
@@ -24,11 +24,13 @@ import { useNavigate } from 'react-router-dom';
 
 type Props = {
     studyset: any;
+    handleShowConfirmDialog: any;
 }
 
 const HomeStudySetCard = (props: Props) => {
     const {
         studyset,
+        handleShowConfirmDialog
     } = props;
 
     const {
@@ -44,23 +46,14 @@ const HomeStudySetCard = (props: Props) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [isFavorited, setIsFavorited] = useState(false);
 
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
-    const [anchorEl, setAnchorEl] = useState(false);
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
     const onCardClick = () => {
         dispatch(setSelectedStudySet(studyset));
         navigate(`/view/${uuid}`);
-    }
-
-    const handleShowDeleteConfirmation = () => {
-        setShowDeleteConfirmation(true);
-    }
-
-    const handleCloseDeleteConfirmation = () => {
-        setShowDeleteConfirmation(false);
     }
 
     const openActionsMenu = (event) => {
@@ -71,14 +64,6 @@ const HomeStudySetCard = (props: Props) => {
     const closeActionsMenu = () => {
         setAnchorEl(null)
         setActionsMenuOpen(false);
-    }
-
-    const actionMenuProps = {
-        studyset,
-        open: actionsMenuOpen,
-        onClose: closeActionsMenu,
-        anchorEl: anchorEl,
-        handleShowDeleteConfirmation,
     }
 
     return (
@@ -94,9 +79,9 @@ const HomeStudySetCard = (props: Props) => {
                     >
                         {title}
                     </CardTitle>
-                    <CardDesc>
+                    <CardDescription>
                         {description}
-                    </CardDesc>
+                    </CardDescription>
                     <CardInfo>
                         <TermsLabel>{cards.length} Terms</TermsLabel>
                         <SpacedContainer>
@@ -119,7 +104,11 @@ const HomeStudySetCard = (props: Props) => {
                             <MoreHoriz />
                         </IconButton>
                         <SetActionsMenu
-                            {...actionMenuProps}
+                            studyset={studyset}
+                            open={actionsMenuOpen}
+                            onClose={closeActionsMenu}
+                            anchorEl={anchorEl}
+                            handleShowConfirmDialog={handleShowConfirmDialog}
                         />
                     </CardBottom>
                 </CardContent>
