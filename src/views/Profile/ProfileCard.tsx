@@ -2,8 +2,8 @@ import { AddPhotoAlternate as AddPhotoIcon } from "@mui/icons-material";
 import { Typography } from "@mui/material/";
 import { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { selectUserData } from "state/slices/globalSlice";
-import { selectStudySets } from "state/slices/studysetsSlice";
+import { selectUserData } from "state/slices/global";
+import { selectStudySets } from "state/slices/studysets";
 import { useTheme } from "theme/useTheme";
 import {
     ProfilePicture,

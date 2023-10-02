@@ -7,7 +7,7 @@ import {
     DialogContent,
 } from '@mui/material/';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectDialogProps, setDialogProps } from 'state/slices/globalSlice';
+import { selectDialogProps, setDialogProps } from 'state/slices/global';
 import {
     ConfirmDialogProps
 } from "lib/types"

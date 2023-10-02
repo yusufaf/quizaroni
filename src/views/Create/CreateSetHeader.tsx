@@ -31,7 +31,7 @@ import {
 } from "./CreateSetStyles";
 import HeaderAdvancedSection from "./HeaderAdvancedSection";
 import { useSelector } from "react-redux";
-import { selectUserData } from "state/slices/globalSlice";
+import { selectUserData } from "state/slices/global";
 
 type Props = {
     advancedSectionProps: any;
@@ -72,7 +72,7 @@ const CreateSetHeader = (props: Props) => {
 
     const renderLabelOptions = () => {
         const { labels = [] } = userData;
-        const labelJsx = [];
+        const labelJsx: any[] = [];
 
         labelJsx.push(
             <LabelMenuItem key="" value="" sx={{ width: "10rem" }}>
@@ -113,7 +113,6 @@ const CreateSetHeader = (props: Props) => {
                         <TitleInput
                             variant="standard"
                             placeholder={CREATE_SET.TITLE_PLACEHOLDER}
-                            // label="Title"
                             value={title}
                             onChange={onTitleChange}
                             size="small"

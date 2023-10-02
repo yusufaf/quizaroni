@@ -21,7 +21,7 @@ const StudysetSettings = (props: Props) => {
         useUpdateStudysetMetadataMutation();
 
     const handleAlignmentChange = (
-        event: React.MouseEvent<HTMLElement>,
+        _event: React.MouseEvent<HTMLElement>,
         newAlignment: string | null,
       ) => {
         updateStudysetMetadata({
@@ -29,9 +29,7 @@ const StudysetSettings = (props: Props) => {
             newValue: newAlignment,
             uuid: studyset?.uuid ?? "",
         });
-        // setAlignment(newAlignment);
     };
-    
 
     return (
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
@@ -49,8 +47,7 @@ const StudysetSettings = (props: Props) => {
                         Notes Drawer Alignment
                     </Typography>
                     <ToggleButtonGroup
-                        value={NOTES_DRAWER_POSITIONS.LEFT}
-                        // value={studyset?.metadata?.notesDrawerPosition ?? "left"}
+                        value={studyset?.metadata?.notesDrawerPosition ?? NOTES_DRAWER_POSITIONS.LEFT}
                         exclusive
                         aria-label="notes drawer alignment"
                         onChange={handleAlignmentChange}

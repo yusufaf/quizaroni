@@ -25,7 +25,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Studyset } from "lib/types";
 import { Dispatch, SetStateAction } from "react";
 import { useDispatch } from "react-redux";
-import { setSelectedDialog } from "state/slices/viewSetsSlice";
+import { setSelectedDialog } from "state/slices/viewSets";
 
 import CustomIconButton from "components/CustomIconButton/CustomIconButton";
 

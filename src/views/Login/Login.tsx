@@ -21,8 +21,8 @@ import {
     setAuthenticated,
     setUserData,
     selectUserData,
-} from "state/slices/globalSlice";
-import { selectStudySets, setStudySets } from "state/slices/studysetsSlice";
+} from "state/slices/global";
+import { selectStudySets, setStudySets } from "state/slices/studysets";
 import { Auth } from "@aws-amplify/auth";
 import axios from "axios";
 import { useGetAllStudysetsQuery } from "state/api/studysets";

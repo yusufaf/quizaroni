@@ -16,11 +16,11 @@ import {
     useUpdateLastViewedMutation,
     useUpdateStudysetMetadataMutation,
 } from "state/api/studysets";
-import { selectUserData, setDialogProps } from "state/slices/globalSlice";
+import { selectUserData, setDialogProps } from "state/slices/global";
 import {
     selectSelectedDialog,
     setSelectedDialog,
-} from "state/slices/viewSetsSlice";
+} from "state/slices/viewSets";
 import {
     CONFIRM_DIALOGS,
     DEFAULT_CATEGORIES,
