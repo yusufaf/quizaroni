@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Paper } from "@mui/material";
 import { Auth } from "@aws-amplify/auth";
 import { useSelector } from "react-redux";
-import { selectCognitoUser } from "state/slices/globalSlice";
+import { selectCognitoUser } from "state/slices/global";
 import { useNavigate } from "react-router-dom";
 import {
     ConfirmBtn,

@@ -13,7 +13,7 @@ import {
     selectAuthenticated,
     selectCognitoUser,
     selectUserData,
-} from "state/slices/globalSlice";
+} from "state/slices/global";
 import { useTheme } from "theme/useTheme";
 import { CREATE_PAGE_TYPES, PAGES } from "utilities/constants";
 import { v4 as uuidv4 } from "uuid";
@@ -23,6 +23,7 @@ import { AddCardButton, AddCardIcon, CreateSetPage } from "./CreateSetStyles";
 import ImportSetModal from "./ImportSetModal/ImportSetModal";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import SetModificationButtons from "./SetModificationButtons";
+import { Virtuoso } from "react-virtuoso";
 
 const EMPTY_CARD: InitialCard = {
     term: "",
@@ -86,8 +87,6 @@ const CreateSet = (props: Props) => {
         descInput: false,
     });
 
-    const createSetDisabled = !title || !description;
-
     const [advancedExpanded, setAdvancedExpanded] = useState(false);
     const [blankCardsCount, setBlankCardsCount] = useState(0);
 
@@ -124,13 +123,6 @@ const CreateSet = (props: Props) => {
                 username,
                 userUUID,
             };
-
-            console.log({ cards, cognitoUser, studySet });
-            // if (label) {
-            //     createNewLabel();
-            // }
-
-            console.log("Successfully created new flash set");
 
             createStudySet(studySet)
                 .unwrap()
@@ -214,7 +206,6 @@ const CreateSet = (props: Props) => {
      * Render the JSX for all the card inputs
        Re-compute the JSX array when the "createdSetCards" prop changes. 
     */
-
     const cardInputs = useMemo(() => {
         return createdSetCards.map((_, index: number) => {
             const cardValues = createdSetCards[index];
@@ -286,7 +277,7 @@ const CreateSet = (props: Props) => {
     const headerProps = {
         advancedSectionProps,
         createNewSet,
-        description: description,
+        description,
         label: enteredLabel,
         onDescriptionChange,
         onLabelChange,
@@ -294,7 +285,7 @@ const CreateSet = (props: Props) => {
         onTitleChange,
         selectedLabel,
         setShowImportModal,
-        title: title,
+        title,
         pageType,
     };
 

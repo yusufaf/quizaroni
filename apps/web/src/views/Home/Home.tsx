@@ -15,12 +15,12 @@ import {
     selectAuthenticated,
     selectUserData,
     setDialogProps,
-} from "state/slices/globalSlice";
+} from "state/slices/global";
 import {
     selectStudySets,
     setSelectedStudySet,
     setStudySets,
-} from "state/slices/studysetsSlice";
+} from "state/slices/studysets";
 import { useTheme } from "theme/useTheme";
 import { CONFIRM_DIALOGS, FLASHSET_VIEWS } from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";

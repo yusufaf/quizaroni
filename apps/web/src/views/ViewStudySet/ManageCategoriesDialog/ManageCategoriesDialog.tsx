@@ -16,7 +16,7 @@ import {
     useDeleteCategoryMutation,
     useEditCategoryMutation,
 } from "state/api/studysets";
-import { selectUserData } from "state/slices/globalSlice";
+import { selectUserData } from "state/slices/global";
 import { capitalizeFirstLetter } from "utilities/functions";
 import AssignTabView from "./AssignTabView";
 import CategoriesList from "./CategoriesList";

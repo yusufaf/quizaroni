@@ -7,7 +7,7 @@ import {
     DialogContentText,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { selectDialogOpen, setDialogOpen } from "state/slices/globalSlice";
+import { selectDialogOpen, setDialogOpen } from "state/slices/global";
 import styled from "@emotion/styled";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
