@@ -33,6 +33,7 @@ export type StudysetMetadata = {
     customTerminology: string;
     labelTerminology: string;
     customLabelTerminology: string;
+    notesDrawerPosition: string;
 };
 
 export type Studyset = {

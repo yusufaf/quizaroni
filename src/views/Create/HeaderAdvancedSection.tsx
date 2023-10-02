@@ -5,7 +5,7 @@ import {
     ExpandMore as ExpandMoreIcon,
     ExpandLess as ExpandLessIcon,
 } from "@mui/icons-material";
-import { setAlert } from "state/slices/globalSlice";
+import { setAlert } from "state/slices/global";
 import { useDispatch } from 'react-redux';
 
 type Props = {
