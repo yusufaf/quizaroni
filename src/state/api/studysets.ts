@@ -168,7 +168,7 @@ export const studysetsApi = api.injectEndpoints({
         }),
         deleteNote: build.mutation<void, DeleteNoteParams>({
             query: ({ cardUUID, noteUUID }) => ({
-                url: "studysets/createNote",
+                url: "studysets/deleteNote",
                 method: "POST",
                 body: { cardUUID, noteUUID },
             }),
@@ -176,7 +176,7 @@ export const studysetsApi = api.injectEndpoints({
         }),
         editNote: build.mutation<void, EditNoteParams>({
             query: ({ cardUUID, noteUUID, text }) => ({
-                url: "studysets/createNote",
+                url: "studysets/editNote",
                 method: "POST",
                 body: { cardUUID, noteUUID, text },
             }),
