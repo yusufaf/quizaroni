@@ -259,19 +259,6 @@ const Home = (props: Props) => {
                                             style: { cursor: "context-menu" },
                                         },
                                     }}
-                                    // components={{ Toolbar: GridToolbar }}
-                                    // componentsProps={{
-                                    //     toolbar: {
-                                    //         // showQuickFilter: true,
-                                    //         // quickFilterProps: {
-                                    //         //     debounceMs: 500,
-                                    //         // },
-                                    //     },
-                                    //     row: {
-                                    //         onContextMenu: handleContextMenu,
-                                    //         style: { cursor: 'context-menu' },
-                                    //     }
-                                    // }}
                                     getRowId={(row) => row.uuid}
                                 />
                                 <SetActionsMenu

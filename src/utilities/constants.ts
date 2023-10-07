@@ -91,7 +91,7 @@ export const MIME_TYPES: { [key: string]: string } = {
 export const FLASHSET_VIEWS = {
     TABLE: "table",
     GRID: "grid",
-    TEXT: "text",
+    HTML: "html",
 };
 
 // Define regex patterns for each requirement

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import FeedbackDialog from "components/FeedbackDialog/FeedbackDialog";
 import Footer from "views/Footer/Footer";
 import NavBar from "views/NavBar/NavBar";
-import { useTheme } from "./theme/useTheme";
+import { useTheme } from "theme/useTheme";
 import { DARK, LIGHT } from "utilities/constants";
 import { handleDesktopZoom } from "utilities/handleDesktopZoom";
 import AppRoutes from "./AppRoutes";

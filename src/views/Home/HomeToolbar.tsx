@@ -8,6 +8,7 @@ import {
     GridView as GridViewIcon,
     Search as SearchIcon,
     TableView as TableViewIcon,
+    Html as HTMLIcon
 } from "@mui/icons-material";
 import { FLASHSET_VIEWS } from "utilities/constants";
 import { SpacedFlexContainer } from "common/AppStyles";
@@ -60,11 +61,11 @@ const HomeToolbar = (props: Props) => {
                     <GridViewIcon />
                 </ToggleButton>
                 <ToggleButton
-                    value={FLASHSET_VIEWS.GRID}
+                    value={FLASHSET_VIEWS.HTML}
                     key="right"
-                    title="Grid View"
+                    title="HTML Table View"
                 >
-                    <GridViewIcon />
+                    <HTMLIcon />
                 </ToggleButton>
             </ToggleButtonGroup>
         </SpacedFlexContainer>
