@@ -169,6 +169,7 @@ export const VIEW_SET_DIALOGS: { [key: string]: string } = {
     CATEGORIES: "CATEGORIES",
     SETTINGS: "SETTINGS",
     PRINT: "PRINT",
+    SHARE: "SHARE",
 }
 
 export const NOTES_DRAWER_POSITIONS = {

@@ -17,10 +17,7 @@ import {
     useUpdateStudysetMetadataMutation,
 } from "state/api/studysets";
 import { selectUserData, setDialogProps } from "state/slices/global";
-import {
-    selectSelectedDialog,
-    setSelectedDialog,
-} from "state/slices/viewSets";
+import { selectSelectedDialog, setSelectedDialog } from "state/slices/viewSets";
 import {
     CONFIRM_DIALOGS,
     DEFAULT_CATEGORIES,
@@ -135,30 +132,8 @@ const ViewStudySet = (props: Props) => {
         }
     };
 
-    const handleDeleteStudyset = () => {
-        const dialogProps = {
-            open: true,
-            title: "Delete this study set?",
-            dialogMessage: "Are you sure you want to delete this set?",
-            type: CONFIRM_DIALOGS.DELETE,
-            props: {
-                uuid: selectedStudyset?.uuid ?? "",
-            },
-        };
-        dispatch(setDialogProps(dialogProps));
-    };
-
     const handleBackClick = () => {
         navigate("/");
-    };
-
-    const actionSectionProps = {
-        controlAnchorRef,
-        updateMetadataField,
-        setShowControlMenu,
-        showControlMenu,
-        selectedStudyset,
-        handleDeleteStudyset,
     };
 
     const sortedViewFlashCards = useSortViewCards({
@@ -179,7 +154,7 @@ const ViewStudySet = (props: Props) => {
     // )
     // :
 
-    const handleShowManageLabelsDialog = () => {
+    const showManageLabelsDialog = () => {
         dispatch(setSelectedDialog(VIEW_SET_DIALOGS.LABELS));
     };
 
@@ -212,18 +187,23 @@ const ViewStudySet = (props: Props) => {
                                 >
                                     <Chip
                                         label={
-                                            selectedStudyset?.label
-                                                ? selectedStudyset.label
-                                                : "No label selected"
+                                            selectedStudyset?.label ??
+                                            "No label selected"
                                         }
                                         variant="outlined"
-                                        onClick={handleShowManageLabelsDialog}
+                                        onClick={showManageLabelsDialog}
                                     />
                                 </Tooltip>
                                 <Typography variant="body1">
                                     {selectedStudyset?.description}
                                 </Typography>
-                                <StudysetActions {...actionSectionProps} />
+                                <StudysetActions
+                                    controlAnchorRef={controlAnchorRef}
+                                    updateMetadataField={updateMetadataField}
+                                    setShowControlMenu={setShowControlMenu}
+                                    showControlMenu={showControlMenu}
+                                    selectedStudyset={selectedStudyset}
+                                />
                             </StudysetInfo>
                             {/* <div className={viewFlashStyles.studySection}>
                                             <Typography
@@ -277,10 +257,7 @@ const ViewStudySet = (props: Props) => {
                         />
                     );
                 })}
-                <NotesDrawer
-                    open={true}
-                    selectedStudyset={selectedStudyset}
-                />
+                <NotesDrawer open={true} selectedStudyset={selectedStudyset} />
             </ViewStudysetPage>
             <ManageLabelsDialog
                 labels={labels}
