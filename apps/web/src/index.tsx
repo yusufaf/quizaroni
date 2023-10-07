@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
-import { CustomThemeProvider } from "./theme/ThemeProvider";
+import { CustomThemeProvider } from "./lib/theme/ThemeProvider";
 import { CssBaseline } from "@mui/material";
 import AuthProvider from "./AuthProvider/AuthProvider";
 

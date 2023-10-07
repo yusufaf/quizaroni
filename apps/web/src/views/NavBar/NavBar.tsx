@@ -159,7 +159,6 @@ const NavBar = (props: Props) => {
                                         ref={dropdownRef}
                                     >
                                         <StyledAccountIcon />
-                                        <StyledArrowIcon />
                                     </ProfileIconContainer>
                                     <ProfileDropdown
                                         showDropdown={showDropdown}

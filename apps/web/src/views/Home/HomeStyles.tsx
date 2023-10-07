@@ -17,7 +17,9 @@ export const HomeContainer = styled(Box)({
 
 export const HomeSetsHeading = styled(BoldTypography)({})
 
-export const HomeSetsContainer = styled(Box)({
+export const HomeSetsContainer = styled("div")({
+    display: "flex",
+    flexDirection: "column",
     height: "40rem",
     marginTop: "1rem"
 })
