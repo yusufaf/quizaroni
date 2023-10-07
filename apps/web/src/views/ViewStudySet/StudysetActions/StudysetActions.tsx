@@ -17,8 +17,15 @@ import {
     MenuOpen,
     Print,
     Settings,
+    Share,
 } from "@mui/icons-material/";
-import { DISABLED, ENABLED, SET_METADATA_FIELDS, VIEW_SET_DIALOGS } from "utilities/constants";
+import {
+    CONFIRM_DIALOGS,
+    DISABLED,
+    ENABLED,
+    SET_METADATA_FIELDS,
+    VIEW_SET_DIALOGS,
+} from "utilities/constants";
 import { useTheme } from "theme/useTheme";
 import { ActionButtonsRow } from "../styles";
 import { useNavigate, useParams } from "react-router-dom";
@@ -26,8 +33,8 @@ import { Studyset } from "lib/types";
 import { Dispatch, SetStateAction } from "react";
 import { useDispatch } from "react-redux";
 import { setSelectedDialog } from "state/slices/viewSets";
-
 import CustomIconButton from "components/CustomIconButton/CustomIconButton";
+import { setDialogProps } from "state/slices/global";
 
 type Props = {
     controlAnchorRef: any;
@@ -35,7 +42,6 @@ type Props = {
     setShowControlMenu: Dispatch<SetStateAction<boolean>>;
     showControlMenu: any;
     selectedStudyset: Studyset | undefined;
-    handleDeleteStudyset: () => void;
 };
 
 const StudysetActions = (props: Props) => {
@@ -45,14 +51,12 @@ const StudysetActions = (props: Props) => {
         setShowControlMenu,
         showControlMenu,
         selectedStudyset,
-        handleDeleteStudyset,
     } = props;
 
     const { theme } = useTheme();
     const navigate = useNavigate();
     const { id: studySetUUID } = useParams();
     const dispatch = useDispatch();
-
 
     const handleOpenControlMenu = () => {
         setShowControlMenu(true);
@@ -92,6 +96,23 @@ const StudysetActions = (props: Props) => {
         dispatch(setSelectedDialog(dialog));
     };
 
+    /**
+     * Displays the confirmation dialog for deleting a studyset
+     * @returns {void}
+     */
+    const handleDeleteStudyset = () => {
+        const dialogProps = {
+            open: true,
+            title: "Delete this study set?",
+            dialogMessage: "Are you sure you want to delete this set?",
+            type: CONFIRM_DIALOGS.DELETE,
+            props: {
+                uuid: selectedStudyset?.uuid ?? "",
+            },
+        };
+        dispatch(setDialogProps(dialogProps));
+    };
+
     /*
         Former Implementation of tooltip buttons:
         <Tooltip title="Edit Study Set">
@@ -120,7 +141,9 @@ const StudysetActions = (props: Props) => {
                     title={"Manage Notifications"}
                     color="primary"
                     icon={<EditNotifications />}
-                    onClick={() => handleShowDialog(VIEW_SET_DIALOGS.NOTIFICATIONS)}
+                    onClick={() =>
+                        handleShowDialog(VIEW_SET_DIALOGS.NOTIFICATIONS)
+                    }
                 />
                 {/* <CustomIconButton
                     title={"Control Menu"}
@@ -151,6 +174,12 @@ const StudysetActions = (props: Props) => {
                     color="primary"
                     icon={<Settings />}
                     onClick={() => handleShowDialog(VIEW_SET_DIALOGS.SETTINGS)}
+                />
+                <CustomIconButton
+                    title={"Share"}
+                    color="primary"
+                    icon={<Share />}
+                    onClick={() => handleShowDialog(VIEW_SET_DIALOGS.SHARE)}
                 />
             </ActionButtonsRow>
             <Menu
@@ -214,7 +243,7 @@ const StudysetActions = (props: Props) => {
                         }
                     />
                 </MenuItem>
-                <MenuItem>
+                {/* <MenuItem>
                     <FormControlLabel
                         control={
                             <Switch
@@ -241,7 +270,7 @@ const StudysetActions = (props: Props) => {
                             </Typography>
                         }
                     />
-                </MenuItem>
+                </MenuItem> */}
             </Menu>
         </>
     );

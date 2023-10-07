@@ -15,10 +15,8 @@ import {
     Tab,
     Tabs,
 } from "@mui/material/";
-import { Close as CloseIcon } from "@mui/icons-material/";
 import { TABS, ACTIONS } from "./constants";
 import {
-    CloseButton,
     DeleteLabelWarning,
     LabelField,
     StyledDialog,

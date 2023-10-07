@@ -1,4 +1,4 @@
-import { DataGrid, GridEventListener, GridSortModel } from "@mui/x-data-grid";
+import { DataGrid, GridEventListener, GridSortModel, GridToolbar } from "@mui/x-data-grid";
 import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import useCustomMutation from "lib/hooks/useCustomMutation";
@@ -97,7 +97,7 @@ const Home = (props: Props) => {
         {
             field: "lastViewed",
             sort: "desc",
-        }
+        },
     ]);
 
     const navigate = useNavigate();
@@ -248,12 +248,17 @@ const Home = (props: Props) => {
                                     columns={columns}
                                     pageSizeOptions={[10, 25, 100]}
                                     sortModel={sortModel}
-                                    onSortModelChange={(model) => setSortModel(model)}
+                                    onSortModelChange={(model) =>
+                                        setSortModel(model)
+                                    }
                                     checkboxSelection
                                     // disableSelectionOnClick
                                     onRowDoubleClick={onRowDoubleClick}
+                                    slots={{ toolbar: GridToolbar }}
                                     slotProps={{
-                                        // toolbar: GridToolbar,
+                                        toolbar: {
+                                            showQuickFilter: true,
+                                        },
                                         row: {
                                             onContextMenu: handleContextMenu,
                                             style: { cursor: "context-menu" },
