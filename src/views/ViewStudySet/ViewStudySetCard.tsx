@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { useTheme } from "theme/useTheme";
-import { Chip, IconButton, Tooltip, Typography } from "@mui/material/";
+import { IconButton, Popover, Tooltip, Typography } from "@mui/material/";
 import { SpeakerNotes, Star, StarBorder, VolumeUp } from "@mui/icons-material";
 import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import {
@@ -26,24 +26,13 @@ type Props = {
     selectedStudyset: Studyset;
 };
 
-// Helper function to calculate the total width of the chips
-const getTotalChipsWidth = (chips: any[]) => {
-    return chips.reduce((acc, chip) => {
-        const chipWidth = chip.offsetWidth;
-        return acc + chipWidth;
-    }, 0);
-};
-
 const ViewStudySetCard = (props: Props) => {
     const { card, index, selectedStudyset } = props;
 
     const { isDarkMode, theme } = useTheme();
     const { speak, cancel } = useSpeechSynthesis();
 
-    const [chipsToShowMap, setChipsToShowMap] = useState<{
-        [key: string]: number;
-    }>({});
-    const [isViewAllOpen, setIsViewAllOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
     const timeoutRef = useRef(null);
     const chipContainerRef = useRef(null);
@@ -65,58 +54,6 @@ const ViewStudySetCard = (props: Props) => {
             : selectedLabelTerminology;
 
     const [markCardAsImportant] = useMarkCardAsImportantMutation();
-
-    useEffect(() => {
-        const updateChipsDisplay = () => {
-            if (chipContainerRef.current) {
-                // @ts-ignore
-                const chips =
-                    chipContainerRef.current.querySelectorAll(
-                        ".MuiChip-root"
-                    ) || [];
-                //@ts-ignore
-                const availableWidth =
-                    chipContainerRef.current.parentElement.offsetWidth;
-
-                let currentCard = "";
-                let visibleChips = 0;
-                let currentWidth = 0;
-                let chipsToShow: { [key: string]: number } = {};
-
-                chips.forEach((chip: Element) => {
-                    // @ts-ignore
-                    const chipWidth = chip.offsetWidth;
-
-                    if (currentCard !== chip.id) {
-                        currentCard = chip.id;
-                        visibleChips = 0;
-                        currentWidth = 0;
-                    }
-
-                    if (currentWidth + chipWidth <= availableWidth) {
-                        visibleChips++;
-                        currentWidth += chipWidth;
-                    } else {
-                        chipsToShow[currentCard] = visibleChips;
-                        visibleChips = 1;
-                        currentWidth = chipWidth;
-                    }
-                });
-
-                // Update the last card
-                chipsToShow[currentCard] = visibleChips;
-
-                setChipsToShowMap(chipsToShow);
-            }
-        };
-
-        updateChipsDisplay();
-
-        window.addEventListener("resize", updateChipsDisplay);
-        return () => {
-            window.removeEventListener("resize", updateChipsDisplay);
-        };
-    }, [categories, chipContainerRef.current]);
 
     // TODO: Adjust to clear timeout / reset if clicked multiple times
     const handleAudioPlayback = () => {
@@ -145,9 +82,16 @@ const ViewStudySetCard = (props: Props) => {
         });
     };
 
-    const visibleChipsCount = chipsToShowMap[card.id] || 0;
-    const categoriesToDisplay = categories.slice(0, visibleChipsCount);
-    const remainingCategories = categories.slice(visibleChipsCount);
+    /* ==== Categories Popover ==== */
+    const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+      setAnchorEl(event.currentTarget);
+    };
+  
+    const handlePopoverClose = () => {
+      setAnchorEl(null);
+    };
+  
+    const open = Boolean(anchorEl);
 
     return (
         <ViewFlashsetCard
@@ -168,23 +112,53 @@ const ViewStudySetCard = (props: Props) => {
                     {labelTerminology} {index + 1}
                 </BoldTypography>
                 <CategoryChips ref={chipContainerRef}>
-                    {categoriesToDisplay.map(
-                        (category: string, index: number) => (
+                    {categories.length > 3 ? (
+                        <>
                             <CategoryChip
-                                key={index}
-                                label={category}
+                                aria-owns={open ? 'mouse-over-popover' : undefined}
+                                aria-haspopup="true"
+                                onMouseEnter={handlePopoverOpen}
+                                onMouseLeave={handlePopoverClose}
+                                label={`View ${categories.length} Categories`}
                                 variant="outlined"
-                                title={category}
                             />
-                        )
-                    )}
-                    {remainingCategories.length > 0 && (
-                        <CategoryChip
-                            label={`+${remainingCategories.length}`}
-                            variant="outlined"
-                            title={`View ${remainingCategories.length} more`}
-                            onClick={() => setIsViewAllOpen(true)}
-                        />
+                            <Popover
+                                id="mouse-over-popover"
+                                sx={{
+                                    pointerEvents: "none",
+                                    maxWidth: "70rem",
+                                }}
+                                open={open}
+                                anchorEl={anchorEl}
+                                anchorOrigin={{
+                                    vertical: "top",
+                                    horizontal: "right",
+                                }}
+                                transformOrigin={{
+                                    vertical: "top",
+                                    horizontal: "left",
+                                }}
+                                onClose={handlePopoverClose}
+                                disableRestoreFocus
+                            >
+                                <Typography sx={{ p: 2, borderRadius: "0.25rem" }}>
+                                    {categories.map((category) => category).join(", ")}
+                                </Typography>
+                            </Popover>
+                        </>
+                    ) : (
+                        <>
+                            {categories.map(
+                                (category: string, index: number) => (
+                                    <CategoryChip
+                                        key={index}
+                                        label={category}
+                                        variant="outlined"
+                                        title={category}
+                                    />
+                                )
+                            )}
+                        </>
                     )}
                 </CategoryChips>
                 <ViewFlashCardActions>
