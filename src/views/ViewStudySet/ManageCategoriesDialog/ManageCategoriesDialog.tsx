@@ -38,7 +38,7 @@ type Props = {
 const ManageCategoriesDialog = (props: Props) => {
     const { open, onClose, selectedStudyset, studysets } = props;
 
-    const { uuid: studySetUUID = "" } = selectedStudyset || {};
+    const { uuid: studysetUUID = "" } = selectedStudyset || {};
 
     const dispatch = useDispatch();
     const { uuid: userUUID = "" } = useSelector(selectUserData);
@@ -140,11 +140,11 @@ const ManageCategoriesDialog = (props: Props) => {
     };
 
     const handleCreate = async () => {
-        if (!studySetUUID) {
+        if (!studysetUUID) {
             return;
         }
         createCategory({
-            uuid: studySetUUID,
+            studysetUUID,
             category: categoryName,
         });
     };
@@ -191,13 +191,13 @@ const ManageCategoriesDialog = (props: Props) => {
                     oldCategory: selectedCategoryName,
                 });
             } else if (selectedAction === ACTIONS.DELETE) {
-                for (const index of deleteIndices) {
-                    const categoryToDelete = categories[index];
-                    deleteCategory({
-                        studysetUUID: uuid,
-                        categoryToDelete,
-                    });
-                }
+                const categoriesToDelete = deleteIndices.map(
+                    (index) => categories[index]
+                );
+                deleteCategory({
+                    studysetUUID,
+                    categoriesToDelete,
+                });
             }
         } catch (error) {
             console.error(error);
@@ -208,6 +208,7 @@ const ManageCategoriesDialog = (props: Props) => {
 
     const onAssignedCategoriesChange = (e: SelectChangeEvent) => {
         assignCardCategories({
+            studysetUUID,
             cardUUID: selectedCardUUID,
             categories: e.target.value,
         });
@@ -228,7 +229,7 @@ const ManageCategoriesDialog = (props: Props) => {
 
         for (const category of categoriesToImport) {
             createCategory({
-                uuid: studySetUUID,
+                uuid: studysetUUID,
                 category,
             });
         }
@@ -239,11 +240,10 @@ const ManageCategoriesDialog = (props: Props) => {
         const categoriesToDelete: string[] = categories.filter((category) => {
             return !cards.some((card) => card.categories.includes(category));
         });
-
-        for (const category of categoriesToDelete) {
+        if (categoriesToDelete.length !== 0) {
             deleteCategory({
-                studysetUUID: uuid,
-                categoryToDelete: category,
+                studysetUUID,
+                categoriesToDelete,
             });
         }
     };

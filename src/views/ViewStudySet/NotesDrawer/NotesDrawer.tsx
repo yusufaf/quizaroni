@@ -43,7 +43,7 @@ const transitionDuration = 1000; //can also use theme.transitions.duration
 const NotesDrawer = (props: Props) => {
     const { selectedStudyset } = props;
 
-    const { uuid: studySetUUID = "", metadata } = selectedStudyset || {};
+    const { uuid: studysetUUID = "", metadata } = selectedStudyset || {};
     // TODO: Doesn't work on initial load as expected
     const [hidden, setHidden] = useState<boolean>(metadata?.notesDrawerInitial === NOTES_DRAWER_INITIAL_APPEARANCE.CLOSED);
     const [openNotes, setOpenNotes] = useState<OpenCardNotes>(new Set());
@@ -124,6 +124,7 @@ const NotesDrawer = (props: Props) => {
         handleEditingNoteToggle(noteUUID);
         if (currentValue !== editedValue) {
             editNote({
+                studysetUUID,
                 cardUUID,
                 noteUUID,
                 text: editedValue,
@@ -235,6 +236,7 @@ const NotesDrawer = (props: Props) => {
                                                 <IconButton
                                                     onClick={() =>
                                                         deleteNote({
+                                                            studysetUUID,
                                                             cardUUID,
                                                             noteUUID: uuid,
                                                         })
@@ -253,6 +255,7 @@ const NotesDrawer = (props: Props) => {
                                 sx={{ width: "100%", marginTop: "1rem" }}
                                 onClick={() => {
                                     createNote({
+                                        studysetUUID,
                                         cardUUID,
                                     });
                                 }}

@@ -76,6 +76,7 @@ const ViewStudySetCard = (props: Props) => {
      */
     const handleMarkAsImportant = async () => {
         await markCardAsImportant({
+            studysetUUID: selectedStudyset.uuid,
             cardUUID: card.uuid ?? "",
             newValue: !card.important,
         });
