@@ -50,13 +50,9 @@ const ViewStudySet = (props: Props) => {
     const {} = props;
 
     /* Hooks / Redux */
-
     const navigate = useNavigate();
     const { id: studysetUUID = "" } = useParams();
     const dispatch = useDispatch();
-    // const studySets = useSelector(selectStudySets);
-    // console.log({ studySets });
-    // const selectedStudySet = useSelector(selectSelectedStudySet);
     const { uuid: userUUID = "", labels = [] } = useSelector(selectUserData);
 
     const selectedDialog = useSelector(selectSelectedDialog);
@@ -105,28 +101,22 @@ const ViewStudySet = (props: Props) => {
         SORT_DIRECTIONS.ASC
     );
 
-    // TODO: This leads to an infinite loop. Need to figure out why.
     useEffect(() => {
-        if (!updatedViewTimestamp.current) {
+        if (!updatedViewTimestamp.current && studysetUUID) {
             updateLastViewed({
-                uuid: selectedStudyset?.uuid ?? "",
+                studysetUUID,
             });
             updatedViewTimestamp.current = true;
         }
-    }, [selectedStudyset]);
+    }, [studysetUUID]);
 
     const updateMetadataField = (property: string, newValue: any) => {
         try {
-            if (!selectedStudyset) {
-                return;
-            }
-            const { uuid } = selectedStudyset;
-            const updateBody = {
+            updateStudysetMetadata({
                 property,
                 newValue,
-                uuid,
-            };
-            updateStudysetMetadata(updateBody);
+                uuid: studysetUUID,
+            });
         } catch (error) {
             console.error("Error updating study set metadata");
         }

@@ -201,8 +201,8 @@ const Home = (props: Props) => {
         navigate(`/view/${row.uuid}`);
     };
 
+    /* ==== Right-Click Context Menu ==== */
     const handleContextMenu = (event: React.MouseEvent) => {
-        console.log("HELP = ", { event });
         event.preventDefault();
 
         const localStudyset = studySetsData.find(
