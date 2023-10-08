@@ -32,20 +32,20 @@ import {
     useEditNoteMutation,
 } from "state/api/studysets";
 import useCustomMutation from "lib/hooks/useCustomMutation";
-import { EMPTY_NOTE_PLACEHOLDER } from "utilities/constants";
+import { EMPTY_NOTE_PLACEHOLDER, NOTES_DRAWER_INITIAL_APPEARANCE } from "utilities/constants";
 
 type Props = {
-    open: boolean;
     selectedStudyset: Studyset;
 };
 
 const transitionDuration = 1000; //can also use theme.transitions.duration
 
 const NotesDrawer = (props: Props) => {
-    const { open, selectedStudyset } = props;
+    const { selectedStudyset } = props;
 
-    const { uuid: studySetUUID = "" } = selectedStudyset || {};
-    const [hidden, setHidden] = useState<boolean>(false);
+    const { uuid: studySetUUID = "", metadata } = selectedStudyset || {};
+    // TODO: Doesn't work on initial load as expected
+    const [hidden, setHidden] = useState<boolean>(metadata?.notesDrawerInitial === NOTES_DRAWER_INITIAL_APPEARANCE.CLOSED);
     const [openNotes, setOpenNotes] = useState<OpenCardNotes>(new Set());
     const [currentEditKey, setCurrentEditKey] = useState<string>();
 

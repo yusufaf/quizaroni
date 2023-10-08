@@ -35,7 +35,6 @@ const ViewStudySetCard = (props: Props) => {
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
     const timeoutRef = useRef(null);
-    const chipContainerRef = useRef(null);
 
     const { categories = [] } = card;
 
@@ -111,7 +110,7 @@ const ViewStudySetCard = (props: Props) => {
                 <BoldTypography variant="h5">
                     {labelTerminology} {index + 1}
                 </BoldTypography>
-                <CategoryChips ref={chipContainerRef}>
+                <CategoryChips>
                     {categories.length > 3 ? (
                         <>
                             <CategoryChip

@@ -1,5 +1,5 @@
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import FeedbackDialog from "components/FeedbackDialog/FeedbackDialog";
 import Footer from "views/Footer/Footer";
 import NavBar from "views/NavBar/NavBar";

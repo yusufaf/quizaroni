@@ -178,3 +178,8 @@ export const NOTES_DRAWER_POSITIONS = {
 }
 
 export const EMPTY_NOTE_PLACEHOLDER = "Enter text for the note";
+
+export const NOTES_DRAWER_INITIAL_APPEARANCE = {
+    OPEN: "open",
+    CLOSED: "closed",
+}
