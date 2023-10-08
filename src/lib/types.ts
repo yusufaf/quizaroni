@@ -34,6 +34,7 @@ export type StudysetMetadata = {
     labelTerminology: string;
     customLabelTerminology: string;
     notesDrawerPosition: string;
+    notesDrawerInitial: string; 
 };
 
 export type Studyset = {

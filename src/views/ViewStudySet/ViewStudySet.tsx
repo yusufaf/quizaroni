@@ -257,7 +257,7 @@ const ViewStudySet = (props: Props) => {
                         />
                     );
                 })}
-                <NotesDrawer open={true} selectedStudyset={selectedStudyset} />
+                <NotesDrawer selectedStudyset={selectedStudyset} />
             </ViewStudysetPage>
             <ManageLabelsDialog
                 labels={labels}
