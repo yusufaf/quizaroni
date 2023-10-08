@@ -54,6 +54,10 @@ export type Studyset = {
 
 /* RTK Query Types */
 
+export type StudysetUUIDPayload = {
+    studysetUUID: UUID;
+}
+
 export type GetAllStudysetsParams = {
     userUUID: UUID;
 };
@@ -81,13 +85,13 @@ export type UpdateMetadataParams = {
 };
 
 export type CreateCategoryParams = {
-    uuid: UUID;
+    studysetUUID: UUID;
     category: string;
 };
 
 export type DeleteCategoryParams = {
     studysetUUID: UUID;
-    categoryToDelete: string;
+    categoriesToDelete: string;
 };
 
 export type EditCategoryParams = {
@@ -98,25 +102,30 @@ export type EditCategoryParams = {
 };
 
 export type AssignCardCategoriesParams = {
+    studysetUUID: UUID;
     cardUUID: UUID;
     categories: string[];
 }
 
 export type MarkCardAsImportantParams = {
+    studysetUUID: UUID;
     cardUUID: UUID;
     newValue: boolean;
 }
 
 export type CreateNoteParams = {
+    studysetUUID: UUID;
     cardUUID: UUID;
 }
 
 export type DeleteNoteParams = {
+    studysetUUID: UUID;
     cardUUID: UUID;
     noteUUID: UUID;
 }
 
 export type EditNoteParams = {
+    studysetUUID: UUID;
     cardUUID: UUID;
     noteUUID: UUID;
     text: string;
