@@ -49,7 +49,6 @@ export type Studyset = {
     userUUID: UUID;
     username: string;
     uuid: UUID;
-    _id: UUID;
 };
 
 /* RTK Query Types */
@@ -84,56 +83,46 @@ export type UpdateMetadataParams = {
     newValue: any;
 };
 
-export type CreateCategoryParams = {
-    studysetUUID: UUID;
+export type CreateCategoryParams = StudysetUUIDPayload & {
     category: string;
 };
 
-export type DeleteCategoryParams = {
-    studysetUUID: UUID;
+export type DeleteCategoryParams = StudysetUUIDPayload & {
     categoriesToDelete: string;
 };
 
-export type EditCategoryParams = {
-    studysetUUID: UUID;
+export type EditCategoryParams = StudysetUUIDPayload & {
     index: number;
     newCategory: string;
     oldCategory: string;
 };
 
-export type AssignCardCategoriesParams = {
-    studysetUUID: UUID;
+export type AssignCardCategoriesParams = StudysetUUIDPayload & {
     cardUUID: UUID;
     categories: string[];
 }
 
-export type MarkCardAsImportantParams = {
-    studysetUUID: UUID;
+export type MarkCardAsImportantParams = StudysetUUIDPayload & {
     cardUUID: UUID;
     newValue: boolean;
 }
 
-export type CreateNoteParams = {
-    studysetUUID: UUID;
+export type CreateNoteParams = StudysetUUIDPayload & {
     cardUUID: UUID;
 }
 
-export type DeleteNoteParams = {
-    studysetUUID: UUID;
+export type DeleteNoteParams = StudysetUUIDPayload & {
     cardUUID: UUID;
     noteUUID: UUID;
 }
 
-export type EditNoteParams = {
-    studysetUUID: UUID;
+export type EditNoteParams = StudysetUUIDPayload & {
     cardUUID: UUID;
     noteUUID: UUID;
     text: string;
 }
 
-export type UpdateLastViewedParams = {
-    uuid: UUID;
-}
+export type UpdateLastViewedParams = StudysetUUIDPayload;
 
 export type CreateLabelParams = {
     userUUID: UUID;
