@@ -139,12 +139,14 @@ export const studysetsApi = api.injectEndpoints({
             ],
         }),
         updateLastViewed: build.mutation<Studyset, UpdateLastViewedParams>({
-            query: ({ uuid }) => ({
+            query: ({ studysetUUID }) => ({
                 url: "studysets/updateLastViewed",
                 method: "POST",
-                body: { uuid },
+                body: { studysetUUID },
             }),
-            invalidatesTags: ["Studyset"],
+            invalidatesTags: (_result, _error, arg) => [
+                { type: "Studyset", id: arg.studysetUUID },
+            ],
         }),
         markCardAsImportant: build.mutation<
             Studyset,
