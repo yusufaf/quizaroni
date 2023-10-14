@@ -210,10 +210,10 @@ export const studysetsApi = api.injectEndpoints({
             invalidatesTags: ["Studyset", "User"],
         }),
         deleteLabel: build.mutation<void, DeleteLabelParams>({
-            query: ({ userUUID, labelToDelete }) => ({
-                url: "studysets/createLabel",
+            query: ({ userUUID, labelsToDelete }) => ({
+                url: "studysets/deleteLabel",
                 method: "POST",
-                body: { userUUID, labelToDelete },
+                body: { userUUID, labelsToDelete },
             }),
             invalidatesTags: ["Studyset", "User"],
         }),

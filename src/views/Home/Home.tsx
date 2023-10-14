@@ -1,4 +1,9 @@
-import { DataGrid, GridEventListener, GridSortModel, GridToolbar } from "@mui/x-data-grid";
+import {
+    DataGrid,
+    GridEventListener,
+    GridSortModel,
+    GridToolbar,
+} from "@mui/x-data-grid";
 import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import useCustomMutation from "lib/hooks/useCustomMutation";
@@ -23,7 +28,7 @@ import {
     setStudySets,
 } from "state/slices/studysets";
 import { useTheme } from "theme/useTheme";
-import { CONFIRM_DIALOGS, FLASHSET_VIEWS } from "utilities/constants";
+import { CONFIRM_DIALOGS, HOME_LAYOUTS } from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";
 import HomeGridView from "./HomeGridView";
 import {
@@ -35,6 +40,7 @@ import {
 } from "./HomeStyles";
 import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
+import HomeHTMLView from "./HomeHTMLView";
 
 type Props = {};
 
@@ -241,7 +247,7 @@ const Home = (props: Props) => {
                         selectedView={selectedView}
                     />
                     <HomeSetsContainer>
-                        {selectedView === FLASHSET_VIEWS.TABLE ? (
+                        {selectedView === HOME_LAYOUTS.TABLE && (
                             <>
                                 <DataGrid
                                     rows={studysets}
@@ -293,12 +299,18 @@ const Home = (props: Props) => {
                                     }
                                 />
                             </>
-                        ) : (
+                        )}
+                        {selectedView === HOME_LAYOUTS.GRID && (
                             <HomeGridView
                                 studysets={studysets}
                                 handleShowConfirmDialog={
                                     handleShowConfirmDialog
                                 }
+                            />
+                        )}
+                        {selectedView === HOME_LAYOUTS.HTML && (
+                            <HomeHTMLView
+                                studysets={studysets}
                             />
                         )}
                     </HomeSetsContainer>

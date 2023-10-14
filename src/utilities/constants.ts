@@ -88,7 +88,7 @@ export const MIME_TYPES: { [key: string]: string } = {
 }
 
 
-export const FLASHSET_VIEWS = {
+export const HOME_LAYOUTS = {
     TABLE: "table",
     GRID: "grid",
     HTML: "html",

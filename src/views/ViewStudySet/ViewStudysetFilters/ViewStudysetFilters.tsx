@@ -6,7 +6,11 @@ import {
     SortCardsDropdown,
 } from "../styles";
 import { SimpleFlexContainer } from "common/AppStyles";
-import { DEFAULT_CATEGORIES, SORT_DIRECTIONS, VIEW_SET_DIALOGS } from "utilities/constants";
+import {
+    DEFAULT_CATEGORIES,
+    SORT_DIRECTIONS,
+    VIEW_SET_DIALOGS,
+} from "utilities/constants";
 import { Studyset, SortDirection } from "lib/types";
 import {
     Button,
@@ -58,10 +62,8 @@ const ViewStudysetFilters = (props: Props) => {
     };
 
     const toggleSortDirection = () => {
-        const newSortDirection =
-            sortDirection === SORT_DIRECTIONS.ASC
-                ? SORT_DIRECTIONS.DSC
-                : SORT_DIRECTIONS.ASC;
+        const { ASC, DSC } = SORT_DIRECTIONS;
+        const newSortDirection = sortDirection === ASC ? DSC : ASC;
         setSortDirection(newSortDirection);
     };
 
@@ -71,7 +73,7 @@ const ViewStudysetFilters = (props: Props) => {
 
     const handleShowCategoriesDialog = () => {
         dispatch(setSelectedDialog(VIEW_SET_DIALOGS.CATEGORIES));
-    }
+    };
 
     return (
         <CardFiltersContainer>
@@ -84,10 +86,7 @@ const ViewStudysetFilters = (props: Props) => {
                 >
                     {categoryTabs}
                 </CategoryTabs>
-                <Button
-                    variant="outlined"
-                    onClick={handleShowCategoriesDialog}
-                >
+                <Button variant="outlined" onClick={handleShowCategoriesDialog}>
                     Manage Categories
                 </Button>
             </SimpleFlexContainer>
