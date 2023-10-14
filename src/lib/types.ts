@@ -133,7 +133,7 @@ export type CreateLabelParams = {
 
 export type DeleteLabelParams = {
     userUUID: UUID;
-    labelToDelete: string;
+    labelsToDelete: string;
 }
 
 export type EditLabelParams = {
