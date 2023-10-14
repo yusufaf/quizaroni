@@ -187,13 +187,11 @@ const ManageLabelsDialog = (props: Props) => {
     };
 
     const handleDeleteConfirmation = () => {
-        for (const index of deleteIndices) {
-            const labelToDelete = labels[index];
-            deleteLabel({
-                userUUID,
-                labelToDelete,
-            });
-        }
+        const labelsToDelete = deleteIndices.map((index) => labels[index]);
+        deleteLabel({
+            userUUID,
+            labelsToDelete,
+        });
     };
 
     const handleEditOrDelete = () => {
@@ -353,7 +351,6 @@ const ManageLabelsDialog = (props: Props) => {
                         your study sets. Proceed with caution.
                     </DeleteLabelWarning>
                 )}
-
                 {showDeleteConfirmation && (
                     <DeleteLabelWarning variant="body2" color="error">
                         Are you sure you want to delete these labels? This will
