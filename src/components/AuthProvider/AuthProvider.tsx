@@ -42,8 +42,13 @@ const AuthProvider = ({ children }: Props) => {
             // const session = await Auth.currentSession();
             // console.log("Response from current session = ", session);
 
+            /* Removing unneeded properties to make the CognitoUser object serializable in redux */
+            const modifiedCognitoUser = {...currentUser};
+            const propertiesToRemove = ["signInUserSession", "pool", "storage", "client"];
+            propertiesToRemove.forEach((property) => delete modifiedCognitoUser[property]);
+
             dispatch(setAuthenticated(true));
-            dispatch(setCognitoUser(currentUser));
+            dispatch(setCognitoUser(modifiedCognitoUser));
             const { username } = currentUser;
             /* Retrieve user data, passing username as a query parameter */
             const response = await axios.get("/api/users/get", {
