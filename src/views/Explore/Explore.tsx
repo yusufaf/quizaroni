@@ -5,3 +5,5 @@ const Explore = (props: Props) => {
     <div>Explore</div>
   )
 }
+
+export default Explore;

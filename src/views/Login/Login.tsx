@@ -85,24 +85,6 @@ const Login = (props: Props) => {
         return;
     };
 
-    /**
-     * Update the last time the user signed in on the database
-     * @param {*} uid
-     */
-    // const updateLastSignIn = async (uid) => {
-    //     const usersCollection = collection(database, "users");
-    //     const queryResult = query(usersCollection, where("uid", "==", uid));
-    //     const querySnapshot = await getDocs(queryResult);
-
-    //     const userDoc = querySnapshot.docs[0];
-    //     if (userDoc) {
-    //         const userRef = userDoc.ref;
-    //         updateDoc(userRef, {
-    //             lastSignInDate: new Date().toLocaleDateString()
-    //         });
-    //     }
-    // }
-
     // const handleGoogleSignIn = () => {
     //     signInWithPopup(auth, provider)
     //         .then((result) => {

@@ -37,6 +37,7 @@ import {
     HomePaper,
     HomeSetsContainer,
     HomeSetsHeading,
+    StyledDataGrid,
 } from "./HomeStyles";
 import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
@@ -249,7 +250,7 @@ const Home = (props: Props) => {
                     <HomeSetsContainer>
                         {selectedView === HOME_LAYOUTS.TABLE && (
                             <>
-                                <DataGrid
+                                <StyledDataGrid
                                     rows={studysets}
                                     columns={columns}
                                     pageSizeOptions={[10, 25, 100]}
@@ -309,9 +310,7 @@ const Home = (props: Props) => {
                             />
                         )}
                         {selectedView === HOME_LAYOUTS.HTML && (
-                            <HomeHTMLView
-                                studysets={studysets}
-                            />
+                            <HomeHTMLView studysets={studysets} />
                         )}
                     </HomeSetsContainer>
                     <ConfirmDialog />

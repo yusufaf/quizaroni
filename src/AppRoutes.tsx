@@ -7,6 +7,8 @@ import ForgotPassword from "views/ForgotPassword/ForgotPassword";
 import Profile from "views/Profile/Profile";
 import ConfirmEmail from "views/ConfirmEmail/ConfirmEmail";
 import ViewStudySet from "views/ViewStudySet/ViewStudySet";
+import Explore from "views/Explore/Explore";
+import NotFound from "views/NotFound/NotFound";
 
 type Props = {};
 
@@ -19,11 +21,11 @@ const AppRoutes = (props: Props) => {
             <Route path="/create" element={<CreateSet />} />
             <Route path="/forgotPassword" element={<ForgotPassword />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/explore" element={<></>} />
+            <Route path="/explore" element={<Explore />} />
             <Route path="/view/:id" element={<ViewStudySet />} />
             <Route path="/edit/:id" element={<CreateSet pageType="Edit" />} />
 
-            {/* <Route path="*" element={<NotFound />} /> */}
+            <Route path="*" element={<NotFound />} />
             <Route path="/confirmEmail" element={<ConfirmEmail />} />
         </Routes>
     );
