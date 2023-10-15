@@ -73,7 +73,6 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body,
             }),
-            // invalidatesTags: ["Studyset"],
             invalidatesTags: [{ type: "Studyset", id: "LIST" }],
         }),
         deleteStudyset: build.mutation<void, DeleteStudysetParams>({
@@ -91,7 +90,6 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body: { uuid },
             }),
-            // invalidatesTags: ["Studyset"],
             invalidatesTags: [{ type: "Studyset", id: "LIST" }],
         }),
         updateStudysetMetadata: build.mutation<void, UpdateMetadataParams>({
@@ -231,7 +229,9 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body: { studysetUUID, newLabel },
             }),
-            invalidatesTags: ["Studyset"],
+            invalidatesTags: (_result, _error, arg) => [
+                { type: "Studyset", id: arg.studysetUUID },
+            ],
         }),
     }),
 });

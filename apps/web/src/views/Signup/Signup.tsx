@@ -51,25 +51,6 @@ const Signup = (props: Props) => {
 
     useBrowserTitle("Sign Up");
 
-    /**
-     * Display alert indicating status of sign up attempt
-     * @param {*} type
-     */
-    const displaySignupAlert = (type) => {
-        const showLoginToast = true;
-        if (type === C.SUCCESS) {
-            const loginSuccessAlert = {
-                message: "Successfully logged in :)",
-                open: showLoginToast,
-                type: C.SUCCESS,
-            };
-            dispatch(setAlert(loginSuccessAlert));
-        }
-        if (type === C.ERROR) {
-        }
-        return;
-    };
-
     const handlePasswordChange = (e: any) => {
         setPassword(e.target.value);
     };
