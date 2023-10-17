@@ -1,16 +1,22 @@
 import { v4 as uuidv4 } from "uuid";
-import { TODO } from "lib/types";
+import type { TODO, InitialCard } from "lib/types";
+import { EMPTY_CARD } from "./constants";
 
-type CardUtilityParams = {
+
+type CommonCardUtility = {
     createdSetCards: TODO[];
     setStateCallback: TODO;
 };
 
-type CardUtilityParamsWithIndex = CardUtilityParams & {
+type CardUtilityWithIndex = CommonCardUtility & {
     index: number;
 };
 
-type DeleteCardParams = CardUtilityParamsWithIndex;
+export const generateEmptyCard = (): InitialCard => {
+    return { ...EMPTY_CARD, uuid: uuidv4() };
+}
+
+type DeleteCardParams = CardUtilityWithIndex;
 /**
  * Handles the deletion of a card from the created set.
  */
@@ -18,13 +24,13 @@ export const deleteCard = ({
     index,
     createdSetCards,
     setStateCallback,
-}: DeleteCardParams) => {
+}: DeleteCardParams): void => {
     const newCreatedSetCards = [...createdSetCards];
     newCreatedSetCards.splice(index, 1);
     setStateCallback(newCreatedSetCards);
 };
 
-type AddCreateCardInputParams = CardUtilityParams & {
+type AddCreateCardInputParams = CommonCardUtility & {
     EMPTY_CARD: TODO;
 };
 /**
@@ -34,20 +40,20 @@ export const addCreateCardInput = ({
     createdSetCards,
     EMPTY_CARD,
     setStateCallback,
-}: AddCreateCardInputParams) => {
+}: AddCreateCardInputParams): void  => {
     const newEmptyCard = { ...EMPTY_CARD, uuid: uuidv4() };
     setStateCallback(createdSetCards.concat(newEmptyCard));
 };
 
-type DuplicateCardParams = CardUtilityParamsWithIndex;
+type DuplicateCardParams = CardUtilityWithIndex;
 /**
  * Handles the duplication of a card
  */
-export const handleDuplicateCard = ({
+export const duplicateCard = ({
     index,
     createdSetCards,
     setStateCallback,
-}: DuplicateCardParams) => {
+}: DuplicateCardParams): void  => {
     const duplicateCard = { ...createdSetCards[index] };
     setStateCallback(createdSetCards.concat(duplicateCard));
 };
@@ -58,17 +64,33 @@ export const handleDuplicateCard = ({
 export const handleReverse = ({
     createdSetCards,
     setStateCallback,
-}: CardUtilityParams) => {
+}: CommonCardUtility) => {
     setStateCallback([...createdSetCards].reverse());
+};
+
+type SwapCardParams = CardUtilityWithIndex; 
+/**
+ * Handles the swapping of a card's term and definition
+ * @param index
+ */
+export const swapCard = ({createdSetCards, setStateCallback, index}: SwapCardParams): void  => {
+    const newCreatedSetCards = [...createdSetCards];
+    const selectedCard = newCreatedSetCards[index];
+    newCreatedSetCards[index] = {
+        ...selectedCard,
+        term: selectedCard.definition,
+        definition: selectedCard.term,
+    };;
+    setStateCallback(newCreatedSetCards);
 };
 
 /**
  * Handles the swapping of all the cards
  */
-export const handleSwapAll = ({
+export const swapAllCards = ({
     createdSetCards,
     setStateCallback,
-}: CardUtilityParams) => {
+}: CommonCardUtility): void => {
     const swappedCards = createdSetCards.map((card) => {
         const { definition, term } = card;
         return {
@@ -80,19 +102,21 @@ export const handleSwapAll = ({
     setStateCallback(swappedCards);
 };
 
-type AddCardBelowParams = CardUtilityParamsWithIndex & {
-    EMPTY_CARD: TODO;
-};
+type AddCardParams = {
+    createdSetCards: TODO[];
+    setStateCallback: TODO;
+    index?: number
+}
 /**
- *
+ * Adds a card
  */
-const handleAddCardBelow = ({
+export const addCard = ({
     index,
     createdSetCards,
     setStateCallback,
-    EMPTY_CARD,
-}: AddCardBelowParams) => {
+}: AddCardParams): void => {
     const newCreatedSetCards = [...createdSetCards];
-    newCreatedSetCards.splice(index + 1, 0, { ...EMPTY_CARD });
+    const indexToUse = index !== undefined ? index + 1 : newCreatedSetCards.length;
+    newCreatedSetCards.splice(indexToUse, 0, generateEmptyCard());
     setStateCallback(newCreatedSetCards);
 };
