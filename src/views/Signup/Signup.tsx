@@ -11,8 +11,8 @@ import {
     LoginField as SignupField,
     LoginPageContainer as SignupPageContainer,
     LoginTitle as SignupTitle,
-    StyledLink,
 } from "views/Login/LoginStyles";
+import { StyledLink } from "common/AppStyles";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import { useDispatch } from "react-redux";
 import { setAlert, setCognitoUser } from "state/slices/global";

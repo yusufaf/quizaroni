@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction } from "react";
 import { SwapHoriz, Sync, UploadFile } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { SpacedFlexContainer } from "common/AppStyles";
-import { handleReverse, handleSwapAll } from "./createUtils";
+import { handleReverse, swapAllCards } from "../../utilities/createUtils";
 
 type Props = {
     studysetCards: any;
@@ -14,7 +14,7 @@ const SetModificationButtons = (props: Props) => {
     const { studysetCards = [], setCardsCallback = () => {}, setShowImportModal } = props;
 
     const onSwapAllClick = (_e: any) => {
-        handleSwapAll({
+        swapAllCards({
             createdSetCards: studysetCards,
             setStateCallback: setCardsCallback,
         });

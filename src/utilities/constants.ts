@@ -1,4 +1,6 @@
-import { SortDirection } from "lib/types";
+import type { SortDirection } from "lib/types";
+import type { InitialCard } from "lib/types";
+import { v4 as uuidv4 } from "uuid";
 
 export const LIGHT = "light";
 export const DARK = "dark";
@@ -50,11 +52,34 @@ export const FLASHSET_COLUMNS = {
     LABEL: "Label",
 };
 
+/* ==== Create Page Constants ==== */
 export const CREATE_SET = {
     TITLE: "Create a new study set",
     TITLE_PLACEHOLDER: "Enter a title for your new study set",
     DESC_PLACEHOLDER: "Enter a description for your new study set",
     LABEL_PLACEHOLDER: "Enter a label for your new study set",
+};
+
+export const CREATE_PAGE_TYPES: { [key: string]: string } = {
+    CREATE: "Create",
+    EDIT: "Edit",
+};
+
+export const CREATE_PAGE_PROPS: { [key: string]: any } = {
+    [CREATE_PAGE_TYPES.CREATE]: {
+        TITLE: "Create a new study set",
+        BUTTON: "Create Set",
+    },
+    [CREATE_PAGE_TYPES.EDIT]: {
+        TITLE: "Edit your study set",
+        BUTTON: "Save Changes",
+    },
+};
+
+export const EMPTY_CARD: InitialCard = {
+    term: "",
+    definition: "",
+    uuid: uuidv4(),
 };
 
 export const VIEW_SET = {
@@ -122,22 +147,6 @@ export const DEFAULT_CATEGORIES = {
 export const SORT_DIRECTIONS: { [key: string]: SortDirection } = {
     ASC: "asc",
     DSC: "dsc",
-};
-
-export const CREATE_PAGE_TYPES: { [key: string]: string } = {
-    CREATE: "Create",
-    EDIT: "Edit",
-};
-
-export const CREATE_PAGE_PROPS: { [key: string]: any } = {
-    [CREATE_PAGE_TYPES.CREATE]: {
-        TITLE: "Create a new study set",
-        BUTTON: "Create Set",
-    },
-    [CREATE_PAGE_TYPES.EDIT]: {
-        TITLE: "Edit your study set",
-        BUTTON: "Save Changes",
-    },
 };
 
 export const DEFAULT_TERMINOLOGY = "Term/Definition";

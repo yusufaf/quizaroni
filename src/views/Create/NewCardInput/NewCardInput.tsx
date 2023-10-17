@@ -14,6 +14,7 @@ import {
 } from "@mui/icons-material";
 import { useTheme } from "theme/useTheme";
 import { ChromePicker } from "react-color";
+import { BoldTypography } from "common/AppStyles";
 import {
     BgColorPickerContainer,
     NewCard,
@@ -32,21 +33,33 @@ import {
     AddCardBelowButton,
 } from "../CreateSetStyles";
 import { TODO } from "lib/types";
+import {
+    addCard,
+    deleteCard,
+    duplicateCard,
+    swapCard,
+} from "utilities/createUtils";
 
-type Props = TODO;
+type Props = {
+    index: number,
+    updateCardValue: any;
+    onFileChange: any;
+    onColorChange: any;
+    fileInputRef: any;
+    cardValues: any;
+    createdSetCards: any;
+    setCreatedSetCards: any;
+}
 const NewCardInput = (props: Props) => {
     const {
         index,
-        handleDelete,
         updateCardValue,
         onFileChange,
         onColorChange,
         fileInputRef,
-        handleSwap,
         cardValues,
-        handleDuplicateCard,
-        handleAddCardBelow,
         createdSetCards,
+        setCreatedSetCards,
     } = props;
 
     const {
@@ -54,7 +67,10 @@ const NewCardInput = (props: Props) => {
         definition,
         backgroundColor = "",
         textColor = "",
+        uuid,
     } = cardValues;
+
+    const setStateCallback = setCreatedSetCards;
 
     const { isDarkMode, theme } = useTheme();
 
@@ -143,7 +159,7 @@ const NewCardInput = (props: Props) => {
     return (
         <NewCard
             raised
-            key={index}
+            key={uuid}
             sx={{
                 background: displayBackgroundColor
                     ? localBackgroundColor
@@ -151,19 +167,16 @@ const NewCardInput = (props: Props) => {
             }}
         >
             <NewCardHeader>
-                <Typography
-                    variant="h6"
-                    sx={{
-                        fontWeight: "bold",
-                    }}
-                >
-                    Card {index + 1}
-                </Typography>
+                <BoldTypography variant="h6">Card {index + 1}</BoldTypography>
                 <CenterActions>
                     <Tooltip title="Change card text color" placement="top">
                         <IconButton
                             onClick={toggleTextColorPicker}
-                            sx={showTextColorPicker && colorPickerActiveStyling}
+                            sx={
+                                showTextColorPicker
+                                    ? colorPickerActiveStyling
+                                    : {}
+                            }
                         >
                             <FormatColorText
                                 fontSize="medium"
@@ -219,8 +232,9 @@ const NewCardInput = (props: Props) => {
                         <IconButton
                             onClick={toggleBackgroundColorPicker}
                             sx={
-                                showBackgroundColorPicker &&
-                                colorPickerActiveStyling
+                                showBackgroundColorPicker
+                                    ? colorPickerActiveStyling
+                                    : {}
                             }
                         >
                             <FormatColorFill
@@ -275,19 +289,43 @@ const NewCardInput = (props: Props) => {
                         </BgColorPickerContainer>
                     )}
                     <Tooltip title="Swap term and definition" placement="top">
-                        <IconButton onClick={() => handleSwap(index)}>
+                        <IconButton
+                            onClick={() =>
+                                swapCard({
+                                    createdSetCards,
+                                    index,
+                                    setStateCallback,
+                                })
+                            }
+                        >
                             <SwapHoriz fontSize="medium" />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Duplicate" placement="top">
-                        <IconButton onClick={() => handleDuplicateCard(index)}>
+                        <IconButton
+                            onClick={() =>
+                                duplicateCard({
+                                    createdSetCards,
+                                    index,
+                                    setStateCallback,
+                                })
+                            }
+                        >
                             <ContentCopy />
                         </IconButton>
                     </Tooltip>
                 </CenterActions>
                 <RightActions>
                     <Tooltip title="Delete this card" placement="top">
-                        <IconButton onClick={() => handleDelete(index)}>
+                        <IconButton
+                            onClick={() =>
+                                deleteCard({
+                                    createdSetCards,
+                                    index,
+                                    setStateCallback,
+                                })
+                            }
+                        >
                             <Delete fontSize="medium" />
                         </IconButton>
                     </Tooltip>
@@ -352,7 +390,13 @@ const NewCardInput = (props: Props) => {
                 <BottomActions>
                     {index !== createdSetCards.length - 1 && (
                         <AddCardBelowButton
-                            onClick={() => handleAddCardBelow(index)}
+                            onClick={() =>
+                                addCard({
+                                    createdSetCards,
+                                    index,
+                                    setStateCallback,
+                                })
+                            }
                             title="Add card below"
                         >
                             <Add fontSize="medium" />

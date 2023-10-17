@@ -1,5 +1,6 @@
 import { styled } from "@mui/system";
 import { DialogTitle, IconButton, Typography } from '@mui/material/';
+import { Link } from "react-router-dom";
 
 export const SimpleFlexContainer = styled("div")({
     display: "flex",
@@ -35,3 +36,13 @@ export const RightAlignedCloseButton = styled(IconButton)(
         marginLeft: "auto",
     }
 )
+
+export const StyledLink = styled(Link)(({ theme }) => ({
+    color: theme.palette.primary.main,
+    textDecoration: "none",
+    transition: "0.2s ease",
+    '&:hover': {
+        color: theme.palette.primary.dark,
+        textDecoration: "underline", 
+    },
+}));

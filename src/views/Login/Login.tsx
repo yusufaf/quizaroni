@@ -12,8 +12,8 @@ import {
     LoginField,
     LoginTitle,
     LoginButton,
-    StyledLink,
 } from "./LoginStyles";
+import { StyledLink } from "common/AppStyles";
 import { useDispatch, useSelector } from "react-redux";
 import {
     setAlert,
