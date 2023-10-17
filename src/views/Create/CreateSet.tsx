@@ -24,12 +24,8 @@ import ImportSetModal from "./ImportSetModal/ImportSetModal";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import SetModificationButtons from "./SetModificationButtons";
 import { Virtuoso } from "react-virtuoso";
-
-const EMPTY_CARD: InitialCard = {
-    term: "",
-    definition: "",
-    uuid: uuidv4(),
-};
+import { EMPTY_CARD } from "utilities/constants";
+import { addCard } from "utilities/createUtils";
 
 type Props = {
     pageType?: string;
@@ -61,16 +57,7 @@ const CreateSet = (props: Props) => {
 
     const [createStudySet] = useCreateStudysetMutation();
 
-    useEffect(() => {
-        if (isStudySetSuccess && selectedStudySet) {
-            const { label, title, description, cards } = selectedStudySet;
-            setEnteredLabel(label);
-            setTitle(title);
-            setDescription(description);
-            setCreatedSetCards(cards);
-        }
-    }, [selectedStudySet]);
-
+    /* Local State */
     const [title, setTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [enteredLabel, setEnteredLabel] = useState<string>("");
@@ -91,6 +78,16 @@ const CreateSet = (props: Props) => {
     const [blankCardsCount, setBlankCardsCount] = useState(0);
 
     useBrowserTitle(PAGES.CREATE);
+
+    useEffect(() => {
+        if (isStudySetSuccess && selectedStudySet) {
+            const { label, title, description, cards } = selectedStudySet;
+            setEnteredLabel(label);
+            setTitle(title);
+            setDescription(description);
+            setCreatedSetCards(cards);
+        }
+    }, [selectedStudySet]);
 
     /* Check that length of createdCardObjects is not 0 */
     const createNewSet = async () => {
@@ -150,20 +147,6 @@ const CreateSet = (props: Props) => {
         updateCardValue(index, "file", event.target.files[0]);
     };
 
-    /* Delete the selected card */
-    const handleDelete = (index: number) => {
-        const newCreatedSetCards = [...createdSetCards];
-        newCreatedSetCards.splice(index, 1);
-        setCreatedSetCards(newCreatedSetCards);
-    };
-
-    /* Adding a new card input box with a term input and description input */
-    const addCreateCardInput = () => {
-        const newCreatedSetCards = [...createdSetCards];
-        newCreatedSetCards.push({ ...EMPTY_CARD, uuid: uuidv4() });
-        setCreatedSetCards(newCreatedSetCards);
-    };
-
     /**
      * Update a given card input's value in the array storing the cards
      */
@@ -177,31 +160,6 @@ const CreateSet = (props: Props) => {
         updateCardValue(index, property, event.hex);
     };
 
-    const handleSwap = (index: number) => {
-        const newCreatedSetCards = [...createdSetCards];
-        let selectedCard = newCreatedSetCards[index];
-        const { term, definition } = selectedCard;
-        selectedCard = {
-            ...selectedCard,
-            term: definition,
-            definition: term,
-        };
-        newCreatedSetCards[index] = selectedCard;
-        setCreatedSetCards(newCreatedSetCards);
-    };
-
-    const handleDuplicateCard = (index: number) => {
-        const newCreatedSetCards = [...createdSetCards];
-        const duplicateCard = { ...newCreatedSetCards[index] };
-        setCreatedSetCards(newCreatedSetCards.concat(duplicateCard));
-    };
-
-    const handleAddCardBelow = (index: number) => {
-        const newCreatedSetCards = [...createdSetCards];
-        newCreatedSetCards.splice(index + 1, 0, { ...EMPTY_CARD });
-        setCreatedSetCards(newCreatedSetCards);
-    };
-
     /**
      * Render the JSX for all the card inputs
        Re-compute the JSX array when the "createdSetCards" prop changes. 
@@ -212,17 +170,13 @@ const CreateSet = (props: Props) => {
             const props = {
                 createdSetCards,
                 fileInputRef,
-                handleDelete,
                 onColorChange,
                 onFileChange,
                 setCreatedSetCards,
                 updateCardValue,
-                handleSwap,
-                handleDuplicateCard,
-                handleAddCardBelow,
                 index,
                 cardValues,
-                key: index,
+                key: cardValues.uuid
             };
             return <NewCardInput {...props} />;
         });
@@ -304,7 +258,15 @@ const CreateSet = (props: Props) => {
                 />
                 {/* TODO: Virtual Scroll */}
                 {cardInputs}
-                <AddCardButton variant="contained" onClick={addCreateCardInput}>
+                <AddCardButton
+                    variant="contained"
+                    onClick={() =>
+                        addCard({
+                            createdSetCards,
+                            setStateCallback: setCreatedSetCards,
+                        })
+                    }
+                >
                     <AddCardIcon />
                     Add Card
                 </AddCardButton>

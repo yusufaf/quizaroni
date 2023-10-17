@@ -1,6 +1,6 @@
 import { styled } from "@mui/system";
 import { Box, Button, Paper, TextField, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
+import { StyledLink } from "common/AppStyles";
 
 export const LoginPageContainer = styled(Box)({
     display: "flex",
@@ -8,7 +8,6 @@ export const LoginPageContainer = styled(Box)({
     alignItems: "center",
     marginTop: "4rem",
 })
-
 
 export const LoginContainer = styled(Box)({
     display: "flex",
@@ -39,16 +38,8 @@ export const LoginField = styled(TextField)({
     marginTop: "1rem",
 })
 
-
-export const ForgotPasswordLink = styled(Link)(({ theme }) => ({
-    color: theme.palette.primary.main,
-    textDecoration: "none",
+export const ForgotPasswordLink = styled(StyledLink)({
     display: "flex",
     alignSelf: "flex-end",
     marginTop: "0.5rem"
-}));
-
-export const StyledLink = styled(Link)(({ theme }) => ({
-    color: theme.palette.primary.main,
-    textDecoration: "none"
-}));
+});
