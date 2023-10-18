@@ -1,6 +1,5 @@
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import { InitialCard } from "lib/types";
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -15,17 +14,27 @@ import {
     selectUserData,
 } from "state/slices/global";
 import { useTheme } from "theme/useTheme";
-import { CREATE_PAGE_TYPES, PAGES } from "utilities/constants";
+import {
+    CREATE_PAGE_PROPS,
+    CREATE_PAGE_TYPES,
+    PAGES,
+} from "utilities/constants";
 import { v4 as uuidv4 } from "uuid";
 import LoginMessage from "views/LoginMessage/LoginMessage";
 import CreateSetHeader from "./CreateSetHeader";
-import { AddCardButton, AddCardIcon, CreateSetPage } from "./CreateSetStyles";
+import {
+    AddCardButton,
+    AddCardIcon,
+    CreateSetButton,
+    CreateSetPage,
+} from "./createSetStyles";
 import ImportSetModal from "./ImportSetModal/ImportSetModal";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import SetModificationButtons from "./SetModificationButtons";
 import { Virtuoso } from "react-virtuoso";
 import { EMPTY_CARD } from "utilities/constants";
 import { addCard } from "utilities/createUtils";
+import { Create } from "@mui/icons-material";
 
 type Props = {
     pageType?: string;
@@ -63,6 +72,8 @@ const CreateSet = (props: Props) => {
     const [enteredLabel, setEnteredLabel] = useState<string>("");
     const [selectedLabel, setSelectedLabel] = useState<string>("");
     const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
+
+    const createSetDisabled = !title || !description;
 
     const [showImportModal, setShowImportModal] = useState<boolean>(false);
 
@@ -176,7 +187,7 @@ const CreateSet = (props: Props) => {
                 updateCardValue,
                 index,
                 cardValues,
-                key: cardValues.uuid
+                key: cardValues.uuid,
             };
             return <NewCardInput {...props} />;
         });
@@ -241,6 +252,7 @@ const CreateSet = (props: Props) => {
         setShowImportModal,
         title,
         pageType,
+        createSetDisabled
     };
 
     if (!authenticated) {
@@ -270,6 +282,20 @@ const CreateSet = (props: Props) => {
                     <AddCardIcon />
                     Add Card
                 </AddCardButton>
+                <CreateSetButton
+                    variant="contained"
+                    onClick={() => createNewSet()}
+                    size="large"
+                    disabled={createSetDisabled}
+                    startIcon={<Create />}
+                    sx={{
+                        display: "flex",
+                        marginLeft: "auto",
+                        alignSelf: "flex-end",
+                    }}
+                >
+                    {CREATE_PAGE_PROPS[pageType].BUTTON}
+                </CreateSetButton>
             </CreateSetPage>
             <ImportSetModal
                 open={showImportModal}
