@@ -1,6 +1,6 @@
 import { Button, IconButton, TextField, Typography } from "@mui/material";
 import { BoldTypography, SimpleFlexContainer } from "common/AppStyles"
-import { AdvancedSection, BlankInputsContainer, BlankInputsField } from "./CreateSetStyles"
+import { AdvancedSection, BlankInputsContainer, BlankInputsField } from "./createSetStyles"
 import {
     ExpandMore as ExpandMoreIcon,
     ExpandLess as ExpandLessIcon,

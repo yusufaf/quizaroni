@@ -31,8 +31,7 @@ import {
     NewCardLabel,
     BottomActions,
     AddCardBelowButton,
-} from "../CreateSetStyles";
-import { TODO } from "lib/types";
+} from "../createSetStyles";
 import {
     addCard,
     deleteCard,

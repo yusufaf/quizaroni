@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { SwapHoriz, Sync, UploadFile } from "@mui/icons-material";
 import { Button } from "@mui/material";
-import { SpacedFlexContainer } from "common/AppStyles";
+import { SetModificationsContainer } from "./createSetStyles";
 import { handleReverse, swapAllCards } from "../../utilities/createUtils";
 
 type Props = {
@@ -28,7 +28,7 @@ const SetModificationButtons = (props: Props) => {
     };
 
     return (
-        <SpacedFlexContainer style={{ gap: "2rem" }}>
+        <SetModificationsContainer>
             <Button
                 variant="outlined"
                 startIcon={<UploadFile fontSize="medium" />}
@@ -50,7 +50,7 @@ const SetModificationButtons = (props: Props) => {
             >
                 Reverse Cards
             </Button>
-        </SpacedFlexContainer>
+        </SetModificationsContainer>
     );
 };
 

@@ -1,114 +1,127 @@
-
 import { styled } from "@mui/system";
-import { Box, Button, Card, Paper, Select, TextField, TextareaAutosize, Typography, IconButton, MenuItem } from "@mui/material";
+import {
+    Box,
+    Button,
+    Card,
+    Paper,
+    Select,
+    TextField,
+    TextareaAutosize,
+    Typography,
+    IconButton,
+    MenuItem,
+} from "@mui/material";
 import { AddCircleOutline } from "@mui/icons-material";
-import { BasePage, FlexColumn, SpacedFlexContainer, SimpleFlexContainer } from "common/AppStyles";
+import {
+    BasePage,
+    FlexColumn,
+    SpacedFlexContainer,
+    SimpleFlexContainer,
+} from "common/AppStyles";
 import { ChromePicker } from "react-color";
 
 export const CreateSetPage = styled(BasePage)({
-    display: "grid",
-    justifyItems: "center",
-    alignItems: "center",
-    gridTemplateRows: "auto auto",
+    marginTop: "0",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
     gap: "2rem",
-    paddingBottom: "2rem",
-})
+    padding: "2rem 20rem"
+});
 
-export const CreateSetPaper = styled(Paper)({})
+export const CreateSetPaper = styled(Paper)({});
 
-export const CreateSetContainer = styled("div")({
+export const HeaderContainer = styled("div")({
     height: "fit-content",
-    width: "70rem",
     padding: "1.25rem",
     borderRadius: "0.75rem",
     display: "grid",
     gridTemplateColumns: "2fr 1fr",
-})
+    overflow: "hidden"
+});
 
-export const HeaderLeftContainer = styled(FlexColumn)({})
+export const HeaderLeft = styled(FlexColumn)({
+    gap: "1.25rem",
+});
 
-export const HeaderRightContainer = styled(FlexColumn)({})
+export const HeaderRight = styled(FlexColumn)({});
 
 export const CreateSetInputsContainer = styled(Box)({
     display: "flex",
     flexDirection: "column",
-    alignItems: "flex-start",
-    marginTop: "1.25rem",
+    gap: "1rem",
     position: "relative",
-})
+});
 
 export const TitleInput = styled(TextField)({
-    marginBottom: "1rem",
     width: "17rem",
-})
+});
 
 export const DescriptionInput = styled(TextField)({
     width: "30rem",
-    marginBottom: "1rem",
-})
+});
 
 export const LabelInputContainer = styled(SimpleFlexContainer)({
     gap: "1rem",
-})
+});
 
 export const LabelInput = styled(TextField)({
-    width: "18rem"
-})
+    width: "18rem",
+});
 
 export const CreateSetButton = styled(Button)({
-    // position: "absolute",
-    // right: "2rem",
-})
 
-export const AdvancedSection = styled(FlexColumn)({
-})
+});
+
+export const AdvancedSection = styled(FlexColumn)({});
 
 export const BlankInputsContainer = styled(SimpleFlexContainer)({
     gap: "0.75rem",
-})
+});
 
 export const BlankInputsField = styled(TextField)({
     width: "5rem",
-})
-
-export const LabelSelect = styled(Select)({
-    width: "10rem"
-})
-
-export const LabelMenuItem = styled(MenuItem)({
-    width: "10rem"
 });
 
+export const LabelSelect = styled(Select)({
+    width: "10rem",
+});
 
-/* 
-New Card Styled Components
-*/
+export const LabelMenuItem = styled(MenuItem)({
+    width: "10rem",
+});
 
+/* ==== Set Modification Buttons ==== */
+export const SetModificationsContainer = styled(SimpleFlexContainer)({
+    gap: "2rem",
+    alignSelf: "flex-end"
+})
+
+/* ==== New Card Styled Components ====  */
 export const NewCard = styled(Card)({
-    width: "70rem",
     padding: "1rem 1.25rem 1.25rem 1.25rem",
     borderRadius: "0.75rem",
-    overflow: "unset"
-})
+    overflow: "unset",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem",
+    width: "100%",
+});
 
 export const AddCardButton = styled(Button)({
     display: "flex",
-    alignItems: "center",
     gap: "0.5rem",
     fontWeight: "bold",
-    width: "70rem",
     fontSize: "1rem",
-    marginTop: "0.5rem",
-})
+});
 
 export const AddCardIcon = styled(AddCircleOutline)({
-    fontSize: "3rem"
-})
+    fontSize: "3rem",
+});
 
 export const NewCardInputs = styled(SpacedFlexContainer)({
-    marginTop: "0.5rem",
     position: "relative",
-})
+});
 
 export const NewCardInputField = styled(TextField)({
     width: "25rem",
@@ -124,7 +137,7 @@ export const NewCardInputField = styled(TextField)({
     // '&::-webkit-scrollbar-thumb:hover': {
     //     background: '#555'
     // }
-})
+});
 
 export const NewCardHeader = styled("div")({
     display: "flex",
@@ -148,39 +161,39 @@ export const BottomActions = styled(SimpleFlexContainer)({
 
 export const AddCardBelowButton = styled(IconButton)(({ theme }) => ({
     backgroundColor: theme.palette.primary.main,
-    color: theme.palette.background.paper
+    color: theme.palette.background.paper,
 }));
 
 export const NewCardLabel = styled(Typography)(({ theme }) => ({
-    color: theme.palette.primary.main
+    color: theme.palette.primary.main,
 }));
 
-export const NewCardTerm = styled(FlexColumn)({})
+export const NewCardTerm = styled(FlexColumn)({});
 
-export const NewCardDefinition = styled(FlexColumn)({})
+export const NewCardDefinition = styled(FlexColumn)({});
 
 export const BgColorPickerContainer = styled("div")({
     position: "absolute",
     bottom: "2.5rem",
     left: "4rem",
     display: "flex",
-    flexDirection:"row"
-})
+    flexDirection: "row",
+});
 
 export const TextColorPickerContainer = styled("div")({
     position: "absolute",
     bottom: "2.5rem",
     display: "flex",
-    flexDirection:"row"
-})
+    flexDirection: "row",
+});
 
 export const ExtraPickerContainer = styled(FlexColumn)(({ theme }) => ({
     background: theme.palette.background.paper,
     border: `0.125rem solid ${theme.palette.divider}`,
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "column",
 }));
 
 export const ExtraPickerButton = styled(IconButton)({
-    height: "fit-content"
-})
+    height: "fit-content",
+});

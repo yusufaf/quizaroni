@@ -17,18 +17,18 @@ import {
 } from "utilities/constants";
 import {
     CreateSetButton,
-    CreateSetContainer,
+    HeaderContainer,
     CreateSetInputsContainer,
     CreateSetPaper,
     DescriptionInput,
-    HeaderLeftContainer,
-    HeaderRightContainer,
+    HeaderLeft,
+    HeaderRight,
     LabelInput,
     LabelInputContainer,
     LabelMenuItem,
     LabelSelect,
     TitleInput,
-} from "./CreateSetStyles";
+} from "./createSetStyles";
 import HeaderAdvancedSection from "./HeaderAdvancedSection";
 import { useSelector } from "react-redux";
 import { selectUserData } from "state/slices/global";
@@ -46,6 +46,7 @@ type Props = {
     title: string;
     setShowImportModal: Dispatch<SetStateAction<boolean>>;
     pageType: string;
+    createSetDisabled: boolean;
 };
 
 const CreateSetHeader = (props: Props) => {
@@ -61,14 +62,12 @@ const CreateSetHeader = (props: Props) => {
         selectedLabel,
         title,
         pageType = "",
+        createSetDisabled,
     } = props;
 
     const { theme } = useTheme();
 
     const userData = useSelector(selectUserData);
-
-    /* TODO: Make sure there's at least one card in the set ? */
-    const createSetDisabled = !title || !description;
 
     const renderLabelOptions = () => {
         const { labels = [] } = userData;
@@ -82,80 +81,88 @@ const CreateSetHeader = (props: Props) => {
             </LabelMenuItem>
         );
 
-        labelJsx.push(...labels.map((label: any, index: number) => {
-            return (
-                <LabelMenuItem
-                    key={index}
-                    value={label}
-                    sx={{ width: "10rem" }}
-                    title={label}
-                >
-                    <Typography variant="inherit" noWrap>
-                        {label}
-                    </Typography>
-                </LabelMenuItem>
-            );
-        }))
+        labelJsx.push(
+            ...labels.map((label: any, index: number) => {
+                return (
+                    <LabelMenuItem
+                        key={index}
+                        value={label}
+                        sx={{ width: "10rem" }}
+                        title={label}
+                    >
+                        <Typography variant="inherit" noWrap>
+                            {label}
+                        </Typography>
+                    </LabelMenuItem>
+                );
+            })
+        );
         return labelJsx;
     };
 
     return (
         <CreateSetPaper elevation={6}>
-            <CreateSetContainer>
-                <HeaderLeftContainer>
+            <HeaderContainer>
+                <HeaderLeft>
                     <BoldTypography variant="h5">
                         {CREATE_PAGE_PROPS[pageType].TITLE}
                     </BoldTypography>
                     <CreateSetInputsContainer>
-                        <BoldTypography variant="subtitle1">
-                            Title
-                        </BoldTypography>
-                        <TitleInput
-                            variant="standard"
-                            placeholder={CREATE_SET.TITLE_PLACEHOLDER}
-                            value={title}
-                            onChange={onTitleChange}
-                            size="small"
-                        />
-                        <BoldTypography variant="subtitle1">
-                            Description
-                        </BoldTypography>
-                        <DescriptionInput
-                            variant="outlined"
-                            placeholder={CREATE_SET.DESC_PLACEHOLDER}
-                            value={description}
-                            onChange={onDescriptionChange}
-                            multiline
-                            maxRows={4}
-                        />
-                        <BoldTypography variant="subtitle1">
-                            Label
-                        </BoldTypography>
-                        <LabelInputContainer>
-                            <LabelInput
+                        <div>
+                            <BoldTypography variant="subtitle1">
+                                Title
+                            </BoldTypography>
+                            <TitleInput
                                 variant="standard"
+                                placeholder={CREATE_SET.TITLE_PLACEHOLDER}
+                                value={title}
+                                onChange={onTitleChange}
                                 size="small"
-                                placeholder={
-                                    "Enter a label for your new study set"
-                                }
-                                onChange={onLabelChange}
-                                disabled={selectedLabel !== ""}
                             />
-                            <Typography component="span">
-                                or select an existing one
-                            </Typography>
-                            <FormControl variant="standard">
-                                <LabelSelect
-                                    value={selectedLabel}
-                                    onChange={onSelectedLabelChange}
-                                >
-                                    {renderLabelOptions()}
-                                </LabelSelect>
-                            </FormControl>
-                        </LabelInputContainer>
+                        </div>
+                        <div>
+                            <BoldTypography variant="subtitle1">
+                                Description
+                            </BoldTypography>
+                            <DescriptionInput
+                                variant="outlined"
+                                placeholder={CREATE_SET.DESC_PLACEHOLDER}
+                                value={description}
+                                onChange={onDescriptionChange}
+                                multiline
+                                maxRows={4}
+                            />
+                        </div>
+                        <div>
+                            <BoldTypography variant="subtitle1">
+                                Label
+                            </BoldTypography>
+                            <LabelInputContainer>
+                                <LabelInput
+                                    variant="standard"
+                                    size="small"
+                                    placeholder={
+                                        "Enter a label for your new study set"
+                                    }
+                                    onChange={onLabelChange}
+                                    disabled={selectedLabel !== ""}
+                                />
+                                <Typography component="span">
+                                    or select an existing one
+                                </Typography>
+                                <FormControl variant="standard">
+                                    <LabelSelect
+                                        value={selectedLabel}
+                                        onChange={onSelectedLabelChange}
+                                    >
+                                        {renderLabelOptions()}
+                                    </LabelSelect>
+                                </FormControl>
+                            </LabelInputContainer>
+                        </div>
                     </CreateSetInputsContainer>
-                </HeaderLeftContainer>
-                <HeaderRightContainer>
+                </HeaderLeft>
+                <HeaderRight>
                     <CreateSetButton
                         variant="contained"
                         onClick={() => createNewSet()}
@@ -166,8 +173,8 @@ const CreateSetHeader = (props: Props) => {
                         {CREATE_PAGE_PROPS[pageType].BUTTON}
                     </CreateSetButton>
                     <HeaderAdvancedSection {...advancedSectionProps} />
-                </HeaderRightContainer>
-            </CreateSetContainer>
+                </HeaderRight>
+            </HeaderContainer>
         </CreateSetPaper>
     );
 };
