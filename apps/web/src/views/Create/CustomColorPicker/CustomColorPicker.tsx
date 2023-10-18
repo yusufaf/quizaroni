@@ -1,6 +1,6 @@
 import { RestartAlt, Visibility, VisibilityOff, Add } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
-import { ExtraPickerButton } from "../CreateSetStyles";
+import { ExtraPickerButton } from "../createSetStyles";
 import { ColorPickerContainer, ExtraPickerContainer } from "./styles";
 import { ChromePicker } from "react-color";
 import { useState } from "react";
