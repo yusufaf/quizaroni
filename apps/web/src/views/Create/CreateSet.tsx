@@ -1,7 +1,7 @@
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
@@ -35,6 +35,7 @@ import { Virtuoso } from "react-virtuoso";
 import { EMPTY_CARD } from "utilities/constants";
 import { addCard } from "utilities/createUtils";
 import { Create } from "@mui/icons-material";
+import { selectShowImportModal, setShowImportModal } from "state/slices/createSet";
 
 type Props = {
     pageType?: string;
@@ -50,10 +51,12 @@ const CreateSet = (props: Props) => {
     const { id: studySetUUID } = useParams();
     const { isDarkMode, theme } = useTheme();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const authenticated = useSelector(selectAuthenticated);
     const cognitoUser = useSelector(selectCognitoUser);
     const userData = useSelector(selectUserData);
+    const showImportModal = useSelector(selectShowImportModal);
 
     const {
         data: selectedStudySet,
@@ -74,8 +77,6 @@ const CreateSet = (props: Props) => {
     const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
 
     const createSetDisabled = !title || !description;
-
-    const [showImportModal, setShowImportModal] = useState<boolean>(false);
 
     const fileInputRef = useRef(null);
 
@@ -162,7 +163,7 @@ const CreateSet = (props: Props) => {
      * Update a given card input's value in the array storing the cards
      */
     const updateCardValue = (index: number, property: string, value: any) => {
-        let newCreatedSetCards = [...createdSetCards];
+        const newCreatedSetCards = [...createdSetCards];
         newCreatedSetCards[index][property] = value;
         setCreatedSetCards(newCreatedSetCards);
     };
@@ -249,7 +250,6 @@ const CreateSet = (props: Props) => {
         onSelectedLabelChange,
         onTitleChange,
         selectedLabel,
-        setShowImportModal,
         title,
         pageType,
         createSetDisabled
@@ -266,7 +266,6 @@ const CreateSet = (props: Props) => {
                 <SetModificationButtons
                     studysetCards={createdSetCards}
                     setCardsCallback={setCreatedSetCards}
-                    setShowImportModal={setShowImportModal}
                 />
                 {/* TODO: Virtual Scroll */}
                 {cardInputs}
@@ -299,7 +298,7 @@ const CreateSet = (props: Props) => {
             </CreateSetPage>
             <ImportSetModal
                 open={showImportModal}
-                onClose={() => setShowImportModal(false)}
+                onClose={() => dispatch(setShowImportModal(true))}
             />
             <ScrollToTopFab />
         </>
