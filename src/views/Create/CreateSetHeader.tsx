@@ -44,7 +44,6 @@ type Props = {
     label: string;
     selectedLabel: string;
     title: string;
-    setShowImportModal: Dispatch<SetStateAction<boolean>>;
     pageType: string;
     createSetDisabled: boolean;
 };

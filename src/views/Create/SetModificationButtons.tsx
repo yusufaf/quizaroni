@@ -1,18 +1,20 @@
-import { Dispatch, SetStateAction } from "react";
 import { SwapHoriz, Sync, UploadFile } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import { SetModificationsContainer } from "./createSetStyles";
 import { handleReverse, swapAllCards } from "../../utilities/createUtils";
+import { useDispatch } from "react-redux";
+import { setShowImportModal } from "state/slices/createSet";
 
 type Props = {
     studysetCards: any;
     setCardsCallback: any;
-    setShowImportModal: Dispatch<SetStateAction<boolean>>;
 };
 
 const SetModificationButtons = (props: Props) => {
-    const { studysetCards = [], setCardsCallback = () => {}, setShowImportModal } = props;
+    const { studysetCards = [], setCardsCallback = () => {} } = props;
 
+    const dispatch = useDispatch();
+    
     const onSwapAllClick = (_e: any) => {
         swapAllCards({
             createdSetCards: studysetCards,
@@ -32,7 +34,7 @@ const SetModificationButtons = (props: Props) => {
             <Button
                 variant="outlined"
                 startIcon={<UploadFile fontSize="medium" />}
-                onClick={() => setShowImportModal(true)}
+                onClick={() => dispatch(setShowImportModal(true))}
             >
                 Import Cards
             </Button>
