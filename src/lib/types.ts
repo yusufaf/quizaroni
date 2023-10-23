@@ -162,3 +162,5 @@ export type ConfirmDialogProps = {
 // export type ViewSetDialog = 
 
 export type OpenCardNotes = Set<UUID>;
+
+export type ColorPickerType = "textColor" | "backgroundColor";

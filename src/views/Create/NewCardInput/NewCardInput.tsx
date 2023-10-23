@@ -8,15 +8,10 @@ import {
     SwapHoriz,
     Add,
     ContentCopy,
-    RestartAlt,
-    Visibility,
-    VisibilityOff,
 } from "@mui/icons-material";
 import { useTheme } from "theme/useTheme";
-import { ChromePicker } from "react-color";
 import { BoldTypography } from "common/AppStyles";
 import {
-    BgColorPickerContainer,
     NewCard,
     NewCardDefinition,
     NewCardHeader,
@@ -25,9 +20,6 @@ import {
     RightActions,
     CenterActions,
     NewCardTerm,
-    TextColorPickerContainer,
-    ExtraPickerButton,
-    ExtraPickerContainer,
     NewCardLabel,
     BottomActions,
     AddCardBelowButton,
@@ -38,9 +30,11 @@ import {
     duplicateCard,
     swapCard,
 } from "utilities/createUtils";
+import CustomColorPicker from "../CustomColorPicker/CustomColorPicker";
+import type { ColorPickerType } from "lib/types";
 
 type Props = {
-    index: number,
+    index: number;
     updateCardValue: any;
     onFileChange: any;
     onColorChange: any;
@@ -48,7 +42,7 @@ type Props = {
     cardValues: any;
     createdSetCards: any;
     setCreatedSetCards: any;
-}
+};
 const NewCardInput = (props: Props) => {
     const {
         index,
@@ -105,19 +99,9 @@ const NewCardInput = (props: Props) => {
         // }
     };
 
-    const onBackgroundColorChange = (e: any) => {
-        onColorChange(e, "backgroundColor", index);
-        setLocalBackgroundColor(e.hex);
-    };
-
     const toggleBackgroundColorPicker = () => {
         setShowTextColorPicker(false);
         setShowBackgroundColorPicker(!showBackgroundColorPicker);
-    };
-
-    const onTextColorChange = (e: any) => {
-        onColorChange(e, "textColor", index);
-        setLocalTextColor(e.hex);
     };
 
     const toggleTextColorPicker = () => {
@@ -125,22 +109,26 @@ const NewCardInput = (props: Props) => {
         setShowTextColorPicker(!showTextColorPicker);
     };
 
-    const resetTextColor = () => {
-        updateCardValue(index, "textColor", "");
-        setLocalTextColor("");
+    const onColorPickerChange = (e, type: ColorPickerType) => {
+        const localStateCallback =
+            type === "textColor" ? setLocalTextColor : setLocalBackgroundColor;
+        onColorChange(e, type, index);
+        localStateCallback(e.hex);
     };
 
-    const resetBackgroundColor = () => {
-        updateCardValue(index, "backgroundColor", "");
-        setLocalBackgroundColor("");
+    const resetColor = (type: ColorPickerType) => {
+        const localStateCallback =
+            type === "textColor" ? setLocalTextColor : setLocalBackgroundColor;
+        updateCardValue(index, type, "");
+        localStateCallback("");
     };
 
-    const toggleApplyTextColor = () => {
-        setApplyTextColor(!applyTextColor);
-    };
-
-    const toggleApplyBackgroundColor = () => {
-        setApplyBackgroundColor(!applyBackgroundColor);
+    const toggleApplyColor = (type: ColorPickerType) => {
+        if (type === "textColor") {
+            setApplyTextColor(!applyTextColor);
+        } else {
+            setApplyBackgroundColor(!applyBackgroundColor);
+        }
     };
 
     const colorPickerActiveStyling = {
@@ -149,11 +137,6 @@ const NewCardInput = (props: Props) => {
 
     const displayBackgroundColor = applyBackgroundColor && localBackgroundColor;
     const displayTextColor = applyTextColor && localTextColor;
-
-    /* TODO/IDEA:
-    - Ability to create named colors, appear in some dropdown in the color picker container you've created
-
-    */
 
     return (
         <NewCard
@@ -186,46 +169,13 @@ const NewCardInput = (props: Props) => {
                         </IconButton>
                     </Tooltip>
                     {showTextColorPicker && (
-                        <TextColorPickerContainer>
-                            <ChromePicker
-                                color={localTextColor}
-                                onChange={onTextColorChange}
-                            />
-                            <ExtraPickerContainer>
-                                <Tooltip
-                                    title="Reset text color"
-                                    placement="right"
-                                >
-                                    <ExtraPickerButton onClick={resetTextColor}>
-                                        <RestartAlt />
-                                    </ExtraPickerButton>
-                                </Tooltip>
-
-                                <Tooltip
-                                    title="Apply text color"
-                                    placement="right"
-                                >
-                                    <ExtraPickerButton
-                                        onClick={toggleApplyTextColor}
-                                    >
-                                        {applyTextColor ? (
-                                            <Visibility />
-                                        ) : (
-                                            <VisibilityOff />
-                                        )}
-                                    </ExtraPickerButton>
-                                </Tooltip>
-
-                                <Tooltip
-                                    title="Add to named colors"
-                                    placement="right"
-                                >
-                                    <ExtraPickerButton>
-                                        <Add />
-                                    </ExtraPickerButton>
-                                </Tooltip>
-                            </ExtraPickerContainer>
-                        </TextColorPickerContainer>
+                        <CustomColorPicker
+                            applyColor={applyTextColor}
+                            color={localTextColor}
+                            onChange={(e) => onColorPickerChange(e, "textColor")}
+                            onResetColor={() => resetColor("textColor")}
+                            onApplyColor={() => toggleApplyColor("textColor")}
+                        />
                     )}
                     <Tooltip title="Change background color" placement="top">
                         <IconButton
@@ -245,47 +195,18 @@ const NewCardInput = (props: Props) => {
                         </IconButton>
                     </Tooltip>
                     {showBackgroundColorPicker && (
-                        <BgColorPickerContainer>
-                            <ChromePicker
-                                color={localBackgroundColor}
-                                onChange={onBackgroundColorChange}
-                            />
-                            <ExtraPickerContainer>
-                                <Tooltip
-                                    title="Reset background color"
-                                    placement="right"
-                                >
-                                    <ExtraPickerButton
-                                        onClick={resetBackgroundColor}
-                                    >
-                                        <RestartAlt />
-                                    </ExtraPickerButton>
-                                </Tooltip>
-
-                                <Tooltip
-                                    title="Apply background color"
-                                    placement="right"
-                                >
-                                    <ExtraPickerButton
-                                        onClick={toggleApplyBackgroundColor}
-                                    >
-                                        {applyBackgroundColor ? (
-                                            <Visibility />
-                                        ) : (
-                                            <VisibilityOff />
-                                        )}
-                                    </ExtraPickerButton>
-                                </Tooltip>
-                                <Tooltip
-                                    title="Add to named colors"
-                                    placement="right"
-                                >
-                                    <ExtraPickerButton>
-                                        <Add />
-                                    </ExtraPickerButton>
-                                </Tooltip>
-                            </ExtraPickerContainer>
-                        </BgColorPickerContainer>
+                        <CustomColorPicker
+                            applyColor={applyBackgroundColor}
+                            color={localBackgroundColor}
+                            onChange={(e) => onColorPickerChange(e, "backgroundColor")}
+                            onResetColor={() => resetColor("backgroundColor")}
+                            onApplyColor={() =>
+                                toggleApplyColor("backgroundColor")
+                            }
+                            style={{
+                                left: "4rem",
+                            }}
+                        />
                     )}
                     <Tooltip title="Swap term and definition" placement="top">
                         <IconButton
