@@ -1,26 +1,23 @@
-import { Create, UploadFile } from "@mui/icons-material";
+import { Create } from "@mui/icons-material";
 import {
-    Button,
     FormControl,
-    IconButton,
-    InputLabel,
-    MenuItem,
-    Typography,
+    Typography
 } from "@mui/material";
-import { Dispatch, SetStateAction } from "react";
-import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
+import { BoldTypography } from "common/AppStyles";
+import { useSelector } from "react-redux";
+import { selectUserData } from "state/slices/global";
 import { useTheme } from "theme/useTheme";
 import {
-    CREATE_SET,
-    CREATE_PAGE_TYPES,
     CREATE_PAGE_PROPS,
+    CREATE_SET
 } from "utilities/constants";
+import HeaderAdvancedSection from "./HeaderAdvancedSection";
 import {
     CreateSetButton,
-    HeaderContainer,
     CreateSetInputsContainer,
     CreateSetPaper,
     DescriptionInput,
+    HeaderContainer,
     HeaderLeft,
     HeaderRight,
     LabelInput,
@@ -29,9 +26,6 @@ import {
     LabelSelect,
     TitleInput,
 } from "./createSetStyles";
-import HeaderAdvancedSection from "./HeaderAdvancedSection";
-import { useSelector } from "react-redux";
-import { selectUserData } from "state/slices/global";
 
 type Props = {
     advancedSectionProps: any;

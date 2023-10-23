@@ -76,6 +76,8 @@ const CreateSet = (props: Props) => {
     const [selectedLabel, setSelectedLabel] = useState<string>("");
     const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
 
+    console.log({createdSetCards})
+
     const createSetDisabled = !title || !description;
 
     const fileInputRef = useRef(null);
