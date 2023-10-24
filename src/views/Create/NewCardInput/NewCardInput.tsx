@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { IconButton, TextField, Tooltip, Typography } from "@mui/material/";
 import {
     AddPhotoAlternate,
@@ -78,6 +78,22 @@ const NewCardInput = (props: Props) => {
     const [applyTextColor, setApplyTextColor] = useState<boolean>(false);
     const [applyBackgroundColor, setApplyBackgroundColor] =
         useState<boolean>(false);
+
+    useEffect(() => {
+        if (showTextColorPicker || showBackgroundColorPicker) {
+            const elements = document.querySelectorAll("[id]");
+            for (const el of elements) {
+                if (el.id.startsWith("rc-editable-input")) {
+                    const domElement = document.getElementById(el.id)
+                    // @ts-ignore
+                    domElement.style.color = theme.palette.text.primary;
+                    // @ts-ignore
+                    domElement.style.background = theme.palette.background.paper;
+                    break;
+                }
+            }
+        }
+    }, [showTextColorPicker, showBackgroundColorPicker, theme]);
 
     // TODO: Clicking away from ColorPicker
     // useEffect(() => {
