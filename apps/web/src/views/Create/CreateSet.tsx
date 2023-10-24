@@ -35,7 +35,11 @@ import { Virtuoso } from "react-virtuoso";
 import { EMPTY_CARD } from "utilities/constants";
 import { addCard } from "utilities/createUtils";
 import { Create } from "@mui/icons-material";
-import { selectShowImportModal, setShowImportModal } from "state/slices/createSet";
+import {
+    selectShowImportModal,
+    setShowImportModal,
+} from "state/slices/createSet";
+import NamedColorsDialog from "components/NamedColorsDialog/NamedColorsDialog";
 
 type Props = {
     pageType?: string;
@@ -56,7 +60,6 @@ const CreateSet = (props: Props) => {
     const authenticated = useSelector(selectAuthenticated);
     const cognitoUser = useSelector(selectCognitoUser);
     const userData = useSelector(selectUserData);
-    const showImportModal = useSelector(selectShowImportModal);
 
     const {
         data: selectedStudySet,
@@ -76,7 +79,7 @@ const CreateSet = (props: Props) => {
     const [selectedLabel, setSelectedLabel] = useState<string>("");
     const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
 
-    console.log({createdSetCards})
+    console.log({ createdSetCards });
 
     const createSetDisabled = !title || !description;
 
@@ -254,7 +257,7 @@ const CreateSet = (props: Props) => {
         selectedLabel,
         title,
         pageType,
-        createSetDisabled
+        createSetDisabled,
     };
 
     if (!authenticated) {
@@ -298,10 +301,8 @@ const CreateSet = (props: Props) => {
                     {CREATE_PAGE_PROPS[pageType].BUTTON}
                 </CreateSetButton>
             </CreateSetPage>
-            <ImportSetModal
-                open={showImportModal}
-                onClose={() => dispatch(setShowImportModal(true))}
-            />
+            <ImportSetModal />
+            <NamedColorsDialog />
             <ScrollToTopFab />
         </>
     );

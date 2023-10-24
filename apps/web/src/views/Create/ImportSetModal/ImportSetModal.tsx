@@ -8,12 +8,20 @@ import {
 import { useTheme } from "theme/useTheme";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
+import { useDispatch, useSelector } from "react-redux";
+import { selectShowImportModal, setShowImportModal } from "state/slices/createSet";
 
-const ImportSetModal = (props) => {
-    const { open, onClose } = props;
+type Props = {};
+const ImportSetModal = (props: Props) => {
+    const dispatch = useDispatch();
+    const showImportModal = useSelector(selectShowImportModal);
+
+    const onClose = () => {
+        dispatch(setShowImportModal(false));
+    }
 
     return (
-        <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+        <Dialog open={showImportModal} onClose={onClose} fullWidth maxWidth="md">
             <StyledDialogTitle>
                 Import Cards
                 <CloseDialogButton onClose={onClose} />
