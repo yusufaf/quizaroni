@@ -1,7 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import {
-    RootState
-} from "state/store"
+import { RootState } from "state/store";
 
 type GlobalSliceState = {
     alert: any;
@@ -12,6 +10,7 @@ type GlobalSliceState = {
     authenticated: boolean;
     userData: any;
     dialogProps: any;
+    namedColorDialogProps: any;
 };
 
 const initialState: GlobalSliceState = {
@@ -23,6 +22,7 @@ const initialState: GlobalSliceState = {
     authenticated: false,
     userData: {},
     dialogProps: {},
+    namedColorDialogProps: false,
 };
 
 const sliceName = "globalState";
@@ -52,6 +52,9 @@ export const globalSlice = createSlice({
         setDialogProps: (state, action: PayloadAction<any>) => {
             state.dialogProps = action.payload;
         },
+        setNamedColorDialogProps: (state, action: PayloadAction<any>) => {
+            state.namedColorDialogProps = action.payload;
+        },
     },
 });
 
@@ -63,15 +66,23 @@ export const {
     setAuthenticated,
     setUserData,
     setDialogProps,
+    setNamedColorDialogProps,
 } = globalSlice.actions;
 
 /* Selectors */
 export const selectAlert = (state: RootState) => state[sliceName].alert;
-export const selectDialogOpen = (state: RootState) => state[sliceName].dialogOpen;
-export const selectUserAuthState = (state: RootState) => state[sliceName].userAuthInfo;
-export const selectCognitoUser = (state: RootState) => state[sliceName].cognitoUser;
-export const selectAuthenticated = (state: RootState) => state[sliceName].authenticated;
+export const selectDialogOpen = (state: RootState) =>
+    state[sliceName].dialogOpen;
+export const selectUserAuthState = (state: RootState) =>
+    state[sliceName].userAuthInfo;
+export const selectCognitoUser = (state: RootState) =>
+    state[sliceName].cognitoUser;
+export const selectAuthenticated = (state: RootState) =>
+    state[sliceName].authenticated;
 export const selectUserData = (state: RootState) => state[sliceName].userData;
-export const selectDialogProps = (state: RootState) => state[sliceName].dialogProps;
+export const selectDialogProps = (state: RootState) =>
+    state[sliceName].dialogProps;
+export const selectNamedColorDialogProps = (state: RootState) =>
+    state[sliceName].namedColorDialogProps;
 
 export default globalSlice.reducer;

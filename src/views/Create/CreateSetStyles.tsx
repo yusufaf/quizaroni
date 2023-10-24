@@ -172,21 +172,6 @@ export const NewCardTerm = styled(FlexColumn)({});
 
 export const NewCardDefinition = styled(FlexColumn)({});
 
-export const BgColorPickerContainer = styled("div")({
-    position: "absolute",
-    bottom: "2.5rem",
-    left: "4rem",
-    display: "flex",
-    flexDirection: "row",
-});
-
-export const TextColorPickerContainer = styled("div")({
-    position: "absolute",
-    bottom: "2.5rem",
-    display: "flex",
-    flexDirection: "row",
-});
-
 export const ExtraPickerContainer = styled(FlexColumn)(({ theme }) => ({
     background: theme.palette.background.paper,
     border: `0.125rem solid ${theme.palette.divider}`,

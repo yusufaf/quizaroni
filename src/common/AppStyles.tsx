@@ -1,6 +1,7 @@
 import { styled } from "@mui/system";
 import { DialogTitle, IconButton, Typography } from '@mui/material/';
 import { Link } from "react-router-dom";
+import { ChromePicker } from 'react-color';
 
 export const SimpleFlexContainer = styled("div")({
     display: "flex",
@@ -44,5 +45,11 @@ export const StyledLink = styled(Link)(({ theme }) => ({
     '&:hover': {
         color: theme.palette.primary.dark,
         textDecoration: "underline", 
+    },
+}));
+
+export const StyledChromePicker = styled(ChromePicker)(({ theme }) => ({
+    "&.chrome-picker": {
+        background: `${theme.palette.background.paper} !important`,
     },
 }));
