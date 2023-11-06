@@ -32,9 +32,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Studyset } from "lib/types";
 import { Dispatch, SetStateAction } from "react";
 import { useDispatch } from "react-redux";
-import { setSelectedDialog } from "state/slices/viewSets";
+import { setSelectedDialog } from "state/slices/viewSetsSlice";
 import CustomIconButton from "components/CustomIconButton/CustomIconButton";
-import { setDialogProps } from "state/slices/global";
+import { setDialogProps } from "state/slices/globalSlice";
 
 type Props = {
     controlAnchorRef: any;

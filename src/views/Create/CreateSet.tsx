@@ -7,12 +7,13 @@ import { toast } from "react-toastify";
 import {
     useCreateStudysetMutation,
     useGetStudysetQuery,
-} from "state/api/studysets";
+} from "state/api/studysetsAPI";
 import {
     selectAuthenticated,
     selectCognitoUser,
+    selectNamedColorsDialogProps,
     selectUserData,
-} from "state/slices/global";
+} from "state/slices/globalSlice";
 import { useTheme } from "theme/useTheme";
 import {
     CREATE_PAGE_PROPS,
@@ -38,7 +39,7 @@ import { Create } from "@mui/icons-material";
 import {
     selectShowImportModal,
     setShowImportModal,
-} from "state/slices/createSet";
+} from "state/slices/createSetSlice";
 import NamedColorsDialog from "components/NamedColorsDialog/NamedColorsDialog";
 
 type Props = {
@@ -60,6 +61,7 @@ const CreateSet = (props: Props) => {
     const authenticated = useSelector(selectAuthenticated);
     const cognitoUser = useSelector(selectCognitoUser);
     const userData = useSelector(selectUserData);
+    const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
 
     const {
         data: selectedStudySet,
@@ -302,7 +304,7 @@ const CreateSet = (props: Props) => {
                 </CreateSetButton>
             </CreateSetPage>
             <ImportSetModal />
-            <NamedColorsDialog />
+            {namedColorsDialogProps.open && <NamedColorsDialog />}
             <ScrollToTopFab />
         </>
     );

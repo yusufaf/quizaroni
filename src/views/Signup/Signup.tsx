@@ -15,7 +15,7 @@ import {
 import { StyledLink } from "common/AppStyles";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import { useDispatch } from "react-redux";
-import { setAlert, setCognitoUser } from "state/slices/global";
+import { setAlert, setCognitoUser } from "state/slices/globalSlice";
 import { Auth } from "@aws-amplify/auth";
 import axios from "axios";
 import PasswordValidator from "components/PasswordValidator/PasswordValidator";

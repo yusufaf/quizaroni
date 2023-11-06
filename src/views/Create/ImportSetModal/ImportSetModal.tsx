@@ -9,7 +9,7 @@ import { useTheme } from "theme/useTheme";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import { useDispatch, useSelector } from "react-redux";
-import { selectShowImportModal, setShowImportModal } from "state/slices/createSet";
+import { selectShowImportModal, setShowImportModal } from "state/slices/createSetSlice";
 
 type Props = {};
 const ImportSetModal = (props: Props) => {

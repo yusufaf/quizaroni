@@ -84,3 +84,7 @@ export const ManageTabContainer = styled(FlexColumn)({
 export const ManageTabButton = styled(Button)({
     width: "16rem",
 });
+
+export const StyledDialogActions = styled(DialogActions)({
+    margin: "0 1rem 1rem 0"
+})

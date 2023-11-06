@@ -12,7 +12,7 @@ import {
     NOTES_DRAWER_INITIAL_APPEARANCE,
     NOTES_DRAWER_POSITIONS,
 } from "utilities/constants";
-import { useUpdateStudysetMetadataMutation } from "state/api/studysets";
+import { useUpdateStudysetMetadataMutation } from "state/api/studysetsAPI";
 
 type Props = {
     open: boolean;

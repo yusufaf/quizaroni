@@ -21,11 +21,11 @@ import {
     setAuthenticated,
     setUserData,
     selectUserData,
-} from "state/slices/global";
-import { selectStudySets, setStudySets } from "state/slices/studysets";
+} from "state/slices/globalSlice";
+import { selectStudySets, setStudySets } from "state/slices/studysetsSlice";
 import { Auth } from "@aws-amplify/auth";
 import axios from "axios";
-import { useGetAllStudysetsQuery } from "state/api/studysets";
+import { useGetAllStudysetsQuery } from "state/api/studysetsAPI";
 
 type Props = {};
 
