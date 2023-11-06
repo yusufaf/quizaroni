@@ -14,17 +14,18 @@ import {
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    selectNamedColorDialogProps,
-    setNamedColorDialogProps,
+    selectNamedColorsDialogProps,
+    setNamedColorsDialogProps,
     selectUserData,
     setUserData,
-} from "state/slices/global";
+} from "state/slices/globalSlice";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
-import { ChangeEvent, SyntheticEvent, useState } from "react";
-import { StyledDialog, StyledDialogContent } from "./styles";
+import { ChangeEvent, ReactNode, SyntheticEvent, useState } from "react";
+import { StyledDialog, StyledDialogActions, StyledDialogContent } from "./styles";
 import CreateTabView from "./CreateTabView";
 import { ChromePicker } from 'react-color';
 import NamedColorPicker from "./NamedColorPicker";
+import { LoadingButton } from "@mui/lab";
 
 const TABS = {
     ASSIGN: "ASSIGN",
@@ -34,20 +35,19 @@ const TABS = {
 };
 
 type Props = {
-    newColor: ""; 
 };
-
 const NamedColorsDialog = (props: Props) => {
-    const { newColor } = props;
-
+    /* Redux / Hooks */
     const dispatch = useDispatch();
     const userData = useSelector(selectUserData);
-    const namedColorDialogProps = useSelector(selectNamedColorDialogProps);
+    const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
 
-    const [color, setColor] = useState<string>("");
+    const [color, setColor] = useState<string>(namedColorsDialogProps.color ? namedColorsDialogProps.color : "#000000");
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
-    const [colorName, setColorName] = useState<string>(newColor); // From Create/Edit page
+    const [colorName, setColorName] = useState<string>(""); // From Create/Edit page
     const [errorInfo, setErrorInfo] = useState<any>(null);
+
+    console.log({namedColorsDialogProps})
 
     const isCreateTab = selectedTab === TABS.CREATE;
     const isManageTab = selectedTab === TABS.MANAGE;
@@ -56,7 +56,7 @@ const NamedColorsDialog = (props: Props) => {
 
     const closeNamedColorsDialog = () => {
         dispatch(
-            setNamedColorDialogProps({
+            setNamedColorsDialogProps({
                 open: false,
             })
         );
@@ -64,6 +64,17 @@ const NamedColorsDialog = (props: Props) => {
     
     const onTabChange = (_e: SyntheticEvent, newTab: string) => {
         setSelectedTab(newTab);
+    };
+
+    /* Create Tab */
+    const handleCreateNamedColor = async () => {
+        // if (!studysetUUID) {
+        //     return;
+        // }
+        // createCategory({
+        //     studysetUUID,
+        //     category: categoryName,
+        // });
     };
 
     const onCreateColorChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -86,9 +97,56 @@ const NamedColorsDialog = (props: Props) => {
         setColor(hex);
     };
 
+    const renderDialogButtons = (): ReactNode => {
+        switch (selectedTab) {
+            case TABS.CREATE:
+                return (
+                    <LoadingButton
+                        variant="contained"
+                        // onClick={handleCreate}
+                        // disabled={!categoryName || Boolean(errorInfo)}
+                        // loading={isCreatingCategory}
+                    >
+                        Create
+                    </LoadingButton>
+                );
+            // case TABS.MANAGE:
+            //     const disabled =
+            //         (selectedAction === ACTIONS.EDIT && editErrorInfo) ||
+            //         (selectedAction === ACTIONS.DELETE &&
+            //             !deleteIndices.length);
+            //     const buttonText =
+            //         selectedAction === ACTIONS.EDIT
+            //             ? "Save Edit"
+            //             : `Delete (${deleteIndices.length})`;
+            //     return (
+            //         selectedAction && (
+            //             <Button
+            //                 variant="contained"
+            //                 onClick={handleEditOrDelete}
+            //                 disabled={disabled}
+            //             >
+            //                 {buttonText}
+            //             </Button>
+            //         )
+            //     );
+            // case TABS.IMPORT:
+            //     return (
+            //         <LoadingButton
+            //             variant="contained"
+            //             onClick={handleImport}
+            //             disabled={!selectedStudysetUUID}
+            //             loading={isCreatingCategory}
+            //         >
+            //             Import Categories
+            //         </LoadingButton>
+            //     );
+        }
+    };
+
     return (
         <StyledDialog
-            open={namedColorDialogProps.open}
+            open={namedColorsDialogProps.open}
             onClose={closeNamedColorsDialog}
             fullWidth
             maxWidth="lg"
@@ -158,12 +216,9 @@ const NamedColorsDialog = (props: Props) => {
                     onChange={onColorChange}
                 />
             </StyledDialogContent>
-            <DialogActions>
-                <Button onClick={closeNamedColorsDialog}>Cancel</Button>
-                {/* <Button variant="contained" onClick={handleConfirm}> */}
-
-                {/* </Button> */}
-            </DialogActions>
+            <StyledDialogActions>
+                {renderDialogButtons()}
+            </StyledDialogActions>
         </StyledDialog>
     );
 };

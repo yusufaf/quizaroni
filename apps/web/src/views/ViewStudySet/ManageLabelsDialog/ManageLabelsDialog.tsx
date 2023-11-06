@@ -31,7 +31,7 @@ import {
     useDeleteLabelMutation,
     useEditLabelMutation,
     useChangeLabelMutation,
-} from "state/api/studysets";
+} from "state/api/studysetsAPI";
 import useCustomMutation from "lib/hooks/useCustomMutation";
 import LabelsDialogTabView from "./LabelsDialogTabView";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";

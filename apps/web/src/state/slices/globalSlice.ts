@@ -10,7 +10,7 @@ type GlobalSliceState = {
     authenticated: boolean;
     userData: any;
     dialogProps: any;
-    namedColorDialogProps: any;
+    namedColorsDialogProps: any;
 };
 
 const initialState: GlobalSliceState = {
@@ -22,7 +22,7 @@ const initialState: GlobalSliceState = {
     authenticated: false,
     userData: {},
     dialogProps: {},
-    namedColorDialogProps: false,
+    namedColorsDialogProps: {},
 };
 
 const sliceName = "globalState";
@@ -52,8 +52,8 @@ export const globalSlice = createSlice({
         setDialogProps: (state, action: PayloadAction<any>) => {
             state.dialogProps = action.payload;
         },
-        setNamedColorDialogProps: (state, action: PayloadAction<any>) => {
-            state.namedColorDialogProps = action.payload;
+        setNamedColorsDialogProps: (state, action: PayloadAction<any>) => {
+            state.namedColorsDialogProps = action.payload;
         },
     },
 });
@@ -66,7 +66,7 @@ export const {
     setAuthenticated,
     setUserData,
     setDialogProps,
-    setNamedColorDialogProps,
+    setNamedColorsDialogProps,
 } = globalSlice.actions;
 
 /* Selectors */
@@ -82,7 +82,7 @@ export const selectAuthenticated = (state: RootState) =>
 export const selectUserData = (state: RootState) => state[sliceName].userData;
 export const selectDialogProps = (state: RootState) =>
     state[sliceName].dialogProps;
-export const selectNamedColorDialogProps = (state: RootState) =>
-    state[sliceName].namedColorDialogProps;
+export const selectNamedColorsDialogProps = (state: RootState) =>
+    state[sliceName].namedColorsDialogProps;
 
 export default globalSlice.reducer;

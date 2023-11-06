@@ -5,7 +5,7 @@ import {
 } from "@mui/material";
 import { BoldTypography } from "common/AppStyles";
 import { useSelector } from "react-redux";
-import { selectUserData } from "state/slices/global";
+import { selectUserData } from "state/slices/globalSlice";
 import { useTheme } from "theme/useTheme";
 import {
     CREATE_PAGE_PROPS,

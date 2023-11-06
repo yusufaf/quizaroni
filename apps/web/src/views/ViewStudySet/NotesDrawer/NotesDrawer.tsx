@@ -30,7 +30,7 @@ import {
     useCreateNoteMutation,
     useDeleteNoteMutation,
     useEditNoteMutation,
-} from "state/api/studysets";
+} from "state/api/studysetsAPI";
 import useCustomMutation from "lib/hooks/useCustomMutation";
 import { EMPTY_NOTE_PLACEHOLDER, NOTES_DRAWER_INITIAL_APPEARANCE } from "utilities/constants";
 

@@ -12,7 +12,7 @@ import { ColorPickerContainer, ExtraPickerContainer } from "./styles";
 import { ChromePicker } from "react-color";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { setNamedColorDialogProps } from "state/slices/global";
+import { setNamedColorsDialogProps } from "state/slices/globalSlice";
 import { StyledChromePicker } from "common/AppStyles";
 
 type Props = {
@@ -31,7 +31,7 @@ const CustomColorPicker = (props: Props) => {
     const dispatch = useDispatch();
 
     const openNamedColorsDialog = () => {
-        dispatch(setNamedColorDialogProps({
+        dispatch(setNamedColorsDialogProps({
             open: true,
             color,
         }))

@@ -22,7 +22,7 @@ import {
 } from "@mui/material";
 import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
-import { setSelectedDialog } from "state/slices/viewSets";
+import { setSelectedDialog } from "state/slices/viewSetsSlice";
 
 type Props = {
     selectedTab: string;

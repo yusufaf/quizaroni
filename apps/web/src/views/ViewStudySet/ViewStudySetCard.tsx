@@ -12,7 +12,7 @@ import {
     CategoryChip,
 } from "./styles";
 import { Card, OpenCardNotes, Studyset, UUID } from "lib/types";
-import { useMarkCardAsImportantMutation } from "state/api/studysets";
+import { useMarkCardAsImportantMutation } from "state/api/studysetsAPI";
 import {
     DEFAULT_TERMINOLOGY,
     FORMAT_TERMINOLOGIES,
