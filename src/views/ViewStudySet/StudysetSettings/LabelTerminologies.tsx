@@ -9,7 +9,7 @@ import {
 import { Studyset } from "lib/types";
 import { ChangeEvent, useState, MouseEvent, useEffect } from "react";
 import { CustomInputsContainer, StyledTextField } from "./styles";
-import { useUpdateStudysetMetadataMutation } from "state/api/studysets";
+import { useUpdateStudysetMetadataMutation } from "state/api/studysetsAPI";
 import { LABEL_TERMINOLOGIES } from "utilities/constants";
 
 type Props = {

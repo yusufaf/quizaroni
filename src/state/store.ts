@@ -1,8 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
-import globalReducer from "state/slices/global";
-import studySetsReducer from "state/slices/studysets";
-import viewSetsReducer from "state/slices/viewSets";
-import createSetReducer from "state/slices/createSet";
+import globalReducer from "state/slices/globalSlice";
+import studySetsReducer from "state/slices/studysetsSlice";
+import viewSetsReducer from "state/slices/viewSetsSlice";
+import createSetReducer from "state/slices/createSetSlice";
 import api from "./api/api";
 
 const {reducerPath: apiPath, reducer: apiReducer} = api;

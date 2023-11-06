@@ -15,18 +15,18 @@ import {
     useDeleteStudysetMutation,
     useDuplicateStudysetMutation,
     useGetAllStudysetsQuery,
-} from "state/api/studysets";
-import { useUpdateUserMetadataMutation } from "state/api/users";
+} from "state/api/studysetsAPI";
+import { useUpdateUserMetadataMutation } from "state/api/usersAPI";
 import {
     selectAuthenticated,
     selectUserData,
     setDialogProps,
-} from "state/slices/global";
+} from "state/slices/globalSlice";
 import {
     selectStudySets,
     setSelectedStudySet,
     setStudySets,
-} from "state/slices/studysets";
+} from "state/slices/studysetsSlice";
 import { useTheme } from "theme/useTheme";
 import { CONFIRM_DIALOGS, HOME_LAYOUTS } from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";

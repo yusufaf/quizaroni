@@ -14,7 +14,7 @@ import {
     selectAuthenticated,
     setAlert,
     setAuthenticated,
-} from "state/slices/global";
+} from "state/slices/globalSlice";
 import ProfileDropdown from "views/Profile/ProfileDropdown";
 import { useTheme } from "theme/useTheme";
 import { ROUTES, SUCCESS } from "utilities/constants";

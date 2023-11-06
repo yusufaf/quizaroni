@@ -15,8 +15,8 @@ import {
     useCreateCategoryMutation,
     useDeleteCategoryMutation,
     useEditCategoryMutation,
-} from "state/api/studysets";
-import { selectUserData } from "state/slices/global";
+} from "state/api/studysetsAPI";
+import { selectUserData } from "state/slices/globalSlice";
 import { capitalizeFirstLetter } from "utilities/functions";
 import AssignTabView from "./AssignTabView";
 import CategoriesList from "./CategoriesList";
@@ -24,7 +24,7 @@ import CreateTabView from "./CreateTabView";
 import ImportTabView from "./ImportTabView";
 import ManageTabView from "./ManageTabView";
 import { ACTIONS, TABS } from "./constants";
-import { StyledDialog, StyledDialogContent } from "./styles";
+import { StyledDialog, StyledDialogActions, StyledDialogContent } from "./styles";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 
@@ -357,7 +357,7 @@ const ManageCategoriesDialog = (props: Props) => {
                     handleDeleteClick={handleDeleteClick}
                 />
             </StyledDialogContent>
-            <DialogActions>{renderDialogButton()}</DialogActions>
+            <StyledDialogActions>{renderDialogButton()}</StyledDialogActions>
         </StyledDialog>
     );
 };

@@ -27,6 +27,10 @@ export const StyledDialogContent = styled(DialogContent)({
     gap: "1rem",
 });
 
+export const StyledDialogActions = styled(DialogActions)({
+    margin: "0 1rem 1rem 0"
+})
+
 export const CreateColorField = styled(TextField)({
     marginTop: "1.25rem",
 });
@@ -50,3 +54,7 @@ export const Swatch = styled("div")(({ theme }) => ({
     cursor: "pointer",
     border: `0.125rem solid ${theme.palette.divider}`,
 }));
+
+export const NamedColorPickerContainer = styled("div")({
+    position: "absolute",
+})

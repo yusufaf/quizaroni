@@ -8,9 +8,9 @@ import {
     setAuthenticated,
     setCognitoUser,
     setUserData,
-} from "state/slices/global";
-import { setStudySets } from "state/slices/studysets";
-import { useGetAllStudysetsQuery } from "state/api/studysets";
+} from "state/slices/globalSlice";
+import { setStudySets } from "state/slices/studysetsSlice";
+import { useGetAllStudysetsQuery } from "state/api/studysetsAPI";
 
 type Props = {
     children: any;

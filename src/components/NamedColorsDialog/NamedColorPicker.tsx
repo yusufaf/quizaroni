@@ -1,13 +1,12 @@
 "use strict";
 import { IconButton, Paper, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Swatch, SwatchPaper } from "./styles";
+import { Swatch, SwatchPaper, NamedColorPickerContainer } from "./styles";
 import { useTheme } from "lib/theme/useTheme";
 import { StyledChromePicker, SimpleFlexContainer } from "common/AppStyles";
 import {
     ContentCopy as CopyIcon,
 } from "@mui/icons-material";
-
 
 type Props = {
     color: string;
@@ -35,19 +34,15 @@ const NamedColorPicker = (props: Props) => {
         }
     }, [showColorPicker]);
 
-    const handleClick = () => {
+    const handleClickSwatch = () => {
         setShowColorPicker(!showColorPicker);
-    };
-
-    const handleClose = () => {
-        setShowColorPicker(false);
     };
 
     return (
         <div>
             <SwatchPaper elevation={6}>
                 <Swatch
-                    onClick={handleClick}
+                    onClick={handleClickSwatch}
                     style={{
                         background: color,
                     }}
@@ -60,7 +55,9 @@ const NamedColorPicker = (props: Props) => {
                 </SimpleFlexContainer>
             </SwatchPaper>
             {showColorPicker && (
-                <StyledChromePicker color={color} onChange={onChange} />
+                <NamedColorPickerContainer>
+                    <StyledChromePicker color={color} onChange={onChange} />
+                </NamedColorPickerContainer>
             )}
         </div>
     );

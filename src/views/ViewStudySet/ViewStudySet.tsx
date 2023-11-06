@@ -15,9 +15,9 @@ import {
     useGetStudysetQuery,
     useUpdateLastViewedMutation,
     useUpdateStudysetMetadataMutation,
-} from "state/api/studysets";
-import { selectUserData, setDialogProps } from "state/slices/global";
-import { selectSelectedDialog, setSelectedDialog } from "state/slices/viewSets";
+} from "state/api/studysetsAPI";
+import { selectUserData, setDialogProps } from "state/slices/globalSlice";
+import { selectSelectedDialog, setSelectedDialog } from "state/slices/viewSetsSlice";
 import {
     CONFIRM_DIALOGS,
     DEFAULT_CATEGORIES,

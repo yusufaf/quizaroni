@@ -3,7 +3,7 @@ import { Button } from "@mui/material";
 import { SetModificationsContainer } from "./createSetStyles";
 import { handleReverse, swapAllCards } from "../../utilities/createUtils";
 import { useDispatch } from "react-redux";
-import { setShowImportModal } from "state/slices/createSet";
+import { setShowImportModal } from "state/slices/createSetSlice";
 
 type Props = {
     studysetCards: any;

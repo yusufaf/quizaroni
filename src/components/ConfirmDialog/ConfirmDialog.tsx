@@ -7,13 +7,13 @@ import {
     DialogContent,
 } from '@mui/material/';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectDialogProps, setDialogProps } from 'state/slices/global';
+import { selectDialogProps, setDialogProps } from 'state/slices/globalSlice';
 import {
     ConfirmDialogProps
 } from "lib/types"
 import { CONFIRM_DIALOGS } from 'utilities/constants';
 import useCustomMutation from "lib/hooks/useCustomMutation";
-import { useDeleteStudysetMutation, useDuplicateStudysetMutation } from "state/api/studysets";
+import { useDeleteStudysetMutation, useDuplicateStudysetMutation } from "state/api/studysetsAPI";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import { useNavigate } from 'react-router-dom';
