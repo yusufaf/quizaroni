@@ -26,6 +26,7 @@ import CreateTabView from "./CreateTabView";
 import { ChromePicker } from 'react-color';
 import NamedColorPicker from "./NamedColorPicker";
 import { LoadingButton } from "@mui/lab";
+import { useUpdateUserMetadataMutation } from "state/api/usersAPI";
 
 const TABS = {
     ASSIGN: "ASSIGN",
@@ -39,8 +40,17 @@ type Props = {
 const NamedColorsDialog = (props: Props) => {
     /* Redux / Hooks */
     const dispatch = useDispatch();
-    const userData = useSelector(selectUserData);
+    const { metadata: { namedColors = [] }, uuid: userUUID = ""} = useSelector(selectUserData);
     const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
+
+    const [
+        updateUserMetadata,
+        {
+            isLoading: isUpdateMetadataLoading,
+            isSuccess: isUpdateMetadataSuccess,
+            isError: isUpdateMetadataError,
+        },
+    ] = useUpdateUserMetadataMutation();
 
     const [color, setColor] = useState<string>(namedColorsDialogProps.color ? namedColorsDialogProps.color : "#000000");
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
@@ -68,19 +78,25 @@ const NamedColorsDialog = (props: Props) => {
 
     /* Create Tab */
     const handleCreateNamedColor = async () => {
-        // if (!studysetUUID) {
-        //     return;
-        // }
-        // createCategory({
-        //     studysetUUID,
-        //     category: categoryName,
-        // });
+        if (!userUUID) {
+            return;
+        }
+        const newColorObject = {
+            color,
+            name: colorName,
+        }
+        const newNamedColors = [...namedColors, newColorObject]
+        updateUserMetadata({
+            uuid: userUUID,
+            property: "namedColors",
+            newValue: newNamedColors
+        })
     };
 
     const onCreateColorChange = (e: ChangeEvent<HTMLInputElement>) => {
         const name = e.target.value;
-        const isDuplicate = false;
-        // const isDuplicate = selectedStudyset.categories.includes(category);
+        console.log({namedColors})
+        const isDuplicate = namedColors.some((colorObject) => colorObject.name === name);
         setColorName(name);
         const localErrorInfo = isDuplicate
             ? {
@@ -103,9 +119,9 @@ const NamedColorsDialog = (props: Props) => {
                 return (
                     <LoadingButton
                         variant="contained"
-                        // onClick={handleCreate}
-                        // disabled={!categoryName || Boolean(errorInfo)}
-                        // loading={isCreatingCategory}
+                        onClick={handleCreateNamedColor}
+                        disabled={!colorName || Boolean(errorInfo)}
+                        loading={isUpdateMetadataLoading}
                     >
                         Create
                     </LoadingButton>
