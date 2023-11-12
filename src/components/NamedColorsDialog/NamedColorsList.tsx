@@ -1,15 +1,15 @@
 import { IconButton, ListItem, Typography } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
 import {
-    StyledCategoriesList,
-    CategoriesListContainer,
-    CategoriesListPaper,
-    CategoryButtons,
+    StyledColorsList,
+    ColorsListContainer,
+    ColorsListPaper,
+    ColorButtonsContainer,
 } from "./styles";
 import { TABS } from "./constants";
 
 type Props = {
-    categories: string[];
+    namedColors: {color: string; name: string }[];
     selectedTab: string;
     editIndex?: number | null;
     deleteIndices?: number[];
@@ -18,9 +18,9 @@ type Props = {
     type?: string;
 };
 
-const CategoriesList = (props: Props) => {
+const NamedColorsList = (props: Props) => {
     const {
-        categories = [],
+        namedColors = [],
         selectedTab,
         editIndex = -1,
         deleteIndices = [],
@@ -30,11 +30,11 @@ const CategoriesList = (props: Props) => {
     } = props;
 
     const isManageTab = selectedTab === TABS.MANAGE;
-    const isImportTab = selectedTab === TABS.IMPORT;
     const listStyle = type === "main" ? { marginTop: "4rem" } : {};
 
-    const renderCategoriesList = () => {
-        return categories?.map((value, index) => {
+    const renderNamedColorsList = () => {
+        return namedColors?.map((value, index) => {
+            const { color, name } = value;
             const isEditSelected = editIndex === index;
             const isDeleteSelected = deleteIndices.includes(index);
 
@@ -44,12 +44,12 @@ const CategoriesList = (props: Props) => {
                     key={index}
                     secondaryAction={
                         isManageTab && (
-                            <CategoryButtons>
+                            <ColorButtonsContainer>
                                 <IconButton
                                     edge="end"
                                     aria-label="edit"
                                     onClick={() => handleEditClick(index)}
-                                    title="Edit category"
+                                    title="Edit named color"
                                 >
                                     <Edit
                                         color={
@@ -63,7 +63,7 @@ const CategoriesList = (props: Props) => {
                                     edge="end"
                                     aria-label="delete"
                                     onClick={() => handleDeleteClick(index)}
-                                    title="Mark category for deletion"
+                                    title="Mark named color for deletion"
                                 >
                                     <Delete
                                         color={
@@ -73,29 +73,30 @@ const CategoriesList = (props: Props) => {
                                         }
                                     />
                                 </IconButton>
-                            </CategoryButtons>
+                            </ColorButtonsContainer>
                         )
                     }
                 >
-                    {value}
+                    {name}
+                    {color}
                 </ListItem>
             );
         });
     };
 
     return (
-        <CategoriesListContainer style={listStyle}>
-            {categories.length === 0 ? (
-                <Typography variant="subtitle1">No categories to display</Typography>
+        <ColorsListContainer style={listStyle}>
+            {namedColors.length === 0 ? (
+                <Typography variant="subtitle1">No named colors to display</Typography>
             ) : (
-                <CategoriesListPaper elevation={6}>
-                    <StyledCategoriesList>
-                        {renderCategoriesList()}
-                    </StyledCategoriesList>
-                </CategoriesListPaper>
+                <ColorsListPaper elevation={6}>
+                    <StyledColorsList>
+                        {renderNamedColorsList()}
+                    </StyledColorsList>
+                </ColorsListPaper>
             )}
-        </CategoriesListContainer>
+        </ColorsListContainer>
     );
 };
 
-export default CategoriesList;
+export default NamedColorsList;

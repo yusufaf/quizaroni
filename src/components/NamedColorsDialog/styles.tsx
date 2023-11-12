@@ -14,6 +14,7 @@ import {
     MenuItem,
 } from "@mui/material/";
 import styled from "@emotion/styled";
+import { FlexColumn, SimpleFlexContainer } from "common/AppStyles";
 
 export const StyledDialog = styled(Dialog)({
     "& .MuiDialog-paper": {
@@ -31,7 +32,7 @@ export const StyledDialogActions = styled(DialogActions)({
     margin: "0 1rem 1rem 0"
 })
 
-export const CreateColorField = styled(TextField)({
+export const ColorNameField = styled(TextField)({
     marginTop: "1.25rem",
 });
 
@@ -58,3 +59,33 @@ export const Swatch = styled("div")(({ theme }) => ({
 export const NamedColorPickerContainer = styled("div")({
     position: "absolute",
 })
+
+export const ManageTabContainer = styled(FlexColumn)({
+    gap: "1rem",
+})
+
+export const ManageTabButton = styled(Button)({
+    width: "16rem",
+});
+
+
+export const ColorsListContainer = styled("div")(({ theme }) => ({
+    maxHeight: "20rem",
+    overflowY: "auto",
+    "&::-webkit-scrollbar": {
+        width: "0.5rem",
+    },
+    // "&::-webkit-scrollbar-track": {
+    // },
+    "&::-webkit-scrollbar-thumb": {
+        background: theme.palette.grey[500],
+    },
+}));
+
+export const ColorsListPaper = styled(Paper)({});
+
+export const StyledColorsList = styled(List)({});
+
+export const ColorButtonsContainer = styled(SimpleFlexContainer)({
+    gap: "0.5rem",
+});
