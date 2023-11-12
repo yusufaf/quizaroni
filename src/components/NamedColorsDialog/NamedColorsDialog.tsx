@@ -1,16 +1,4 @@
-import {
-    Button,
-    Dialog,
-    DialogContent,
-    DialogContentText,
-    Typography,
-    DialogActions,
-    List,
-    Paper,
-    ListItem,
-    Tabs,
-    Tab,
-} from "@mui/material";
+import { Button, Tabs, Tab } from "@mui/material";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -21,26 +9,27 @@ import {
 } from "state/slices/globalSlice";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import { ChangeEvent, ReactNode, SyntheticEvent, useState } from "react";
-import { StyledDialog, StyledDialogActions, StyledDialogContent } from "./styles";
+import {
+    StyledDialog,
+    StyledDialogActions,
+    StyledDialogContent,
+} from "./styles";
 import CreateTabView from "./CreateTabView";
-import { ChromePicker } from 'react-color';
 import NamedColorPicker from "./NamedColorPicker";
 import { LoadingButton } from "@mui/lab";
 import { useUpdateUserMetadataMutation } from "state/api/usersAPI";
+import ManageTabView from "./ManageTabView";
+import { ACTIONS, TABS } from "./constants";
+import NamedColorsList from "./NamedColorsList";
 
-const TABS = {
-    ASSIGN: "ASSIGN",
-    CREATE: "CREATE",
-    MANAGE: "MANAGE",
-    IMPORT: "IMPORT",
-};
-
-type Props = {
-};
+type Props = {};
 const NamedColorsDialog = (props: Props) => {
     /* Redux / Hooks */
     const dispatch = useDispatch();
-    const { metadata: { namedColors = [] }, uuid: userUUID = ""} = useSelector(selectUserData);
+    const {
+        metadata: { namedColors = [] },
+        uuid: userUUID = "",
+    } = useSelector(selectUserData);
     const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
 
     const [
@@ -52,12 +41,20 @@ const NamedColorsDialog = (props: Props) => {
         },
     ] = useUpdateUserMetadataMutation();
 
-    const [color, setColor] = useState<string>(namedColorsDialogProps.color ? namedColorsDialogProps.color : "#000000");
+    const [color, setColor] = useState<string>(
+        namedColorsDialogProps.color ? namedColorsDialogProps.color : "#000000"
+    );
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
     const [colorName, setColorName] = useState<string>(""); // From Create/Edit page
     const [errorInfo, setErrorInfo] = useState<any>(null);
 
-    console.log({namedColorsDialogProps})
+    const [editColorName, setEditColorName] = useState<string>("");
+    const [editErrorInfo, setEditErrorInfo] = useState<any>(null);
+    const [editIndex, setEditIndex] = useState<number | null>(null);
+    const [deleteIndices, setDeleteIndices] = useState<number[]>([]);
+    const [selectedAction, setSelectedAction] = useState<string | null>(null);
+
+    console.log({ namedColorsDialogProps });
 
     const isCreateTab = selectedTab === TABS.CREATE;
     const isManageTab = selectedTab === TABS.MANAGE;
@@ -71,7 +68,7 @@ const NamedColorsDialog = (props: Props) => {
             })
         );
     };
-    
+
     const onTabChange = (_e: SyntheticEvent, newTab: string) => {
         setSelectedTab(newTab);
     };
@@ -84,19 +81,21 @@ const NamedColorsDialog = (props: Props) => {
         const newColorObject = {
             color,
             name: colorName,
-        }
-        const newNamedColors = [...namedColors, newColorObject]
+        };
+        const newNamedColors = [...namedColors, newColorObject];
         updateUserMetadata({
             uuid: userUUID,
             property: "namedColors",
-            newValue: newNamedColors
-        })
+            newValue: newNamedColors,
+        });
     };
 
     const onCreateColorChange = (e: ChangeEvent<HTMLInputElement>) => {
         const name = e.target.value;
-        console.log({namedColors})
-        const isDuplicate = namedColors.some((colorObject) => colorObject.name === name);
+        console.log({ namedColors });
+        const isDuplicate = namedColors.some(
+            (colorObject) => colorObject.name === name
+        );
         setColorName(name);
         const localErrorInfo = isDuplicate
             ? {
@@ -109,8 +108,86 @@ const NamedColorsDialog = (props: Props) => {
     const onColorChange = (e) => {
         // hex, hsl, hsv, rgb
         const { hex } = e;
-        console.log("e in onColorChange = ", {e});
+        console.log("e in onColorChange = ", { e });
         setColor(hex);
+    };
+
+    const onEditColorChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const newNamedColorName = e.target.value;
+        const allOtherNamedColors = [...namedColors].filter(
+            (_, index) => index != editIndex
+        );
+        const isDuplicate = allOtherNamedColors.some(
+            (value) => value.name === newNamedColorName
+        );
+        setEditColorName(newNamedColorName);
+        if (isDuplicate) {
+            setEditErrorInfo({
+                helperText: "Color with that name already exists",
+            });
+        } else if (!newNamedColorName) {
+            setEditErrorInfo({
+                helperText: "Color name can't be empty",
+            });
+        } else {
+            setEditErrorInfo(null);
+        }
+    };
+
+    const handleEditClick = (index: number) => {
+        setDeleteIndices([]);
+        setSelectedAction(ACTIONS.EDIT);
+        setEditIndex(index);
+        setEditColorName(namedColors[index].name);
+    };
+
+    const handleDeleteClick = (index: number) => {
+        setEditIndex(null);
+        setEditColorName("");
+        setEditErrorInfo(null);
+
+        setSelectedAction(ACTIONS.DELETE);
+        if (deleteIndices.includes(index)) {
+            setDeleteIndices(deleteIndices.filter((value) => value !== index));
+        } else {
+            setDeleteIndices(deleteIndices.concat(index));
+        }
+    };
+
+    const handleEditOrDelete = async () => {
+        if (!userUUID) {
+            return;
+        }
+
+        try {
+            if (selectedAction === ACTIONS.EDIT && editIndex !== null) {
+                const selectedColor = namedColors[editIndex];
+                // /* Don't make network call if it's unchanged */
+                // if (editCategoryName === selectedCategoryName) {
+                //     return;
+                // }
+
+                // editCategory({
+                //     studysetUUID: uuid,
+                //     index: editIndex,
+                //     newCategory: editCategoryName,
+                //     oldCategory: selectedCategoryName,
+                // });
+            }
+            if (selectedAction === ACTIONS.DELETE) {
+                // const colorsToDelete = deleteIndices.map(
+                //     (index) => categories[index]
+                // );
+                // deleteCategory({
+                //     studysetUUID,
+                //     categoriesToDelete: colorsToDelete,
+                // });
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setSelectedAction(null);
+        }
     };
 
     const renderDialogButtons = (): ReactNode => {
@@ -126,26 +203,26 @@ const NamedColorsDialog = (props: Props) => {
                         Create
                     </LoadingButton>
                 );
-            // case TABS.MANAGE:
-            //     const disabled =
-            //         (selectedAction === ACTIONS.EDIT && editErrorInfo) ||
-            //         (selectedAction === ACTIONS.DELETE &&
-            //             !deleteIndices.length);
-            //     const buttonText =
-            //         selectedAction === ACTIONS.EDIT
-            //             ? "Save Edit"
-            //             : `Delete (${deleteIndices.length})`;
-            //     return (
-            //         selectedAction && (
-            //             <Button
-            //                 variant="contained"
-            //                 onClick={handleEditOrDelete}
-            //                 disabled={disabled}
-            //             >
-            //                 {buttonText}
-            //             </Button>
-            //         )
-            //     );
+            case TABS.MANAGE:
+                const isEditAction = selectedAction === ACTIONS.EDIT;
+                const disabled =
+                    (isEditAction && editErrorInfo) ||
+                    (selectedAction === ACTIONS.DELETE &&
+                        !deleteIndices.length);
+                const buttonText = isEditAction
+                    ? "Save Edit"
+                    : `Delete (${deleteIndices.length})`;
+                return (
+                    selectedAction && (
+                        <Button
+                            variant="contained"
+                            onClick={handleEditOrDelete}
+                            disabled={disabled}
+                        >
+                            {buttonText}
+                        </Button>
+                    )
+                );
             // case TABS.IMPORT:
             //     return (
             //         <LoadingButton
@@ -189,15 +266,15 @@ const NamedColorsDialog = (props: Props) => {
                             onCreateColorChange={onCreateColorChange}
                         />
                     )}
-                     {/* {isManageTab && (
+                    {isManageTab && (
                         <ManageTabView
                             editErrorInfo={editErrorInfo}
-                            editCategoryName={editCategoryName}
+                            editColorName={editColorName}
                             editIndex={editIndex}
-                            onEditCategoryChange={onEditCategoryChange}
-                            deleteUnusedCategories={deleteUnusedCategories}
+                            onEditColorChange={onEditColorChange}
                         />
                     )}
+                    {/*
                     {isImportTab && (
                         <ImportTabView
                             selectedStudysetUUID={selectedStudysetUUID}
@@ -218,23 +295,17 @@ const NamedColorsDialog = (props: Props) => {
                         />
                     )} */}
                 </div>
-
-                {/* 
-                <Paper elevation={6}>
-                    <List>
-                        {["test", "bruh"].map((value) => {
-                            return <ListItem divider />;
-                        })}
-                    </List>
-                </Paper> */}
-                <NamedColorPicker
-                    color={color}
-                    onChange={onColorChange}
+                <NamedColorPicker color={color} onChange={onColorChange} />
+                <NamedColorsList
+                    namedColors={namedColors}
+                    selectedTab={selectedTab}
+                    editIndex={editIndex}
+                    deleteIndices={deleteIndices}
+                    handleEditClick={handleEditClick}
+                    handleDeleteClick={handleDeleteClick}
                 />
             </StyledDialogContent>
-            <StyledDialogActions>
-                {renderDialogButtons()}
-            </StyledDialogActions>
+            <StyledDialogActions>{renderDialogButtons()}</StyledDialogActions>
         </StyledDialog>
     );
 };
