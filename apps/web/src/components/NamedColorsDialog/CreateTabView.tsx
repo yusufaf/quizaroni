@@ -1,4 +1,4 @@
-import { CreateColorField } from "./styles";
+import { ColorNameField } from "./styles";
 import { ChangeEvent } from "react";
 
 type Props = {
@@ -15,7 +15,7 @@ const CreateTabView = (props: Props) => {
     } = props;
 
     return (
-        <CreateColorField
+        <ColorNameField
             margin="dense"
             label="Color Name"
             type="text"
