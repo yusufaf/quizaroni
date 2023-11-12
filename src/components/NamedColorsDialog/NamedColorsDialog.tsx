@@ -7,9 +7,15 @@ import {
     selectUserData,
     setUserData,
 } from "state/slices/globalSlice";
-import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import {
+    BoldTypography,
+    SimpleFlexContainer,
+    FlexDialogTitle as StyledDialogTitle,
+} from "common/AppStyles";
 import { ChangeEvent, ReactNode, SyntheticEvent, useState } from "react";
 import {
+    ColorsListColumn,
+    DownloadListButton,
     StyledDialog,
     StyledDialogActions,
     StyledDialogContent,
@@ -21,6 +27,8 @@ import { useUpdateUserMetadataMutation } from "state/api/usersAPI";
 import ManageTabView from "./ManageTabView";
 import { ACTIONS, TABS } from "./constants";
 import NamedColorsList from "./NamedColorsList";
+import { Download } from "@mui/icons-material";
+import { downloadObjectAsJSON } from "utilities/functions";
 
 type Props = {};
 const NamedColorsDialog = (props: Props) => {
@@ -190,6 +198,10 @@ const NamedColorsDialog = (props: Props) => {
         }
     };
 
+    const downloadNamedColorsList = () => {
+        downloadObjectAsJSON(namedColors, "Quizaroni_NamedColors.json");
+    };
+
     const renderDialogButtons = (): ReactNode => {
         switch (selectedTab) {
             case TABS.CREATE:
@@ -296,14 +308,28 @@ const NamedColorsDialog = (props: Props) => {
                     )} */}
                 </div>
                 <NamedColorPicker color={color} onChange={onColorChange} />
-                <NamedColorsList
-                    namedColors={namedColors}
-                    selectedTab={selectedTab}
-                    editIndex={editIndex}
-                    deleteIndices={deleteIndices}
-                    handleEditClick={handleEditClick}
-                    handleDeleteClick={handleDeleteClick}
-                />
+                <ColorsListColumn>
+                    <SimpleFlexContainer>
+                        <BoldTypography>
+                            Named Colors
+                        </BoldTypography>
+                        <DownloadListButton
+                            variant="outlined"
+                            startIcon={<Download />}
+                            onClick={downloadNamedColorsList}
+                        >
+                            Download
+                        </DownloadListButton>
+                    </SimpleFlexContainer>
+                    <NamedColorsList
+                        namedColors={namedColors}
+                        selectedTab={selectedTab}
+                        editIndex={editIndex}
+                        deleteIndices={deleteIndices}
+                        handleEditClick={handleEditClick}
+                        handleDeleteClick={handleDeleteClick}
+                    />
+                </ColorsListColumn>
             </StyledDialogContent>
             <StyledDialogActions>{renderDialogButtons()}</StyledDialogActions>
         </StyledDialog>
