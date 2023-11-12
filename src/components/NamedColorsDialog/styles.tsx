@@ -29,13 +29,12 @@ export const StyledDialogContent = styled(DialogContent)({
 });
 
 export const StyledDialogActions = styled(DialogActions)({
-    margin: "0 1rem 1rem 0"
-})
+    margin: "0 1rem 1rem 0",
+});
 
 export const ColorNameField = styled(TextField)({
     marginTop: "1.25rem",
 });
-
 
 export const SwatchPaper = styled(Paper)({
     display: "flex",
@@ -45,7 +44,7 @@ export const SwatchPaper = styled(Paper)({
     width: "7rem",
     padding: "0.5rem 0.5rem 0 0.5rem",
     borderRadius: "0.25rem",
-})
+});
 
 export const Swatch = styled("div")(({ theme }) => ({
     alignSelf: "center",
@@ -58,16 +57,25 @@ export const Swatch = styled("div")(({ theme }) => ({
 
 export const NamedColorPickerContainer = styled("div")({
     position: "absolute",
-})
+});
 
 export const ManageTabContainer = styled(FlexColumn)({
     gap: "1rem",
-})
+});
 
 export const ManageTabButton = styled(Button)({
     width: "16rem",
 });
 
+export const ColorsListColumn = styled(FlexColumn)({
+    gap: "0.5rem",
+    marginTop: "4rem",
+});
+
+export const DownloadListButton = styled(Button)({
+    display: "flex",
+    marginLeft: "auto",
+});
 
 export const ColorsListContainer = styled("div")(({ theme }) => ({
     maxHeight: "20rem",

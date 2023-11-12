@@ -15,7 +15,7 @@ type Props = {
     deleteIndices?: number[];
     handleEditClick?: (index: number) => void;
     handleDeleteClick?: (index: number) => void;
-    type?: string;
+    style?: Object;
 };
 
 const CategoriesList = (props: Props) => {
@@ -26,12 +26,11 @@ const CategoriesList = (props: Props) => {
         deleteIndices = [],
         handleEditClick = () => {},
         handleDeleteClick = () => {},
-        type = "main",
+        style = {},
     } = props;
 
     const isManageTab = selectedTab === TABS.MANAGE;
     const isImportTab = selectedTab === TABS.IMPORT;
-    const listStyle = type === "main" ? { marginTop: "4rem" } : {};
 
     const renderCategoriesList = () => {
         return categories?.map((value, index) => {
@@ -84,7 +83,7 @@ const CategoriesList = (props: Props) => {
     };
 
     return (
-        <CategoriesListContainer style={listStyle}>
+        <CategoriesListContainer style={style}>
             {categories.length === 0 ? (
                 <Typography variant="subtitle1">No categories to display</Typography>
             ) : (
