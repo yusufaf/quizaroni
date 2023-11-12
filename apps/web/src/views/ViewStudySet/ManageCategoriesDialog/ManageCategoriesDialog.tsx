@@ -1,7 +1,6 @@
 import { LoadingButton } from "@mui/lab";
 import {
     Button,
-    DialogActions,
     SelectChangeEvent,
     Tab,
     Tabs,
@@ -17,16 +16,23 @@ import {
     useEditCategoryMutation,
 } from "state/api/studysetsAPI";
 import { selectUserData } from "state/slices/globalSlice";
-import { capitalizeFirstLetter } from "utilities/functions";
+import { capitalizeFirstLetter, downloadObjectAsJSON } from "utilities/functions";
 import AssignTabView from "./AssignTabView";
 import CategoriesList from "./CategoriesList";
 import CreateTabView from "./CreateTabView";
 import ImportTabView from "./ImportTabView";
 import ManageTabView from "./ManageTabView";
 import { ACTIONS, TABS } from "./constants";
-import { StyledDialog, StyledDialogActions, StyledDialogContent } from "./styles";
-import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import {
+    CategoriesListColumn,
+    DownloadListButton,
+    StyledDialog,
+    StyledDialogActions,
+    StyledDialogContent,
+} from "./styles";
+import { BoldTypography, SimpleFlexContainer, FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
+import { Download } from "@mui/icons-material";
 
 type Props = {
     open: boolean;
@@ -38,7 +44,7 @@ type Props = {
 const ManageCategoriesDialog = (props: Props) => {
     const { open, onClose, selectedStudyset, studysets } = props;
 
-    const { uuid: studysetUUID = "" } = selectedStudyset || {};
+    const { uuid: studysetUUID = "", categories = [], title: studysetTitle = ""} = selectedStudyset || {};
 
     const dispatch = useDispatch();
     const { uuid: userUUID = "" } = useSelector(selectUserData);
@@ -108,7 +114,7 @@ const ManageCategoriesDialog = (props: Props) => {
 
     const onCreateCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
         const category = e.target.value;
-        const isDuplicate = selectedStudyset.categories.includes(category);
+        const isDuplicate = categories.includes(category);
         setCategoryName(category);
         if (isDuplicate) {
             setErrorInfo({
@@ -121,7 +127,7 @@ const ManageCategoriesDialog = (props: Props) => {
 
     const onEditCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
         const newCategoryName = e.target.value;
-        const allOtherCategories = [...selectedStudyset.categories].filter(
+        const allOtherCategories = categories.filter(
             (_, index) => index != editIndex
         );
         const isDuplicate = allOtherCategories.includes(newCategoryName);
@@ -153,7 +159,7 @@ const ManageCategoriesDialog = (props: Props) => {
         setDeleteIndices([]);
         setSelectedAction(ACTIONS.EDIT);
         setEditIndex(index);
-        setEditCategoryName(selectedStudyset.categories[index]);
+        setEditCategoryName(categories[index]);
     };
 
     const handleDeleteClick = (index: number) => {
@@ -170,12 +176,12 @@ const ManageCategoriesDialog = (props: Props) => {
     };
 
     const handleEditOrDelete = async () => {
+        if (!studysetUUID) {
+            return;
+        }
+
         try {
-            const { categories, uuid } = selectedStudyset;
             /* Don't need to check categories cause they're paired */
-            if (!uuid) {
-                return;
-            }
 
             if (selectedAction === ACTIONS.EDIT && editIndex !== null) {
                 const selectedCategoryName = categories[editIndex];
@@ -185,7 +191,7 @@ const ManageCategoriesDialog = (props: Props) => {
                 }
 
                 editCategory({
-                    studysetUUID: uuid,
+                    studysetUUID,
                     index: editIndex,
                     newCategory: editCategoryName,
                     oldCategory: selectedCategoryName,
@@ -224,7 +230,7 @@ const ManageCategoriesDialog = (props: Props) => {
 
         // Ensure no duplicates, filter out categories that already exist
         const categoriesToImport = importSetCategories.filter(
-            (category) => !selectedStudyset.categories.includes(category)
+            (category) => !categories.includes(category)
         );
 
         for (const category of categoriesToImport) {
@@ -295,6 +301,10 @@ const ManageCategoriesDialog = (props: Props) => {
         }
     };
 
+    const downloadCategoriesList = () => {
+        downloadObjectAsJSON(categories, `Quizaroni_${studysetTitle}_Categories.json`);
+    };
+
     return (
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
             <StyledDialogTitle>
@@ -348,14 +358,26 @@ const ManageCategoriesDialog = (props: Props) => {
                         />
                     )}
                 </div>
-                <CategoriesList
-                    categories={selectedStudyset?.categories ?? []}
-                    selectedTab={selectedTab}
-                    editIndex={editIndex}
-                    deleteIndices={deleteIndices}
-                    handleEditClick={handleEditClick}
-                    handleDeleteClick={handleDeleteClick}
-                />
+                <CategoriesListColumn>
+                    <SimpleFlexContainer>
+                        <BoldTypography>Categories</BoldTypography>
+                        <DownloadListButton
+                            variant="outlined"
+                            startIcon={<Download />}
+                            onClick={downloadCategoriesList}
+                        >
+                            Download
+                        </DownloadListButton>
+                    </SimpleFlexContainer>
+                    <CategoriesList
+                        categories={selectedStudyset?.categories ?? []}
+                        selectedTab={selectedTab}
+                        editIndex={editIndex}
+                        deleteIndices={deleteIndices}
+                        handleEditClick={handleEditClick}
+                        handleDeleteClick={handleDeleteClick}
+                    />
+                </CategoriesListColumn>
             </StyledDialogContent>
             <StyledDialogActions>{renderDialogButton()}</StyledDialogActions>
         </StyledDialog>

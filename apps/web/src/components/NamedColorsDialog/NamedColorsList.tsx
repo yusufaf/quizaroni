@@ -15,7 +15,7 @@ type Props = {
     deleteIndices?: number[];
     handleEditClick?: (index: number) => void;
     handleDeleteClick?: (index: number) => void;
-    type?: string;
+    style?: Object;
 };
 
 const NamedColorsList = (props: Props) => {
@@ -26,11 +26,10 @@ const NamedColorsList = (props: Props) => {
         deleteIndices = [],
         handleEditClick = () => {},
         handleDeleteClick = () => {},
-        type = "main",
+        style = {},
     } = props;
 
     const isManageTab = selectedTab === TABS.MANAGE;
-    const listStyle = type === "main" ? { marginTop: "4rem" } : {};
 
     const renderNamedColorsList = () => {
         return namedColors?.map((value, index) => {
@@ -85,7 +84,7 @@ const NamedColorsList = (props: Props) => {
     };
 
     return (
-        <ColorsListContainer style={listStyle}>
+        <ColorsListContainer style={style}>
             {namedColors.length === 0 ? (
                 <Typography variant="subtitle1">No named colors to display</Typography>
             ) : (

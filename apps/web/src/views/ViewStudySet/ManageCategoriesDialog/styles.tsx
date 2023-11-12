@@ -37,6 +37,16 @@ export const StyledDialogContent = styled(DialogContent)({
     gap: "1rem",
 });
 
+export const CategoriesListColumn = styled(FlexColumn)({
+    gap: "0.5rem",
+    marginTop: "4rem",
+});
+
+export const DownloadListButton = styled(Button)({
+    display: "flex",
+    marginLeft: "auto",
+});
+
 export const CategoriesListContainer = styled("div")(({ theme }) => ({
     maxHeight: "20rem",
     overflowY: "auto",
