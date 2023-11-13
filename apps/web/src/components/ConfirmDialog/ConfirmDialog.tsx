@@ -76,6 +76,7 @@ const ConfirmDialog = (props: Props) => {
         <Dialog 
             open={dialogProps?.open} 
             onClose={onClose}
+            fullWidth
         >
             <StyledDialogTitle>
                 {dialogProps?.title}
