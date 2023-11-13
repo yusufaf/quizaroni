@@ -7,7 +7,7 @@ import {
 import {
     Tooltip,
 } from "@mui/material";
-import { ExtraPickerButton } from "../createSetStyles";
+import { ExtraPickerButton } from "../CreateSetStyles";
 import { ColorPickerContainer, ExtraPickerContainer } from "./styles";
 import { ChromePicker } from "react-color";
 import { useState } from "react";

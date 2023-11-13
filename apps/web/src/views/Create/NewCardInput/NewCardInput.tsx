@@ -23,7 +23,7 @@ import {
     NewCardLabel,
     BottomActions,
     AddCardBelowButton,
-} from "../createSetStyles";
+} from "../CreateSetStyles";
 import {
     addCard,
     deleteCard,

@@ -25,7 +25,7 @@ import {
     LabelMenuItem,
     LabelSelect,
     TitleInput,
-} from "./createSetStyles";
+} from "./CreateSetStyles";
 
 type Props = {
     advancedSectionProps: any;

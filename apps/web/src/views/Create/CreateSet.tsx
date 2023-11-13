@@ -28,7 +28,7 @@ import {
     AddCardIcon,
     CreateSetButton,
     CreateSetPage,
-} from "./createSetStyles";
+} from "./CreateSetStyles";
 import ImportSetModal from "./ImportSetModal/ImportSetModal";
 import NewCardInput from "./NewCardInput/NewCardInput";
 import SetModificationButtons from "./SetModificationButtons";

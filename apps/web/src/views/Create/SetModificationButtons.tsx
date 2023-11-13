@@ -1,6 +1,6 @@
 import { SwapHoriz, Sync, UploadFile } from "@mui/icons-material";
 import { Button } from "@mui/material";
-import { SetModificationsContainer } from "./createSetStyles";
+import { SetModificationsContainer } from "./CreateSetStyles";
 import { handleReverse, swapAllCards } from "../../utilities/createUtils";
 import { useDispatch } from "react-redux";
 import { setShowImportModal } from "state/slices/createSetSlice";
