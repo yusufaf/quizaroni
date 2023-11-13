@@ -17,7 +17,10 @@ import {
     useUpdateStudysetMetadataMutation,
 } from "state/api/studysetsAPI";
 import { selectUserData, setDialogProps } from "state/slices/globalSlice";
-import { selectSelectedDialog, setSelectedDialog } from "state/slices/viewSetsSlice";
+import {
+    selectSelectedDialog,
+    setSelectedDialog,
+} from "state/slices/viewSetsSlice";
 import {
     CONFIRM_DIALOGS,
     DEFAULT_CATEGORIES,
@@ -36,6 +39,7 @@ import ViewStudySetCard from "./ViewStudySetCard";
 import ViewStudysetFilters from "./ViewStudysetFilters/ViewStudysetFilters";
 import {
     CardCount,
+    NoCardsMessage,
     StudysetInfo,
     ViewFlashsetPaper,
     ViewStudysetContainer,
@@ -237,16 +241,25 @@ const ViewStudySet = (props: Props) => {
                 totalCount={filteredViewFlashCards.length}
                 itemContent={(index) => filteredViewFlashCards[index]}
             /> */}
-                {filteredViewFlashCards.map((card, index) => {
-                    return (
-                        <ViewStudySetCard
-                            key={card.uuid}
-                            card={card}
-                            index={index}
-                            selectedStudyset={selectedStudyset}
-                        />
-                    );
-                })}
+                {filteredViewFlashCards.length === 0 &&
+                selectedTab !== DEFAULT_CATEGORIES.ALL ? (
+                    <NoCardsMessage>
+                        No cards matched the selected category.
+                    </NoCardsMessage>
+                ) : filteredViewFlashCards.length === 0 ? (
+                    <NoCardsMessage>No cards in this study set.</NoCardsMessage>
+                ) : (
+                    filteredViewFlashCards.map((card, index) => {
+                        return (
+                            <ViewStudySetCard
+                                key={card.uuid}
+                                card={card}
+                                index={index}
+                                selectedStudyset={selectedStudyset}
+                            />
+                        );
+                    })
+                )}
                 <NotesDrawer selectedStudyset={selectedStudyset} />
             </ViewStudysetPage>
             <ManageLabelsDialog

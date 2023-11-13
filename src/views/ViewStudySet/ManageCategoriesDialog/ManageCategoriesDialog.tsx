@@ -1,10 +1,5 @@
 import { LoadingButton } from "@mui/lab";
-import {
-    Button,
-    SelectChangeEvent,
-    Tab,
-    Tabs,
-} from "@mui/material/";
+import { Button, SelectChangeEvent, Tab, Tabs } from "@mui/material/";
 import useCustomMutation from "lib/hooks/useCustomMutation";
 import { Studyset } from "lib/types";
 import { ChangeEvent, ReactNode, SyntheticEvent, useState } from "react";
@@ -16,7 +11,10 @@ import {
     useEditCategoryMutation,
 } from "state/api/studysetsAPI";
 import { selectUserData } from "state/slices/globalSlice";
-import { capitalizeFirstLetter, downloadObjectAsJSON } from "utilities/functions";
+import {
+    capitalizeFirstLetter,
+    downloadObjectAsJSON,
+} from "utilities/functions";
 import AssignTabView from "./AssignTabView";
 import CategoriesList from "./CategoriesList";
 import CreateTabView from "./CreateTabView";
@@ -30,7 +28,11 @@ import {
     StyledDialogActions,
     StyledDialogContent,
 } from "./styles";
-import { BoldTypography, SimpleFlexContainer, FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import {
+    BoldTypography,
+    SimpleFlexContainer,
+    FlexDialogTitle as StyledDialogTitle,
+} from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import { Download } from "@mui/icons-material";
 
@@ -44,7 +46,11 @@ type Props = {
 const ManageCategoriesDialog = (props: Props) => {
     const { open, onClose, selectedStudyset, studysets } = props;
 
-    const { uuid: studysetUUID = "", categories = [], title: studysetTitle = ""} = selectedStudyset || {};
+    const {
+        uuid: studysetUUID = "",
+        categories = [],
+        title: studysetTitle = "",
+    } = selectedStudyset || {};
 
     const dispatch = useDispatch();
     const { uuid: userUUID = "" } = useSelector(selectUserData);
@@ -302,7 +308,10 @@ const ManageCategoriesDialog = (props: Props) => {
     };
 
     const downloadCategoriesList = () => {
-        downloadObjectAsJSON(categories, `Quizaroni_${studysetTitle}_Categories.json`);
+        downloadObjectAsJSON(
+            categories,
+            `Quizaroni_${studysetTitle}_Categories.json`
+        );
     };
 
     return (
@@ -359,7 +368,7 @@ const ManageCategoriesDialog = (props: Props) => {
                     )}
                 </div>
                 <CategoriesListColumn>
-                    <SimpleFlexContainer>
+                    <SimpleFlexContainer style={{ alignItems: "baseline" }}>
                         <BoldTypography>Categories</BoldTypography>
                         <DownloadListButton
                             variant="outlined"

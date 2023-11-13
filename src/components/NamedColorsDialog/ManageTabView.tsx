@@ -9,8 +9,12 @@ type Props = {
 };
 
 const ManageTabView = (props: Props) => {
-    const { editErrorInfo, editColorName, editIndex, onEditColorChange } =
-        props;
+    const { 
+        editErrorInfo, 
+        editColorName, 
+        editIndex, 
+        onEditColorChange 
+    } = props;
 
     return (
         <ColorNameField

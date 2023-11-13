@@ -170,26 +170,31 @@ const NamedColorsDialog = (props: Props) => {
         try {
             if (selectedAction === ACTIONS.EDIT && editIndex !== null) {
                 const selectedColor = namedColors[editIndex];
-                // /* Don't make network call if it's unchanged */
-                // if (editCategoryName === selectedCategoryName) {
-                //     return;
-                // }
+                /* Don't make network call if it's unchanged */
+                if (editColorName === selectedColor.name) {
+                    return;
+                }
 
-                // editCategory({
-                //     studysetUUID: uuid,
-                //     index: editIndex,
-                //     newCategory: editCategoryName,
-                //     oldCategory: selectedCategoryName,
-                // });
+                let newNamedColors = [...namedColors];
+                newNamedColors[editIndex] = {
+                    color,
+                    name: editColorName,
+                };
+                updateUserMetadata({
+                    uuid: userUUID,
+                    property: "namedColors",
+                    newValue: newNamedColors,
+                });
             }
             if (selectedAction === ACTIONS.DELETE) {
-                // const colorsToDelete = deleteIndices.map(
-                //     (index) => categories[index]
-                // );
-                // deleteCategory({
-                //     studysetUUID,
-                //     categoriesToDelete: colorsToDelete,
-                // });
+                const newNamedColors = [...namedColors].filter(
+                    (_value, index) => deleteIndices.includes(index)
+                );
+                updateUserMetadata({
+                    uuid: userUUID,
+                    property: "namedColors",
+                    newValue: newNamedColors,
+                });
             }
         } catch (error) {
             console.error(error);
@@ -309,10 +314,8 @@ const NamedColorsDialog = (props: Props) => {
                 </div>
                 <NamedColorPicker color={color} onChange={onColorChange} />
                 <ColorsListColumn>
-                    <SimpleFlexContainer>
-                        <BoldTypography>
-                            Named Colors
-                        </BoldTypography>
+                    <SimpleFlexContainer style={{ alignItems: "baseline" }}>
+                        <BoldTypography>Named Colors</BoldTypography>
                         <DownloadListButton
                             variant="outlined"
                             startIcon={<Download />}
