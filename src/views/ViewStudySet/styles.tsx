@@ -1,6 +1,6 @@
 import { styled } from "@mui/system";
 import { Box, Card, FormControl, Paper, Tabs, Typography, Tab, Chip } from "@mui/material";
-import { BasePage, SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
+import { BasePage, BoldTypography, SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
 
 export const ViewStudysetPage = styled(BasePage)({
     height: "100%",
@@ -110,6 +110,8 @@ export const ViewCardInfo = styled("div")({
 export const ViewCardText = styled(Typography)({
 
 });
+
+export const NoCardsMessage = styled(BoldTypography)({});
 
 
 export const StudyModeOption = styled("div")(({ theme }) => ({
