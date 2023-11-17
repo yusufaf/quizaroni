@@ -6,26 +6,35 @@ import {
     ExpandLess as ExpandLessIcon,
 } from "@mui/icons-material";
 import { setAlert } from "state/slices/globalSlice";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectAdvancedSectionProps, setAdvancedSectionProps } from "state/slices/createSetSlice";
 
 type Props = {
-    blankCardsCount: number,
-    expanded: boolean,
-    onToggleExpanded: any,
-    onBlankInputsChange: any,
     onBlankInputsSubmit: any,
 }
 
 const HeaderAdvancedSection = (props: Props) => {
     const {
-        blankCardsCount,
-        expanded,
-        onToggleExpanded,
-        onBlankInputsChange = null,
         onBlankInputsSubmit = null,
     } = props;
 
     const dispatch = useDispatch();
+
+    const { blankCardsCount, expanded } = useSelector(selectAdvancedSectionProps);
+
+    const onBlankInputsChange = (e: any) => {
+        dispatch(setAdvancedSectionProps({
+            blankCardsCount: e.target.value,
+            expanded,
+        }))
+    };
+
+    const onToggleExpanded = () => {
+        dispatch(setAdvancedSectionProps({
+            blankCardsCount,
+            expanded: !expanded
+        }))
+    }
 
     const handleBlankInputsSubmit = () => {
         onBlankInputsSubmit();
