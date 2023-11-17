@@ -39,6 +39,7 @@ import { Create } from "@mui/icons-material";
 import {
     selectShowImportModal,
     setShowImportModal,
+    selectAdvancedSectionProps, setAdvancedSectionProps 
 } from "state/slices/createSetSlice";
 import NamedColorsDialog from "components/NamedColorsDialog/NamedColorsDialog";
 
@@ -62,13 +63,15 @@ const CreateSet = (props: Props) => {
     const cognitoUser = useSelector(selectCognitoUser);
     const userData = useSelector(selectUserData);
     const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
+    const { blankCardsCount, expanded } = useSelector(selectAdvancedSectionProps);
+
 
     const {
         data: selectedStudySet,
         isLoading: isStudySetLoading,
         isSuccess: isStudySetSuccess,
         isError: isStudySetError,
-    } = useGetStudysetQuery(studySetUUID ?? "", {
+    } = useGetStudysetQuery({uuid: studySetUUID ?? ""}, {
         skip: !studySetUUID,
     });
 
@@ -81,6 +84,8 @@ const CreateSet = (props: Props) => {
     const [selectedLabel, setSelectedLabel] = useState<string>("");
     const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
 
+
+    
     console.log({ createdSetCards });
 
     const createSetDisabled = !title || !description;
@@ -93,12 +98,10 @@ const CreateSet = (props: Props) => {
         descInput: false,
     });
 
-    const [advancedExpanded, setAdvancedExpanded] = useState(false);
-    const [blankCardsCount, setBlankCardsCount] = useState(0);
-
     useBrowserTitle(PAGES.CREATE);
 
     useEffect(() => {
+        console.log("editing stuff ", {isStudySetSuccess, selectedStudySet});
         if (isStudySetSuccess && selectedStudySet) {
             const { label, title, description, cards } = selectedStudySet;
             setEnteredLabel(label);
@@ -220,15 +223,6 @@ const CreateSet = (props: Props) => {
 
     /* Advanced Section Functions */
 
-    const toggleAdvancedSection = () => {
-        setAdvancedExpanded(!advancedExpanded);
-    };
-
-    const onBlankInputsChange = (e: any) => {
-        const newValue = e.target.value;
-        setBlankCardsCount(newValue);
-    };
-
     const onBlankInputsSubmit = () => {
         const newCreatedSetCards = [...createdSetCards];
         for (let i = 0; i < blankCardsCount; i++) {
@@ -236,19 +230,16 @@ const CreateSet = (props: Props) => {
         }
         setCreatedSetCards(newCreatedSetCards);
         /* Clear the blank cards count input */
-        setBlankCardsCount(0);
-    };
-
-    const advancedSectionProps = {
-        blankCardsCount,
-        expanded: advancedExpanded,
-        onToggleExpanded: toggleAdvancedSection,
-        onBlankInputsChange,
-        onBlankInputsSubmit,
+        dispatch(setAdvancedSectionProps({
+            blankCardsCount: 0,
+            expanded,
+        }))
     };
 
     const headerProps = {
-        advancedSectionProps,
+        advancedSectionProps: {
+            onBlankInputsSubmit
+        },
         createNewSet,
         description,
         label: enteredLabel,

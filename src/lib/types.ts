@@ -77,10 +77,17 @@ export type DuplicateStudysetParams = {
     uuid: UUID;
 };
 
+
+// Users API
 export type UpdateMetadataParams = {
     uuid: UUID;
     property: string;
     newValue: any;
+};
+
+export type UpdateDefaultThemeParams = {
+    uuid: UUID;
+    newTheme: "light" | "dark";
 };
 
 export type CreateCategoryParams = StudysetUUIDPayload & {

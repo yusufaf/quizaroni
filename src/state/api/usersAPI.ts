@@ -1,5 +1,5 @@
 import api from "./api";
-import { UpdateMetadataParams } from "lib/types";
+import { UpdateDefaultThemeParams, UpdateMetadataParams } from "lib/types";
 
 
 /* Endpoints
@@ -23,9 +23,21 @@ export const usersApi = api.injectEndpoints({
             }),
             invalidatesTags: ["User"],
         }),
+        updateDefaultTheme: build.mutation<void, UpdateDefaultThemeParams>({
+            query: ({ newTheme, uuid }) => ({
+                url: "users/updateDefaultTheme",
+                method: "POST",
+                body: {
+                    uuid,
+                    newTheme
+                },
+            }),
+            invalidatesTags: ["User"],
+        }),
     }),
 });
 
 export const {
-    useUpdateUserMetadataMutation
+    useUpdateUserMetadataMutation,
+    useUpdateDefaultThemeMutation,
 } = usersApi;

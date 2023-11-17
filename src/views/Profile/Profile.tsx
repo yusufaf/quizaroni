@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import {
     Button,
-    Tooltip,
-    IconButton,
     ToggleButton,
     ToggleButtonGroup,
     Typography,
@@ -15,8 +13,6 @@ import {
     Password,
     Person,
     RemoveCircleOutline,
-    VisibilityOff,
-    Visibility,
 } from "@mui/icons-material";
 import LoginMessage from "views/LoginMessage/LoginMessage";
 import ProfileCard from "./ProfileCard";
