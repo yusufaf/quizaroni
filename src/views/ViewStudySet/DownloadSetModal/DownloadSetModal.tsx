@@ -1,15 +1,17 @@
 import {
     Button,
+    Checkbox,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     FormControl,
+    FormControlLabel,
     MenuItem,
     Select,
 } from "@mui/material/";
 import { Card, Studyset } from "lib/types";
-import { Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 import {
     DOWNLOAD_FILE_TYPES,
     MIME_TYPES,
@@ -17,6 +19,7 @@ import {
 } from "utilities/constants";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
+import { DownloadDialogContent } from "../styles";
 
 const downloadTypeItems = Object.values(DOWNLOAD_FILE_TYPES).map(
     (value, index) => {
@@ -39,17 +42,20 @@ type DownloadFileParams = {
 };
 
 type Props = {
-    downloadFileType: string;
     onClose: () => void;
     open: boolean;
-    setDownloadFileType: Dispatch<SetStateAction<string>>;
     studyset: Studyset;
 };
 
 const DownloadSetModal = (props: Props) => {
-    const { open, onClose, downloadFileType, setDownloadFileType, studyset } =
+    const { open, onClose, studyset } =
         props;
 
+    const [downloadFileType, setDownloadFileType] = useState<string>(
+        DOWNLOAD_FILE_TYPES.TXT
+    );
+    const [includeMetadata, setIncludeMetadata] = useState<boolean>(false);
+    
     const downloadFile = ({ data, fileName, fileType }: DownloadFileParams) => {
         const blob = new Blob([data], { type: MIME_TYPES[fileType] });
         const anchor = document.createElement("a");
@@ -143,7 +149,7 @@ const DownloadSetModal = (props: Props) => {
                 Download Study Set
                 <CloseDialogButton onClose={onClose} />
             </StyledDialogTitle>
-            <DialogContent>
+            <DownloadDialogContent>
                 <DialogContentText>
                     Choose what format you'd like to download the study set as:
                 </DialogContentText>
@@ -159,7 +165,16 @@ const DownloadSetModal = (props: Props) => {
                         {downloadTypeItems}
                     </Select>
                 </FormControl>
-            </DialogContent>
+                <FormControlLabel
+                    label="Include metadata?"
+                    control={
+                        <Checkbox
+                        checked={includeMetadata}
+                        onChange={(e) => setIncludeMetadata(e.target.checked)}
+                        />
+                    }
+                />
+            </DownloadDialogContent>
             <DialogActions>
                 <Button onClick={onClose} variant="outlined">
                     Cancel
