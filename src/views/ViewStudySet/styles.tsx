@@ -1,5 +1,5 @@
 import { styled } from "@mui/system";
-import { Box, Card, FormControl, Paper, Tabs, Typography, Tab, Chip } from "@mui/material";
+import { Box, Card, FormControl, Paper, Tabs, Typography, Tab, Chip, DialogContent } from "@mui/material";
 import { BasePage, BoldTypography, SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
 
 export const ViewStudysetPage = styled(BasePage)({
@@ -131,3 +131,9 @@ export const StudyModeOption = styled("div")(({ theme }) => ({
         transition: "0.2s ease",
     }
 }));
+
+// Download Dialog
+export const DownloadDialogContent = styled(DialogContent)({
+    display: "flex",
+    flexDirection: "column",
+});

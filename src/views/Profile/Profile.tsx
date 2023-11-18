@@ -1,42 +1,28 @@
-import { useState, useEffect, useRef } from "react";
 import {
-    Button,
-    ToggleButton,
-    ToggleButtonGroup,
-    Typography,
-    TextField,
+    Tabs
 } from "@mui/material/";
+import { SyntheticEvent, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
-    DarkMode,
-    LightMode,
-    Palette,
-    Password,
-    Person,
-    RemoveCircleOutline,
-} from "@mui/icons-material";
-import LoginMessage from "views/LoginMessage/LoginMessage";
-import ProfileCard from "./ProfileCard";
-import DeleteAccountDialog from "./DeleteAccountDialog/DeleteAccountDialog";
-import { LIGHT, DARK } from "utilities/constants";
+    selectAuthenticated,
+    selectUserData
+} from "state/slices/globalSlice";
 import { useTheme } from "theme/useTheme";
-import PasswordToggle from "components/PasswordToggle/PasswordToggle";
+import LoginMessage from "views/LoginMessage/LoginMessage";
+import AccountTab from "./AccountTab";
+import CustomizationTab from "./CustomizationTab";
+import ProfileCard from "./ProfileCard";
 import {
-    ActionHeader,
-    InfoChangeContainer,
-    PasswordFieldsContainer,
     ProfileContainer,
     ProfilePage,
     ProfilePaper,
+    ProfileTab,
 } from "./ProfileStyles";
-import { BoldTypography } from "common/AppStyles";
-import { useDispatch, useSelector } from "react-redux";
-import {
-    selectCognitoUser,
-    selectAuthenticated,
-    selectUserData,
-    setUserData,
-} from "state/slices/globalSlice";
-import axios from "axios";
+
+const TABS = {
+    ACCOUNT: "Account",
+    CUSTOMIZATION: "Customization",
+}
 
 type Props = {};
 
@@ -47,96 +33,15 @@ const Profile = (props: Props) => {
     const authenticated = useSelector(selectAuthenticated);
     const userData = useSelector(selectUserData);
 
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [deletePassword, setDeletePassword] = useState<string>("");
-    const [enteredNewUsername, setEnteredNewUsername] = useState<string>("");
-    const [newPassword, setNewPassword] = useState<string>("");
-    const [enteredConfirmPassword, setEnteredConfirmPassword] = useState("");
-
-    const [newPasswordVisibility, setNewPasswordVisibility] = useState(false);
+    const [selectedProfileTab, setSelectedProfileTab] = useState<string>(TABS.CUSTOMIZATION);
 
     /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
         confirmPassInput: false,
     });
 
-    const [defaultTheme, setDefaultTheme] = useState<string>(
-        userData?.metadata?.defaultTheme ?? "dark"
-    );
-
-    useEffect(() => {
-        if (userData?.metadata?.defaultTheme) {
-            setDefaultTheme(userData.metadata.defaultTheme);
-        }
-    }, []);
-
-    const checkIfInputMatches = (event) => {
-        let updatedErrorText = { ...showErrorText };
-        updatedErrorText[event.target.name] =
-            event.target.value !== newPassword;
-        setShowErrorText(updatedErrorText);
-    };
-
-    /**
-     * Update user's selected default theme
-     */
-    const handleDefaultTheme = async (event, newTheme) => {
-        try {
-            const { uuid } = userData;
-            /* Don't take any action if selected theme is the same */
-            if (!uuid || newTheme === null || newTheme === defaultTheme) {
-                return;
-            }
-
-            const themeUpdateResult = await axios.post(
-                "/api/users/updateDefaultTheme",
-                {
-                    uuid,
-                    newTheme,
-                }
-            );
-            console.log({ themeUpdateResult });
-
-            setDefaultTheme(newTheme);
-
-            const newUserData = {
-                ...userData,
-				metadata: {
-					...userData.metadata,
-					defaultTheme: newTheme,
-				}
-            };
-			console.log({newUserData})
-            dispatch(setUserData(newUserData));
-        } catch (error) {
-            console.error("Error updating default theme");
-        }
-    };
-
-    const handleDeleteAccount = async () => {
-        // TODO
-    };
-
-    /**
-     * Change username for authenticated user
-     */
-    const handleChangeUsername = async () => {
-        // TODO
-    };
-
-    /**
-     * Change user password if signed up with email / password
-     */
-    const handleChangePassword = () => {
-        // TODO
-    };
-
-    const handleShowDeleteDialog = () => {
-        setShowDeleteDialog(true);
-    };
-
-    const handleCloseDeleteDialog = () => {
-        setShowDeleteDialog(false);
+    const onTabChange = (_e: SyntheticEvent, newTab: string) => {
+        setSelectedProfileTab(newTab);
     };
 
     if (!authenticated) {
@@ -149,158 +54,27 @@ const Profile = (props: Props) => {
                 <ProfileCard />
                 <ProfilePaper elevation={6}>
                     <ProfileContainer>
-                        <BoldTypography variant="h5">Profile</BoldTypography>
-                        <ActionHeader>
-                            <Palette />
-                            <Typography variant="h6">Default Theme</Typography>
-                        </ActionHeader>
-                        <ToggleButtonGroup
-                            aria-label="Set default theme"
-                            exclusive
-                            onChange={handleDefaultTheme}
-                            value={defaultTheme}
+                        <Tabs
+                            value={selectedProfileTab}
+                            onChange={onTabChange}
                         >
-                            <ToggleButton
-                                value={LIGHT}
-                                title="Switch default to Light mode"
-                            >
-                                <LightMode />
-                            </ToggleButton>
-                            <ToggleButton
-                                value={DARK}
-                                title="Switch default to Dark mode"
-                            >
-                                <DarkMode />
-                            </ToggleButton>
-                        </ToggleButtonGroup>
-                        <ActionHeader>
-                            <Person />
-                            <Typography variant="h6">
-                                Change Username
-                            </Typography>
-                        </ActionHeader>
-                        <InfoChangeContainer>
-                            <TextField
-                                variant="standard"
-                                label="Username"
-                                placeholder="Enter new password"
-                                value={enteredNewUsername}
-                                onChange={(e) =>
-                                    setEnteredNewUsername(e.target.value)
-                                }
-                                size="small"
+                            <ProfileTab
+                                label={TABS.CUSTOMIZATION}
+                                value={TABS.CUSTOMIZATION}
                             />
-                            <Button
-                                variant="contained"
-                                onClick={() => handleChangeUsername()}
-                                disabled={enteredNewUsername === ""}
-                            >
-                                Submit
-                            </Button>
-                        </InfoChangeContainer>
-
-                        <ActionHeader>
-                            <Password />
-                            <Typography variant="h6">
-                                Change Password
-                            </Typography>
-                        </ActionHeader>
-
-                        <InfoChangeContainer>
-                            <PasswordFieldsContainer>
-                                <TextField
-                                    variant="standard"
-                                    placeholder="Enter new password"
-                                    label="Password"
-                                    type={
-                                        newPasswordVisibility
-                                            ? "text"
-                                            : "password"
-                                    }
-                                    value={newPassword}
-                                    name="passInput"
-                                    onChange={(e) =>
-                                        setNewPassword(e.target.value)
-                                    }
-                                    // error={showErrorText.passInput}
-                                    size="small"
-                                    InputProps={{
-                                        endAdornment: (
-                                            <PasswordToggle
-                                                passwordVisibility={
-                                                    newPasswordVisibility
-                                                }
-                                                setPasswordVisibility={
-                                                    setNewPasswordVisibility
-                                                }
-                                            />
-                                        ),
-                                    }}
-                                />
-
-                                <TextField
-                                    variant="standard"
-                                    placeholder="Confirm new password"
-                                    label="Confirm Password"
-                                    type={
-                                        newPasswordVisibility
-                                            ? "text"
-                                            : "password"
-                                    }
-                                    value={newPassword}
-                                    name="passInput"
-                                    onChange={(e) =>
-                                        setEnteredConfirmPassword(
-                                            e.target.value
-                                        )
-                                    }
-                                    // error={showErrorText.passInput}
-                                    size="small"
-                                    InputProps={{
-                                        endAdornment: (
-                                            <PasswordToggle
-                                                passwordVisibility={
-                                                    newPasswordVisibility
-                                                }
-                                                setPasswordVisibility={
-                                                    setNewPasswordVisibility
-                                                }
-                                            />
-                                        ),
-                                    }}
-                                />
-                            </PasswordFieldsContainer>
-
-                            <Button
-                                variant="contained"
-                                onClick={() => handleChangePassword()}
-                                // disabled={
-                                //     newPassword === "" ||
-                                //     enteredConfirmPassword === "" ||
-                                //     showErrorText.confirmPassInput
-                                // }
-                            >
-                                Submit
-                            </Button>
-                        </InfoChangeContainer>
-
-                        <ActionHeader>
-                            <RemoveCircleOutline />
-                            <Typography variant="h6">Delete Account</Typography>
-                        </ActionHeader>
-                        <Button
-                            variant="outlined"
-                            color="error"
-                            onClick={handleShowDeleteDialog}
-                        >
-                            Delete Account
-                        </Button>
-                        <DeleteAccountDialog
-                            open={showDeleteDialog}
-                            handleClose={handleCloseDeleteDialog}
-                            deletePassword={deletePassword}
-                            setDeletePassword={setDeletePassword}
-                        />
+                            <ProfileTab
+                                label={TABS.ACCOUNT}
+                                value={TABS.ACCOUNT}
+                            />
+                        </Tabs>
+                        {selectedProfileTab === TABS.CUSTOMIZATION
+                            &&
+                            <CustomizationTab userData={userData}/> 
+                        }
+                        {selectedProfileTab === TABS.ACCOUNT
+                            &&
+                            <AccountTab/> 
+                        }
                     </ProfileContainer>
                 </ProfilePaper>
             </ProfilePage>
