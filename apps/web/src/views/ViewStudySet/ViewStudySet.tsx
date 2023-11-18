@@ -24,7 +24,6 @@ import {
 import {
     CONFIRM_DIALOGS,
     DEFAULT_CATEGORIES,
-    DOWNLOAD_FILE_TYPES,
     SORT_DIRECTIONS,
     VIEW_SET_DIALOGS,
 } from "utilities/constants";
@@ -51,8 +50,6 @@ import NotesDrawer from "./NotesDrawer/NotesDrawer";
 type Props = {};
 
 const ViewStudySet = (props: Props) => {
-    const {} = props;
-
     /* Hooks / Redux */
     const navigate = useNavigate();
     const { id: studysetUUID = "" } = useParams();
@@ -96,9 +93,7 @@ const ViewStudySet = (props: Props) => {
     const [showControlMenu, setShowControlMenu] = useState<boolean>(false);
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
-    const [downloadFileType, setDownloadFileType] = useState<string>(
-        DOWNLOAD_FILE_TYPES.TXT
-    );
+
     const [selectedTab, setSelectedTab] = useState(DEFAULT_CATEGORIES.ALL);
     const [selectedSort, setSelectedSort] = useState<string>("");
     const [sortDirection, setSortDirection] = useState<SortDirection>(
@@ -276,8 +271,6 @@ const ViewStudySet = (props: Props) => {
             <DownloadSetModal
                 open={selectedDialog === VIEW_SET_DIALOGS.DOWNLOAD}
                 onClose={onDialogClose}
-                downloadFileType={downloadFileType}
-                setDownloadFileType={setDownloadFileType}
                 studyset={selectedStudyset}
             />
             <ManageCategoriesDialog

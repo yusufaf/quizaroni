@@ -14,7 +14,7 @@ const App = () => {
     const { setTheme, theme } = useTheme();
     const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
-    console.log({theme})
+    console.log("APP THEME = ", {theme})
 
     useEffect(() => {
         prefersDarkMode ? setTheme(DARK) : setTheme(LIGHT);

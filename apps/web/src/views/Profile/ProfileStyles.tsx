@@ -1,5 +1,5 @@
-import { Card, IconButton, Paper, styled, Typography } from "@mui/material";
-import { BasePage } from "common/AppStyles";
+import { Card, IconButton, Paper, styled, Tab, Typography } from "@mui/material";
+import { BasePage, FlexColumn } from "common/AppStyles";
 
 export const ProfilePage = styled(BasePage)({
     display: "grid",
@@ -8,10 +8,8 @@ export const ProfilePage = styled(BasePage)({
     gap: "4rem"
 })
 
-export const ProfileContainer = styled("div")({
-    display: "flex",
+export const ProfileContainer = styled(FlexColumn)({
     alignItems: "flex-start",
-    flexDirection: "column",
     gap: "1.25rem",
     borderRadius: "0.75rem",
     padding: "1.25rem",
@@ -75,3 +73,10 @@ export const UploadImageButton = styled(IconButton)({
     left: "9rem",
     cursor: "pointer",
 })
+
+export const ProfileTab = styled(Tab)(({ theme }) => ({
+    color: theme.palette.text.primary,
+    fontSize: "1rem",
+    fontWeight: "bold",
+    textTransform: "none",
+}));

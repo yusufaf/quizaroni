@@ -65,7 +65,6 @@ const CreateSet = (props: Props) => {
     const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
     const { blankCardsCount, expanded } = useSelector(selectAdvancedSectionProps);
 
-
     const {
         data: selectedStudySet,
         isLoading: isStudySetLoading,
@@ -83,8 +82,6 @@ const CreateSet = (props: Props) => {
     const [enteredLabel, setEnteredLabel] = useState<string>("");
     const [selectedLabel, setSelectedLabel] = useState<string>("");
     const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
-
-
     
     console.log({ createdSetCards });
 
