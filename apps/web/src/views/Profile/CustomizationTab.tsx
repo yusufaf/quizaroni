@@ -1,11 +1,29 @@
-import { Palette, LightMode, DarkMode } from "@mui/icons-material";
-import { Typography, ToggleButtonGroup, ToggleButton } from "@mui/material";
+import {
+  Palette,
+  LightMode,
+  DarkMode,
+  Label,
+  Launch,
+} from "@mui/icons-material";
+import {
+  Typography,
+  ToggleButtonGroup,
+  ToggleButton,
+  Button,
+} from "@mui/material";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { setUserData } from "state/slices/globalSlice";
+import {
+  selectNamedColorsDialogProps,
+  selectUserData,
+  setNamedColorsDialogProps,
+  setUserData,
+} from "state/slices/globalSlice";
 import { LIGHT, DARK } from "utilities/constants";
-import { ActionHeader } from "./ProfileStyles";
-import { useDispatch } from "react-redux";
+import { ActionColumn, ActionHeader } from "./ProfileStyles";
+import { useDispatch, useSelector } from "react-redux";
+import ManageLabelsDialog from "views/ViewStudySet/ManageLabelsDialog/ManageLabelsDialog";
+import NamedColorsDialog from "components/NamedColorsDialog/NamedColorsDialog";
 
 type Props = {
   userData: any;
@@ -15,9 +33,13 @@ const CustomizationTab = (props: Props) => {
   const { userData } = props;
 
   const dispatch = useDispatch();
+
+  const { uuid: userUUID = "", labels = [] } = useSelector(selectUserData);
+  const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
   const [defaultTheme, setDefaultTheme] = useState<string>(
     userData?.metadata?.defaultTheme ?? "dark"
   );
+  const [labelsDialogOpen, setLabelsDialogOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (userData?.metadata?.defaultTheme) {
@@ -61,25 +83,72 @@ const CustomizationTab = (props: Props) => {
     }
   };
 
+  const openNamedColorsDialog = () => {
+    dispatch(
+      setNamedColorsDialogProps({
+        open: true,
+      })
+    );
+  }
+
+  const closeLabelsDialog = () => {
+    setLabelsDialogOpen(false);
+  }
+
   return (
     <>
-      <ActionHeader>
-        <Palette />
-        <Typography variant="h6">Default Theme</Typography>
-      </ActionHeader>
-      <ToggleButtonGroup
-        aria-label="Set default theme"
-        exclusive
-        onChange={handleDefaultTheme}
-        value={defaultTheme}
-      >
-        <ToggleButton value={LIGHT} title="Switch default to Light mode">
-          <LightMode />
-        </ToggleButton>
-        <ToggleButton value={DARK} title="Switch default to Dark mode">
+      <ActionColumn>
+        <ActionHeader>
           <DarkMode />
-        </ToggleButton>
-      </ToggleButtonGroup>
+          <Typography variant="h6">Default Theme</Typography>
+        </ActionHeader>
+        <ToggleButtonGroup
+          aria-label="Set default theme"
+          exclusive
+          onChange={handleDefaultTheme}
+          value={defaultTheme}
+        >
+          <ToggleButton value={LIGHT} title="Switch default to Light mode">
+            <LightMode />
+          </ToggleButton>
+          <ToggleButton value={DARK} title="Switch default to Dark mode">
+            <DarkMode />
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </ActionColumn>
+      <ActionColumn>
+        <ActionHeader>
+          <Label />
+          <Typography variant="h6">Labels</Typography>
+        </ActionHeader>
+        <Button
+          variant="outlined"
+          startIcon={<Launch />}
+          onClick={() => setLabelsDialogOpen(true)}
+        >
+          Manage Labels
+        </Button>
+        <ManageLabelsDialog
+          labels={labels}
+          open={labelsDialogOpen}
+          onClose={closeLabelsDialog}
+          userUUID={userUUID}
+        />
+      </ActionColumn>
+      <ActionColumn>
+        <ActionHeader>
+          <Palette />
+          <Typography variant="h6">Named Colors</Typography>
+        </ActionHeader>
+        <Button
+          variant="outlined"
+          startIcon={<Launch />}
+          onClick={openNamedColorsDialog}
+        >
+          Manage Named Colors
+        </Button>
+        {namedColorsDialogProps.open && <NamedColorsDialog />}
+      </ActionColumn>
     </>
   );
 };
