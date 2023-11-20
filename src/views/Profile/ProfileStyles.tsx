@@ -80,3 +80,7 @@ export const ProfileTab = styled(Tab)(({ theme }) => ({
     fontWeight: "bold",
     textTransform: "none",
 }));
+
+export const ActionColumn = styled(FlexColumn)({
+    gap: "1rem"
+})
