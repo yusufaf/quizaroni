@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import {
     useCreateStudysetMutation,
     useGetStudysetQuery,
+    useUpdateStudysetMutation,
 } from "state/api/studysetsAPI";
 import {
     selectAuthenticated,
@@ -26,7 +27,7 @@ import CreateSetHeader from "./CreateSetHeader";
 import {
     AddCardButton,
     AddCardIcon,
-    CreateSetButton,
+    PageMainButton,
     CreateSetPage,
 } from "./CreateSetStyles";
 import ImportSetModal from "./ImportSetModal/ImportSetModal";
@@ -42,6 +43,7 @@ import {
     selectAdvancedSectionProps, setAdvancedSectionProps 
 } from "state/slices/createSetSlice";
 import NamedColorsDialog from "components/NamedColorsDialog/NamedColorsDialog";
+import { Studyset } from "lib/types";
 
 type Props = {
     pageType?: string;
@@ -50,8 +52,7 @@ type Props = {
 const CreateSet = (props: Props) => {
     const { pageType = "Create" } = props;
 
-    const isCreatePage = pageType === CREATE_PAGE_TYPES.CREATE;
-    const isEditPage = pageType === CREATE_PAGE_TYPES.EDIT;
+    const pageProps = CREATE_PAGE_PROPS[pageType];
 
     /* Hooks / Redux */
     const { id: studySetUUID } = useParams();
@@ -75,6 +76,7 @@ const CreateSet = (props: Props) => {
     });
 
     const [createStudySet] = useCreateStudysetMutation();
+    const [updateStudySet] = useUpdateStudysetMutation();
 
     /* Local State */
     const [title, setTitle] = useState<string>("");
@@ -85,7 +87,7 @@ const CreateSet = (props: Props) => {
     
     console.log({ createdSetCards });
 
-    const createSetDisabled = !title || !description;
+    const mainButtonDisabled = !title || !description;
 
     const fileInputRef = useRef(null);
 
@@ -97,6 +99,7 @@ const CreateSet = (props: Props) => {
 
     useBrowserTitle(PAGES.CREATE);
 
+    /* Loading values for editing a studyset */
     useEffect(() => {
         console.log("editing stuff ", {isStudySetSuccess, selectedStudySet});
         if (isStudySetSuccess && selectedStudySet) {
@@ -108,7 +111,6 @@ const CreateSet = (props: Props) => {
         }
     }, [selectedStudySet]);
 
-    /* Check that length of createdCardObjects is not 0 */
     const createNewSet = async () => {
         try {
             const cards = [...createdSetCards];
@@ -124,7 +126,6 @@ const CreateSet = (props: Props) => {
             const createdAt = new Date().getTime();
             const lastViewed = new Date().getTime();
             const label = enteredLabel || "";
-            // const { username } = cognitoUser;
             const { username, uuid: userUUID } = userData;
             const metadata = {};
 
@@ -159,6 +160,48 @@ const CreateSet = (props: Props) => {
                 });
         } catch (error) {}
     };
+
+    const saveChanges = () => {
+        console.log({selectedStudySet, title, description})
+
+        // TODO: Fix typing with cards array
+
+        // @ts-ignore
+        let studyset: Studyset = {
+            ...selectedStudySet,
+            // cards: createdSetCards,
+            title,
+            description,
+        
+        };
+
+        updateStudySet({studyset})
+        .unwrap()
+        .then((response: any) => {
+            console.log({ response });
+            toast.success("Successfully updating study set", {
+                position: toast.POSITION.BOTTOM_LEFT,
+            });
+            navigate(`/view/${studySetUUID}`);
+        })
+        .catch((error) => {
+            console.log({ error });
+            toast.error("Error updating study set", {
+                position: toast.POSITION.BOTTOM_LEFT,
+            });
+        });
+    }
+
+    const handleMainButton = () => {
+        switch (pageType) {
+            case CREATE_PAGE_TYPES.CREATE:
+                createNewSet();
+                return;
+            case CREATE_PAGE_TYPES.EDIT:
+                saveChanges();
+                return;
+        }
+    }
 
     /* Runs everytime the file selected for the image upload changes */
     const onFileChange = (event, index) => {
@@ -237,7 +280,7 @@ const CreateSet = (props: Props) => {
         advancedSectionProps: {
             onBlankInputsSubmit
         },
-        createNewSet,
+        handleMainButton,
         description,
         label: enteredLabel,
         onDescriptionChange,
@@ -247,7 +290,7 @@ const CreateSet = (props: Props) => {
         selectedLabel,
         title,
         pageType,
-        createSetDisabled,
+        mainButtonDisabled,
     };
 
     if (!authenticated) {
@@ -276,11 +319,11 @@ const CreateSet = (props: Props) => {
                     <AddCardIcon />
                     Add Card
                 </AddCardButton>
-                <CreateSetButton
+                <PageMainButton
                     variant="contained"
-                    onClick={() => createNewSet()}
+                    onClick={handleMainButton}
                     size="large"
-                    disabled={createSetDisabled}
+                    disabled={mainButtonDisabled}
                     startIcon={<Create />}
                     sx={{
                         display: "flex",
@@ -288,8 +331,8 @@ const CreateSet = (props: Props) => {
                         alignSelf: "flex-end",
                     }}
                 >
-                    {CREATE_PAGE_PROPS[pageType].BUTTON}
-                </CreateSetButton>
+                    {pageProps.BUTTON}
+                </PageMainButton>
             </CreateSetPage>
             <ImportSetModal />
             {namedColorsDialogProps.open && <NamedColorsDialog />}

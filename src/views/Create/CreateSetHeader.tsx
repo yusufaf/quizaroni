@@ -1,5 +1,6 @@
-import { Create } from "@mui/icons-material";
+import { ArrowBack, Create } from "@mui/icons-material";
 import {
+    Button,
     FormControl,
     Typography
 } from "@mui/material";
@@ -9,11 +10,12 @@ import { selectUserData } from "state/slices/globalSlice";
 import { useTheme } from "theme/useTheme";
 import {
     CREATE_PAGE_PROPS,
+    CREATE_PAGE_TYPES,
     CREATE_SET
 } from "utilities/constants";
 import HeaderAdvancedSection from "./HeaderAdvancedSection";
 import {
-    CreateSetButton,
+    PageMainButton,
     CreateSetInputsContainer,
     CreateSetPaper,
     DescriptionInput,
@@ -25,27 +27,29 @@ import {
     LabelMenuItem,
     LabelSelect,
     TitleInput,
+    BackToViewButton,
 } from "./CreateSetStyles";
+import { useNavigate, useParams } from "react-router-dom";
 
 type Props = {
     advancedSectionProps: any;
-    createNewSet: any;
+    handleMainButton: any;
+    mainButtonDisabled: boolean;
+    description: string;
+    label: string;
     onDescriptionChange: any;
     onLabelChange: any;
     onSelectedLabelChange: any;
     onTitleChange: any;
-    description: string;
-    label: string;
+    pageType: string;
     selectedLabel: string;
     title: string;
-    pageType: string;
-    createSetDisabled: boolean;
 };
 
 const CreateSetHeader = (props: Props) => {
     const {
         advancedSectionProps,
-        createNewSet,
+        handleMainButton,
         description,
         label,
         onDescriptionChange,
@@ -55,10 +59,14 @@ const CreateSetHeader = (props: Props) => {
         selectedLabel,
         title,
         pageType = "",
-        createSetDisabled,
+        mainButtonDisabled,
     } = props;
 
+    const isEditPage = pageType === CREATE_PAGE_TYPES.EDIT;
+
     const { theme } = useTheme();
+    const navigate = useNavigate();
+    const { id: studySetUUID } = useParams();
 
     const userData = useSelector(selectUserData);
 
@@ -93,10 +101,22 @@ const CreateSetHeader = (props: Props) => {
         return labelJsx;
     };
 
+    const handleBackClick = () => {
+        navigate(`/view/${studySetUUID}`);
+    }
+
     return (
         <CreateSetPaper elevation={6}>
             <HeaderContainer>
                 <HeaderLeft>
+                    {isEditPage && (
+                        <BackToViewButton
+                            onClick={handleBackClick}
+                            startIcon={<ArrowBack color="primary" />}
+                        >
+                            Back to Study Set
+                        </BackToViewButton>
+                    )}
                     <BoldTypography variant="h5">
                         {CREATE_PAGE_PROPS[pageType].TITLE}
                     </BoldTypography>
@@ -156,15 +176,15 @@ const CreateSetHeader = (props: Props) => {
                     </CreateSetInputsContainer>
                 </HeaderLeft>
                 <HeaderRight>
-                    <CreateSetButton
+                    <PageMainButton
                         variant="contained"
-                        onClick={() => createNewSet()}
+                        onClick={() => handleMainButton()}
                         size="large"
-                        disabled={createSetDisabled}
+                        disabled={mainButtonDisabled}
                         startIcon={<Create />}
                     >
                         {CREATE_PAGE_PROPS[pageType].BUTTON}
-                    </CreateSetButton>
+                    </PageMainButton>
                     <HeaderAdvancedSection {...advancedSectionProps} />
                 </HeaderRight>
             </HeaderContainer>
