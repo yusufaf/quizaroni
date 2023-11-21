@@ -77,6 +77,9 @@ export type DuplicateStudysetParams = {
     uuid: UUID;
 };
 
+export type UpdateStudysetParams = {
+    studyset: Studyset;
+};
 
 // Users API
 export type UpdateMetadataParams = {

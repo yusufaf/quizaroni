@@ -65,7 +65,7 @@ const AccountTab = (props: Props) => {
         <TextField
           variant="standard"
           label="Username"
-          placeholder="Enter new password"
+          placeholder="Enter new username"
           value={enteredNewUsername}
           onChange={(e) => setEnteredNewUsername(e.target.value)}
           size="small"

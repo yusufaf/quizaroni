@@ -20,21 +20,33 @@ import {
     CreateNoteParams,
     DeleteNoteParams,
     EditNoteParams,
+    UpdateStudysetParams,
 } from "lib/types";
 
 /* Endpoints
-	router.post("/api/studysets/create", createStudySet);
-	router.get("/api/studysets/get", getStudySets);
-	router.post("/api/studysets/delete", deleteStudySet);
-	router.post("/api/studysets/updateMetadata", updateStudySetMetadata);
-	router.post("/api/studysets/createCategory", createStudySetCategory);
-	router.post("/api/studysets/editCategory", editStudySetCategory);
-	router.post("/api/studysets/deleteCategory", deleteStudySetCategory);
-	router.post("/api/studysets/updateLastViewed", updateLastViewed);
-	router.post("/api/studysets/markCardAsImportant", markCardAsImportant);
-	router.post("/api/studysets/assignCardCategories", assignCardCategories)
+    // Studysets
+    router.post("/api/studysets/create", createStudySet);
+    router.post("/api/studysets/update", updateStudySet);
+    router.get("/api/studysets/getAll", getStudySets);
+    router.get("/api/studysets/get", getStudySet);
+    router.post("/api/studysets/delete", deleteStudySet);
+    router.post("/api/studysets/duplicate", duplicateStudySet);
+    router.post("/api/studysets/updateMetadata", updateStudySetMetadata);
+    router.post("/api/studysets/createCategory", createStudySetCategory);
+    router.post("/api/studysets/editCategory", editStudySetCategory);
+    router.post("/api/studysets/deleteCategory", deleteStudySetCategory);
+    router.post("/api/studysets/updateLastViewed", updateLastViewed);
+    // Cards
+    router.post("/api/studysets/markCardAsImportant", markCardAsImportant);
+    router.post("/api/studysets/assignCardCategories", assignCardCategories);
     router.post("/api/studysets/createNote", createNote);
-
+    router.post("/api/studysets/deleteNote", deleteNote);
+    router.post("/api/studysets/editNote", editNote);
+    // Labels
+    router.post("/api/studysets/createLabel", createLabel);
+    router.post("/api/studysets/deleteLabel", deleteLabel);
+    router.post("/api/studysets/editLabel", editLabel);
+    router.post("/api/studysets/changeLabel", changeLabel);
 */
 
 /* */
@@ -91,6 +103,16 @@ export const studysetsApi = api.injectEndpoints({
                 body: { uuid },
             }),
             invalidatesTags: [{ type: "Studyset", id: "LIST" }],
+        }),
+        updateStudyset: build.mutation<void, UpdateStudysetParams>({
+            query: ({ studyset }) => ({
+                url: "studysets/update",
+                method: "POST",
+                body: { studyset },
+            }),
+            invalidatesTags: (_result, _error, arg) => [
+                { type: "Studyset", id: arg.studyset.uuid },
+            ],        
         }),
         updateStudysetMetadata: build.mutation<void, UpdateMetadataParams>({
             query: ({ property, newValue, uuid }) => ({
@@ -242,6 +264,7 @@ export const {
     useCreateStudysetMutation,
     useDeleteStudysetMutation,
     useDuplicateStudysetMutation,
+    useUpdateStudysetMutation,
     useUpdateStudysetMetadataMutation,
     useCreateCategoryMutation,
     useEditCategoryMutation,
