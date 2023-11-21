@@ -44,6 +44,11 @@ export const HeaderLeft = styled(FlexColumn)({
     gap: "1.25rem",
 });
 
+export const BackToViewButton = styled(Button)({
+    width: "fit-content"
+});
+
+
 export const HeaderRight = styled(FlexColumn)({});
 
 export const CreateSetInputsContainer = styled(Box)({
@@ -69,9 +74,7 @@ export const LabelInput = styled(TextField)({
     width: "18rem",
 });
 
-export const CreateSetButton = styled(Button)({
-
-});
+export const PageMainButton = styled(Button)({});
 
 export const AdvancedSection = styled(FlexColumn)({});
 
