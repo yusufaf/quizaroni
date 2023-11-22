@@ -113,19 +113,6 @@ const NavBar = (props: Props) => {
                                     >
                                         Logout
                                     </AuthenticationButton>
-                                    {/* TODO: Move these buttons to revamped footer */}
-                                    <IconButton 
-                                        href="https://github.com/yusufaf"
-                                        target="_blank"
-                                    >
-                                        <GitHub />
-                                    </IconButton>
-                                    <IconButton
-                                        href="https://www.linkedin.com/in/yusuf-afzal/"
-                                        target="_blank"
-                                    >
-                                        <LinkedIn />
-                                    </IconButton>
                                 </>
                             ) : (
                                 <LoginButtonsContainer>
