@@ -46,10 +46,6 @@ export const CategoryTabs = styled(Tabs)({
     maxWidth: "25rem",
 })
 
-export const CardCount = styled(Typography)({
-    justifySelf: "left",
-})
-
 export const CardFiltersContainer = styled(SpacedFlexContainer)({
     display: "flex",
     alignItems: "center",
