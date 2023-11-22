@@ -1,4 +1,4 @@
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { CustomThemeProvider } from "./lib/theme/ThemeProvider";
@@ -14,9 +14,9 @@ import { Amplify } from "aws-amplify";
 import awsconfig from "./aws-exports";
 Amplify.configure(awsconfig);
 
-const rootElement = document.getElementById("root");
-
-ReactDOM.render(
+const domElement = document.getElementById("root") as Element;
+const root = createRoot(domElement);
+root.render(
     <Provider store={store}>
         <BrowserRouter>
             <CustomThemeProvider>
@@ -26,6 +26,5 @@ ReactDOM.render(
                 </AuthProvider>
             </CustomThemeProvider>
         </BrowserRouter>
-    </Provider>,
-    rootElement
+    </Provider>
 );
