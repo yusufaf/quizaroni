@@ -8,7 +8,6 @@ export const StyledFooter = styled("footer")(({ theme }) => ({
     height: "4rem",
     width: "100%",
     marginTop: "auto",
-    borderTop: `0.125rem solid ${theme.palette.divider}`,
 }));
 
 export const FooterPaper = styled(Paper)({
