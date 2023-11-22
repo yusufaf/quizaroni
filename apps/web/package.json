@@ -29,6 +29,7 @@
     "babel-preset-react": "^6.24.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
+    "framer-motion": "^10.16.5",
     "mongodb": "^4.5.0",
     "papaparse": "^5.3.1",
     "react": "^18.2.0",

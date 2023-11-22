@@ -1,6 +1,6 @@
-import { ArrowBack } from "@mui/icons-material/";
+import { ArrowBack, HelpOutlineRounded } from "@mui/icons-material/";
 import { Button, Chip, Tooltip, Typography } from "@mui/material/";
-import { BoldTypography } from "common/AppStyles";
+import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
@@ -215,10 +215,25 @@ const ViewStudySet = (props: Props) => {
                         </ViewStudysetHeader>
                     </ViewStudysetContainer>
                 </ViewFlashsetPaper>
-                <CardCount variant="h6">
-                    Number of cards in this study set:{" "}
-                    {selectedStudyset?.cards.length ?? "N/A"}
-                </CardCount>
+                <SimpleFlexContainer
+                    style={{ gap: "0.5rem" }}
+                >
+                    <Typography variant="h6">
+                        Number of cards in this study set:{" "}
+                        {selectedStudyset?.cards.length ?? "N/A"}
+                    </Typography>
+                    {!selectedStudyset?.cards.length && (
+                        <Tooltip
+                            title="If a studyset contains no cards for an extended period of time, it will be automatically deleted."
+                            placement="right"
+                        >
+                            <HelpOutlineRounded
+                                fontSize="medium"
+                                color="error"
+                            />
+                        </Tooltip>
+                    )}
+                </SimpleFlexContainer>
                 <ViewStudysetFilters
                     selectedTab={selectedTab}
                     setSelectedTab={setSelectedTab}

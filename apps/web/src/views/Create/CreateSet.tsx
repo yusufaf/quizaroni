@@ -36,14 +36,17 @@ import SetModificationButtons from "./SetModificationButtons";
 import { Virtuoso } from "react-virtuoso";
 import { EMPTY_CARD } from "utilities/constants";
 import { addCard } from "utilities/createUtils";
-import { Create } from "@mui/icons-material";
+import { Create, HelpOutlineRounded } from "@mui/icons-material";
 import {
     selectShowImportModal,
     setShowImportModal,
-    selectAdvancedSectionProps, setAdvancedSectionProps 
+    selectAdvancedSectionProps,
+    setAdvancedSectionProps,
 } from "state/slices/createSetSlice";
 import NamedColorsDialog from "components/NamedColorsDialog/NamedColorsDialog";
 import { Studyset } from "lib/types";
+import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
+import { Tooltip, Typography } from "@mui/material";
 
 type Props = {
     pageType?: string;
@@ -64,16 +67,21 @@ const CreateSet = (props: Props) => {
     const cognitoUser = useSelector(selectCognitoUser);
     const userData = useSelector(selectUserData);
     const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
-    const { blankCardsCount, expanded } = useSelector(selectAdvancedSectionProps);
+    const { blankCardsCount, expanded } = useSelector(
+        selectAdvancedSectionProps
+    );
 
     const {
         data: selectedStudySet,
         isLoading: isStudySetLoading,
         isSuccess: isStudySetSuccess,
         isError: isStudySetError,
-    } = useGetStudysetQuery({uuid: studySetUUID ?? ""}, {
-        skip: !studySetUUID,
-    });
+    } = useGetStudysetQuery(
+        { uuid: studySetUUID ?? "" },
+        {
+            skip: !studySetUUID,
+        }
+    );
 
     const [createStudySet] = useCreateStudysetMutation();
     const [updateStudySet] = useUpdateStudysetMutation();
@@ -84,7 +92,7 @@ const CreateSet = (props: Props) => {
     const [enteredLabel, setEnteredLabel] = useState<string>("");
     const [selectedLabel, setSelectedLabel] = useState<string>("");
     const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
-    
+
     console.log({ createdSetCards });
 
     const mainButtonDisabled = !title || !description;
@@ -101,7 +109,7 @@ const CreateSet = (props: Props) => {
 
     /* Loading values for editing a studyset */
     useEffect(() => {
-        console.log("editing stuff ", {isStudySetSuccess, selectedStudySet});
+        console.log("editing stuff ", { isStudySetSuccess, selectedStudySet });
         if (isStudySetSuccess && selectedStudySet) {
             const { label, title, description, cards } = selectedStudySet;
             setEnteredLabel(label);
@@ -115,9 +123,10 @@ const CreateSet = (props: Props) => {
         try {
             const cards = [...createdSetCards];
 
-            if (cards.length === 0) {
-                return;
-            }
+            // TODO: Re-visit allowing user to create study set with no cards
+            // if (cards.length === 0) {
+            //     return;
+            // }
 
             // const allCardsHaveContent = createdCardObjects.every(
             //     (card) => card.term.trim() && card.definition.trim()
@@ -162,7 +171,7 @@ const CreateSet = (props: Props) => {
     };
 
     const saveChanges = () => {
-        console.log({selectedStudySet, title, description})
+        console.log({ selectedStudySet, title, description });
 
         // TODO: Fix typing with cards array
 
@@ -172,25 +181,24 @@ const CreateSet = (props: Props) => {
             // cards: createdSetCards,
             title,
             description,
-        
         };
 
-        updateStudySet({studyset})
-        .unwrap()
-        .then((response: any) => {
-            console.log({ response });
-            toast.success("Successfully updating study set", {
-                position: toast.POSITION.BOTTOM_LEFT,
+        updateStudySet({ studyset })
+            .unwrap()
+            .then((response: any) => {
+                console.log({ response });
+                toast.success("Successfully updating study set", {
+                    position: toast.POSITION.BOTTOM_LEFT,
+                });
+                navigate(`/view/${studySetUUID}`);
+            })
+            .catch((error) => {
+                console.log({ error });
+                toast.error("Error updating study set", {
+                    position: toast.POSITION.BOTTOM_LEFT,
+                });
             });
-            navigate(`/view/${studySetUUID}`);
-        })
-        .catch((error) => {
-            console.log({ error });
-            toast.error("Error updating study set", {
-                position: toast.POSITION.BOTTOM_LEFT,
-            });
-        });
-    }
+    };
 
     const handleMainButton = () => {
         switch (pageType) {
@@ -201,7 +209,7 @@ const CreateSet = (props: Props) => {
                 saveChanges();
                 return;
         }
-    }
+    };
 
     /* Runs everytime the file selected for the image upload changes */
     const onFileChange = (event, index) => {
@@ -270,15 +278,17 @@ const CreateSet = (props: Props) => {
         }
         setCreatedSetCards(newCreatedSetCards);
         /* Clear the blank cards count input */
-        dispatch(setAdvancedSectionProps({
-            blankCardsCount: 0,
-            expanded,
-        }))
+        dispatch(
+            setAdvancedSectionProps({
+                blankCardsCount: 0,
+                expanded,
+            })
+        );
     };
 
     const headerProps = {
         advancedSectionProps: {
-            onBlankInputsSubmit
+            onBlankInputsSubmit,
         },
         handleMainButton,
         description,
@@ -301,10 +311,30 @@ const CreateSet = (props: Props) => {
         <>
             <CreateSetPage>
                 <CreateSetHeader {...headerProps} />
-                <SetModificationButtons
-                    studysetCards={createdSetCards}
-                    setCardsCallback={setCreatedSetCards}
-                />
+                <SpacedFlexContainer>
+                    <SimpleFlexContainer style={{ gap: "0.5rem" }}>
+                        <Typography variant="h6">
+                            Number of cards in this study set:{" "}
+                            {createdSetCards.length ?? "N/A"}
+                        </Typography>
+                        {!createdSetCards.length && (
+                            <Tooltip
+                                title="If a studyset contains no cards for an extended period of time, it will be automatically deleted."
+                                placement="right"
+                            >
+                                <HelpOutlineRounded
+                                    fontSize="medium"
+                                    color="error"
+                                />
+                            </Tooltip>
+                        )}
+                    </SimpleFlexContainer>
+
+                    <SetModificationButtons
+                        studysetCards={createdSetCards}
+                        setCardsCallback={setCreatedSetCards}
+                    />
+                </SpacedFlexContainer>
                 {/* TODO: Virtual Scroll */}
                 {cardInputs}
                 <AddCardButton
