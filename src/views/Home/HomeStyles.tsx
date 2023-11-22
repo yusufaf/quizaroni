@@ -8,16 +8,19 @@ import { Box, Card, Chip, Paper, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 
 export const HomePage = styled(BasePage)({
+    marginTop: "0",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "0 2rem 2rem 2rem",
+    padding: "2rem 20rem"
 });
 
 export const HomePaper = styled(Paper)({});
 
 export const HomeContainer = styled(Box)({
     width: "70rem",
+    padding: "1.25rem",
+    borderRadius: "0.75rem",
 });
 
 export const HomeSetsHeading = styled(BoldTypography)({});
