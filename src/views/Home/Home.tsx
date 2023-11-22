@@ -239,7 +239,7 @@ const Home = (props: Props) => {
     return (
         <HomePage>
             <HomePaper elevation={6}>
-                <HomeContainer p={2} borderRadius={5}>
+                <HomeContainer>
                     <HomeSetsHeading variant="h5">
                         Your Study Sets
                     </HomeSetsHeading>

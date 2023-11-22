@@ -8,7 +8,7 @@ type Props = {};
 const Footer = (_props: Props) => {
     return (
         <StyledFooter>
-            <FooterPaper elevation={0.5}>
+            <FooterPaper elevation={1}>
                 <FlexColumn style={{alignItems: "flex-start", marginLeft: "auto"}}>
                     <BoldTypography>
                         Socials
