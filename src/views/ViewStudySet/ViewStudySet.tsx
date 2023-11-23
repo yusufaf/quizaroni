@@ -176,9 +176,11 @@ const ViewStudySet = (props: Props) => {
                                 >
                                     <Chip
                                         label={
-                                            selectedStudyset?.label ??
-                                            "No label selected"
+                                            selectedStudyset?.label
+                                                ? selectedStudyset?.label
+                                                : "No label selected"
                                         }
+                                        color={!selectedStudyset?.label ? "error" : undefined}
                                         variant="outlined"
                                         onClick={showManageLabelsDialog}
                                     />
@@ -215,9 +217,7 @@ const ViewStudySet = (props: Props) => {
                         </ViewStudysetHeader>
                     </ViewStudysetContainer>
                 </ViewFlashsetPaper>
-                <SimpleFlexContainer
-                    style={{ gap: "0.5rem" }}
-                >
+                <SimpleFlexContainer style={{ gap: "0.5rem" }}>
                     <Typography variant="h6">
                         Number of cards in this study set:{" "}
                         {selectedStudyset?.cards.length ?? "N/A"}
