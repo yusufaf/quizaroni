@@ -46,7 +46,7 @@ import {
 import NamedColorsDialog from "components/NamedColorsDialog/NamedColorsDialog";
 import { Studyset } from "lib/types";
 import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
-import { Tooltip, Typography } from "@mui/material";
+import { SelectChangeEvent, Tooltip, Typography } from "@mui/material";
 
 type Props = {
     pageType?: string;
@@ -89,7 +89,7 @@ const CreateSet = (props: Props) => {
     /* Local State */
     const [title, setTitle] = useState<string>("");
     const [description, setDescription] = useState<string>("");
-    const [enteredLabel, setEnteredLabel] = useState<string>("");
+    const [enteredLabel, setEnteredLabel] = useState<string | null>(null);
     const [selectedLabel, setSelectedLabel] = useState<string>("");
     const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
 
@@ -132,18 +132,17 @@ const CreateSet = (props: Props) => {
             //     (card) => card.term.trim() && card.definition.trim()
             // );
 
-            const createdAt = new Date().getTime();
-            const lastViewed = new Date().getTime();
-            const label = enteredLabel || "";
+            const timestamp = new Date().getTime();
+            const label = (enteredLabel ?? selectedLabel) || null;
             const { username, uuid: userUUID } = userData;
             const metadata = {};
 
             const studySet = {
                 cards,
-                createdAt,
+                createdAt: timestamp,
                 description,
                 label,
-                lastViewed,
+                lastViewed: timestamp,
                 metadata,
                 title,
                 username,
@@ -261,11 +260,12 @@ const CreateSet = (props: Props) => {
         setDescription(e.target.value);
     };
 
-    const onLabelChange = (e) => {
+    const onLabelChange = (e: ChangeEvent<HTMLInputElement>) => {
         setEnteredLabel(e.target.value);
     };
 
-    const onSelectedLabelChange = (e) => {
+    const onSelectedLabelChange = (e: SelectChangeEvent) => {
+        setEnteredLabel(null);
         setSelectedLabel(e.target.value);
     };
 
