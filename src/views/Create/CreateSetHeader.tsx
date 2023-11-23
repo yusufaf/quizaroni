@@ -36,7 +36,7 @@ type Props = {
     handleMainButton: any;
     mainButtonDisabled: boolean;
     description: string;
-    label: string;
+    label: string | null;
     onDescriptionChange: any;
     onLabelChange: any;
     onSelectedLabelChange: any;

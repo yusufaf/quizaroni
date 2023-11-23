@@ -262,7 +262,7 @@ const NewCardInput = (props: Props) => {
                                 })
                             }
                         >
-                            <Delete fontSize="medium" />
+                            <Delete fontSize="medium" color="error"/>
                         </IconButton>
                     </Tooltip>
                     <input
