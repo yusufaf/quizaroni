@@ -1,19 +1,15 @@
 import {
-    DataGrid,
     GridEventListener,
     GridSortModel,
     GridToolbar,
 } from "@mui/x-data-grid";
 import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import useCustomMutation from "lib/hooks/useCustomMutation";
 import { Studyset } from "lib/types";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
-    useDeleteStudysetMutation,
-    useDuplicateStudysetMutation,
     useGetAllStudysetsQuery,
 } from "state/api/studysetsAPI";
 import { useUpdateUserMetadataMutation } from "state/api/usersAPI";
@@ -55,21 +51,10 @@ const Home = (props: Props) => {
     const studysets = useSelector(selectStudySets);
 
     /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: studySetsData = [] } = useGetAllStudysetsQuery(
+    const { data: studySetsData = [], isLoading: isGetAllStudysetsLoading } = useGetAllStudysetsQuery(
         { userUUID: userUUID ?? "" },
         { skip: !userUUID }
     );
-
-    const {
-        mutate: deleteStudySet,
-        isLoading: isDeletingStudySet,
-        isSuccess: isDeleteStudySetSuccess,
-        isError: isDeleteStudySetError,
-    } = useCustomMutation({
-        mutation: useDeleteStudysetMutation,
-        successMessage: "Successfully deleted study set",
-        errorMessage: "Error deleting study set",
-    });
 
     const [
         updateUserMetadata,
@@ -89,8 +74,6 @@ const Home = (props: Props) => {
     /* State */
     const [searchFilteredSets, setSearchFilteredSets] = useState([]);
     const [enteredSearch, setEnteredSearch] = useState("");
-
-    const [isFavorited, setIsFavorited] = useState(false);
 
     const [selectedView, setSelectedView] = useState("table");
 
@@ -186,15 +169,13 @@ const Home = (props: Props) => {
 
     const handleFavoriteFilter = () => {};
 
-    const handleViewChange = (_event: any, newView: string | null) => {
-        if (newView !== null) {
-            updateUserMetadata({
-                uuid: userUUID,
-                property: "homeView",
-                newValue: newView,
-            });
-            setSelectedView(newView);
-        }
+    const handleViewChange = (_event: any, newView: string) => {
+        updateUserMetadata({
+            uuid: userUUID,
+            property: "homeView",
+            newValue: newView,
+        });
+        setSelectedView(newView);
     };
 
     const onRowDoubleClick: GridEventListener<"rowDoubleClick"> = (
@@ -251,6 +232,7 @@ const Home = (props: Props) => {
                         {selectedView === HOME_LAYOUTS.TABLE && (
                             <>
                                 <StyledDataGrid
+                                    loading={isGetAllStudysetsLoading}
                                     rows={studysets}
                                     columns={columns}
                                     pageSizeOptions={[10, 25, 100]}
