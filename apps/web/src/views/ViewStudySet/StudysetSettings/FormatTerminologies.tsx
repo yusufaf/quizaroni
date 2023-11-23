@@ -21,6 +21,14 @@ const FormatTerminologies = (props: Props) => {
 
     const [customTerminology1, setCustomTerminology1] = useState<string>("");
     const [customTerminology2, setCustomTerminology2] = useState<string>("");
+    const [customTerminologyErrors, setCustomTerminologyErrors] = useState<
+        Map<number, string>
+    >(
+        new Map([
+            [1, ""],
+            [2, ""],
+        ])
+    );
 
     const isCustomTerminology =
         studyset?.metadata?.terminology === FORMAT_TERMINOLOGIES.CUSTOM;
@@ -60,6 +68,25 @@ const FormatTerminologies = (props: Props) => {
         });
     };
 
+    const onCustomTerminologyChange = (
+        e: ChangeEvent<HTMLInputElement>,
+        inputNumber: 1 | 2
+    ) => {
+        const setStateCallback =
+            inputNumber === 1 ? setCustomTerminology1 : setCustomTerminology2;
+
+        const newValue = e.target.value;
+        const localErrorsMap = new Map(customTerminologyErrors);
+        if (newValue.includes("/")) {
+            localErrorsMap.set(inputNumber, "/ is a disallowed character.");
+            setCustomTerminologyErrors(localErrorsMap);
+        } else {
+            localErrorsMap.set(inputNumber, "");
+            setCustomTerminologyErrors(localErrorsMap);
+            setStateCallback(newValue);
+        }
+    };
+
     return (
         <div>
             <FormControl>
@@ -85,26 +112,31 @@ const FormatTerminologies = (props: Props) => {
                             label={
                                 <>
                                     {value}
-                                    {value ===
-                                        FORMAT_TERMINOLOGIES.CUSTOM && (
+                                    {value === FORMAT_TERMINOLOGIES.CUSTOM && (
                                         <CustomInputsContainer>
                                             <StyledTextField
                                                 label="Terminology 1"
                                                 onChange={(e) =>
-                                                    setCustomTerminology1(
-                                                        e.target.value
+                                                    onCustomTerminologyChange(
+                                                        e as ChangeEvent<HTMLInputElement>,
+                                                        1
                                                     )
                                                 }
                                                 value={customTerminology1}
+                                                error={Boolean(customTerminologyErrors.get(1))}
+                                                helperText={customTerminologyErrors.get(1)}
                                             />
                                             <StyledTextField
                                                 label="Terminology 2"
                                                 onChange={(e) =>
-                                                    setCustomTerminology2(
-                                                        e.target.value
+                                                    onCustomTerminologyChange(
+                                                        e as ChangeEvent<HTMLInputElement>,
+                                                        2
                                                     )
                                                 }
                                                 value={customTerminology2}
+                                                error={Boolean(customTerminologyErrors.get(2))}
+                                                helperText={customTerminologyErrors.get(2)}
                                             />
                                             <Button
                                                 variant="contained"

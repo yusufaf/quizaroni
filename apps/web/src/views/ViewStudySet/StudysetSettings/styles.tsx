@@ -27,5 +27,6 @@ export const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
 
 export const CustomInputsContainer = styled("div")({
     display: "flex", 
+    alignItems: "baseline",
     gap: "2rem",
 });
