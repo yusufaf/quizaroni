@@ -19,7 +19,7 @@ import { HOME_LAYOUTS } from "utilities/constants";
 import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
 
 type Props = {
-    handleViewChange: any;
+    handleViewChange: (_event: any, newView: string) => void;
     selectedView: string;
 };
 
@@ -68,7 +68,7 @@ const HomeToolbar = (props: Props) => {
                 </SimpleFlexContainer>
             )}
             <ToggleButtonGroup
-                aria-label="Grid/Table View Toggle"
+                aria-label="Home View Toggle Group"
                 exclusive
                 onChange={handleViewChange}
                 value={selectedView}

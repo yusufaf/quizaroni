@@ -1,5 +1,5 @@
 import { ArrowBack, HelpOutlineRounded } from "@mui/icons-material/";
-import { Button, Chip, Tooltip, Typography } from "@mui/material/";
+import { Button, Chip, Skeleton, Tooltip, Typography } from "@mui/material/";
 import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
@@ -165,10 +165,18 @@ const ViewStudySet = (props: Props) => {
                                     Back to Your Study Sets
                                 </Button>
                                 <BoldTypography variant="h5">
-                                    {selectedStudyset?.title}
+                                    {isStudySetLoading ? (
+                                        <Skeleton />
+                                    ) : (
+                                        <>{selectedStudyset?.title}</>
+                                    )}
                                 </BoldTypography>
                                 <Typography variant="subtitle1">
-                                    Created by {selectedStudyset?.username}
+                                    {isStudySetLoading ? (
+                                        <Skeleton />
+                                    ) : (
+                                        <>{`Created by ${selectedStudyset?.username}`}</>
+                                    )}
                                 </Typography>
                                 <Tooltip
                                     title="Manage Labels"
@@ -180,13 +188,21 @@ const ViewStudySet = (props: Props) => {
                                                 ? selectedStudyset?.label
                                                 : "No label selected"
                                         }
-                                        color={!selectedStudyset?.label ? "error" : undefined}
+                                        color={
+                                            !selectedStudyset?.label
+                                                ? "error"
+                                                : undefined
+                                        }
                                         variant="outlined"
                                         onClick={showManageLabelsDialog}
                                     />
                                 </Tooltip>
                                 <Typography variant="body1">
-                                    {selectedStudyset?.description}
+                                    {isStudySetLoading ? (
+                                        <Skeleton />
+                                    ) : (
+                                        <>{selectedStudyset?.description}</>
+                                    )}
                                 </Typography>
                                 <StudysetActions
                                     controlAnchorRef={controlAnchorRef}
