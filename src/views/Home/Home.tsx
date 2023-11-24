@@ -1,5 +1,7 @@
 import {
+    GridColDef,
     GridEventListener,
+    GridRenderCellParams,
     GridSortModel,
     GridToolbar,
 } from "@mui/x-data-grid";
@@ -38,6 +40,7 @@ import {
 import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
 import HomeHTMLView from "./HomeHTMLView";
+import { Favorite, FavoriteBorder } from "@mui/icons-material";
 
 type Props = {};
 
@@ -51,7 +54,7 @@ const Home = (props: Props) => {
     const studysets = useSelector(selectStudySets);
 
     /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: studySetsData = [], isLoading: isGetAllStudysetsLoading } = useGetAllStudysetsQuery(
+    const { data: allStudysets = [], isLoading: isGetAllStudysetsLoading } = useGetAllStudysetsQuery(
         { userUUID: userUUID ?? "" },
         { skip: !userUUID }
     );
@@ -66,8 +69,8 @@ const Home = (props: Props) => {
     ] = useUpdateUserMetadataMutation();
 
     useEffect(() => {
-        dispatch(setStudySets(studySetsData));
-    }, [studySetsData]);
+        dispatch(setStudySets(allStudysets));
+    }, [allStudysets]);
 
     useBrowserTitle("Home");
 
@@ -123,7 +126,7 @@ const Home = (props: Props) => {
     // Store a reference to the HTML file <input>
     const fileInput = useRef(null);
 
-    const columns = [
+    const columns: GridColDef[] = [
         {
             field: "title",
             headerName: "Title",
@@ -165,6 +168,21 @@ const Home = (props: Props) => {
             width: 200,
             editable: false,
         },
+        {
+            field: "favorited",
+            headerName: "Favorited",
+            width: 150,
+            editable: false,
+            renderCell: (params: GridRenderCellParams<any, boolean>) => (
+                <>
+                    {params.value ? (
+                        <Favorite color="primary" />
+                    ) : (
+                        <FavoriteBorder />
+                    )}
+                </>
+              ),
+        },
     ];
 
     const handleFavoriteFilter = () => {};
@@ -193,7 +211,7 @@ const Home = (props: Props) => {
     const handleContextMenu = (event: React.MouseEvent) => {
         event.preventDefault();
 
-        const localStudyset = studySetsData.find(
+        const localStudyset = allStudysets.find(
             (studyset: Studyset) =>
                 studyset.uuid === event.currentTarget.getAttribute("data-id")
         );
@@ -285,14 +303,14 @@ const Home = (props: Props) => {
                         )}
                         {selectedView === HOME_LAYOUTS.GRID && (
                             <HomeGridView
-                                studysets={studysets}
+                                studysets={allStudysets}
                                 handleShowConfirmDialog={
                                     handleShowConfirmDialog
                                 }
                             />
                         )}
                         {selectedView === HOME_LAYOUTS.HTML && (
-                            <HomeHTMLView studysets={studysets} />
+                            <HomeHTMLView studysets={allStudysets} />
                         )}
                     </HomeSetsContainer>
                     <ConfirmDialog />
