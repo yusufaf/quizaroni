@@ -1,5 +1,5 @@
 import api from "./api";
-import { UpdateDefaultThemeParams, UpdateMetadataParams } from "lib/types";
+import { GetUserParams, UpdateDefaultThemeParams, UpdateMetadataParams, User } from "lib/types";
 
 
 /* Endpoints
@@ -11,6 +11,16 @@ import { UpdateDefaultThemeParams, UpdateMetadataParams } from "lib/types";
 
 export const usersApi = api.injectEndpoints({
     endpoints: (build) => ({
+        getUser: build.query<User, GetUserParams>({
+            query: ({ username }) => ({
+                url: "users/get",
+                method: "GET",
+                params: { username },
+            }),
+            providesTags: (result, _error, _arg) => [
+                { type: "User", id: result?.uuid },
+            ],
+        }),
         updateUserMetadata: build.mutation<void, UpdateMetadataParams>({
             query: ({ property, newValue, uuid }) => ({
                 url: "users/updateMetadata",
@@ -38,6 +48,7 @@ export const usersApi = api.injectEndpoints({
 });
 
 export const {
+    useGetUserQuery,
     useUpdateUserMetadataMutation,
     useUpdateDefaultThemeMutation,
 } = usersApi;
