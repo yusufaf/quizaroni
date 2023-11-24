@@ -51,7 +51,7 @@ import {
     router.post("/api/studysets/changeLabel", changeLabel);
 */
 
-/* */
+// TODO: Look into set actions delete, duplicate, favorite. Currently fetches all studysets again once called.
 export const studysetsApi = api.injectEndpoints({
     endpoints: (build) => ({
         getAllStudysets: build.query<Studyset[], GetAllStudysetsParams>({
@@ -176,9 +176,7 @@ export const studysetsApi = api.injectEndpoints({
                 method: "POST",
                 body: { studysetUUID, favorited },
             }),
-            invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.studysetUUID },
-            ],
+            invalidatesTags: [{ type: "Studyset", id: "LIST" }],
         }),
         markCardAsImportant: build.mutation<
             Studyset,

@@ -1,5 +1,8 @@
+import { Studyset } from "lib/types";
 
-type Props = {}
+type Props = {
+  studysets: Studyset[];
+};
 
 const HomeHTMLView = (props: Props) => {
   return (
