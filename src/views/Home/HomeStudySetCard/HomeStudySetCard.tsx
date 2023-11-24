@@ -41,6 +41,7 @@ const HomeStudySetCard = (props: Props) => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { theme } = useTheme();
 
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -98,6 +99,11 @@ const HomeStudySetCard = (props: Props) => {
                             onClick={(e) => {
                                 e.stopPropagation();
                                 openActionsMenu(e);
+                            }}
+                            sx={{
+                                background: actionsMenuOpen
+                                    ? theme.palette.action.selected
+                                    : undefined,
                             }}
                         >
                             <MoreHoriz />
