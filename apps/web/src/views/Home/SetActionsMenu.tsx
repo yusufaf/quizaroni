@@ -84,7 +84,7 @@ const SetActionsMenu = (props: Props) => {
                 }}
             >
                 <ListItemIcon>
-                    <DeleteIcon />
+                    <DeleteIcon color="error"/>
                 </ListItemIcon>
                 <ListItemText>Delete</ListItemText>
             </MenuItem>
