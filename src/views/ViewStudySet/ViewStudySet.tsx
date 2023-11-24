@@ -37,7 +37,6 @@ import StudysetSettings from "./StudysetSettings/StudysetSettings";
 import ViewStudySetCard from "./ViewStudySetCard";
 import ViewStudysetFilters from "./ViewStudysetFilters/ViewStudysetFilters";
 import {
-    CardCount,
     NoCardsMessage,
     StudysetInfo,
     ViewFlashsetPaper,
@@ -87,10 +86,7 @@ const ViewStudySet = (props: Props) => {
 
     useBrowserTitle(selectedStudyset?.title ?? "");
 
-    const controlAnchorRef = useRef(null);
     const updatedViewTimestamp = useRef<boolean>(false);
-
-    const [showControlMenu, setShowControlMenu] = useState<boolean>(false);
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
 
@@ -205,10 +201,7 @@ const ViewStudySet = (props: Props) => {
                                     )}
                                 </Typography>
                                 <StudysetActions
-                                    controlAnchorRef={controlAnchorRef}
                                     updateMetadataField={updateMetadataField}
-                                    setShowControlMenu={setShowControlMenu}
-                                    showControlMenu={showControlMenu}
                                     selectedStudyset={selectedStudyset}
                                 />
                             </StudysetInfo>
