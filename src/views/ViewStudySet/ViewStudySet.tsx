@@ -1,4 +1,4 @@
-import { ArrowBack, HelpOutlineRounded } from "@mui/icons-material/";
+import { ArrowBack, ErrorOutlineRounded } from "@mui/icons-material/";
 import { Button, Chip, Skeleton, Tooltip, Typography } from "@mui/material/";
 import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
@@ -229,7 +229,7 @@ const ViewStudySet = (props: Props) => {
                             title="If a studyset contains no cards for an extended period of time, it will be automatically deleted."
                             placement="right"
                         >
-                            <HelpOutlineRounded
+                            <ErrorOutlineRounded
                                 fontSize="medium"
                                 color="error"
                             />
@@ -272,7 +272,7 @@ const ViewStudySet = (props: Props) => {
                         );
                     })
                 )}
-                <NotesDrawer selectedStudyset={selectedStudyset} />
+            <NotesDrawer selectedStudyset={selectedStudyset} />
             </ViewStudysetPage>
             <ManageLabelsDialog
                 labels={labels}

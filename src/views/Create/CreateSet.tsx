@@ -11,7 +11,6 @@ import {
 } from "state/api/studysetsAPI";
 import {
     selectAuthenticated,
-    selectCognitoUser,
     selectNamedColorsDialogProps,
     selectUserData,
 } from "state/slices/globalSlice";
@@ -36,7 +35,7 @@ import SetModificationButtons from "./SetModificationButtons";
 import { Virtuoso } from "react-virtuoso";
 import { EMPTY_CARD } from "utilities/constants";
 import { addCard } from "utilities/createUtils";
-import { Create, HelpOutlineRounded } from "@mui/icons-material";
+import { Create, ErrorOutlineRounded } from "@mui/icons-material";
 import {
     selectShowImportModal,
     setShowImportModal,
@@ -64,7 +63,6 @@ const CreateSet = (props: Props) => {
     const dispatch = useDispatch();
 
     const authenticated = useSelector(selectAuthenticated);
-    const cognitoUser = useSelector(selectCognitoUser);
     const userData = useSelector(selectUserData);
     const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
     const { blankCardsCount, expanded } = useSelector(
@@ -106,6 +104,21 @@ const CreateSet = (props: Props) => {
     });
 
     useBrowserTitle(PAGES.CREATE);
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.ctrlKey && event.key === 'z') {
+
+            }
+        };
+    
+        document.addEventListener('keydown', handleKeyDown);
+    
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+    
 
     /* Loading values for editing a studyset */
     useEffect(() => {
@@ -322,7 +335,7 @@ const CreateSet = (props: Props) => {
                                 title="If a studyset contains no cards for an extended period of time, it will be automatically deleted."
                                 placement="right"
                             >
-                                <HelpOutlineRounded
+                                <ErrorOutlineRounded
                                     fontSize="medium"
                                     color="error"
                                 />

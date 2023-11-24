@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 import { DEFAULT_CATEGORIES } from "utilities/constants";
+import { Card } from "lib/types";
 
 type UseFilterViewCardsProps = {
     selectedTab: string;
-    sortedViewFlashCards: any[];
+    sortedViewFlashCards: Card[];
 };
 
 export default function useFilterViewCards(props: UseFilterViewCardsProps) {

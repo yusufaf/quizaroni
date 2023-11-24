@@ -42,16 +42,19 @@ const ControlMenu = (props: Props) => {
                 condition: textColorVisible,
                 updateProperty: SET_METADATA_FIELDS.TEXT,
                 label: "Text Color",
+                description: "If enabled, text color for the term/definition will be applied/visible."
             },
             {
                 condition: backgroundColorVisible,
                 updateProperty: SET_METADATA_FIELDS.BACKGROUND,
                 label: "Background Color",
+                description: "If enabled, background color for cards will be applied/visible."
             },
             {
                 condition: contentOnly,
                 updateProperty: SET_METADATA_FIELDS.CONTENT_ONLY,
                 label: "Content Only",
+                description: "If enabled, buttons and labels on all cards will be hidden."
             },
         ],
         [textColorVisible, backgroundColorVisible, contentOnly]
@@ -59,7 +62,7 @@ const ControlMenu = (props: Props) => {
 
     return (
         <Menu open={open} onClose={onClose} anchorEl={anchorEl}>
-            {menuItems.map(({ condition, updateProperty, label }) => {
+            {menuItems.map(({ condition, updateProperty, label, description }) => {
                 return (
                     <MenuItem>
                         <FormControlLabel
@@ -85,6 +88,7 @@ const ControlMenu = (props: Props) => {
                                     }`}
                                 </Typography>
                             }
+                            title={description}
                         />
                     </MenuItem>
                 );

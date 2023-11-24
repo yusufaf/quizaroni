@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
-import { IconButton, TextField, Tooltip, Typography } from "@mui/material/";
+import { useState, useEffect } from "react";
+import { IconButton, Tooltip, Typography } from "@mui/material/";
 import {
     AddPhotoAlternate,
     Delete,
@@ -34,14 +34,14 @@ import CustomColorPicker from "../CustomColorPicker/CustomColorPicker";
 import type { ColorPickerType } from "lib/types";
 
 type Props = {
-    index: number;
-    updateCardValue: any;
-    onFileChange: any;
-    onColorChange: any;
-    fileInputRef: any;
     cardValues: any;
     createdSetCards: any;
+    fileInputRef: any;
+    index: number;
+    onColorChange: any;
+    onFileChange: any;
     setCreatedSetCards: any;
+    updateCardValue: any;
 };
 const NewCardInput = (props: Props) => {
     const {
@@ -65,7 +65,7 @@ const NewCardInput = (props: Props) => {
 
     const setStateCallback = setCreatedSetCards;
 
-    const { isDarkMode, theme } = useTheme();
+    const { theme } = useTheme();
 
     const [showTextColorPicker, setShowTextColorPicker] =
         useState<boolean>(false);
@@ -178,9 +178,6 @@ const NewCardInput = (props: Props) => {
                         >
                             <FormatColorText
                                 fontSize="medium"
-                                // sx={{
-                                //     color: `${localTextColor ? localTextColor : theme.foreground}`
-                                // }}
                             />
                         </IconButton>
                     </Tooltip>
@@ -204,9 +201,6 @@ const NewCardInput = (props: Props) => {
                         >
                             <FormatColorFill
                                 fontSize="medium"
-                                // sx={{
-                                //     color: `${localBackgroundColor ? localBackgroundColor : theme.foreground}`
-                                // }}
                             />
                         </IconButton>
                     </Tooltip>
