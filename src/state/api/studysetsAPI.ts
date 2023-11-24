@@ -21,6 +21,7 @@ import {
     DeleteNoteParams,
     EditNoteParams,
     UpdateStudysetParams,
+    FavoriteStudysetParams,
 } from "lib/types";
 
 /* Endpoints
@@ -36,6 +37,7 @@ import {
     router.post("/api/studysets/editCategory", editStudySetCategory);
     router.post("/api/studysets/deleteCategory", deleteStudySetCategory);
     router.post("/api/studysets/updateLastViewed", updateLastViewed);
+    router.post("/api/studysets/favorite", favoriteStudyset);
     // Cards
     router.post("/api/studysets/markCardAsImportant", markCardAsImportant);
     router.post("/api/studysets/assignCardCategories", assignCardCategories);
@@ -112,7 +114,7 @@ export const studysetsApi = api.injectEndpoints({
             }),
             invalidatesTags: (_result, _error, arg) => [
                 { type: "Studyset", id: arg.studyset.uuid },
-            ],        
+            ],
         }),
         updateStudysetMetadata: build.mutation<void, UpdateMetadataParams>({
             query: ({ property, newValue, uuid }) => ({
@@ -163,6 +165,16 @@ export const studysetsApi = api.injectEndpoints({
                 url: "studysets/updateLastViewed",
                 method: "POST",
                 body: { studysetUUID },
+            }),
+            invalidatesTags: (_result, _error, arg) => [
+                { type: "Studyset", id: arg.studysetUUID },
+            ],
+        }),
+        favoriteStudyset: build.mutation<Studyset, FavoriteStudysetParams>({
+            query: ({ studysetUUID, favorited }) => ({
+                url: "studysets/favorite",
+                method: "POST",
+                body: { studysetUUID, favorited },
             }),
             invalidatesTags: (_result, _error, arg) => [
                 { type: "Studyset", id: arg.studysetUUID },
@@ -270,6 +282,7 @@ export const {
     useEditCategoryMutation,
     useDeleteCategoryMutation,
     useUpdateLastViewedMutation,
+    useFavoriteStudysetMutation,
     useMarkCardAsImportantMutation,
     useAssignCardCategoriesMutation,
     useCreateLabelMutation,

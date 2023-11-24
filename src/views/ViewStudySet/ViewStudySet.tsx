@@ -11,7 +11,6 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-    useGetAllStudysetsQuery,
     useGetStudysetQuery,
     useUpdateLastViewedMutation,
     useUpdateStudysetMetadataMutation,
@@ -45,6 +44,7 @@ import {
     ViewStudysetPage,
 } from "./styles";
 import NotesDrawer from "./NotesDrawer/NotesDrawer";
+import { selectStudySets } from "state/slices/studysetsSlice";
 
 type Props = {};
 
@@ -56,14 +56,7 @@ const ViewStudySet = (props: Props) => {
     const { uuid: userUUID = "", labels = [] } = useSelector(selectUserData);
 
     const selectedDialog = useSelector(selectSelectedDialog);
-
-    const {
-        data: studysets = [],
-        isLoading: isStudysetsLoading,
-        isSuccess: isStudysetsSuccess,
-    } = useGetAllStudysetsQuery({
-        userUUID,
-    });
+    const studysets = useSelector(selectStudySets);
 
     const {
         data: selectedStudyset,

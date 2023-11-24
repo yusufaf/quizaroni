@@ -42,6 +42,7 @@ export type Studyset = {
     categories: any[];
     createdAt: Timestamp;
     description: string;
+    favorited?: boolean;
     label: string;
     lastViewed: Timestamp;
     metadata: StudysetMetadata;
@@ -88,6 +89,10 @@ export type DuplicateStudysetParams = {
 export type UpdateStudysetParams = {
     studyset: Studyset;
 };
+
+export type FavoriteStudysetParams = StudysetUUIDPayload & {
+    favorited: boolean;
+}
 
 // Users API
 export type GetUserParams = {

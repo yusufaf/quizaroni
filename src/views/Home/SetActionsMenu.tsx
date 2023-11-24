@@ -1,14 +1,22 @@
-import { Menu, MenuItem, PopoverPosition, PopoverReference, Typography } from "@mui/material/";
+import {
+    ListItemIcon,
+    ListItemText,
+    Menu,
+    MenuItem,
+    PopoverPosition,
+    PopoverReference,
+} from "@mui/material/";
 import {
     ContentCopy as CopyIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
-    FavoriteBorder as FavoriteIcon,
+    Favorite,
+    FavoriteBorder,
 } from "@mui/icons-material";
-import { useTheme } from "theme/useTheme";
 import { useNavigate } from "react-router-dom";
 import { Studyset } from "lib/types";
 import { CONFIRM_DIALOGS } from "utilities/constants";
+import { useFavoriteStudysetMutation } from "state/api/studysetsAPI";
 
 type Props = {
     studyset: Studyset | null;
@@ -22,22 +30,20 @@ type Props = {
 };
 
 const SetActionsMenu = (props: Props) => {
-    const { 
-        studyset, 
-        open, 
-        onClose, 
-        anchorEl, 
+    const {
+        studyset,
+        open,
+        onClose,
+        anchorEl,
         handleShowConfirmDialog,
         anchorReference,
         anchorPosition,
-        slotProps
+        slotProps,
     } = props;
 
-    const { isDarkMode, theme } = useTheme();
+    const { favorited = false, uuid = "" } = studyset ?? {};
 
-    const iconStyling = {
-        marginRight: "0.75rem",
-    };
+    const [favoriteStudyset] = useFavoriteStudysetMutation();
 
     const navigate = useNavigate();
 
@@ -52,17 +58,24 @@ const SetActionsMenu = (props: Props) => {
             slotProps={slotProps}
         >
             <MenuItem onClick={() => navigate(`/edit/${studyset?.uuid}`)}>
-                <EditIcon sx={iconStyling} />
-                <Typography>Edit</Typography>
+                <ListItemIcon>
+                    <EditIcon />
+                </ListItemIcon>
+                <ListItemText>Edit</ListItemText>
             </MenuItem>
             <MenuItem
                 onClick={(e) => {
                     e.stopPropagation();
-                    handleShowConfirmDialog(CONFIRM_DIALOGS.DUPLICATE, studyset);
+                    handleShowConfirmDialog(
+                        CONFIRM_DIALOGS.DUPLICATE,
+                        studyset
+                    );
                 }}
             >
-                <CopyIcon sx={iconStyling} />
-                <Typography>Duplicate</Typography>
+                <ListItemIcon>
+                    <CopyIcon />
+                </ListItemIcon>
+                <ListItemText>Duplicate</ListItemText>
             </MenuItem>
             <MenuItem
                 onClick={(e) => {
@@ -70,12 +83,29 @@ const SetActionsMenu = (props: Props) => {
                     handleShowConfirmDialog(CONFIRM_DIALOGS.DELETE, studyset);
                 }}
             >
-                <DeleteIcon sx={iconStyling} />
-                <Typography>Delete</Typography>
+                <ListItemIcon>
+                    <DeleteIcon />
+                </ListItemIcon>
+                <ListItemText>Delete</ListItemText>
             </MenuItem>
-            <MenuItem onClick={(e) => e.stopPropagation()}>
-                <FavoriteIcon sx={iconStyling} />
-                <Typography>Favorite</Typography>
+            <MenuItem
+                onClick={() =>
+                    favoriteStudyset({
+                        studysetUUID: uuid,
+                        favorited: !favorited,
+                    })
+                }
+            >
+                <ListItemIcon>
+                    {favorited ? (
+                        <Favorite color="primary" />
+                    ) : (
+                        <FavoriteBorder />
+                    )}
+                </ListItemIcon>
+                <ListItemText>
+                    {favorited ? "Unfavorite" : "Favorite"}
+                </ListItemText>
             </MenuItem>
         </Menu>
     );
