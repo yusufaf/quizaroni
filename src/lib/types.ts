@@ -51,6 +51,14 @@ export type Studyset = {
     uuid: UUID;
 };
 
+export type User = {
+    createdAt: Timestamp;
+    email: string;
+    labels: string[];
+    metadata: any;
+    uuid: string; 
+}
+
 /* RTK Query Types */
 
 export type StudysetUUIDPayload = {
@@ -82,6 +90,10 @@ export type UpdateStudysetParams = {
 };
 
 // Users API
+export type GetUserParams = {
+    username: string;
+};  
+
 export type UpdateMetadataParams = {
     uuid: UUID;
     property: string;
