@@ -20,7 +20,6 @@ import {
     CREATE_PAGE_TYPES,
     PAGES,
 } from "utilities/constants";
-import { v4 as uuidv4 } from "uuid";
 import LoginMessage from "views/LoginMessage/LoginMessage";
 import CreateSetHeader from "./CreateSetHeader";
 import {
