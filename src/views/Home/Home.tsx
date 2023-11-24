@@ -11,9 +11,7 @@ import { Studyset } from "lib/types";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-    useGetAllStudysetsQuery,
-} from "state/api/studysetsAPI";
+import { useGetAllStudysetsQuery } from "state/api/studysetsAPI";
 import { useUpdateUserMetadataMutation } from "state/api/usersAPI";
 import {
     selectAuthenticated,
@@ -40,7 +38,12 @@ import {
 import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
 import HomeHTMLView from "./HomeHTMLView";
-import { Favorite, FavoriteBorder } from "@mui/icons-material";
+import {
+    ErrorOutlineRounded,
+    Favorite,
+    FavoriteBorder,
+} from "@mui/icons-material";
+import { SimpleFlexContainer } from "common/AppStyles";
 
 type Props = {};
 
@@ -54,10 +57,11 @@ const Home = (props: Props) => {
     const studysets = useSelector(selectStudySets);
 
     /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: allStudysets = [], isLoading: isGetAllStudysetsLoading } = useGetAllStudysetsQuery(
-        { userUUID: userUUID ?? "" },
-        { skip: !userUUID }
-    );
+    const { data: allStudysets = [], isLoading: isGetAllStudysetsLoading } =
+        useGetAllStudysetsQuery(
+            { userUUID: userUUID ?? "" },
+            { skip: !userUUID }
+        );
 
     const [
         updateUserMetadata,
@@ -161,6 +165,14 @@ const Home = (props: Props) => {
             valueGetter: (params) => {
                 return params.row?.cards?.length;
             },
+            renderCell: (params: GridRenderCellParams<any, any>) => (
+                <SimpleFlexContainer style={{ gap: "0.5rem" }}>
+                    <span>{params.row?.cards?.length}</span>
+                    {params.row?.cards?.length === 0 && (
+                        <ErrorOutlineRounded color="error" />
+                    )}
+                </SimpleFlexContainer>
+            ),
         },
         {
             field: "label",
@@ -181,13 +193,17 @@ const Home = (props: Props) => {
                         <FavoriteBorder />
                     )}
                 </>
-              ),
+            ),
         },
     ];
 
     const handleFavoriteFilter = () => {};
 
-    const handleViewChange = (_event: any, newView: string) => {
+    const handleViewChange = (_event: any, newView: string | null) => {
+        // Enforces one view always being selected
+        if (newView === null) {
+            return;
+        }
         updateUserMetadata({
             uuid: userUUID,
             property: "homeView",

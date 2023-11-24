@@ -19,7 +19,7 @@ import { HOME_LAYOUTS } from "utilities/constants";
 import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
 
 type Props = {
-    handleViewChange: (_event: any, newView: string) => void;
+    handleViewChange: (_event: any, newView: string | null) => void;
     selectedView: string;
 };
 
