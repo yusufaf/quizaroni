@@ -29,6 +29,7 @@ export type StudysetMetadata = {
     textColorVisible: boolean;
     backgroundColorVisible: boolean;
     publiclyViewable: boolean;
+    contentOnly?: boolean;
     terminology: string;
     customTerminology: string;
     labelTerminology: string;

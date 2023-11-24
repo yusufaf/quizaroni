@@ -37,19 +37,24 @@ const ViewStudySetCard = (props: Props) => {
     const timeoutRef = useRef(null);
 
     const { categories = [] } = card;
+    const {
+        customTerminology,
+        customLabelTerminology,
+        labelTerminology,
+        terminology,
+        contentOnly,
+    } = selectedStudyset.metadata;
 
-    const selectedTerminology =
-        selectedStudyset?.metadata?.terminology ?? DEFAULT_TERMINOLOGY;
+    const selectedTerminology = terminology ?? DEFAULT_TERMINOLOGY;
     const [terminology1, terminology2] =
         selectedTerminology === FORMAT_TERMINOLOGIES.CUSTOM
-            ? selectedStudyset?.metadata?.customTerminology?.split("/") ?? []
+            ? customTerminology?.split("/") ?? []
             : selectedTerminology.split("/");
     const selectedLabelTerminology =
-        selectedStudyset?.metadata?.labelTerminology ??
-        LABEL_TERMINOLOGIES.CARD;
-    const labelTerminology =
+        labelTerminology ?? LABEL_TERMINOLOGIES.CARD;
+    const currentLabelTerminology =
         selectedLabelTerminology === LABEL_TERMINOLOGIES.CUSTOM
-            ? selectedStudyset?.metadata?.customLabelTerminology ?? ""
+            ? customLabelTerminology ?? ""
             : selectedLabelTerminology;
 
     const [markCardAsImportant] = useMarkCardAsImportantMutation();
@@ -84,13 +89,13 @@ const ViewStudySetCard = (props: Props) => {
 
     /* ==== Categories Popover ==== */
     const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
-      setAnchorEl(event.currentTarget);
+        setAnchorEl(event.currentTarget);
     };
-  
+
     const handlePopoverClose = () => {
-      setAnchorEl(null);
+        setAnchorEl(null);
     };
-  
+
     const open = Boolean(anchorEl);
 
     return (
@@ -107,84 +112,94 @@ const ViewStudySetCard = (props: Props) => {
             }}
             tabIndex={index}
         >
-            <SimpleFlexContainer>
-                <BoldTypography variant="h5">
-                    {labelTerminology} {index + 1}
-                </BoldTypography>
-                <CategoryChips>
-                    {categories.length > 3 ? (
-                        <>
-                            <CategoryChip
-                                aria-owns={open ? 'mouse-over-popover' : undefined}
-                                aria-haspopup="true"
-                                onMouseEnter={handlePopoverOpen}
-                                onMouseLeave={handlePopoverClose}
-                                label={`View ${categories.length} Categories`}
-                                variant="outlined"
-                            />
-                            <Popover
-                                id="mouse-over-popover"
-                                sx={{
-                                    pointerEvents: "none",
-                                    maxWidth: "70rem",
-                                }}
-                                open={open}
-                                anchorEl={anchorEl}
-                                anchorOrigin={{
-                                    vertical: "top",
-                                    horizontal: "right",
-                                }}
-                                transformOrigin={{
-                                    vertical: "top",
-                                    horizontal: "left",
-                                }}
-                                onClose={handlePopoverClose}
-                                disableRestoreFocus
-                            >
-                                <Typography sx={{ p: 2, borderRadius: "0.25rem" }}>
-                                    {categories.map((category) => category).join(", ")}
-                                </Typography>
-                            </Popover>
-                        </>
-                    ) : (
-                        <>
-                            {categories.map(
-                                (category: string, index: number) => (
-                                    <CategoryChip
-                                        key={index}
-                                        label={category}
-                                        variant="outlined"
-                                        title={category}
-                                    />
-                                )
-                            )}
-                        </>
-                    )}
-                </CategoryChips>
-                <ViewFlashCardActions>
-                    <Tooltip title="Play TTS" placement="top">
-                        <IconButton onClick={handleAudioPlayback}>
-                            <VolumeUp />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Mark as important" placement="top">
-                        <IconButton onClick={handleMarkAsImportant}>
-                            {card.important ? (
-                                <Star
-                                    sx={{ color: theme.palette.other.gold }}
+            {!contentOnly && (
+                <SimpleFlexContainer>
+                    <BoldTypography variant="h5">
+                        {currentLabelTerminology} {index + 1}
+                    </BoldTypography>
+                    <CategoryChips>
+                        {categories.length > 3 ? (
+                            <>
+                                <CategoryChip
+                                    aria-owns={
+                                        open ? "mouse-over-popover" : undefined
+                                    }
+                                    aria-haspopup="true"
+                                    onMouseEnter={handlePopoverOpen}
+                                    onMouseLeave={handlePopoverClose}
+                                    label={`View ${categories.length} Categories`}
+                                    variant="outlined"
                                 />
-                            ) : (
-                                <StarBorder />
-                            )}
-                        </IconButton>
-                    </Tooltip>
-                </ViewFlashCardActions>
-            </SimpleFlexContainer>
+                                <Popover
+                                    id="mouse-over-popover"
+                                    sx={{
+                                        pointerEvents: "none",
+                                        maxWidth: "70rem",
+                                    }}
+                                    open={open}
+                                    anchorEl={anchorEl}
+                                    anchorOrigin={{
+                                        vertical: "top",
+                                        horizontal: "right",
+                                    }}
+                                    transformOrigin={{
+                                        vertical: "top",
+                                        horizontal: "left",
+                                    }}
+                                    onClose={handlePopoverClose}
+                                    disableRestoreFocus
+                                >
+                                    <Typography
+                                        sx={{ p: 2, borderRadius: "0.25rem" }}
+                                    >
+                                        {categories
+                                            .map((category) => category)
+                                            .join(", ")}
+                                    </Typography>
+                                </Popover>
+                            </>
+                        ) : (
+                            <>
+                                {categories.map(
+                                    (category: string, index: number) => (
+                                        <CategoryChip
+                                            key={index}
+                                            label={category}
+                                            variant="outlined"
+                                            title={category}
+                                        />
+                                    )
+                                )}
+                            </>
+                        )}
+                    </CategoryChips>
+                    <ViewFlashCardActions>
+                        <Tooltip title="Play TTS" placement="top">
+                            <IconButton onClick={handleAudioPlayback}>
+                                <VolumeUp />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Mark as important" placement="top">
+                            <IconButton onClick={handleMarkAsImportant}>
+                                {card.important ? (
+                                    <Star
+                                        sx={{ color: theme.palette.other.gold }}
+                                    />
+                                ) : (
+                                    <StarBorder />
+                                )}
+                            </IconButton>
+                        </Tooltip>
+                    </ViewFlashCardActions>
+                </SimpleFlexContainer>
+            )}
             <ViewCardContainer>
                 <ViewCardInfo>
-                    <Typography variant="h6" color="primary">
-                        {terminology1 ?? "Term"}
-                    </Typography>
+                    {!contentOnly && (
+                        <Typography variant="h6" color="primary">
+                            {terminology1 ?? "Term"}
+                        </Typography>
+                    )}
                     <Typography
                         sx={{
                             color: `${
@@ -200,9 +215,11 @@ const ViewStudySetCard = (props: Props) => {
                     {/* TODO: Term image */}
                 </ViewCardInfo>
                 <ViewCardInfo>
-                    <Typography variant="h6" color="primary">
-                        {terminology2 ?? "Definition"}
-                    </Typography>
+                    {!contentOnly && (
+                        <Typography variant="h6" color="primary">
+                            {terminology2 ?? "Definition"}
+                        </Typography>
+                    )}
                     <Typography
                         sx={{
                             color: `${
