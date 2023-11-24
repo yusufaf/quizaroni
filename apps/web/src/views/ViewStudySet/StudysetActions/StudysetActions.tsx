@@ -1,5 +1,4 @@
 import {
-    Button,
     FormControlLabel,
     IconButton,
     Menu,
@@ -7,7 +6,6 @@ import {
     Switch,
     Typography,
     Tooltip,
-    Paper,
 } from "@mui/material/";
 import {
     Delete,
@@ -30,26 +28,21 @@ import { useTheme } from "theme/useTheme";
 import { ActionButtonsRow } from "../styles";
 import { useNavigate, useParams } from "react-router-dom";
 import { Studyset } from "lib/types";
-import { Dispatch, SetStateAction } from "react";
+import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setSelectedDialog } from "state/slices/viewSetsSlice";
 import CustomIconButton from "components/CustomIconButton/CustomIconButton";
 import { setDialogProps } from "state/slices/globalSlice";
+import ControlMenu from "./ControlMenu";
 
 type Props = {
-    controlAnchorRef: any;
     updateMetadataField: any;
-    setShowControlMenu: Dispatch<SetStateAction<boolean>>;
-    showControlMenu: any;
     selectedStudyset: Studyset | undefined;
 };
 
 const StudysetActions = (props: Props) => {
     const {
-        controlAnchorRef,
         updateMetadataField,
-        setShowControlMenu,
-        showControlMenu,
         selectedStudyset,
     } = props;
 
@@ -58,6 +51,9 @@ const StudysetActions = (props: Props) => {
     const { id: studySetUUID } = useParams();
     const dispatch = useDispatch();
 
+    const [showControlMenu, setShowControlMenu] = useState<boolean>(false);
+    const controlAnchorRef = useRef(null);
+
     const handleOpenControlMenu = () => {
         setShowControlMenu(true);
     };
@@ -65,18 +61,6 @@ const StudysetActions = (props: Props) => {
     const handleCloseControlMenu = () => {
         setShowControlMenu(false);
     };
-
-    const { metadata = {} } = selectedStudyset || {};
-
-    const {
-        // @ts-ignore
-        backgroundColorVisible = false,
-        // @ts-ignore
-        publiclyViewable = false,
-        // @ts-ignore
-        textColorVisible = false,
-    } = metadata;
-    console.log({ metadata });
 
     const updateMetadataState = (property: string) => {
         let newValue;
@@ -182,96 +166,13 @@ const StudysetActions = (props: Props) => {
                     onClick={() => handleShowDialog(VIEW_SET_DIALOGS.SHARE)}
                 />
             </ActionButtonsRow>
-            <Menu
+            <ControlMenu
                 open={showControlMenu}
                 onClose={handleCloseControlMenu}
                 anchorEl={controlAnchorRef.current}
-            >
-                <MenuItem>
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                size="small"
-                                checked={textColorVisible}
-                                onChange={() =>
-                                    updateMetadataState(
-                                        SET_METADATA_FIELDS.TEXT
-                                    )
-                                }
-                            />
-                        }
-                        label={
-                            <Typography
-                                sx={{
-                                    color: textColorVisible
-                                        ? theme.palette.success.main
-                                        : theme.palette.error.main,
-                                }}
-                            >
-                                {`Text Color: ${
-                                    textColorVisible ? ENABLED : DISABLED
-                                }`}
-                            </Typography>
-                        }
-                    />
-                </MenuItem>
-                <MenuItem>
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                size="small"
-                                checked={backgroundColorVisible}
-                                onChange={() =>
-                                    updateMetadataState(
-                                        SET_METADATA_FIELDS.BACKGROUND
-                                    )
-                                }
-                            />
-                        }
-                        label={
-                            <Typography
-                                sx={{
-                                    color: backgroundColorVisible
-                                        ? theme.palette.success.main
-                                        : theme.palette.error.main,
-                                }}
-                            >
-                                {`Background Color: ${
-                                    backgroundColorVisible ? ENABLED : DISABLED
-                                }`}
-                            </Typography>
-                        }
-                    />
-                </MenuItem>
-                {/* <MenuItem>
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                size="small"
-                                checked={publiclyViewable}
-                                onChange={() =>
-                                    updateMetadataState(
-                                        SET_METADATA_FIELDS.PUBLIC
-                                    )
-                                }
-                            />
-                        }
-                        label={
-                            <Typography
-                                sx={{
-                                    color: publiclyViewable
-                                        ? theme.palette.success.main
-                                        : theme.palette.error.main,
-                                }}
-                            >
-                                {`Viewable: ${
-                                    publiclyViewable ? "Public" : "Private"
-                                }`}
-                            </Typography>
-                        }
-                    />
-                </MenuItem> */}
-            </Menu>
+                selectedStudyset={selectedStudyset}
+                updateMetadataState={updateMetadataState}
+            />
         </>
     );
 };

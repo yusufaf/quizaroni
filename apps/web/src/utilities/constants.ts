@@ -137,6 +137,7 @@ export const SET_METADATA_FIELDS = {
     TEXT: "textColorVisible",
     BACKGROUND: "backgroundColorVisible",
     PUBLIC: "publiclyViewable",
+    CONTENT_ONLY: "contentOnly",
 };
 
 export const DEFAULT_CATEGORIES = {
