@@ -1,0 +1,124 @@
+import {
+    Menu,
+    MenuItem,
+    FormControlLabel,
+    Switch,
+    Typography,
+} from "@mui/material";
+import { SET_METADATA_FIELDS, ENABLED, DISABLED } from "utilities/constants";
+import { Studyset, TODO } from "lib/types";
+import { useTheme } from "theme/useTheme";
+import { useMemo } from "react";
+
+type Props = {
+    open: boolean;
+    onClose: () => void;
+    anchorEl: Element | null;
+    selectedStudyset: Studyset | undefined;
+    updateMetadataState: any;
+};
+
+const ControlMenu = (props: Props) => {
+    const { open, onClose, anchorEl, selectedStudyset, updateMetadataState } =
+        props;
+
+    const { theme } = useTheme();
+
+    const { metadata = {} } = selectedStudyset || {};
+    const {
+        // @ts-ignore
+        backgroundColorVisible = false,
+        // @ts-ignore
+        publiclyViewable = false,
+        // @ts-ignore
+        textColorVisible = false,
+        // @ts-ignore
+        contentOnly = false,
+    } = metadata;
+
+    const menuItems = useMemo(
+        () => [
+            {
+                condition: textColorVisible,
+                updateProperty: SET_METADATA_FIELDS.TEXT,
+                label: "Text Color",
+            },
+            {
+                condition: backgroundColorVisible,
+                updateProperty: SET_METADATA_FIELDS.BACKGROUND,
+                label: "Background Color",
+            },
+            {
+                condition: contentOnly,
+                updateProperty: SET_METADATA_FIELDS.CONTENT_ONLY,
+                label: "Content Only",
+            },
+        ],
+        [textColorVisible, backgroundColorVisible, contentOnly]
+    );
+
+    return (
+        <Menu open={open} onClose={onClose} anchorEl={anchorEl}>
+            {menuItems.map(({ condition, updateProperty, label }) => {
+                return (
+                    <MenuItem>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    size="small"
+                                    checked={condition}
+                                    onChange={() =>
+                                        updateMetadataState(updateProperty)
+                                    }
+                                />
+                            }
+                            label={
+                                <Typography
+                                    sx={{
+                                        color: condition
+                                            ? theme.palette.success.main
+                                            : theme.palette.error.main,
+                                    }}
+                                >
+                                    {`${label}: ${
+                                        condition ? ENABLED : DISABLED
+                                    }`}
+                                </Typography>
+                            }
+                        />
+                    </MenuItem>
+                );
+            })}
+            {/* <MenuItem>
+        <FormControlLabel
+            control={
+                <Switch
+                    size="small"
+                    checked={publiclyViewable}
+                    onChange={() =>
+                        updateMetadataState(
+                            SET_METADATA_FIELDS.PUBLIC
+                        )
+                    }
+                />
+            }
+            label={
+                <Typography
+                    sx={{
+                        color: publiclyViewable
+                            ? theme.palette.success.main
+                            : theme.palette.error.main,
+                    }}
+                >
+                    {`Viewable: ${
+                        publiclyViewable ? "Public" : "Private"
+                    }`}
+                </Typography>
+            }
+        />
+    </MenuItem> */}
+        </Menu>
+    );
+};
+
+export default ControlMenu;
