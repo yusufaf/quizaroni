@@ -89,13 +89,10 @@ export const CardTitle = styled(Typography)({
 export const CardDescription = styled(Typography)({
     overflow: "hidden",
     textOverflow: "ellipsis",
-    display: "-webkit-box",
-    WebkitLineClamp: "2",
-    WebkitBoxOrient: "vertical",
 });
 
 export const CardInfo = styled("div")({
-    marginTop: "2rem",
+    marginTop: "1rem",
 });
 
 export const TermsLabel = styled(Typography)({

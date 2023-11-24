@@ -18,22 +18,29 @@ import SetActionsMenu from "../SetActionsMenu";
 import { useDispatch } from "react-redux";
 import { setSelectedStudySet } from "state/slices/studysetsSlice";
 import { useNavigate } from "react-router-dom";
+import { Studyset } from "lib/types";
 
 type Props = {
-    studyset: any;
+    studyset: Studyset;
     handleShowConfirmDialog: any;
 };
 
 const HomeStudySetCard = (props: Props) => {
     const { studyset, handleShowConfirmDialog } = props;
 
-    const { cards, createdAt, title, description, label, lastViewed, uuid } =
-        studyset;
+    const {
+        cards,
+        createdAt,
+        title,
+        description,
+        label,
+        lastViewed,
+        uuid,
+        username,
+    } = studyset;
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    const [isFavorited, setIsFavorited] = useState(false);
 
     const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -60,7 +67,12 @@ const HomeStudySetCard = (props: Props) => {
                     <CardTitle title={title} variant="h6">
                         {title}
                     </CardTitle>
-                    <CardDescription>{description}</CardDescription>
+                    <Typography variant="subtitle1">
+                        {`Created by ${username}`}
+                    </Typography>
+                    <CardDescription title={description}>
+                        {description}
+                    </CardDescription>
                     <CardInfo>
                         <TermsLabel>{cards.length} Terms</TermsLabel>
                         <SpacedContainer>
@@ -90,16 +102,16 @@ const HomeStudySetCard = (props: Props) => {
                         >
                             <MoreHoriz />
                         </IconButton>
-                        <SetActionsMenu
-                            studyset={studyset}
-                            open={actionsMenuOpen}
-                            onClose={closeActionsMenu}
-                            anchorEl={anchorEl}
-                            handleShowConfirmDialog={handleShowConfirmDialog}
-                        />
                     </CardBottom>
                 </CardContent>
             </HomeSetCard>
+            <SetActionsMenu
+                studyset={studyset}
+                open={actionsMenuOpen}
+                onClose={closeActionsMenu}
+                anchorEl={anchorEl}
+                handleShowConfirmDialog={handleShowConfirmDialog}
+            />
             <ConfirmDialog />
         </>
     );
