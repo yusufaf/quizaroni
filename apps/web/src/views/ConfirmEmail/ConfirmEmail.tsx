@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Paper } from "@mui/material";
-import { Auth } from "@aws-amplify/auth";
+import { confirmSignUp, resendSignUpCode } from "aws-amplify/auth";
 import { useSelector } from "react-redux";
 import { selectCognitoUser } from "state/slices/globalSlice";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +26,7 @@ const ConfirmEmail = (props: Props) => {
 
     const handleConfirmEmail = async () => {
         try {
-            const result = await Auth.confirmSignUp(username, confirmationCode);
+            const result = await confirmSignUp({username, confirmationCode});
             console.log("Confirmation code sent succcesfully", result);
 
             /* Send user to login page if successfully confirmed email */
@@ -38,7 +38,7 @@ const ConfirmEmail = (props: Props) => {
 
     const handleResendCode = async () => {
         try {
-            const result = await Auth.resendSignUp(username);
+            const result = await resendSignUpCode({username});
             console.log("Code resent succesfully", result);
         } catch (err) {
             console.error("error resending code: ", err);

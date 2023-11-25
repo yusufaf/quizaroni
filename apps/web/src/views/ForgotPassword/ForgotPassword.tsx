@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Auth } from "@aws-amplify/auth";
+import { confirmResetPassword, resetPassword } from "aws-amplify/auth";
 import { Paper } from "@mui/material";
 import {
     ForgotPassBtn,
@@ -25,7 +25,7 @@ const ForgotPassword = (props: Props) => {
 
     const handleForgotPassword = async () => {
         try {
-            const result = await Auth.forgotPassword(username);
+            const result = await resetPassword({username});
             console.log("Result of sending forgot pass code = ", result);
 
             /* Trigger change in the "form" */
@@ -37,11 +37,11 @@ const ForgotPassword = (props: Props) => {
 
     const handleResetPassword = async () => {
         try {
-            const result = await Auth.forgotPasswordSubmit(
+            const result = await confirmResetPassword({
                 username,
                 confirmationCode,
                 newPassword
-            );
+            });
             console.log("Result of submitting reset password", result);
 
             /* Send user to login page if successfully changed */

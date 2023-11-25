@@ -16,7 +16,7 @@ import { StyledLink } from "common/AppStyles";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import { useDispatch } from "react-redux";
 import { setAlert, setCognitoUser } from "state/slices/globalSlice";
-import { Auth } from "@aws-amplify/auth";
+import { Auth, signUp } from "@aws-amplify/auth";
 import axios from "axios";
 import PasswordValidator from "components/PasswordValidator/PasswordValidator";
 
@@ -58,30 +58,31 @@ const Signup = (props: Props) => {
     const handleSignup = async () => {
         /* Sign up button is disabled until fields are valid */
         try {
-            const { user } = await Auth.signUp({
+            const signUpResult = await signUp({
                 username,
                 password,
-                attributes: {
-                    email,
-                },
-                autoSignIn: {
-                    enabled: true,
+                options: {
+                    userAttributes: {
+                        email
+                    },
+                    autoSignIn: {
+                        enabled: true,
+                    },
                 },
             });
-
-            console.log(user);
+            console.log({signUpResult});
 
             // @ts-ignore - storage should exist on a newly created cognito user
             
-            const { userInfo } = user.storage;
-            const { createdAt, emailVerified, uid } = JSON.parse(userInfo);
-            const newUserData = {
-                createdAt: Number.parseInt(createdAt),
-                username,
-                email,
-                emailVerified,
-                uid,
-            };
+            // const { userInfo } = user.storage;
+            // const { createdAt, emailVerified, uid } = JSON.parse(userInfo);
+            // const newUserData = {
+            //     createdAt: Number.parseInt(createdAt),
+            //     username,
+            //     email,
+            //     emailVerified,
+            //     uid,
+            // };
 
             /* Store newly created cognito user in Redux */
             // dispatch(
@@ -93,10 +94,8 @@ const Signup = (props: Props) => {
             /* Send user to confirm email page */
             navigate("/confirmEmail");
 
-            const response = await axios.post("/api/users/create", newUserData);
-            console.log({ response });
-
-            // Response.data has message in it
+            // const response = await axios.post("/api/users/create", newUserData);
+            // console.log({ response });
         } catch (error) {
             console.log("error signing up:", error);
         }
