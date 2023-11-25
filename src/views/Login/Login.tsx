@@ -20,7 +20,6 @@ import {
     setCognitoUser,
     setAuthenticated,
     setUserData,
-    selectUserData,
 } from "state/slices/globalSlice";
 import { selectStudySets, setStudySets } from "state/slices/studysetsSlice";
 import { signIn } from "@aws-amplify/auth";
@@ -35,18 +34,6 @@ const Login = (props: Props) => {
     useBrowserTitle("Login");
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    const { uuid: userUUID = "" } = useSelector(selectUserData);
-
-    /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: studySetsData = [] } = useGetAllStudysetsQuery(
-        { userUUID: userUUID ?? "" },
-        { skip: !userUUID }
-    );
-
-    useEffect(() => {
-        dispatch(setStudySets(studySetsData));
-    }, [studySetsData]);
 
     /* OAuth Variables */
     // const provider = new GoogleAuthProvider();
@@ -107,11 +94,10 @@ const Login = (props: Props) => {
 
     const handleLogin = async () => {
         try {
-            const user = await signIn({username, password});
+            const user = await signIn({ username, password });
             console.log("Result of cognito sign in = ", user);
 
             /* Retrieve user data, passing username as a query parameter */
-            
             const response = await axios.get("/api/users/get", {
                 params: {
                     username,
@@ -119,14 +105,14 @@ const Login = (props: Props) => {
             });
             console.log({ response, user });
             const userData = response.data;
-            const { uuid: userUUID } = userData;
 
             /* Store cognito user and authenticated in state */
-            dispatch(setCognitoUser(user));
+            dispatch(setCognitoUser({username}));
             dispatch(setAuthenticated(true));
-            dispatch(setUserData(userData));
+            // dispatch(setUserData(userData));
 
-            navigate("/create");
+            // Navigate to home page
+            navigate("/");
         } catch (error) {
             console.error("Error signing in", error);
         }

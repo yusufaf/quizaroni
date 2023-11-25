@@ -4,8 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     selectNamedColorsDialogProps,
     setNamedColorsDialogProps,
-    selectUserData,
-    setUserData,
+    selectCognitoUser,
 } from "state/slices/globalSlice";
 import {
     BoldTypography,
@@ -23,21 +22,32 @@ import {
 import CreateTabView from "./CreateTabView";
 import NamedColorPicker from "./NamedColorPicker";
 import { LoadingButton } from "@mui/lab";
-import { useUpdateUserMetadataMutation } from "state/api/usersAPI";
+import {
+    useGetUserQuery,
+    useUpdateUserMetadataMutation,
+} from "state/api/usersAPI";
 import ManageTabView from "./ManageTabView";
 import { ACTIONS, TABS } from "./constants";
 import NamedColorsList from "./NamedColorsList";
 import { Download } from "@mui/icons-material";
 import { downloadObjectAsJSON } from "utilities/functions";
+import { DEFAULT_USER_DATA } from "utilities/constants";
 
 type Props = {};
 const NamedColorsDialog = (props: Props) => {
     /* Redux / Hooks */
     const dispatch = useDispatch();
+
+    const cognitoUser = useSelector(selectCognitoUser);
     const {
-        metadata: { namedColors = [] },
-        uuid: userUUID = "",
-    } = useSelector(selectUserData);
+        data: {
+            metadata: { namedColors = [] },
+            uuid: userUUID = "",
+        } = DEFAULT_USER_DATA,
+    } = useGetUserQuery({
+        username: cognitoUser.username ?? "",
+    });
+
     const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
 
     const [

@@ -10,7 +10,6 @@ import {
     useDeleteCategoryMutation,
     useEditCategoryMutation,
 } from "state/api/studysetsAPI";
-import { selectUserData } from "state/slices/globalSlice";
 import {
     capitalizeFirstLetter,
     downloadObjectAsJSON,
@@ -53,7 +52,6 @@ const ManageCategoriesDialog = (props: Props) => {
     } = selectedStudyset || {};
 
     const dispatch = useDispatch();
-    const { uuid: userUUID = "" } = useSelector(selectUserData);
 
     const {
         mutate: createCategory,

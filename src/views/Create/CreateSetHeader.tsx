@@ -6,12 +6,13 @@ import {
 } from "@mui/material";
 import { BoldTypography } from "common/AppStyles";
 import { useSelector } from "react-redux";
-import { selectUserData } from "state/slices/globalSlice";
+import { selectCognitoUser } from "state/slices/globalSlice";
 import { useTheme } from "theme/useTheme";
 import {
     CREATE_PAGE_PROPS,
     CREATE_PAGE_TYPES,
-    CREATE_SET
+    CREATE_SET,
+    DEFAULT_USER_DATA
 } from "utilities/constants";
 import HeaderAdvancedSection from "./HeaderAdvancedSection";
 import {
@@ -30,6 +31,7 @@ import {
     BackToViewButton,
 } from "./CreateSetStyles";
 import { useNavigate, useParams } from "react-router-dom";
+import { useGetUserQuery } from "state/api/usersAPI";
 
 type Props = {
     advancedSectionProps: any;
@@ -68,10 +70,16 @@ const CreateSetHeader = (props: Props) => {
     const navigate = useNavigate();
     const { id: studySetUUID } = useParams();
 
-    const userData = useSelector(selectUserData);
+    const cognitoUser = useSelector(selectCognitoUser);
+    const {
+        data: {
+            labels = []
+        } = DEFAULT_USER_DATA,
+    } = useGetUserQuery({
+        username: cognitoUser.username ?? "",
+    });
 
     const renderLabelOptions = () => {
-        const { labels = [] } = userData;
         const labelJsx: any[] = [];
 
         labelJsx.push(
