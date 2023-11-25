@@ -23,7 +23,7 @@ import {
     selectUserData,
 } from "state/slices/globalSlice";
 import { selectStudySets, setStudySets } from "state/slices/studysetsSlice";
-import { Auth } from "@aws-amplify/auth";
+import { signIn } from "@aws-amplify/auth";
 import axios from "axios";
 import { useGetAllStudysetsQuery } from "state/api/studysetsAPI";
 
@@ -107,7 +107,7 @@ const Login = (props: Props) => {
 
     const handleLogin = async () => {
         try {
-            const user = await Auth.signIn(username, password);
+            const user = await signIn({username, password});
             console.log("Result of cognito sign in = ", user);
 
             /* Retrieve user data, passing username as a query parameter */

@@ -1,4 +1,4 @@
-import { GitHub, LinkedIn, Logout as LogoutIcon } from "@mui/icons-material";
+import { Logout as LogoutIcon } from "@mui/icons-material";
 import {
     AppBar,
     IconButton,
@@ -32,7 +32,7 @@ import {
     StyledLightModeIcon,
     StyledNavLink,
 } from "./NavStyles";
-import { Auth } from "aws-amplify";
+import { signOut } from "aws-amplify/auth";
 
 type Props = {};
 
@@ -57,7 +57,7 @@ const NavBar = (props: Props) => {
 
     const handleLogout = async () => {
         try {
-            const result = await Auth.signOut();
+            const result = await signOut();
             console.log("Sign-In Result = ", result);
 
             dispatch(setAuthenticated(false));
