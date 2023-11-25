@@ -27,7 +27,6 @@ const ConfirmEmail = (props: Props) => {
     const handleConfirmEmail = async () => {
         try {
             const result = await confirmSignUp({username, confirmationCode});
-            console.log("Confirmation code sent succcesfully", result);
 
             /* Send user to login page if successfully confirmed email */
             navigate("/login");
@@ -76,9 +75,14 @@ const ConfirmEmail = (props: Props) => {
                         label="Confirmation Code"
                         size="small"
                         required
+                        placeholder="123456"
                         value={confirmationCode}
-                        onChange={(e) => setConfirmationCode(e.target.value)}
-                        error={!isValidCode}
+                        onChange={(e) => {
+                            if (!(e.target.value.length > 6)) {
+                                setConfirmationCode(e.target.value)
+                            }
+                        }}
+                        error={!isValidCode && Boolean(confirmationCode)}
                     />
                     <ConfirmBtn
                         variant="contained"
