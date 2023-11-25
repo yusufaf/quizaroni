@@ -1,6 +1,5 @@
 import api from "./api";
-import { GetUserParams, UpdateDefaultThemeParams, UpdateMetadataParams, User } from "lib/types";
-
+import { CreateUserParams, GetUserParams, UpdateDefaultThemeParams, UpdateMetadataParams, User } from "lib/types";
 
 /* Endpoints
     router.post("/api/users/create", createUser);
@@ -11,6 +10,13 @@ import { GetUserParams, UpdateDefaultThemeParams, UpdateMetadataParams, User } f
 
 export const usersApi = api.injectEndpoints({
     endpoints: (build) => ({
+        createUser: build.mutation<void, CreateUserParams>({
+            query: ({ email, username }) => ({
+                url: "users/create",
+                method: "POST",
+                params: { email, username },
+            }),
+        }),
         getUser: build.query<User, GetUserParams>({
             query: ({ username }) => ({
                 url: "users/get",
@@ -48,6 +54,7 @@ export const usersApi = api.injectEndpoints({
 });
 
 export const {
+    useCreateUserMutation,
     useGetUserQuery,
     useUpdateUserMetadataMutation,
     useUpdateDefaultThemeMutation,

@@ -16,9 +16,9 @@ import { StyledLink } from "common/AppStyles";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import { useDispatch } from "react-redux";
 import { setAlert, setCognitoUser } from "state/slices/globalSlice";
-import { Auth, signUp } from "@aws-amplify/auth";
-import axios from "axios";
+import { signUp } from "@aws-amplify/auth";
 import PasswordValidator from "components/PasswordValidator/PasswordValidator";
+import { useCreateUserMutation } from "state/api/usersAPI";
 
 type Props = {};
 
@@ -31,6 +31,7 @@ const Signup = (props: Props) => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [createUser] = useCreateUserMutation();
 
     /* Signup Input States */
     const [email, setEmail] = useState<string>("");
@@ -72,30 +73,20 @@ const Signup = (props: Props) => {
             });
             console.log({signUpResult});
 
-            // @ts-ignore - storage should exist on a newly created cognito user
-            
-            // const { userInfo } = user.storage;
-            // const { createdAt, emailVerified, uid } = JSON.parse(userInfo);
-            // const newUserData = {
-            //     createdAt: Number.parseInt(createdAt),
-            //     username,
-            //     email,
-            //     emailVerified,
-            //     uid,
-            // };
-
             /* Store newly created cognito user in Redux */
-            // dispatch(
-            //     setCognitoUser({
-            //         username,
-            //     })
-            // );
+            dispatch(
+                setCognitoUser({
+                    username,
+                })
+            );
+
+            createUser({
+                email,
+                username,
+            })
 
             /* Send user to confirm email page */
             navigate("/confirmEmail");
-
-            // const response = await axios.post("/api/users/create", newUserData);
-            // console.log({ response });
         } catch (error) {
             console.log("error signing up:", error);
         }
