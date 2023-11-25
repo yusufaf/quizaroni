@@ -15,7 +15,6 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import {
   selectNamedColorsDialogProps,
-  selectUserData,
   setNamedColorsDialogProps,
   setUserData,
 } from "state/slices/globalSlice";
@@ -24,9 +23,10 @@ import { ActionColumn, ActionHeader } from "./ProfileStyles";
 import { useDispatch, useSelector } from "react-redux";
 import ManageLabelsDialog from "views/ViewStudySet/ManageLabelsDialog/ManageLabelsDialog";
 import NamedColorsDialog from "components/NamedColorsDialog/NamedColorsDialog";
+import { User } from "lib/types";
 
 type Props = {
-  userData: any;
+  userData: User;
 };
 
 const CustomizationTab = (props: Props) => {
@@ -34,7 +34,7 @@ const CustomizationTab = (props: Props) => {
 
   const dispatch = useDispatch();
 
-  const { uuid: userUUID = "", labels = [] } = useSelector(selectUserData);
+  const { uuid: userUUID = "", labels = [] } = userData;
   const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
   const [defaultTheme, setDefaultTheme] = useState<string>(
     userData?.metadata?.defaultTheme ?? "dark"
@@ -52,16 +52,15 @@ const CustomizationTab = (props: Props) => {
    */
   const handleDefaultTheme = async (event, newTheme) => {
     try {
-      const { uuid } = userData;
       /* Don't take any action if selected theme is the same */
-      if (!uuid || newTheme === null || newTheme === defaultTheme) {
+      if (!userUUID || newTheme === null || newTheme === defaultTheme) {
         return;
       }
 
       const themeUpdateResult = await axios.post(
         "/api/users/updateDefaultTheme",
         {
-          uuid,
+          uuid: userUUID,
           newTheme,
         }
       );

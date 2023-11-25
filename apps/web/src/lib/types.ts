@@ -7,12 +7,12 @@ export type InitialCard = {
     term: string;
     definition: string;
     uuid: UUID;
-}
+};
 
 export type Note = {
     uuid: UUID;
     text: string;
-}
+};
 
 export type Card = {
     term: string;
@@ -35,7 +35,7 @@ export type StudysetMetadata = {
     labelTerminology: string;
     customLabelTerminology: string;
     notesDrawerPosition: string;
-    notesDrawerInitial: string; 
+    notesDrawerInitial: string;
 };
 
 export type Studyset = {
@@ -53,19 +53,28 @@ export type Studyset = {
     uuid: UUID;
 };
 
+export type AppTheme = "light" | "dark";
+export type HomeView = "table" | "grid" | "html";
+export type NamedColor = { color: string; name: string };
+
 export type User = {
     createdAt: Timestamp;
     email: string;
     labels: string[];
-    metadata: any;
-    uuid: string; 
-}
+    metadata: {
+        defaultTheme: AppTheme;
+        homeView: HomeView;
+        namedColors: NamedColor[];
+    };
+    username: string;
+    uuid: string;
+};
 
 /* RTK Query Types */
 
 export type StudysetUUIDPayload = {
     studysetUUID: UUID;
-}
+};
 
 export type GetAllStudysetsParams = {
     userUUID: UUID;
@@ -73,10 +82,10 @@ export type GetAllStudysetsParams = {
 
 export type GetStudysetParams = {
     uuid: UUID;
-};  
+};
 
 export type CreateStudysetParams = {
-// TODO
+    // TODO
 };
 
 export type DeleteStudysetParams = {
@@ -93,17 +102,17 @@ export type UpdateStudysetParams = {
 
 export type FavoriteStudysetParams = StudysetUUIDPayload & {
     favorited: boolean;
-}
+};
 
 // Users API
 export type GetUserParams = {
     username: string;
-};  
+};
 
 export type CreateUserParams = {
     email: string;
     username: string;
-}
+};
 
 export type UpdateMetadataParams = {
     uuid: UUID;
@@ -133,27 +142,27 @@ export type EditCategoryParams = StudysetUUIDPayload & {
 export type AssignCardCategoriesParams = StudysetUUIDPayload & {
     cardUUID: UUID;
     categories: string[];
-}
+};
 
 export type MarkCardAsImportantParams = StudysetUUIDPayload & {
     cardUUID: UUID;
     newValue: boolean;
-}
+};
 
 export type CreateNoteParams = StudysetUUIDPayload & {
     cardUUID: UUID;
-}
+};
 
 export type DeleteNoteParams = StudysetUUIDPayload & {
     cardUUID: UUID;
     noteUUID: UUID;
-}
+};
 
 export type EditNoteParams = StudysetUUIDPayload & {
     cardUUID: UUID;
     noteUUID: UUID;
     text: string;
-}
+};
 
 export type UpdateLastViewedParams = StudysetUUIDPayload;
 
@@ -162,24 +171,24 @@ export type CreateLabelParams = {
     label: string;
     updateStudysetLabel: boolean;
     studysetUUID?: UUID;
-}
+};
 
 export type DeleteLabelParams = {
     userUUID: UUID;
     labelsToDelete: string;
-}
+};
 
 export type EditLabelParams = {
     userUUID: UUID;
     index: number;
     oldLabel: string;
     newLabel: string;
-}
+};
 
 export type ChangeLabelParams = {
     studysetUUID: UUID;
     newLabel: string;
-}
+};
 
 export type SortDirection = "asc" | "dsc";
 
@@ -190,9 +199,9 @@ export type ConfirmDialogProps = {
     open: boolean;
     title: string;
     type: string;
-}
+};
 
-// export type ViewSetDialog = 
+// export type ViewSetDialog =
 
 export type OpenCardNotes = Set<UUID>;
 

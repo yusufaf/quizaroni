@@ -11,13 +11,14 @@ import {
 } from "state/api/studysetsAPI";
 import {
     selectAuthenticated,
+    selectCognitoUser,
     selectNamedColorsDialogProps,
-    selectUserData,
 } from "state/slices/globalSlice";
 import { useTheme } from "theme/useTheme";
 import {
     CREATE_PAGE_PROPS,
     CREATE_PAGE_TYPES,
+    DEFAULT_USER_DATA,
     PAGES,
 } from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";
@@ -45,6 +46,7 @@ import NamedColorsDialog from "components/NamedColorsDialog/NamedColorsDialog";
 import { Studyset } from "lib/types";
 import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
 import { SelectChangeEvent, Tooltip, Typography } from "@mui/material";
+import { useGetUserQuery } from "state/api/usersAPI";
 
 type Props = {
     pageType?: string;
@@ -62,7 +64,15 @@ const CreateSet = (props: Props) => {
     const dispatch = useDispatch();
 
     const authenticated = useSelector(selectAuthenticated);
-    const userData = useSelector(selectUserData);
+    const cognitoUser = useSelector(selectCognitoUser);
+    const {
+        data: {
+            uuid: userUUID = "",
+            username,
+        } = DEFAULT_USER_DATA,
+    } = useGetUserQuery({
+        username: cognitoUser.username ?? "",
+    });
     const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
     const { blankCardsCount, expanded } = useSelector(
         selectAdvancedSectionProps
@@ -146,7 +156,6 @@ const CreateSet = (props: Props) => {
 
             const timestamp = new Date().getTime();
             const label = (enteredLabel ?? selectedLabel) || null;
-            const { username, uuid: userUUID } = userData;
             const metadata = {};
 
             const studySet = {

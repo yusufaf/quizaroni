@@ -1,9 +1,6 @@
 import { AddPhotoAlternate as AddPhotoIcon } from "@mui/icons-material";
 import { Typography } from "@mui/material/";
 import { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
-import { selectUserData } from "state/slices/globalSlice";
-import { selectStudySets } from "state/slices/studysetsSlice";
 import { useTheme } from "theme/useTheme";
 import {
     ProfilePicture,
@@ -12,14 +9,21 @@ import {
     UserInfoContainer,
     UserInfoHeading,
 } from "./ProfileStyles";
+import { useGetAllStudysetsQuery } from "state/api/studysetsAPI";
+import { User } from "lib/types";
 
-type Props = {};
-
+type Props = {
+    userData: User;
+};
 const ProfileCard = (props: Props) => {
+    const { userData } = props;
+
     const { isDarkMode, theme } = useTheme();
 
-    const userData = useSelector(selectUserData);
-    const studySets = useSelector(selectStudySets);
+    const { data: studysets = [] } = useGetAllStudysetsQuery(
+        { userUUID: userData.uuid ?? "" },
+        { skip: !userData.uuid }
+    );
 
     const profilePicRef = useRef(null);
     console.log({ userData });
@@ -53,7 +57,7 @@ const ProfileCard = (props: Props) => {
                 </UserInfoContainer>
                 <UserInfoContainer>
                     <UserInfoHeading># of Study Sets Created</UserInfoHeading>
-                    <Typography>{studySets?.length ?? 0}</Typography>
+                    <Typography>{studysets?.length ?? 0}</Typography>
                 </UserInfoContainer>
                 <UserInfoContainer>
                     <UserInfoHeading>Account Created</UserInfoHeading>

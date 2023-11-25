@@ -1,4 +1,4 @@
-import type { SortDirection } from "lib/types";
+import type { SortDirection, User } from "lib/types";
 import type { InitialCard } from "lib/types";
 import { v4 as uuidv4 } from "uuid";
 
@@ -192,4 +192,17 @@ export const EMPTY_NOTE_PLACEHOLDER = "Enter text for the note";
 export const NOTES_DRAWER_INITIAL_APPEARANCE = {
     OPEN: "open",
     CLOSED: "closed",
+}
+
+export const DEFAULT_USER_DATA: User = {
+    createdAt: new Date().getTime(),
+    email: "",
+    labels: [],
+    metadata: {
+        defaultTheme: "dark",
+        homeView: "table",
+        namedColors: [],
+    },
+    username: "",
+    uuid: "",
 }
