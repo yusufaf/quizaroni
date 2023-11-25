@@ -1,4 +1,4 @@
-import { Auth } from "aws-amplify";
+import { getCurrentUser } from 'aws-amplify/auth';
 import axios from "axios";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,11 +36,8 @@ const AuthProvider = ({ children }: Props) => {
 
     const checkAuthState = async () => {
         try {
-            const currentUser = await Auth.currentAuthenticatedUser();
+            const currentUser = await getCurrentUser();
             console.log("Testing current auth user = ", currentUser);
-            // TODO: Review what you can do with this
-            // const session = await Auth.currentSession();
-            // console.log("Response from current session = ", session);
 
             /* Removing unneeded properties to make the CognitoUser object serializable in redux */
             const modifiedCognitoUser = {...currentUser};
