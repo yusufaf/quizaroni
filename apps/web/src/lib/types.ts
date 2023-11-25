@@ -100,6 +100,11 @@ export type GetUserParams = {
     username: string;
 };  
 
+export type CreateUserParams = {
+    email: string;
+    username: string;
+}
+
 export type UpdateMetadataParams = {
     uuid: UUID;
     property: string;

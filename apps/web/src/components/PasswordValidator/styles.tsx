@@ -14,8 +14,8 @@ export const PasswordPolicyPaper = styled(Paper)({
 });
 
 export const RequirementText = styled(Typography)<{ isSatisfied: boolean }>(
-    ({ isSatisfied }) => ({
-        color: isSatisfied ? "green" : "red",
+    ({ isSatisfied, theme }) => ({
+        color: isSatisfied ? theme.palette.success.main : theme.palette.error.main,
         transition: "color 0.2s ease",
     })
 );
