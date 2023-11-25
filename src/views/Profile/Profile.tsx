@@ -5,7 +5,7 @@ import { SyntheticEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     selectAuthenticated,
-    selectUserData
+    selectCognitoUser,
 } from "state/slices/globalSlice";
 import { useTheme } from "theme/useTheme";
 import LoginMessage from "views/LoginMessage/LoginMessage";
@@ -18,6 +18,8 @@ import {
     ProfilePaper,
     ProfileTab,
 } from "./ProfileStyles";
+import { useGetUserQuery } from "state/api/usersAPI";
+import { DEFAULT_USER_DATA } from "utilities/constants";
 
 const TABS = {
     ACCOUNT: "Account",
@@ -31,7 +33,12 @@ const Profile = (props: Props) => {
 
     const dispatch = useDispatch();
     const authenticated = useSelector(selectAuthenticated);
-    const userData = useSelector(selectUserData);
+    const cognitoUser = useSelector(selectCognitoUser);
+    const {
+        data: userData = DEFAULT_USER_DATA,
+    } = useGetUserQuery({
+        username: cognitoUser.username ?? "",
+    });
 
     const [selectedProfileTab, setSelectedProfileTab] = useState<string>(TABS.CUSTOMIZATION);
 
@@ -51,7 +58,7 @@ const Profile = (props: Props) => {
     return (
         <>
             <ProfilePage>
-                <ProfileCard />
+                <ProfileCard userData={userData}/>
                 <ProfilePaper elevation={6}>
                     <ProfileContainer>
                         <Tabs

@@ -12,19 +12,22 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useGetAllStudysetsQuery } from "state/api/studysetsAPI";
-import { useUpdateUserMetadataMutation } from "state/api/usersAPI";
+import {
+    useGetUserQuery,
+    useUpdateUserMetadataMutation,
+} from "state/api/usersAPI";
 import {
     selectAuthenticated,
-    selectUserData,
+    selectCognitoUser,
     setDialogProps,
 } from "state/slices/globalSlice";
-import {
-    selectStudySets,
-    setSelectedStudySet,
-    setStudySets,
-} from "state/slices/studysetsSlice";
+import { setSelectedStudySet } from "state/slices/studysetsSlice";
 import { useTheme } from "theme/useTheme";
-import { CONFIRM_DIALOGS, HOME_LAYOUTS } from "utilities/constants";
+import {
+    CONFIRM_DIALOGS,
+    DEFAULT_USER_DATA,
+    HOME_LAYOUTS,
+} from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";
 import HomeGridView from "./HomeGridView";
 import {
@@ -53,11 +56,19 @@ const Home = (props: Props) => {
 
     const dispatch = useDispatch();
     const authenticated = useSelector(selectAuthenticated);
-    const { uuid: userUUID = "" } = useSelector(selectUserData);
-    const studysets = useSelector(selectStudySets);
+    const cognitoUser = useSelector(selectCognitoUser);
+    const { data: { uuid: userUUID = "" } = DEFAULT_USER_DATA } =
+        useGetUserQuery(
+            {
+                username: cognitoUser.username ?? "",
+            },
+            {
+                skip: !cognitoUser.username,
+            }
+        );
 
     /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: allStudysets = [], isLoading: isGetAllStudysetsLoading } =
+    const { data: studysets = [], isLoading: isGetAllStudysetsLoading } =
         useGetAllStudysetsQuery(
             { userUUID: userUUID ?? "" },
             { skip: !userUUID }
@@ -71,10 +82,6 @@ const Home = (props: Props) => {
             isError: isUpdateMetadataError,
         },
     ] = useUpdateUserMetadataMutation();
-
-    useEffect(() => {
-        dispatch(setStudySets(allStudysets));
-    }, [allStudysets]);
 
     useBrowserTitle("Home");
 
@@ -227,7 +234,7 @@ const Home = (props: Props) => {
     const handleContextMenu = (event: React.MouseEvent) => {
         event.preventDefault();
 
-        const localStudyset = allStudysets.find(
+        const localStudyset = studysets.find(
             (studyset: Studyset) =>
                 studyset.uuid === event.currentTarget.getAttribute("data-id")
         );
@@ -319,14 +326,14 @@ const Home = (props: Props) => {
                         )}
                         {selectedView === HOME_LAYOUTS.GRID && (
                             <HomeGridView
-                                studysets={allStudysets}
+                                studysets={studysets}
                                 handleShowConfirmDialog={
                                     handleShowConfirmDialog
                                 }
                             />
                         )}
                         {selectedView === HOME_LAYOUTS.HTML && (
-                            <HomeHTMLView studysets={allStudysets} />
+                            <HomeHTMLView studysets={studysets} />
                         )}
                     </HomeSetsContainer>
                     <ConfirmDialog />

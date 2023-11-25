@@ -11,11 +11,12 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
+    useGetAllStudysetsQuery,
     useGetStudysetQuery,
     useUpdateLastViewedMutation,
     useUpdateStudysetMetadataMutation,
 } from "state/api/studysetsAPI";
-import { selectUserData, setDialogProps } from "state/slices/globalSlice";
+import { selectCognitoUser, setDialogProps } from "state/slices/globalSlice";
 import {
     selectSelectedDialog,
     setSelectedDialog,
@@ -45,6 +46,7 @@ import {
 } from "./styles";
 import NotesDrawer from "./NotesDrawer/NotesDrawer";
 import { selectStudySets } from "state/slices/studysetsSlice";
+import { useGetUserQuery } from "state/api/usersAPI";
 
 type Props = {};
 
@@ -53,10 +55,19 @@ const ViewStudySet = (props: Props) => {
     const navigate = useNavigate();
     const { id: studysetUUID = "" } = useParams();
     const dispatch = useDispatch();
-    const { uuid: userUUID = "", labels = [] } = useSelector(selectUserData);
+    const cognitoUser = useSelector(selectCognitoUser);
+    const { data: userData } = useGetUserQuery({
+        username: cognitoUser.username ?? ""
+    })
 
     const selectedDialog = useSelector(selectSelectedDialog);
-    const studysets = useSelector(selectStudySets);
+
+    /* Skip option prevents hook from running when userUUID is undefined */
+    const { data: studysets = [] } =
+        useGetAllStudysetsQuery(
+            { userUUID: userData?.uuid ?? "" },
+            { skip: !userData?.uuid }
+        );
 
     const {
         data: selectedStudyset,
