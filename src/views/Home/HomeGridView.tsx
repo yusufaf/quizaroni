@@ -16,7 +16,7 @@ const HomeGridView = (props: Props) => {
 
     const [page, setPage] = useState<number>(1);
 
-    const onPageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    const onPageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value);
     };
 

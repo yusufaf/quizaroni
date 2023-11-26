@@ -11,7 +11,7 @@ import { selectDialogProps, setDialogProps } from 'state/slices/globalSlice';
 import {
     ConfirmDialogProps
 } from "lib/types"
-import { CONFIRM_DIALOGS } from 'utilities/constants';
+import { STUDYSET_CONFIRM_DIALOGS } from 'utilities/constants';
 import useCustomMutation from "lib/hooks/useCustomMutation";
 import { useDeleteStudysetMutation, useDuplicateStudysetMutation } from "state/api/studysetsAPI";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
@@ -57,11 +57,11 @@ const ConfirmDialog = (props: Props) => {
 
     const handleConfirm = () => {
         switch (dialogProps.type) {
-            case CONFIRM_DIALOGS.DELETE:
+            case STUDYSET_CONFIRM_DIALOGS.DELETE:
                 deleteStudySet({...dialogProps.props});
                 navigate("/");
                 break;
-            case CONFIRM_DIALOGS.DUPLICATE:
+            case STUDYSET_CONFIRM_DIALOGS.DUPLICATE:
                 duplicateStudySet({...dialogProps.props});
                 break;
         }

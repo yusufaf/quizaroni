@@ -18,7 +18,7 @@ import {
     Share,
 } from "@mui/icons-material/";
 import {
-    CONFIRM_DIALOGS,
+    STUDYSET_CONFIRM_DIALOGS,
     DISABLED,
     ENABLED,
     SET_METADATA_FIELDS,
@@ -89,7 +89,7 @@ const StudysetActions = (props: Props) => {
             open: true,
             title: "Delete this study set?",
             dialogMessage: "Are you sure you want to delete this set?",
-            type: CONFIRM_DIALOGS.DELETE,
+            type: STUDYSET_CONFIRM_DIALOGS.DELETE,
             props: {
                 uuid: selectedStudyset?.uuid ?? "",
             },
