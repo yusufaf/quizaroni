@@ -128,10 +128,21 @@ export const PWD_REGEX = {
     length: /^.{8,}$/,
 };
 
-export const CONFIRM_DIALOGS = {
+export const STUDYSET_CONFIRM_DIALOGS = {
     DELETE: "DELETE",
     DUPLICATE: "DUPLICATE",
 };
+
+export const STUDYSET_CONFIRM_DIALOG_PROPS = new Map([
+    [STUDYSET_CONFIRM_DIALOGS.DELETE, {
+        title: `Delete the study set`,
+        dialogMessage: `Are you sure you want to delete this set?`
+    }],
+    [STUDYSET_CONFIRM_DIALOGS.DUPLICATE, {
+        title: `Duplicate the study set`,
+        dialogMessage: `Are you sure you want to duplicate this set?`
+    }],
+])
 
 export const SET_METADATA_FIELDS = {
     TEXT: "textColorVisible",

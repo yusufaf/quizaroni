@@ -1,7 +1,6 @@
 import { MoreHoriz } from "@mui/icons-material/";
 import { IconButton, Typography } from "@mui/material/";
 import { useState } from "react";
-import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import { useTheme } from "theme/useTheme";
 import {
     CardBottom,
@@ -75,7 +74,7 @@ const HomeStudySetCard = (props: Props) => {
                         {description}
                     </CardDescription>
                     <CardInfo>
-                        <TermsLabel>{cards.length} Terms</TermsLabel>
+                        <TermsLabel>{cards.length} Cards</TermsLabel>
                         <SpacedContainer>
                             <Typography>Date Created</Typography>
                             <Typography>
@@ -118,7 +117,6 @@ const HomeStudySetCard = (props: Props) => {
                 anchorEl={anchorEl}
                 handleShowConfirmDialog={handleShowConfirmDialog}
             />
-            <ConfirmDialog />
         </>
     );
 };

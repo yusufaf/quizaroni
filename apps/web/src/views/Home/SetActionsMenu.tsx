@@ -15,7 +15,7 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { Studyset } from "lib/types";
-import { CONFIRM_DIALOGS } from "utilities/constants";
+import { STUDYSET_CONFIRM_DIALOGS } from "utilities/constants";
 import { useFavoriteStudysetMutation } from "state/api/studysetsAPI";
 
 type Props = {
@@ -47,6 +47,22 @@ const SetActionsMenu = (props: Props) => {
 
     const navigate = useNavigate();
 
+    const handleConfirmAction = (
+        e: React.MouseEvent<HTMLLIElement, MouseEvent>,
+        action: string,
+        studyset: Studyset | null
+    ) => {
+        e.stopPropagation();
+        handleShowConfirmDialog(action, studyset);
+    };
+
+    const handleFavoriteAction = () => {
+        favoriteStudyset({
+            studysetUUID: uuid,
+            favorited: !favorited,
+        })
+    }
+
     return (
         <Menu
             anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -64,13 +80,13 @@ const SetActionsMenu = (props: Props) => {
                 <ListItemText>Edit</ListItemText>
             </MenuItem>
             <MenuItem
-                onClick={(e) => {
-                    e.stopPropagation();
-                    handleShowConfirmDialog(
-                        CONFIRM_DIALOGS.DUPLICATE,
+                onClick={(e) =>
+                    handleConfirmAction(
+                        e,
+                        STUDYSET_CONFIRM_DIALOGS.DUPLICATE,
                         studyset
-                    );
-                }}
+                    )
+                }
             >
                 <ListItemIcon>
                     <CopyIcon />
@@ -78,23 +94,21 @@ const SetActionsMenu = (props: Props) => {
                 <ListItemText>Duplicate</ListItemText>
             </MenuItem>
             <MenuItem
-                onClick={(e) => {
-                    e.stopPropagation();
-                    handleShowConfirmDialog(CONFIRM_DIALOGS.DELETE, studyset);
-                }}
+                onClick={(e) =>
+                    handleConfirmAction(
+                        e,
+                        STUDYSET_CONFIRM_DIALOGS.DELETE,
+                        studyset
+                    )
+                }
             >
                 <ListItemIcon>
-                    <DeleteIcon color="error"/>
+                    <DeleteIcon color="error" />
                 </ListItemIcon>
                 <ListItemText>Delete</ListItemText>
             </MenuItem>
             <MenuItem
-                onClick={() =>
-                    favoriteStudyset({
-                        studysetUUID: uuid,
-                        favorited: !favorited,
-                    })
-                }
+                onClick={handleFavoriteAction}
             >
                 <ListItemIcon>
                     {favorited ? (
