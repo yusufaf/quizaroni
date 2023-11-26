@@ -1,10 +1,12 @@
 import {
     FormControl,
+    IconButton,
     InputAdornment,
     InputLabel,
     ListSubheader,
     MenuItem,
     Select,
+    SelectChangeEvent,
     TextField,
     ToggleButton,
     ToggleButtonGroup,
@@ -14,57 +16,103 @@ import {
     Search as SearchIcon,
     TableView as TableViewIcon,
     Html as HTMLIcon,
+    ArrowDownward,
+    ArrowUpward,
 } from "@mui/icons-material";
-import { HOME_LAYOUTS } from "utilities/constants";
+import { HOME_LAYOUTS, SORT_DIRECTIONS } from "utilities/constants";
 import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
+import { ChangeEvent, Dispatch, SetStateAction } from "react";
+import { SortDirection } from "lib/types";
 
 type Props = {
     handleViewChange: (_event: any, newView: string | null) => void;
     selectedView: string;
+    setSearchText: Dispatch<SetStateAction<string>>;
+    setSelectedSort: Dispatch<SetStateAction<string>>;
+    sortDirection: SortDirection;
+    setSortDirection: Dispatch<SetStateAction<SortDirection>>;
 };
 
 const HomeToolbar = (props: Props) => {
-    const { handleViewChange, selectedView } = props;
+    const {
+        handleViewChange,
+        selectedView,
+        setSearchText,
+        setSelectedSort,
+        sortDirection,
+        setSortDirection,
+    } = props;
 
     const notTableView = selectedView !== HOME_LAYOUTS.TABLE;
+
+    const onSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setSearchText(e.target.value);
+    };
+
+    const onSortChange = (event: SelectChangeEvent<string>) => {
+        setSelectedSort(event.target.value);
+    };
+
+    const toggleSortDirection = () => {
+        const { ASC, DSC } = SORT_DIRECTIONS;
+        const newSortDirection = sortDirection === ASC ? DSC : ASC;
+        setSortDirection(newSortDirection);
+    };
 
     return (
         <SpacedFlexContainer>
             {notTableView && (
-                <SimpleFlexContainer>
+                <SimpleFlexContainer style={{ gap: "1rem" }}>
                     <TextField
-                        id="input-with-icon-textfield"
-                        label="TextField"
+                        label="Search"
                         InputProps={{
                             startAdornment: (
-                                <InputAdornment position="end">
+                                <InputAdornment position="start">
                                     <SearchIcon />
                                 </InputAdornment>
                             ),
                         }}
                         variant="standard"
+                        onChange={onSearchChange}
                     />
                     {/* TODO: Display a modal on mobile? */}
-                    <FormControl sx={{ m: 1, minWidth: 120 }}>
-                        <InputLabel htmlFor="grouped-select">
-                            Grouping
-                        </InputLabel>
-                        <Select
-                            defaultValue=""
-                            id="grouped-select"
-                            label="Grouping"
+
+                    <SimpleFlexContainer>
+                        <IconButton
+                            color="primary"
+                            onClick={toggleSortDirection}
+                            title="Sort Direction"
                         >
-                            <MenuItem value="">
-                                <em>None</em>
-                            </MenuItem>
-                            <ListSubheader>Category 1</ListSubheader>
-                            <MenuItem value={1}>Option 1</MenuItem>
-                            <MenuItem value={2}>Option 2</MenuItem>
-                            <ListSubheader>Category 2</ListSubheader>
-                            <MenuItem value={3}>Option 3</MenuItem>
-                            <MenuItem value={4}>Option 4</MenuItem>
-                        </Select>
-                    </FormControl>
+                            {sortDirection === SORT_DIRECTIONS.ASC ? (
+                                <ArrowUpward />
+                            ) : (
+                                <ArrowDownward />
+                            )}
+                        </IconButton>
+                        <FormControl sx={{ m: 1, minWidth: 120 }}>
+                            <InputLabel id="sort-label">Sort</InputLabel>
+                            <Select
+                                labelId="sort-label"
+                                label="Sort"
+                                onChange={onSortChange}
+                                autoWidth
+                            >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                </MenuItem>
+                                <MenuItem value={"title"}>
+                                    Title
+                                </MenuItem>
+                                <MenuItem value={"lastViewed"}>
+                                    Last Viewed
+                                </MenuItem>
+                                <MenuItem value={"createdAt"}>
+                                    Date Created
+                                </MenuItem>
+                                <MenuItem value={"numCards"}># of Cards</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </SimpleFlexContainer>
                 </SimpleFlexContainer>
             )}
             <ToggleButtonGroup
