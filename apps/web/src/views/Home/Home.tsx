@@ -6,7 +6,7 @@ import {
     GridToolbar,
 } from "@mui/x-data-grid";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import { Studyset } from "lib/types";
+import { SortDirection, Studyset } from "lib/types";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +26,7 @@ import {
     STUDYSET_CONFIRM_DIALOG_PROPS,
     DEFAULT_USER_DATA,
     HOME_LAYOUTS,
+    SORT_DIRECTIONS,
 } from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";
 import HomeGridView from "./HomeGridView";
@@ -46,6 +47,8 @@ import {
     FavoriteBorder,
 } from "@mui/icons-material";
 import { SimpleFlexContainer } from "common/AppStyles";
+import useSortStudysets from "lib/hooks/useSortStudysets";
+import useFilterStudysets from "lib/hooks/useFilterStudysets";
 
 type Props = {};
 
@@ -87,7 +90,11 @@ const Home = (props: Props) => {
 
     /* State */
     const [searchFilteredSets, setSearchFilteredSets] = useState([]);
-    const [enteredSearch, setEnteredSearch] = useState("");
+    const [searchText, setSearchText] = useState<string>("");
+    const [selectedSort, setSelectedSort] = useState<string>("");
+    const [sortDirection, setSortDirection] = useState<SortDirection>(
+        SORT_DIRECTIONS.ASC
+    );
 
     const [selectedView, setSelectedView] = useState("table");
 
@@ -249,6 +256,20 @@ const Home = (props: Props) => {
         }
     }, [studysets])
 
+    console.log("HOME VIEW = ", {searchText, studysets})
+
+    /* ==== Searching & Filtering for Grid/Table View ==== */
+    const sortedStudysets = useSortStudysets({
+        sortDirection,
+        selectedSort,
+        studysets,
+    });
+
+    const searchedStudysets = useFilterStudysets({
+        searchText,
+        studysets: sortedStudysets
+    })
+
     // TODO: Replace this
     if (!authenticated) {
         return <LoginMessage page="home" />;
@@ -264,6 +285,10 @@ const Home = (props: Props) => {
                     <HomeToolbar
                         handleViewChange={handleViewChange}
                         selectedView={selectedView}
+                        setSearchText={setSearchText}
+                        setSelectedSort={setSelectedSort}
+                        setSortDirection={setSortDirection}
+                        sortDirection={sortDirection}
                     />
                     <HomeSetsContainer>
                         {selectedView === HOME_LAYOUTS.TABLE && (
@@ -322,14 +347,14 @@ const Home = (props: Props) => {
                         )}
                         {selectedView === HOME_LAYOUTS.GRID && (
                             <HomeGridView
-                                studysets={studysets}
+                                studysets={searchedStudysets}
                                 handleShowConfirmDialog={
                                     handleShowConfirmDialog
                                 }
                             />
                         )}
                         {selectedView === HOME_LAYOUTS.HTML && (
-                            <HomeHTMLView studysets={studysets} />
+                            <HomeHTMLView studysets={searchedStudysets} />
                         )}
                     </HomeSetsContainer>
                 </HomeContainer>
