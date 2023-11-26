@@ -5,7 +5,6 @@ import {
     GridSortModel,
     GridToolbar,
 } from "@mui/x-data-grid";
-import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import { Studyset } from "lib/types";
 import { useEffect, useRef, useState } from "react";
@@ -24,7 +23,7 @@ import {
 import { setSelectedStudySet } from "state/slices/studysetsSlice";
 import { useTheme } from "theme/useTheme";
 import {
-    CONFIRM_DIALOGS,
+    STUDYSET_CONFIRM_DIALOG_PROPS,
     DEFAULT_USER_DATA,
     HOME_LAYOUTS,
 } from "utilities/constants";
@@ -53,8 +52,9 @@ type Props = {};
 const Home = (props: Props) => {
     /* Hooks / Redux */
     const { isDarkMode, theme } = useTheme();
-
+    const navigate = useNavigate();
     const dispatch = useDispatch();
+
     const authenticated = useSelector(selectAuthenticated);
     const cognitoUser = useSelector(selectCognitoUser);
     const { data: { uuid: userUUID = "" } = DEFAULT_USER_DATA } =
@@ -104,27 +104,12 @@ const Home = (props: Props) => {
         },
     ]);
 
-    const navigate = useNavigate();
-
     const handleShowConfirmDialog = (type: string, studyset: Studyset) => {
-        let dialogProps = {};
-        switch (type) {
-            case CONFIRM_DIALOGS.DUPLICATE:
-                dialogProps = {
-                    title: `Duplicate the study set "${studyset.title}"?`,
-                    dialogMessage:
-                        "Are you sure you want to duplicate this set?",
-                };
-                break;
-            case CONFIRM_DIALOGS.DELETE:
-                dialogProps = {
-                    title: `Delete the study set "${studyset.title}"?`,
-                    dialogMessage: "Are you sure you want to delete this set?",
-                };
-                break;
-        }
-        dialogProps = {
-            ...dialogProps,
+        console.log({STUDYSET_CONFIRM_DIALOG_PROPS, type})
+        const { title: titlePrefix, dialogMessage } = STUDYSET_CONFIRM_DIALOG_PROPS.get(type)!;
+        const dialogProps = {
+            dialogMessage,
+            title: `${titlePrefix} ${studyset.title}?`,
             open: true,
             type,
             props: {
@@ -204,8 +189,6 @@ const Home = (props: Props) => {
         },
     ];
 
-    const handleFavoriteFilter = () => {};
-
     const handleViewChange = (_event: any, newView: string | null) => {
         // Enforces one view always being selected
         if (newView === null) {
@@ -252,6 +235,19 @@ const Home = (props: Props) => {
     const handleCloseContextMenu = () => {
         setContextMenu(null);
     };
+
+    useEffect(() => {
+        // Update the set for which the context menu is open
+        if (contextMenuStudyset) {
+            setContextMenuStudyset(prevContextMenuStudyset => {
+                const localStudyset = studysets.find(
+                    (studyset: Studyset) =>
+                        studyset.uuid === prevContextMenuStudyset?.uuid
+                );
+                return localStudyset ?? null;
+            });
+        }
+    }, [studysets])
 
     // TODO: Replace this
     if (!authenticated) {
@@ -336,7 +332,6 @@ const Home = (props: Props) => {
                             <HomeHTMLView studysets={studysets} />
                         )}
                     </HomeSetsContainer>
-                    <ConfirmDialog />
                 </HomeContainer>
             </HomePaper>
         </HomePage>

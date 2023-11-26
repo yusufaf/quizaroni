@@ -5,10 +5,10 @@ import Footer from "views/Footer/Footer";
 import NavBar from "views/NavBar/NavBar";
 import { useTheme } from "theme/useTheme";
 import { DARK, LIGHT } from "utilities/constants";
-import { handleDesktopZoom } from "utilities/handleDesktopZoom";
 import AppRoutes from "./AppRoutes";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import StudysetConfirmDialog from "components/StudysetConfirmDialog/StudysetConfirmDialog";
 
 const App = () => {
     const { setTheme, theme } = useTheme();
@@ -29,6 +29,7 @@ const App = () => {
             <ToastContainer 
                 theme={theme}
             />
+            <StudysetConfirmDialog />
         </>
     );
 };

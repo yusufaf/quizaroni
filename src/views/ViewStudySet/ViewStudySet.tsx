@@ -1,7 +1,6 @@
 import { ArrowBack, ErrorOutlineRounded } from "@mui/icons-material/";
 import { Button, Chip, Skeleton, Tooltip, Typography } from "@mui/material/";
 import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
-import ConfirmDialog from "components/ConfirmDialog/ConfirmDialog";
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import useFilterViewCards from "lib/hooks/useFilterViewCards";
@@ -22,8 +21,9 @@ import {
     setSelectedDialog,
 } from "state/slices/viewSetsSlice";
 import {
-    CONFIRM_DIALOGS,
+    STUDYSET_CONFIRM_DIALOGS,
     DEFAULT_CATEGORIES,
+    DEFAULT_USER_DATA,
     SORT_DIRECTIONS,
     VIEW_SET_DIALOGS,
 } from "utilities/constants";
@@ -56,17 +56,22 @@ const ViewStudySet = (props: Props) => {
     const { id: studysetUUID = "" } = useParams();
     const dispatch = useDispatch();
     const cognitoUser = useSelector(selectCognitoUser);
-    const { data: userData } = useGetUserQuery({
-        username: cognitoUser.username ?? ""
-    })
+    const {
+        data: {
+            labels = [],
+            uuid: userUUID = "",
+        } = DEFAULT_USER_DATA,
+    } = useGetUserQuery({
+        username: cognitoUser.username ?? "",
+    });
 
     const selectedDialog = useSelector(selectSelectedDialog);
 
     /* Skip option prevents hook from running when userUUID is undefined */
     const { data: studysets = [] } =
         useGetAllStudysetsQuery(
-            { userUUID: userData?.uuid ?? "" },
-            { skip: !userData?.uuid }
+            { userUUID: userUUID ?? "" },
+            { skip: !userUUID }
         );
 
     const {
@@ -317,7 +322,6 @@ const ViewStudySet = (props: Props) => {
                 onClose={onDialogClose}
                 studyset={selectedStudyset}
             />
-            <ConfirmDialog />
             <ScrollToTopFab />
         </>
     );
