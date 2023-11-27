@@ -151,6 +151,7 @@ const CreateSetHeader = (props: Props) => {
                                 value={description}
                                 onChange={onDescriptionChange}
                                 multiline
+                                rows={3}
                                 maxRows={4}
                             />
                         </div>

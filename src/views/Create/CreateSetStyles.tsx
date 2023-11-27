@@ -62,9 +62,16 @@ export const TitleInput = styled(TextField)({
     width: "17rem",
 });
 
-export const DescriptionInput = styled(TextField)({
+export const DescriptionInput = styled(TextField)(({ theme }) => ({
     width: "30rem",
-});
+    "& .MuiInputBase-input::-webkit-scrollbar": {
+        width: "0.5rem",
+    },
+    "& .MuiInputBase-input::-webkit-scrollbar-thumb": {
+        background: theme.palette.grey[500],
+        borderRadius: "0.25rem",
+    },
+}));
 
 export const LabelInputContainer = styled(SimpleFlexContainer)({
     gap: "1rem",
