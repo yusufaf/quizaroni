@@ -89,11 +89,10 @@ const Home = (props: Props) => {
     useBrowserTitle("Home");
 
     /* State */
-    const [searchFilteredSets, setSearchFilteredSets] = useState([]);
     const [searchText, setSearchText] = useState<string>("");
-    const [selectedSort, setSelectedSort] = useState<string>("");
+    const [selectedSort, setSelectedSort] = useState<string>("lastViewed");
     const [sortDirection, setSortDirection] = useState<SortDirection>(
-        SORT_DIRECTIONS.ASC
+        SORT_DIRECTIONS.DSC
     );
 
     const [selectedView, setSelectedView] = useState("table");
@@ -285,7 +284,9 @@ const Home = (props: Props) => {
                     <HomeToolbar
                         handleViewChange={handleViewChange}
                         selectedView={selectedView}
+                        searchText={searchText}
                         setSearchText={setSearchText}
+                        selectedSort={selectedSort}
                         setSelectedSort={setSelectedSort}
                         setSortDirection={setSortDirection}
                         sortDirection={sortDirection}
