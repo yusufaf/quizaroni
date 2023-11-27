@@ -18,6 +18,7 @@ import {
     Html as HTMLIcon,
     ArrowDownward,
     ArrowUpward,
+    CloseRounded,
 } from "@mui/icons-material";
 import { HOME_LAYOUTS, SORT_DIRECTIONS } from "utilities/constants";
 import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
@@ -27,7 +28,9 @@ import { SortDirection } from "lib/types";
 type Props = {
     handleViewChange: (_event: any, newView: string | null) => void;
     selectedView: string;
+    searchText: string;
     setSearchText: Dispatch<SetStateAction<string>>;
+    selectedSort: string;
     setSelectedSort: Dispatch<SetStateAction<string>>;
     sortDirection: SortDirection;
     setSortDirection: Dispatch<SetStateAction<SortDirection>>;
@@ -37,7 +40,9 @@ const HomeToolbar = (props: Props) => {
     const {
         handleViewChange,
         selectedView,
+        searchText,
         setSearchText,
+        selectedSort,
         setSelectedSort,
         sortDirection,
         setSortDirection,
@@ -47,6 +52,10 @@ const HomeToolbar = (props: Props) => {
 
     const onSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
         setSearchText(e.target.value);
+    };
+
+    const clearSearchText = () => {
+        setSearchText("");
     };
 
     const onSortChange = (event: SelectChangeEvent<string>) => {
@@ -71,9 +80,21 @@ const HomeToolbar = (props: Props) => {
                                     <SearchIcon />
                                 </InputAdornment>
                             ),
+                            endAdornment: searchText ? (
+                                <InputAdornment position="start">
+                                    <IconButton onClick={clearSearchText}>
+                                        <CloseRounded />
+                                    </IconButton>
+                                </InputAdornment>
+                            ) :
+                            // Spacing div to prevent moving when no search text 
+                            (
+                                <div style={{ width: "3rem" }} />
+                            ),
                         }}
                         variant="standard"
                         onChange={onSearchChange}
+                        value={searchText}
                     />
                     {/* TODO: Display a modal on mobile? */}
 
@@ -96,20 +117,22 @@ const HomeToolbar = (props: Props) => {
                                 label="Sort"
                                 onChange={onSortChange}
                                 autoWidth
+                                value={selectedSort}
                             >
                                 <MenuItem value="">
                                     <em>None</em>
                                 </MenuItem>
-                                <MenuItem value={"title"}>
-                                    Title
-                                </MenuItem>
+                                {}
+                                <MenuItem value={"title"}>Title</MenuItem>
                                 <MenuItem value={"lastViewed"}>
                                     Last Viewed
                                 </MenuItem>
                                 <MenuItem value={"createdAt"}>
                                     Date Created
                                 </MenuItem>
-                                <MenuItem value={"numCards"}># of Cards</MenuItem>
+                                <MenuItem value={"numCards"}>
+                                    # of Cards
+                                </MenuItem>
                             </Select>
                         </FormControl>
                     </SimpleFlexContainer>
