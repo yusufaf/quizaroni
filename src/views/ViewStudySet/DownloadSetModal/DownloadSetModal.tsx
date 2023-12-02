@@ -16,6 +16,8 @@ import {
     DOWNLOAD_FILE_TYPES,
     MIME_TYPES,
     DOWNLOAD_FILE_TITLES,
+    DEFAULT_CSV_HEADERS,
+    METADATA_CSV_HEADERS,
 } from "utilities/constants";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
@@ -48,14 +50,13 @@ type Props = {
 };
 
 const DownloadSetModal = (props: Props) => {
-    const { open, onClose, studyset } =
-        props;
+    const { open, onClose, studyset } = props;
 
     const [downloadFileType, setDownloadFileType] = useState<string>(
         DOWNLOAD_FILE_TYPES.TXT
     );
     const [includeMetadata, setIncludeMetadata] = useState<boolean>(false);
-    
+
     const downloadFile = ({ data, fileName, fileType }: DownloadFileParams) => {
         const blob = new Blob([data], { type: MIME_TYPES[fileType] });
         const anchor = document.createElement("a");
@@ -73,20 +74,47 @@ const DownloadSetModal = (props: Props) => {
 
         let blobData: any = null;
 
+        const metadata = {
+            title,
+            description,
+            label,
+            downloadedOn: downloadTimestamp,
+        };
+
         switch (downloadFileType) {
             case DOWNLOAD_FILE_TYPES.CSV: {
-                const headers = ["Term, Definition"];
-                const cardsCSV = cards.reduce((acc: string[], card: Card) => {
-                    const { term, definition } = card;
-                    acc.push([term, definition].join(","));
-                    return acc;
-                }, []);
-                const csvData = [...headers, ...cardsCSV].join("\n");
+                const headers: string = includeMetadata
+                    ? `${METADATA_CSV_HEADERS}, ${DEFAULT_CSV_HEADERS}`
+                    : DEFAULT_CSV_HEADERS;
+
+                const studysetCSV: string[] = cards.reduce(
+                    (acc: string[], card: Card, index) => {
+                        const { term, definition } = card;
+
+                        let startString = "";
+                        if (includeMetadata && index === 0) {
+                            startString = Object.values(metadata).join(",");
+                        } else if (includeMetadata) {
+                            startString = [
+                                ...Array(Object.values(metadata).length).keys(),
+                            ]
+                                .map(() => "#")
+                                .join(",");
+                        }
+                        const csvStrings = [term, definition];
+                        if (startString) {
+                            csvStrings.unshift(startString);
+                        }
+                        acc.push(csvStrings.join(","));
+                        return acc;
+                    },
+                    []
+                );
+                const csvData = [headers, ...studysetCSV].join("\n");
                 blobData = csvData;
                 break;
             }
             case DOWNLOAD_FILE_TYPES.TXT: {
-                const metadataText = `Title: ${title}\nDescription: ${description}\nLabel: ${label}\nDownloaded on: ${downloadTimestamp} \n\n`;
                 const cardText = cards.map((card: Card, index: number) => {
                     const { definition, term } = card;
                     const termString = `Term: ${term}`;
@@ -95,17 +123,17 @@ const DownloadSetModal = (props: Props) => {
                         index + 1
                     }:\n\t ${termString} \n\t ${definitionString} \n`;
                 });
-                const textData = `${metadataText}${cardText.join("\n")}`;
+
+                const newLineSeparatedCardText = `${cardText.join("\n")}`;
+                let textData: string = `${newLineSeparatedCardText}`;
+                if (includeMetadata) {
+                    const metadataText = `Title: ${title}\nDescription: ${description}\nLabel: ${label}\nDownloaded on: ${downloadTimestamp} \n\n`;
+                    textData = `${metadataText}${newLineSeparatedCardText}`;
+                }
                 blobData = textData;
                 break;
             }
             case DOWNLOAD_FILE_TYPES.JSON: {
-                const metadata = {
-                    title,
-                    description,
-                    label,
-                    downloadedOn: downloadTimestamp,
-                };
                 const mappedCards = cards.map((card: Card, index: number) => {
                     const { definition, term } = card;
                     return {
@@ -116,22 +144,30 @@ const DownloadSetModal = (props: Props) => {
                     };
                 });
                 const cleanedCards = Object.assign({}, ...mappedCards);
-                const studysetJson = {
-                    metadata,
+                const studysetJSON: { cards: any; metadata?: Object } = {
                     cards: cleanedCards,
                 };
-                blobData = JSON.stringify(studysetJson, null, 4);
+                if (includeMetadata) {
+                    studysetJSON.metadata = metadata;
+                }
+
+                blobData = JSON.stringify(studysetJSON, null, 4);
                 break;
             }
             case DOWNLOAD_FILE_TYPES.MD: {
-                const metadataText = `# ${title}\n\n## Description\n${description}\n\n## Label\n${label}\n\n## Downloaded on\n${downloadTimestamp}\n\n`;
                 const cardText = cards.map((card: Card, index: number) => {
                     const { definition, term } = card;
                     return `## Card ${
                         index + 1
                     }\n\n**Term:** ${term}\n\n**Definition:** ${definition}\n\n`;
                 });
-                const mdData = `${metadataText}${cardText.join("\n")}`;
+                const cardsMarkdownText = `${cardText.join("\n")}`
+                let mdData = cardsMarkdownText;
+                if (includeMetadata) {
+                    const metadataText = `# ${title}\n\n## Description\n${description}\n\n## Label\n${label}\n\n## Downloaded on\n${downloadTimestamp}\n\n`;
+                    mdData = `${metadataText}${mdData}`;
+                }
+
                 blobData = mdData;
                 break;
             }
@@ -169,8 +205,10 @@ const DownloadSetModal = (props: Props) => {
                     label="Include metadata?"
                     control={
                         <Checkbox
-                        checked={includeMetadata}
-                        onChange={(e) => setIncludeMetadata(e.target.checked)}
+                            checked={includeMetadata}
+                            onChange={(e) =>
+                                setIncludeMetadata(e.target.checked)
+                            }
                         />
                     }
                 />

@@ -91,6 +91,8 @@ export const STUDY_MODES = {
     FLASHCARDS: "FLASHCARDS",
 };
 
+
+/* ==== Download ==== */
 export const DOWNLOAD_FILE_TYPES = {
     TXT: "TXT",
     JSON: "JSON",
@@ -112,6 +114,8 @@ export const MIME_TYPES: { [key: string]: string } = {
     [DOWNLOAD_FILE_TYPES.MD]: "text/markdown",
 }
 
+export const DEFAULT_CSV_HEADERS = "Term, Definition";
+export const METADATA_CSV_HEADERS = "Title, Description, Label, Downloaded on";
 
 export const HOME_LAYOUTS = {
     TABLE: "table",
