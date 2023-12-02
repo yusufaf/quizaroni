@@ -49,6 +49,8 @@ import {
 import { SimpleFlexContainer } from "common/AppStyles";
 import useSortStudysets from "lib/hooks/useSortStudysets";
 import useFilterStudysets from "lib/hooks/useFilterStudysets";
+import { Tooltip } from "@mui/material";
+import NoCardsWarningsIcon from "components/NoCardsWarningsIcon/NoCardsWarningsIcon";
 
 type Props = {};
 
@@ -167,7 +169,7 @@ const Home = (props: Props) => {
                 <SimpleFlexContainer style={{ gap: "0.5rem" }}>
                     <span>{params.row?.cards?.length}</span>
                     {params.row?.cards?.length === 0 && (
-                        <ErrorOutlineRounded color="error" />
+                        <NoCardsWarningsIcon />
                     )}
                 </SimpleFlexContainer>
             ),
