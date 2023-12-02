@@ -47,6 +47,7 @@ import {
 import NotesDrawer from "./NotesDrawer/NotesDrawer";
 import { selectStudySets } from "state/slices/studysetsSlice";
 import { useGetUserQuery } from "state/api/usersAPI";
+import NoCardsWarningsIcon from "components/NoCardsWarningsIcon/NoCardsWarningsIcon";
 
 type Props = {};
 
@@ -241,15 +242,7 @@ const ViewStudySet = (props: Props) => {
                         {selectedStudyset?.cards.length ?? "N/A"}
                     </Typography>
                     {!selectedStudyset?.cards.length && (
-                        <Tooltip
-                            title="If a studyset contains no cards for an extended period of time, it will be automatically deleted."
-                            placement="right"
-                        >
-                            <ErrorOutlineRounded
-                                fontSize="medium"
-                                color="error"
-                            />
-                        </Tooltip>
+                        <NoCardsWarningsIcon />
                     )}
                 </SimpleFlexContainer>
                 <ViewStudysetFilters

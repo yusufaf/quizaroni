@@ -47,6 +47,7 @@ import { Studyset } from "lib/types";
 import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
 import { SelectChangeEvent, Tooltip, Typography } from "@mui/material";
 import { useGetUserQuery } from "state/api/usersAPI";
+import NoCardsWarningsIcon from "components/NoCardsWarningsIcon/NoCardsWarningsIcon";
 
 type Props = {
     pageType?: string;
@@ -339,15 +340,7 @@ const CreateSet = (props: Props) => {
                             {createdSetCards.length ?? "N/A"}
                         </Typography>
                         {!createdSetCards.length && (
-                            <Tooltip
-                                title="If a studyset contains no cards for an extended period of time, it will be automatically deleted."
-                                placement="right"
-                            >
-                                <ErrorOutlineRounded
-                                    fontSize="medium"
-                                    color="error"
-                                />
-                            </Tooltip>
+                            <NoCardsWarningsIcon />
                         )}
                     </SimpleFlexContainer>
 
