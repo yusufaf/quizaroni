@@ -53,10 +53,9 @@ export const CategoriesListContainer = styled("div")(({ theme }) => ({
     "&::-webkit-scrollbar": {
         width: "0.5rem",
     },
-    // "&::-webkit-scrollbar-track": {
-    // },
     "&::-webkit-scrollbar-thumb": {
         background: theme.palette.grey[500],
+        borderRadius: "0.25rem",
     },
 }));
 

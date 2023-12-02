@@ -111,8 +111,8 @@ const Home = (props: Props) => {
     ]);
 
     const handleShowConfirmDialog = (type: string, studyset: Studyset) => {
-        console.log({STUDYSET_CONFIRM_DIALOG_PROPS, type})
-        const { title: titlePrefix, dialogMessage } = STUDYSET_CONFIRM_DIALOG_PROPS.get(type)!;
+        const { title: titlePrefix, dialogMessage } =
+            STUDYSET_CONFIRM_DIALOG_PROPS.get(type)!;
         const dialogProps = {
             dialogMessage,
             title: `${titlePrefix} ${studyset.title}?`,
@@ -142,7 +142,7 @@ const Home = (props: Props) => {
         },
         {
             field: "createdAt",
-            headerName: "Created on",
+            headerName: "Date Created",
             type: "date",
             width: 150,
             editable: false,
@@ -245,7 +245,7 @@ const Home = (props: Props) => {
     useEffect(() => {
         // Update the set for which the context menu is open
         if (contextMenuStudyset) {
-            setContextMenuStudyset(prevContextMenuStudyset => {
+            setContextMenuStudyset((prevContextMenuStudyset) => {
                 const localStudyset = studysets.find(
                     (studyset: Studyset) =>
                         studyset.uuid === prevContextMenuStudyset?.uuid
@@ -253,9 +253,9 @@ const Home = (props: Props) => {
                 return localStudyset ?? null;
             });
         }
-    }, [studysets])
+    }, [studysets]);
 
-    console.log("HOME VIEW = ", {searchText, studysets})
+    console.log("HOME VIEW = ", { searchText, studysets });
 
     /* ==== Searching & Filtering for Grid/Table View ==== */
     const sortedStudysets = useSortStudysets({
@@ -266,8 +266,8 @@ const Home = (props: Props) => {
 
     const searchedStudysets = useFilterStudysets({
         searchText,
-        studysets: sortedStudysets
-    })
+        studysets: sortedStudysets,
+    });
 
     // TODO: Replace this
     if (!authenticated) {
@@ -355,7 +355,12 @@ const Home = (props: Props) => {
                             />
                         )}
                         {selectedView === HOME_LAYOUTS.HTML && (
-                            <HomeHTMLView studysets={searchedStudysets} />
+                            <HomeHTMLView
+                                studysets={searchedStudysets}
+                                handleShowConfirmDialog={
+                                    handleShowConfirmDialog
+                                }
+                            />
                         )}
                     </HomeSetsContainer>
                 </HomeContainer>
