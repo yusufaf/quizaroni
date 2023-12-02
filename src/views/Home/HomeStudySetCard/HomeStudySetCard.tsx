@@ -42,7 +42,7 @@ const HomeStudySetCard = (props: Props) => {
     const navigate = useNavigate();
     const { theme } = useTheme();
 
-    const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
+    const [actionsMenuOpen, setActionsMenuOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
     const onCardClick = () => {

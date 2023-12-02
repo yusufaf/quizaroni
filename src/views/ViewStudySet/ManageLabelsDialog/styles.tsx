@@ -54,6 +54,7 @@ export const LabelsListContainer = styled("div")(({ theme }) => ({
     },
     "&::-webkit-scrollbar-thumb": {
         background: theme.palette.grey[500],
+        borderRadius: "0.25rem",
     },
 }));
 

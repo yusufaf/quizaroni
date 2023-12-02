@@ -190,7 +190,7 @@ const NewCardInput = (props: Props) => {
                             onApplyColor={() => toggleApplyColor("textColor")}
                         />
                     )}
-                    <Tooltip title="Change background color" placement="top">
+                    <Tooltip title="Change card background color" placement="top">
                         <IconButton
                             onClick={toggleBackgroundColorPicker}
                             sx={
@@ -288,7 +288,7 @@ const NewCardInput = (props: Props) => {
                         multiline
                         maxRows={4}
                         value={term}
-                        inputProps={{
+                        InputProps={{
                             style: {
                                 color: displayTextColor
                                     ? localTextColor
@@ -308,7 +308,7 @@ const NewCardInput = (props: Props) => {
                         multiline
                         maxRows={4}
                         value={definition}
-                        inputProps={{
+                        InputProps={{
                             style: {
                                 color: displayTextColor
                                     ? localTextColor

@@ -1,6 +1,5 @@
 import { styled } from "@mui/system";
 import {
-    Box,
     Button,
     Card,
     Paper,
@@ -51,7 +50,7 @@ export const BackToViewButton = styled(Button)({
 
 export const HeaderRight = styled(FlexColumn)({});
 
-export const CreateSetInputsContainer = styled(Box)({
+export const CreateSetInputsContainer = styled("div")({
     display: "flex",
     flexDirection: "column",
     gap: "1rem",
@@ -59,11 +58,11 @@ export const CreateSetInputsContainer = styled(Box)({
 });
 
 export const TitleInput = styled(TextField)({
-    width: "17rem",
+    width: "80%",
 });
 
 export const DescriptionInput = styled(TextField)(({ theme }) => ({
-    width: "30rem",
+    width: "80%",
     "& .MuiInputBase-input::-webkit-scrollbar": {
         width: "0.5rem",
     },
@@ -133,21 +132,17 @@ export const NewCardInputs = styled(SpacedFlexContainer)({
     position: "relative",
 });
 
-export const NewCardInputField = styled(TextField)({
+
+export const NewCardInputField = styled(TextField)(({ theme }) => ({
     width: "25rem",
-    // '&::-webkit-scrollbar': {
-    //     width: '0.4rem',
-    // },
-    // '&::-webkit-scrollbar-track': {
-    //     background: "#f1f1f1",
-    // },
-    // '&::-webkit-scrollbar-thumb': {
-    //     backgroundColor: '#888',
-    // },
-    // '&::-webkit-scrollbar-thumb:hover': {
-    //     background: '#555'
-    // }
-});
+    "& .MuiInputBase-input::-webkit-scrollbar": {
+        width: "0.5rem",
+    },
+    "& .MuiInputBase-input::-webkit-scrollbar-thumb": {
+        background: theme.palette.grey[500],
+        borderRadius: "0.25rem",
+    },
+}));
 
 export const NewCardHeader = styled("div")({
     display: "flex",

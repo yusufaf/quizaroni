@@ -109,3 +109,24 @@ export const LabelChip = styled(Chip)({});
 
 /* Actions Menu Styling */
 // export const
+
+
+/* HTML View */
+export const HomeHTMLTableWrapper = styled("div")(({ theme }) => ({
+    overflowY: "auto",
+    "&::-webkit-scrollbar": {
+        width: "0.5rem",
+    },
+    "&::-webkit-scrollbar-thumb": {
+        background: theme.palette.grey[500],
+        borderRadius: "0.25rem",
+    },
+}));
+
+export const HomeHTMLTable = styled("table")({
+    width: "100%",
+});
+
+export const HTMLTableThead = styled("thead")({
+    textAlign: "left",
+})

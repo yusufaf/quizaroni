@@ -131,7 +131,7 @@ const CreateSetHeader = (props: Props) => {
                     <CreateSetInputsContainer>
                         <div>
                             <BoldTypography variant="subtitle1">
-                                Title
+                                Title *
                             </BoldTypography>
                             <TitleInput
                                 variant="standard"
@@ -143,7 +143,7 @@ const CreateSetHeader = (props: Props) => {
                         </div>
                         <div>
                             <BoldTypography variant="subtitle1">
-                                Description
+                                Description *
                             </BoldTypography>
                             <DescriptionInput
                                 variant="outlined"
