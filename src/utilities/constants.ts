@@ -216,4 +216,14 @@ export const DEFAULT_USER_DATA: User = {
     },
     username: "",
     uuid: "",
-}
+};
+
+export const HTML_TABLE_HEADERS = [
+    "Title",
+    "Description",
+    "Date Created",
+    "Last Viewed",
+    "# of Cards",
+    "Label",
+    "Favorited"
+]
