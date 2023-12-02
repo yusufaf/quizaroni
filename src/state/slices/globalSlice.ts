@@ -2,27 +2,27 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "state/store";
 
 type GlobalSliceState = {
-    alert: any;
-    userAuthInfo: any;
-    feedbackDialogOpen: boolean;
-    dialogOpen: boolean;
-    cognitoUser: any;
     authenticated: boolean;
-    userData: any;
+    cognitoUser: any;
+    dialogOpen: boolean;
     dialogProps: any;
+    feedbackDialogOpen: boolean;
     namedColorsDialogProps: any;
+    userAuthInfo: any;
+    userData: any;
+    labelsDialogProps: any;
 };
 
 const initialState: GlobalSliceState = {
-    alert: {},
-    userAuthInfo: {},
-    feedbackDialogOpen: false,
-    dialogOpen: false,
-    cognitoUser: {},
     authenticated: false,
-    userData: {},
+    cognitoUser: {},
+    dialogOpen: false,
     dialogProps: {},
+    feedbackDialogOpen: false,
     namedColorsDialogProps: {},
+    userAuthInfo: {},
+    userData: {},
+    labelsDialogProps: {}
 };
 
 const sliceName = "globalState";
@@ -36,9 +36,6 @@ export const globalSlice = createSlice({
         },
         setCognitoUser: (state, action: PayloadAction<any>) => {
             state.cognitoUser = action.payload;
-        },
-        setAlert: (state, action: PayloadAction<any>) => {
-            state.alert = action.payload;
         },
         setDialogOpen: (state, action: PayloadAction<boolean>) => {
             state.dialogOpen = action.payload;
@@ -55,22 +52,28 @@ export const globalSlice = createSlice({
         setNamedColorsDialogProps: (state, action: PayloadAction<any>) => {
             state.namedColorsDialogProps = action.payload;
         },
+        setFeedbackDialogOpen: (state, action: PayloadAction<boolean>) => {
+            state.dialogOpen = action.payload;
+        },
+        setLabelsDialogProps: (state, action: PayloadAction<any>) => {
+            state.labelsDialogProps = action.payload;
+        },
     },
 });
 
 export const {
-    setUserAuthState,
-    setAlert,
-    setDialogOpen,
-    setCognitoUser,
     setAuthenticated,
-    setUserData,
+    setCognitoUser,
+    setDialogOpen,
     setDialogProps,
+    setFeedbackDialogOpen,
     setNamedColorsDialogProps,
+    setUserAuthState,
+    setUserData,
+    setLabelsDialogProps
 } = globalSlice.actions;
 
 /* Selectors */
-export const selectAlert = (state: RootState) => state[sliceName].alert;
 export const selectDialogOpen = (state: RootState) =>
     state[sliceName].dialogOpen;
 export const selectUserAuthState = (state: RootState) =>
@@ -84,5 +87,9 @@ export const selectDialogProps = (state: RootState) =>
     state[sliceName].dialogProps;
 export const selectNamedColorsDialogProps = (state: RootState) =>
     state[sliceName].namedColorsDialogProps;
+export const selectFeedbackDialogOpen = (state: RootState) =>
+    state[sliceName].dialogOpen;
+export const selectLabelsDialogProps = (state: RootState) =>
+    state[sliceName].labelsDialogProps;
 
 export default globalSlice.reducer;

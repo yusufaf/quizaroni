@@ -5,7 +5,6 @@ import {
     ExpandMore as ExpandMoreIcon,
     ExpandLess as ExpandLessIcon,
 } from "@mui/icons-material";
-import { setAlert } from "state/slices/globalSlice";
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAdvancedSectionProps, setAdvancedSectionProps } from "state/slices/createSetSlice";
 
@@ -43,7 +42,6 @@ const HeaderAdvancedSection = (props: Props) => {
             message: `${blankCardsCount} cards successfully created!`,
             open: true,
         };
-        dispatch(setAlert(successAlert));
     }
    
     return (

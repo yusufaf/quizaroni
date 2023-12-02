@@ -2,6 +2,7 @@ import {
     GridColDef,
     GridEventListener,
     GridRenderCellParams,
+    GridRowSelectionModel,
     GridSortModel,
     GridToolbar,
 } from "@mui/x-data-grid";
@@ -41,15 +42,10 @@ import {
 import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
 import HomeHTMLView from "./HomeHTMLView";
-import {
-    ErrorOutlineRounded,
-    Favorite,
-    FavoriteBorder,
-} from "@mui/icons-material";
+import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import { SimpleFlexContainer } from "common/AppStyles";
 import useSortStudysets from "lib/hooks/useSortStudysets";
 import useFilterStudysets from "lib/hooks/useFilterStudysets";
-import { Tooltip } from "@mui/material";
 import NoCardsWarningsIcon from "components/NoCardsWarningsIcon/NoCardsWarningsIcon";
 
 type Props = {};
@@ -111,6 +107,10 @@ const Home = (props: Props) => {
             sort: "desc",
         },
     ]);
+    const [rowSelectionModel, setRowSelectionModel] =
+        useState<GridRowSelectionModel>([]);
+
+    const selectedStudysetRows: Studyset[] = rowSelectionModel.map((studysetUUID) => studysets.find((studyset) => studyset.uuid === studysetUUID)).filter(Boolean);
 
     const handleShowConfirmDialog = (type: string, studyset: Studyset) => {
         const { title: titlePrefix, dialogMessage } =
@@ -168,9 +168,7 @@ const Home = (props: Props) => {
             renderCell: (params: GridRenderCellParams<any, any>) => (
                 <SimpleFlexContainer style={{ gap: "0.5rem" }}>
                     <span>{params.row?.cards?.length}</span>
-                    {params.row?.cards?.length === 0 && (
-                        <NoCardsWarningsIcon />
-                    )}
+                    {params.row?.cards?.length === 0 && <NoCardsWarningsIcon />}
                 </SimpleFlexContainer>
             ),
         },
@@ -276,6 +274,8 @@ const Home = (props: Props) => {
         return <LoginMessage page="home" />;
     }
 
+    console.log({rowSelectionModel})
+
     return (
         <HomePage>
             <HomePaper elevation={6}>
@@ -292,6 +292,7 @@ const Home = (props: Props) => {
                         setSelectedSort={setSelectedSort}
                         setSortDirection={setSortDirection}
                         sortDirection={sortDirection}
+                        selectedStudysetRows={selectedStudysetRows}
                     />
                     <HomeSetsContainer>
                         {selectedView === HOME_LAYOUTS.TABLE && (
@@ -305,6 +306,14 @@ const Home = (props: Props) => {
                                     onSortModelChange={(model) =>
                                         setSortModel(model)
                                     }
+                                    onRowSelectionModelChange={(
+                                        newRowSelectionModel
+                                    ) => {
+                                        setRowSelectionModel(
+                                            newRowSelectionModel
+                                        );
+                                    }}
+                                    rowSelectionModel={rowSelectionModel}
                                     checkboxSelection
                                     // disableSelectionOnClick
                                     onRowDoubleClick={onRowDoubleClick}

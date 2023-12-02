@@ -82,7 +82,7 @@ const HomeStudySetCard = (props: Props) => {
                             </Typography>
                         </SpacedContainer>
                         <SpacedContainer>
-                            <Typography>Last viewed</Typography>
+                            <Typography>Last Viewed</Typography>
                             <Typography>
                                 {new Date(lastViewed).toLocaleDateString()}
                             </Typography>

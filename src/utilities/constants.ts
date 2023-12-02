@@ -188,7 +188,6 @@ export const LABEL_TERMINOLOGIES = {
 }
 
 export const VIEW_SET_DIALOGS: { [key: string]: string } = {
-    LABELS: "LABELS",
     NOTIFICATIONS: "NOTIFICATIONS",
     DOWNLOAD: "DOWNLOAD",
     CATEGORIES: "CATEGORIES",

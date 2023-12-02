@@ -9,6 +9,7 @@ import AppRoutes from "./AppRoutes";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import StudysetConfirmDialog from "components/StudysetConfirmDialog/StudysetConfirmDialog";
+import ManageLabelsDialog from "components/ManageLabelsDialog/ManageLabelsDialog";
 
 const App = () => {
     const { setTheme, theme } = useTheme();
@@ -30,6 +31,7 @@ const App = () => {
                 theme={theme}
             />
             <StudysetConfirmDialog />
+            <ManageLabelsDialog/>
         </>
     );
 };
