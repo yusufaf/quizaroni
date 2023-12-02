@@ -68,10 +68,6 @@ const ConfirmDialog = (props: Props) => {
         onClose();
     }
 
-    if (!dialogProps?.open) {
-        return null;
-    } 
-    
     return (
         <Dialog 
             open={dialogProps?.open} 

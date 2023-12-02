@@ -1,4 +1,5 @@
 import {
+    Button,
     FormControl,
     IconButton,
     InputAdornment,
@@ -23,7 +24,9 @@ import {
 import { HOME_LAYOUTS, SORT_DIRECTIONS } from "utilities/constants";
 import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
-import { SortDirection } from "lib/types";
+import { SortDirection, Studyset } from "lib/types";
+import { setLabelsDialogProps } from "state/slices/globalSlice";
+import { useDispatch } from "react-redux";
 
 type Props = {
     handleViewChange: (_event: any, newView: string | null) => void;
@@ -34,6 +37,7 @@ type Props = {
     setSelectedSort: Dispatch<SetStateAction<string>>;
     sortDirection: SortDirection;
     setSortDirection: Dispatch<SetStateAction<SortDirection>>;
+    selectedStudysetRows: Studyset[];
 };
 
 const HomeToolbar = (props: Props) => {
@@ -46,9 +50,12 @@ const HomeToolbar = (props: Props) => {
         setSelectedSort,
         sortDirection,
         setSortDirection,
+        selectedStudysetRows,
     } = props;
 
-    const notTableView = selectedView !== HOME_LAYOUTS.TABLE;
+    const dispatch = useDispatch();
+
+    const isTableView = selectedView === HOME_LAYOUTS.TABLE;
 
     const onSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
         setSearchText(e.target.value);
@@ -68,9 +75,18 @@ const HomeToolbar = (props: Props) => {
         setSortDirection(newSortDirection);
     };
 
+    const handleAssignLabelsClick = () => {
+        dispatch(
+            setLabelsDialogProps({
+                open: true,
+                selectedStudysetRows,
+            })
+        );
+    };
+
     return (
-        <SpacedFlexContainer>
-            {notTableView && (
+        <SpacedFlexContainer style={{ alignItems: "baseline" }}>
+            {!isTableView && (
                 <SimpleFlexContainer style={{ gap: "1rem" }}>
                     <TextField
                         label="Search"
@@ -86,9 +102,8 @@ const HomeToolbar = (props: Props) => {
                                         <CloseRounded />
                                     </IconButton>
                                 </InputAdornment>
-                            ) :
-                            // Spacing div to prevent moving when no search text 
-                            (
+                            ) : (
+                                // Spacing div to prevent moving when no search text
                                 <div style={{ width: "3rem" }} />
                             ),
                         }}
@@ -122,7 +137,6 @@ const HomeToolbar = (props: Props) => {
                                 <MenuItem value="">
                                     <em>None</em>
                                 </MenuItem>
-                                {}
                                 <MenuItem value={"title"}>Title</MenuItem>
                                 <MenuItem value={"lastViewed"}>
                                     Last Viewed
@@ -136,6 +150,16 @@ const HomeToolbar = (props: Props) => {
                             </Select>
                         </FormControl>
                     </SimpleFlexContainer>
+                </SimpleFlexContainer>
+            )}
+            {isTableView && selectedStudysetRows.length > 0 && (
+                <SimpleFlexContainer>
+                    <Button
+                        variant="outlined"
+                        onClick={handleAssignLabelsClick}
+                    >
+                        Assign Labels
+                    </Button>
                 </SimpleFlexContainer>
             )}
             <ToggleButtonGroup

@@ -16,7 +16,6 @@ import {
 import { StyledLink } from "common/AppStyles";
 import { useDispatch, useSelector } from "react-redux";
 import {
-    setAlert,
     setCognitoUser,
     setAuthenticated,
     setUserData,
@@ -46,31 +45,6 @@ const Login = (props: Props) => {
         emailInput: false,
         passInput: false,
     });
-
-    const displayLoginAlert = (type) => {
-        const showLoginToast = true;
-        if (type === C.SUCCESS) {
-            const loginSuccessAlert = {
-                message: "Successfully logged in :)",
-                open: showLoginToast,
-                type: C.SUCCESS,
-            };
-            dispatch(setAlert(loginSuccessAlert));
-
-            /* Redirect user to the home page after */
-            navigate("/");
-        }
-
-        if (type === C.ERROR) {
-            const loginFailureAlert = {
-                message: "Failed to log in",
-                open: showLoginToast,
-                type: C.ERROR,
-            };
-            dispatch(setAlert(loginFailureAlert));
-        }
-        return;
-    };
 
     // const handleGoogleSignIn = () => {
     //     signInWithPopup(auth, provider)

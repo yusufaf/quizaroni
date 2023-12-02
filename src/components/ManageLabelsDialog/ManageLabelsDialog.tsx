@@ -1,12 +1,4 @@
-import {
-    Dispatch,
-    ReactNode,
-    SetStateAction,
-    useEffect,
-    useState,
-    SyntheticEvent,
-    ChangeEvent,
-} from "react";
+import { useState, SyntheticEvent, ChangeEvent } from "react";
 import {
     Button,
     Checkbox,
@@ -18,7 +10,6 @@ import {
 import { TABS, ACTIONS } from "./constants";
 import {
     DeleteLabelWarning,
-    LabelField,
     StyledDialog,
     StyledDialogContent,
 } from "./styles";
@@ -33,26 +24,48 @@ import {
     useChangeLabelMutation,
 } from "state/api/studysetsAPI";
 import useCustomMutation from "lib/hooks/useCustomMutation";
-import LabelsDialogTabView from "./LabelsDialogTabView";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
+import CreateTabView from "./CreateTabView";
+import ManageTabView from "./ManageTabView";
+import AssignTabView from "./AssignTabView";
+import {
+    selectLabelsDialogProps,
+    setLabelsDialogProps,
+    selectCognitoUser,
+} from "state/slices/globalSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { useGetUserQuery } from "state/api/usersAPI";
+import { DEFAULT_USER_DATA } from "utilities/constants";
 
 type ErrorInfo = {
     helperText: string;
 };
 
 type Props = {
-    labels: string[];
-    onClose: () => void;
-    open: boolean;
-    selectedStudySet?: Studyset;
-    userUUID: string;
+
 };
 const ManageLabelsDialog = (props: Props) => {
-    const { labels = [], onClose, open, selectedStudySet, userUUID } = props;
+    const { 
+    } = props;
 
-    const { uuid: studySetUUID = "" } = selectedStudySet || {};
 
+    /* ==== Redux ==== */
+    const dispatch = useDispatch();
+    const cognitoUser = useSelector(selectCognitoUser);
+    const {
+        data: {
+            labels = [],
+            uuid: userUUID = "",
+        } = DEFAULT_USER_DATA,
+    } = useGetUserQuery({
+        username: cognitoUser.username ?? "",
+    });
+    const labelDialogProps = useSelector(selectLabelsDialogProps);
+
+    const { uuid: studySetUUID = "" } = labelDialogProps.studyset || {};
+
+    /* ==== RTK Query ==== */
     const {
         mutate: createLabel,
         isLoading: isCreatingLabel,
@@ -121,7 +134,19 @@ const ManageLabelsDialog = (props: Props) => {
     const [shouldUpdateLabel, setShouldUpdateLabel] = useState<boolean>(true);
 
     const isCreateTab = selectedTab === TABS.CREATE;
+    const isManageTab = selectedTab === TABS.MANAGE;
+    const isAssignTab = selectedTab === TABS.ASSIGN;
+
     const isEditActionSelected = selectedAction === ACTIONS.EDIT;
+
+    /* ==== Dialog Logic ==== */
+    const closeLabelsDialog = () => {
+        dispatch(
+            setLabelsDialogProps({
+                open: false,
+            })
+        );
+    };
 
     const onTabChange = (_e: SyntheticEvent, newTab: string) => {
         setSelectedTab(newTab);
@@ -297,10 +322,15 @@ const ManageLabelsDialog = (props: Props) => {
     };
 
     return (
-        <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
+        <StyledDialog
+            open={labelDialogProps.open}
+            onClose={closeLabelsDialog}
+            fullWidth
+            maxWidth="lg"
+        >
             <StyledDialogTitle>
                 {capitalizeFirstLetter(selectedTab.toLowerCase())} Labels
-                <CloseDialogButton onClose={onClose} />
+                <CloseDialogButton onClose={closeLabelsDialog} />
             </StyledDialogTitle>
             <StyledDialogContent>
                 <div>
@@ -309,16 +339,22 @@ const ManageLabelsDialog = (props: Props) => {
                             <Tab key={index} label={tab} value={tab} />
                         ))}
                     </Tabs>
-                    <LabelsDialogTabView
-                        editErrorInfo={editErrorInfo}
-                        editIndex={editIndex}
-                        editLabelName={editLabelName}
-                        errorInfo={errorInfo}
-                        labelName={labelName}
-                        onCreateLabelChange={onCreateLabelChange}
-                        onEditLabelChange={onEditLabelChange}
-                        selectedTab={selectedTab}
-                    />
+                    {isCreateTab && (
+                        <CreateTabView
+                            labelName={labelName}
+                            errorInfo={errorInfo}
+                            onCreateLabelChange={onCreateLabelChange}
+                        />
+                    )}
+                    {isManageTab && (
+                        <ManageTabView
+                            editErrorInfo={editErrorInfo}
+                            editIndex={editIndex}
+                            editLabelName={editLabelName}
+                            onEditLabelChange={onEditLabelChange}
+                        />
+                    )}
+                    {isAssignTab && <AssignTabView />}
                 </div>
                 <LabelsList
                     labels={labels}
@@ -327,7 +363,7 @@ const ManageLabelsDialog = (props: Props) => {
                     handleDeleteClick={handleDeleteClick}
                     editIndex={editIndex}
                     deleteIndices={deleteIndices}
-                    currentLabel={selectedStudySet?.label}
+                    currentLabel={labelDialogProps?.studyset?.label}
                     handleChangeCurrentLabel={handleChangeCurrentLabel}
                 />
             </StyledDialogContent>
