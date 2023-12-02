@@ -15,7 +15,7 @@ import {
     useUpdateLastViewedMutation,
     useUpdateStudysetMetadataMutation,
 } from "state/api/studysetsAPI";
-import { selectCognitoUser, setDialogProps } from "state/slices/globalSlice";
+import { selectCognitoUser, setDialogProps, setLabelsDialogProps } from "state/slices/globalSlice";
 import {
     selectSelectedDialog,
     setSelectedDialog,
@@ -29,7 +29,7 @@ import {
 } from "utilities/constants";
 import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
 import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
-import ManageLabelsDialog from "./ManageLabelsDialog/ManageLabelsDialog";
+import ManageLabelsDialog from "../../components/ManageLabelsDialog/ManageLabelsDialog";
 import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
 import PrintDialog from "./PrintDialog.tsx/PrintDialog";
 import StudysetActions from "./StudysetActions/StudysetActions";
@@ -150,7 +150,12 @@ const ViewStudySet = (props: Props) => {
     // :
 
     const showManageLabelsDialog = () => {
-        dispatch(setSelectedDialog(VIEW_SET_DIALOGS.LABELS));
+        dispatch(
+            setLabelsDialogProps({
+              open: true,
+              studyset: selectedStudyset
+            })
+          );
     };
 
     const onDialogClose = () => {
@@ -283,13 +288,6 @@ const ViewStudySet = (props: Props) => {
                 )}
             <NotesDrawer selectedStudyset={selectedStudyset} />
             </ViewStudysetPage>
-            <ManageLabelsDialog
-                labels={labels}
-                open={selectedDialog === VIEW_SET_DIALOGS.LABELS}
-                onClose={onDialogClose}
-                selectedStudySet={selectedStudyset}
-                userUUID={userUUID}
-            />
             <NotificationsDialog
                 open={selectedDialog === VIEW_SET_DIALOGS.NOTIFICATIONS}
                 onClose={onDialogClose}
