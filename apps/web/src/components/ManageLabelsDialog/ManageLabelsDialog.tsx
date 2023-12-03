@@ -1,4 +1,4 @@
-import { useState, SyntheticEvent, ChangeEvent } from "react";
+import { useState, SyntheticEvent, ChangeEvent, useEffect } from "react";
 import {
     Button,
     Checkbox,
@@ -9,7 +9,7 @@ import {
 } from "@mui/material/";
 import { TABS, ACTIONS } from "./constants";
 import {
-    DeleteLabelWarning,
+    LabelActionWarning,
     StyledDialog,
     StyledDialogContent,
 } from "./styles";
@@ -22,6 +22,8 @@ import {
     useDeleteLabelMutation,
     useEditLabelMutation,
     useChangeLabelMutation,
+    useGetAllStudysetsQuery,
+    useGetStudysetQuery,
 } from "state/api/studysetsAPI";
 import useCustomMutation from "lib/hooks/useCustomMutation";
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
@@ -42,30 +44,36 @@ type ErrorInfo = {
     helperText: string;
 };
 
-type Props = {
-
-};
+type Props = {};
 const ManageLabelsDialog = (props: Props) => {
-    const { 
-    } = props;
-
+    const {} = props;
 
     /* ==== Redux ==== */
     const dispatch = useDispatch();
     const cognitoUser = useSelector(selectCognitoUser);
-    const {
-        data: {
-            labels = [],
-            uuid: userUUID = "",
-        } = DEFAULT_USER_DATA,
-    } = useGetUserQuery({
-        username: cognitoUser.username ?? "",
-    });
+
     const labelDialogProps = useSelector(selectLabelsDialogProps);
 
-    const { uuid: studySetUUID = "" } = labelDialogProps.studyset || {};
+    const { studySetUUID = "" } = labelDialogProps || {};
 
     /* ==== RTK Query ==== */
+    const { data: { labels = [], uuid: userUUID = "" } = DEFAULT_USER_DATA } =
+        useGetUserQuery({
+            username: cognitoUser.username ?? "",
+        });
+
+    const { data: studysets = [] } = useGetAllStudysetsQuery(
+        { userUUID: userUUID ?? "" },
+        { skip: !userUUID }
+    );
+
+    const { data: selectedStudyset } = useGetStudysetQuery(
+        {
+            uuid: labelDialogProps.studySetUUID ?? "",
+        },
+        { skip: !labelDialogProps.studySetUUID }
+    );
+
     const {
         mutate: createLabel,
         isLoading: isCreatingLabel,
@@ -132,12 +140,28 @@ const ManageLabelsDialog = (props: Props) => {
     const [showDeleteConfirmation, setShowDeleteConfirmation] =
         useState<boolean>(false);
     const [shouldUpdateLabel, setShouldUpdateLabel] = useState<boolean>(true);
+    const [selectedStudysetUUIDs, setSelectedStudysetUUIDs] = useState<
+        string[]
+    >([]);
+    const [assignLabel, setAssignLabel] = useState<string>("");
 
     const isCreateTab = selectedTab === TABS.CREATE;
     const isManageTab = selectedTab === TABS.MANAGE;
     const isAssignTab = selectedTab === TABS.ASSIGN;
 
     const isEditActionSelected = selectedAction === ACTIONS.EDIT;
+
+    // TODO: Look into initial value for selectedStudysetUUIDs useState()
+    useEffect(() => {
+        if (labelDialogProps.selectedStudysetUUIDs) {
+            setSelectedStudysetUUIDs([
+                ...labelDialogProps.selectedStudysetUUIDs,
+            ]);
+        }
+        if (labelDialogProps.tab) {
+            setSelectedTab(labelDialogProps.tab);
+        }
+    }, [labelDialogProps]);
 
     /* ==== Dialog Logic ==== */
     const closeLabelsDialog = () => {
@@ -153,6 +177,8 @@ const ManageLabelsDialog = (props: Props) => {
         if (newTab === TABS.CREATE) {
             setShowDeleteConfirmation(false);
             setSelectedAction(null);
+        }
+        if (newTab === TABS.ASSIGN) {
         }
     };
 
@@ -268,6 +294,15 @@ const ManageLabelsDialog = (props: Props) => {
         });
     };
 
+    const handleAssignLabelToStudysets = () => {
+        for (const localStudysetUUID of selectedStudysetUUIDs) {
+            changeLabel({
+                studysetUUID: localStudysetUUID,
+                newLabel: assignLabel,
+            });
+        }
+    };
+
     const renderDialogButtons = () => {
         switch (selectedTab) {
             case TABS.CREATE:
@@ -307,16 +342,31 @@ const ManageLabelsDialog = (props: Props) => {
                     buttonOnClick = handleDeleteConfirmation;
                 }
 
+                if (!selectedAction) {
+                    return <></>;
+                }
+
                 return (
-                    selectedAction && (
-                        <Button
-                            variant="contained"
-                            onClick={() => buttonOnClick()}
-                            disabled={disabled}
-                        >
-                            {buttonText}
-                        </Button>
-                    )
+                    <Button
+                        variant="contained"
+                        onClick={() => buttonOnClick()}
+                        disabled={disabled}
+                    >
+                        {buttonText}
+                    </Button>
+                );
+            case TABS.ASSIGN:
+                return (
+                    <Button
+                        variant="contained"
+                        onClick={() => handleAssignLabelToStudysets()}
+                        disabled={
+                            !selectedStudysetUUIDs ||
+                            selectedStudysetUUIDs.length === 0
+                        }
+                    >
+                        Assign
+                    </Button>
                 );
         }
     };
@@ -354,7 +404,13 @@ const ManageLabelsDialog = (props: Props) => {
                             onEditLabelChange={onEditLabelChange}
                         />
                     )}
-                    {isAssignTab && <AssignTabView />}
+                    {isAssignTab && (
+                        <AssignTabView
+                            studysets={studysets}
+                            selectedStudysetUUIDs={selectedStudysetUUIDs}
+                            setSelectedStudysetUUIDs={setSelectedStudysetUUIDs}
+                        />
+                    )}
                 </div>
                 <LabelsList
                     labels={labels}
@@ -363,8 +419,10 @@ const ManageLabelsDialog = (props: Props) => {
                     handleDeleteClick={handleDeleteClick}
                     editIndex={editIndex}
                     deleteIndices={deleteIndices}
-                    currentLabel={labelDialogProps?.studyset?.label}
+                    currentLabel={selectedStudyset?.label}
                     handleChangeCurrentLabel={handleChangeCurrentLabel}
+                    assignLabel={assignLabel}
+                    setAssignLabel={setAssignLabel}
                 />
             </StyledDialogContent>
             <DialogActions>
@@ -381,19 +439,24 @@ const ManageLabelsDialog = (props: Props) => {
                         label="Apply new label to current study set"
                     />
                 )}
-                {isEditActionSelected && (
-                    <DeleteLabelWarning variant="body2" color="error">
+                {isManageTab && isEditActionSelected && (
+                    <LabelActionWarning variant="body2" color="error">
                         Editing this label will change the labels for all of
                         your study sets. Proceed with caution.
-                    </DeleteLabelWarning>
+                    </LabelActionWarning>
+                )}
+                {isAssignTab && assignLabel && selectedStudysetUUIDs.length && (
+                    <LabelActionWarning variant="body2" color="error">
+                        This action cannot be undone.
+                    </LabelActionWarning>
                 )}
                 {showDeleteConfirmation && (
-                    <DeleteLabelWarning variant="body2" color="error">
+                    <LabelActionWarning variant="body2" color="error">
                         Are you sure you want to delete these labels? This will
                         remove the label from all of your study sets.
                         {"\n"}
                         This action cannot be undone.
-                    </DeleteLabelWarning>
+                    </LabelActionWarning>
                 )}
                 {renderDialogButtons()}
             </DialogActions>

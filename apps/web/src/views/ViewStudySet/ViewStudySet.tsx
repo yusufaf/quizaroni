@@ -29,7 +29,6 @@ import {
 } from "utilities/constants";
 import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
 import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
-import ManageLabelsDialog from "../../components/ManageLabelsDialog/ManageLabelsDialog";
 import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
 import PrintDialog from "./PrintDialog.tsx/PrintDialog";
 import StudysetActions from "./StudysetActions/StudysetActions";
@@ -45,7 +44,6 @@ import {
     ViewStudysetPage,
 } from "./styles";
 import NotesDrawer from "./NotesDrawer/NotesDrawer";
-import { selectStudySets } from "state/slices/studysetsSlice";
 import { useGetUserQuery } from "state/api/usersAPI";
 import NoCardsWarningsIcon from "components/NoCardsWarningsIcon/NoCardsWarningsIcon";
 
@@ -153,7 +151,8 @@ const ViewStudySet = (props: Props) => {
         dispatch(
             setLabelsDialogProps({
               open: true,
-              studyset: selectedStudyset
+            //   studyset: selectedStudyset
+            studySetUUID: selectedStudyset?.uuid ?? ""
             })
           );
     };
