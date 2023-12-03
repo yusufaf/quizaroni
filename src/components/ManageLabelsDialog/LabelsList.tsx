@@ -14,6 +14,7 @@ import {
     StyledListButton,
 } from "./styles";
 import { TABS } from "./constants";
+import { Dispatch, SetStateAction } from "react";
 
 type Props = {
     labels: string[];
@@ -25,6 +26,8 @@ type Props = {
     type?: string;
     currentLabel?: string;
     handleChangeCurrentLabel: (label: string) => void;
+    assignLabel: string;
+    setAssignLabel: Dispatch<SetStateAction<string>>;
 };
 
 const LabelsList = (props: Props) => {
@@ -38,11 +41,24 @@ const LabelsList = (props: Props) => {
         type = "main",
         currentLabel = "",
         handleChangeCurrentLabel = () => {},
+        assignLabel,
+        setAssignLabel,
     } = props;
 
-    const isChangeTab = selectedTab === TABS.CREATE;
+    const isCreateTab = selectedTab === TABS.CREATE;
     const isManageTab = selectedTab === TABS.MANAGE;
+    const isAssignTab = selectedTab === TABS.ASSIGN;
+
     const listStyle = type === "main" ? { marginTop: "4rem" } : {};
+
+    const handleListItemClick = (label: string) => {
+        if (isCreateTab) {
+            handleChangeCurrentLabel(label);
+        }
+        if (isAssignTab) {
+            setAssignLabel(label);
+        }
+    }
 
     const renderLabelsList = () => {
         return labels?.map((label: string, index: number) => {
@@ -50,6 +66,17 @@ const LabelsList = (props: Props) => {
             const isDeleteSelected = deleteIndices.includes(index);
 
             const isCurrentLabel = currentLabel === label;
+            const isAssignLabel = assignLabel === label;
+            const createLabelSelected = isCreateTab && isCurrentLabel;
+            const assignLabelSelected = isAssignTab && isAssignLabel
+
+            let labelListItemStyling = {};
+            let chipLabel = createLabelSelected ? "Current" : assignLabelSelected ? "Selected" : "";
+            if (createLabelSelected || assignLabelSelected) {
+                labelListItemStyling = {
+                    color: "primary.main",
+                }
+            }
 
             return (
                 <ListItem
@@ -90,22 +117,19 @@ const LabelsList = (props: Props) => {
                             </LabelButtons>
                         )
                     }
-                    sx={{
-                        color: isCurrentLabel ? "primary.main" : "",
-                    }}
+                    sx={labelListItemStyling}
                 >
                     <StyledListButton
-                        isChangeTab={isChangeTab}
-                        onClick={() => handleChangeCurrentLabel(label)}
+                        iscreatetab={`${isCreateTab}`}
+                        onClick={() => handleListItemClick(label)}
                     >
                         {label}
-                        {isCurrentLabel && (
+                        {(createLabelSelected || assignLabelSelected) && (
                             <Chip
-                                label={"Current"}
+                                label={chipLabel}
                                 color="primary"
                                 variant="outlined"
                                 size="small"
-                                sx={{ marginLeft: "0.5rem" }}
                             />
                         )}
                     </StyledListButton>

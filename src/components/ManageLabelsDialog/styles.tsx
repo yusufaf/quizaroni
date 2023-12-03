@@ -39,7 +39,7 @@ export const StyledDialogContent = styled(DialogContent)({
     gap: "1rem",
 });
 
-export const DeleteLabelWarning = styled(Typography)({
+export const LabelActionWarning = styled(Typography)({
     position: "absolute",
     bottom: "10%",
     whiteSpace: "pre-line",
@@ -63,14 +63,16 @@ export const LabelsListPaper = styled(Paper)({});
 export const StyledLabelsList = styled(List)({});
 
 interface StyledListButtonProps {
-    isChangeTab: boolean;
+    iscreatetab: string;
 }
 
 export const StyledListButton = styled(ListItemButton)<StyledListButtonProps>(
-    ({ isChangeTab }) => ({
+    ({ iscreatetab }) => ({
+        display: "flex",
+        gap: "0.5rem",
         "&:hover": {
-            background: isChangeTab ? undefined : "transparent",
-            cursor: isChangeTab ? undefined : "default",
+            background: Boolean(iscreatetab) ? undefined : "transparent",
+            cursor: Boolean(iscreatetab) ? undefined : "default",
         },
     })
 );
@@ -96,4 +98,10 @@ export const LabelFormControl = styled(FormControl)({
 
 export const StyledMenuItem = styled(MenuItem)({
     width: "20rem",
+});
+
+export const SelectChipsContainer = styled("div")({
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 0.5,
 });
