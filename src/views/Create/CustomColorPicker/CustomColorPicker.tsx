@@ -4,16 +4,13 @@ import {
     VisibilityOff,
     Add,
 } from "@mui/icons-material";
-import {
-    Tooltip,
-} from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { ExtraPickerButton } from "../CreateSetStyles";
 import { ColorPickerContainer, ExtraPickerContainer } from "./styles";
-import { ChromePicker } from "react-color";
-import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setNamedColorsDialogProps } from "state/slices/globalSlice";
 import { StyledChromePicker } from "common/AppStyles";
+import { useClickAway } from "lib/hooks/useClickAway";
 
 type Props = {
     color: string;
@@ -22,23 +19,36 @@ type Props = {
     onApplyColor: () => void;
     onChange: (e: any) => void;
     style?: Object;
+    onClose: () => void;
+    additionalRefs?: any[],
 };
 
 const CustomColorPicker = (props: Props) => {
-    const { applyColor, color, onResetColor, onApplyColor, onChange, style } =
-        props;
+    const { 
+        applyColor, 
+        color, 
+        onResetColor, 
+        onApplyColor, 
+        onChange, 
+        style,
+        onClose,
+        additionalRefs,
+    } = props;
 
+    const ref = useClickAway(onClose, additionalRefs);
     const dispatch = useDispatch();
 
     const openNamedColorsDialog = () => {
-        dispatch(setNamedColorsDialogProps({
-            open: true,
-            color,
-        }))
-    }
+        dispatch(
+            setNamedColorsDialogProps({
+                open: true,
+                color,
+            })
+        );
+    };
 
     return (
-        <ColorPickerContainer style={style}>
+        <ColorPickerContainer style={style} ref={ref}>
             <StyledChromePicker color={color} onChange={onChange} />
             <ExtraPickerContainer>
                 <Tooltip title="Reset text color" placement="right">
@@ -54,9 +64,7 @@ const CustomColorPicker = (props: Props) => {
                 </Tooltip>
 
                 <Tooltip title="Add to named colors" placement="right">
-                    <ExtraPickerButton
-                        onClick={openNamedColorsDialog}
-                    >
+                    <ExtraPickerButton onClick={openNamedColorsDialog}>
                         <Add />
                     </ExtraPickerButton>
                 </Tooltip>
