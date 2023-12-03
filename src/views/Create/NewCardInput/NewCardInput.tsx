@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { IconButton, Tooltip, Typography } from "@mui/material/";
 import {
     AddPhotoAlternate,
@@ -67,6 +67,9 @@ const NewCardInput = (props: Props) => {
 
     const { theme } = useTheme();
 
+    const textColorButtonRef = useRef(null);
+    const backgroundColorButtonRef = useRef(null);
+
     const [showTextColorPicker, setShowTextColorPicker] =
         useState<boolean>(false);
     const [showBackgroundColorPicker, setShowBackgroundColorPicker] =
@@ -94,26 +97,6 @@ const NewCardInput = (props: Props) => {
             }
         }
     }, [showTextColorPicker, showBackgroundColorPicker, theme]);
-
-    // TODO: Clicking away from ColorPicker
-    // useEffect(() => {
-    //     window.addEventListener("click", handleClickOutside);
-    //     return () => {
-    //         window.removeEventListener("click", handleClickOutside);
-    //     }
-    // }, [colorPickerRef])
-
-    /**
-     * Handles hiding dropdown when clicking away from it
-     * @param {*} e
-     */
-    const handleClickOutside = (e) => {
-        // console.log("colorPickerRef.current = ", colorPickerRef.current);
-        // console.log("e.target = ", e.target);
-        // if (colorPickerRef.current && !colorPickerRef?.current?.contains(e.target) && !colorPik) {
-        //     setShowColorPicker(false);
-        // }
-    };
 
     const toggleBackgroundColorPicker = () => {
         setShowTextColorPicker(false);
@@ -169,6 +152,7 @@ const NewCardInput = (props: Props) => {
                 <CenterActions>
                     <Tooltip title="Change card text color" placement="top">
                         <IconButton
+                            ref={textColorButtonRef}
                             onClick={toggleTextColorPicker}
                             sx={
                                 showTextColorPicker
@@ -185,6 +169,8 @@ const NewCardInput = (props: Props) => {
                         <CustomColorPicker
                             applyColor={applyTextColor}
                             color={localTextColor}
+                            additionalRefs={[textColorButtonRef]}
+                            onClose={() => setShowTextColorPicker(false)}
                             onChange={(e) => onColorPickerChange(e, "textColor")}
                             onResetColor={() => resetColor("textColor")}
                             onApplyColor={() => toggleApplyColor("textColor")}
@@ -192,6 +178,7 @@ const NewCardInput = (props: Props) => {
                     )}
                     <Tooltip title="Change card background color" placement="top">
                         <IconButton
+                            ref={backgroundColorButtonRef}
                             onClick={toggleBackgroundColorPicker}
                             sx={
                                 showBackgroundColorPicker
@@ -208,6 +195,8 @@ const NewCardInput = (props: Props) => {
                         <CustomColorPicker
                             applyColor={applyBackgroundColor}
                             color={localBackgroundColor}
+                            additionalRefs={[backgroundColorButtonRef]}
+                            onClose={() => setShowBackgroundColorPicker(false)}
                             onChange={(e) => onColorPickerChange(e, "backgroundColor")}
                             onResetColor={() => resetColor("backgroundColor")}
                             onApplyColor={() =>
