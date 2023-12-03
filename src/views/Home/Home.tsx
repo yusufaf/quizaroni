@@ -293,6 +293,7 @@ const Home = (props: Props) => {
                         setSortDirection={setSortDirection}
                         sortDirection={sortDirection}
                         selectedStudysetRows={selectedStudysetRows}
+                        selectedStudysetUUIDs={rowSelectionModel}
                     />
                     <HomeSetsContainer>
                         {selectedView === HOME_LAYOUTS.TABLE && (

@@ -38,6 +38,7 @@ type Props = {
     sortDirection: SortDirection;
     setSortDirection: Dispatch<SetStateAction<SortDirection>>;
     selectedStudysetRows: Studyset[];
+    selectedStudysetUUIDs: string[];
 };
 
 const HomeToolbar = (props: Props) => {
@@ -51,6 +52,7 @@ const HomeToolbar = (props: Props) => {
         sortDirection,
         setSortDirection,
         selectedStudysetRows,
+        selectedStudysetUUIDs
     } = props;
 
     const dispatch = useDispatch();
@@ -79,7 +81,8 @@ const HomeToolbar = (props: Props) => {
         dispatch(
             setLabelsDialogProps({
                 open: true,
-                selectedStudysetRows,
+                selectedStudysetUUIDs,
+                tab: "ASSIGN",
             })
         );
     };
