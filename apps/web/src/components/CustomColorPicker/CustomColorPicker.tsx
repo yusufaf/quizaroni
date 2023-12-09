@@ -5,7 +5,7 @@ import {
     Add,
 } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
-import { ExtraPickerButton } from "../CreateSetStyles";
+import { ExtraPickerButton } from "../../views/Create/CreateSetStyles";
 import { ColorPickerContainer, ExtraPickerContainer } from "./styles";
 import { useDispatch } from "react-redux";
 import { setNamedColorsDialogProps } from "state/slices/globalSlice";
@@ -51,13 +51,13 @@ const CustomColorPicker = (props: Props) => {
         <ColorPickerContainer style={style} ref={ref}>
             <StyledChromePicker color={color} onChange={onChange} />
             <ExtraPickerContainer>
-                <Tooltip title="Reset text color" placement="right">
+                <Tooltip title="Reset color" placement="right">
                     <ExtraPickerButton onClick={onResetColor}>
                         <RestartAlt />
                     </ExtraPickerButton>
                 </Tooltip>
 
-                <Tooltip title="Apply text color" placement="right">
+                <Tooltip title="Apply color" placement="right">
                     <ExtraPickerButton onClick={onApplyColor}>
                         {applyColor ? <Visibility /> : <VisibilityOff />}
                     </ExtraPickerButton>

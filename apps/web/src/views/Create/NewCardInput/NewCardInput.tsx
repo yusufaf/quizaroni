@@ -30,7 +30,7 @@ import {
     duplicateCard,
     swapCard,
 } from "utilities/createUtils";
-import CustomColorPicker from "../CustomColorPicker/CustomColorPicker";
+import CustomColorPicker from "../../../components/CustomColorPicker/CustomColorPicker";
 import type { ColorPickerType } from "lib/types";
 
 type Props = {

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-/* Outside Components */
 import {
     Button,
     Card,
@@ -19,7 +18,7 @@ import { ViewFlashCardActions } from "./ViewFlashSetStyles";
 import ConfirmDialog from "components/StudysetConfirmDialog/StudysetConfirmDialog";
 import {
     StudyElements
-} from "./StudyModeStyles";
+} from "../ViewStudySet/StudyModeStyles";
 
 type Props = {
     
