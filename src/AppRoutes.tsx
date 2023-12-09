@@ -27,6 +27,7 @@ const AppRoutes = (props: Props) => {
 
             <Route path="*" element={<NotFound />} />
             <Route path="/confirmEmail" element={<ConfirmEmail />} />
+            <Route path="/study/:id" element={<NotFound />} />
         </Routes>
     );
 };
