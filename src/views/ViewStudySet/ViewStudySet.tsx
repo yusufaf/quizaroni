@@ -1,4 +1,4 @@
-import { ArrowBack, ErrorOutlineRounded } from "@mui/icons-material/";
+import { ArrowBack } from "@mui/icons-material/";
 import { Button, Chip, Skeleton, Tooltip, Typography } from "@mui/material/";
 import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
@@ -15,7 +15,11 @@ import {
     useUpdateLastViewedMutation,
     useUpdateStudysetMetadataMutation,
 } from "state/api/studysetsAPI";
-import { selectCognitoUser, setDialogProps, setLabelsDialogProps } from "state/slices/globalSlice";
+import {
+    selectCognitoUser,
+    setDialogProps,
+    setLabelsDialogProps,
+} from "state/slices/globalSlice";
 import {
     selectSelectedDialog,
     setSelectedDialog,
@@ -55,23 +59,18 @@ const ViewStudySet = (props: Props) => {
     const { id: studysetUUID = "" } = useParams();
     const dispatch = useDispatch();
     const cognitoUser = useSelector(selectCognitoUser);
-    const {
-        data: {
-            labels = [],
-            uuid: userUUID = "",
-        } = DEFAULT_USER_DATA,
-    } = useGetUserQuery({
-        username: cognitoUser.username ?? "",
-    });
+    const { data: { labels = [], uuid: userUUID = "" } = DEFAULT_USER_DATA } =
+        useGetUserQuery({
+            username: cognitoUser.username ?? "",
+        });
 
     const selectedDialog = useSelector(selectSelectedDialog);
 
     /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: studysets = [] } =
-        useGetAllStudysetsQuery(
-            { userUUID: userUUID ?? "" },
-            { skip: !userUUID }
-        );
+    const { data: studysets = [] } = useGetAllStudysetsQuery(
+        { userUUID: userUUID ?? "" },
+        { skip: !userUUID }
+    );
 
     const {
         data: selectedStudyset,
@@ -140,21 +139,14 @@ const ViewStudySet = (props: Props) => {
         sortedViewFlashCards,
     });
 
-    /* TODO: Move this to separate route */
-    // selectedStudyMode === STUDY_MODES.FLASHCARDS ?
-    // (
-    //     <FlashcardsStudy />
-    // )
-    // :
-
     const showManageLabelsDialog = () => {
         dispatch(
             setLabelsDialogProps({
-              open: true,
-            //   studyset: selectedStudyset
-            studySetUUID: selectedStudyset?.uuid ?? ""
+                open: true,
+                //   studyset: selectedStudyset
+                studySetUUID: selectedStudyset?.uuid ?? "",
             })
-          );
+        );
     };
 
     const onDialogClose = () => {
@@ -245,9 +237,7 @@ const ViewStudySet = (props: Props) => {
                         Number of cards in this study set:{" "}
                         {selectedStudyset?.cards.length ?? "N/A"}
                     </Typography>
-                    {!selectedStudyset?.cards.length && (
-                        <NoCardsWarningsIcon />
-                    )}
+                    {!selectedStudyset?.cards.length && <NoCardsWarningsIcon />}
                 </SimpleFlexContainer>
                 <ViewStudysetFilters
                     selectedTab={selectedTab}
@@ -285,7 +275,7 @@ const ViewStudySet = (props: Props) => {
                         );
                     })
                 )}
-            <NotesDrawer selectedStudyset={selectedStudyset} />
+                <NotesDrawer selectedStudyset={selectedStudyset} />
             </ViewStudysetPage>
             <NotificationsDialog
                 open={selectedDialog === VIEW_SET_DIALOGS.NOTIFICATIONS}
