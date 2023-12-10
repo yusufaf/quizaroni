@@ -102,8 +102,12 @@ export const LabelMenuItem = styled(MenuItem)({
 
 /* ==== Set Modification Buttons ==== */
 export const SetModificationsContainer = styled(SimpleFlexContainer)({
-    gap: "2rem",
+    gap: "1.5rem",
     alignSelf: "flex-end"
+})
+
+export const KeysToPressContainer = styled("div")({
+    marginLeft: "1rem",
 })
 
 /* ==== New Card Styled Components ====  */

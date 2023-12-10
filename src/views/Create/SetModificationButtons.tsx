@@ -1,12 +1,27 @@
 import {
     KeyboardArrowLeftRounded,
     KeyboardArrowRightRounded,
+    KeyboardRounded,
     SwapHoriz,
     Sync,
+    UndoRounded,
     UploadFile,
 } from "@mui/icons-material";
-import { Button, IconButton, Tooltip, useMediaQuery } from "@mui/material";
-import { SetModificationsContainer } from "./CreateSetStyles";
+import {
+    Button,
+    IconButton,
+    ListItemIcon,
+    ListItemText,
+    Menu,
+    MenuItem,
+    Tooltip,
+    Typography,
+    useMediaQuery,
+} from "@mui/material";
+import {
+    SetModificationsContainer,
+    KeysToPressContainer,
+} from "./CreateSetStyles";
 import { handleReverse, swapAllCards } from "../../utilities/createUtils";
 import { useDispatch } from "react-redux";
 import { setShowImportModal } from "state/slices/createSetSlice";
@@ -24,7 +39,9 @@ const SetModificationButtons = (props: Props) => {
     const hideButtonTextQuery = useMediaQuery(
         "only screen and (max-width:1180px)"
     );
-    const [expanded, setExpanded] = useState<boolean>(false);
+    const [expanded, setExpanded] = useState<boolean>(true);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const keyboardShortcutsOpen = Boolean(anchorEl);
 
     const expandButtonTitle = expanded ? "Hide Buttons" : "Expand Buttons";
 
@@ -46,10 +63,46 @@ const SetModificationButtons = (props: Props) => {
         setExpanded(!expanded);
     };
 
+    const handleOpenShortcutsMenu = (
+        event: React.MouseEvent<HTMLButtonElement>
+    ) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseShortcutsMenu = () => {
+        setAnchorEl(null);
+    };
+
     return (
         <SetModificationsContainer
             sx={{ gap: hideButtonTextQuery ? "0.5rem" : undefined }}
         >
+            <Tooltip title="Keyboard Shortcuts">
+                <IconButton onClick={handleOpenShortcutsMenu}>
+                    <KeyboardRounded color="primary" fontSize="medium" />
+                </IconButton>
+            </Tooltip>
+          
+            <Menu
+                id="keyboard-shortcuts-menu"
+                anchorEl={anchorEl}
+                open={keyboardShortcutsOpen}
+                onClose={handleCloseShortcutsMenu}
+                MenuListProps={{
+                    "aria-labelledby": "basic-button",
+                }}
+                disableScrollLock
+            >
+                <MenuItem onClick={handleCloseShortcutsMenu}>
+                    <ListItemIcon>
+                        <UndoRounded />
+                    </ListItemIcon>
+                    <ListItemText>Undo</ListItemText>
+                    <KeysToPressContainer>
+                        <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Z</kbd>
+                    </KeysToPressContainer>
+                </MenuItem>
+            </Menu>
             <IconButton
                 onClick={onToggleExpanded}
                 title={`${expandButtonTitle}`}
