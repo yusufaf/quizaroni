@@ -152,7 +152,6 @@ const CreateSetHeader = (props: Props) => {
                                 onChange={onDescriptionChange}
                                 multiline
                                 rows={3}
-                                maxRows={4}
                             />
                         </div>
                         <div>
@@ -172,7 +171,9 @@ const CreateSetHeader = (props: Props) => {
                                 <Typography component="span">
                                     or select an existing one
                                 </Typography>
-                                <FormControl variant="standard">
+                                <FormControl 
+                                    variant="standard"
+                                >
                                     <LabelSelect
                                         value={selectedLabel}
                                         onChange={onSelectedLabelChange}

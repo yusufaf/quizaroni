@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import type { TODO, InitialCard } from "lib/types";
 import { EMPTY_CARD } from "./constants";
+import { Dispatch, SetStateAction } from 'react';
 
 
 type CommonCardUtility = {
@@ -12,11 +13,16 @@ type CardUtilityWithIndex = CommonCardUtility & {
     index: number;
 };
 
+type ActionsStackBaseProps = {
+    actionsStack: TODO[];
+    setActionsStack: Dispatch<SetStateAction<TODO[]>>;
+}
+
 export const generateEmptyCard = (): InitialCard => {
     return { ...EMPTY_CARD, uuid: uuidv4() };
 }
 
-type DeleteCardParams = CardUtilityWithIndex;
+type DeleteCardParams = ActionsStackBaseProps & CardUtilityWithIndex;
 /**
  * Handles the deletion of a card from the created set.
  */
@@ -24,10 +30,25 @@ export const deleteCard = ({
     index,
     createdSetCards,
     setStateCallback,
+    actionsStack,
+    setActionsStack
 }: DeleteCardParams): void => {
     const newCreatedSetCards = [...createdSetCards];
+    const cardBeingDeleted = newCreatedSetCards[index];
+    console.log({cardBeingDeleted})
     newCreatedSetCards.splice(index, 1);
     setStateCallback(newCreatedSetCards);
+
+    const newActionsStack = [...actionsStack].concat({
+        actionType: "deleteCard",
+        undoCallback: (createdSetCards: TODO[], setStateCallback: TODO) => {
+            const newCreatedSetCards = [...createdSetCards]
+            console.log({newCreatedSetCards, originalUUID: cardBeingDeleted.uuid})
+            newCreatedSetCards.splice(index, 0, cardBeingDeleted);
+            setStateCallback(newCreatedSetCards)
+        }
+    })
+    setActionsStack(newActionsStack);
 };
 
 type AddCreateCardInputParams = CommonCardUtility & {
@@ -55,7 +76,7 @@ export const duplicateCard = ({
     setStateCallback,
 }: DuplicateCardParams): void  => {
     const duplicateCard = { ...createdSetCards[index] };
-    setStateCallback(createdSetCards.concat(duplicateCard));
+    setStateCallback([...createdSetCards].concat(duplicateCard));
 };
 
 /**
@@ -102,10 +123,10 @@ export const swapAllCards = ({
     setStateCallback(swappedCards);
 };
 
-type AddCardParams = {
+type AddCardParams = ActionsStackBaseProps & {
     createdSetCards: TODO[];
     setStateCallback: TODO;
-    index?: number
+    index?: number;
 }
 /**
  * Adds a card
@@ -114,9 +135,26 @@ export const addCard = ({
     index,
     createdSetCards,
     setStateCallback,
+    actionsStack = [],
+    setActionsStack,
 }: AddCardParams): void => {
     const newCreatedSetCards = [...createdSetCards];
     const indexToUse = index !== undefined ? index + 1 : newCreatedSetCards.length;
-    newCreatedSetCards.splice(indexToUse, 0, generateEmptyCard());
+    const cardToAdd = generateEmptyCard();
+    newCreatedSetCards.splice(indexToUse, 0, cardToAdd);
     setStateCallback(newCreatedSetCards);
+
+    const newActionsStack = [...actionsStack].concat({
+        actionType: "addCard",
+        undoCallback: (createdSetCards: TODO[], setStateCallback: TODO) => {
+            const newCreatedSetCards = [...createdSetCards].filter((value) => value.UUID !== cardToAdd.uuid);
+            console.log({newCreatedSetCards, originalUUID: cardToAdd.uuid})
+            setStateCallback(newCreatedSetCards)
+        }
+    })
+    setActionsStack(newActionsStack);
 };
+
+
+/* ==== Actions Stack ==== */
+

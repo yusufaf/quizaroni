@@ -1,6 +1,6 @@
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -35,7 +35,7 @@ import SetModificationButtons from "./SetModificationButtons";
 import { Virtuoso } from "react-virtuoso";
 import { EMPTY_CARD } from "utilities/constants";
 import { addCard } from "utilities/createUtils";
-import { Create, ErrorOutlineRounded } from "@mui/icons-material";
+import { Create } from "@mui/icons-material";
 import {
     selectShowImportModal,
     setShowImportModal,
@@ -100,12 +100,14 @@ const CreateSet = (props: Props) => {
     const [enteredLabel, setEnteredLabel] = useState<string | null>(null);
     const [selectedLabel, setSelectedLabel] = useState<string>("");
     const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
+    const [actionsStack, setActionsStack] = useState<any[]>([]);
+
+    const fileInputRef = useRef(null);
 
     console.log({ createdSetCards });
 
     const mainButtonDisabled = !title || !description;
 
-    const fileInputRef = useRef(null);
 
     /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
@@ -115,10 +117,25 @@ const CreateSet = (props: Props) => {
 
     useBrowserTitle(PAGES.CREATE);
 
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            if (event.ctrlKey && event.key === 'z') {
+    /* ==== Actions Stack ==== */
+    const handleUndoAction = useCallback(() => {
+        const newActionsStack = [...actionsStack];
+        const lastAction = newActionsStack.pop();
+        console.log("ENTERED HANDLEUNDO", { newActionsStack, lastAction, createdSetCards});
+        if (!lastAction) {
+            return newActionsStack;
+        }
+        const { undoCallback } = lastAction;
+        undoCallback(createdSetCards, setCreatedSetCards);
+        
+        return newActionsStack;
+    }, [createdSetCards, actionsStack]);
 
+    /* */
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.ctrlKey && event.altKey && event.key === 'z') {
+                handleUndoAction();
             }
         };
     
@@ -127,7 +144,7 @@ const CreateSet = (props: Props) => {
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, []);
+    }, [handleUndoAction]);
     
 
     /* Loading values for editing a studyset */
@@ -267,6 +284,8 @@ const CreateSet = (props: Props) => {
                 updateCardValue,
                 index,
                 cardValues,
+                actionsStack,
+                setActionsStack,
                 key: cardValues.uuid,
             };
             return <NewCardInput {...props} />;
@@ -325,6 +344,22 @@ const CreateSet = (props: Props) => {
         mainButtonDisabled,
     };
 
+    // const handleUndoAction = () => {
+    //     setActionsStack(prevStack => {
+    //         const newActionsStack = [...prevStack];
+    //         const lastAction = newActionsStack.pop();
+    //         console.log("ENTERED HANDLEUNDO", { actionsStack: prevStack, lastAction, createdSetCards});
+    //         if (!lastAction) {
+    //             return prevStack;
+    //         }
+    //         const { undoCallback } = lastAction;
+    //         undoCallback(createdSetCards, setCreatedSetCards);
+            
+    //         return newActionsStack;
+    //     });
+    // }
+
+
     if (!authenticated) {
         return <LoginMessage page="createSet" />;
     }
@@ -357,6 +392,8 @@ const CreateSet = (props: Props) => {
                         addCard({
                             createdSetCards,
                             setStateCallback: setCreatedSetCards,
+                            actionsStack,
+                            setActionsStack
                         })
                     }
                 >
