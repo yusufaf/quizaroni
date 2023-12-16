@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
 import { IconButton, Tooltip, Typography } from "@mui/material/";
 import {
     AddPhotoAlternate,
@@ -31,7 +31,7 @@ import {
     swapCard,
 } from "utilities/createUtils";
 import CustomColorPicker from "../../../components/CustomColorPicker/CustomColorPicker";
-import type { ColorPickerType } from "lib/types";
+import type { ColorPickerType, TODO } from "lib/types";
 
 type Props = {
     cardValues: any;
@@ -42,6 +42,8 @@ type Props = {
     onFileChange: any;
     setCreatedSetCards: any;
     updateCardValue: any;
+    actionsStack: TODO[];
+    setActionsStack: Dispatch<SetStateAction<TODO[]>>;
 };
 const NewCardInput = (props: Props) => {
     const {
@@ -53,6 +55,8 @@ const NewCardInput = (props: Props) => {
         cardValues,
         createdSetCards,
         setCreatedSetCards,
+        actionsStack,
+        setActionsStack,
     } = props;
 
     const {
@@ -242,6 +246,8 @@ const NewCardInput = (props: Props) => {
                                     createdSetCards,
                                     index,
                                     setStateCallback,
+                                    actionsStack,
+                                    setActionsStack,
                                 })
                             }
                         >
