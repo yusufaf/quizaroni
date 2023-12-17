@@ -1,23 +1,26 @@
-import { Button, Tooltip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, TextField } from '@mui/material/';
+import {
+    Button,
+    Tooltip,
+    Dialog,
+    DialogContentText,
+    Typography,
+    TextField,
+} from "@mui/material/";
 import * as C from "utilities/constants";
-import { styled } from '@mui/system';
 import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from "react";
+import { DeleteDialogContent, StyledDialogActions } from "../ProfileStyles";
 
 type Props = {
     open: boolean;
     handleClose: () => void;
     deletePassword: string;
     setDeletePassword: Dispatch<SetStateAction<string>>;
-}
+};
 
 const DeleteAccountDialog = (props: Props) => {
     const { open, handleClose, deletePassword, setDeletePassword } = props;
-
-    const DeletePasswordInput = styled(TextField)({
-        marginTop: "1rem"
-    })
 
     // deleteUser(user).then(() => {
     //     // User deleted.
@@ -28,38 +31,32 @@ const DeleteAccountDialog = (props: Props) => {
 
     const handleDeleteAccount = () => {
         // TODO
-    }
+    };
+
+    console.log({ deletePassword });
 
     return (
-        <Dialog
-            open={open}
-            onClose={handleClose}
-            sx={{
-                bottom: "20rem",
-            }}
-        >
+        <Dialog open={open} onClose={handleClose}>
             <StyledDialogTitle>
                 Delete Account
                 <CloseDialogButton onClose={handleClose} />
             </StyledDialogTitle>
-            <DialogContent>
-                <DialogContentText>
-                    {C.DELETE_ACCOUNT_MSG}
-                </DialogContentText>
-                <DeletePasswordInput
+            <DeleteDialogContent>
+                <DialogContentText>{C.DELETE_ACCOUNT_MSG}</DialogContentText>
+                <TextField
                     fullWidth={true}
                     label="Password"
                     placeholder="Enter your password"
                     value={deletePassword}
                     name="passwordInput"
-                    onChange={e => setDeletePassword(e.target.value)}
+                    onChange={(e) => setDeletePassword(e.target.value)}
                     // onBlur={e => checkIfInputEmpty(e)}
                     // helperText={showErrorText.passInput && "A password is required"}
                     // error={showErrorText.passInput}
                     size="small"
                 />
-            </DialogContent>
-            <DialogActions>
+            </DeleteDialogContent>
+            <StyledDialogActions>
                 <Button
                     variant="contained"
                     color="error"
@@ -68,9 +65,9 @@ const DeleteAccountDialog = (props: Props) => {
                 >
                     Delete Account
                 </Button>
-            </DialogActions>
+            </StyledDialogActions>
         </Dialog>
-    )
-}
+    );
+};
 
 export default DeleteAccountDialog;

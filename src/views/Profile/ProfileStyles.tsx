@@ -1,4 +1,4 @@
-import { Card, IconButton, Paper, styled, Tab, Typography } from "@mui/material";
+import { Button, Card, DialogActions, DialogContent, IconButton, Paper, styled, Tab, Typography } from "@mui/material";
 import { BasePage, FlexColumn } from "common/AppStyles";
 
 export const ProfilePage = styled(BasePage)({
@@ -20,21 +20,35 @@ export const ProfilePaper = styled(Paper)({
 
 export const InfoChangeContainer = styled("div")({
     display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: "2rem",
+    flexDirection: "column",
+    gap: "1rem",
 })
 
 export const PasswordFieldsContainer = styled("div")({
     display: "flex",
     flexDirection: "column",
-    gap: "2rem",
+    gap: "1rem",
+})
+
+export const AccountViewContainer = styled(FlexColumn)({
+    alignItems: "flex-start",
+    gap: "1rem",
+    width: "100%",
+})
+
+export const ActionSection = styled(FlexColumn)({
+    gap: "0.5rem",
+    width: "25%"
 })
 
 export const ActionHeader = styled("div")({
     display: "flex",
     alignItems: "center",
     gap: "0.75rem",
+})
+
+export const ActionSubmitButton = styled(Button)({
+    width: "50%",
 })
 
 /* Profile Card Styles */
@@ -83,4 +97,14 @@ export const ProfileTab = styled(Tab)(({ theme }) => ({
 
 export const ActionColumn = styled(FlexColumn)({
     gap: "1rem"
+})
+
+export const DeleteDialogContent = styled(DialogContent)({
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+})
+
+export const StyledDialogActions = styled(DialogActions)({
+    margin: "0 1rem 1rem 0"
 })
