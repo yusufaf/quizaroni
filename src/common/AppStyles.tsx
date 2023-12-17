@@ -8,6 +8,11 @@ export const SimpleFlexContainer = styled("div")({
     alignItems: "center",
 })
 
+export const BaselineFlexContainer = styled("div")({
+    display: "flex",
+    alignItems: "baseline",
+})
+
 export const SpacedFlexContainer = styled("div")({
     display: "flex",
     alignItems: "center",
