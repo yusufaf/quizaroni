@@ -7,7 +7,7 @@ import {
     GridToolbar,
 } from "@mui/x-data-grid";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import { SortDirection, Studyset } from "lib/types";
+import { HomeView, SortDirection, Studyset } from "lib/types";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -93,7 +93,7 @@ const Home = (props: Props) => {
         SORT_DIRECTIONS.DSC
     );
 
-    const [selectedView, setSelectedView] = useState("table");
+    const [selectedView, setSelectedView] = useState<HomeView>(localStorage.getItem("homeView") ?? "table");
 
     const [contextMenuStudyset, setContextMenuStudyset] =
         useState<Studyset | null>(null);
@@ -205,7 +205,8 @@ const Home = (props: Props) => {
             property: "homeView",
             newValue: newView,
         });
-        setSelectedView(newView);
+        setSelectedView(newView as HomeView);
+        localStorage.setItem("homeView", newView);
     };
 
     const onRowDoubleClick: GridEventListener<"rowDoubleClick"> = (

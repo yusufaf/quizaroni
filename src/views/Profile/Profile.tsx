@@ -40,7 +40,7 @@ const Profile = (props: Props) => {
         username: cognitoUser.username ?? "",
     });
 
-    const [selectedProfileTab, setSelectedProfileTab] = useState<string>(TABS.CUSTOMIZATION);
+    const [selectedProfileTab, setSelectedProfileTab] = useState<string>(localStorage.getItem("profileTab") ?? TABS.CUSTOMIZATION);
 
     /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
@@ -48,6 +48,7 @@ const Profile = (props: Props) => {
     });
 
     const onTabChange = (_e: SyntheticEvent, newTab: string) => {
+        localStorage.setItem("profileTab", newTab);
         setSelectedProfileTab(newTab);
     };
 
