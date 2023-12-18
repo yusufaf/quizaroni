@@ -132,6 +132,9 @@ export const PWD_REGEX = {
     length: /^.{8,}$/,
 };
 
+// https://bobbyhadz.com/blog/react-check-if-email-is-valid
+export const EMAIL_REGEX = /\S+@\S+\.\S+/;
+
 export const STUDYSET_CONFIRM_DIALOGS = {
     DELETE: "DELETE",
     DUPLICATE: "DUPLICATE",

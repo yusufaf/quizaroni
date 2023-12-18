@@ -8,7 +8,7 @@ import { Typography, TextField, Button } from "@mui/material";
 import PasswordToggle from "components/PasswordToggle/PasswordToggle";
 import DeleteAccountDialog from "./DeleteAccountDialog/DeleteAccountDialog";
 import {
-  AccountViewContainer,
+    AccountViewContainer,
     ActionHeader,
     ActionSection,
     ActionSubmitButton,
@@ -16,12 +16,21 @@ import {
     PasswordFieldsContainer,
 } from "./ProfileStyles";
 import { useState } from "react";
-import { updateUserAttribute } from "@aws-amplify/auth";
+import {
+    UpdateUserAttributeOutput,
+    updateUserAttribute,
+} from "@aws-amplify/auth";
+import { EMAIL_REGEX } from "utilities/constants";
+import { useNavigate } from "react-router-dom";
+import { User } from "lib/types";
 
-type Props = {};
-
+type Props = {
+    userData: User;
+};
 const AccountTab = (props: Props) => {
-    const {} = props;
+    const { userData } = props;
+
+    const navigate = useNavigate();
 
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [deletePassword, setDeletePassword] = useState<string>("");
@@ -31,6 +40,8 @@ const AccountTab = (props: Props) => {
 
     const [newPasswordVisibility, setNewPasswordVisibility] = useState(false);
     const [newEmail, setNewEmail] = useState<string>("");
+
+    const isNewEmailValid = EMAIL_REGEX.test(newEmail);
 
     const checkIfInputMatches = (event) => {
         // let updatedErrorText = { ...showErrorText };
@@ -63,6 +74,56 @@ const AccountTab = (props: Props) => {
 
     const handleCloseDeleteDialog = () => {
         setShowDeleteDialog(false);
+    };
+
+    const handleUpdateUserAttribute = async (
+        attributeKey: string,
+        value: string
+    ) => {
+        try {
+            const output = await updateUserAttribute({
+                userAttribute: {
+                    attributeKey,
+                    value,
+                },
+            });
+            handleUpdateUserAttributeNextSteps(output);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleUpdateUserAttributeNextSteps = (
+        output: UpdateUserAttributeOutput
+    ) => {
+        const { nextStep } = output;
+
+        switch (nextStep.updateAttributeStep) {
+            case "CONFIRM_ATTRIBUTE_WITH_CODE":
+                const codeDeliveryDetails = nextStep.codeDeliveryDetails;
+                console.log(
+                    `Confirmation code was sent to ${codeDeliveryDetails?.deliveryMedium}.`
+                );
+                // Collect the confirmation code from the user and pass to confirmUserAttribute.
+
+                navigate("/confirmEmail", {
+                    state: {
+                        actionType: "changeEmail",
+                        canResend: false,
+                        newEmail,
+                    }
+                })
+
+                break;
+            case "DONE":
+                console.log(`attribute was successfully updated.`);
+                break;
+        }
+    };
+
+    const handleChangeEmail = async () => {
+        handleUpdateUserAttribute("email", newEmail);
+        setNewEmail("");
     };
 
     return (
@@ -161,15 +222,18 @@ const AccountTab = (props: Props) => {
                 <InfoChangeContainer>
                     <TextField
                         variant="standard"
-                        label="Email"
+                        label="New Email"
                         placeholder="Enter new email"
                         value={newEmail}
                         onChange={(e) => setNewEmail(e.target.value)}
+                        required={true}
+                        error={Boolean(newEmail) && !isNewEmailValid}
+                        helperText={newEmail && !isNewEmailValid && "Please enter a valid email"}
                     />
                     <ActionSubmitButton
                         variant="contained"
-                        onClick={() => handleChangeUsername()}
-                        disabled={enteredNewUsername === ""}
+                        onClick={handleChangeEmail}
+                        disabled={!newEmail || !isNewEmailValid}
                     >
                         Submit
                     </ActionSubmitButton>

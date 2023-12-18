@@ -1,11 +1,12 @@
 import api from "./api";
-import { CreateUserParams, GetUserParams, UpdateDefaultThemeParams, UpdateMetadataParams, User } from "lib/types";
+import { CreateUserParams, GetUserParams, UpdateDefaultThemeParams, UpdateEmailParams, UpdateMetadataParams, User } from "lib/types";
 
 /* Endpoints
     router.post("/api/users/create", createUser);
     router.get("/api/users/get", getUser);
     router.post("/api/users/updateDefaultTheme", updateDefaultTheme);
     router.post("/api/users/updateUserMetadata", updateUserMetadata);
+    router.post("/api/users/updateEmail", updateUserEmail);
 */
 
 export const usersApi = api.injectEndpoints({
@@ -50,6 +51,17 @@ export const usersApi = api.injectEndpoints({
             }),
             invalidatesTags: ["User"],
         }),
+        updateEmail: build.mutation<void, UpdateEmailParams>({
+            query: ({ username, newEmail }) => ({
+                url: "users/updateEmail",
+                method: "POST",
+                body: {
+                    username, 
+                    newEmail
+                },
+            }),
+            invalidatesTags: ["User"],
+        }),
     }),
 });
 
@@ -58,4 +70,5 @@ export const {
     useGetUserQuery,
     useUpdateUserMetadataMutation,
     useUpdateDefaultThemeMutation,
+    useUpdateEmailMutation,
 } = usersApi;

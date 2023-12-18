@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { Paper } from "@mui/material";
-import { confirmSignUp, resendSignUpCode } from "aws-amplify/auth";
+import {
+    confirmSignUp,
+    resendSignUpCode,
+    confirmUserAttribute,
+} from "aws-amplify/auth";
 import { useSelector } from "react-redux";
 import { selectCognitoUser } from "state/slices/globalSlice";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
     ConfirmBtn,
     ConfirmEmailContainer,
@@ -12,24 +16,48 @@ import {
     ConfirmEmailTitle,
     ConfirmationField,
 } from "./styles";
+import { useUpdateEmailMutation } from "state/api/usersAPI";
 
 type Props = {};
-
 const ConfirmEmail = (props: Props) => {
     const cognitoUser = useSelector(selectCognitoUser);
     console.log({ cognitoUser });
     const { username } = cognitoUser;
 
     const navigate = useNavigate();
+    const { state } = useLocation();
+
+    const [updateEmail] = useUpdateEmailMutation();
+
+    const { actionType = "signUp", canResend = false, newEmail = "" } = state;
 
     const [confirmationCode, setConfirmationCode] = useState<string>("");
 
     const handleConfirmEmail = async () => {
         try {
-            const result = await confirmSignUp({username, confirmationCode});
+            switch (actionType) {
+                case "signUp":
+                    const result = await confirmSignUp({
+                        username,
+                        confirmationCode,
+                    });
 
-            /* Send user to login page if successfully confirmed email */
-            navigate("/login");
+                    /* Send user to login page if successfully confirmed email */
+                    navigate("/login");
+                    break;
+                case "changeEmail":
+                    const changeEmailResult = await confirmUserAttribute({
+                        userAttributeKey: "email",
+                        confirmationCode,
+                    });
+                    console.log({ changeEmailResult });
+
+                    updateEmail({
+                        username,
+                        newEmail,
+                    });
+                    navigate("/profile");
+            }
         } catch (error) {
             console.error("Error confirming sign up", error);
         }
@@ -37,7 +65,7 @@ const ConfirmEmail = (props: Props) => {
 
     const handleResendCode = async () => {
         try {
-            const result = await resendSignUpCode({username});
+            const result = await resendSignUpCode({ username });
             console.log("Code resent succesfully", result);
         } catch (err) {
             console.error("error resending code: ", err);
@@ -79,7 +107,7 @@ const ConfirmEmail = (props: Props) => {
                         value={confirmationCode}
                         onChange={(e) => {
                             if (!(e.target.value.length > 6)) {
-                                setConfirmationCode(e.target.value)
+                                setConfirmationCode(e.target.value);
                             }
                         }}
                         error={!isValidCode && Boolean(confirmationCode)}
@@ -91,12 +119,14 @@ const ConfirmEmail = (props: Props) => {
                     >
                         Confirm Email
                     </ConfirmBtn>
-                    <ConfirmBtn 
-                        variant="outlined" 
-                        onClick={handleResendCode}
-                    >
-                        Resend Confirmation Code
-                    </ConfirmBtn>
+                    {canResend && (
+                        <ConfirmBtn
+                            variant="outlined"
+                            onClick={handleResendCode}
+                        >
+                            Resend Confirmation Code
+                        </ConfirmBtn>
+                    )}
                 </ConfirmEmailContainer>
             </Paper>
         </ConfirmEmailPage>
