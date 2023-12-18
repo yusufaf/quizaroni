@@ -125,6 +125,11 @@ export type UpdateDefaultThemeParams = {
     newTheme: "light" | "dark";
 };
 
+export type UpdateEmailParams = {
+    username: string;
+    newEmail: string;
+};
+
 export type CreateCategoryParams = StudysetUUIDPayload & {
     category: string;
 };

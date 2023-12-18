@@ -80,7 +80,7 @@ const Profile = (props: Props) => {
                         }
                         {selectedProfileTab === TABS.ACCOUNT
                             &&
-                            <AccountTab/> 
+                            <AccountTab userData={userData}/> 
                         }
                     </ProfileContainer>
                 </ProfilePaper>
