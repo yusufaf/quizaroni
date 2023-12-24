@@ -1,7 +1,11 @@
 import { styled } from "@mui/system";
-import { DialogTitle, IconButton, Typography } from '@mui/material/';
+import { Button, DialogActions, DialogTitle, IconButton, Typography } from '@mui/material/';
 import { Link } from "react-router-dom";
 import { ChromePicker } from 'react-color';
+
+export const BoldButton = styled(Button)({
+    fontWeight: 600
+})
 
 export const SimpleFlexContainer = styled("div")({
     display: "flex",
@@ -35,7 +39,13 @@ export const BasePage = styled("main")({
 export const FlexDialogTitle = styled(DialogTitle)({
     display: "flex",
     alignItems: "center",
+    fontWeight: 600,
 })
+
+export const StyledDialogActions = styled(DialogActions)({
+    margin: "0 1rem 1rem 0",
+});
+
 
 export const RightAlignedCloseButton = styled(IconButton)(
     {

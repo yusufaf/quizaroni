@@ -1,11 +1,5 @@
-import {
-    Person,
-    Password,
-    RemoveCircleOutline,
-    EmailRounded,
-} from "@mui/icons-material";
-import { Typography, TextField, Button } from "@mui/material";
-import PasswordToggle from "components/PasswordToggle/PasswordToggle";
+import { Person, RemoveCircleOutline, EmailRounded } from "@mui/icons-material";
+import { Typography, TextField } from "@mui/material";
 import DeleteAccountDialog from "./DeleteAccountDialog/DeleteAccountDialog";
 import {
     AccountViewContainer,
@@ -13,16 +7,18 @@ import {
     ActionSection,
     ActionSubmitButton,
     InfoChangeContainer,
-    PasswordFieldsContainer,
 } from "./ProfileStyles";
 import { useState } from "react";
 import {
-    UpdateUserAttributeOutput,
+    type UpdateUserAttributeOutput,
     updateUserAttribute,
 } from "@aws-amplify/auth";
 import { EMAIL_REGEX } from "utilities/constants";
 import { useNavigate } from "react-router-dom";
 import { User } from "lib/types";
+import { useDispatch } from "react-redux";
+import { setConfirmationCodeDialogProps } from "state/slices/globalSlice";
+import ChangePasswordSection from "./ChangePasswordSection/ChangePasswordSection";
 
 type Props = {
     userData: User;
@@ -31,10 +27,12 @@ const AccountTab = (props: Props) => {
     const { userData } = props;
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [deletePassword, setDeletePassword] = useState<string>("");
     const [enteredNewUsername, setEnteredNewUsername] = useState<string>("");
+    const [oldPassword, setOldPassword] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
     const [enteredConfirmPassword, setEnteredConfirmPassword] = useState("");
 
@@ -58,13 +56,6 @@ const AccountTab = (props: Props) => {
      * Change username for authenticated user
      */
     const handleChangeUsername = async () => {
-        // TODO
-    };
-
-    /**
-     * Change user password if signed up with email / password
-     */
-    const handleChangePassword = () => {
         // TODO
     };
 
@@ -100,19 +91,16 @@ const AccountTab = (props: Props) => {
 
         switch (nextStep.updateAttributeStep) {
             case "CONFIRM_ATTRIBUTE_WITH_CODE":
-                const codeDeliveryDetails = nextStep.codeDeliveryDetails;
-                console.log(
-                    `Confirmation code was sent to ${codeDeliveryDetails?.deliveryMedium}.`
-                );
-                // Collect the confirmation code from the user and pass to confirmUserAttribute.
-
-                navigate("/confirmEmail", {
-                    state: {
+                dispatch(
+                    setConfirmationCodeDialogProps({
+                        open: true,
                         actionType: "changeEmail",
                         canResend: false,
+                        description: `To confirm you want to change the email associated with your account to ${newEmail}, we've sent a 6-digit confirmation code.`,
                         newEmail,
-                    }
-                })
+                        title: "Confirm Email Change",
+                    })
+                );
 
                 break;
             case "DONE":
@@ -151,69 +139,7 @@ const AccountTab = (props: Props) => {
                     </ActionSubmitButton>
                 </InfoChangeContainer>
             </ActionSection>
-            <ActionSection>
-                <ActionHeader>
-                    <Password />
-                    <Typography variant="h6">Change Password</Typography>
-                </ActionHeader>
-                <InfoChangeContainer>
-                    <TextField
-                        variant="standard"
-                        placeholder="Enter new password"
-                        label="Password"
-                        type={newPasswordVisibility ? "text" : "password"}
-                        value={newPassword}
-                        name="passInput"
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        // error={showErrorText.passInput}
-                        size="small"
-                        InputProps={{
-                            endAdornment: (
-                                <PasswordToggle
-                                    passwordVisibility={newPasswordVisibility}
-                                    setPasswordVisibility={
-                                        setNewPasswordVisibility
-                                    }
-                                />
-                            ),
-                        }}
-                    />
-                    <TextField
-                        variant="standard"
-                        placeholder="Confirm new password"
-                        label="Confirm Password"
-                        type={newPasswordVisibility ? "text" : "password"}
-                        value={newPassword}
-                        name="passInput"
-                        onChange={(e) =>
-                            setEnteredConfirmPassword(e.target.value)
-                        }
-                        // error={showErrorText.passInput}
-                        size="small"
-                        InputProps={{
-                            endAdornment: (
-                                <PasswordToggle
-                                    passwordVisibility={newPasswordVisibility}
-                                    setPasswordVisibility={
-                                        setNewPasswordVisibility
-                                    }
-                                />
-                            ),
-                        }}
-                    />
-                    <ActionSubmitButton
-                        variant="contained"
-                        onClick={() => handleChangePassword()}
-                        // disabled={
-                        //     newPassword === "" ||
-                        //     enteredConfirmPassword === "" ||
-                        //     showErrorText.confirmPassInput
-                        // }
-                    >
-                        Submit
-                    </ActionSubmitButton>
-                </InfoChangeContainer>
-            </ActionSection>
+            <ChangePasswordSection />
             <ActionSection>
                 <ActionHeader>
                     <EmailRounded />
@@ -228,7 +154,11 @@ const AccountTab = (props: Props) => {
                         onChange={(e) => setNewEmail(e.target.value)}
                         required={true}
                         error={Boolean(newEmail) && !isNewEmailValid}
-                        helperText={newEmail && !isNewEmailValid && "Please enter a valid email"}
+                        helperText={
+                            newEmail &&
+                            !isNewEmailValid &&
+                            "Please enter a valid email"
+                        }
                     />
                     <ActionSubmitButton
                         variant="contained"
