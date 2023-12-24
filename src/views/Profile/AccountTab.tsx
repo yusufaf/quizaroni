@@ -114,6 +114,17 @@ const AccountTab = (props: Props) => {
         setNewEmail("");
     };
 
+    const getChangeEmailHelperText = () => {
+        if (newEmail && !isNewEmailValid) {
+            return "Please enter a valid email";
+        }
+
+        // Existing email would satisfy regex
+        if (newEmail === userData.email) {
+            return "Same as current email";
+        }
+    };
+
     return (
         <AccountViewContainer>
             <ActionSection>
@@ -154,11 +165,7 @@ const AccountTab = (props: Props) => {
                         onChange={(e) => setNewEmail(e.target.value)}
                         required={true}
                         error={Boolean(newEmail) && !isNewEmailValid}
-                        helperText={
-                            newEmail &&
-                            !isNewEmailValid &&
-                            "Please enter a valid email"
-                        }
+                        helperText={getChangeEmailHelperText()}
                     />
                     <ActionSubmitButton
                         variant="contained"
