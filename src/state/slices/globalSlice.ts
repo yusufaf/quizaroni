@@ -11,6 +11,7 @@ type GlobalSliceState = {
     userAuthInfo: any;
     userData: any;
     labelsDialogProps: any;
+    confirmationCodeDialogProps: any;
 };
 
 const initialState: GlobalSliceState = {
@@ -22,7 +23,8 @@ const initialState: GlobalSliceState = {
     namedColorsDialogProps: {},
     userAuthInfo: {},
     userData: {},
-    labelsDialogProps: {}
+    labelsDialogProps: {},
+    confirmationCodeDialogProps: {},
 };
 
 const sliceName = "globalState";
@@ -58,6 +60,9 @@ export const globalSlice = createSlice({
         setLabelsDialogProps: (state, action: PayloadAction<any>) => {
             state.labelsDialogProps = action.payload;
         },
+        setConfirmationCodeDialogProps: (state, action: PayloadAction<any>) => {
+            state.confirmationCodeDialogProps = action.payload;
+        },
     },
 });
 
@@ -70,7 +75,8 @@ export const {
     setNamedColorsDialogProps,
     setUserAuthState,
     setUserData,
-    setLabelsDialogProps
+    setLabelsDialogProps,
+    setConfirmationCodeDialogProps
 } = globalSlice.actions;
 
 /* Selectors */
@@ -91,5 +97,8 @@ export const selectFeedbackDialogOpen = (state: RootState) =>
     state[sliceName].dialogOpen;
 export const selectLabelsDialogProps = (state: RootState) =>
     state[sliceName].labelsDialogProps;
+export const selectConfirmationCodeDialogProps = (state: RootState) =>
+    state[sliceName].confirmationCodeDialogProps;
+
 
 export default globalSlice.reducer;
