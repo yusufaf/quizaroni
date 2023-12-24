@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { PWD_REGEX } from "utilities/constants";
 import {
-    PasswordPolicyBox,
+    PasswordPolicyContainer,
     PasswordPolicyPaper,
     RequirementText,
 } from "./styles";
@@ -20,6 +20,7 @@ type Props = {
     isPasswordValid?: boolean;
     setIsPasswordValid: Dispatch<SetStateAction<boolean>>;
     password: string;
+    style?: Object;
 };
 
 const initialRequirementState: RequirementState = {
@@ -31,7 +32,7 @@ const initialRequirementState: RequirementState = {
 };
 
 const PasswordValidator = (props: Props) => {
-    const { setIsPasswordValid, password } = props;
+    const { setIsPasswordValid, password, style = {} } = props;
 
     const [requirementState, setRequirementState] = useState<RequirementState>({
         ...initialRequirementState,
@@ -52,29 +53,46 @@ const PasswordValidator = (props: Props) => {
         checkPasswordValidity();
     }, [password]);
 
+    const booleanToString = (value) => {
+        return `${Boolean(value)}`;
+    };
+
     return (
-        <PasswordPolicyBox>
+        <PasswordPolicyContainer style={style}>
             <PasswordPolicyPaper elevation={6}>
-                <BoldTypography variant="subtitle1" sx={{ textAlign: "center" }}>
+                <BoldTypography
+                    variant="subtitle1"
+                    sx={{ textAlign: "center" }}
+                >
                     Password Policy:
                 </BoldTypography>
-                <RequirementText isSatisfied={requirementState.length}>
+                <RequirementText
+                    isSatisfied={booleanToString(requirementState.length)}
+                >
                     &bull; Must be at least 8 characters long
                 </RequirementText>
-                <RequirementText isSatisfied={requirementState.uppercase}>
+                <RequirementText
+                    isSatisfied={booleanToString(requirementState.uppercase)}
+                >
                     &bull; Must contain at least one uppercase letter
                 </RequirementText>
-                <RequirementText isSatisfied={requirementState.special}>
+                <RequirementText
+                    isSatisfied={booleanToString(requirementState.special)}
+                >
                     &bull; Must contain at least one special character
                 </RequirementText>
-                <RequirementText isSatisfied={requirementState.lowercase}>
+                <RequirementText
+                    isSatisfied={booleanToString(requirementState.lowercase)}
+                >
                     &bull; Must contain at least one lowercase letter
                 </RequirementText>
-                <RequirementText isSatisfied={requirementState.number}>
+                <RequirementText
+                    isSatisfied={booleanToString(requirementState.number)}
+                >
                     &bull; Must contain at least one number
                 </RequirementText>
             </PasswordPolicyPaper>
-        </PasswordPolicyBox>
+        </PasswordPolicyContainer>
     );
 };
 

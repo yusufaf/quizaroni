@@ -7,9 +7,11 @@ import {
     InfoChangeContainer,
     ActionSubmitButton,
 } from "../ProfileStyles";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { updatePassword } from "@aws-amplify/auth";
 import { toast } from "react-toastify";
+import PasswordValidator from "components/PasswordValidator/PasswordValidator";
+import useBoundingRect from "lib/hooks/useBoundingRect";
 
 type Props = {};
 
@@ -17,11 +19,25 @@ const ChangePasswordSection = ({}: Props) => {
     const [oldPassword, setOldPassword] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
     const [confirmPassword, setConfirmPassword] = useState<string>("");
+    const [passwordValid, setPasswordValid] = useState<boolean>(false);
 
     const [oldPasswordVisibility, setOldPasswordVisibility] =
         useState<boolean>(false);
     const [newPasswordVisibility, setNewPasswordVisibility] =
         useState<boolean>(false);
+
+    const newPasswordInputRef = useRef<HTMLElement>(null);
+    const boundingRect = useBoundingRect(newPasswordInputRef);
+
+    const passwordsDontMatch =
+        newPassword && confirmPassword && newPassword !== confirmPassword;
+
+    const submitButtonDisabled =
+        !oldPassword ||
+        !newPassword ||
+        !confirmPassword ||
+        newPassword !== confirmPassword ||
+        !passwordValid;
 
     const handleUpdatePassword = async () => {
         try {
@@ -52,7 +68,7 @@ const ChangePasswordSection = ({}: Props) => {
                     value={oldPassword}
                     name="oldPasswordInput"
                     onChange={(e) => setOldPassword(e.target.value)}
-                    // error={showErrorText.passInput}
+                    required={true}
                     size="small"
                     InputProps={{
                         endAdornment: (
@@ -64,6 +80,7 @@ const ChangePasswordSection = ({}: Props) => {
                     }}
                 />
                 <TextField
+                    ref={newPasswordInputRef}
                     variant="standard"
                     placeholder="Enter new password"
                     label="Password"
@@ -71,7 +88,8 @@ const ChangePasswordSection = ({}: Props) => {
                     value={newPassword}
                     name="passInput"
                     onChange={(e) => setNewPassword(e.target.value)}
-                    // error={showErrorText.passInput}
+                    error={Boolean(passwordsDontMatch)}
+                    required={true}
                     size="small"
                     InputProps={{
                         endAdornment: (
@@ -90,7 +108,12 @@ const ChangePasswordSection = ({}: Props) => {
                     value={confirmPassword}
                     name="passInput"
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    // error={showErrorText.passInput}
+                    error={Boolean(passwordsDontMatch)}
+                    helperText={
+                        passwordsDontMatch &&
+                        "Password and confirm password don't match"
+                    }
+                    required={true}
                     size="small"
                     InputProps={{
                         endAdornment: (
@@ -103,11 +126,22 @@ const ChangePasswordSection = ({}: Props) => {
                 />
                 <ActionSubmitButton
                     variant="contained"
+                    disabled={submitButtonDisabled}
                     onClick={handleUpdatePassword}
                 >
                     Submit
                 </ActionSubmitButton>
             </InfoChangeContainer>
+            {boundingRect && (
+                <PasswordValidator
+                    password={newPassword}
+                    setIsPasswordValid={setPasswordValid}
+                    style={{
+                        left: boundingRect.right + 50,
+                        top: boundingRect.top - 75,
+                    }}
+                />
+            )}
         </ActionSection>
     );
 };

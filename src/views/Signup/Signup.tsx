@@ -92,9 +92,6 @@ const Signup = (props: Props) => {
                     title: "Confirm Sign Up",
                 })
             );
-
-            /* Send user to confirm email page */
-            navigate("/confirmEmail");
         } catch (error) {
             console.log("error signing up:", error);
         }
