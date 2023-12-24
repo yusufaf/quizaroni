@@ -1,7 +1,7 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Paper, Typography } from "@mui/material";
 import styled from "@emotion/styled";
 
-export const PasswordPolicyBox = styled(Box)({
+export const PasswordPolicyContainer = styled("div")({
     position: "absolute",
     left: "25rem",
     top: "8rem",
@@ -13,9 +13,9 @@ export const PasswordPolicyPaper = styled(Paper)({
     textAlign: "left",
 });
 
-export const RequirementText = styled(Typography)<{ isSatisfied: boolean }>(
+export const RequirementText = styled(Typography)<{ isSatisfied: string }>(
     ({ isSatisfied, theme }) => ({
-        color: isSatisfied ? theme.palette.success.main : theme.palette.error.main,
+        color: isSatisfied === "true" ? theme.palette.success.main : theme.palette.error.main,
         transition: "color 0.2s ease",
     })
 );
