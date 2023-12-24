@@ -1,0 +1,153 @@
+import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
+import {
+    BoldButton,
+    StyledDialogActions,
+    FlexDialogTitle as StyledDialogTitle,
+} from "common/AppStyles";
+import {
+    ConfirmDescription,
+    StyledDialog,
+    StyledDialogContent,
+} from "./styles";
+import { TextField } from "@mui/material";
+import {
+    selectCognitoUser,
+    selectConfirmationCodeDialogProps,
+    setConfirmationCodeDialogProps,
+} from "state/slices/globalSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { useState } from "react";
+import {
+    confirmSignUp,
+    resendSignUpCode,
+    confirmUserAttribute,
+} from "aws-amplify/auth";
+import { useNavigate } from "react-router-dom";
+import { useUpdateEmailMutation } from "state/api/usersAPI";
+
+type Props = {};
+const ConfirmationCodeDialog = (props: Props) => {
+    /* Redux / Hooks */
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const cognitoUser = useSelector(selectCognitoUser);
+    const { username } = cognitoUser;
+    const confirmationCodeDialogProps = useSelector(
+        selectConfirmationCodeDialogProps
+    );
+
+    const [updateEmail] = useUpdateEmailMutation();
+
+    const [confirmationCode, setConfirmationCode] = useState<string>("");
+    const isValidCode = /^\d{6}$/.test(confirmationCode);
+
+    const {
+        actionType = "signUp",
+        canResend = false,
+        description = "Check your email for a six-digit confirmation code.",
+        newEmail = "",
+        open,
+        title = "Confirm Email",
+    } = confirmationCodeDialogProps;
+
+    const closeDialog = () => {
+        dispatch(
+            setConfirmationCodeDialogProps({
+                open: false,
+            })
+        );
+    };
+
+    const handleResendCode = async () => {
+        try {
+            const result = await resendSignUpCode({ username: "" });
+            console.log("Code resent succesfully", result);
+        } catch (err) {
+            console.error("error resending code: ", err);
+        }
+    };
+
+    const handleConfirmEmail = async () => {
+        try {
+            switch (actionType) {
+                case "signUp":
+                    const result = await confirmSignUp({
+                        username,
+                        confirmationCode,
+                    });
+
+                    /* Send user to login page if successfully confirmed email */
+                    navigate("/login");
+                    break;
+                case "changeEmail":
+                    const changeEmailResult = await confirmUserAttribute({
+                        userAttributeKey: "email",
+                        confirmationCode,
+                    });
+                    console.log({ changeEmailResult });
+
+                    updateEmail({
+                        username,
+                        newEmail,
+                    });
+            }
+        } catch (error) {
+            console.error("Error confirming sign up", error);
+        }
+    };
+
+    return (
+        <StyledDialog open={open} onClose={closeDialog} fullWidth>
+            <StyledDialogTitle>
+                {title}
+                <CloseDialogButton onClose={closeDialog} />
+            </StyledDialogTitle>
+            <StyledDialogContent>
+                <div>
+                    <ConfirmDescription variant="body1">
+                        {description}
+                    </ConfirmDescription>
+                    <ConfirmDescription
+                        variant="body1"
+                        sx={{
+                            fontWeight: "600",
+                            marginTop: "0.25rem",
+                        }}
+                    >
+                        Be sure to check your spam folder.
+                    </ConfirmDescription>
+                </div>
+                <TextField
+                    label="Confirmation Code"
+                    size="small"
+                    required
+                    placeholder="123456"
+                    value={confirmationCode}
+                    onChange={(e) => {
+                        if (!(e.target.value.length > 6)) {
+                            setConfirmationCode(e.target.value);
+                        }
+                    }}
+                    error={!isValidCode && Boolean(confirmationCode)}
+                />
+            </StyledDialogContent>
+            <StyledDialogActions>
+                {canResend && (
+                    <BoldButton variant="outlined" onClick={handleResendCode}>
+                        Resend Confirmation Code
+                    </BoldButton>
+                )}
+                <BoldButton
+                    variant="contained"
+                    disabled={!isValidCode}
+                    onClick={handleConfirmEmail}
+                >
+                    Confirm Email
+                </BoldButton>
+            </StyledDialogActions>
+        </StyledDialog>
+    );
+};
+
+export default ConfirmationCodeDialog;

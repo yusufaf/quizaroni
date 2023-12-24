@@ -15,7 +15,7 @@ import {
 import { StyledLink } from "common/AppStyles";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import { useDispatch } from "react-redux";
-import { setCognitoUser } from "state/slices/globalSlice";
+import { setCognitoUser, setConfirmationCodeDialogProps } from "state/slices/globalSlice";
 import { signUp } from "@aws-amplify/auth";
 import PasswordValidator from "components/PasswordValidator/PasswordValidator";
 import { useCreateUserMutation } from "state/api/usersAPI";
@@ -84,6 +84,14 @@ const Signup = (props: Props) => {
                 email,
                 username,
             })
+
+            dispatch(
+                setConfirmationCodeDialogProps({
+                    open: true,
+                    actionType: "signUp",
+                    title: "Confirm Sign Up",
+                })
+            );
 
             /* Send user to confirm email page */
             navigate("/confirmEmail");

@@ -6,16 +6,17 @@ import NavBar from "views/NavBar/NavBar";
 import { useTheme } from "theme/useTheme";
 import { DARK, LIGHT } from "utilities/constants";
 import AppRoutes from "./AppRoutes";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import StudysetConfirmDialog from "components/StudysetConfirmDialog/StudysetConfirmDialog";
 import ManageLabelsDialog from "components/ManageLabelsDialog/ManageLabelsDialog";
+import ConfirmationCodeDialog from "components/ConfirmationCodeDialog/ConfirmationCodeDialog";
 
 const App = () => {
     const { setTheme, theme } = useTheme();
     const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
-    console.log("APP THEME = ", {theme})
+    console.log("APP THEME = ", { theme });
 
     useEffect(() => {
         prefersDarkMode ? setTheme(DARK) : setTheme(LIGHT);
@@ -27,11 +28,10 @@ const App = () => {
             <AppRoutes />
             <Footer />
             <FeedbackDialog />
-            <ToastContainer 
-                theme={theme}
-            />
+            <ToastContainer theme={theme} />
             <StudysetConfirmDialog />
-            <ManageLabelsDialog/>
+            <ManageLabelsDialog />
+            <ConfirmationCodeDialog />
         </>
     );
 };
