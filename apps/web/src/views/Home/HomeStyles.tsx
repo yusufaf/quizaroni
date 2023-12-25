@@ -107,6 +107,13 @@ export const CardBottom = styled(SpacedContainer)({});
 
 export const LabelChip = styled(Chip)({});
 
+export const CenteredTypography = styled(Typography)({
+    display: "flex",
+    gridColumn: "2",
+    alignItems: "center",
+    justifyContent: "center",
+})
+
 /* Actions Menu Styling */
 // export const
 

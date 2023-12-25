@@ -260,7 +260,9 @@ const CreateSet = (props: Props) => {
      */
     const updateCardValue = (index: number, property: string, value: any) => {
         const newCreatedSetCards = [...createdSetCards];
-        newCreatedSetCards[index][property] = value;
+        const newCard = {...newCreatedSetCards[index]};
+        newCard[property] = value;
+        newCreatedSetCards[index] = newCard;
         setCreatedSetCards(newCreatedSetCards);
     };
 
