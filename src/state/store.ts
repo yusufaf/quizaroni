@@ -4,8 +4,16 @@ import studySetsReducer from "state/slices/studysetsSlice";
 import viewSetsReducer from "state/slices/viewSetsSlice";
 import createSetReducer from "state/slices/createSetSlice";
 import api from "./api/api";
+import loggerMiddleware from "./middleware/logger";
 
-const {reducerPath: apiPath, reducer: apiReducer} = api;
+const isDevelopment = import.meta.env.DEV;
+
+const { reducerPath: apiPath, reducer: apiReducer } = api;
+
+const middlewares = [api.middleware];
+if (isDevelopment) {
+    middlewares.push(loggerMiddleware);
+}
 
 export const store = configureStore({
     reducer: {
@@ -16,9 +24,9 @@ export const store = configureStore({
         createSet: createSetReducer,
     },
     middleware: (getDefaultMiddleware) => {
-        return getDefaultMiddleware().concat(api.middleware);
+        return getDefaultMiddleware().concat(middlewares);
     },
-    devTools: process.env.NODE_ENV !== "production",
+    devTools: isDevelopment,
 });
 
 export type AppDispatch = typeof store.dispatch;
