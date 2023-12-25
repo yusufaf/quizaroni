@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Pagination } from "@mui/material";
-import { HomeSetGrid } from "./HomeStyles";
+import { CenteredTypography, HomeSetGrid } from "./HomeStyles";
 import { Studyset } from "lib/types";
 import HomeStudySetCard from "./HomeStudySetCard/HomeStudySetCard";
 
@@ -16,7 +16,10 @@ const HomeGridView = (props: Props) => {
 
     const [page, setPage] = useState<number>(1);
 
-    const onPageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+    const onPageChange = (
+        _event: React.ChangeEvent<unknown>,
+        value: number
+    ) => {
         setPage(value);
     };
 
@@ -31,13 +34,19 @@ const HomeGridView = (props: Props) => {
     return (
         <>
             <HomeSetGrid>
-                {paginatedStudySets.map((studyset) => (
-                    <HomeStudySetCard 
-                        key={studyset.uuid} 
-                        studyset={studyset} 
-                        handleShowConfirmDialog={handleShowConfirmDialog}
-                    />
-                ))}
+                {paginatedStudySets.length === 0 ? (
+                    <CenteredTypography>
+                        No results found
+                    </CenteredTypography>
+                ) : (
+                    paginatedStudySets.map((studyset) => (
+                        <HomeStudySetCard
+                            key={studyset.uuid}
+                            studyset={studyset}
+                            handleShowConfirmDialog={handleShowConfirmDialog}
+                        />
+                    ))
+                )}
             </HomeSetGrid>
             <Pagination onChange={onPageChange} count={numPages} page={page} />
         </>

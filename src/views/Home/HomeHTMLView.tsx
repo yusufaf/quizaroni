@@ -49,13 +49,7 @@ const HomeHTMLView = (props: Props) => {
                         </tr>
                     </HTMLTableThead>
                     <tbody>
-                        {[
-                            ...studysets,
-                            ...studysets,
-                            ...studysets,
-                            ...studysets,
-                            ...studysets,
-                        ].map((studyset) => {
+                        {studysets.map((studyset) => {
                             return (
                                 <tr>
                                     <td>{studyset.title}</td>
