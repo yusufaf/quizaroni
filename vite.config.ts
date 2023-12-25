@@ -5,36 +5,41 @@ import path from "path";
 // https://vitejs.dev/config/
 // TODO: https://vite-plugin-pwa.netlify.app/guide/#setup
 
-export default defineConfig({
-    define: {
-        global: {},
-    },
-    plugins: [
-        react(),
-        // VitePWA({ registerType: "autoUpdate" }),
-    ],
-    resolve: {
-        alias: {
-            src: path.resolve("src/"),
-            components: path.resolve("src/components/"),
-            views: path.resolve("src/views/"),
-            state: path.resolve("src/state/"),
-            lib: path.resolve("src/lib/"),
-            resources: path.resolve("src/resources/"),
-            utilities: path.resolve("src/utilities/"),
-            theme: path.resolve("src/lib/theme/"),
-            common: path.resolve("src/common/"),
+export default defineConfig(({ command, mode }) => {
+    const isDevelopment = mode === 'development';
+    const apiProxyURL = isDevelopment ? "http://localhost:5000/" : "https://quizaroni-api.onrender.com/"; 
+
+    return {
+        define: {
+            global: {},
         },
-    },
-    server: {
-        proxy: {
-            "/api": {
-                target: "http://localhost:5000/",
-                changeOrigin: true,
-                secure: false,
-                ws: true,
+        plugins: [
+            react(),
+            // VitePWA({ registerType: "autoUpdate" }),
+        ],
+        resolve: {
+            alias: {
+                src: path.resolve("src/"),
+                components: path.resolve("src/components/"),
+                views: path.resolve("src/views/"),
+                state: path.resolve("src/state/"),
+                lib: path.resolve("src/lib/"),
+                resources: path.resolve("src/resources/"),
+                utilities: path.resolve("src/utilities/"),
+                theme: path.resolve("src/lib/theme/"),
+                common: path.resolve("src/common/"),
             },
         },
-        port: 3000,
-    },
+        server: {
+            proxy: {
+                "/api": {
+                    target: apiProxyURL,
+                    changeOrigin: true,
+                    secure: false,
+                    ws: true,
+                },
+            },
+            port: 3000,
+        },
+    }
 });
