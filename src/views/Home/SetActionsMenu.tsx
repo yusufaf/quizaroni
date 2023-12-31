@@ -12,6 +12,7 @@ import {
     Delete as DeleteIcon,
     Favorite,
     FavoriteBorder,
+    OpenInNewRounded,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { Studyset } from "lib/types";
@@ -41,7 +42,7 @@ const SetActionsMenu = (props: Props) => {
         slotProps,
     } = props;
 
-    const { favorited = false, uuid = "" } = studyset ?? {};
+    const { favorited = false, uuid: studysetUUID = "" } = studyset ?? {};
 
     const [favoriteStudyset] = useFavoriteStudysetMutation();
 
@@ -58,10 +59,15 @@ const SetActionsMenu = (props: Props) => {
 
     const handleFavoriteAction = () => {
         favoriteStudyset({
-            studysetUUID: uuid,
+            studysetUUID,
             favorited: !favorited,
-        })
-    }
+        });
+    };
+
+    const handleViewInNewTab = () => {
+        // Doesn't seem like opening in new tab is possible with the useNavigate hook
+        window.open(`${window.location.origin}/view/${studysetUUID}`);
+    };
 
     return (
         <Menu
@@ -73,7 +79,7 @@ const SetActionsMenu = (props: Props) => {
             anchorPosition={anchorPosition}
             slotProps={slotProps}
         >
-            <MenuItem onClick={() => navigate(`/edit/${studyset?.uuid}`)}>
+            <MenuItem onClick={() => navigate(`/edit/${studysetUUID}`)}>
                 <ListItemIcon>
                     <EditIcon />
                 </ListItemIcon>
@@ -107,9 +113,7 @@ const SetActionsMenu = (props: Props) => {
                 </ListItemIcon>
                 <ListItemText>Delete</ListItemText>
             </MenuItem>
-            <MenuItem
-                onClick={handleFavoriteAction}
-            >
+            <MenuItem onClick={handleFavoriteAction}>
                 <ListItemIcon>
                     {favorited ? (
                         <Favorite color="primary" />
@@ -120,6 +124,12 @@ const SetActionsMenu = (props: Props) => {
                 <ListItemText>
                     {favorited ? "Unfavorite" : "Favorite"}
                 </ListItemText>
+            </MenuItem>
+            <MenuItem onClick={handleViewInNewTab}>
+                <ListItemIcon>
+                    <OpenInNewRounded />
+                </ListItemIcon>
+                <ListItemText>View in new tab</ListItemText>
             </MenuItem>
         </Menu>
     );

@@ -18,6 +18,7 @@ import { useDispatch } from "react-redux";
 import { setSelectedStudySet } from "state/slices/studysetsSlice";
 import { useNavigate } from "react-router-dom";
 import { Studyset } from "lib/types";
+import { GhostLink } from "common/AppStyles";
 
 type Props = {
     studyset: Studyset;
@@ -64,8 +65,11 @@ const HomeStudySetCard = (props: Props) => {
         <>
             <HomeSetCard raised onClick={onCardClick}>
                 <CardContent>
-                    <CardTitle title={title} variant="h6">
-                        {title}
+                    <CardTitle
+                        title={title}
+                        variant="h6"
+                    >
+                        <GhostLink to={`/view/${uuid}`}>{title}</GhostLink>
                     </CardTitle>
                     <Typography variant="subtitle1">
                         {`Created by ${username}`}

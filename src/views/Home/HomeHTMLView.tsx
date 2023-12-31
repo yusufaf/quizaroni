@@ -9,6 +9,7 @@ import { IconButton } from "@mui/material";
 import { MoreHoriz } from "@mui/icons-material";
 import { useState } from "react";
 import SetActionsMenu from "./SetActionsMenu";
+import { GhostLink } from "common/AppStyles";
 
 type Props = {
     studysets: Studyset[];
@@ -52,7 +53,13 @@ const HomeHTMLView = (props: Props) => {
                         {studysets.map((studyset) => {
                             return (
                                 <tr>
-                                    <td>{studyset.title}</td>
+                                    <td>
+                                        <GhostLink
+                                            to={`/view/${studyset.uuid}`}
+                                        >
+                                            {studyset.title}
+                                        </GhostLink>
+                                    </td>
                                     <td>{studyset.description}</td>
                                     <td>
                                         {new Date(
