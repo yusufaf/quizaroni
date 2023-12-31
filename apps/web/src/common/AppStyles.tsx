@@ -63,6 +63,15 @@ export const StyledLink = styled(Link)(({ theme }) => ({
     },
 }));
 
+export const GhostLink = styled(Link)(({ theme }) => ({
+    color: theme.palette.text.primary,
+    textDecoration: "none",
+    transition: "0.2s ease",
+    '&:hover': {
+        color: theme.palette.primary.main,
+    },
+}));
+
 export const StyledChromePicker = styled(ChromePicker)(({ theme }) => ({
     "&.chrome-picker": {
         background: `${theme.palette.background.paper} !important`,

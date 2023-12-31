@@ -1,5 +1,6 @@
 import {
     Button,
+    ButtonGroup,
     FormControl,
     IconButton,
     InputAdornment,
@@ -20,6 +21,12 @@ import {
     ArrowDownward,
     ArrowUpward,
     CloseRounded,
+    EditRounded,
+    DeleteRounded,
+    FavoriteRounded,
+    FavoriteBorderRounded,
+    ContentCopyRounded,
+    LabelRounded,
 } from "@mui/icons-material";
 import { HOME_LAYOUTS, SORT_DIRECTIONS } from "utilities/constants";
 import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
@@ -52,12 +59,13 @@ const HomeToolbar = (props: Props) => {
         sortDirection,
         setSortDirection,
         selectedStudysetRows,
-        selectedStudysetUUIDs
+        selectedStudysetUUIDs,
     } = props;
 
     const dispatch = useDispatch();
 
     const isTableView = selectedView === HOME_LAYOUTS.TABLE;
+    const firstStudyset = selectedStudysetRows[0];
 
     const onSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
         setSearchText(e.target.value);
@@ -156,9 +164,31 @@ const HomeToolbar = (props: Props) => {
                 </SimpleFlexContainer>
             )}
             {isTableView && selectedStudysetRows.length > 0 && (
-                <SimpleFlexContainer>
+                <SimpleFlexContainer style={{ gap: "1rem" }}>
+                    {!(selectedStudysetRows.length > 1) && (
+                        <>
+                            <Button startIcon={<EditRounded />}>Edit</Button>
+                            <Button
+                                startIcon={
+                                    firstStudyset?.favorited ? (
+                                        <FavoriteRounded color="primary" />
+                                    ) : (
+                                        <FavoriteBorderRounded />
+                                    )
+                                }
+                            >
+                                {firstStudyset?.favorited
+                                    ? "Unfavorite"
+                                    : "Favorite"}
+                            </Button>
+                        </>
+                    )}
+                    <Button startIcon={<ContentCopyRounded />}>
+                        Duplicate
+                    </Button>
+                    <Button startIcon={<DeleteRounded />}>Delete</Button>
                     <Button
-                        variant="outlined"
+                        startIcon={<LabelRounded />}
                         onClick={handleAssignLabelsClick}
                     >
                         Assign Labels
