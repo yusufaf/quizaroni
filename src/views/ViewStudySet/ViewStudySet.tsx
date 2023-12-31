@@ -40,8 +40,9 @@ import StudysetSettings from "./StudysetSettings/StudysetSettings";
 import ViewStudySetCard from "./ViewStudySetCard";
 import ViewStudysetFilters from "./ViewStudysetFilters/ViewStudysetFilters";
 import {
-    NoCardsMessage,
+    NoCardsMessage, 
     StudysetInfo,
+    UpdateCardsButton,
     ViewFlashsetPaper,
     ViewStudysetContainer,
     ViewStudysetHeader,
@@ -152,6 +153,10 @@ const ViewStudySet = (props: Props) => {
     const onDialogClose = () => {
         dispatch(setSelectedDialog(""));
     };
+
+    const handleUpdateCardsClick = () => {
+        navigate(`/edit/${studysetUUID}`);
+    }
 
     return (
         <>
@@ -275,6 +280,12 @@ const ViewStudySet = (props: Props) => {
                         );
                     })
                 )}
+                <UpdateCardsButton
+                    variant="contained"
+                    onClick={handleUpdateCardsClick}
+                >
+                    Update Cards
+                </UpdateCardsButton>
                 <NotesDrawer selectedStudyset={selectedStudyset} />
             </ViewStudysetPage>
             <NotificationsDialog
