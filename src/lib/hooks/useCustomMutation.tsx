@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import { UseMutation } from "@reduxjs/toolkit/dist/query/react/buildHooks";
 
 type UseCustomMutationProps = {
-    mutation: any;
+    mutation: UseMutation<any>;
     successMessage: string;
     errorMessage: string;
     onSuccess?: () => void;

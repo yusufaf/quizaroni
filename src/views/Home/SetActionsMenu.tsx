@@ -18,13 +18,14 @@ import { useNavigate } from "react-router-dom";
 import { Studyset } from "lib/types";
 import { STUDYSET_CONFIRM_DIALOGS } from "utilities/constants";
 import { useFavoriteStudysetMutation } from "state/api/studysetsAPI";
+import { showConfirmDialog } from "state/slices/globalSlice";
+import { useDispatch } from "react-redux";
 
 type Props = {
     studyset: Studyset | null;
     open: boolean;
     onClose: any;
     anchorEl: any;
-    handleShowConfirmDialog: any;
     anchorReference?: PopoverReference;
     anchorPosition?: PopoverPosition;
     slotProps?: any;
@@ -36,7 +37,6 @@ const SetActionsMenu = (props: Props) => {
         open,
         onClose,
         anchorEl,
-        handleShowConfirmDialog,
         anchorReference,
         anchorPosition,
         slotProps,
@@ -45,16 +45,23 @@ const SetActionsMenu = (props: Props) => {
     const { favorited = false, uuid: studysetUUID = "" } = studyset ?? {};
 
     const [favoriteStudyset] = useFavoriteStudysetMutation();
-
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleConfirmAction = (
         e: React.MouseEvent<HTMLLIElement, MouseEvent>,
         action: string,
-        studyset: Studyset | null
+        studyset: Studyset
     ) => {
         e.stopPropagation();
-        handleShowConfirmDialog(action, studyset);
+
+        console.log("Props before calling = ", {
+            action, studyset
+        })
+        dispatch(showConfirmDialog({
+            type: action,
+            studysets: [studyset],
+        }));
     };
 
     const handleFavoriteAction = () => {

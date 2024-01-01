@@ -28,12 +28,21 @@ import {
     ContentCopyRounded,
     LabelRounded,
 } from "@mui/icons-material";
-import { HOME_LAYOUTS, SORT_DIRECTIONS } from "utilities/constants";
+import {
+    HOME_LAYOUTS,
+    SORT_DIRECTIONS,
+    STUDYSET_CONFIRM_DIALOGS,
+} from "utilities/constants";
 import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { SortDirection, Studyset } from "lib/types";
-import { setLabelsDialogProps } from "state/slices/globalSlice";
+import {
+    setLabelsDialogProps,
+    showConfirmDialog,
+} from "state/slices/globalSlice";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useFavoriteStudysetMutation } from "state/api/studysetsAPI";
 
 type Props = {
     handleViewChange: (_event: any, newView: string | null) => void;
@@ -63,9 +72,13 @@ const HomeToolbar = (props: Props) => {
     } = props;
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const [favoriteStudyset] = useFavoriteStudysetMutation();
 
     const isTableView = selectedView === HOME_LAYOUTS.TABLE;
     const firstStudyset = selectedStudysetRows[0];
+    const multipleStudysetsSelected = selectedStudysetRows.length > 1;
 
     const onSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
         setSearchText(e.target.value);
@@ -83,6 +96,40 @@ const HomeToolbar = (props: Props) => {
         const { ASC, DSC } = SORT_DIRECTIONS;
         const newSortDirection = sortDirection === ASC ? DSC : ASC;
         setSortDirection(newSortDirection);
+    };
+
+    /* ==== Table View: Studyset Action Buttons ==== */
+    const handleEditClick = () => {
+        if (!firstStudyset) {
+            return;
+        }
+        navigate(`/edit/${firstStudyset.uuid}`);
+    };
+
+    const handleFavoriteClick = () => {
+        if (!firstStudyset) {
+            return;
+        }
+        const { uuid: studysetUUID, favorited: oldFavorited } = firstStudyset;
+        favoriteStudyset({
+            studysetUUID,
+            favorited: !oldFavorited,
+        });
+    };
+
+    /**
+     * Handles delete or duplicate
+     */
+    const handleMassActionClick = (type: string) => {
+        const modifiedType = multipleStudysetsSelected
+            ? `${type}_MULTIPLE`
+            : type;
+        dispatch(
+            showConfirmDialog({
+                type: modifiedType,
+                studysets: selectedStudysetRows,
+            })
+        );
     };
 
     const handleAssignLabelsClick = () => {
@@ -167,7 +214,12 @@ const HomeToolbar = (props: Props) => {
                 <SimpleFlexContainer style={{ gap: "1rem" }}>
                     {!(selectedStudysetRows.length > 1) && (
                         <>
-                            <Button startIcon={<EditRounded />}>Edit</Button>
+                            <Button
+                                startIcon={<EditRounded />}
+                                onClick={handleEditClick}
+                            >
+                                Edit
+                            </Button>
                             <Button
                                 startIcon={
                                     firstStudyset?.favorited ? (
@@ -176,6 +228,7 @@ const HomeToolbar = (props: Props) => {
                                         <FavoriteBorderRounded />
                                     )
                                 }
+                                onClick={handleFavoriteClick}
                             >
                                 {firstStudyset?.favorited
                                     ? "Unfavorite"
@@ -183,10 +236,26 @@ const HomeToolbar = (props: Props) => {
                             </Button>
                         </>
                     )}
-                    <Button startIcon={<ContentCopyRounded />}>
+                    <Button
+                        startIcon={<ContentCopyRounded />}
+                        onClick={() =>
+                            handleMassActionClick(
+                                STUDYSET_CONFIRM_DIALOGS.DUPLICATE
+                            )
+                        }
+                    >
                         Duplicate
                     </Button>
-                    <Button startIcon={<DeleteRounded />}>Delete</Button>
+                    <Button
+                        startIcon={<DeleteRounded />}
+                        onClick={() =>
+                            handleMassActionClick(
+                                STUDYSET_CONFIRM_DIALOGS.DELETE
+                            )
+                        }
+                    >
+                        Delete
+                    </Button>
                     <Button
                         startIcon={<LabelRounded />}
                         onClick={handleAssignLabelsClick}

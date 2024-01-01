@@ -15,7 +15,7 @@ import {
 import { ArrowBack, ArrowForward, VolumeUp } from '@mui/icons-material/';
 import { useTheme } from "theme/useTheme";
 import { ViewFlashCardActions } from "./ViewFlashSetStyles";
-import ConfirmDialog from "components/StudysetConfirmDialog/StudysetConfirmDialog";
+import ConfirmDialog from "components/GlobalConfirmDialog/GlobalConfirmDialog";
 import {
     StudyElements
 } from "../ViewStudySet/StudyModeStyles";

@@ -6,13 +6,12 @@ import HomeStudySetCard from "./HomeStudySetCard/HomeStudySetCard";
 
 type Props = {
     studysets: Studyset[];
-    handleShowConfirmDialog: any;
 };
 
 const cardsPerPage = 6;
 
 const HomeGridView = (props: Props) => {
-    const { studysets, handleShowConfirmDialog } = props;
+    const { studysets } = props;
 
     const [page, setPage] = useState<number>(1);
 
@@ -43,7 +42,6 @@ const HomeGridView = (props: Props) => {
                         <HomeStudySetCard
                             key={studyset.uuid}
                             studyset={studyset}
-                            handleShowConfirmDialog={handleShowConfirmDialog}
                         />
                     ))
                 )}

@@ -22,11 +22,10 @@ import { GhostLink } from "common/AppStyles";
 
 type Props = {
     studyset: Studyset;
-    handleShowConfirmDialog: any;
 };
 
 const HomeStudySetCard = (props: Props) => {
-    const { studyset, handleShowConfirmDialog } = props;
+    const { studyset } = props;
 
     const {
         cards,
@@ -119,7 +118,6 @@ const HomeStudySetCard = (props: Props) => {
                 open={actionsMenuOpen}
                 onClose={closeActionsMenu}
                 anchorEl={anchorEl}
-                handleShowConfirmDialog={handleShowConfirmDialog}
             />
         </>
     );

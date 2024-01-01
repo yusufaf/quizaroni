@@ -17,7 +17,7 @@ import {
 } from "state/api/studysetsAPI";
 import {
     selectCognitoUser,
-    setDialogProps,
+    setConfirmDialogProps,
     setLabelsDialogProps,
 } from "state/slices/globalSlice";
 import {
