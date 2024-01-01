@@ -44,8 +44,8 @@ export const FlexDialogTitle = styled(DialogTitle)({
 
 export const StyledDialogActions = styled(DialogActions)({
     margin: "0 1rem 1rem 0",
+    gap: "0.5rem",
 });
-
 
 export const RightAlignedCloseButton = styled(IconButton)(
     {

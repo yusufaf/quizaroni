@@ -20,7 +20,7 @@ export default function useFilterViewCards(props: UseFilterViewCardsProps) {
                 });
             default:
                 return [...sortedViewFlashCards].filter((value) => {
-                    return value.categories.includes(selectedTab);
+                    return (value.categories ?? []).includes(selectedTab);
                 });
         }
     }, [selectedTab, sortedViewFlashCards]);

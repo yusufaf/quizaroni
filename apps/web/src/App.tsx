@@ -8,7 +8,7 @@ import { DARK, LIGHT } from "utilities/constants";
 import AppRoutes from "./AppRoutes";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import StudysetConfirmDialog from "components/StudysetConfirmDialog/StudysetConfirmDialog";
+import GlobalConfirmDialog from "components/GlobalConfirmDialog/GlobalConfirmDialog";
 import ManageLabelsDialog from "components/ManageLabelsDialog/ManageLabelsDialog";
 import ConfirmationCodeDialog from "components/ConfirmationCodeDialog/ConfirmationCodeDialog";
 
@@ -29,7 +29,7 @@ const App = () => {
             <Footer />
             <FeedbackDialog />
             <ToastContainer theme={theme} />
-            <StudysetConfirmDialog />
+            <GlobalConfirmDialog />
             <ManageLabelsDialog />
             <ConfirmationCodeDialog />
         </>

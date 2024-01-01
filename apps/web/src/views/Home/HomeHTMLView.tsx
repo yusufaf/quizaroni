@@ -13,11 +13,10 @@ import { GhostLink } from "common/AppStyles";
 
 type Props = {
     studysets: Studyset[];
-    handleShowConfirmDialog: any;
 };
 
 const HomeHTMLView = (props: Props) => {
-    const { studysets, handleShowConfirmDialog } = props;
+    const { studysets } = props;
 
     const [localSelectedStudyset, setLocalSelectedStudyset] =
         useState<Studyset | null>(null);
@@ -103,7 +102,6 @@ const HomeHTMLView = (props: Props) => {
                 open={actionsMenuOpen}
                 onClose={closeActionsMenu}
                 anchorEl={anchorEl}
-                handleShowConfirmDialog={handleShowConfirmDialog}
             />
         </>
     );

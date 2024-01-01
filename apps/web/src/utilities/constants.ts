@@ -1,4 +1,4 @@
-import type { SortDirection, User } from "lib/types";
+import type { ConfirmDialogProps, SortDirection, User } from "lib/types";
 import type { InitialCard } from "lib/types";
 import { v4 as uuidv4 } from "uuid";
 
@@ -135,9 +135,18 @@ export const PWD_REGEX = {
 // https://bobbyhadz.com/blog/react-check-if-email-is-valid
 export const EMAIL_REGEX = /\S+@\S+\.\S+/;
 
+export const INITIAL_CONFIRM_DIALOG_PROPS: ConfirmDialogProps = {
+    open: false,
+    title: "",
+    type: "",
+    dialogMessage: "",
+};
+
 export const STUDYSET_CONFIRM_DIALOGS = {
     DELETE: "DELETE",
     DUPLICATE: "DUPLICATE",
+    DELETE_MULTIPLE: "DELETE_MULTIPLE",
+    DUPLICATE_MULTIPLE: "DUPLICATE_MULTIPLE",
 };
 
 export const STUDYSET_CONFIRM_DIALOG_PROPS = new Map([
@@ -148,6 +157,14 @@ export const STUDYSET_CONFIRM_DIALOG_PROPS = new Map([
     [STUDYSET_CONFIRM_DIALOGS.DUPLICATE, {
         title: `Duplicate the study set`,
         dialogMessage: `Are you sure you want to duplicate this set?`
+    }],
+    [STUDYSET_CONFIRM_DIALOGS.DELETE_MULTIPLE, {
+        title: `Delete multiple study sets?`,
+        dialogMessage: `The following sets will be deleted:`
+    }],
+    [STUDYSET_CONFIRM_DIALOGS.DUPLICATE_MULTIPLE, {
+        title: `Duplicate multiple study sets?`,
+        dialogMessage: `The following sets will be duplicated:`
     }],
 ])
 
