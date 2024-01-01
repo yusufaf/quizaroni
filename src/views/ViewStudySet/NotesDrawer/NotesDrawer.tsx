@@ -150,7 +150,7 @@ const NotesDrawer = (props: Props) => {
         </>
     ) : (
         <StyledDrawer
-            variant="persistent"
+            variant="permanent"
             anchor="right"
             open={true}
             transitionDuration={{

@@ -32,7 +32,7 @@ import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setSelectedDialog } from "state/slices/viewSetsSlice";
 import CustomIconButton from "components/CustomIconButton/CustomIconButton";
-import { setDialogProps } from "state/slices/globalSlice";
+import { setConfirmDialogProps } from "state/slices/globalSlice";
 import ControlMenu from "./ControlMenu";
 
 type Props = {
@@ -94,7 +94,7 @@ const StudysetActions = (props: Props) => {
                 uuid: selectedStudyset?.uuid ?? "",
             },
         };
-        dispatch(setDialogProps(dialogProps));
+        dispatch(setConfirmDialogProps(dialogProps));
     };
 
     /*

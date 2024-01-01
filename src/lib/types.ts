@@ -204,6 +204,7 @@ export type ConfirmDialogProps = {
     open: boolean;
     title: string;
     type: string;
+    props?: any;
 };
 
 // export type ViewSetDialog =

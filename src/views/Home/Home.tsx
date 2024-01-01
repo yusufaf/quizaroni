@@ -7,7 +7,7 @@ import {
     GridToolbar,
 } from "@mui/x-data-grid";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import { HomeView, SortDirection, Studyset } from "lib/types";
+import { ConfirmDialogProps, HomeView, SortDirection, Studyset } from "lib/types";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +19,7 @@ import {
 import {
     selectAuthenticated,
     selectCognitoUser,
-    setDialogProps,
+    setConfirmDialogProps,
 } from "state/slices/globalSlice";
 import { setSelectedStudySet } from "state/slices/studysetsSlice";
 import { useTheme } from "theme/useTheme";
@@ -28,6 +28,7 @@ import {
     DEFAULT_USER_DATA,
     HOME_LAYOUTS,
     SORT_DIRECTIONS,
+    STUDYSET_CONFIRM_DIALOGS,
 } from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";
 import HomeGridView from "./HomeGridView";
@@ -93,7 +94,9 @@ const Home = (props: Props) => {
         SORT_DIRECTIONS.DSC
     );
 
-    const [selectedView, setSelectedView] = useState<HomeView>(localStorage.getItem("homeView") ?? "table");
+    const [selectedView, setSelectedView] = useState<HomeView>(
+        (localStorage.getItem("homeView") as HomeView) ?? "table"
+    );
 
     const [contextMenuStudyset, setContextMenuStudyset] =
         useState<Studyset | null>(null);
@@ -110,22 +113,11 @@ const Home = (props: Props) => {
     const [rowSelectionModel, setRowSelectionModel] =
         useState<GridRowSelectionModel>([]);
 
-    const selectedStudysetRows: Studyset[] = rowSelectionModel.map((studysetUUID) => studysets.find((studyset) => studyset.uuid === studysetUUID)).filter(Boolean);
-
-    const handleShowConfirmDialog = (type: string, studyset: Studyset) => {
-        const { title: titlePrefix, dialogMessage } =
-            STUDYSET_CONFIRM_DIALOG_PROPS.get(type)!;
-        const dialogProps = {
-            dialogMessage,
-            title: `${titlePrefix} ${studyset.title}?`,
-            open: true,
-            type,
-            props: {
-                uuid: studyset.uuid,
-            },
-        };
-        dispatch(setDialogProps(dialogProps));
-    };
+    const selectedStudysetRows: Studyset[] = rowSelectionModel
+        .map((studysetUUID) =>
+            studysets.find((studyset) => studyset.uuid === studysetUUID)
+        )
+        .filter(Boolean) as Studyset[];
 
     // Store a reference to the HTML file <input>
     const fileInput = useRef(null);
@@ -256,8 +248,6 @@ const Home = (props: Props) => {
         }
     }, [studysets]);
 
-    console.log("HOME VIEW = ", { searchText, studysets });
-
     /* ==== Searching & Filtering for Grid/Table View ==== */
     const sortedStudysets = useSortStudysets({
         sortDirection,
@@ -274,8 +264,6 @@ const Home = (props: Props) => {
     if (!authenticated) {
         return <LoginMessage page="home" />;
     }
-
-    console.log({rowSelectionModel})
 
     return (
         <HomePage>
@@ -294,7 +282,7 @@ const Home = (props: Props) => {
                         setSortDirection={setSortDirection}
                         sortDirection={sortDirection}
                         selectedStudysetRows={selectedStudysetRows}
-                        selectedStudysetUUIDs={rowSelectionModel}
+                        selectedStudysetUUIDs={rowSelectionModel as string[]}
                     />
                     <HomeSetsContainer>
                         {selectedView === HOME_LAYOUTS.TABLE && (
@@ -353,26 +341,17 @@ const Home = (props: Props) => {
                                     }}
                                     studyset={contextMenuStudyset}
                                     anchorEl={null}
-                                    handleShowConfirmDialog={
-                                        handleShowConfirmDialog
-                                    }
                                 />
                             </>
                         )}
                         {selectedView === HOME_LAYOUTS.GRID && (
                             <HomeGridView
                                 studysets={searchedStudysets}
-                                handleShowConfirmDialog={
-                                    handleShowConfirmDialog
-                                }
                             />
                         )}
                         {selectedView === HOME_LAYOUTS.HTML && (
                             <HomeHTMLView
                                 studysets={searchedStudysets}
-                                handleShowConfirmDialog={
-                                    handleShowConfirmDialog
-                                }
                             />
                         )}
                     </HomeSetsContainer>

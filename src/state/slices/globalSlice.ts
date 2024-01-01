@@ -1,11 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ConfirmDialogProps, Studyset } from "lib/types";
 import { RootState } from "state/store";
+import {
+    STUDYSET_CONFIRM_DIALOG_PROPS,
+    STUDYSET_CONFIRM_DIALOGS,
+    INITIAL_CONFIRM_DIALOG_PROPS
+} from "utilities/constants";
 
 type GlobalSliceState = {
     authenticated: boolean;
     cognitoUser: any;
     dialogOpen: boolean;
-    dialogProps: any;
+    confirmDialogProps: ConfirmDialogProps;
     feedbackDialogOpen: boolean;
     namedColorsDialogProps: any;
     userAuthInfo: any;
@@ -18,7 +24,7 @@ const initialState: GlobalSliceState = {
     authenticated: false,
     cognitoUser: {},
     dialogOpen: false,
-    dialogProps: {},
+    confirmDialogProps: {...INITIAL_CONFIRM_DIALOG_PROPS},
     feedbackDialogOpen: false,
     namedColorsDialogProps: {},
     userAuthInfo: {},
@@ -48,8 +54,66 @@ export const globalSlice = createSlice({
         setUserData: (state, action: PayloadAction<any>) => {
             state.userData = action.payload;
         },
-        setDialogProps: (state, action: PayloadAction<any>) => {
-            state.dialogProps = action.payload;
+        setConfirmDialogProps: (state, action: PayloadAction<any>) => {
+            state.confirmDialogProps = action.payload;
+        },
+        // TODO: Could possibly rename to showStudysetConfirmDialog
+        showConfirmDialog: (
+            state,
+            action: PayloadAction<{ type: string; studysets: Studyset[] }>
+        ) => {
+            console.log("Entered showConfirmDialog with = ", {
+                state,
+                action
+            })
+            const { type, studysets } = action.payload;
+            const initialProps = STUDYSET_CONFIRM_DIALOG_PROPS.get(type)!;
+            const { title, dialogMessage } = initialProps;
+
+            let dialogProps: ConfirmDialogProps = {
+                open: true,
+                title: "",
+                type,
+            };
+
+            switch (type) {
+                case STUDYSET_CONFIRM_DIALOGS.DELETE:
+                case STUDYSET_CONFIRM_DIALOGS.DUPLICATE: {
+                    const studyset = studysets[0];
+                    dialogProps = {
+                        ...dialogProps,
+                        dialogMessage,
+                        title: `${title} ${studyset.title}?`,
+                        props: {
+                            uuid: studyset.uuid,
+                        },
+                    };
+                    break;
+                }
+                case STUDYSET_CONFIRM_DIALOGS.DELETE_MULTIPLE:
+                case STUDYSET_CONFIRM_DIALOGS.DUPLICATE_MULTIPLE: {
+                    const studysetUUIDs: string[] = [];
+                    const messages: string[] = []
+                    for (const studyset of studysets) {
+                        messages.push(studyset.title)
+                        studysetUUIDs.push(studyset.uuid);
+                    }
+
+                    dialogProps = {
+                        ...dialogProps,
+                        dialogMessage,
+                        title,
+                        props: {
+                            studysetUUIDs,
+                            messages,
+                        },
+                    };
+                    break;
+                }
+            }
+
+            // Update the confirmDialogProps state
+            state.confirmDialogProps = dialogProps;
         },
         setNamedColorsDialogProps: (state, action: PayloadAction<any>) => {
             state.namedColorsDialogProps = action.payload;
@@ -70,13 +134,14 @@ export const {
     setAuthenticated,
     setCognitoUser,
     setDialogOpen,
-    setDialogProps,
+    setConfirmDialogProps,
     setFeedbackDialogOpen,
     setNamedColorsDialogProps,
     setUserAuthState,
     setUserData,
     setLabelsDialogProps,
-    setConfirmationCodeDialogProps
+    setConfirmationCodeDialogProps,
+    showConfirmDialog,
 } = globalSlice.actions;
 
 /* Selectors */
@@ -89,8 +154,8 @@ export const selectCognitoUser = (state: RootState) =>
 export const selectAuthenticated = (state: RootState) =>
     state[sliceName].authenticated;
 export const selectUserData = (state: RootState) => state[sliceName].userData;
-export const selectDialogProps = (state: RootState) =>
-    state[sliceName].dialogProps;
+export const selectConfirmDialogProps = (state: RootState) =>
+    state[sliceName].confirmDialogProps;
 export const selectNamedColorsDialogProps = (state: RootState) =>
     state[sliceName].namedColorsDialogProps;
 export const selectFeedbackDialogOpen = (state: RootState) =>
@@ -99,6 +164,5 @@ export const selectLabelsDialogProps = (state: RootState) =>
     state[sliceName].labelsDialogProps;
 export const selectConfirmationCodeDialogProps = (state: RootState) =>
     state[sliceName].confirmationCodeDialogProps;
-
 
 export default globalSlice.reducer;
