@@ -51,13 +51,13 @@ const SetActionsMenu = (props: Props) => {
     const handleConfirmAction = (
         e: React.MouseEvent<HTMLLIElement, MouseEvent>,
         action: string,
-        studyset: Studyset
     ) => {
         e.stopPropagation();
+        
+        if (!studyset) {
+            return;
+        }
 
-        console.log("Props before calling = ", {
-            action, studyset
-        })
         dispatch(showConfirmDialog({
             type: action,
             studysets: [studyset],
@@ -96,8 +96,7 @@ const SetActionsMenu = (props: Props) => {
                 onClick={(e) =>
                     handleConfirmAction(
                         e,
-                        STUDYSET_CONFIRM_DIALOGS.DUPLICATE,
-                        studyset
+                        STUDYSET_CONFIRM_DIALOGS.DUPLICATE
                     )
                 }
             >
@@ -110,8 +109,7 @@ const SetActionsMenu = (props: Props) => {
                 onClick={(e) =>
                     handleConfirmAction(
                         e,
-                        STUDYSET_CONFIRM_DIALOGS.DELETE,
-                        studyset
+                        STUDYSET_CONFIRM_DIALOGS.DELETE
                     )
                 }
             >
