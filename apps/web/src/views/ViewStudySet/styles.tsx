@@ -1,15 +1,14 @@
-import { styled } from "@mui/system";
 import {
-    Box,
     Card,
-    FormControl,
-    Paper,
-    Tabs,
-    Typography,
-    Tab,
     Chip,
     DialogContent,
+    FormControl,
+    Paper,
+    Tab,
+    Tabs,
+    Typography,
 } from "@mui/material";
+import { styled } from "@mui/system";
 import {
     BasePage,
     BoldButton,
@@ -28,25 +27,45 @@ export const ViewStudysetPage = styled(BasePage)({
 
 export const ViewFlashsetPaper = styled(Paper)({});
 
-export const ViewStudysetContainer = styled(Box)({
+export const ViewStudysetContainer = styled("div")({
     gridRow: "1",
     height: "25rem",
-    // width: "70rem",
     padding: "1rem 1.25rem",
     borderRadius: "0.75rem",
 });
 
-export const ViewStudysetHeader = styled(Box)({
+export const ViewStudysetHeader = styled("div")({
     display: "grid",
     gridTemplateColumns: "30rem auto",
+    height: "100%",
 });
 
 export const StudysetInfo = styled("div")(({ theme }) => ({
+    height: "100%",
+    paddingRight: "0.5rem",
     borderRight: `0.1rem solid ${theme.palette.text.primary}`,
     overflowY: "auto",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
 }));
 
-export const StudyModeGrid = styled(Box)({
+export const StudysetDescription = styled(Typography)(({ theme }) => ({
+    flex: 1,
+    margin: "1rem 0",
+    maxHeight: "10rem",
+    overflowY: "auto",
+    overflowX: "hidden",
+    "&::-webkit-scrollbar": {
+        width: "0.5rem",
+    },
+    "&::-webkit-scrollbar-thumb": {
+        background: theme.palette.grey[500],
+        borderRadius: "0.25rem",
+    },
+}));
+
+export const StudyModeGrid = styled("div")({
     marginTop: "1rem",
     display: "grid",
     gridTemplateColumns: "15rem 15rem",
@@ -125,7 +144,7 @@ export const UpdateCardsButton = styled(BoldButton)({
     alignSelf: "center",
     width: "25%",
     textTransform: "none",
-    fontSize: "1rem"
+    fontSize: "1rem",
 });
 
 export const StudyModeOption = styled("div")(({ theme }) => ({

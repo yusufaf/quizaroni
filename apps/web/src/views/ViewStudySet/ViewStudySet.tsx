@@ -17,7 +17,6 @@ import {
 } from "state/api/studysetsAPI";
 import {
     selectCognitoUser,
-    setConfirmDialogProps,
     setLabelsDialogProps,
 } from "state/slices/globalSlice";
 import {
@@ -41,6 +40,7 @@ import ViewStudySetCard from "./ViewStudySetCard";
 import ViewStudysetFilters from "./ViewStudysetFilters/ViewStudysetFilters";
 import {
     NoCardsMessage, 
+    StudysetDescription, 
     StudysetInfo,
     UpdateCardsButton,
     ViewFlashsetPaper,
@@ -163,7 +163,7 @@ const ViewStudySet = (props: Props) => {
             <ViewStudysetPage>
                 <ViewFlashsetPaper elevation={6}>
                     <ViewStudysetContainer>
-                        <ViewStudysetHeader>
+                        <ViewStudysetHeader id="viewStudysetHeader">
                             <StudysetInfo>
                                 <Button
                                     onClick={handleBackClick}
@@ -204,13 +204,13 @@ const ViewStudySet = (props: Props) => {
                                         onClick={showManageLabelsDialog}
                                     />
                                 </Tooltip>
-                                <Typography variant="body1">
+                                <StudysetDescription variant="body1">
                                     {isStudySetLoading ? (
                                         <Skeleton />
                                     ) : (
                                         <>{selectedStudyset?.description}</>
                                     )}
-                                </Typography>
+                                </StudysetDescription>
                                 <StudysetActions
                                     updateMetadataField={updateMetadataField}
                                     selectedStudyset={selectedStudyset}
