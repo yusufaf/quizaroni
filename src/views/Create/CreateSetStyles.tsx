@@ -1,23 +1,22 @@
-import { styled } from "@mui/system";
+import { AddCircleOutline } from "@mui/icons-material";
 import {
     Button,
     Card,
+    IconButton,
+    MenuItem,
     Paper,
     Select,
     TextField,
-    TextareaAutosize,
-    Typography,
-    IconButton,
-    MenuItem,
+    Typography
 } from "@mui/material";
-import { AddCircleOutline } from "@mui/icons-material";
+import { styled } from "@mui/system";
 import {
     BasePage,
+    BoldButton,
     FlexColumn,
-    SpacedFlexContainer,
     SimpleFlexContainer,
+    SpacedFlexContainer,
 } from "common/AppStyles";
-import { ChromePicker } from "react-color";
 
 export const CreateSetPage = styled(BasePage)({
     marginTop: "0",
@@ -80,7 +79,7 @@ export const LabelInput = styled(TextField)({
     width: "18rem",
 });
 
-export const PageMainButton = styled(Button)({});
+export const PageMainButton = styled(BoldButton)({});
 
 export const AdvancedSection = styled(FlexColumn)({});
 

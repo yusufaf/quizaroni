@@ -1,13 +1,5 @@
 import {
-    FormControlLabel,
-    IconButton,
-    Menu,
-    MenuItem,
-    Switch,
-    Typography,
-    Tooltip,
-} from "@mui/material/";
-import {
+    ContentCopyRounded,
     Delete,
     Download,
     Edit,
@@ -18,21 +10,24 @@ import {
     Share,
 } from "@mui/icons-material/";
 import {
-    STUDYSET_CONFIRM_DIALOGS,
-    DISABLED,
-    ENABLED,
-    SET_METADATA_FIELDS,
-    VIEW_SET_DIALOGS,
-} from "utilities/constants";
-import { useTheme } from "theme/useTheme";
-import { ActionButtonsRow } from "../styles";
-import { useNavigate, useParams } from "react-router-dom";
+    IconButton,
+    Tooltip
+} from "@mui/material/";
+import CustomIconButton from "components/CustomIconButton/CustomIconButton";
 import { Studyset } from "lib/types";
 import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+    showConfirmDialog
+} from "state/slices/globalSlice";
 import { setSelectedDialog } from "state/slices/viewSetsSlice";
-import CustomIconButton from "components/CustomIconButton/CustomIconButton";
-import { setConfirmDialogProps } from "state/slices/globalSlice";
+import { useTheme } from "theme/useTheme";
+import {
+    STUDYSET_CONFIRM_DIALOGS,
+    VIEW_SET_DIALOGS
+} from "utilities/constants";
+import { ActionButtonsRow } from "../styles";
 import ControlMenu from "./ControlMenu";
 
 type Props = {
@@ -41,10 +36,7 @@ type Props = {
 };
 
 const StudysetActions = (props: Props) => {
-    const {
-        updateMetadataField,
-        selectedStudyset,
-    } = props;
+    const { updateMetadataField, selectedStudyset } = props;
 
     const { theme } = useTheme();
     const navigate = useNavigate();
@@ -81,20 +73,19 @@ const StudysetActions = (props: Props) => {
     };
 
     /**
-     * Displays the confirmation dialog for deleting a studyset
-     * @returns {void}
+     * Displays the confirmation dialog for deleting or duplicating a studyset
      */
-    const handleDeleteStudyset = () => {
-        const dialogProps = {
-            open: true,
-            title: "Delete this study set?",
-            dialogMessage: "Are you sure you want to delete this set?",
-            type: STUDYSET_CONFIRM_DIALOGS.DELETE,
-            props: {
-                uuid: selectedStudyset?.uuid ?? "",
-            },
-        };
-        dispatch(setConfirmDialogProps(dialogProps));
+    const handleConfirmAction = (action: string) => {
+        if (!selectedStudyset) {
+            return;
+        }
+
+        dispatch(
+            showConfirmDialog({
+                type: action,
+                studysets: [selectedStudyset],
+            })
+        );
     };
 
     /*
@@ -151,7 +142,17 @@ const StudysetActions = (props: Props) => {
                     title={"Delete Study Set"}
                     color="primary"
                     icon={<Delete />}
-                    onClick={() => handleDeleteStudyset()}
+                    onClick={() =>
+                        handleConfirmAction(STUDYSET_CONFIRM_DIALOGS.DELETE)
+                    }
+                />
+                <CustomIconButton
+                    title={"Duplicate Study Set"}
+                    color="primary"
+                    icon={<ContentCopyRounded />}
+                    onClick={() =>
+                        handleConfirmAction(STUDYSET_CONFIRM_DIALOGS.DUPLICATE)
+                    }
                 />
                 <CustomIconButton
                     title={"Study Set Settings"}

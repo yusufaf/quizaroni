@@ -1,3 +1,4 @@
+import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import {
     GridColDef,
     GridEventListener,
@@ -6,8 +7,16 @@ import {
     GridSortModel,
     GridToolbar,
 } from "@mui/x-data-grid";
+import { GhostLink, SimpleFlexContainer } from "common/AppStyles";
+import NoCardsWarningsIcon from "components/NoCardsWarningsIcon/NoCardsWarningsIcon";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import { ConfirmDialogProps, HomeView, SortDirection, Studyset } from "lib/types";
+import useFilterStudysets from "lib/hooks/useFilterStudysets";
+import useSortStudysets from "lib/hooks/useSortStudysets";
+import {
+    HomeView,
+    SortDirection,
+    Studyset
+} from "lib/types";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -18,20 +27,18 @@ import {
 } from "state/api/usersAPI";
 import {
     selectAuthenticated,
-    selectCognitoUser,
-    setConfirmDialogProps,
+    selectCognitoUser
 } from "state/slices/globalSlice";
 import { setSelectedStudySet } from "state/slices/studysetsSlice";
 import { useTheme } from "theme/useTheme";
 import {
-    STUDYSET_CONFIRM_DIALOG_PROPS,
     DEFAULT_USER_DATA,
     HOME_LAYOUTS,
-    SORT_DIRECTIONS,
-    STUDYSET_CONFIRM_DIALOGS,
+    SORT_DIRECTIONS
 } from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";
 import HomeGridView from "./HomeGridView";
+import HomeHTMLView from "./HomeHTMLView";
 import {
     HomeContainer,
     HomePage,
@@ -42,12 +49,6 @@ import {
 } from "./HomeStyles";
 import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
-import HomeHTMLView from "./HomeHTMLView";
-import { Favorite, FavoriteBorder } from "@mui/icons-material";
-import { SimpleFlexContainer } from "common/AppStyles";
-import useSortStudysets from "lib/hooks/useSortStudysets";
-import useFilterStudysets from "lib/hooks/useFilterStudysets";
-import NoCardsWarningsIcon from "components/NoCardsWarningsIcon/NoCardsWarningsIcon";
 
 type Props = {};
 
@@ -127,19 +128,20 @@ const Home = (props: Props) => {
             field: "title",
             headerName: "Title",
             width: 300,
+            renderCell: (params: GridRenderCellParams<any, any>) => (
+                <GhostLink to={`/view/${params.id}`}>{params.value}</GhostLink>
+            ),
         },
         {
             field: "description",
             headerName: "Description",
             width: 300,
-            editable: false,
         },
         {
             field: "createdAt",
             headerName: "Date Created",
             type: "date",
             width: 150,
-            editable: false,
             valueGetter: ({ value }) => value && new Date(value),
         },
         {
@@ -147,7 +149,6 @@ const Home = (props: Props) => {
             headerName: "Last Viewed",
             type: "date",
             width: 150,
-            editable: false,
             valueGetter: ({ value }) => value && new Date(value),
         },
         {
@@ -168,13 +169,11 @@ const Home = (props: Props) => {
             field: "label",
             headerName: "Label",
             width: 200,
-            editable: false,
         },
         {
             field: "favorited",
             headerName: "Favorited",
             width: 150,
-            editable: false,
             renderCell: (params: GridRenderCellParams<any, boolean>) => (
                 <>
                     {params.value ? (
@@ -345,14 +344,10 @@ const Home = (props: Props) => {
                             </>
                         )}
                         {selectedView === HOME_LAYOUTS.GRID && (
-                            <HomeGridView
-                                studysets={searchedStudysets}
-                            />
+                            <HomeGridView studysets={searchedStudysets} />
                         )}
                         {selectedView === HOME_LAYOUTS.HTML && (
-                            <HomeHTMLView
-                                studysets={searchedStudysets}
-                            />
+                            <HomeHTMLView studysets={searchedStudysets} />
                         )}
                     </HomeSetsContainer>
                 </HomeContainer>
