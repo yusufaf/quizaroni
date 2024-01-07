@@ -1,5 +1,5 @@
 import { Button, Card, DialogActions, DialogContent, IconButton, Paper, styled, Tab, Typography } from "@mui/material";
-import { BasePage, FlexColumn } from "common/AppStyles";
+import { BasePage, BoldButton, FlexColumn } from "common/AppStyles";
 
 export const ProfilePage = styled(BasePage)({
     display: "grid",
@@ -47,7 +47,7 @@ export const ActionHeader = styled("div")({
     gap: "0.75rem",
 })
 
-export const ActionSubmitButton = styled(Button)({
+export const ActionSubmitButton = styled(BoldButton)({
     width: "50%",
 })
 

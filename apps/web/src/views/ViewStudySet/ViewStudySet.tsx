@@ -1,5 +1,11 @@
-import { ArrowBack } from "@mui/icons-material/";
-import { Button, Chip, Skeleton, Tooltip, Typography } from "@mui/material/";
+import { ArrowBack, ViewCarouselRounded } from "@mui/icons-material/";
+import {
+    Button,
+    Chip,
+    Skeleton,
+    Tooltip,
+    Typography,
+} from "@mui/material/";
 import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
@@ -39,8 +45,12 @@ import StudysetSettings from "./StudysetSettings/StudysetSettings";
 import ViewStudySetCard from "./ViewStudySetCard";
 import ViewStudysetFilters from "./ViewStudysetFilters/ViewStudysetFilters";
 import {
-    NoCardsMessage, 
-    StudysetDescription, 
+    NoCardsMessage,
+    StudyModeGrid,
+    StudyModePaper,
+    StudyModeTitle,
+    StudyModesSection,
+    StudysetDescription,
     StudysetInfo,
     UpdateCardsButton,
     ViewFlashsetPaper,
@@ -95,6 +105,9 @@ const ViewStudySet = (props: Props) => {
     useBrowserTitle(selectedStudyset?.title ?? "");
 
     const updatedViewTimestamp = useRef<boolean>(false);
+    const studyModeIconStyle = {
+        fontSize: "5rem",
+    };
 
     const [selectedStudyMode, setSelectedStudyMode] = useState("");
 
@@ -156,7 +169,7 @@ const ViewStudySet = (props: Props) => {
 
     const handleUpdateCardsClick = () => {
         navigate(`/edit/${studysetUUID}`);
-    }
+    };
 
     return (
         <>
@@ -216,24 +229,58 @@ const ViewStudySet = (props: Props) => {
                                     selectedStudyset={selectedStudyset}
                                 />
                             </StudysetInfo>
-                            {/* <div className={viewFlashStyles.studySection}>
-                                            <Typography
-                                                variant="h6"
-                                                sx={{
-                                                    fontWeight: "bold"
-                                                }}
-                                            >
-                                                Study
-                                            </Typography>
-                                            <StudyModeGrid>
-                                                <StudyModeOption
-                                                    onClick={() => setSelectedStudyMode(STUDY_MODES.FLASHCARDS)}
-                                                >
-                                                    <img src={FLASH_CARDS_IMG} height={32} width={32} />
-                                                    <Typography>Flashcards</Typography>
-                                                </StudyModeOption>
-                                            </StudyModeGrid>
-                                        </div> */}
+                            <StudyModesSection>
+                                <StudyModeGrid>
+                                    <StudyModePaper>
+                                        <ViewCarouselRounded
+                                            sx={studyModeIconStyle}
+                                        />
+                                        <StudyModeTitle variant="subtitle1">
+                                            Flashcards
+                                        </StudyModeTitle>
+                                    </StudyModePaper>
+                                    <StudyModePaper>
+                                        <ViewCarouselRounded
+                                            sx={studyModeIconStyle}
+                                        />
+                                        <StudyModeTitle variant="subtitle1">
+                                            Flashcards
+                                        </StudyModeTitle>
+                                    </StudyModePaper>
+                                    <StudyModePaper>
+                                        <ViewCarouselRounded
+                                            sx={studyModeIconStyle}
+                                        />
+                                        <StudyModeTitle variant="subtitle1">
+                                            Flashcards
+                                        </StudyModeTitle>
+                                    </StudyModePaper>
+                                    <StudyModePaper>
+                                        <ViewCarouselRounded
+                                            sx={studyModeIconStyle}
+                                        />
+                                        <StudyModeTitle variant="subtitle1">
+                                            Flashcards
+                                        </StudyModeTitle>
+                                    </StudyModePaper>
+                                    <StudyModePaper>
+                                        <ViewCarouselRounded
+                                            sx={studyModeIconStyle}
+                                        />
+                                        <StudyModeTitle variant="subtitle1">
+                                            Flashcards
+                                        </StudyModeTitle>
+                                    </StudyModePaper>
+                                    <StudyModePaper>
+                                        <ViewCarouselRounded
+                                            sx={studyModeIconStyle}
+                                        />
+                                        <StudyModeTitle variant="subtitle1">
+                                            Flashcards
+                                        </StudyModeTitle>
+                                    </StudyModePaper>
+                                </StudyModeGrid>
+                            </StudyModesSection>
                         </ViewStudysetHeader>
                     </ViewStudysetContainer>
                 </ViewFlashsetPaper>

@@ -32,21 +32,9 @@ const AccountTab = (props: Props) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [deletePassword, setDeletePassword] = useState<string>("");
     const [enteredNewUsername, setEnteredNewUsername] = useState<string>("");
-    const [oldPassword, setOldPassword] = useState<string>("");
-    const [newPassword, setNewPassword] = useState<string>("");
-    const [enteredConfirmPassword, setEnteredConfirmPassword] = useState("");
-
-    const [newPasswordVisibility, setNewPasswordVisibility] = useState(false);
     const [newEmail, setNewEmail] = useState<string>("");
 
     const isNewEmailValid = EMAIL_REGEX.test(newEmail);
-
-    const checkIfInputMatches = (event) => {
-        // let updatedErrorText = { ...showErrorText };
-        // updatedErrorText[event.target.name] =
-        // event.target.value !== newPassword;
-        // setShowErrorText(updatedErrorText);
-    };
 
     const handleDeleteAccount = async () => {
         // TODO
