@@ -65,11 +65,34 @@ export const StudysetDescription = styled(Typography)(({ theme }) => ({
     },
 }));
 
+export const StudyModesSection = styled("section")({
+    padding: "0 1rem"
+})
+
 export const StudyModeGrid = styled("div")({
-    marginTop: "1rem",
+    height: "100%",
     display: "grid",
-    gridTemplateColumns: "15rem 15rem",
-    gridTemplateRows: "auto auto",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gridTemplateRows: "repeat(2, auto)",
+    gap: "1rem",
+});
+
+export const StudyModePaper = styled(Paper)(({ theme }) => ({
+    fontSize: "1.25rem",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    userSelect: "none",
+    cursor: "pointer",
+    "&: hover": {
+        background: theme.palette.action.hover,
+        transition: "0.2s ease",
+    },
+}));
+
+export const StudyModeTitle = styled(BoldTypography)({
+    fontSize: "1.25rem",
 });
 
 export const CategoryTab = styled(Tab)({
@@ -146,24 +169,6 @@ export const UpdateCardsButton = styled(BoldButton)({
     textTransform: "none",
     fontSize: "1rem",
 });
-
-export const StudyModeOption = styled("div")(({ theme }) => ({
-    fontSize: "1.25rem",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-
-    userSelect: "none",
-    cursor: "pointer",
-
-    padding: "0.75rem 0.5rem",
-    borderRadius: "0.25rem",
-    "&: hover": {
-        background: theme.palette.action.hover,
-        transition: "0.2s ease",
-    },
-}));
 
 // Download Dialog
 export const DownloadDialogContent = styled(DialogContent)({
