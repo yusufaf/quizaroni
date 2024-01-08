@@ -180,6 +180,12 @@ export const NewCardTerm = styled(FlexColumn)({});
 
 export const NewCardDefinition = styled(FlexColumn)({});
 
+export const NewCardRow = styled("div")({
+    display: "flex",
+    alignItems: "flex-end",
+    gap: "1rem"
+})
+
 export const ExtraPickerContainer = styled(FlexColumn)(({ theme }) => ({
     background: theme.palette.background.paper,
     border: `0.125rem solid ${theme.palette.divider}`,

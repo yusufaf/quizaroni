@@ -1,29 +1,20 @@
-import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
-import { IconButton, Tooltip, Typography } from "@mui/material/";
 import {
-    AddPhotoAlternate,
-    Delete,
-    FormatColorText,
-    FormatColorFill,
-    SwapHoriz,
     Add,
+    AddPhotoAlternate,
     ContentCopy,
+    Delete,
+    FormatColorFill,
+    FormatColorText,
+    SwapHoriz,
 } from "@mui/icons-material";
-import { useTheme } from "theme/useTheme";
-import { BoldTypography } from "common/AppStyles";
+import { IconButton, Tooltip } from "@mui/material/";
 import {
-    NewCard,
-    NewCardDefinition,
-    NewCardHeader,
-    NewCardInputField,
-    NewCardInputs,
-    RightActions,
-    CenterActions,
-    NewCardTerm,
-    NewCardLabel,
-    BottomActions,
-    AddCardBelowButton,
-} from "../CreateSetStyles";
+    BoldTypography
+} from "common/AppStyles";
+import FileUpload from "components/FileUpload/FileUpload";
+import type { ColorPickerType, TODO } from "lib/types";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { useTheme } from "theme/useTheme";
 import {
     addCard,
     deleteCard,
@@ -31,7 +22,20 @@ import {
     swapCard,
 } from "utilities/createUtils";
 import CustomColorPicker from "../../../components/CustomColorPicker/CustomColorPicker";
-import type { ColorPickerType, TODO } from "lib/types";
+import {
+    AddCardBelowButton,
+    BottomActions,
+    CenterActions,
+    NewCard,
+    NewCardDefinition,
+    NewCardHeader,
+    NewCardInputField,
+    NewCardInputs,
+    NewCardLabel,
+    NewCardRow,
+    NewCardTerm,
+    RightActions,
+} from "../CreateSetStyles";
 
 type Props = {
     cardValues: any;
@@ -91,11 +95,12 @@ const NewCardInput = (props: Props) => {
             const elements = document.querySelectorAll("[id]");
             for (const el of elements) {
                 if (el.id.startsWith("rc-editable-input")) {
-                    const domElement = document.getElementById(el.id)
+                    const domElement = document.getElementById(el.id);
                     // @ts-ignore
                     domElement.style.color = theme.palette.text.primary;
                     // @ts-ignore
-                    domElement.style.background = theme.palette.background.paper;
+                    domElement.style.background =
+                        theme.palette.background.paper;
                     break;
                 }
             }
@@ -164,9 +169,7 @@ const NewCardInput = (props: Props) => {
                                     : {}
                             }
                         >
-                            <FormatColorText
-                                fontSize="medium"
-                            />
+                            <FormatColorText fontSize="medium" />
                         </IconButton>
                     </Tooltip>
                     {showTextColorPicker && (
@@ -175,12 +178,17 @@ const NewCardInput = (props: Props) => {
                             color={localTextColor}
                             additionalRefs={[textColorButtonRef]}
                             onClose={() => setShowTextColorPicker(false)}
-                            onChange={(e) => onColorPickerChange(e, "textColor")}
+                            onChange={(e) =>
+                                onColorPickerChange(e, "textColor")
+                            }
                             onResetColor={() => resetColor("textColor")}
                             onApplyColor={() => toggleApplyColor("textColor")}
                         />
                     )}
-                    <Tooltip title="Change card background color" placement="top">
+                    <Tooltip
+                        title="Change card background color"
+                        placement="top"
+                    >
                         <IconButton
                             ref={backgroundColorButtonRef}
                             onClick={toggleBackgroundColorPicker}
@@ -190,9 +198,7 @@ const NewCardInput = (props: Props) => {
                                     : {}
                             }
                         >
-                            <FormatColorFill
-                                fontSize="medium"
-                            />
+                            <FormatColorFill fontSize="medium" />
                         </IconButton>
                     </Tooltip>
                     {showBackgroundColorPicker && (
@@ -201,7 +207,9 @@ const NewCardInput = (props: Props) => {
                             color={localBackgroundColor}
                             additionalRefs={[backgroundColorButtonRef]}
                             onClose={() => setShowBackgroundColorPicker(false)}
-                            onChange={(e) => onColorPickerChange(e, "backgroundColor")}
+                            onChange={(e) =>
+                                onColorPickerChange(e, "backgroundColor")
+                            }
                             onResetColor={() => resetColor("backgroundColor")}
                             onApplyColor={() =>
                                 toggleApplyColor("backgroundColor")
@@ -251,7 +259,7 @@ const NewCardInput = (props: Props) => {
                                 })
                             }
                         >
-                            <Delete fontSize="medium" color="error"/>
+                            <Delete fontSize="medium" color="error" />
                         </IconButton>
                     </Tooltip>
                     <input
@@ -272,46 +280,58 @@ const NewCardInput = (props: Props) => {
                 </RightActions>
             </NewCardHeader>
             <NewCardInputs>
-                <NewCardTerm>
-                    <NewCardLabel variant="subtitle1">Term</NewCardLabel>
-                    <NewCardInputField
-                        variant="standard"
-                        placeholder={"Enter a term"}
-                        onChange={(e) =>
-                            updateCardValue(index, "term", e.target.value)
-                        }
-                        multiline
-                        maxRows={4}
-                        value={term}
-                        InputProps={{
-                            style: {
-                                color: displayTextColor
-                                    ? localTextColor
-                                    : undefined,
-                            },
-                        }}
-                    />
-                </NewCardTerm>
-                <NewCardDefinition>
-                    <NewCardLabel variant="subtitle1">Definition</NewCardLabel>
-                    <NewCardInputField
-                        variant="standard"
-                        placeholder={"Enter a definition"}
-                        onChange={(e) =>
-                            updateCardValue(index, "definition", e.target.value)
-                        }
-                        multiline
-                        maxRows={4}
-                        value={definition}
-                        InputProps={{
-                            style: {
-                                color: displayTextColor
-                                    ? localTextColor
-                                    : undefined,
-                            },
-                        }}
-                    />
-                </NewCardDefinition>
+                <NewCardRow>
+                    <NewCardTerm>
+                        <NewCardLabel variant="subtitle1">Term</NewCardLabel>
+                        <NewCardInputField
+                            variant="standard"
+                            placeholder={"Enter a term"}
+                            onChange={(e) =>
+                                updateCardValue(index, "term", e.target.value)
+                            }
+                            multiline
+                            maxRows={4}
+                            value={term}
+                            InputProps={{
+                                style: {
+                                    color: displayTextColor
+                                        ? localTextColor
+                                        : undefined,
+                                },
+                            }}
+                        />
+                    </NewCardTerm>
+                    <FileUpload />
+                </NewCardRow>
+                <NewCardRow>
+                    <FileUpload />
+                    <NewCardDefinition>
+                        <NewCardLabel variant="subtitle1">
+                            Definition
+                        </NewCardLabel>
+                        <NewCardInputField
+                            variant="standard"
+                            placeholder={"Enter a definition"}
+                            onChange={(e) =>
+                                updateCardValue(
+                                    index,
+                                    "definition",
+                                    e.target.value
+                                )
+                            }
+                            multiline
+                            maxRows={4}
+                            value={definition}
+                            InputProps={{
+                                style: {
+                                    color: displayTextColor
+                                        ? localTextColor
+                                        : undefined,
+                                },
+                            }}
+                        />
+                    </NewCardDefinition>
+                </NewCardRow>
                 <BottomActions>
                     {index !== createdSetCards.length - 1 && (
                         <AddCardBelowButton
