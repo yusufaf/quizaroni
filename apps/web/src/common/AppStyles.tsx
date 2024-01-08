@@ -7,6 +7,10 @@ export const BoldButton = styled(Button)({
     fontWeight: 600
 })
 
+export const FlexRow = styled("div")({
+    display: "flex",
+})
+
 export const SimpleFlexContainer = styled("div")({
     display: "flex",
     alignItems: "center",
@@ -77,3 +81,24 @@ export const StyledChromePicker = styled(ChromePicker)(({ theme }) => ({
         background: `${theme.palette.background.paper} !important`,
     },
 }));
+
+/* ==== File Upload Component ==== */
+export const FileUploadContainer = styled(FlexColumn)(({ theme }) => ({
+    height: "3rem",
+    width: "5rem",
+    boxSizing: "border-box",
+    padding: "1.75rem 1rem",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    border: `0.125rem dashed ${theme.palette.divider}`,
+    borderRadius: "0.25rem",
+}));
+
+export const HiddenInput = styled("input")({
+    display: "none",
+})
+
+export const FileUploadTypeText = styled(BoldTypography)({
+    fontSize: "0.75rem",
+})
