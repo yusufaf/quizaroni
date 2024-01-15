@@ -40,10 +40,8 @@ import {
 type Props = {
     cardValues: any;
     createdSetCards: any;
-    fileInputRef: any;
     index: number;
     onColorChange: any;
-    onFileChange: any;
     setCreatedSetCards: any;
     updateCardValue: any;
     actionsStack: TODO[];
@@ -53,9 +51,7 @@ const NewCardInput = (props: Props) => {
     const {
         index,
         updateCardValue,
-        onFileChange,
         onColorChange,
-        fileInputRef,
         cardValues,
         createdSetCards,
         setCreatedSetCards,
@@ -260,21 +256,6 @@ const NewCardInput = (props: Props) => {
                             }
                         >
                             <Delete fontSize="medium" color="error" />
-                        </IconButton>
-                    </Tooltip>
-                    <input
-                        type="file"
-                        id="fileInput"
-                        ref={fileInputRef}
-                        accept=".png, .jpg"
-                        onChange={(e) => onFileChange(e, index)}
-                        style={{ display: "none" }}
-                    />
-                    <Tooltip title="Upload an image" placement="top">
-                        <IconButton
-                            onClick={() => fileInputRef.current.click()}
-                        >
-                            <AddPhotoAlternate fontSize="medium" />
                         </IconButton>
                     </Tooltip>
                 </RightActions>

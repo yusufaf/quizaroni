@@ -143,7 +143,7 @@ const CreateSetHeader = (props: Props) => {
                         </div>
                         <div>
                             <BoldTypography variant="subtitle1">
-                                Description *
+                                Description
                             </BoldTypography>
                             <DescriptionInput
                                 variant="outlined"
@@ -165,8 +165,8 @@ const CreateSetHeader = (props: Props) => {
                                     placeholder={
                                         "Enter a label for your new study set"
                                     }
+                                    value={label}
                                     onChange={onLabelChange}
-                                    disabled={selectedLabel !== ""}
                                 />
                                 <Typography component="span">
                                     or select an existing one

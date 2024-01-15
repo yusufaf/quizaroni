@@ -93,6 +93,7 @@ export const FileUploadContainer = styled(FlexColumn)(({ theme }) => ({
     textAlign: "center",
     border: `0.125rem dashed ${theme.palette.divider}`,
     borderRadius: "0.25rem",
+    cursor: "pointer"
 }));
 
 export const HiddenInput = styled("input")({
