@@ -102,12 +102,7 @@ const CreateSet = (props: Props) => {
     const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
     const [actionsStack, setActionsStack] = useState<any[]>([]);
 
-    const fileInputRef = useRef(null);
-
-    console.log({ createdSetCards });
-
-    const mainButtonDisabled = !title || !description;
-
+    const mainButtonDisabled = !title;
 
     /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
@@ -249,11 +244,6 @@ const CreateSet = (props: Props) => {
         }
     };
 
-    /* Runs everytime the file selected for the image upload changes */
-    const onFileChange = (event, index) => {
-        console.log("File chosen = ", event.target.files[0]);
-        updateCardValue(index, "file", event.target.files[0]);
-    };
 
     /**
      * Update a given card input's value in the array storing the cards
@@ -279,9 +269,7 @@ const CreateSet = (props: Props) => {
             const cardValues = createdSetCards[index];
             const props = {
                 createdSetCards,
-                fileInputRef,
                 onColorChange,
-                onFileChange,
                 setCreatedSetCards,
                 updateCardValue,
                 index,
@@ -308,7 +296,10 @@ const CreateSet = (props: Props) => {
     };
 
     const onSelectedLabelChange = (e: SelectChangeEvent) => {
-        setEnteredLabel(null);
+        const newSelectedLabelValue = e.target.value;
+        if (newSelectedLabelValue !== "") {
+            setEnteredLabel(e.target.value);
+        }
         setSelectedLabel(e.target.value);
     };
 
