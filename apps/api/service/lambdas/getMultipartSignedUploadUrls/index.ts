@@ -25,7 +25,8 @@ export default ({
         environment: {
             AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
             deploymentType,
-            mainDynamoDBTable: `${appName}-${deploymentType}-main`
+            mainDynamoDBTable: `${appName}-${deploymentType}-main-table`,
+            mainS3Bucket: `${appName}-${deploymentType}-main-bucket`,
         } 
     })
 
