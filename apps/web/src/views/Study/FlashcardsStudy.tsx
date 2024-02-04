@@ -18,7 +18,7 @@ import { ViewFlashCardActions } from "./ViewFlashSetStyles";
 import ConfirmDialog from "components/GlobalConfirmDialog/GlobalConfirmDialog";
 import {
     StudyElements
-} from "../ViewStudySet/StudyModeStyles";
+} from "./StudyModeStyles";
 
 type Props = {
     
