@@ -1,24 +1,25 @@
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { useTheme } from "theme/useTheme";
+import { Star, StarBorder, VolumeUp } from "@mui/icons-material";
 import { IconButton, Popover, Tooltip, Typography } from "@mui/material/";
-import { SpeakerNotes, Star, StarBorder, VolumeUp } from "@mui/icons-material";
 import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
-import {
-    ViewFlashsetCard,
-    ViewFlashCardActions,
-    ViewCardInfo,
-    ViewCardContainer,
-    CategoryChips,
-    CategoryChip,
-} from "./styles";
-import { Card, OpenCardNotes, Studyset, UUID } from "lib/types";
+import useSpeechSynthesis from "lib/hooks/useSpeechSynthesis";
+import { Card, Studyset } from "lib/types";
+import { useRef, useState } from "react";
 import { useMarkCardAsImportantMutation } from "state/api/studysetsAPI";
+import { useTheme } from "theme/useTheme";
 import {
     DEFAULT_TERMINOLOGY,
     FORMAT_TERMINOLOGIES,
     LABEL_TERMINOLOGIES,
 } from "utilities/constants";
-import useSpeechSynthesis from "lib/hooks/useSpeechSynthesis";
+import {
+    CategoryChip,
+    CategoryChips,
+    ViewCardContainer,
+    ViewCardInfo,
+    ViewFlashCardActions,
+    ViewFlashsetCard,
+} from "./styles";
+import CategoriesPopover from "./CategoriesPopover";
 
 type Props = {
     card: Card;
@@ -31,8 +32,6 @@ const ViewStudySetCard = (props: Props) => {
 
     const { isDarkMode, theme } = useTheme();
     const { speak, cancel } = useSpeechSynthesis();
-
-    const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
     const timeoutRef = useRef(null);
 
@@ -87,17 +86,6 @@ const ViewStudySetCard = (props: Props) => {
         });
     };
 
-    /* ==== Categories Popover ==== */
-    const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handlePopoverClose = () => {
-        setAnchorEl(null);
-    };
-
-    const open = Boolean(anchorEl);
-
     return (
         <ViewFlashsetCard
             elevation={6}
@@ -119,45 +107,9 @@ const ViewStudySetCard = (props: Props) => {
                     </BoldTypography>
                     <CategoryChips>
                         {categories.length > 3 ? (
-                            <>
-                                <CategoryChip
-                                    aria-owns={
-                                        open ? "mouse-over-popover" : undefined
-                                    }
-                                    aria-haspopup="true"
-                                    onMouseEnter={handlePopoverOpen}
-                                    onMouseLeave={handlePopoverClose}
-                                    label={`View ${categories.length} Categories`}
-                                    variant="outlined"
-                                />
-                                <Popover
-                                    id="mouse-over-popover"
-                                    sx={{
-                                        pointerEvents: "none",
-                                        maxWidth: "70rem",
-                                    }}
-                                    open={open}
-                                    anchorEl={anchorEl}
-                                    anchorOrigin={{
-                                        vertical: "top",
-                                        horizontal: "right",
-                                    }}
-                                    transformOrigin={{
-                                        vertical: "top",
-                                        horizontal: "left",
-                                    }}
-                                    onClose={handlePopoverClose}
-                                    disableRestoreFocus
-                                >
-                                    <Typography
-                                        sx={{ p: 2, borderRadius: "0.25rem" }}
-                                    >
-                                        {categories
-                                            .map((category) => category)
-                                            .join(", ")}
-                                    </Typography>
-                                </Popover>
-                            </>
+                            <CategoriesPopover 
+                                categories={categories}
+                            />
                         ) : (
                             <>
                                 {categories.map(
