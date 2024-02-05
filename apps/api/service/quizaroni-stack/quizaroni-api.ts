@@ -5,9 +5,11 @@ import {
     RestApi,
     LambdaIntegration,
     Resource,
+    ApiKey,
+    UsagePlan,
 } from "aws-cdk-lib/aws-apigateway";
 import { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
-import { Role, ServicePrincipal, PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { Role, ServicePrincipal, PolicyStatement, ManagedPolicy } from "aws-cdk-lib/aws-iam";
 import { addRole } from "../../resources/roles";
 
 /* Lambdas */
@@ -27,6 +29,7 @@ export class QuizaroniAPI extends Construct {
     appName: string;
     deploymentType: string;
     region: string;
+    prefix: string;
 
     constructor(scope: Construct, id: string, props: ExtendedStackProps) {
         super(scope, id);
@@ -43,8 +46,9 @@ export class QuizaroniAPI extends Construct {
         this.region = region;
         this.appName = appName;
         this.deploymentType = deploymentType;
+        this.prefix = `${appName}-${deploymentType}`;
 
-        const apiNameAndID = `${appName}-${deploymentType}-main`;
+        const apiNameAndID = `${this.prefix}-main`;
         const api = new RestApi(this, apiNameAndID, {
             restApiName: apiNameAndID,
             description: `${deploymentType.toUpperCase()} API for Quizaroni`,
@@ -60,49 +64,59 @@ export class QuizaroniAPI extends Construct {
                     "Authorization",
                     "X-Api-Key",
                 ],
-                allowMethods: [
-                    "GET",
-                    "POST",
-                    "PUT",
-                    "DELETE",
-                ],
+                allowMethods: ["GET", "POST", "PUT", "DELETE"],
                 allowCredentials: true,
                 allowOrigins: ["localhost:3000", "quizaroni.netlify.app"],
             },
             cloudWatchRole: true,
         });
 
+        const apiKeyNameAndID = `${this.prefix}-api-key`;
+        const apiKey = new ApiKey(this, apiKeyNameAndID, {
+            apiKeyName: apiKeyNameAndID
+        });
+        const usagePlan = new UsagePlan(this, `${this.prefix}-usage-plan`, {
+            name: `${this.deploymentType[0].toUpperCase() + this.deploymentType.slice(1)} Usage Plan`,
+            apiStages: [
+                {
+                    api,
+                    stage: api.deploymentStage,
+                },
+            ],
+        });
+        usagePlan.addApiKey(apiKey);
+
         this.createLambdaRoles();
 
         const lambdaProps = {
             construct: this,
             props,
-        }
+        };
 
         const quizaroniResource = api.root.addResource("api");
 
         const filesResource = quizaroniResource.addResource("files");
 
         this.createLambdaProxyIntegration({
-          httpMethod: "POST",
-          lambda: initiateMultipartUpload({...lambdaProps}),
-          methodName: "initiateMultipartUpload",
-          parentResource: filesResource,
-        })
+            httpMethod: "POST",
+            lambda: initiateMultipartUpload({ ...lambdaProps }),
+            methodName: "initiateMultipartUpload",
+            parentResource: filesResource,
+        });
 
         this.createLambdaProxyIntegration({
             httpMethod: "POST",
-            lambda: completeMultipartUpload({...lambdaProps}),
+            lambda: completeMultipartUpload({ ...lambdaProps }),
             methodName: "completeMultipartUpload",
             parentResource: filesResource,
-          })
+        });
 
         this.createLambdaProxyIntegration({
             httpMethod: "POST",
-            lambda: getMultipartSignedUploadUrls({...lambdaProps}),
+            lambda: getMultipartSignedUploadUrls({ ...lambdaProps }),
             methodName: "getMultipartSignedUploadUrls",
             parentResource: filesResource,
-        })
+        });
     }
 
     createLambdaRoles = () => {
@@ -111,10 +125,11 @@ export class QuizaroniAPI extends Construct {
         const mainLambdaRole = new Role(this, mainLambdaRoleNameAndID, {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
             roleName: mainLambdaRoleNameAndID,
+            managedPolicies: [ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole")]
         });
 
         // Add a policy statement for DynamoDB access
-        const dynamoDBTableName = `${this.appName}-${this.deploymentType}-main`;
+        const dynamoDBTableName = `${this.prefix}-main`;
         const dynamoDBPolicyStatement = new PolicyStatement({
             actions: [
                 "dynamodb:GetItem",
@@ -131,7 +146,7 @@ export class QuizaroniAPI extends Construct {
         mainLambdaRole.addToPolicy(dynamoDBPolicyStatement);
 
         // Add a policy statement for S3 read and write access
-        const s3BucketName = `${this.appName}-${this.deploymentType}-main`;
+        const s3BucketName = `${this.prefix}-main`;
         const s3PolicyStatement = new PolicyStatement({
             actions: ["s3:GetObject", "s3:PutObject", "s3:ListBucket"],
             resources: [

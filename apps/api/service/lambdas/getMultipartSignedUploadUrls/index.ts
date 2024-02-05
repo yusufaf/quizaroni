@@ -1,8 +1,9 @@
-import { Code, Function as LambdaFunction, Runtime } from "aws-cdk-lib/aws-lambda";
+import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { getRole } from "../../../resources/roles";
 import { LambdaProps } from "../../../models/stack";
 import { Duration } from "aws-cdk-lib";
 import path from "path";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 
 export default ({
     props,
@@ -10,21 +11,22 @@ export default ({
 }: LambdaProps) => {
     const { appName, deploymentType = "" } = props;
 
-    const functionName = "getMultipartSignedUploadURLs";
+    const functionName = "getMultipartSignedUploadUrls";
     const nameAndID = `${deploymentType}-${functionName}`
     const role = getRole(`${deploymentType}-main-lambda-role`)
 
-    const lambdaFunction = new LambdaFunction(construct, nameAndID, {
+    const lambdaFunction = new NodejsFunction(construct, nameAndID, {
+        functionName: nameAndID,
         runtime: Runtime.NODEJS_20_X,
         timeout: Duration.seconds(30),
-        functionName: nameAndID,
-        handler: `${functionName}.handler`,
-        code: Code.fromAsset(path.join(__dirname, `./src`)),
         role,
         memorySize: 1000,
+        entry: path.join(__dirname, `./src/${functionName}.ts`),
+        handler: "handler",
+        awsSdkConnectionReuse: true,
         environment: {
-            AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
             deploymentType,
+            NODE_OPTIONS: '--enable-source-maps',
             mainDynamoDBTable: `${appName}-${deploymentType}-main-table`,
             mainS3Bucket: `${appName}-${deploymentType}-main-bucket`,
         } 
