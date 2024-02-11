@@ -23,10 +23,6 @@ export class Quizaroni extends Construct {
         this.createS3Buckets();
     }
 
-    createApi = () => {
-
-    }
-
     createDynamoDBTables = () => {
         const mainTableNameAndID = `${this.appName}-${this.deploymentType}-main-table`;
         const mainDynamoDBTable = new Table(this, mainTableNameAndID, {
@@ -42,6 +38,13 @@ export class Quizaroni extends Construct {
         const mainBucketNameAndID = `${this.appName}-${this.deploymentType}-main-bucket`;
         const mainBucket = new Bucket(this, mainBucketNameAndID, {
             bucketName: mainBucketNameAndID,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+            removalPolicy: RemovalPolicy.RETAIN,
+        });
+
+        const assetsBucketNameAndID = `${this.appName}-${this.deploymentType}-assets-bucket`;
+        const assetsBucket = new Bucket(this, assetsBucketNameAndID, {
+            bucketName: assetsBucketNameAndID,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             removalPolicy: RemovalPolicy.RETAIN,
         });
