@@ -28,6 +28,7 @@ export default defineConfig(({ command, mode }) => {
                 utilities: path.resolve("src/utilities/"),
                 theme: path.resolve("src/lib/theme/"),
                 common: path.resolve("src/common/"),
+                api: path.resolve("src/api/"),
             },
         },
         server: {

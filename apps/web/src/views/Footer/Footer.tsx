@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { IconButton } from "@mui/material/";
 import { FooterPaper, StyledFooter } from "./styles";
 import { GitHub, LinkedIn } from "@mui/icons-material";
