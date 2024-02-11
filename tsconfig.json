@@ -92,6 +92,7 @@
       "resources/*": ["./resources/*"],
       "theme/*": ["./theme/*"],
       "common/*": ["./common/*"],
+      "api/*": ["./api/*"],
     },
   },
   "include": [
