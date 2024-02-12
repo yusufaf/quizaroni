@@ -16,6 +16,7 @@ import { addRole } from "../../resources/roles";
 import completeMultipartUpload from "../lambdas/completeMultipartUpload";
 import getMultipartSignedUploadUrls from "../lambdas/getMultipartSignedUploadUrls";
 import initiateMultipartUpload from "../lambdas/initiateMultipartUpload";
+import deleteFile from "../lambdas/deleteFile";
 
 type CreateLambdaProxyIntegrationProps = {
     lambda: LambdaFunction;
@@ -117,6 +118,14 @@ export class QuizaroniAPI extends Construct {
             methodName: "getMultipartSignedUploadUrls",
             parentResource: filesResource,
         });
+
+        this.createLambdaProxyIntegration({
+            httpMethod: "POST",
+            lambda: deleteFile({ ...lambdaProps }),
+            methodName: "deleteFile",
+            parentResource: filesResource,
+        });
+
     }
 
     createLambdaRoles = () => {

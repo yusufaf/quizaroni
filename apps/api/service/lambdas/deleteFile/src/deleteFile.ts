@@ -1,12 +1,12 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult, Handler } from "aws-lambda";
-import { S3Client, CompleteMultipartUploadCommand } from "@aws-sdk/client-s3";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 const { mainS3Bucket = "" } = process.env;
 
 const s3Client = new S3Client();
 
 type Body = {
-    uploadId: string;
+    key: string;
 };
 
 export const handler: Handler = async (
@@ -16,20 +16,20 @@ export const handler: Handler = async (
     console.log(JSON.stringify({ event, context }, null, 4));
 
     const body: Body = JSON.parse(event.body ?? "");
-    const { uploadId } = body;
+    const { key } = body;    
 
     try {
-        const completeMultipartUploadCommand = new CompleteMultipartUploadCommand({
+
+        const deleteCommand = new DeleteObjectCommand({
             Bucket: mainS3Bucket,
-            Key: "TODO",
-            UploadId: uploadId,
-        });
-        const completeMultipartUploadResponse = await s3Client.send(completeMultipartUploadCommand);
+            Key: key,
+        })
+        const deleteResponse = await s3Client.send(deleteCommand);
 
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: "Success",
+                message: "Successfully deleted file",
             }),
         };
     } catch (err) {
@@ -37,7 +37,7 @@ export const handler: Handler = async (
         return {
             statusCode: 500,
             body: JSON.stringify({
-                message: "Error",
+                message: "Error deleting file",
             }),
         };
     }
