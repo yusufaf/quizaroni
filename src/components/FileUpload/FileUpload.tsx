@@ -4,20 +4,20 @@ import {
     FileUploadTypeText,
     HiddenInput,
 } from "common/AppStyles";
-import { useRef } from "react";
-
-type Props = {
-    style?: Object;
-    type?: string;
-};
+import { useRef, DragEvent, ChangeEvent } from "react";
 
 const FILE_UPLOAD_ICONS = new Map([
     ["IMAGE", <AddPhotoAlternateRounded />],
     ["FILE", <UploadRounded />],
 ]);
 
+type Props = {
+    style?: Object;
+    type?: string;
+    handleFiles: (files: any) => {};
+};
 const FileUpload = (props: Props) => {
-    const { style, type = "IMAGE" } = props;
+    const { handleFiles, style, type = "IMAGE"} = props;
 
     const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -25,15 +25,15 @@ const FileUpload = (props: Props) => {
         inputRef.current?.click();
     };
 
-    const handleChange = (e: any) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
         if (!e.target.files || !e.target.files[0]) {
             return;
         }
-        // TODO: handleFiles(e.target.files);
+        handleFiles(e.target.files);
     };
 
-    const handleDrag = (e) => {
+    const handleDrag = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
         if (e.type === "dragenter" || e.type === "dragover") {
@@ -43,14 +43,14 @@ const FileUpload = (props: Props) => {
         }
     };
 
-    const handleDrop = (e) => {
+    const handleDrop = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
         // setDragActive(false);
         if (!e.dataTransfer.files || !e.dataTransfer.files[0]) {
             return;
         }
-        // TODO: handleFiles(e.dataTransfer.files);
+        handleFiles(e.dataTransfer.files);
     };
 
     return (
