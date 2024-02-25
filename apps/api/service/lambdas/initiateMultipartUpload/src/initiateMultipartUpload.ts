@@ -13,7 +13,14 @@ type Body = {
     studysetUUID: string;
     uploadType: string;
     userUUID: string;
+    fileName: string;
+    contentType: string;
 };
+
+interface Response {
+    key: string;
+    uploadId: string | undefined;
+}
 
 export const handler: Handler = async (
     event: APIGatewayProxyEvent,
@@ -22,14 +29,21 @@ export const handler: Handler = async (
     console.log(JSON.stringify({ event, context }, null, 4));
 
     const body: Body = JSON.parse(event.body ?? "");
-    const { studysetUUID, uploadType, userUUID } = body;
+    const { 
+        contentType, 
+        fileName, 
+        studysetUUID, 
+        uploadType, 
+        userUUID 
+    } = body;
 
-    const key = `${studysetUUID}/${userUUID}`;
+    const key = `${studysetUUID}/${userUUID}/${fileName}`;
 
     try {
         const multipartCommand = new CreateMultipartUploadCommand({
             Bucket: mainS3Bucket,
-            Key: "",
+            Key: key,
+            ContentType: contentType,
         });
         const multipartUploadResponse = await s3Client.send(multipartCommand);
         return {
