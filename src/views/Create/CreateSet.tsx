@@ -337,22 +337,6 @@ const CreateSet = (props: Props) => {
         mainButtonDisabled,
     };
 
-    // const handleUndoAction = () => {
-    //     setActionsStack(prevStack => {
-    //         const newActionsStack = [...prevStack];
-    //         const lastAction = newActionsStack.pop();
-    //         console.log("ENTERED HANDLEUNDO", { actionsStack: prevStack, lastAction, createdSetCards});
-    //         if (!lastAction) {
-    //             return prevStack;
-    //         }
-    //         const { undoCallback } = lastAction;
-    //         undoCallback(createdSetCards, setCreatedSetCards);
-            
-    //         return newActionsStack;
-    //     });
-    // }
-
-
     if (!authenticated) {
         return <LoginMessage page="createSet" />;
     }

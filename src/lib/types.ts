@@ -195,6 +195,18 @@ export type ChangeLabelParams = {
     newLabel: string;
 };
 
+export type FileMetadata = {
+    key: string;
+    name: string;
+    signedURL: string;
+    size: number;
+};
+
+export type Part = {
+    ETag: string;
+    PartNumber: number;
+}
+
 export type SortDirection = "asc" | "dsc";
 
 export type ConfirmDialogProps = {
@@ -212,3 +224,4 @@ export type ConfirmDialogProps = {
 export type OpenCardNotes = Set<UUID>;
 
 export type ColorPickerType = "textColor" | "backgroundColor";
+
