@@ -3,8 +3,7 @@ import {
 } from "@mui/icons-material";
 import FileUpload from "components/FileUpload/FileUpload";
 import type { TODO } from "lib/types";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { useTheme } from "theme/useTheme";
+import { Dispatch, SetStateAction, useState } from "react";
 import {
     AddCardBelowButton,
     BottomActions,
@@ -16,6 +15,7 @@ import {
     NewCardRow,
     NewCardTerm,
 } from "../CreateSetStyles";
+import useFileUpload from "lib/hooks/useFileUpload";
 import NewCardHeader from "./NewCardHeader";
 
 type Props = {
@@ -50,6 +50,11 @@ const NewCardInput = (props: Props) => {
 
     const setStateCallback = setCreatedSetCards;
 
+    const { uploadFile } = useFileUpload({
+        studysetUUID: "",
+        userUUID: "",
+    });
+
     const [localTextColor, setLocalTextColor] = useState(textColor);
     const [localBackgroundColor, setLocalBackgroundColor] =
         useState(backgroundColor);
@@ -59,6 +64,7 @@ const NewCardInput = (props: Props) => {
         useState<boolean>(false);
     const displayBackgroundColor = applyBackgroundColor && localBackgroundColor;
     const displayTextColor = applyTextColor && localTextColor;
+
 
     return (
         <NewCard
