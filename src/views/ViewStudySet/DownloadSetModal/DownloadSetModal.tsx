@@ -19,7 +19,7 @@ import {
     DEFAULT_CSV_HEADERS,
     METADATA_CSV_HEADERS,
 } from "utilities/constants";
-import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import { StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import { DownloadDialogContent } from "../styles";
 

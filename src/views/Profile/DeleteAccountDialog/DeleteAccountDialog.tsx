@@ -7,7 +7,7 @@ import {
     TextField,
 } from "@mui/material/";
 import * as C from "utilities/constants";
-import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import { StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import { Dispatch, SetStateAction } from "react";
 import { DeleteDialogContent, StyledDialogActions } from "../ProfileStyles";

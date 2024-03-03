@@ -9,7 +9,7 @@ import {
 import {
     BoldTypography,
     SimpleFlexContainer,
-    FlexDialogTitle as StyledDialogTitle,
+    StyledDialogTitle,
 } from "common/AppStyles";
 import { ChangeEvent, ReactNode, SyntheticEvent, useState } from "react";
 import {

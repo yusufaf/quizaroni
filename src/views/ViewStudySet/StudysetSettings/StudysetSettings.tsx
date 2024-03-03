@@ -2,7 +2,7 @@ import { Studyset } from "lib/types";
 import { StyledDialog, StyledDialogContent } from "./styles";
 import {
     FlexColumn,
-    FlexDialogTitle as StyledDialogTitle,
+    StyledDialogTitle,
 } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import FormatTerminologies from "./FormatTerminologies";
