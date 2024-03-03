@@ -23,7 +23,7 @@ import {
 } from "state/api/studysetsAPI";
 import {
     StyledDialogActions,
-    FlexDialogTitle as StyledDialogTitle,
+    StyledDialogTitle,
 } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import { useNavigate } from "react-router-dom";

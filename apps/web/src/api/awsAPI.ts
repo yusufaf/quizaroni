@@ -1,4 +1,4 @@
-import { Part, UUID } from "lib/types";
+import { FileMetadata, Part, UUID } from "lib/types";
 
 const BASE_API_URL =
     "https://30hl3jkdbg.execute-api.us-west-2.amazonaws.com/development/api";
@@ -19,12 +19,17 @@ type InitiateMultipartUploadProps = {
     fileName: string;
     contentType: string;
 };
+
+type InitiateMultipartUploadResponse = {
+    key: string;
+    uploadId: string | undefined;
+};
 export const initiateMultipartUpload = async ({
     studysetUUID = "",
     userUUID,
     fileName,
     contentType,
-}: InitiateMultipartUploadProps) => {
+}: InitiateMultipartUploadProps): Promise<InitiateMultipartUploadResponse> => {
     const url = `${BASE_API_URL}/files/initiateMultipartUpload`;
     return await fetch(url, {
         body: JSON.stringify({ studysetUUID, userUUID, fileName, contentType }),
@@ -38,11 +43,15 @@ type GetMultipartSignedUploadUrlsProps = {
     uploadId: string;
     numParts: number;
 };
+
+type GetMultipartSignedUploadUrlsResponse = {
+    signedURLs: Record<number, string>;
+};
 export const getMultipartSignedUploadUrls = async ({
     key,
     uploadId,
     numParts,
-}: GetMultipartSignedUploadUrlsProps) => {
+}: GetMultipartSignedUploadUrlsProps): Promise<GetMultipartSignedUploadUrlsResponse> => {
     const url = `${BASE_API_URL}/files/getMultipartSignedUploadUrls`;
     return await fetch(url, {
         body: JSON.stringify({ key, uploadId, numParts }),
@@ -54,13 +63,15 @@ export const getMultipartSignedUploadUrls = async ({
 type CompleteMultipartUploadProps = {
     key: string;
     uploadId: string;
-    parts: Part[]
+    parts: Part[];
 };
+
+type CompleteMultipartUploadResponse = FileMetadata;
 export const completeMultipartUpload = async ({
     key,
     uploadId,
     parts,
-}: CompleteMultipartUploadProps) => {
+}: CompleteMultipartUploadProps): Promise<CompleteMultipartUploadResponse> => {
     const url = `${BASE_API_URL}/files/completeMultipartUpload`;
     return await fetch(url, {
         body: JSON.stringify({ key, uploadId, parts }),

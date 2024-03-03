@@ -2,7 +2,7 @@ import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import {
     BoldButton,
     StyledDialogActions,
-    FlexDialogTitle as StyledDialogTitle,
+    StyledDialogTitle,
 } from "common/AppStyles";
 import {
     ConfirmDescription,

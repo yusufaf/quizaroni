@@ -43,7 +43,7 @@ import {
     setAdvancedSectionProps,
 } from "state/slices/createSetSlice";
 import NamedColorsDialog from "components/NamedColorsDialog/NamedColorsDialog";
-import { Studyset } from "lib/types";
+import { Card, Studyset } from "lib/types";
 import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
 import { SelectChangeEvent, Tooltip, Typography } from "@mui/material";
 import { useGetUserQuery } from "state/api/usersAPI";
@@ -99,7 +99,7 @@ const CreateSet = (props: Props) => {
     const [description, setDescription] = useState<string>("");
     const [enteredLabel, setEnteredLabel] = useState<string | null>(null);
     const [selectedLabel, setSelectedLabel] = useState<string>("");
-    const [createdSetCards, setCreatedSetCards] = useState([{ ...EMPTY_CARD }]);
+    const [createdSetCards, setCreatedSetCards] = useState<Card[]>([{ ...EMPTY_CARD }]);
     const [actionsStack, setActionsStack] = useState<any[]>([]);
 
     const mainButtonDisabled = !title;
@@ -268,15 +268,15 @@ const CreateSet = (props: Props) => {
         return createdSetCards.map((_, index: number) => {
             const cardValues = createdSetCards[index];
             const props = {
+                actionsStack,
+                cardValues,
                 createdSetCards,
+                index,
+                key: cardValues.uuid,
                 onColorChange,
+                setActionsStack,
                 setCreatedSetCards,
                 updateCardValue,
-                index,
-                cardValues,
-                actionsStack,
-                setActionsStack,
-                key: cardValues.uuid,
             };
             return <NewCardInput {...props} />;
         });
@@ -355,7 +355,6 @@ const CreateSet = (props: Props) => {
                             <NoCardsWarningsIcon />
                         )}
                     </SimpleFlexContainer>
-
                     <SetModificationButtons
                         studysetCards={createdSetCards}
                         setCardsCallback={setCreatedSetCards}

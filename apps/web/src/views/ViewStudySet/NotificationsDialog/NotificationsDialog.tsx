@@ -6,7 +6,7 @@ import {
     IconButton,
 } from "@mui/material/";
 import { Email } from "@mui/icons-material";
-import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import { StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import { StyledDialog } from "./styles";
 

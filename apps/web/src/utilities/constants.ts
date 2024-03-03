@@ -77,8 +77,11 @@ export const CREATE_PAGE_PROPS: { [key: string]: any } = {
 };
 
 export const EMPTY_CARD: InitialCard = {
-    term: "",
+    categories: [],
     definition: "",
+    important: false,
+    notes: [],
+    term: "",
     uuid: uuidv4(),
 };
 

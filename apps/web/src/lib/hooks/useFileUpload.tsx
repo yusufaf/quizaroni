@@ -4,7 +4,7 @@ import {
     getMultipartSignedUploadUrls,
     completeMultipartUpload,
 } from "api/awsAPI";
-import { UUID, FileMetadata, Part, } from "lib/types";
+import { UUID, Part } from "lib/types";
 
 type UseFileUploadProps = {
     studysetUUID: UUID;
@@ -53,24 +53,26 @@ const useFileUpload = (props: UseFileUploadProps) => {
     };
 
     const uploadFile = useCallback(
-        async (files: FileList) => {
+        async (files: File[]) => {
             try {
                 const FILE_CHUNK_SIZE = 10_000_000; // 10 MB
 
                 for (const file of files) {
                     const { name: fileName, type: contentType, size } = file;
+                    console.log({file});
 
-                    const { key: uploadKey, uploadId } =
+                    const { key: uploadKey, uploadId = "" } =
                         await initiateMultipartUpload({
                             studysetUUID,
                             userUUID,
                             fileName,
                             contentType,
                         });
+                    console.log({uploadKey, uploadId });
 
                     const numParts = Math.ceil(size / FILE_CHUNK_SIZE);
 
-                    const signedURLs = await getMultipartSignedUploadUrls({
+                    const { signedURLs } = await getMultipartSignedUploadUrls({
                         key: uploadKey,
                         uploadId,
                         numParts,
