@@ -14,7 +14,7 @@ const FILE_UPLOAD_ICONS = new Map([
 type Props = {
     style?: Object;
     type?: string;
-    handleFiles: (files: any) => {};
+    handleFiles: (files: File[]) => any;
 };
 const FileUpload = (props: Props) => {
     const { handleFiles, style, type = "IMAGE"} = props;
@@ -30,7 +30,7 @@ const FileUpload = (props: Props) => {
         if (!e.target.files || !e.target.files[0]) {
             return;
         }
-        handleFiles(e.target.files);
+        handleFiles([...e.target.files]);
     };
 
     const handleDrag = (e: DragEvent<HTMLDivElement>) => {
@@ -50,7 +50,7 @@ const FileUpload = (props: Props) => {
         if (!e.dataTransfer.files || !e.dataTransfer.files[0]) {
             return;
         }
-        handleFiles(e.dataTransfer.files);
+        handleFiles([...e.dataTransfer.files]);
     };
 
     return (

@@ -4,38 +4,41 @@ export type UUID = string;
 export type Timestamp = number;
 
 export type InitialCard = {
-    term: string;
+    categories: string[];
     definition: string;
+    important: boolean;
+    notes: Note[];
+    term: string;
     uuid: UUID;
 };
 
 export type Note = {
-    uuid: UUID;
     text: string;
+    uuid: UUID;
 };
 
 export type Card = {
-    term: string;
-    definition: string;
-    textColor?: string;
     backgroundColor?: string;
-    important: boolean;
-    uuid: UUID;
     categories: string[];
+    definition: string;
+    important: boolean;
     notes: Note[];
+    term: string;
+    textColor?: string;
+    uuid: UUID;
 };
 
 export type StudysetMetadata = {
-    textColorVisible: boolean;
     backgroundColorVisible: boolean;
-    publiclyViewable: boolean;
     contentOnly?: boolean;
-    terminology: string;
+    customLabelTerminology: string;
     customTerminology: string;
     labelTerminology: string;
-    customLabelTerminology: string;
-    notesDrawerPosition: string;
     notesDrawerInitial: string;
+    notesDrawerPosition: string;
+    publiclyViewable: boolean;
+    terminology: string;
+    textColorVisible: boolean;
 };
 
 export type Studyset = {
@@ -205,7 +208,7 @@ export type FileMetadata = {
 export type Part = {
     ETag: string;
     PartNumber: number;
-}
+};
 
 export type SortDirection = "asc" | "dsc";
 
@@ -224,4 +227,3 @@ export type ConfirmDialogProps = {
 export type OpenCardNotes = Set<UUID>;
 
 export type ColorPickerType = "textColor" | "backgroundColor";
-

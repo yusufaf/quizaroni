@@ -6,7 +6,7 @@ import {
     Typography,
 } from "@mui/material/";
 import { useTheme } from "theme/useTheme";
-import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import { StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import { useDispatch, useSelector } from "react-redux";
 import { selectShowImportModal, setShowImportModal } from "state/slices/createSetSlice";

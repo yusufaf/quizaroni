@@ -1,5 +1,5 @@
 import { Dialog } from '@mui/material'
-import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import { StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import { Studyset } from "lib/types";
 

@@ -30,7 +30,7 @@ import {
 import {
     BoldTypography,
     SimpleFlexContainer,
-    FlexDialogTitle as StyledDialogTitle,
+    StyledDialogTitle,
 } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import { Download } from "@mui/icons-material";

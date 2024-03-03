@@ -25,11 +25,12 @@ import {
 import { handleReverse, swapAllCards } from "../../utilities/createUtils";
 import { useDispatch } from "react-redux";
 import { setShowImportModal } from "state/slices/createSetSlice";
-import { useState } from "react";
+import { Dispatch, MouseEvent, SetStateAction, useState } from "react";
+import { Card } from "lib/types";
 
 type Props = {
-    studysetCards: any;
-    setCardsCallback: any;
+    studysetCards: Card[];
+    setCardsCallback: Dispatch<SetStateAction<Card[]>>;
 };
 
 const SetModificationButtons = (props: Props) => {
@@ -45,14 +46,18 @@ const SetModificationButtons = (props: Props) => {
 
     const expandButtonTitle = expanded ? "Hide Buttons" : "Expand Buttons";
 
-    const onSwapAllClick = (_e: any) => {
+    const onImportClick = (_e: MouseEvent<HTMLButtonElement>) => {
+        dispatch(setShowImportModal(true));
+    };
+
+    const onSwapAllClick = (_e: MouseEvent<HTMLButtonElement>) => {
         swapAllCards({
             createdSetCards: studysetCards,
             setStateCallback: setCardsCallback,
         });
     };
 
-    const onReverseClick = (_e: any) => {
+    const onReverseClick = (_e: MouseEvent<HTMLButtonElement>) => {
         handleReverse({
             createdSetCards: studysetCards,
             setStateCallback: setCardsCallback,
@@ -82,7 +87,6 @@ const SetModificationButtons = (props: Props) => {
                     <KeyboardRounded color="primary" fontSize="medium" />
                 </IconButton>
             </Tooltip>
-          
             <Menu
                 id="keyboard-shortcuts-menu"
                 anchorEl={anchorEl}
@@ -117,20 +121,14 @@ const SetModificationButtons = (props: Props) => {
                 <>
                     <Tooltip title="Import Cards">
                         {hideButtonTextQuery ? (
-                            <IconButton
-                                onClick={() =>
-                                    dispatch(setShowImportModal(true))
-                                }
-                            >
+                            <IconButton onClick={onImportClick}>
                                 <UploadFile color="primary" fontSize="medium" />
                             </IconButton>
                         ) : (
                             <Button
                                 variant="outlined"
                                 startIcon={<UploadFile fontSize="medium" />}
-                                onClick={() =>
-                                    dispatch(setShowImportModal(true))
-                                }
+                                onClick={onImportClick}
                             >
                                 Import Cards
                             </Button>

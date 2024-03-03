@@ -40,7 +40,8 @@ export const BasePage = styled("main")({
     marginTop: "2rem",
 })
 
-export const FlexDialogTitle = styled(DialogTitle)({
+/* ==== Dialog ==== */
+export const StyledDialogTitle = styled(DialogTitle)({
     display: "flex",
     alignItems: "center",
     fontWeight: 600,

@@ -17,27 +17,32 @@ import {
 } from "../CreateSetStyles";
 import useFileUpload from "lib/hooks/useFileUpload";
 import NewCardHeader from "./NewCardHeader";
+import { useSelector } from "react-redux";
+import { useGetUserQuery } from "state/api/usersAPI";
+import { selectCognitoUser } from "state/slices/globalSlice";
+import { DEFAULT_USER_DATA } from "utilities/constants";
+import { addCard } from "utilities/createUtils";
 
 type Props = {
+    actionsStack: TODO[];
     cardValues: any;
     createdSetCards: any;
     index: number;
     onColorChange: any;
+    setActionsStack: Dispatch<SetStateAction<TODO[]>>;
     setCreatedSetCards: any;
     updateCardValue: any;
-    actionsStack: TODO[];
-    setActionsStack: Dispatch<SetStateAction<TODO[]>>;
 };
 const NewCardInput = (props: Props) => {
     const {
-        index,
-        updateCardValue,
-        onColorChange,
+        actionsStack,
         cardValues,
         createdSetCards,
-        setCreatedSetCards,
-        actionsStack,
+        index,
+        onColorChange,
         setActionsStack,
+        setCreatedSetCards,
+        updateCardValue,
     } = props;
 
     const {
@@ -50,9 +55,18 @@ const NewCardInput = (props: Props) => {
 
     const setStateCallback = setCreatedSetCards;
 
+    const cognitoUser = useSelector(selectCognitoUser);
+    const {
+        data: {
+            uuid: userUUID = "",
+        } = DEFAULT_USER_DATA,
+    } = useGetUserQuery({
+        username: cognitoUser.username ?? "",
+    });
+
     const { uploadFile } = useFileUpload({
-        studysetUUID: "",
-        userUUID: "",
+        studysetUUID: "testStudysetUUID",
+        userUUID,
     });
 
     const [localTextColor, setLocalTextColor] = useState(textColor);
@@ -64,7 +78,6 @@ const NewCardInput = (props: Props) => {
         useState<boolean>(false);
     const displayBackgroundColor = applyBackgroundColor && localBackgroundColor;
     const displayTextColor = applyTextColor && localTextColor;
-
 
     return (
         <NewCard
@@ -116,12 +129,12 @@ const NewCardInput = (props: Props) => {
                         />
                     </NewCardTerm>
                     <FileUpload 
-                        handleFiles={() => {}}
+                        handleFiles={uploadFile}
                     />
                 </NewCardRow>
                 <NewCardRow>
                     <FileUpload 
-                        handleFiles={() => {}}
+                        handleFiles={uploadFile}
                     />
                     <NewCardDefinition>
                         <NewCardLabel variant="subtitle1">

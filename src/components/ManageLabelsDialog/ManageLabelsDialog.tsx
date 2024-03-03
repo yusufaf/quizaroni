@@ -26,7 +26,7 @@ import {
     useGetStudysetQuery,
 } from "state/api/studysetsAPI";
 import useCustomMutation from "lib/hooks/useCustomMutation";
-import { FlexDialogTitle as StyledDialogTitle } from "common/AppStyles";
+import { StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import CreateTabView from "./CreateTabView";
 import ManageTabView from "./ManageTabView";
