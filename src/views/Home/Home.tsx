@@ -34,6 +34,7 @@ import { useTheme } from "theme/useTheme";
 import {
     DEFAULT_USER_DATA,
     HOME_LAYOUTS,
+    PAGE_TITLES,
     SORT_DIRECTIONS
 } from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";
@@ -86,7 +87,7 @@ const Home = (props: Props) => {
         },
     ] = useUpdateUserMetadataMutation();
 
-    useBrowserTitle("Home");
+    useBrowserTitle(PAGE_TITLES.HOME);
 
     /* State */
     const [searchText, setSearchText] = useState<string>("");

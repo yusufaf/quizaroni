@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Box, Paper, Popover, Typography } from "@mui/material/";
 import { useNavigate } from "react-router-dom";
 import PasswordToggle from "components/PasswordToggle/PasswordToggle";
-import * as C from "utilities/constants";
+import { PAGE_TITLES } from "utilities/constants";
 import { useTheme } from "theme/useTheme";
 import { BoldTypography } from "common/AppStyles";
 import {
@@ -50,7 +50,7 @@ const Signup = (props: Props) => {
         passInput: false,
     });
 
-    useBrowserTitle("Sign Up");
+    useBrowserTitle(PAGE_TITLES.SIGN_UP);
 
     const handlePasswordChange = (e: any) => {
         setPassword(e.target.value);

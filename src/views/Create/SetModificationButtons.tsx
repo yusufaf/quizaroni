@@ -33,12 +33,13 @@ type Props = {
     setCardsCallback: Dispatch<SetStateAction<Card[]>>;
 };
 
-const SetModificationButtons = (props: Props) => {
-    const { studysetCards = [], setCardsCallback = () => {} } = props;
-
+const SetModificationButtons = ({
+    studysetCards = [],
+    setCardsCallback = () => {},
+}: Props) => {
     const dispatch = useDispatch();
     const hideButtonTextQuery = useMediaQuery(
-        "only screen and (max-width:1180px)"
+        "only screen and (max-width:1280px)"
     );
     const [expanded, setExpanded] = useState<boolean>(true);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
