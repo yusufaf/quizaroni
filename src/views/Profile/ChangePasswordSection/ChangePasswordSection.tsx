@@ -11,7 +11,6 @@ import { useRef, useState } from "react";
 import { updatePassword } from "@aws-amplify/auth";
 import { toast } from "react-toastify";
 import PasswordValidator from "components/PasswordValidator/PasswordValidator";
-import useBoundingRect from "lib/hooks/useBoundingRect";
 
 type Props = {};
 
@@ -25,9 +24,6 @@ const ChangePasswordSection = ({}: Props) => {
         useState<boolean>(false);
     const [newPasswordVisibility, setNewPasswordVisibility] =
         useState<boolean>(false);
-
-    const newPasswordInputRef = useRef<HTMLElement>(null);
-    const boundingRect = useBoundingRect(newPasswordInputRef);
 
     const passwordsDontMatch =
         newPassword && confirmPassword && newPassword !== confirmPassword;
@@ -80,7 +76,6 @@ const ChangePasswordSection = ({}: Props) => {
                     }}
                 />
                 <TextField
-                    ref={newPasswordInputRef}
                     variant="standard"
                     placeholder="Enter new password"
                     label="Password"
@@ -100,6 +95,13 @@ const ChangePasswordSection = ({}: Props) => {
                         ),
                     }}
                 />
+                {newPassword.length !== 0 && (
+                    <PasswordValidator
+                        isPasswordValid={passwordValid}
+                        password={newPassword}
+                        setIsPasswordValid={setPasswordValid}
+                    />
+                )}
                 <TextField
                     variant="standard"
                     placeholder="Confirm new password"
@@ -132,16 +134,6 @@ const ChangePasswordSection = ({}: Props) => {
                     Submit
                 </ActionSubmitButton>
             </InfoChangeContainer>
-            {boundingRect && (
-                <PasswordValidator
-                    password={newPassword}
-                    setIsPasswordValid={setPasswordValid}
-                    style={{
-                        left: boundingRect.right + 50,
-                        top: boundingRect.top - 75,
-                    }}
-                />
-            )}
         </ActionSection>
     );
 };
