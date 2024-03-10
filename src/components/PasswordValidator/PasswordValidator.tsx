@@ -1,12 +1,11 @@
-import { useEffect } from "react";
+import { CSSProperties, useEffect, useMemo } from "react";
 import { Dispatch, SetStateAction, useState } from "react";
 import { PWD_REGEX } from "utilities/constants";
-import {
-    PasswordPolicyContainer,
-    PasswordPolicyPaper,
-    RequirementText,
-} from "./styles";
-import { BoldTypography } from "common/AppStyles";
+import { PasswordPolicyContainer, RequirementText } from "./styles";
+import { AnimatePresence } from "framer-motion";
+
+const CHECKMARK_UNICODE = "\u2713";
+const X_UNICODE = "\u2715";
 
 type RequirementState = {
     length: boolean;
@@ -20,7 +19,7 @@ type Props = {
     isPasswordValid?: boolean;
     setIsPasswordValid: Dispatch<SetStateAction<boolean>>;
     password: string;
-    style?: Object;
+    style?: CSSProperties;
 };
 
 const initialRequirementState: RequirementState = {
@@ -31,9 +30,20 @@ const initialRequirementState: RequirementState = {
     uppercase: false,
 };
 
-const PasswordValidator = (props: Props) => {
-    const { setIsPasswordValid, password, style = {} } = props;
+const REQUIREMENT_MESSAGES: { [key: string]: string } = {
+    length: "Must be at least 8 characters long",
+    lowercase: "Must contain at least one lowercase letter",
+    number: "Must contain at least one number",
+    special: "Must contain at least one special character",
+    uppercase: "Must contain at least one uppercase letter",
+};
 
+const PasswordValidator = ({
+    isPasswordValid,
+    setIsPasswordValid,
+    password,
+    style = {},
+}: Props) => {
     const [requirementState, setRequirementState] = useState<RequirementState>({
         ...initialRequirementState,
     });
@@ -57,42 +67,37 @@ const PasswordValidator = (props: Props) => {
         return `${Boolean(value)}`;
     };
 
+    const requirementsJSX = useMemo(() => {
+        return Object.entries(requirementState).map(
+            ([requirementKey, satisfied]) => {
+                const unicodeIcon = satisfied ? CHECKMARK_UNICODE : X_UNICODE;
+                const message = REQUIREMENT_MESSAGES[requirementKey];
+                return (
+                    <RequirementText satisfied={booleanToString(satisfied)}>
+                        {unicodeIcon} {message}
+                    </RequirementText>
+                );
+            }
+        );
+    }, [requirementState]);
+
     return (
-        <PasswordPolicyContainer style={style}>
-            <PasswordPolicyPaper elevation={6}>
-                <BoldTypography
-                    variant="subtitle1"
-                    sx={{ textAlign: "center" }}
-                >
-                    Password Policy:
-                </BoldTypography>
-                <RequirementText
-                    isSatisfied={booleanToString(requirementState.length)}
-                >
-                    &bull; Must be at least 8 characters long
-                </RequirementText>
-                <RequirementText
-                    isSatisfied={booleanToString(requirementState.uppercase)}
-                >
-                    &bull; Must contain at least one uppercase letter
-                </RequirementText>
-                <RequirementText
-                    isSatisfied={booleanToString(requirementState.special)}
-                >
-                    &bull; Must contain at least one special character
-                </RequirementText>
-                <RequirementText
-                    isSatisfied={booleanToString(requirementState.lowercase)}
-                >
-                    &bull; Must contain at least one lowercase letter
-                </RequirementText>
-                <RequirementText
-                    isSatisfied={booleanToString(requirementState.number)}
-                >
-                    &bull; Must contain at least one number
-                </RequirementText>
-            </PasswordPolicyPaper>
-        </PasswordPolicyContainer>
+        <AnimatePresence>
+            <PasswordPolicyContainer
+                style={style}
+                initial={{ x: -100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -100, opacity: 0 }}
+            >
+                {isPasswordValid ? (
+                    <RequirementText satisfied="true">
+                        {CHECKMARK_UNICODE} Your password is secure!
+                    </RequirementText>
+                ) : (
+                    requirementsJSX
+                )}
+            </PasswordPolicyContainer>
+        </AnimatePresence>
     );
 };
 
