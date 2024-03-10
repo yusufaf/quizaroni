@@ -3,16 +3,11 @@ import { Popover, Typography } from "@mui/material/";
 import { CategoryChip } from "./styles";
 
 type Props = {
-  categories: string[];
+    categories: string[];
 };
 
-const CategoriesPopover = (props: Props) => {
-    const {
-      categories = []
-    } = props;
-
+const CategoriesPopover = ({ categories = [] }: Props) => {
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-
     const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };

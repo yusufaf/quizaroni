@@ -34,17 +34,15 @@ type Props = {
     setSelectedSort: Dispatch<SetStateAction<string>>;
 };
 
-const ViewStudysetFilters = (props: Props) => {
-    const {
-        selectedTab,
-        setSelectedTab,
-        selectedStudyset,
-        sortDirection,
-        setSortDirection,
-        selectedSort,
-        setSelectedSort,
-    } = props;
-
+const ViewStudysetFilters = ({
+    selectedTab,
+    setSelectedTab,
+    selectedStudyset,
+    sortDirection,
+    setSortDirection,
+    selectedSort,
+    setSelectedSort,
+}: Props) => {
     const dispatch = useDispatch();
 
     const categoryTabs = useMemo(() => {

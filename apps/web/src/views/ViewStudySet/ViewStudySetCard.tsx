@@ -27,9 +27,7 @@ type Props = {
     selectedStudyset: Studyset;
 };
 
-const ViewStudySetCard = (props: Props) => {
-    const { card, index, selectedStudyset } = props;
-
+const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
     const { isDarkMode, theme } = useTheme();
     const { speak, cancel } = useSpeechSynthesis();
 

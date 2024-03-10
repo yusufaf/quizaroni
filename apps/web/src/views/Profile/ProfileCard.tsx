@@ -15,18 +15,13 @@ import { User } from "lib/types";
 type Props = {
     userData: User;
 };
-const ProfileCard = (props: Props) => {
-    const { userData } = props;
-
+const ProfileCard = ({ userData }: Props) => {
     const { isDarkMode, theme } = useTheme();
 
     const { data: studysets = [] } = useGetAllStudysetsQuery(
         { userUUID: userData.uuid ?? "" },
         { skip: !userData.uuid }
     );
-
-    const profilePicRef = useRef(null);
-    console.log({ userData });
 
     useEffect(() => {}, []);
 
@@ -35,21 +30,7 @@ const ProfileCard = (props: Props) => {
     return (
         <>
             <StyledProfileCard elevation={6}>
-                <ProfilePicture style={{ backgroundImage: "" }}>
-                    {/* TODO: In fileChange function, have a switch case that restricts it to images only */}
-                    <input
-                        type="file"
-                        id="profilePicture"
-                        ref={profilePicRef}
-                        accept=".png, .jpg"
-                        // onChange={e => onFileChange(e, index)}
-                        style={{ display: "none" }}
-                    />
-                    <UploadImageButton
-                        onClick={() => profilePicRef.current.click()}
-                    >
-                        <AddPhotoIcon fontSize="large" />
-                    </UploadImageButton>
+                <ProfilePicture>
                 </ProfilePicture>
                 <UserInfoContainer>
                     <UserInfoHeading>Username</UserInfoHeading>
