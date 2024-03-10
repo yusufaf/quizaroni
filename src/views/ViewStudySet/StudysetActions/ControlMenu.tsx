@@ -11,17 +11,20 @@ import { useTheme } from "theme/useTheme";
 import { useMemo } from "react";
 
 type Props = {
-    open: boolean;
-    onClose: () => void;
     anchorEl: Element | null;
+    onClose: () => void;
+    open: boolean;
     selectedStudyset: Studyset | undefined;
     updateMetadataState: any;
 };
 
-const ControlMenu = (props: Props) => {
-    const { open, onClose, anchorEl, selectedStudyset, updateMetadataState } =
-        props;
-
+const ControlMenu = ({
+    anchorEl,
+    onClose,
+    open,
+    selectedStudyset,
+    updateMetadataState,
+}: Props) => {
     const { theme } = useTheme();
 
     const { metadata = {} } = selectedStudyset || {};
@@ -42,19 +45,22 @@ const ControlMenu = (props: Props) => {
                 condition: textColorVisible,
                 updateProperty: SET_METADATA_FIELDS.TEXT,
                 label: "Text Color",
-                description: "If enabled, text color for the term/definition will be applied/visible."
+                description:
+                    "If enabled, text color for the term/definition will be applied/visible.",
             },
             {
                 condition: backgroundColorVisible,
                 updateProperty: SET_METADATA_FIELDS.BACKGROUND,
                 label: "Background Color",
-                description: "If enabled, background color for cards will be applied/visible."
+                description:
+                    "If enabled, background color for cards will be applied/visible.",
             },
             {
                 condition: contentOnly,
                 updateProperty: SET_METADATA_FIELDS.CONTENT_ONLY,
                 label: "Content Only",
-                description: "If enabled, buttons and labels on all cards will be hidden."
+                description:
+                    "If enabled, buttons and labels on all cards will be hidden.",
             },
         ],
         [textColorVisible, backgroundColorVisible, contentOnly]
@@ -62,37 +68,39 @@ const ControlMenu = (props: Props) => {
 
     return (
         <Menu open={open} onClose={onClose} anchorEl={anchorEl}>
-            {menuItems.map(({ condition, updateProperty, label, description }) => {
-                return (
-                    <MenuItem>
-                        <FormControlLabel
-                            control={
-                                <Switch
-                                    size="small"
-                                    checked={condition}
-                                    onChange={() =>
-                                        updateMetadataState(updateProperty)
-                                    }
-                                />
-                            }
-                            label={
-                                <Typography
-                                    sx={{
-                                        color: condition
-                                            ? theme.palette.success.main
-                                            : theme.palette.error.main,
-                                    }}
-                                >
-                                    {`${label}: ${
-                                        condition ? ENABLED : DISABLED
-                                    }`}
-                                </Typography>
-                            }
-                            title={description}
-                        />
-                    </MenuItem>
-                );
-            })}
+            {menuItems.map(
+                ({ condition, updateProperty, label, description }) => {
+                    return (
+                        <MenuItem>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        size="small"
+                                        checked={condition}
+                                        onChange={() =>
+                                            updateMetadataState(updateProperty)
+                                        }
+                                    />
+                                }
+                                label={
+                                    <Typography
+                                        sx={{
+                                            color: condition
+                                                ? theme.palette.success.main
+                                                : theme.palette.error.main,
+                                        }}
+                                    >
+                                        {`${label}: ${
+                                            condition ? ENABLED : DISABLED
+                                        }`}
+                                    </Typography>
+                                }
+                                title={description}
+                            />
+                        </MenuItem>
+                    );
+                }
+            )}
             {/* <MenuItem>
         <FormControlLabel
             control={

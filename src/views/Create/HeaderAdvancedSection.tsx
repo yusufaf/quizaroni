@@ -1,39 +1,48 @@
 import { Button, IconButton, TextField, Typography } from "@mui/material";
-import { BoldTypography, SimpleFlexContainer } from "common/AppStyles"
-import { AdvancedSection, BlankInputsContainer, BlankInputsField } from "./CreateSetStyles"
+import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
+import {
+    AdvancedSection,
+    BlankInputsContainer,
+    BlankInputsField,
+} from "./CreateSetStyles";
 import {
     ExpandMore as ExpandMoreIcon,
     ExpandLess as ExpandLessIcon,
 } from "@mui/icons-material";
-import { useDispatch, useSelector } from 'react-redux';
-import { selectAdvancedSectionProps, setAdvancedSectionProps } from "state/slices/createSetSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+    selectAdvancedSectionProps,
+    setAdvancedSectionProps,
+} from "state/slices/createSetSlice";
 
 type Props = {
-    onBlankInputsSubmit: any,
-}
+    onBlankInputsSubmit: any;
+};
 
-const HeaderAdvancedSection = (props: Props) => {
-    const {
-        onBlankInputsSubmit = null,
-    } = props;
-
+const HeaderAdvancedSection = ({ onBlankInputsSubmit = null }: Props) => {
     const dispatch = useDispatch();
 
-    const { blankCardsCount, expanded } = useSelector(selectAdvancedSectionProps);
+    const { blankCardsCount, expanded } = useSelector(
+        selectAdvancedSectionProps
+    );
 
     const onBlankInputsChange = (e: any) => {
-        dispatch(setAdvancedSectionProps({
-            blankCardsCount: e.target.value,
-            expanded,
-        }))
+        dispatch(
+            setAdvancedSectionProps({
+                blankCardsCount: e.target.value,
+                expanded,
+            })
+        );
     };
 
     const onToggleExpanded = () => {
-        dispatch(setAdvancedSectionProps({
-            blankCardsCount,
-            expanded: !expanded
-        }))
-    }
+        dispatch(
+            setAdvancedSectionProps({
+                blankCardsCount,
+                expanded: !expanded,
+            })
+        );
+    };
 
     const handleBlankInputsSubmit = () => {
         onBlankInputsSubmit();
@@ -42,44 +51,33 @@ const HeaderAdvancedSection = (props: Props) => {
             message: `${blankCardsCount} cards successfully created!`,
             open: true,
         };
-    }
-   
+    };
+
     return (
         <AdvancedSection>
             <SimpleFlexContainer>
-                <BoldTypography>
-                    Advanced
-                </BoldTypography>
+                <BoldTypography>Advanced</BoldTypography>
                 <IconButton onClick={onToggleExpanded}>
-                    {expanded ?
-                        <ExpandLessIcon /> :
-                        <ExpandMoreIcon />}
+                    {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </IconButton>
             </SimpleFlexContainer>
-            {
-                expanded &&
+            {expanded && (
                 <BlankInputsContainer>
-                    <Typography>
-                        Add x blank cards
-                    </Typography>
+                    <Typography>Add x blank cards</Typography>
                     <BlankInputsField
                         type="number"
                         size="small"
                         InputProps={{
-                            inputProps: { min: 0, max: 100}
+                            inputProps: { min: 0, max: 100 },
                         }}
                         onChange={onBlankInputsChange}
                         value={blankCardsCount}
                     />
-                    <Button 
-                        onClick={handleBlankInputsSubmit}
-                    >
-                        Add
-                    </Button>
+                    <Button onClick={handleBlankInputsSubmit}>Add</Button>
                 </BlankInputsContainer>
-            }
+            )}
         </AdvancedSection>
-    )
-}
+    );
+};
 
 export default HeaderAdvancedSection;

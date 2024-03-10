@@ -57,20 +57,18 @@ type Props = {
     selectedStudysetUUIDs: string[];
 };
 
-const HomeToolbar = (props: Props) => {
-    const {
-        handleViewChange,
-        selectedView,
-        searchText,
-        setSearchText,
-        selectedSort,
-        setSelectedSort,
-        sortDirection,
-        setSortDirection,
-        selectedStudysetRows,
-        selectedStudysetUUIDs,
-    } = props;
-
+const HomeToolbar = ({
+    handleViewChange,
+    selectedView,
+    searchText,
+    setSearchText,
+    selectedSort,
+    setSelectedSort,
+    sortDirection,
+    setSortDirection,
+    selectedStudysetRows,
+    selectedStudysetUUIDs,
+}: Props) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 

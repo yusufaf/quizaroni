@@ -1,46 +1,46 @@
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from "@mui/material";
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+    Button,
+} from "@mui/material";
+import { StyledDialogActions, StyledDialogTitle } from "common/AppStyles";
+import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 
 type Props = {
-  open: boolean;
-  handleClose: () => void;
-  handleImageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}
+    open: boolean;
+    onClose: () => void;
+    handleImageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+};
 
-const ProfilePictureDialog = (props: Props) => {
-  const { open, handleClose, handleImageChange } = props;
-
-  return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      fullWidth
-
-    >
-      <DialogTitle>Profile Picture</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          Select a new profile picture
-        </DialogContentText>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          id="profilePicture"
-          hidden
-        />
-
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} color="primary">
-          Cancel
-        </Button>
-
-        </DialogActions>
-
-    </Dialog>
-
-
-  )
-}
+const ProfilePictureDialog = ({ open, onClose, handleImageChange }: Props) => {
+    return (
+        <Dialog open={open} onClose={onClose} fullWidth>
+            <StyledDialogTitle>
+                Profile Picture
+                <CloseDialogButton onClose={onClose} />
+            </StyledDialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    Select a new profile picture
+                </DialogContentText>
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    id="profilePicture"
+                    hidden
+                />
+            </DialogContent>
+            <StyledDialogActions>
+                <Button onClick={onClose} color="primary">
+                    Cancel
+                </Button>
+            </StyledDialogActions>
+        </Dialog>
+    );
+};
 
 export default ProfilePictureDialog;

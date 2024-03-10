@@ -10,9 +10,7 @@ type Props = {
 
 const cardsPerPage = 6;
 
-const HomeGridView = (props: Props) => {
-    const { studysets } = props;
-
+const HomeGridView = ({ studysets }: Props) => {
     const [page, setPage] = useState<number>(1);
 
     const onPageChange = (
@@ -34,9 +32,7 @@ const HomeGridView = (props: Props) => {
         <>
             <HomeSetGrid>
                 {paginatedStudySets.length === 0 ? (
-                    <CenteredTypography>
-                        No results found
-                    </CenteredTypography>
+                    <CenteredTypography>No results found</CenteredTypography>
                 ) : (
                     paginatedStudySets.map((studyset) => (
                         <HomeStudySetCard

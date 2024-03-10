@@ -29,9 +29,7 @@ type Props = {
     userData: User;
 };
 
-const CustomizationTab = (props: Props) => {
-    const { userData } = props;
-
+const CustomizationTab = ({ userData }: Props) => {
     const dispatch = useDispatch();
 
     const { uuid: userUUID = "", labels = [] } = userData;

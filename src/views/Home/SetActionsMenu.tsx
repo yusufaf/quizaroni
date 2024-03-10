@@ -24,24 +24,22 @@ import { useDispatch } from "react-redux";
 type Props = {
     studyset: Studyset | null;
     open: boolean;
-    onClose: any;
+    onClose: () => void;
     anchorEl: any;
     anchorReference?: PopoverReference;
     anchorPosition?: PopoverPosition;
     slotProps?: any;
 };
 
-const SetActionsMenu = (props: Props) => {
-    const {
-        studyset,
-        open,
-        onClose,
-        anchorEl,
-        anchorReference,
-        anchorPosition,
-        slotProps,
-    } = props;
-
+const SetActionsMenu = ({
+    studyset,
+    open,
+    onClose,
+    anchorEl,
+    anchorReference,
+    anchorPosition,
+    slotProps,
+}: Props) => {
     const { favorited = false, uuid: studysetUUID = "" } = studyset ?? {};
 
     const [favoriteStudyset] = useFavoriteStudysetMutation();
@@ -50,18 +48,20 @@ const SetActionsMenu = (props: Props) => {
 
     const handleConfirmAction = (
         e: React.MouseEvent<HTMLLIElement, MouseEvent>,
-        action: string,
+        action: string
     ) => {
         e.stopPropagation();
-        
+
         if (!studyset) {
             return;
         }
 
-        dispatch(showConfirmDialog({
-            type: action,
-            studysets: [studyset],
-        }));
+        dispatch(
+            showConfirmDialog({
+                type: action,
+                studysets: [studyset],
+            })
+        );
     };
 
     const handleFavoriteAction = () => {
@@ -94,10 +94,7 @@ const SetActionsMenu = (props: Props) => {
             </MenuItem>
             <MenuItem
                 onClick={(e) =>
-                    handleConfirmAction(
-                        e,
-                        STUDYSET_CONFIRM_DIALOGS.DUPLICATE
-                    )
+                    handleConfirmAction(e, STUDYSET_CONFIRM_DIALOGS.DUPLICATE)
                 }
             >
                 <ListItemIcon>
@@ -107,10 +104,7 @@ const SetActionsMenu = (props: Props) => {
             </MenuItem>
             <MenuItem
                 onClick={(e) =>
-                    handleConfirmAction(
-                        e,
-                        STUDYSET_CONFIRM_DIALOGS.DELETE
-                    )
+                    handleConfirmAction(e, STUDYSET_CONFIRM_DIALOGS.DELETE)
                 }
             >
                 <ListItemIcon>
