@@ -15,7 +15,10 @@ import {
 import { StyledLink } from "common/AppStyles";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import { useDispatch } from "react-redux";
-import { setCognitoUser, setConfirmationCodeDialogProps } from "state/slices/globalSlice";
+import {
+    setCognitoUser,
+    setConfirmationCodeDialogProps,
+} from "state/slices/globalSlice";
 import { signUp } from "@aws-amplify/auth";
 import PasswordValidator from "components/PasswordValidator/PasswordValidator";
 import { useCreateUserMutation } from "state/api/usersAPI";
@@ -64,14 +67,14 @@ const Signup = (props: Props) => {
                 password,
                 options: {
                     userAttributes: {
-                        email
+                        email,
                     },
                     autoSignIn: {
                         enabled: true,
                     },
                 },
             });
-            console.log({signUpResult});
+            console.log({ signUpResult });
 
             /* Store newly created cognito user in Redux */
             dispatch(
@@ -83,7 +86,7 @@ const Signup = (props: Props) => {
             createUser({
                 email,
                 username,
-            })
+            });
 
             dispatch(
                 setConfirmationCodeDialogProps({
@@ -119,9 +122,8 @@ const Signup = (props: Props) => {
     return (
         <SignupPageContainer>
             <Paper elevation={6}>
-                <SignupContainer onKeyPress={enterKeyHandler}>
+                <SignupContainer onKeyUp={enterKeyHandler}>
                     <SignupTitle variant="h5">Sign up</SignupTitle>
-
                     <SignupField
                         label="Email"
                         name="emailInput"
@@ -158,6 +160,16 @@ const Signup = (props: Props) => {
                         }}
                         required
                     />
+                    {password.length !== 0 && (
+                        <PasswordValidator
+                            isPasswordValid={passwordValid}
+                            setIsPasswordValid={setPasswordValid}
+                            password={password}
+                            style={{
+                                marginTop: "0.5rem",
+                            }}
+                        />
+                    )}
                     <SignupField
                         label="Confirm Password"
                         name="passInput"
@@ -178,10 +190,6 @@ const Signup = (props: Props) => {
                             ),
                         }}
                         required
-                    />
-                    <PasswordValidator
-                        setIsPasswordValid={setPasswordValid}
-                        password={password}
                     />
                     <SignupButton
                         variant="contained"
