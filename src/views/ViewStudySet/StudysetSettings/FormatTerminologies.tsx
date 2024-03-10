@@ -16,9 +16,7 @@ type Props = {
     studyset: Studyset | undefined;
 };
 
-const FormatTerminologies = (props: Props) => {
-    const { studyset } = props;
-
+const FormatTerminologies = ({ studyset } : Props) => {
     const [customTerminology1, setCustomTerminology1] = useState<string>("");
     const [customTerminology2, setCustomTerminology2] = useState<string>("");
     const [customTerminologyErrors, setCustomTerminologyErrors] = useState<

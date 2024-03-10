@@ -16,9 +16,7 @@ type Props = {
     studyset: Studyset | undefined;
 };
 
-const LabelTerminologies = (props: Props) => {
-    const { studyset } = props;
-
+const LabelTerminologies = ({ studyset }: Props) => {
     const [customTerminology, setCustomTerminology] = useState<string>("");
 
     const isCustomTerminology =

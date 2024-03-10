@@ -20,9 +20,7 @@ type Props = {
     studyset: Studyset | undefined;
 };
 
-const StudysetSettings = (props: Props) => {
-    const { open, onClose, studyset } = props;
-
+const StudysetSettings = ({ open, onClose, studyset }: Props) => {
     const [updateStudysetMetadata, { isLoading: isUpdatingTerminology }] =
         useUpdateStudysetMetadataMutation();
 
