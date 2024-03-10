@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Paper } from "@mui/material/";
 import PasswordToggle from "components/PasswordToggle/PasswordToggle";
 import { useTheme } from "theme/useTheme";
-import * as C from "utilities/constants";
+import { PAGE_TITLES } from "utilities/constants";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import {
     ForgotPasswordLink,
@@ -30,7 +30,7 @@ type Props = {};
 const Login = (props: Props) => {
     const { isDarkMode, theme } = useTheme();
 
-    useBrowserTitle("Login");
+    useBrowserTitle(PAGE_TITLES.LOGIN);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -112,7 +112,7 @@ const Login = (props: Props) => {
         <>
             <LoginPageContainer role="page">
                 <Paper elevation={6}>
-                    <LoginContainer onKeyPress={enterKeyHandler}>
+                    <LoginContainer onKeyUp={enterKeyHandler}>
                         <LoginTitle variant="h5">Login</LoginTitle>
                         <LoginField
                             label="Email or username"

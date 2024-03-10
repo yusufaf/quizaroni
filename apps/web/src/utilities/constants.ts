@@ -19,13 +19,15 @@ export const ROUTES = {
     CREATE: "/create",
 };
 
-export const PAGES = {
+export const PAGE_TITLES = {
     CREATE: "Create",
-    LOGIN: "login",
-    SIGNUP: "signup",
-    profile: "profile",
-    home: "home",
-};
+    EDIT: "Edit",
+    HOME: "Home",
+    LOGIN: "Login",
+    SIGN_UP: "Sign Up",
+    EXPLORE: "Explore",
+    PROFILE: "Profile",
+}
 
 export const DELETE_ACCOUNT_MSG = `We're sad to see you go, but if you're certain you want to delete your account, 
                                     please confirm your password below.`;
