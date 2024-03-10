@@ -1,6 +1,13 @@
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+    ChangeEvent,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -53,9 +60,7 @@ type Props = {
     pageType?: string;
 };
 
-const CreateSet = (props: Props) => {
-    const { pageType = "Create" } = props;
-
+const CreateSet = ({ pageType = "Create" }: Props) => {
     const pageProps = CREATE_PAGE_PROPS[pageType];
 
     /* Hooks / Redux */
@@ -66,14 +71,10 @@ const CreateSet = (props: Props) => {
 
     const authenticated = useSelector(selectAuthenticated);
     const cognitoUser = useSelector(selectCognitoUser);
-    const {
-        data: {
-            uuid: userUUID = "",
-            username,
-        } = DEFAULT_USER_DATA,
-    } = useGetUserQuery({
-        username: cognitoUser.username ?? "",
-    });
+    const { data: { uuid: userUUID = "", username } = DEFAULT_USER_DATA } =
+        useGetUserQuery({
+            username: cognitoUser.username ?? "",
+        });
     const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
     const { blankCardsCount, expanded } = useSelector(
         selectAdvancedSectionProps
@@ -99,10 +100,12 @@ const CreateSet = (props: Props) => {
     const [description, setDescription] = useState<string>("");
     const [enteredLabel, setEnteredLabel] = useState<string | null>(null);
     const [selectedLabel, setSelectedLabel] = useState<string>("");
-    const [createdSetCards, setCreatedSetCards] = useState<Card[]>([{ ...EMPTY_CARD }]);
+    const [createdSetCards, setCreatedSetCards] = useState<Card[]>([
+        { ...EMPTY_CARD },
+    ]);
     const [actionsStack, setActionsStack] = useState<any[]>([]);
 
-    const mainButtonDisabled = !title;
+    const mainButtonDisabled = useMemo(() => !title, [title]);
 
     /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
@@ -110,37 +113,40 @@ const CreateSet = (props: Props) => {
         descInput: false,
     });
 
-    useBrowserTitle(PAGES.CREATE);
+    useBrowserTitle(pageType);
 
     /* ==== Actions Stack ==== */
     const handleUndoAction = useCallback(() => {
         const newActionsStack = [...actionsStack];
         const lastAction = newActionsStack.pop();
-        console.log("ENTERED HANDLEUNDO", { newActionsStack, lastAction, createdSetCards});
+        console.log("ENTERED HANDLEUNDO", {
+            newActionsStack,
+            lastAction,
+            createdSetCards,
+        });
         if (!lastAction) {
             return newActionsStack;
         }
         const { undoCallback } = lastAction;
         undoCallback(createdSetCards, setCreatedSetCards);
-        
+
         return newActionsStack;
     }, [createdSetCards, actionsStack]);
 
     /* */
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.ctrlKey && event.altKey && event.key === 'z') {
+            if (event.ctrlKey && event.altKey && event.key === "z") {
                 handleUndoAction();
             }
         };
-    
-        document.addEventListener('keydown', handleKeyDown);
-    
+
+        document.addEventListener("keydown", handleKeyDown);
+
         return () => {
-            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener("keydown", handleKeyDown);
         };
     }, [handleUndoAction]);
-    
 
     /* Loading values for editing a studyset */
     useEffect(() => {
@@ -244,13 +250,12 @@ const CreateSet = (props: Props) => {
         }
     };
 
-
     /**
      * Update a given card input's value in the array storing the cards
      */
     const updateCardValue = (index: number, property: string, value: any) => {
         const newCreatedSetCards = [...createdSetCards];
-        const newCard = {...newCreatedSetCards[index]};
+        const newCard = { ...newCreatedSetCards[index] };
         newCard[property] = value;
         newCreatedSetCards[index] = newCard;
         setCreatedSetCards(newCreatedSetCards);
@@ -351,9 +356,7 @@ const CreateSet = (props: Props) => {
                             Number of cards in this study set:{" "}
                             {createdSetCards.length ?? "N/A"}
                         </Typography>
-                        {!createdSetCards.length && (
-                            <NoCardsWarningsIcon />
-                        )}
+                        {!createdSetCards.length && <NoCardsWarningsIcon />}
                     </SimpleFlexContainer>
                     <SetModificationButtons
                         studysetCards={createdSetCards}
@@ -369,7 +372,7 @@ const CreateSet = (props: Props) => {
                             createdSetCards,
                             setStateCallback: setCreatedSetCards,
                             actionsStack,
-                            setActionsStack
+                            setActionsStack,
                         })
                     }
                 >

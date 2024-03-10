@@ -1,6 +1,4 @@
-import {
-    Tabs
-} from "@mui/material/";
+import { Tabs } from "@mui/material/";
 import { SyntheticEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -19,12 +17,13 @@ import {
     ProfileTab,
 } from "./ProfileStyles";
 import { useGetUserQuery } from "state/api/usersAPI";
-import { DEFAULT_USER_DATA } from "utilities/constants";
+import { DEFAULT_USER_DATA, PAGE_TITLES } from "utilities/constants";
+import useBrowserTitle from "lib/hooks/useBrowserTitle";
 
 const TABS = {
     ACCOUNT: "Account",
     CUSTOMIZATION: "Customization",
-}
+};
 
 type Props = {};
 
@@ -34,13 +33,15 @@ const Profile = (props: Props) => {
     const dispatch = useDispatch();
     const authenticated = useSelector(selectAuthenticated);
     const cognitoUser = useSelector(selectCognitoUser);
-    const {
-        data: userData = DEFAULT_USER_DATA,
-    } = useGetUserQuery({
+    const { data: userData = DEFAULT_USER_DATA } = useGetUserQuery({
         username: cognitoUser.username ?? "",
     });
 
-    const [selectedProfileTab, setSelectedProfileTab] = useState<string>(localStorage.getItem("profileTab") ?? TABS.CUSTOMIZATION);
+    useBrowserTitle(PAGE_TITLES.PROFILE);
+
+    const [selectedProfileTab, setSelectedProfileTab] = useState<string>(
+        localStorage.getItem("profileTab") ?? TABS.CUSTOMIZATION
+    );
 
     /* User Input Error Checking */
     const [showErrorText, setShowErrorText] = useState({
@@ -59,13 +60,10 @@ const Profile = (props: Props) => {
     return (
         <>
             <ProfilePage>
-                <ProfileCard userData={userData}/>
+                <ProfileCard userData={userData} />
                 <ProfilePaper elevation={6}>
                     <ProfileContainer>
-                        <Tabs
-                            value={selectedProfileTab}
-                            onChange={onTabChange}
-                        >
+                        <Tabs value={selectedProfileTab} onChange={onTabChange}>
                             <ProfileTab
                                 label={TABS.CUSTOMIZATION}
                                 value={TABS.CUSTOMIZATION}
@@ -75,14 +73,12 @@ const Profile = (props: Props) => {
                                 value={TABS.ACCOUNT}
                             />
                         </Tabs>
-                        {selectedProfileTab === TABS.CUSTOMIZATION
-                            &&
-                            <CustomizationTab userData={userData}/> 
-                        }
-                        {selectedProfileTab === TABS.ACCOUNT
-                            &&
-                            <AccountTab userData={userData}/> 
-                        }
+                        {selectedProfileTab === TABS.CUSTOMIZATION && (
+                            <CustomizationTab userData={userData} />
+                        )}
+                        {selectedProfileTab === TABS.ACCOUNT && (
+                            <AccountTab userData={userData} />
+                        )}
                     </ProfileContainer>
                 </ProfilePaper>
             </ProfilePage>

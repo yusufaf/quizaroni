@@ -1,9 +1,5 @@
 import { ArrowBack, Create } from "@mui/icons-material";
-import {
-    Button,
-    FormControl,
-    Typography
-} from "@mui/material";
+import { Button, FormControl, Typography } from "@mui/material";
 import { BoldTypography } from "common/AppStyles";
 import { useSelector } from "react-redux";
 import { selectCognitoUser } from "state/slices/globalSlice";
@@ -12,7 +8,7 @@ import {
     CREATE_PAGE_PROPS,
     CREATE_PAGE_TYPES,
     CREATE_SET,
-    DEFAULT_USER_DATA
+    DEFAULT_USER_DATA,
 } from "utilities/constants";
 import HeaderAdvancedSection from "./HeaderAdvancedSection";
 import {
@@ -32,10 +28,11 @@ import {
 } from "./CreateSetStyles";
 import { useNavigate, useParams } from "react-router-dom";
 import { useGetUserQuery } from "state/api/usersAPI";
+import { ReactElement } from "react";
 
 type Props = {
     advancedSectionProps: any;
-    handleMainButton: any;
+    handleMainButton: () => void;
     mainButtonDisabled: boolean;
     description: string;
     label: string | null;
@@ -48,22 +45,20 @@ type Props = {
     title: string;
 };
 
-const CreateSetHeader = (props: Props) => {
-    const {
-        advancedSectionProps,
-        handleMainButton,
-        description,
-        label,
-        onDescriptionChange,
-        onLabelChange,
-        onSelectedLabelChange,
-        onTitleChange,
-        selectedLabel,
-        title,
-        pageType = "",
-        mainButtonDisabled,
-    } = props;
-
+const CreateSetHeader = ({
+    advancedSectionProps,
+    handleMainButton,
+    description,
+    label,
+    onDescriptionChange,
+    onLabelChange,
+    onSelectedLabelChange,
+    onTitleChange,
+    selectedLabel,
+    title,
+    pageType = "",
+    mainButtonDisabled,
+}: Props) => {
     const isEditPage = pageType === CREATE_PAGE_TYPES.EDIT;
 
     const { theme } = useTheme();
@@ -71,16 +66,12 @@ const CreateSetHeader = (props: Props) => {
     const { id: studySetUUID } = useParams();
 
     const cognitoUser = useSelector(selectCognitoUser);
-    const {
-        data: {
-            labels = []
-        } = DEFAULT_USER_DATA,
-    } = useGetUserQuery({
+    const { data: { labels = [] } = DEFAULT_USER_DATA } = useGetUserQuery({
         username: cognitoUser.username ?? "",
     });
 
     const renderLabelOptions = () => {
-        const labelJsx: any[] = [];
+        const labelJsx: ReactElement[] = [];
 
         labelJsx.push(
             <LabelMenuItem key="" value="" sx={{ width: "10rem" }}>
@@ -91,7 +82,7 @@ const CreateSetHeader = (props: Props) => {
         );
 
         labelJsx.push(
-            ...labels.map((label: any, index: number) => {
+            ...labels.map((label, index: number) => {
                 return (
                     <LabelMenuItem
                         key={index}
@@ -111,7 +102,7 @@ const CreateSetHeader = (props: Props) => {
 
     const handleBackClick = () => {
         navigate(`/view/${studySetUUID}`);
-    }
+    };
 
     return (
         <CreateSetPaper elevation={6}>
@@ -171,9 +162,7 @@ const CreateSetHeader = (props: Props) => {
                                 <Typography component="span">
                                     or select an existing one
                                 </Typography>
-                                <FormControl 
-                                    variant="standard"
-                                >
+                                <FormControl variant="standard">
                                     <LabelSelect
                                         value={selectedLabel}
                                         onChange={onSelectedLabelChange}
