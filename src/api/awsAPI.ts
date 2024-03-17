@@ -1,15 +1,11 @@
 import { FileMetadata, Part, UUID } from "lib/types";
 
-const BASE_API_URL =
-    "https://30hl3jkdbg.execute-api.us-west-2.amazonaws.com/development/api";
-const AWS_API_KEY = import.meta.env.VITE_AWS_API_KEY;
+const BASE_API_URL = "https://c0yfrps22e.execute-api.us-west-2.amazonaws.com/api";
 
 const COMMON_REQUEST_PROPS: RequestInit = {
-    mode: "no-cors",
     credentials: "omit",
     headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": AWS_API_KEY,
     },
 };
 
