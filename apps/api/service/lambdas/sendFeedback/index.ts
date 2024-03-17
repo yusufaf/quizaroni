@@ -11,7 +11,7 @@ export default ({
 }: LambdaProps) => {
     const { appName, deploymentType = "" } = props;
 
-    const functionName = "initiateMultipartUpload";
+    const functionName = "sendFeedback";
     const nameAndID = `${deploymentType}-${functionName}`
     const role = getRole(`${deploymentType}-main-lambda-role`)
 

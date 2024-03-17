@@ -39,7 +39,7 @@ export const handler: Handler = async (
         }
 
         const uploadPartsResult = await Promise.all(promises);
-        const partURLs = uploadPartsResult.reduce((map: any, part, index) => {
+        const signedURLs = uploadPartsResult.reduce((map: Record<number, string> , part, index) => {
             map[index] = part;
             return map;
         }, {})
@@ -47,7 +47,7 @@ export const handler: Handler = async (
         return {
             statusCode: 200,
             body: JSON.stringify({
-                partURLs
+                signedURLs
             }),
         };
     } catch (err) {

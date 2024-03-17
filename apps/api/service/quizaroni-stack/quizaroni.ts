@@ -1,8 +1,8 @@
 import { Construct } from "constructs";
-import { ExtendedStackProps } from "../../models/stack";
+import { ExtendedStackProps } from "models/stack";
 import { Table, AttributeType, BillingMode } from "aws-cdk-lib/aws-dynamodb";
 import { RemovalPolicy } from "aws-cdk-lib";
-import { Bucket, BlockPublicAccess } from "aws-cdk-lib/aws-s3";
+import { Bucket, BlockPublicAccess, HttpMethods } from "aws-cdk-lib/aws-s3";
 import { QuizaroniAPI } from "./quizaroni-api";
 
 export class Quizaroni extends Construct {
@@ -40,6 +40,19 @@ export class Quizaroni extends Construct {
             bucketName: mainBucketNameAndID,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             removalPolicy: RemovalPolicy.RETAIN,
+            cors: [
+                {
+                  allowedMethods: [
+                    HttpMethods.GET,
+                    HttpMethods.PUT,
+                    HttpMethods.POST,
+                    HttpMethods.DELETE,
+                  ],
+                  allowedOrigins: ["http://localhost:3000", "https://quizaroni.netlify.app"],
+                  allowedHeaders: ["*"],
+                  maxAge: 3600, // 1hr
+                },
+              ],
         });
 
         const assetsBucketNameAndID = `${this.appName}-${this.deploymentType}-assets-bucket`;
@@ -47,6 +60,16 @@ export class Quizaroni extends Construct {
             bucketName: assetsBucketNameAndID,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             removalPolicy: RemovalPolicy.RETAIN,
+            cors: [
+                {
+                  allowedMethods: [
+                    HttpMethods.GET,
+                  ],
+                  allowedOrigins: ["http://localhost:3000", "https://quizaroni.netlify.app"],
+                  allowedHeaders: ["*"],
+                  maxAge: 3600, // 1hr
+                },
+              ],
         });
     };
 }

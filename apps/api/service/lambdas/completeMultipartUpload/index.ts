@@ -1,6 +1,6 @@
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { getRole } from "../../../resources/roles";
-import { LambdaProps } from "../../../models/stack";
+import { LambdaProps } from "models/stack";
 import { Duration } from "aws-cdk-lib";
 import path from "path";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";

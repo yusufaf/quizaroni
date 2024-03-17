@@ -1,5 +1,5 @@
 import { Construct } from "constructs";
-import { ExtendedStackProps } from "../../models/stack";
+import { ExtendedStackProps, LambdaProps } from "models/stack";
 import {
     MethodLoggingLevel,
     RestApi,
@@ -9,14 +9,28 @@ import {
     UsagePlan,
 } from "aws-cdk-lib/aws-apigateway";
 import { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
-import { Role, ServicePrincipal, PolicyStatement, ManagedPolicy } from "aws-cdk-lib/aws-iam";
+import {
+    Role,
+    ServicePrincipal,
+    PolicyStatement,
+    ManagedPolicy,
+    Effect,
+} from "aws-cdk-lib/aws-iam";
 import { addRole } from "../../resources/roles";
-
-/* Lambdas */
-import completeMultipartUpload from "../lambdas/completeMultipartUpload";
-import getMultipartSignedUploadUrls from "../lambdas/getMultipartSignedUploadUrls";
-import initiateMultipartUpload from "../lambdas/initiateMultipartUpload";
-import deleteFile from "../lambdas/deleteFile";
+import {
+    capitalizeFirstLetter,
+    getDefaultExportForLambda,
+} from "../../utilities/generalUtils";
+import {
+    CfnStage,
+    CorsHttpMethod,
+    HttpApi,
+    HttpMethod,
+    HttpStage,
+} from "aws-cdk-lib/aws-apigatewayv2";
+import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import { LogGroup } from "aws-cdk-lib/aws-logs";
 
 type CreateLambdaProxyIntegrationProps = {
     lambda: LambdaFunction;
@@ -50,42 +64,83 @@ export class QuizaroniAPI extends Construct {
         this.prefix = `${appName}-${deploymentType}`;
 
         const apiNameAndID = `${this.prefix}-main`;
-        const api = new RestApi(this, apiNameAndID, {
-            restApiName: apiNameAndID,
-            description: `${deploymentType.toUpperCase()} API for Quizaroni`,
-            deployOptions: {
-                metricsEnabled: true,
-                loggingLevel: MethodLoggingLevel.INFO,
-                stageName: deploymentType,
-            },
-            defaultCorsPreflightOptions: {
+        const api = new HttpApi(this, apiNameAndID, {
+            apiName: apiNameAndID,
+            description: `${capitalizeFirstLetter(
+                deploymentType
+            )} API for Quizaroni`,
+            corsPreflight: {
                 allowHeaders: [
                     "Content-Type",
                     "X-Amz-Date",
                     "Authorization",
                     "X-Api-Key",
                 ],
-                allowMethods: ["GET", "POST", "PUT", "DELETE"],
+                allowMethods: [
+                    CorsHttpMethod.OPTIONS,
+                    CorsHttpMethod.GET,
+                    CorsHttpMethod.POST,
+                    CorsHttpMethod.PUT,
+                    CorsHttpMethod.PATCH,
+                    CorsHttpMethod.DELETE,
+                ],
                 allowCredentials: true,
-                allowOrigins: ["localhost:3000", "quizaroni.netlify.app"],
+                allowOrigins: [
+                    "http://localhost:3000",
+                    "https://quizaroni.netlify.app",
+                ],
             },
-            cloudWatchRole: true,
         });
 
-        const apiKeyNameAndID = `${this.prefix}-api-key`;
-        const apiKey = new ApiKey(this, apiKeyNameAndID, {
-            apiKeyName: apiKeyNameAndID
+        // Setup the access log for APIGWv2
+        const logGroupNameAndID = `${this.prefix}-api-AccessLogs`
+        const accessLogs = new LogGroup(this, logGroupNameAndID,
+            {
+                logGroupName: logGroupNameAndID
+            }
+        );
+        const stage = api.defaultStage?.node.defaultChild as CfnStage;
+        stage.accessLogSettings = {
+            destinationArn: accessLogs.logGroupArn,
+            format: JSON.stringify({
+                requestId: "$context.requestId",
+                userAgent: "$context.identity.userAgent",
+                sourceIp: "$context.identity.sourceIp",
+                requestTime: "$context.requestTime",
+                requestTimeEpoch: "$context.requestTimeEpoch",
+                httpMethod: "$context.httpMethod",
+                path: "$context.path",
+                status: "$context.status",
+                protocol: "$context.protocol",
+                responseLength: "$context.responseLength",
+                domainName: "$context.domainName",
+            }),
+        };
+
+        const role = new Role(this, "ApiGWLogWriterRole", {
+            assumedBy: new ServicePrincipal("apigateway.amazonaws.com"),
         });
-        const usagePlan = new UsagePlan(this, `${this.prefix}-usage-plan`, {
-            name: `${this.deploymentType[0].toUpperCase() + this.deploymentType.slice(1)} Usage Plan`,
-            apiStages: [
-                {
-                    api,
-                    stage: api.deploymentStage,
-                },
+
+        const policy = new PolicyStatement({
+            actions: [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+                "logs:GetLogEvents",
+                "logs:FilterLogEvents",
             ],
+            resources: ["*"],
         });
-        usagePlan.addApiKey(apiKey);
+        role.addToPolicy(policy);
+        accessLogs.grantWrite(role);
+
+        new HttpStage(this, `${deploymentType}-stage}`, {
+            httpApi: api,
+            stageName: deploymentType,
+        });
+
 
         this.createLambdaRoles();
 
@@ -94,38 +149,33 @@ export class QuizaroniAPI extends Construct {
             props,
         };
 
-        const quizaroniResource = api.root.addResource("api");
-
-        const filesResource = quizaroniResource.addResource("files");
-
-        this.createLambdaProxyIntegration({
-            httpMethod: "POST",
-            lambda: initiateMultipartUpload({ ...lambdaProps }),
-            methodName: "initiateMultipartUpload",
-            parentResource: filesResource,
+        this.createLambdaHttpIntegration({
+            api,
+            lambdaProps,
+            path: "/api/files/initiateMultipartUpload",
+            lambdaName: "initiateMultipartUpload",
         });
 
-        this.createLambdaProxyIntegration({
-            httpMethod: "POST",
-            lambda: completeMultipartUpload({ ...lambdaProps }),
-            methodName: "completeMultipartUpload",
-            parentResource: filesResource,
+        this.createLambdaHttpIntegration({
+            api,
+            lambdaProps,
+            path: "/api/files/completeMultipartUpload",
+            lambdaName: "completeMultipartUpload",
         });
 
-        this.createLambdaProxyIntegration({
-            httpMethod: "POST",
-            lambda: getMultipartSignedUploadUrls({ ...lambdaProps }),
-            methodName: "getMultipartSignedUploadUrls",
-            parentResource: filesResource,
+        this.createLambdaHttpIntegration({
+            api,
+            lambdaProps,
+            path: "/api/files/getMultipartSignedUploadUrls",
+            lambdaName: "getMultipartSignedUploadUrls",
         });
 
-        this.createLambdaProxyIntegration({
-            httpMethod: "POST",
-            lambda: deleteFile({ ...lambdaProps }),
-            methodName: "deleteFile",
-            parentResource: filesResource,
+        this.createLambdaHttpIntegration({
+            api,
+            lambdaProps,
+            path: "/api/files/deleteFile",
+            lambdaName: "deleteFile",
         });
-
     }
 
     createLambdaRoles = () => {
@@ -134,12 +184,17 @@ export class QuizaroniAPI extends Construct {
         const mainLambdaRole = new Role(this, mainLambdaRoleNameAndID, {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
             roleName: mainLambdaRoleNameAndID,
-            managedPolicies: [ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole")]
+            managedPolicies: [
+                ManagedPolicy.fromAwsManagedPolicyName(
+                    "service-role/AWSLambdaBasicExecutionRole"
+                ),
+            ],
         });
 
         // Add a policy statement for DynamoDB access
-        const dynamoDBTableName = `${this.prefix}-main`;
+        const dynamoDBTableName = `${this.prefix}-main-table`;
         const dynamoDBPolicyStatement = new PolicyStatement({
+            effect: Effect.ALLOW,
             actions: [
                 "dynamodb:GetItem",
                 "dynamodb:Query",
@@ -155,9 +210,17 @@ export class QuizaroniAPI extends Construct {
         mainLambdaRole.addToPolicy(dynamoDBPolicyStatement);
 
         // Add a policy statement for S3 read and write access
-        const s3BucketName = `${this.prefix}-main`;
+        const s3BucketName = `${this.prefix}-main-bucket`;
         const s3PolicyStatement = new PolicyStatement({
-            actions: ["s3:GetObject", "s3:PutObject", "s3:ListBucket"],
+            effect: Effect.ALLOW,
+            actions: [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:ListBucket",
+                "s3:DeleteObject",
+                "s3:AbortMultipartUpload",
+                "s3:ListMultipartUploadParts",
+            ],
             resources: [
                 `arn:aws:s3:::${s3BucketName}`,
                 `arn:aws:s3:::${s3BucketName}/*`,
@@ -179,5 +242,32 @@ export class QuizaroniAPI extends Construct {
         });
         const resource = parentResource.addResource(methodName);
         resource.addMethod(httpMethod, lambdaIntegration, {});
+    };
+
+    createLambdaHttpIntegration = async ({
+        api,
+        lambdaProps,
+        methods = [HttpMethod.POST],
+        path,
+        lambdaName,
+    }: {
+        api: HttpApi;
+        lambdaName: string;
+        lambdaProps: any;
+        methods?: HttpMethod[];
+        path: string;
+    }) => {
+        const lambdaFunction: (props: LambdaProps) => NodejsFunction =
+            await getDefaultExportForLambda(lambdaName);
+
+        api.addRoutes({
+            path,
+            methods,
+            integration: new HttpLambdaIntegration(
+                `${this.deploymentType}-${lambdaName}-integration`,
+                lambdaFunction({ ...lambdaProps }),
+                {}
+            ),
+        });
     };
 }
