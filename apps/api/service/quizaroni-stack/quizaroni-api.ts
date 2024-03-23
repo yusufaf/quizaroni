@@ -86,17 +86,15 @@ export class QuizaroniAPI extends Construct {
                     CorsHttpMethod.DELETE,
                 ],
                 allowCredentials: true,
-                allowOrigins: DEFAULT_ALLOWED_ORIGINS
+                allowOrigins: DEFAULT_ALLOWED_ORIGINS,
             },
         });
 
         // Setup the access log for APIGWv2
-        const logGroupNameAndID = `${this.prefix}-api-AccessLogs`
-        const accessLogs = new LogGroup(this, logGroupNameAndID,
-            {
-                logGroupName: logGroupNameAndID
-            }
-        );
+        const logGroupNameAndID = `${this.prefix}-api-AccessLogs`;
+        const accessLogs = new LogGroup(this, logGroupNameAndID, {
+            logGroupName: logGroupNameAndID,
+        });
         const stage = api.defaultStage?.node.defaultChild as CfnStage;
         stage.accessLogSettings = {
             destinationArn: accessLogs.logGroupArn,
@@ -139,7 +137,6 @@ export class QuizaroniAPI extends Construct {
             stageName: deploymentType,
         });
 
-
         this.createLambdaRoles();
 
         const lambdaProps = {
@@ -174,6 +171,13 @@ export class QuizaroniAPI extends Construct {
             path: "/api/files/deleteFile",
             lambdaName: "deleteFile",
         });
+
+        this.createLambdaHttpIntegration({
+            api,
+            lambdaProps,
+            path: "/api/files/sendFeedback",
+            lambdaName: "sendFeedback",
+        });
     }
 
     createLambdaRoles = () => {
@@ -190,7 +194,10 @@ export class QuizaroniAPI extends Construct {
         });
 
         // Add a policy statement for DynamoDB access
-        const dynamoDBTableName = `${this.prefix}-main-table`;
+        const dynamoTableResources = [`main`].map(
+            (tableName) =>
+                `arn:aws:dynamodb:${this.region}:${this.account}:table/${this.prefix}-${tableName}`
+        );
         const dynamoDBPolicyStatement = new PolicyStatement({
             effect: Effect.ALLOW,
             actions: [
@@ -201,14 +208,15 @@ export class QuizaroniAPI extends Construct {
                 "dynamodb:UpdateItem",
                 "dynamodb:DeleteItem",
             ],
-            resources: [
-                `arn:aws:dynamodb:${this.region}:${this.account}:table/${dynamoDBTableName}`,
-            ],
+            resources: dynamoTableResources,
         });
         mainLambdaRole.addToPolicy(dynamoDBPolicyStatement);
 
         // Add a policy statement for S3 read and write access
-        const s3BucketName = `${this.prefix}-main-bucket`;
+        const s3BucketResources = [`main`, `assets`].map(
+            (bucketName) => 
+            [`arn:aws:s3:::${bucketName}`, `arn:aws:s3:::${this.prefix}-${bucketName}/*`]
+        ).flat();
         const s3PolicyStatement = new PolicyStatement({
             effect: Effect.ALLOW,
             actions: [
@@ -219,10 +227,7 @@ export class QuizaroniAPI extends Construct {
                 "s3:AbortMultipartUpload",
                 "s3:ListMultipartUploadParts",
             ],
-            resources: [
-                `arn:aws:s3:::${s3BucketName}`,
-                `arn:aws:s3:::${s3BucketName}/*`,
-            ],
+            resources: s3BucketResources
         });
         mainLambdaRole.addToPolicy(s3PolicyStatement);
 

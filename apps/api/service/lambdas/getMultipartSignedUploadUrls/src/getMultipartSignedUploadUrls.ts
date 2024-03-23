@@ -1,4 +1,8 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult, Handler } from "aws-lambda";
+import {
+    APIGatewayProxyEventV2,
+    APIGatewayProxyResultV2,
+    Handler,
+} from "aws-lambda";
 import { S3Client, GetObjectCommand, UploadPartCommand, UploadPartCommandInput } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -13,9 +17,9 @@ type Body = {
 };
 
 export const handler: Handler = async (
-    event: APIGatewayProxyEvent,
+    event: APIGatewayProxyEventV2,
     context
-): Promise<APIGatewayProxyResult> => {
+): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));
 
     const body: Body = JSON.parse(event.body ?? "");

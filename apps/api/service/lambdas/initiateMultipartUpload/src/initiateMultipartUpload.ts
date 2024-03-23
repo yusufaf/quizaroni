@@ -34,20 +34,7 @@ export const handler: Handler = async (
             Key: key,
             ContentType: contentType,
         });
-        console.log("Sending multipart command", {
-            mainS3Bucket,
-            key,
-            contentType,
-        });
         const multipartUploadResponse = await s3Client.send(multipartCommand);
-        console.log("Done sending multipart command");
-
-        console.log("What's the return tho = ", {
-            body: JSON.stringify({
-                key,
-                uploadId: multipartUploadResponse.UploadId,
-            }),
-        });
         return {
             statusCode: 200,
             body: JSON.stringify({
