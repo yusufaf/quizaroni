@@ -31,6 +31,7 @@ import {
 import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { LogGroup } from "aws-cdk-lib/aws-logs";
+import { DEFAULT_ALLOWED_ORIGINS } from "../../constants";
 
 type CreateLambdaProxyIntegrationProps = {
     lambda: LambdaFunction;
@@ -85,10 +86,7 @@ export class QuizaroniAPI extends Construct {
                     CorsHttpMethod.DELETE,
                 ],
                 allowCredentials: true,
-                allowOrigins: [
-                    "http://localhost:3000",
-                    "https://quizaroni.netlify.app",
-                ],
+                allowOrigins: DEFAULT_ALLOWED_ORIGINS
             },
         });
 
