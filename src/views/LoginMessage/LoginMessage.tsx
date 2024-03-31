@@ -1,4 +1,3 @@
-import { useTheme } from "theme/useTheme";
 import macaroniDance from "resources/images/macaroni_dance.gif";
 import { LOGIN_MESSAGES } from "utilities/constants";
 import { Card, Typography } from "@mui/material/";
@@ -9,8 +8,6 @@ type Props = {
 
 const LoginMessage = (props: Props) => {
   const { page } = props;
-
-  const { isDarkMode, theme } = useTheme();
 
   const messageStyling = {
     position: "absolute",

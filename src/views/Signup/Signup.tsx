@@ -3,7 +3,6 @@ import { Box, Paper, Popover, Typography } from "@mui/material/";
 import { useNavigate } from "react-router-dom";
 import PasswordToggle from "components/PasswordToggle/PasswordToggle";
 import { PAGE_TITLES } from "utilities/constants";
-import { useTheme } from "theme/useTheme";
 import { BoldTypography } from "common/AppStyles";
 import {
     LoginButton as SignupButton,
@@ -26,8 +25,6 @@ import { useCreateUserMutation } from "state/api/usersAPI";
 type Props = {};
 
 const Signup = (props: Props) => {
-    const { isDarkMode, theme } = useTheme();
-
     // const auth = getAuth();
     // const provider = new GoogleAuthProvider();
     // provider.setCustomParameters({ prompt: "select_account" });

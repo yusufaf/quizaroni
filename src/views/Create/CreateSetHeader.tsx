@@ -3,7 +3,6 @@ import { Button, FormControl, Typography } from "@mui/material";
 import { BoldTypography } from "common/AppStyles";
 import { useSelector } from "react-redux";
 import { selectCognitoUser } from "state/slices/globalSlice";
-import { useTheme } from "theme/useTheme";
 import {
     CREATE_PAGE_PROPS,
     CREATE_PAGE_TYPES,
@@ -61,7 +60,6 @@ const CreateSetHeader = ({
 }: Props) => {
     const isEditPage = pageType === CREATE_PAGE_TYPES.EDIT;
 
-    const { theme } = useTheme();
     const navigate = useNavigate();
     const { id: studySetUUID } = useParams();
 

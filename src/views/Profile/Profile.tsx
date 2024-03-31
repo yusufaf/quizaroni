@@ -5,7 +5,6 @@ import {
     selectAuthenticated,
     selectCognitoUser,
 } from "state/slices/globalSlice";
-import { useTheme } from "theme/useTheme";
 import LoginMessage from "views/LoginMessage/LoginMessage";
 import AccountTab from "./AccountTab";
 import CustomizationTab from "./CustomizationTab";
@@ -28,8 +27,6 @@ const TABS = {
 type Props = {};
 
 const Profile = (props: Props) => {
-    const { isDarkMode, toggleDarkMode, theme } = useTheme();
-
     const dispatch = useDispatch();
     const authenticated = useSelector(selectAuthenticated);
     const cognitoUser = useSelector(selectCognitoUser);

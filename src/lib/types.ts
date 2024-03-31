@@ -3,6 +3,11 @@ export type TODO = any;
 export type UUID = string;
 export type Timestamp = number;
 
+// #region Theme
+export type ThemeName = "light" | "dark"
+
+// #endregion
+
 export type InitialCard = {
     categories: string[];
     definition: string;

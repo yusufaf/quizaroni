@@ -28,7 +28,7 @@ type Props = {
 };
 
 const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
-    const { isDarkMode, theme } = useTheme();
+    const { muiTheme } = useTheme();
     const { speak, cancel } = useSpeechSynthesis();
 
     const timeoutRef = useRef(null);
@@ -133,7 +133,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                             <IconButton onClick={handleMarkAsImportant}>
                                 {card.important ? (
                                     <Star
-                                        sx={{ color: theme.palette.other.gold }}
+                                        sx={{ color: muiTheme.palette.other.gold }}
                                     />
                                 ) : (
                                     <StarBorder />

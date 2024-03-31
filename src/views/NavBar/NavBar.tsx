@@ -1,4 +1,4 @@
-import { Logout as LogoutIcon } from "@mui/icons-material";
+import { Create, Logout as LogoutIcon } from "@mui/icons-material";
 import {
     AppBar,
     IconButton,
@@ -16,7 +16,7 @@ import {
 } from "state/slices/globalSlice";
 import ProfileDropdown from "views/Profile/ProfileDropdown";
 import { useTheme } from "theme/useTheme";
-import { ROUTES, SUCCESS } from "utilities/constants";
+import { ROUTES } from "utilities/constants";
 import NavDrawer from "./NavDrawer";
 import {
     AuthenticationButton,
@@ -26,20 +26,20 @@ import {
     NavRightActions,
     ProfileIconContainer,
     StyledAccountIcon,
-    StyledArrowIcon,
     StyledDarkModeIcon,
     StyledLightModeIcon,
     StyledNavLink,
 } from "./NavStyles";
 import { signOut } from "aws-amplify/auth";
+import { BoldButton } from "common/AppStyles";
 
 type Props = {};
 
 const NavBar = (props: Props) => {
-    const { isDarkMode, toggleDarkMode, theme } = useTheme();
+    const { isDarkMode, toggleDarkMode, muiTheme } = useTheme();
 
     // TODO: Verify that a medium breakpoint works to handle mobile cases, can always add more breakpoints
-    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+    const isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
 
     const dispatch = useDispatch();
     const authenticated = useSelector(selectAuthenticated);
@@ -51,7 +51,7 @@ const NavBar = (props: Props) => {
 
     const activeLinkStyle = ({ isActive }) => ({
         borderBottom: isActive ? "0.2rem solid orange" : "none",
-        color: `${theme.palette.text.primary}`,
+        color: `${muiTheme.palette.text.primary}`,
     });
 
     const handleLogout = async () => {
@@ -92,15 +92,20 @@ const NavBar = (props: Props) => {
                             <StyledNavLink to="/" style={activeLinkStyle}>
                                 Home
                             </StyledNavLink>
-                            <StyledNavLink to="/create" style={activeLinkStyle}>
-                                Create
-                            </StyledNavLink>
                             <StyledNavLink
                                 to="/explore"
                                 style={activeLinkStyle}
                             >
                                 Explore
                             </StyledNavLink>
+                            <BoldButton
+                                variant="contained"
+                                onClick={() => {}}
+                                size="large"
+                                startIcon={<Create />}
+                            >
+                                Create Study Set
+                            </BoldButton>
                         </NavLinksContainer>
                         <NavRightActions>
                             {authenticated ? (

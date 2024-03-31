@@ -31,26 +31,24 @@ type Props = {
     setStateCallback: Dispatch<SetStateAction<any>>;
     updateCardValue: any;
 };
-const NewCardHeader = (props: Props) => {
-    const {
-        applyBackgroundColor,
-        applyTextColor,
-        createdSetCards,
-        index,
-        localBackgroundColor,
-        localTextColor,
-        onColorChange,
-        actionsStack,
-        setActionsStack,
-        setApplyBackgroundColor,
-        setApplyTextColor,
-        setLocalBackgroundColor,
-        setLocalTextColor,
-        setStateCallback,
-        updateCardValue,
-    } = props;
-
-    const { theme } = useTheme();
+const NewCardHeader = ({
+    applyBackgroundColor,
+    applyTextColor,
+    createdSetCards,
+    index,
+    localBackgroundColor,
+    localTextColor,
+    onColorChange,
+    actionsStack,
+    setActionsStack,
+    setApplyBackgroundColor,
+    setApplyTextColor,
+    setLocalBackgroundColor,
+    setLocalTextColor,
+    setStateCallback,
+    updateCardValue,
+}: Props) => {
+    const { muiTheme } = useTheme();
     const textColorButtonRef = useRef(null);
     const backgroundColorButtonRef = useRef(null);
 
@@ -66,15 +64,15 @@ const NewCardHeader = (props: Props) => {
                 if (el.id.startsWith("rc-editable-input")) {
                     const domElement = document.getElementById(el.id);
                     // @ts-ignore
-                    domElement.style.color = theme.palette.text.primary;
+                    domElement.style.color = muiTheme.palette.text.primary;
                     // @ts-ignore
                     domElement.style.background =
-                        theme.palette.background.paper;
+                        muiTheme.palette.background.paper;
                     break;
                 }
             }
         }
-    }, [showTextColorPicker, showBackgroundColorPicker, theme]);
+    }, [showTextColorPicker, showBackgroundColorPicker, muiTheme]);
 
     const toggleBackgroundColorPicker = () => {
         setShowTextColorPicker(false);
@@ -109,7 +107,7 @@ const NewCardHeader = (props: Props) => {
     };
 
     const colorPickerActiveStyling = {
-        backgroundColor: theme.palette.action.hover,
+        backgroundColor: muiTheme.palette.action.hover,
     };
 
     return (

@@ -22,7 +22,6 @@ import {
     showConfirmDialog
 } from "state/slices/globalSlice";
 import { setSelectedDialog } from "state/slices/viewSetsSlice";
-import { useTheme } from "theme/useTheme";
 import {
     STUDYSET_CONFIRM_DIALOGS,
     VIEW_SET_DIALOGS
@@ -38,7 +37,6 @@ type Props = {
 const StudysetActions = (props: Props) => {
     const { updateMetadataField, selectedStudyset } = props;
 
-    const { theme } = useTheme();
     const navigate = useNavigate();
     const { id: studySetUUID } = useParams();
     const dispatch = useDispatch();

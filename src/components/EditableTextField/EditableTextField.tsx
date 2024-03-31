@@ -1,9 +1,5 @@
-import {
-    TextField,
-    Typography,
-} from "@mui/material/";
+import { TextField, Typography } from "@mui/material/";
 import { useState } from "react";
-import { useTheme } from "theme/useTheme";
 
 type Props = {
     isEditing: boolean;
@@ -11,19 +7,15 @@ type Props = {
     value: string;
     placeholder?: string;
     onBlur: (editedValue: string) => void;
-}
+};
 
-const EditableTextField = (props: Props) => {
-    const { 
-        isEditing, 
-        style = {}, 
-        value, 
-        placeholder = "No value",
-        onBlur,
-    } = props;
-
-    const { isDarkMode, theme } = useTheme();
-
+const EditableTextField = ({
+    isEditing,
+    style = {},
+    value,
+    placeholder = "No value",
+    onBlur,
+}: Props) => {
     const [editedValue, setEditedValue] = useState(value);
 
     const handleChange = (event) => {
@@ -32,18 +24,17 @@ const EditableTextField = (props: Props) => {
 
     const handleOnBlur = () => {
         onBlur(editedValue);
-    }
+    };
 
     return (
         <>
             {!isEditing ? (
-                <Typography 
+                <Typography
                     sx={{
-                        wordBreak: "break-word", 
+                        wordBreak: "break-word",
                         width: "100%",
                         opacity: value ? 1 : 0.5, // Adjust opacity
                     }}
-
                 >
                     {value || placeholder}
                 </Typography>
