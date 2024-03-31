@@ -25,7 +25,7 @@ const ControlMenu = ({
     selectedStudyset,
     updateMetadataState,
 }: Props) => {
-    const { theme } = useTheme();
+    const { muiTheme } = useTheme();
 
     const { metadata = {} } = selectedStudyset || {};
     const {
@@ -86,8 +86,8 @@ const ControlMenu = ({
                                     <Typography
                                         sx={{
                                             color: condition
-                                                ? theme.palette.success.main
-                                                : theme.palette.error.main,
+                                                ? muiTheme.palette.success.main
+                                                : muiTheme.palette.error.main,
                                         }}
                                     >
                                         {`${label}: ${

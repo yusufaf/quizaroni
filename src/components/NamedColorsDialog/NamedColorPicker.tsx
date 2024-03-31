@@ -15,7 +15,7 @@ type Props = {
 const NamedColorPicker = (props: Props) => {
     const { color, onChange } = props;
 
-    const { theme } = useTheme();
+    const { muiTheme } = useTheme();
     const [showColorPicker, setShowColorPicker] = useState(false);
 
     useEffect(() => {
@@ -25,9 +25,9 @@ const NamedColorPicker = (props: Props) => {
                 if (el.id.startsWith("rc-editable-input")) {
                     const domElement = document.getElementById(el.id)
                     // @ts-ignore
-                    domElement.style.color = theme.palette.text.primary;
+                    domElement.style.color = muiTheme.palette.text.primary;
                     // @ts-ignore
-                    domElement.style.background = theme.palette.grey[800];
+                    domElement.style.background = muiTheme.palette.grey[800];
                     break;
                 }
             }

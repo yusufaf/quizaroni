@@ -23,10 +23,7 @@ import { GhostLink } from "common/AppStyles";
 type Props = {
     studyset: Studyset;
 };
-
-const HomeStudySetCard = (props: Props) => {
-    const { studyset } = props;
-
+const HomeStudySetCard = ({ studyset }: Props) => {
     const {
         cards,
         createdAt,
@@ -40,7 +37,7 @@ const HomeStudySetCard = (props: Props) => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { theme } = useTheme();
+    const { muiTheme } = useTheme();
 
     const [actionsMenuOpen, setActionsMenuOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -64,10 +61,7 @@ const HomeStudySetCard = (props: Props) => {
         <>
             <HomeSetCard raised onClick={onCardClick}>
                 <CardContent>
-                    <CardTitle
-                        title={title}
-                        variant="h6"
-                    >
+                    <CardTitle title={title} variant="h6">
                         <GhostLink to={`/view/${uuid}`}>{title}</GhostLink>
                     </CardTitle>
                     <Typography variant="subtitle1">
@@ -104,7 +98,7 @@ const HomeStudySetCard = (props: Props) => {
                             }}
                             sx={{
                                 background: actionsMenuOpen
-                                    ? theme.palette.action.selected
+                                    ? muiTheme.palette.action.selected
                                     : undefined,
                             }}
                         >

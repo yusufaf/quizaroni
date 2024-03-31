@@ -86,7 +86,6 @@ const ViewStudySet = (props: Props) => {
     const {
         data: selectedStudyset,
         isLoading: isStudySetLoading,
-        isSuccess: isStudySetSuccess,
     } = useGetStudysetQuery({
         uuid: studysetUUID,
     });
@@ -94,7 +93,6 @@ const ViewStudySet = (props: Props) => {
     const [
         updateStudysetMetadata,
         {
-            isLoading: isUpdateMetadataLoading,
             isSuccess: isUpdateMetadataSuccess,
             isError: isUpdateMetadataError,
         },
