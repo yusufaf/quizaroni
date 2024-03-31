@@ -1,52 +1,46 @@
-import { useState } from "react";
-import { ThemeContext, themes } from "./ThemeContext";
-import { ThemeProvider } from '@mui/material/styles';
+import { useState, type ReactNode } from "react";
+import { ThemeContext, ThemeContextType } from "./ThemeContext";
+import { themes } from "./themes";
+import { Theme, ThemeProvider } from "@mui/material/styles";
 import { LIGHT, DARK } from "utilities/constants";
+import { ThemeName } from "lib/types";
 
 type Props = {
-    children: any;
+    children: ReactNode;
 };
+export const CustomThemeProvider = ({ children }: Props) => {
+    // TODO: Read current theme from localStorage or maybe from an api
+    const initialThemeName = (localStorage.getItem("appTheme") ?? LIGHT) as ThemeName;
+    const [theme, setTheme] = useState<ThemeName>(initialThemeName);
+    const [muiTheme, setMuiTheme] = useState<Theme>(themes[theme]);
+    const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
-export const CustomThemeProvider = (props: Props) => {
-    const { children } = props;
-
-    const [isDarkMode, setIsDarkMode] = useState(false);
-
-    // Read current theme from localStorage or maybe from an api
-    const currentTheme = localStorage.getItem("appTheme") || LIGHT;
-    const [themeName, setThemeName] = useState(currentTheme);
-
-    const [theme, setTheme] = useState(themes[themeName]);
-
-    // Wrap setThemeName to store new theme names in localStorage
-    const setAppThemeName = (name: string) => {
-        localStorage.setItem('appTheme', name)
-        setThemeName(name);
+    /**
+     * Wrapper function for updating the theme
+     */
+    const setAppTheme = (name: ThemeName) => {
+        localStorage.setItem("appTheme", name);
+        setTheme(name);
         setIsDarkMode(name === DARK);
-        // console.log("Setting theme to = ", name, themes[name]);
-        setTheme(themes[name])
-    }
+        setMuiTheme(themes[name]);
+    };
 
     const toggleDarkMode = () => {
-        setIsDarkMode(!isDarkMode);
-        const oppositeThemeName = themeName === DARK ? LIGHT : DARK;
-        setThemeName(oppositeThemeName);
-        setTheme(themes[oppositeThemeName]);
-    }
+        const oppositeThemeName = isDarkMode ? LIGHT : DARK;
+        setAppTheme(oppositeThemeName);
+    };
 
-    const contextValue = {
-        currentTheme: themeName,
-        isDarkMode,
+    const contextValue: ThemeContextType = {
         theme,
-        setTheme: setAppThemeName,
-        toggleDarkMode
-    }
+        isDarkMode,
+        muiTheme,
+        setTheme: setAppTheme,
+        toggleDarkMode,
+    };
 
     return (
         <ThemeContext.Provider value={contextValue}>
-            <ThemeProvider theme={theme}>
-                {children}
-            </ThemeProvider>
+            <ThemeProvider theme={muiTheme}>{children}</ThemeProvider>
         </ThemeContext.Provider>
-    )
-}
+    );
+};

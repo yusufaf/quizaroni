@@ -5,27 +5,26 @@ import {
     List,
     ListItem,
     ListItemText,
-} from '@mui/material/';
-import { Menu } from "@mui/icons-material";
-import { NavLink } from "react-router-dom";
-import { styled } from '@mui/system';
+} from "@mui/material/";
+import { Create, Menu } from "@mui/icons-material";
 import { StyledNavLink } from "./NavStyles";
+import { BoldButton } from "common/AppStyles";
 
-const NavDrawer = props => {
+const NavDrawer = (props) => {
     const [openDrawer, setOpenDrawer] = useState(false);
 
     const handleCloseDrawer = () => {
-        setOpenDrawer(false)
-    }
+        setOpenDrawer(false);
+    };
 
     const handleToggleDrawer = () => {
-        setOpenDrawer(!openDrawer)
-    }
-    
+        setOpenDrawer(!openDrawer);
+    };
+
     return (
         <>
             <Drawer
-                //anchor="bottom" 
+                //anchor="bottom"
                 open={openDrawer}
                 onClose={handleCloseDrawer}
             >
@@ -37,14 +36,17 @@ const NavDrawer = props => {
                     </ListItem>
                     <ListItem onClick={handleCloseDrawer}>
                         <ListItemText>
-                            <StyledNavLink to="/create">Create</StyledNavLink>
-                        </ListItemText>
-                    </ListItem>
-                    <ListItem onClick={handleCloseDrawer}>
-                        <ListItemText>
                             <StyledNavLink to="/explore">Explore</StyledNavLink>
                         </ListItemText>
                     </ListItem>
+                    <BoldButton
+                        variant="contained"
+                        onClick={() => {}}
+                        size="large"
+                        startIcon={<Create />}
+                    >
+                        Create Study Set
+                    </BoldButton>
                 </List>
             </Drawer>
             <IconButton onClick={handleToggleDrawer}>
@@ -52,5 +54,5 @@ const NavDrawer = props => {
             </IconButton>
         </>
     );
-}
+};
 export default NavDrawer;

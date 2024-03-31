@@ -7,9 +7,13 @@ import {
     INITIAL_CONFIRM_DIALOG_PROPS
 } from "utilities/constants";
 
+type CognitoUser = {
+    username: string;
+};
+
 type GlobalSliceState = {
     authenticated: boolean;
-    cognitoUser: any;
+    cognitoUser: CognitoUser;
     dialogOpen: boolean;
     confirmDialogProps: ConfirmDialogProps;
     feedbackDialogOpen: boolean;
@@ -22,7 +26,9 @@ type GlobalSliceState = {
 
 const initialState: GlobalSliceState = {
     authenticated: false,
-    cognitoUser: {},
+    cognitoUser: {
+        username: "",
+    },
     dialogOpen: false,
     confirmDialogProps: {...INITIAL_CONFIRM_DIALOG_PROPS},
     feedbackDialogOpen: false,
@@ -42,7 +48,7 @@ export const globalSlice = createSlice({
         setUserAuthState: (state, action: PayloadAction<any>) => {
             state.userAuthInfo = action.payload;
         },
-        setCognitoUser: (state, action: PayloadAction<any>) => {
+        setCognitoUser: (state, action: PayloadAction<CognitoUser>) => {
             state.cognitoUser = action.payload;
         },
         setDialogOpen: (state, action: PayloadAction<boolean>) => {

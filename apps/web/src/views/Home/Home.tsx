@@ -30,7 +30,6 @@ import {
     selectCognitoUser
 } from "state/slices/globalSlice";
 import { setSelectedStudySet } from "state/slices/studysetsSlice";
-import { useTheme } from "theme/useTheme";
 import {
     DEFAULT_USER_DATA,
     HOME_LAYOUTS,
@@ -55,7 +54,6 @@ type Props = {};
 
 const Home = (props: Props) => {
     /* Hooks / Redux */
-    const { isDarkMode, theme } = useTheme();
     const navigate = useNavigate();
     const dispatch = useDispatch();
 

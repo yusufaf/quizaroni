@@ -1,7 +1,6 @@
 import { AddPhotoAlternate as AddPhotoIcon } from "@mui/icons-material";
 import { Typography } from "@mui/material/";
 import { useEffect, useRef } from "react";
-import { useTheme } from "theme/useTheme";
 import {
     ProfilePicture,
     StyledProfileCard,
@@ -16,8 +15,6 @@ type Props = {
     userData: User;
 };
 const ProfileCard = ({ userData }: Props) => {
-    const { isDarkMode, theme } = useTheme();
-
     const { data: studysets = [] } = useGetAllStudysetsQuery(
         { userUUID: userData.uuid ?? "" },
         { skip: !userData.uuid }

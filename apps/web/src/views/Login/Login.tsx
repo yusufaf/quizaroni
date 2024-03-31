@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Paper } from "@mui/material/";
 import PasswordToggle from "components/PasswordToggle/PasswordToggle";
-import { useTheme } from "theme/useTheme";
 import { PAGE_TITLES } from "utilities/constants";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import {
@@ -28,8 +27,6 @@ import { useGetAllStudysetsQuery } from "state/api/studysetsAPI";
 type Props = {};
 
 const Login = (props: Props) => {
-    const { isDarkMode, theme } = useTheme();
-
     useBrowserTitle(PAGE_TITLES.LOGIN);
     const dispatch = useDispatch();
     const navigate = useNavigate();

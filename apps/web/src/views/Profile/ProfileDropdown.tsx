@@ -7,13 +7,13 @@ import { setDialogOpen } from "state/slices/globalSlice";
 
 const ProfileDropdown = props => {
     const { dropdownRef, showDropdown, onClose } = props;
-    const { isDarkMode, theme } = useTheme();
+    const { muiTheme } = useTheme();
     const dispatch = useDispatch();
 
     const StyledProfileLink = styled(Link)({
         fontSize: "1.25rem",
         textDecoration: "none",
-        color: theme.palette.text.primary
+        color: muiTheme.palette.text.primary
     })
 
     const openFeedbackDialog = () => {
