@@ -1,0 +1,79 @@
+import {
+    APIGatewayProxyEventV2,
+    APIGatewayProxyResultV2,
+    Handler,
+} from "aws-lambda";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { v4 as uuidv4 } from "uuid";
+
+const { mainDynamoDBTable = "" } = process.env;
+
+const client = new DynamoDBClient({});
+const docClient = DynamoDBDocumentClient.from(client);
+
+type RequestBody = {
+    studysetUUID: string;
+};
+
+export const handler: Handler = async (
+    event: APIGatewayProxyEventV2,
+    context
+): Promise<APIGatewayProxyResultV2> => {
+    console.log(JSON.stringify({ event, context }, null, 4));
+
+    const body: RequestBody = JSON.parse(event.body ?? "");
+
+    try {
+        const studysetUUID = uuidv4();
+        const timestamp = new Date().getTime();
+        const initialMetadata = {
+            backgroundColorVisible: false,
+            createOnly: false,
+            customLabelTerminology: "",
+            customTerminology: "",
+            labelTerminolgy: "Card",
+            notesDrawerPosition: "right",
+            publiclyViewable: false,
+            terminology: "Term/Definition",
+            textColorVisible: false,
+        }
+        const initialStudySet = {
+            // TODO: SK
+            PK: `studysetData#${studysetUUID}`,
+            SK: `userUUID#${""}`,
+            cards: [],
+            categories: [],
+            createdAt: timestamp,
+            favorited: false,
+            label: "",
+            lastViewed: timestamp,
+            metadata: initialMetadata,
+            updatedAt: timestamp,
+            studysetUUID,
+            // TODO: userUUID
+        }
+
+        const putCommand = new PutCommand({
+            TableName: mainDynamoDBTable,
+            Item: initialStudySet
+        })
+
+        await docClient.send(putCommand);
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                studysetUUID
+            }),
+        };
+    } catch (err) {
+        console.error(err);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({
+                message: "Error",
+            }),
+        };
+    }
+};

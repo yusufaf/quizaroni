@@ -144,33 +144,46 @@ export class QuizaroniAPI extends Construct {
             props,
         };
 
-        this.createLambdaHttpIntegration({
-            api,
-            lambdaProps,
-            path: "/api/files/initiateMultipartUpload",
-            lambdaName: "initiateMultipartUpload",
-        });
+        const filesPrefix = `/api/files`;
+        const studysetsPrefix = `/api/studysets`;
 
-        this.createLambdaHttpIntegration({
-            api,
-            lambdaProps,
-            path: "/api/files/completeMultipartUpload",
-            lambdaName: "completeMultipartUpload",
-        });
+        const FILES_ROUTES = [
+            {
+                route: `${filesPrefix}/initiate-multipart-upload`,
+                lambdaName: "initiateMultipartUpload",
+            },
+            {
+                route: `${filesPrefix}/complete-multipart-upload`,
+                lambdaName: "completeMultipartUpload",
+            },
+            {
+                route: `${filesPrefix}/get-multipart-signed-upload-urls`,
+                lambdaName: "getMultipartSignedUploadUrls",
+            },
+            {
+                route: `${filesPrefix}/delete-file`,
+                lambdaName: "deleteFile",
+            },
+        ];
 
-        this.createLambdaHttpIntegration({
-            api,
-            lambdaProps,
-            path: "/api/files/getMultipartSignedUploadUrls",
-            lambdaName: "getMultipartSignedUploadUrls",
-        });
+        const STUDYSETS_ROUTES = [
+            {
+                route: `${studysetsPrefix}/create-studyset`,
+                lambdaName: "createStudyset",
+            },
+        
+        ];
 
-        this.createLambdaHttpIntegration({
-            api,
-            lambdaProps,
-            path: "/api/files/deleteFile",
-            lambdaName: "deleteFile",
-        });
+        const API_ROUTES = [...FILES_ROUTES, ...STUDYSETS_ROUTES]
+
+        for (const { route, lambdaName } of API_ROUTES ) {
+            this.createLambdaHttpIntegration({
+                api,
+                lambdaProps,
+                path: route,
+                lambdaName,
+            });
+        }
 
         this.createLambdaHttpIntegration({
             api,
@@ -213,10 +226,12 @@ export class QuizaroniAPI extends Construct {
         mainLambdaRole.addToPolicy(dynamoDBPolicyStatement);
 
         // Add a policy statement for S3 read and write access
-        const s3BucketResources = [`main`, `assets`].map(
-            (bucketName) => 
-            [`arn:aws:s3:::${bucketName}`, `arn:aws:s3:::${this.prefix}-${bucketName}/*`]
-        ).flat();
+        const s3BucketResources = [`main`, `assets`]
+            .map((bucketName) => [
+                `arn:aws:s3:::${bucketName}`,
+                `arn:aws:s3:::${this.prefix}-${bucketName}/*`,
+            ])
+            .flat();
         const s3PolicyStatement = new PolicyStatement({
             effect: Effect.ALLOW,
             actions: [
@@ -227,7 +242,7 @@ export class QuizaroniAPI extends Construct {
                 "s3:AbortMultipartUpload",
                 "s3:ListMultipartUploadParts",
             ],
-            resources: s3BucketResources
+            resources: s3BucketResources,
         });
         mainLambdaRole.addToPolicy(s3PolicyStatement);
 
