@@ -1,12 +1,42 @@
 import { FileMetadata, Part, UUID } from "lib/types";
 
-const BASE_API_URL = "https://c0yfrps22e.execute-api.us-west-2.amazonaws.com/api";
+const BASE_API_URL =
+    "https://c0yfrps22e.execute-api.us-west-2.amazonaws.com/api";
 
-const COMMON_REQUEST_PROPS: RequestInit = {
-    credentials: "omit",
-    headers: {
-        "Content-Type": "application/json",
-    },
+const getCommonPostRequestProps = (): RequestInit => {
+    const { accessToken, idToken } = getCognitoTokens();
+
+    return {
+        credentials: "omit",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${accessToken} ${idToken}`
+        },
+    }
+};
+
+export const getCognitoTokens = (): {
+    accessToken: string;
+    idToken: string;
+    refreshToken: string;
+} => {
+    const propertiesToRetrieve = ["idToken", "refreshToken", "accessToken"];
+    const tokens = {};
+
+    for (const key in localStorage) {
+        if (!propertiesToRetrieve.some((property) => key.includes(property))) {
+            continue;
+        }
+
+        const value = localStorage.getItem(key) ?? "";
+        const propertyName = key.split(".")[3];
+        if (propertyName && value) {
+            tokens[propertyName] = value;
+        }
+    }
+
+    // @ts-ignore 
+    return tokens;
 };
 
 type InitiateMultipartUploadProps = {
@@ -26,11 +56,11 @@ export const initiateMultipartUpload = async ({
     fileName,
     contentType,
 }: InitiateMultipartUploadProps): Promise<InitiateMultipartUploadResponse> => {
-    const url = `${BASE_API_URL}/files/initiateMultipartUpload`;
+    const url = `${BASE_API_URL}/files/initiate-multipart-upload`;
     return await fetch(url, {
         body: JSON.stringify({ studysetUUID, userUUID, fileName, contentType }),
         method: "POST",
-        ...COMMON_REQUEST_PROPS,
+        ...getCommonPostRequestProps(),
     }).then((response) => response.json());
 };
 
@@ -48,11 +78,11 @@ export const getMultipartSignedUploadUrls = async ({
     uploadId,
     numParts,
 }: GetMultipartSignedUploadUrlsProps): Promise<GetMultipartSignedUploadUrlsResponse> => {
-    const url = `${BASE_API_URL}/files/getMultipartSignedUploadUrls`;
+    const url = `${BASE_API_URL}/files/get-multipart-signed-upload-urls`;
     return await fetch(url, {
         body: JSON.stringify({ key, uploadId, numParts }),
         method: "POST",
-        ...COMMON_REQUEST_PROPS,
+        ...getCommonPostRequestProps(),
     }).then((response) => response.json());
 };
 
@@ -68,11 +98,11 @@ export const completeMultipartUpload = async ({
     uploadId,
     parts,
 }: CompleteMultipartUploadProps): Promise<CompleteMultipartUploadResponse> => {
-    const url = `${BASE_API_URL}/files/completeMultipartUpload`;
+    const url = `${BASE_API_URL}/files/complete-multipart-upload`;
     return await fetch(url, {
         body: JSON.stringify({ key, uploadId, parts }),
         method: "POST",
-        ...COMMON_REQUEST_PROPS,
+        ...getCommonPostRequestProps(),
     }).then((response) => response.json());
 };
 
@@ -80,10 +110,22 @@ type DeleteFileProps = {
     key: string;
 };
 export const deleteFile = async ({ key }: DeleteFileProps) => {
-    const url = `${BASE_API_URL}/files/deleteFile`;
+    const url = `${BASE_API_URL}/files/delete-file`;
     return await fetch(url, {
         body: JSON.stringify({ key }),
         method: "POST",
-        ...COMMON_REQUEST_PROPS,
+        ...getCommonPostRequestProps(),
+    }).then((response) => response.json());
+};
+
+type SendFeedbackProps = {
+    key: string;
+};
+export const sendFeedback = async ({ key }: SendFeedbackProps) => {
+    const url = `${BASE_API_URL}/files/sendFeedback`;
+    return await fetch(url, {
+        body: JSON.stringify({ key }),
+        method: "POST",
+        ...getCommonPostRequestProps(),
     }).then((response) => response.json());
 };
