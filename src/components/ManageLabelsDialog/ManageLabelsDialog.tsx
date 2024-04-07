@@ -59,7 +59,7 @@ const ManageLabelsDialog = (props: Props) => {
     /* ==== RTK Query ==== */
     const { data: { labels = [], uuid: userUUID = "" } = DEFAULT_USER_DATA } =
         useGetUserQuery({
-            username: cognitoUser.username ?? "",
+            username: cognitoUser?.username ?? "",
         });
 
     const { data: studysets = [] } = useGetAllStudysetsQuery(

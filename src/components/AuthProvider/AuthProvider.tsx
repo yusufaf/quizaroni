@@ -19,9 +19,11 @@ const AuthProvider = ({ children }: Props) => {
         try {
             const currentUser = await getCurrentUser();
             dispatch(setAuthenticated(true));
-            dispatch(setCognitoUser({
-                username: currentUser.username
-            }));
+            dispatch(
+                setCognitoUser({
+                    username: currentUser.username,
+                })
+            );
         } catch (err) {
             console.log(err);
         }
