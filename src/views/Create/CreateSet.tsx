@@ -57,15 +57,13 @@ import { useGetUserQuery } from "state/api/usersAPI";
 import NoCardsWarningsIcon from "components/NoCardsWarningsIcon/NoCardsWarningsIcon";
 
 type Props = {
-    pageType?: string;
+    pageType?: "Create" | "Edit";
 };
-
 const CreateSet = ({ pageType = "Create" }: Props) => {
     const pageProps = CREATE_PAGE_PROPS[pageType];
 
     /* Hooks / Redux */
     const { id: studySetUUID } = useParams();
-    const { isDarkMode, theme } = useTheme();
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -160,55 +158,59 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
         }
     }, [selectedStudySet]);
 
-    const createNewSet = async () => {
-        try {
-            const cards = [...createdSetCards];
+    /**
+     * Create a new studyset
+     */
+    const createNewSet = () => {
+        const cards = [...createdSetCards];
 
-            // TODO: Re-visit allowing user to create study set with no cards
-            // if (cards.length === 0) {
-            //     return;
-            // }
+        // TODO: Re-visit allowing user to create study set with no cards
+        // if (cards.length === 0) {
+        //     return;
+        // }
 
-            // const allCardsHaveContent = createdCardObjects.every(
-            //     (card) => card.term.trim() && card.definition.trim()
-            // );
+        // const allCardsHaveContent = createdCardObjects.every(
+        //     (card) => card.term.trim() && card.definition.trim()
+        // );
 
-            const timestamp = new Date().getTime();
-            const label = (enteredLabel ?? selectedLabel) || null;
-            const metadata = {};
+        const timestamp = new Date().getTime();
+        const label = (enteredLabel ?? selectedLabel) || null;
+        const metadata = {};
 
-            const studySet = {
-                cards,
-                createdAt: timestamp,
-                description,
-                label,
-                lastViewed: timestamp,
-                metadata,
-                title,
-                username,
-                userUUID,
-            };
+        const studySet = {
+            cards,
+            createdAt: timestamp,
+            description,
+            label,
+            lastViewed: timestamp,
+            metadata,
+            title,
+            username,
+            userUUID,
+        };
 
-            createStudySet(studySet)
-                .unwrap()
-                .then((response: any) => {
-                    console.log({ response });
-                    toast.success("Successfully created new study set", {
-                        position: toast.POSITION.BOTTOM_LEFT,
-                    });
-                    const { studySet } = response;
-                    const { uuid } = studySet;
-                    navigate(`/view/${uuid}`);
-                })
-                .catch((error) => {
-                    console.log({ error });
-                    toast.error("Error creating new study set", {
-                        position: toast.POSITION.BOTTOM_LEFT,
-                    });
+        createStudySet(studySet)
+            .unwrap()
+            .then((response: any) => {
+                console.log({ response });
+                toast.success("Successfully created new study set", {
+                    position: toast.POSITION.BOTTOM_LEFT,
                 });
-        } catch (error) {}
+                const { studySet } = response;
+                const { uuid } = studySet;
+                navigate(`/view/${uuid}`);
+            })
+            .catch((error) => {
+                console.log({ error });
+                toast.error("Error creating new study set", {
+                    position: toast.POSITION.BOTTOM_LEFT,
+                });
+            });
     };
 
+    /**
+     * Update studyset with new changes
+     */
     const saveChanges = () => {
         console.log({ selectedStudySet, title, description });
 
@@ -307,6 +309,15 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
         }
         setSelectedLabel(e.target.value);
     };
+    
+    const handleAddCard = () => {
+        addCard({
+            createdSetCards,
+            setStateCallback: setCreatedSetCards,
+            actionsStack,
+            setActionsStack,
+        })
+    }
 
     /* Advanced Section Functions */
 
@@ -367,14 +378,7 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
                 {cardInputs}
                 <AddCardButton
                     variant="contained"
-                    onClick={() =>
-                        addCard({
-                            createdSetCards,
-                            setStateCallback: setCreatedSetCards,
-                            actionsStack,
-                            setActionsStack,
-                        })
-                    }
+                    onClick={handleAddCard}
                 >
                     <AddCardIcon />
                     Add Card
