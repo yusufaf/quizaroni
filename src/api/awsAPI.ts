@@ -10,7 +10,7 @@ const getCommonPostRequestProps = (): RequestInit => {
         credentials: "omit",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `${accessToken} ${idToken}`
+            "authorization": `${accessToken} ${idToken}`
         },
     }
 };
