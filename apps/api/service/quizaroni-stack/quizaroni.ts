@@ -3,6 +3,7 @@ import { ExtendedStackProps } from "models/stack";
 import { QuizaroniAPI } from "./quizaroni-api";
 import { QuizaroniDynamoDB } from "./quizaroni-dynamo";
 import { QuizaroniS3 } from "./quizaroni-s3";
+import { QuizaroniCognito } from "./quizaroni-cognito";
 
 export class Quizaroni extends Construct {
     appName: string;
@@ -15,6 +16,11 @@ export class Quizaroni extends Construct {
         this.appName = appName;
         this.deploymentType = deploymentType;
 
+        new QuizaroniCognito(
+            scope,
+            `${appName}-${deploymentType}-quizaroni`,
+            props
+        );
         new QuizaroniAPI(scope, `${appName}-${deploymentType}-api`, props);
         new QuizaroniDynamoDB(
             scope,

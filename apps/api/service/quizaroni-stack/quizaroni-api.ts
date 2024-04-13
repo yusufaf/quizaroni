@@ -1,9 +1,6 @@
 import { Construct } from "constructs";
 import { ExtendedStackProps, LambdaProps } from "models/stack";
-import {
-    LambdaIntegration,
-    Resource,
-} from "aws-cdk-lib/aws-apigateway";
+import { LambdaIntegration, Resource } from "aws-cdk-lib/aws-apigateway";
 import { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
 import {
     Role,
@@ -110,10 +107,11 @@ export class QuizaroniAPI extends Construct {
                 protocol: "$context.protocol",
                 responseLength: "$context.responseLength",
                 domainName: "$context.domainName",
+                authorizerError: "$context.authorizer.error",
             }),
         };
 
-        const role = new Role(this, "ApiGWLogWriterRole", {
+        const apiGatewayLogWriterRole = new Role(this, "ApiGWLogWriterRole", {
             assumedBy: new ServicePrincipal("apigateway.amazonaws.com"),
         });
 
@@ -129,8 +127,8 @@ export class QuizaroniAPI extends Construct {
             ],
             resources: ["*"],
         });
-        role.addToPolicy(policy);
-        accessLogs.grantWrite(role);
+        apiGatewayLogWriterRole.addToPolicy(policy);
+        accessLogs.grantWrite(apiGatewayLogWriterRole);
 
         new HttpStage(this, `${deploymentType}-stage}`, {
             httpApi: api,
@@ -144,8 +142,14 @@ export class QuizaroniAPI extends Construct {
             props,
         };
 
-        const authorizerNameAndID = `${this.prefix}-authorizer`
-        const apiAuthorizerLambda = apiAuthorizer({ ...lambdaProps })
+        const authorizerNameAndID = `${this.prefix}-authorizer`;
+        const apiAuthorizerLambda = apiAuthorizer({ ...lambdaProps });
+
+        // Grant API Gateway permission to invoke the authorizer Lambda function
+        apiAuthorizerLambda.grantInvoke(
+            new ServicePrincipal("apigateway.amazonaws.com")
+        );
+
         const authorizerUri = `arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/${apiAuthorizerLambda.functionArn}/invocations`;
         const httpAuthorizer = new HttpAuthorizer(this, authorizerNameAndID, {
             authorizerName: authorizerNameAndID,
@@ -154,12 +158,16 @@ export class QuizaroniAPI extends Construct {
             identitySource: ["$request.header.Authorization"],
             // identitySources: [IdentitySource.header("Authorization")]
             type: HttpAuthorizerType.LAMBDA,
-        })
-        
-        const httpRouteAuthorizer = HttpAuthorizer.fromHttpAuthorizerAttributes(this, `http-route-authorizer`, {
-            authorizerId: httpAuthorizer.authorizerId,
-            authorizerType: "CUSTOM",
-        })
+        });
+
+        const httpRouteAuthorizer = HttpAuthorizer.fromHttpAuthorizerAttributes(
+            this,
+            `http-route-authorizer`,
+            {
+                authorizerId: httpAuthorizer.authorizerId,
+                authorizerType: "CUSTOM",
+            }
+        );
 
         const filesPrefix = `/api/files`;
         const studysetsPrefix = `/api/studysets`;
@@ -186,7 +194,7 @@ export class QuizaroniAPI extends Construct {
         const STUDYSETS_ROUTES: {
             route: string;
             lambdaName: string;
-            methods?: HttpMethod[] | undefined
+            methods?: HttpMethod[] | undefined;
         }[] = [
             {
                 route: `${studysetsPrefix}/create`,
@@ -210,15 +218,15 @@ export class QuizaroniAPI extends Construct {
             // },
         ];
 
-        const API_ROUTES = [...FILES_ROUTES, ...STUDYSETS_ROUTES]
+        const API_ROUTES = [...FILES_ROUTES, ...STUDYSETS_ROUTES];
 
-        for (const { route, lambdaName } of API_ROUTES ) {
+        for (const { route, lambdaName } of API_ROUTES) {
             this.createLambdaHttpIntegration({
                 api,
                 lambdaProps,
                 path: route,
                 lambdaName,
-                authorizer: httpRouteAuthorizer
+                authorizer: httpRouteAuthorizer,
             });
         }
 
@@ -305,14 +313,14 @@ export class QuizaroniAPI extends Construct {
         methods = [HttpMethod.POST],
         path,
         lambdaName,
-        authorizer
+        authorizer,
     }: {
         api: HttpApi;
         lambdaName: string;
         lambdaProps: any;
         methods?: HttpMethod[];
         path: string;
-        authorizer?: IHttpRouteAuthorizer,
+        authorizer?: IHttpRouteAuthorizer;
     }) => {
         const lambdaFunction: (props: LambdaProps) => NodejsFunction =
             await getDefaultExportForLambda(lambdaName);
@@ -325,7 +333,7 @@ export class QuizaroniAPI extends Construct {
                 lambdaFunction({ ...lambdaProps }),
                 {}
             ),
-            authorizer
+            authorizer,
         });
     };
 }
