@@ -1,10 +1,12 @@
 import {
-    APIGatewayAuthorizerResult,
     APIGatewayRequestAuthorizerEvent,
+    APIGatewaySimpleAuthorizerWithContextResult,
     Handler,
 } from "aws-lambda";
 import { CognitoIdentityProviderClient, GetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { CognitoJwtVerifier } from "aws-jwt-verify";
+
+type AuthorizerContext = { [key: string]: any }
 
 const { userPoolId = "", clientId = "" } = process.env;
 
@@ -21,7 +23,7 @@ const verifier = CognitoJwtVerifier.create({
 export const handler: Handler = async (
     event: APIGatewayRequestAuthorizerEvent,
     context
-): Promise<APIGatewayAuthorizerResult> => {
+): Promise<APIGatewaySimpleAuthorizerWithContextResult<AuthorizerContext>> => {
     console.log(JSON.stringify({ event, context }, null, 4));
 
     try {
@@ -35,12 +37,22 @@ export const handler: Handler = async (
         console.log("Token is valid. Payload:", payload);
 
         return {
-            principalId: "",
-            // @ts-ignore 
-            policyDocument: undefined, 
+            isAuthorized: true,
+            context: {
+                username,
+                userAttributes,
+                sub: payload.sub,
+            }
         }
     } catch (err) {
         console.error(err);
+
+        return {
+            isAuthorized: false,
+            context: {
+
+            },
+        }
     }
 };
 
@@ -49,9 +61,18 @@ const getCognitoUserAttributes = async (accessToken: string, idToken: string) =>
         AccessToken: accessToken
     });
     const response = await cognitoClient.send(getUserCommand);
-    const { UserAttributes: userAttributes, Username: username} = response;
+    const { UserAttributes, Username: username} = response;
 
-    // verify(accessToken, )
+    // Reduce user attributes into an object instead of an array
+    const userAttributes = (UserAttributes ?? []).reduce((acc, attribute ) => {
+        const { Name, Value } = attribute
+        if (!Name || !Value) {
+            return acc;
+        }
+        // @ts-ignore Using Name as index type
+        acc[Name] = Value;
+        return acc;
+    }, {})
 
     return {
         userAttributes,

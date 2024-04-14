@@ -158,6 +158,7 @@ export class QuizaroniAPI extends Construct {
             identitySource: ["$request.header.Authorization"],
             // identitySources: [IdentitySource.header("Authorization")]
             type: HttpAuthorizerType.LAMBDA,
+            enableSimpleResponses: true,
         });
 
         const httpRouteAuthorizer = HttpAuthorizer.fromHttpAuthorizerAttributes(
