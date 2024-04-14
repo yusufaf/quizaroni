@@ -1,10 +1,11 @@
 import {
-    APIGatewayProxyEventV2,
+    APIGatewayProxyEventV2WithLambdaAuthorizer,
     APIGatewayProxyResultV2,
     Handler,
 } from "aws-lambda";
 import { S3Client, GetObjectCommand, UploadPartCommand, UploadPartCommandInput } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { AuthorizerContext } from "models/auth";
 
 const { mainS3Bucket = "" } = process.env;
 
@@ -17,7 +18,7 @@ type RequestBody = {
 };
 
 export const handler: Handler = async (
-    event: APIGatewayProxyEventV2,
+    event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>,
     context
 ): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));

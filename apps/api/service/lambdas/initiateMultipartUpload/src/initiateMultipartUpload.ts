@@ -1,9 +1,10 @@
 import {
-    APIGatewayProxyEventV2,
+    APIGatewayProxyEventV2WithLambdaAuthorizer,
     APIGatewayProxyResultV2,
     Handler,
 } from "aws-lambda";
 import { S3Client, CreateMultipartUploadCommand } from "@aws-sdk/client-s3";
+import { AuthorizerContext } from "models/auth";
 
 const { mainS3Bucket = "" } = process.env;
 
@@ -18,14 +19,14 @@ type RequestBody = {
 };
 
 export const handler: Handler = async (
-    event: APIGatewayProxyEventV2,
+    event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>,
     context
 ): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));
-
+    
     const body: RequestBody = JSON.parse(event.body ?? "");
     const { contentType, fileName, studysetUUID, uploadType, userUUID } = body;
-
+    
     const key = `${studysetUUID}/${userUUID}/${fileName}`;
 
     try {

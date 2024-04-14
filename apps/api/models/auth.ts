@@ -1,0 +1,1 @@
+export type AuthorizerContext = { [key: string]: any }

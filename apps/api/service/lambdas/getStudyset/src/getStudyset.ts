@@ -1,11 +1,12 @@
 import {
-    APIGatewayProxyEventV2,
+    APIGatewayProxyEventV2WithLambdaAuthorizer,
     APIGatewayProxyResultV2,
     Handler,
 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { v4 as uuidv4 } from "uuid";
+import { AuthorizerContext } from "models/auth";
 
 const { mainDynamoDBTable = "" } = process.env;
 
@@ -17,7 +18,7 @@ type RequestBody = {
 };
 
 export const handler: Handler = async (
-    event: APIGatewayProxyEventV2,
+    event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>,
     context
 ): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));
