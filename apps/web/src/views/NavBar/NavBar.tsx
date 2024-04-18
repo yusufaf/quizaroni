@@ -26,12 +26,11 @@ import {
     NavRightActions,
     ProfileIconContainer,
     StyledAccountIcon,
-    StyledDarkModeIcon,
-    StyledLightModeIcon,
     StyledNavLink,
 } from "./NavStyles";
 import { signOut } from "aws-amplify/auth";
 import { BoldButton } from "common/AppStyles";
+import DarkModeToggleButton from "./DarkModeToggleButton";
 
 type Props = {};
 
@@ -134,15 +133,7 @@ const NavBar = (props: Props) => {
                                     </AuthenticationButton>
                                 </LoginButtonsContainer>
                             )}
-                            <Tooltip title="Toggle dark mode">
-                                <IconButton onClick={toggleDarkMode}>
-                                    {isDarkMode ? (
-                                        <StyledLightModeIcon />
-                                    ) : (
-                                        <StyledDarkModeIcon />
-                                    )}
-                                </IconButton>
-                            </Tooltip>
+                            <DarkModeToggleButton />
                             {authenticated && (
                                 <>
                                     <ProfileIconContainer
