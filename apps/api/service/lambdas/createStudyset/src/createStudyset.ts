@@ -23,6 +23,7 @@ export const handler: Handler = async (
 ): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));
 
+    const { sub: userUUID, username } = event.requestContext.authorizer.lambda
     const body: RequestBody = JSON.parse(event.body ?? "");
 
     try {
@@ -40,9 +41,8 @@ export const handler: Handler = async (
             textColorVisible: false,
         }
         const initialStudySet = {
-            // TODO: SK
-            PK: `studysetData#${studysetUUID}`,
-            SK: `userUUID#${""}`,
+            PK: `studyset#${studysetUUID}`,
+            SK: `userUUID#${userUUID}`,
             cards: [],
             categories: [],
             createdAt: timestamp,
@@ -52,7 +52,8 @@ export const handler: Handler = async (
             metadata: initialMetadata,
             updatedAt: timestamp,
             studysetUUID,
-            // TODO: userUUID
+            username,
+            userUUID,
         }
 
         const putCommand = new PutCommand({
@@ -65,7 +66,8 @@ export const handler: Handler = async (
         return {
             statusCode: 200,
             body: JSON.stringify({
-                studysetUUID
+                message: "Successfully created study set",
+                studyset: initialStudySet,
             }),
         };
     } catch (err) {

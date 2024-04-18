@@ -204,19 +204,17 @@ export class QuizaroniAPI extends Construct {
             {
                 route: `${studysetsPrefix}/delete`,
                 lambdaName: "deleteStudyset",
-                // TODO: Test the delete HTTP method
-                // methods: [HttpMethod.DELETE]
             },
-            // {
-            //     route: `${studysetsPrefix}/get`,
-            //     lambdaName: "getStudyset",
-            //     methods: [HttpMethod.GET]
-            // },
-            // {
-            //     route: `${studysetsPrefix}/getAll`,
-            //     lambdaName: "getAllStudysets",
-            //     methods: [HttpMethod.GET]
-            // },
+            {
+                route: `${studysetsPrefix}/get`,
+                lambdaName: "getStudyset",
+                // methods: [HttpMethod.GET]
+            },
+            {
+                route: `${studysetsPrefix}/get-all`,
+                lambdaName: "getAllStudysets",
+                // methods: [HttpMethod.GET]
+            },
         ];
 
         const API_ROUTES = [...FILES_ROUTES, ...STUDYSETS_ROUTES];
