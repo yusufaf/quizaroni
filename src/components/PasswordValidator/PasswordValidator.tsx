@@ -69,11 +69,11 @@ const PasswordValidator = ({
 
     const requirementsJSX = useMemo(() => {
         return Object.entries(requirementState).map(
-            ([requirementKey, satisfied]) => {
+            ([requirementKey, satisfied], index) => {
                 const unicodeIcon = satisfied ? CHECKMARK_UNICODE : X_UNICODE;
                 const message = REQUIREMENT_MESSAGES[requirementKey];
                 return (
-                    <RequirementText satisfied={booleanToString(satisfied)}>
+                    <RequirementText key={index} satisfied={booleanToString(satisfied)}>
                         {unicodeIcon} {message}
                     </RequirementText>
                 );

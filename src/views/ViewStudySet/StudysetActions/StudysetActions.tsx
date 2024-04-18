@@ -9,22 +9,17 @@ import {
     Settings,
     Share,
 } from "@mui/icons-material/";
-import {
-    IconButton,
-    Tooltip
-} from "@mui/material/";
+import { IconButton, Tooltip } from "@mui/material/";
 import CustomIconButton from "components/CustomIconButton/CustomIconButton";
 import { Studyset } from "lib/types";
 import { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-    showConfirmDialog
-} from "state/slices/globalSlice";
+import { showConfirmDialog } from "state/slices/globalSlice";
 import { setSelectedDialog } from "state/slices/viewSetsSlice";
 import {
     STUDYSET_CONFIRM_DIALOGS,
-    VIEW_SET_DIALOGS
+    VIEW_SET_DIALOGS,
 } from "utilities/constants";
 import { ActionButtonsRow } from "../styles";
 import ControlMenu from "./ControlMenu";
@@ -98,26 +93,6 @@ const StudysetActions = (props: Props) => {
     return (
         <>
             <ActionButtonsRow>
-                <CustomIconButton
-                    title={"Edit Study Set"}
-                    color="primary"
-                    icon={<Edit />}
-                    onClick={handleEditClick}
-                />
-                <CustomIconButton
-                    title={"Download"}
-                    color="primary"
-                    icon={<Download />}
-                    onClick={() => handleShowDialog(VIEW_SET_DIALOGS.DOWNLOAD)}
-                />
-                <CustomIconButton
-                    title={"Manage Notifications"}
-                    color="primary"
-                    icon={<EditNotifications />}
-                    onClick={() =>
-                        handleShowDialog(VIEW_SET_DIALOGS.NOTIFICATIONS)
-                    }
-                />
                 {/* <CustomIconButton
                     title={"Control Menu"}
                     color="primary"
@@ -125,44 +100,104 @@ const StudysetActions = (props: Props) => {
                     onClick={handleOpenControlMenu}
                     ref={controlAnchorRef}
                 /> */}
-                <Tooltip title="Control Menu" ref={controlAnchorRef}>
-                    <IconButton onClick={handleOpenControlMenu} color="primary">
-                        <MenuOpen />
-                    </IconButton>
-                </Tooltip>
                 <CustomIconButton
-                    title={"Print"}
-                    color="primary"
-                    icon={<Print />}
-                    onClick={() => handleShowDialog(VIEW_SET_DIALOGS.PRINT)}
+                    iconButtonProps={{
+                        color: "primary",
+                        icon: <Edit />,
+                        onClick: handleEditClick,
+                    }}
+                    tooltipProps={{
+                        title: "Edit Study Set",
+                    }}
                 />
                 <CustomIconButton
-                    title={"Delete Study Set"}
-                    color="primary"
-                    icon={<Delete />}
-                    onClick={() =>
-                        handleConfirmAction(STUDYSET_CONFIRM_DIALOGS.DELETE)
-                    }
+                    iconButtonProps={{
+                        color: "primary",
+                        icon: <Download />,
+                        onClick: () =>
+                            handleShowDialog(VIEW_SET_DIALOGS.DOWNLOAD),
+                    }}
+                    tooltipProps={{
+                        title: "Download",
+                    }}
                 />
                 <CustomIconButton
-                    title={"Duplicate Study Set"}
-                    color="primary"
-                    icon={<ContentCopyRounded />}
-                    onClick={() =>
-                        handleConfirmAction(STUDYSET_CONFIRM_DIALOGS.DUPLICATE)
-                    }
+                    iconButtonProps={{
+                        color: "primary",
+                        icon: <EditNotifications />,
+                        onClick: () =>
+                            handleShowDialog(VIEW_SET_DIALOGS.NOTIFICATIONS),
+                    }}
+                    tooltipProps={{
+                        title: "Manage Notifications",
+                    }}
                 />
                 <CustomIconButton
-                    title={"Study Set Settings"}
-                    color="primary"
-                    icon={<Settings />}
-                    onClick={() => handleShowDialog(VIEW_SET_DIALOGS.SETTINGS)}
+                    iconButtonProps={{
+                        color: "primary",
+                        icon: <MenuOpen />,
+                        onClick: handleOpenControlMenu,
+                    }}
+                    tooltipProps={{
+                        title: "Control Menu",
+                    }}
                 />
                 <CustomIconButton
-                    title={"Share"}
-                    color="primary"
-                    icon={<Share />}
-                    onClick={() => handleShowDialog(VIEW_SET_DIALOGS.SHARE)}
+                    iconButtonProps={{
+                        color: "primary",
+                        icon: <Print />,
+                        onClick: () => handleShowDialog(VIEW_SET_DIALOGS.PRINT),
+                    }}
+                    tooltipProps={{
+                        title: "Print",
+                    }}
+                />
+                <CustomIconButton
+                    iconButtonProps={{
+                        color: "primary",
+                        icon: <Delete />,
+                        onClick: () =>
+                            handleConfirmAction(
+                                STUDYSET_CONFIRM_DIALOGS.DELETE
+                            ),
+                    }}
+                    tooltipProps={{
+                        title: "Delete Study Set",
+                    }}
+                />
+                <CustomIconButton
+                    iconButtonProps={{
+                        color: "primary",
+                        icon: <ContentCopyRounded />,
+                        onClick: () =>
+                            handleConfirmAction(
+                                STUDYSET_CONFIRM_DIALOGS.DUPLICATE
+                            ),
+                    }}
+                    tooltipProps={{
+                        title: "Duplicate Study Set",
+                    }}
+                />
+                <CustomIconButton
+                    iconButtonProps={{
+                        color: "primary",
+                        icon: <Settings />,
+                        onClick: () =>
+                            handleShowDialog(VIEW_SET_DIALOGS.SETTINGS),
+                    }}
+                    tooltipProps={{
+                        title: "Study Set Settings",
+                    }}
+                />
+                <CustomIconButton
+                    iconButtonProps={{
+                        color: "primary",
+                        icon: <Share />,
+                        onClick: () => handleShowDialog(VIEW_SET_DIALOGS.SHARE),
+                    }}
+                    tooltipProps={{
+                        title: "Share",
+                    }}
                 />
             </ActionButtonsRow>
             <ControlMenu

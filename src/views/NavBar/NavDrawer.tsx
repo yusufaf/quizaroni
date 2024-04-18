@@ -9,6 +9,7 @@ import {
 import { Create, Menu } from "@mui/icons-material";
 import { StyledNavLink } from "./NavStyles";
 import { BoldButton } from "common/AppStyles";
+import DarkModeToggleButton from "./DarkModeToggleButton";
 
 const NavDrawer = (props) => {
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -47,6 +48,7 @@ const NavDrawer = (props) => {
                     >
                         Create Study Set
                     </BoldButton>
+                    <DarkModeToggleButton />
                 </List>
             </Drawer>
             <IconButton onClick={handleToggleDrawer}>

@@ -1,6 +1,6 @@
 {
   "auth": {
-    "quizaroniafbd19af": {
+    "quizaroni63919860": {
       "customAuth": false,
       "dependsOn": [],
       "providerPlugin": "awscloudformation",
@@ -9,35 +9,35 @@
     }
   },
   "parameters": {
-    "AMPLIFY_auth_quizaroniafbd19af_nativeClientId": {
+    "AMPLIFY_auth_quizaroni63919860_nativeClientId": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "quizaroniafbd19af"
+          "resourceName": "quizaroni63919860"
         }
       ]
     },
-    "AMPLIFY_auth_quizaroniafbd19af_userPoolId": {
+    "AMPLIFY_auth_quizaroni63919860_userPoolId": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "quizaroniafbd19af"
+          "resourceName": "quizaroni63919860"
         }
       ]
     },
-    "AMPLIFY_auth_quizaroniafbd19af_userPoolName": {
+    "AMPLIFY_auth_quizaroni63919860_userPoolName": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "quizaroniafbd19af"
+          "resourceName": "quizaroni63919860"
         }
       ]
     },
-    "AMPLIFY_auth_quizaroniafbd19af_webClientId": {
+    "AMPLIFY_auth_quizaroni63919860_webClientId": {
       "usedBy": [
         {
           "category": "auth",
-          "resourceName": "quizaroniafbd19af"
+          "resourceName": "quizaroni63919860"
         }
       ]
     }

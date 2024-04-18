@@ -37,6 +37,7 @@ const ConfirmationCodeDialog = (props: Props) => {
         selectConfirmationCodeDialogProps
     );
 
+    // TODO: Toast notification?
     const [updateEmail] = useUpdateEmailMutation();
 
     const [confirmationCode, setConfirmationCode] = useState<string>("");
@@ -76,6 +77,8 @@ const ConfirmationCodeDialog = (props: Props) => {
                         username,
                         confirmationCode,
                     });
+                    
+                    closeDialog();
 
                     /* Send user to login page if successfully confirmed email */
                     navigate("/login");
@@ -91,6 +94,8 @@ const ConfirmationCodeDialog = (props: Props) => {
                         username,
                         newEmail,
                     });
+
+                    closeDialog();
             }
         } catch (error) {
             console.error("Error confirming sign up", error);
