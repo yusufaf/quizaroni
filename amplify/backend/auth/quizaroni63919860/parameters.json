@@ -1,0 +1,21 @@
+{
+  "authSelections": "userPoolOnly",
+  "resourceName": "quizaroni63919860",
+  "serviceType": "imported",
+  "region": "us-west-2",
+  "aliasAttributes": [
+    "email",
+    "preferred_username"
+  ],
+  "authProvidersUserPool": [],
+  "requiredAttributes": [
+    "email"
+  ],
+  "passwordPolicyMinLength": 8,
+  "passwordPolicyCharacters": [],
+  "mfaConfiguration": "OFF",
+  "autoVerifiedAttributes": [
+    "email"
+  ],
+  "mfaTypes": []
+}
