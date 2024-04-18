@@ -10,9 +10,10 @@ const getCommonPostRequestProps = (): RequestInit => {
         credentials: "omit",
         headers: {
             "Content-Type": "application/json",
-            "authorization": `${accessToken} ${idToken}`
+            authorization: `${accessToken} ${idToken}`,
         },
-    }
+        method: "POST",
+    };
 };
 
 export const getCognitoTokens = (): {
@@ -35,7 +36,7 @@ export const getCognitoTokens = (): {
         }
     }
 
-    // @ts-ignore 
+    // @ts-ignore
     return tokens;
 };
 
@@ -59,7 +60,6 @@ export const initiateMultipartUpload = async ({
     const url = `${BASE_API_URL}/files/initiate-multipart-upload`;
     return await fetch(url, {
         body: JSON.stringify({ studysetUUID, userUUID, fileName, contentType }),
-        method: "POST",
         ...getCommonPostRequestProps(),
     }).then((response) => response.json());
 };
@@ -81,7 +81,6 @@ export const getMultipartSignedUploadUrls = async ({
     const url = `${BASE_API_URL}/files/get-multipart-signed-upload-urls`;
     return await fetch(url, {
         body: JSON.stringify({ key, uploadId, numParts }),
-        method: "POST",
         ...getCommonPostRequestProps(),
     }).then((response) => response.json());
 };
@@ -101,7 +100,6 @@ export const completeMultipartUpload = async ({
     const url = `${BASE_API_URL}/files/complete-multipart-upload`;
     return await fetch(url, {
         body: JSON.stringify({ key, uploadId, parts }),
-        method: "POST",
         ...getCommonPostRequestProps(),
     }).then((response) => response.json());
 };
@@ -113,7 +111,6 @@ export const deleteFile = async ({ key }: DeleteFileProps) => {
     const url = `${BASE_API_URL}/files/delete-file`;
     return await fetch(url, {
         body: JSON.stringify({ key }),
-        method: "POST",
         ...getCommonPostRequestProps(),
     }).then((response) => response.json());
 };
@@ -125,7 +122,46 @@ export const sendFeedback = async ({ key }: SendFeedbackProps) => {
     const url = `${BASE_API_URL}/files/sendFeedback`;
     return await fetch(url, {
         body: JSON.stringify({ key }),
-        method: "POST",
+        ...getCommonPostRequestProps(),
+    }).then((response) => response.json());
+};
+
+/* ==== Studysets ==== */
+type CreateStudysetProps = {};
+export const createStudyset = async ({}: CreateStudysetProps) => {
+    const url = `${BASE_API_URL}/studysets/create`;
+    return await fetch(url, {
+        // body: JSON.stringify({}),
+        ...getCommonPostRequestProps(),
+    }).then((response) => response.json());
+};
+
+type DeleteStudysetProps = {
+    studysetUUID: UUID;
+};
+export const deleteStudyset = async ({ studysetUUID }: DeleteStudysetProps) => {
+    const url = `${BASE_API_URL}/studysets/delete`;
+    return await fetch(url, {
+        body: JSON.stringify({ studysetUUID }),
+        ...getCommonPostRequestProps(),
+    }).then((response) => response.json());
+};
+
+type GetStudysetProps = {
+    studysetUUID: UUID;
+};
+export const getStudyset = async ({ studysetUUID }: GetStudysetProps) => {
+    const url = `${BASE_API_URL}/studysets/get`;
+    return await fetch(url, {
+        body: JSON.stringify({ studysetUUID }),
+        ...getCommonPostRequestProps(),
+    }).then((response) => response.json());
+};
+
+type GetAllStudysetsProps = {};
+export const getAllStudysets = async ({ }: GetAllStudysetsProps) => {
+    const url = `${BASE_API_URL}/studysets/get-all`;
+    return await fetch(url, {
         ...getCommonPostRequestProps(),
     }).then((response) => response.json());
 };
