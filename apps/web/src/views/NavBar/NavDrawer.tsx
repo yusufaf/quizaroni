@@ -10,9 +10,13 @@ import { Create, Menu } from "@mui/icons-material";
 import { StyledNavLink } from "./NavStyles";
 import { BoldButton } from "common/AppStyles";
 import DarkModeToggleButton from "./DarkModeToggleButton";
+import { createStudyset } from "api/awsAPI";
+import { useNavigate } from "react-router-dom";
 
 const NavDrawer = (props) => {
     const [openDrawer, setOpenDrawer] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleCloseDrawer = () => {
         setOpenDrawer(false);
@@ -21,6 +25,12 @@ const NavDrawer = (props) => {
     const handleToggleDrawer = () => {
         setOpenDrawer(!openDrawer);
     };
+
+    // TODO: Switch to RTK query after
+    const handleCreateStudyset = async () => {
+        const { studyset } = await createStudyset();
+        navigate(`/create/${studyset.studysetUUID}`)
+    }
 
     return (
         <>
@@ -42,7 +52,7 @@ const NavDrawer = (props) => {
                     </ListItem>
                     <BoldButton
                         variant="contained"
-                        onClick={() => {}}
+                        onClick={handleCreateStudyset}
                         size="large"
                         startIcon={<Create />}
                     >

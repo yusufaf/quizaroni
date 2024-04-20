@@ -31,6 +31,7 @@ import {
 import { signOut } from "aws-amplify/auth";
 import { BoldButton } from "common/AppStyles";
 import DarkModeToggleButton from "./DarkModeToggleButton";
+import { createStudyset } from "api/awsAPI";
 
 type Props = {};
 
@@ -72,6 +73,12 @@ const NavBar = (props: Props) => {
         setShowDropdown(false);
     };
 
+    // TODO: Switch to RTK query after
+    const handleCreateStudyset = async () => {
+        const { studyset } = await createStudyset();
+        navigate(`/create/${studyset.studysetUUID}`)
+    }
+
     return (
         <AppBar position="static" color="inherit">
             <Toolbar>
@@ -99,7 +106,7 @@ const NavBar = (props: Props) => {
                             </StyledNavLink>
                             <BoldButton
                                 variant="contained"
-                                onClick={() => {}}
+                                onClick={handleCreateStudyset}
                                 size="large"
                                 startIcon={<Create />}
                             >
