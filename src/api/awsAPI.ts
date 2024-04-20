@@ -128,7 +128,7 @@ export const sendFeedback = async ({ key }: SendFeedbackProps) => {
 
 /* ==== Studysets ==== */
 type CreateStudysetProps = {};
-export const createStudyset = async ({}: CreateStudysetProps) => {
+export const createStudyset = async () => {
     const url = `${BASE_API_URL}/studysets/create`;
     return await fetch(url, {
         // body: JSON.stringify({}),
@@ -159,7 +159,7 @@ export const getStudyset = async ({ studysetUUID }: GetStudysetProps) => {
 };
 
 type GetAllStudysetsProps = {};
-export const getAllStudysets = async ({ }: GetAllStudysetsProps) => {
+export const getAllStudysets = async () => {
     const url = `${BASE_API_URL}/studysets/get-all`;
     return await fetch(url, {
         ...getCommonPostRequestProps(),
