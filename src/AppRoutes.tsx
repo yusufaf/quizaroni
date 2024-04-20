@@ -19,6 +19,7 @@ const AppRoutes = (props: Props) => {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/create" element={<CreateSet />} />
+            <Route path="/create/:id" element={<CreateSet />} />
             <Route path="/forgotPassword" element={<ForgotPassword />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/explore" element={<Explore />} />
