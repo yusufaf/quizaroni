@@ -8,7 +8,7 @@ import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import { AuthorizerContext } from "models/auth";
 
-const { mainDynamoDBTable = "" } = process.env;
+const { mainTable = "" } = process.env;
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -56,7 +56,7 @@ export const handler: Handler = async (
         }
 
         const putCommand = new PutCommand({
-            TableName: mainDynamoDBTable,
+            TableName: mainTable,
             Item: initialStudySet
         })
 

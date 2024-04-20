@@ -8,7 +8,7 @@ import { DeleteCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { AuthorizerContext } from "models/auth";
 
-const { mainDynamoDBTable = "" } = process.env;
+const { mainTable = "" } = process.env;
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -29,7 +29,7 @@ export const handler: Handler = async (
 
     try {
         // const deleteCommand = new DeleteCommand({
-        //     TableName: mainDynamoDBTable,
+        //     TableName: mainTable,
         //     Item: initialStudySet
         // })
 

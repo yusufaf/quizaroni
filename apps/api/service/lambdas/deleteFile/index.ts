@@ -27,7 +27,7 @@ export default ({
         environment: {
             deploymentType,
             NODE_OPTIONS: '--enable-source-maps',
-            mainDynamoDBTable: `${appName}-${deploymentType}-main`,
+            mainTable: `${appName}-${deploymentType}-main`,
             mainS3Bucket: `${appName}-${deploymentType}-main`,
         } 
     })

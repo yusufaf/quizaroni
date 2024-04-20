@@ -5,10 +5,10 @@ import {
 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import { v4 as uuidv4 } from "uuid";
 import { AuthorizerContext } from "models/auth";
+import { removeKeys } from "resources/dynamo/utilities";
 
-const { mainDynamoDBTable = "" } = process.env;
+const { mainTable = "" } = process.env;
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -28,19 +28,37 @@ export const handler: Handler = async (
     const { studysetUUID } = body;
 
     try {
-        // await docClient.send(putCommand);
+        const getCommand = new GetCommand({
+            Key: {
+                PK: `studyset#${studysetUUID}`,
+                // SK: `userUUID#${userUUID}`,
+            },
+            TableName: mainTable,
+        })
+        // TODO: Think about shared sessions
+
+        const result = await docClient.send(getCommand);
+        const studyset = result.Item;
+
+        if (!studyset) {
+            throw new Error(`Studyset with UUID ${studysetUUID} for user ${username} not found`)
+        }
+
+        removeKeys(studyset);
 
         return {
             statusCode: 200,
             body: JSON.stringify({
+                message: "Successfully retrieved study set data",
+                studyset,
             }),
         };
-    } catch (err) {
-        console.error(err);
+    } catch (error) {
+        console.error(error);
         return {
             statusCode: 500,
             body: JSON.stringify({
-                message: "Error",
+                message: error.message,
             }),
         };
     }
