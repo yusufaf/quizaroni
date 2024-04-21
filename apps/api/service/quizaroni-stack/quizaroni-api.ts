@@ -172,6 +172,7 @@ export class QuizaroniAPI extends Construct {
 
         const filesPrefix = `/api/files`;
         const studysetsPrefix = `/api/studysets`;
+        const usersPrefix = `/api/users`;
 
         const FILES_ROUTES = [
             {
@@ -217,7 +218,19 @@ export class QuizaroniAPI extends Construct {
             },
         ];
 
-        const API_ROUTES = [...FILES_ROUTES, ...STUDYSETS_ROUTES];
+        const USERS_ROUTES: {
+            route: string;
+            lambdaName: string;
+            methods?: HttpMethod[] | undefined;
+        }[] = [
+            {
+                route: `${usersPrefix}/get`,
+                lambdaName: "getUser",
+            },
+        ];
+
+
+        const API_ROUTES = [...FILES_ROUTES, ...STUDYSETS_ROUTES, ...USERS_ROUTES];
 
         for (const { route, lambdaName } of API_ROUTES) {
             this.createLambdaHttpIntegration({
