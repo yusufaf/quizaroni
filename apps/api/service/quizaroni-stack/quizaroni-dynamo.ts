@@ -17,7 +17,6 @@ export class QuizaroniDynamoDB extends Construct {
             tableName: mainTableNameAndID
         });
 
-
         const usersTableNameAndID = `${appName}-${deploymentType}-users`;
         this.createDynamoDBTable({
             tableName: usersTableNameAndID

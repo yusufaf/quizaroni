@@ -16,11 +16,6 @@ export class Quizaroni extends Construct {
         this.appName = appName;
         this.deploymentType = deploymentType;
 
-        new QuizaroniCognito(
-            scope,
-            `${appName}-${deploymentType}-quizaroni`,
-            props
-        );
         new QuizaroniAPI(scope, `${appName}-${deploymentType}-api`, props);
         new QuizaroniDynamoDB(
             scope,
@@ -28,5 +23,10 @@ export class Quizaroni extends Construct {
             props
         );
         new QuizaroniS3(scope, `${appName}-${deploymentType}-s3`, props);
+        new QuizaroniCognito(
+            scope,
+            `${appName}-${deploymentType}-quizaroni`,
+            props
+        );
     }
 }

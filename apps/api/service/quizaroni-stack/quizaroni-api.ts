@@ -135,7 +135,7 @@ export class QuizaroniAPI extends Construct {
             stageName: deploymentType,
         });
 
-        this.createLambdaRoles();
+        this.createUpdateLambdaRoles();
 
         const lambdaProps = {
             construct: this,
@@ -237,8 +237,7 @@ export class QuizaroniAPI extends Construct {
         // });
     }
 
-    createLambdaRoles = () => {
-        // Define an IAM role for the Lambda function
+    createUpdateLambdaRoles = () => {
         const mainLambdaRoleNameAndID = `${this.deploymentType}-main-lambda-role`;
         const mainLambdaRole = new Role(this, mainLambdaRoleNameAndID, {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
@@ -251,7 +250,7 @@ export class QuizaroniAPI extends Construct {
         });
 
         // Add a policy statement for DynamoDB access
-        const dynamoTableResources = [`main`].map(
+        const dynamoTableResources = [`main`, `users`].map(
             (tableName) =>
                 `arn:aws:dynamodb:${this.region}:${this.account}:table/${this.prefix}-${tableName}`
         );
@@ -289,8 +288,7 @@ export class QuizaroniAPI extends Construct {
             resources: s3BucketResources,
         });
         mainLambdaRole.addToPolicy(s3PolicyStatement);
-
-        addRole(mainLambdaRoleNameAndID, mainLambdaRole);
+        addRole(mainLambdaRoleNameAndID, mainLambdaRole)
     };
 
     createLambdaProxyIntegration = ({

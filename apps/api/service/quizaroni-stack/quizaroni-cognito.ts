@@ -1,6 +1,7 @@
-import { Duration, RemovalPolicy } from "aws-cdk-lib";
-import { AccountRecovery, UserPool, UserPoolClient } from "aws-cdk-lib/aws-cognito";
+import { Duration } from "aws-cdk-lib";
+import { AccountRecovery, UserPool, UserPoolClient, UserPoolOperation } from "aws-cdk-lib/aws-cognito";
 import { Construct } from "constructs";
+import postConfirmationTrigger from "../lambdas/cognito/postConfirmationTrigger";
 import { ExtendedStackProps } from "models/stack";
 
 export class QuizaroniCognito extends Construct {
@@ -38,6 +39,14 @@ export class QuizaroniCognito extends Construct {
             },
             selfSignUpEnabled: true,
         })
+
+        const lambdaProps = {
+            construct: this,
+            props,
+        };
+
+        const postConfirmationTriggerLambda = postConfirmationTrigger({ ...lambdaProps });
+        userPool.addTrigger(UserPoolOperation.POST_CONFIRMATION, postConfirmationTriggerLambda)
 
         const { userPoolId } = userPool;
         const userPoolClientName = `${appName}-${deploymentType}-user-pool-client`
