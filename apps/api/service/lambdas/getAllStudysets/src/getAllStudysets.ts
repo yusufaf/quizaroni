@@ -3,8 +3,8 @@ import {
     APIGatewayProxyResultV2,
     Handler,
 } from "aws-lambda";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, GetCommand, QueryCommand  } from "@aws-sdk/lib-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import { AuthorizerContext } from "models/auth";
 
@@ -22,50 +22,27 @@ export const handler: Handler = async (
     context
 ): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));
-
+    const { sub: userUUID } = event.requestContext.authorizer.lambda
     const body: RequestBody = JSON.parse(event.body ?? "");
 
     try {
-        const studysetUUID = uuidv4();
-        const timestamp = new Date().getTime();
-        const initialMetadata = {
-            backgroundColorVisible: false,
-            createOnly: false,
-            customLabelTerminology: "",
-            customTerminology: "",
-            labelTerminolgy: "Card",
-            notesDrawerPosition: "right",
-            publiclyViewable: false,
-            terminology: "Term/Definition",
-            textColorVisible: false,
-        }
-        const initialStudySet = {
-            // TODO: SK
-            PK: `studysetData#${studysetUUID}`,
-            SK: `userUUID#${""}`,
-            cards: [],
-            categories: [],
-            createdAt: timestamp,
-            favorited: false,
-            label: "",
-            lastViewed: timestamp,
-            metadata: initialMetadata,
-            updatedAt: timestamp,
-            studysetUUID,
-            // TODO: userUUID
-        }
-
-        const putCommand = new PutCommand({
+        const SK = `userUUID#${userUUID}`;
+        const queryCommand = new QueryCommand({
             TableName: mainTable,
-            Item: initialStudySet
-        })
-
-        await docClient.send(putCommand);
+            KeyConditionExpression: "#sortKey = :sortKeyValue",
+            ExpressionAttributeNames: {
+                "#sortKey": "SK"
+            },
+            ExpressionAttributeValues: {
+                ":sortKeyValue": SK
+            }
+        });
+        const { Items: studysets } = await docClient.send(queryCommand);
 
         return {
             statusCode: 200,
             body: JSON.stringify({
-                studysetUUID
+                studysets: studysets ?? []
             }),
         };
     } catch (err) {
