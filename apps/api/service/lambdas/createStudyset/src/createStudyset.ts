@@ -25,7 +25,7 @@ export const handler: Handler = async (
     console.log(JSON.stringify({ event, context }, null, 4));
 
     const { sub: userUUID, username } = event.requestContext.authorizer.lambda
-    // const body: RequestBody = JSON.parse(event.body ?? "");
+    // const body: RequestBody = JSON.parse(event.body ?? "{}");
 
     try {
         const studysetUUID = uuidv4();
@@ -42,8 +42,8 @@ export const handler: Handler = async (
             textColorVisible: false,
         }
         const initialStudySet = {
-            PK: `studyset#${studysetUUID}`,
-            SK: `userUUID#${userUUID}`,
+            PK: `userUUID#${userUUID}`,
+            SK: `studyset#${studysetUUID}`,
             cards: [],
             categories: [],
             createdAt: timestamp,

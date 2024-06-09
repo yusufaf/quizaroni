@@ -21,7 +21,7 @@ export const handler: Handler = async (
 ): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));
 
-    const body: RequestBody = JSON.parse(event.body ?? "");
+    const body: RequestBody = JSON.parse(event.body ?? "{}");
     const { key } = body;    
 
     try {

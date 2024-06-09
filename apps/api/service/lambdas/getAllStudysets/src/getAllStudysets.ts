@@ -13,28 +13,20 @@ const { mainTable = "" } = process.env;
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
-type RequestBody = {
-    studysetUUID: string;
-};
-
 export const handler: Handler = async (
     event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>,
     context
 ): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));
     const { sub: userUUID } = event.requestContext.authorizer.lambda
-    const body: RequestBody = JSON.parse(event.body ?? "");
 
     try {
         const SK = `userUUID#${userUUID}`;
         const queryCommand = new QueryCommand({
             TableName: mainTable,
-            KeyConditionExpression: "#sortKey = :sortKeyValue",
-            ExpressionAttributeNames: {
-                "#sortKey": "SK"
-            },
+            KeyConditionExpression: "PK = :userUUID",
             ExpressionAttributeValues: {
-                ":sortKeyValue": SK
+                ":userUUID": `userUUID#${userUUID}`
             }
         });
         const { Items: studysets } = await docClient.send(queryCommand);

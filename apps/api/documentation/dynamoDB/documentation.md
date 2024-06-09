@@ -4,8 +4,8 @@
 - quizaroni-{deploymentType}-main
     - Access Patterns:
         - Studysets
-            - PK: `studyset#${studysetUUID}`
-            - SK: `userUUID#${userUUID}`
+            - PK: `userUUID#${userUUID}`
+            - SK: `studyset#${studysetUUID}`
         - Users
             - PK: `userUUID#${userUUID}`
             - SK: `userData`

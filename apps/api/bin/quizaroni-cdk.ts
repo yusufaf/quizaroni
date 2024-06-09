@@ -2,7 +2,7 @@
 import "source-map-support/register";
 import * as dotenv from "dotenv";
 import { App } from "aws-cdk-lib";
-import { QuizaroniStack } from './../service/quizaroni-stack';
+import { QuizaroniStack } from '../service/quizaroni-stack';
 
 dotenv.config();
 

@@ -24,7 +24,7 @@ export const handler: Handler = async (
     console.log(JSON.stringify({ event, context }, null, 4));
 
     const { sub: userUUID, username } = event.requestContext.authorizer.lambda
-    const body: RequestBody = JSON.parse(event.body ?? "");
+    const body: RequestBody = JSON.parse(event.body ?? "{}");
     const { studysetUUID } = body;
 
     try {
