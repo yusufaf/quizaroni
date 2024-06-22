@@ -199,20 +199,20 @@ export class QuizaroniAPI extends Construct {
             methods?: HttpMethod[] | undefined;
         }[] = [
             {
-                route: `${studysetsPrefix}/create`,
+                route: `${studysetsPrefix}/create-studyset`,
                 lambdaName: "createStudyset",
             },
             {
-                route: `${studysetsPrefix}/delete`,
+                route: `${studysetsPrefix}/delete-studyset`,
                 lambdaName: "deleteStudyset",
             },
             {
-                route: `${studysetsPrefix}/get`,
+                route: `${studysetsPrefix}/get-studyset`,
                 lambdaName: "getStudyset",
                 // methods: [HttpMethod.GET]
             },
             {
-                route: `${studysetsPrefix}/get-all`,
+                route: `${studysetsPrefix}/get-all-studysets`,
                 lambdaName: "getAllStudysets",
                 // methods: [HttpMethod.GET]
             },
@@ -224,7 +224,7 @@ export class QuizaroniAPI extends Construct {
             methods?: HttpMethod[] | undefined;
         }[] = [
             {
-                route: `${usersPrefix}/get`,
+                route: `${usersPrefix}/get-user`,
                 lambdaName: "getUser",
             },
         ];

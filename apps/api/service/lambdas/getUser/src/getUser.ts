@@ -8,7 +8,7 @@ import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { AuthorizerContext } from "models/auth";
 import { removeKeys } from "resources/dynamo/utilities";
 
-const { mainTable = "" } = process.env;
+const { usersTable = "" } = process.env;
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -27,8 +27,9 @@ export const handler: Handler = async (
         const getCommand = new GetCommand({
             Key: {
                 PK: `user#${userUUID}`,
+                SK: "userData",
             },
-            TableName: mainTable,
+            TableName: usersTable,
         })
 
         const result = await docClient.send(getCommand);
@@ -43,7 +44,7 @@ export const handler: Handler = async (
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: "Successfully retrieved study set data",
+                message: "Successfully retrieved user data",
                 user,
             }),
         };
