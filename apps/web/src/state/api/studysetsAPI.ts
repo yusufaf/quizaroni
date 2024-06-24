@@ -1,3 +1,4 @@
+import { BASE_API_URL, getCommonPostRequestProps } from "api/awsAPI";
 import api from "./api";
 import {
     UUID,
@@ -22,6 +23,9 @@ import {
     EditNoteParams,
     UpdateStudysetParams,
     FavoriteStudysetParams,
+    GetAllStudysetsResponse,
+    GetStudysetResponse,
+    CreateStudysetResponse,
 } from "lib/types";
 
 /* Endpoints
@@ -54,53 +58,63 @@ import {
 // TODO: Look into set actions delete, duplicate, favorite. Currently fetches all studysets again once called.
 export const studysetsApi = api.injectEndpoints({
     endpoints: (build) => ({
-        getAllStudysets: build.query<Studyset[], GetAllStudysetsParams>({
-            query: ({ userUUID }) => ({
-                url: "studysets/getAll",
-                method: "GET",
-                params: { userUUID },
+        getAllStudysets: build.query<
+            GetAllStudysetsResponse,
+            GetAllStudysetsParams
+        >({
+            query: () => ({
+                url: `${BASE_API_URL}/studysets/get-all-studysets`,
+                ...getCommonPostRequestProps(),
             }),
-            providesTags: (result) =>
-                result
-                    ? [
-                          ...result.map(({ uuid }) => ({
-                              type: "Studyset" as const,
-                              uuid,
-                          })),
-                          { type: "Studyset", id: "LIST" },
-                      ]
-                    : [{ type: "Studyset", id: "LIST" }],
+            providesTags: (result) => {
+                console.log("In providesTags for RTK query", { result });
+                const { studysets } = result ?? {};
+
+                if (studysets) {
+                    return [
+                        ...studysets.map(({ studysetUUID }) => ({
+                            type: "Studyset" as const,
+                            studysetUUID,
+                        })),
+                        { type: "Studyset", id: "LIST" },
+                    ];
+                } else {
+                    return [{ type: "Studyset", id: "LIST" }];
+                }
+            },
         }),
-        getStudyset: build.query<Studyset, GetStudysetParams>({
-            query: ({ uuid }) => ({
-                url: "studysets/get",
-                method: "GET",
-                params: { uuid },
+        getStudyset: build.query<GetStudysetResponse, GetStudysetParams>({
+            query: ({ studysetUUID }) => ({
+                url: `${BASE_API_URL}/studysets/get-studyset`,
+                ...getCommonPostRequestProps(),
+                body: { studysetUUID },
             }),
-            providesTags: (result, error, arg) => [
-                { type: "Studyset", id: result?.uuid },
-            ],
+            providesTags: (result, error, arg) => {
+                console.log({result})
+                // @ts-ignore - TODO: Update types
+                const { studyset } = result;
+                return [{ type: "Studyset", id: studyset.studysetUUID }];
+            },
         }),
-        createStudyset: build.mutation<Studyset, any>({
-            query: (body) => ({
-                url: "studysets/create",
-                method: "POST",
-                body,
+        createStudyset: build.mutation<CreateStudysetResponse, any>({
+            query: () => ({
+                url: `${BASE_API_URL}/studysets/create-studyset`,
+                ...getCommonPostRequestProps(),
             }),
             invalidatesTags: [{ type: "Studyset", id: "LIST" }],
         }),
         deleteStudyset: build.mutation<void, DeleteStudysetParams>({
-            query: ({ uuid }) => ({
-                url: "studysets/delete",
-                method: "POST",
-                body: { uuid },
+            query: ({ studysetUUID }) => ({
+                url: `${BASE_API_URL}/studysets/delete-studyset`,
+                ...getCommonPostRequestProps(),
+                params: { studysetUUID },
             }),
             // invalidatesTags: ["Studyset"],
             invalidatesTags: [{ type: "Studyset", id: "LIST" }],
         }),
         duplicateStudyset: build.mutation<void, DuplicateStudysetParams>({
             query: ({ uuid }) => ({
-                url: "studysets/duplicate",
+                url: "studysets/duplicate-studyset",
                 method: "POST",
                 body: { uuid },
             }),

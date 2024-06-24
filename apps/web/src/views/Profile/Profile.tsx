@@ -16,7 +16,7 @@ import {
     ProfileTab,
 } from "./ProfileStyles";
 import { useGetUserQuery } from "state/api/usersAPI";
-import { DEFAULT_USER_DATA, PAGE_TITLES } from "utilities/constants";
+import { DEFAULT_USER_RESPONSE, PAGE_TITLES } from "utilities/constants";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 
 const TABS = {
@@ -29,10 +29,8 @@ type Props = {};
 const Profile = (props: Props) => {
     const dispatch = useDispatch();
     const authenticated = useSelector(selectAuthenticated);
-    const cognitoUser = useSelector(selectCognitoUser);
-    const { data: userData = DEFAULT_USER_DATA } = useGetUserQuery({
-        username: cognitoUser.username ?? "",
-    });
+
+    const { data: { user: userData } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
 
     useBrowserTitle(PAGE_TITLES.PROFILE);
 

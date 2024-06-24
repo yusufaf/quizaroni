@@ -25,7 +25,6 @@ import axios from "axios";
 import { useGetAllStudysetsQuery } from "state/api/studysetsAPI";
 
 type Props = {};
-
 const Login = (props: Props) => {
     useBrowserTitle(PAGE_TITLES.LOGIN);
     const dispatch = useDispatch();
@@ -80,7 +79,6 @@ const Login = (props: Props) => {
             /* Store cognito user and authenticated in state */
             dispatch(setCognitoUser({username}));
             dispatch(setAuthenticated(true));
-            // dispatch(setUserData(userData));
 
             // Navigate to home page
             navigate("/");

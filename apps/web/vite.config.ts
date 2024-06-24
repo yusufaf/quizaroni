@@ -5,9 +5,10 @@ import path from "path";
 // https://vitejs.dev/config/
 // TODO: https://vite-plugin-pwa.netlify.app/guide/#setup
 
-export default defineConfig(({ command, mode }) => {
-    const isDevelopment = mode === 'development';
-    const apiProxyURL = isDevelopment ? "http://localhost:5000/" : "https://quizaroni-api.onrender.com/"; 
+export default defineConfig(({ mode }) => {
+    const isDevelopment = mode === "development";
+    const apiProxyURL =
+        "https://c0yfrps22e.execute-api.us-west-2.amazonaws.com/api";
 
     return {
         define: {
@@ -37,10 +38,10 @@ export default defineConfig(({ command, mode }) => {
                     target: apiProxyURL,
                     changeOrigin: true,
                     secure: false,
-                    ws: true,
+                    rewrite: (path) => path.replace(/^\/api/, ""),
                 },
             },
             port: 3000,
         },
-    }
+    };
 });

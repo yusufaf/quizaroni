@@ -1,13 +1,11 @@
 import { ArrowBack, Create } from "@mui/icons-material";
 import { Button, FormControl, Typography } from "@mui/material";
 import { BoldTypography } from "common/AppStyles";
-import { useSelector } from "react-redux";
-import { selectCognitoUser } from "state/slices/globalSlice";
 import {
     CREATE_PAGE_PROPS,
     CREATE_PAGE_TYPES,
     CREATE_SET,
-    DEFAULT_USER_DATA,
+    DEFAULT_USER_RESPONSE,
 } from "utilities/constants";
 import HeaderAdvancedSection from "./HeaderAdvancedSection";
 import {
@@ -63,10 +61,7 @@ const CreateSetHeader = ({
     const navigate = useNavigate();
     const { id: studySetUUID } = useParams();
 
-    const cognitoUser = useSelector(selectCognitoUser);
-    const { data: { labels = [] } = DEFAULT_USER_DATA } = useGetUserQuery({
-        username: cognitoUser.username ?? "",
-    });
+    const { data: { user: { labels = []} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
 
     const renderLabelOptions = () => {
         const labelJsx: ReactElement[] = [];
