@@ -26,7 +26,7 @@ import {
     useGetStudysetQuery,
 } from "state/api/studysetsAPI";
 import useCustomMutation from "lib/hooks/useCustomMutation";
-import { StyledDialogTitle } from "common/AppStyles";
+import { BoldButton, StyledDialogTitle } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import CreateTabView from "./CreateTabView";
 import ManageTabView from "./ManageTabView";
@@ -34,11 +34,10 @@ import AssignTabView from "./AssignTabView";
 import {
     selectLabelsDialogProps,
     setLabelsDialogProps,
-    selectCognitoUser,
 } from "state/slices/globalSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useGetUserQuery } from "state/api/usersAPI";
-import { DEFAULT_USER_DATA } from "utilities/constants";
+import { DEFAULT_USER_RESPONSE } from "utilities/constants";
 
 type ErrorInfo = {
     helperText: string;
@@ -50,18 +49,12 @@ const ManageLabelsDialog = (props: Props) => {
 
     /* ==== Redux ==== */
     const dispatch = useDispatch();
-    const cognitoUser = useSelector(selectCognitoUser);
-
     const labelDialogProps = useSelector(selectLabelsDialogProps);
 
     const { studySetUUID = "" } = labelDialogProps || {};
 
     /* ==== RTK Query ==== */
-    const { data: { labels = [], uuid: userUUID = "" } = DEFAULT_USER_DATA } =
-        useGetUserQuery({
-            username: cognitoUser?.username ?? "",
-        });
-
+    const { data: { user: { labels = [], userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
     const { data: studysets = [] } = useGetAllStudysetsQuery(
         { userUUID: userUUID ?? "" },
         { skip: !userUUID }
@@ -69,7 +62,7 @@ const ManageLabelsDialog = (props: Props) => {
 
     const { data: selectedStudyset } = useGetStudysetQuery(
         {
-            uuid: labelDialogProps.studySetUUID ?? "",
+            studysetUUID: labelDialogProps.studySetUUID ?? "",
         },
         { skip: !labelDialogProps.studySetUUID }
     );
@@ -308,17 +301,18 @@ const ManageLabelsDialog = (props: Props) => {
             case TABS.CREATE:
                 return (
                     <>
-                        <Button
+                        <BoldButton
                             variant="contained"
                             onClick={() => handleChangeCurrentLabel("")}
                         >
                             Remove Current Label
-                        </Button>
+                        </BoldButton>
                         <LoadingButton
                             variant="contained"
                             onClick={handleCreate}
                             disabled={!labelName || Boolean(errorInfo)}
                             // loading={}
+                            sx={{fontWeight: 600}}
                         >
                             Create
                         </LoadingButton>

@@ -4,7 +4,7 @@ export type UUID = string;
 export type Timestamp = number;
 
 // #region Theme
-export type ThemeName = "light" | "dark"
+export type ThemeName = "light" | "dark";
 
 // #endregion
 
@@ -55,6 +55,7 @@ export type Studyset = {
     label: string;
     lastViewed: Timestamp;
     metadata: StudysetMetadata;
+    studysetUUID: UUID;
     title: string;
     userUUID: UUID;
     username: string;
@@ -75,7 +76,7 @@ export type User = {
         namedColors: NamedColor[];
     };
     username: string;
-    uuid: string;
+    userUUID: UUID;
 };
 
 /* RTK Query Types */
@@ -85,19 +86,30 @@ export type StudysetUUIDPayload = {
 };
 
 export type GetAllStudysetsParams = {
-    userUUID: UUID;
+};
+
+export type GetAllStudysetsResponse = { 
+    studysets: Studyset[] 
+};
+
+export type GetStudysetResponse = { 
+    studyset: Studyset; 
 };
 
 export type GetStudysetParams = {
-    uuid: UUID;
+    studysetUUID: UUID;
 };
 
 export type CreateStudysetParams = {
     // TODO
 };
 
+export type CreateStudysetResponse = { 
+    studyset: Studyset; 
+};
+
 export type DeleteStudysetParams = {
-    uuid: UUID;
+    studysetUUID: UUID;
 };
 
 export type DuplicateStudysetParams = {
@@ -113,9 +125,10 @@ export type FavoriteStudysetParams = StudysetUUIDPayload & {
 };
 
 // Users API
-export type GetUserParams = {
-    username: string;
-};
+export type GetUserParams = {};
+export type GetUserResponse = {
+    user: User;
+}
 
 export type CreateUserParams = {
     email: string;

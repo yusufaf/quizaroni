@@ -1,9 +1,9 @@
 import { FileMetadata, Part, UUID } from "lib/types";
 
-const BASE_API_URL =
+export const BASE_API_URL =
     "https://c0yfrps22e.execute-api.us-west-2.amazonaws.com/api";
 
-const getCommonPostRequestProps = (): RequestInit => {
+export const getCommonPostRequestProps = (): RequestInit => {
     const { accessToken, idToken } = getCognitoTokens();
 
     return {
@@ -129,7 +129,7 @@ export const sendFeedback = async ({ key }: SendFeedbackProps) => {
 /* ==== Studysets ==== */
 type CreateStudysetProps = {};
 export const createStudyset = async () => {
-    const url = `${BASE_API_URL}/studysets/create`;
+    const url = `${BASE_API_URL}/studysets/create-studyset`;
     return await fetch(url, {
         // body: JSON.stringify({}),
         ...getCommonPostRequestProps(),
@@ -140,7 +140,7 @@ type DeleteStudysetProps = {
     studysetUUID: UUID;
 };
 export const deleteStudyset = async ({ studysetUUID }: DeleteStudysetProps) => {
-    const url = `${BASE_API_URL}/studysets/delete`;
+    const url = `${BASE_API_URL}/studysets/delete-studyset`;
     return await fetch(url, {
         body: JSON.stringify({ studysetUUID }),
         ...getCommonPostRequestProps(),
@@ -151,7 +151,7 @@ type GetStudysetProps = {
     studysetUUID: UUID;
 };
 export const getStudyset = async ({ studysetUUID }: GetStudysetProps) => {
-    const url = `${BASE_API_URL}/studysets/get`;
+    const url = `${BASE_API_URL}/studysets/get-studyset`;
     return await fetch(url, {
         body: JSON.stringify({ studysetUUID }),
         ...getCommonPostRequestProps(),
@@ -160,7 +160,7 @@ export const getStudyset = async ({ studysetUUID }: GetStudysetProps) => {
 
 type GetAllStudysetsProps = {};
 export const getAllStudysets = async () => {
-    const url = `${BASE_API_URL}/studysets/get-all`;
+    const url = `${BASE_API_URL}/studysets/get-all-studysets`;
     return await fetch(url, {
         ...getCommonPostRequestProps(),
     }).then((response) => response.json());

@@ -31,7 +31,7 @@ import {
 import { signOut } from "aws-amplify/auth";
 import { BoldButton } from "common/AppStyles";
 import DarkModeToggleButton from "./DarkModeToggleButton";
-import { createStudyset } from "api/awsAPI";
+import { useCreateStudysetMutation } from "state/api/studysetsAPI";
 
 type Props = {};
 
@@ -48,6 +48,7 @@ const NavBar = (props: Props) => {
 
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
+    const [createStudyset] = useCreateStudysetMutation()
 
     const activeLinkStyle = ({ isActive }) => ({
         borderBottom: isActive ? "0.2rem solid orange" : "none",
@@ -73,9 +74,10 @@ const NavBar = (props: Props) => {
         setShowDropdown(false);
     };
 
-    // TODO: Switch to RTK query after
     const handleCreateStudyset = async () => {
-        const { studyset } = await createStudyset();
+        // @ts-ignore
+        const { data } = await createStudyset({});
+        const { studyset } = data;
         navigate(`/create/${studyset.studysetUUID}`)
     }
 

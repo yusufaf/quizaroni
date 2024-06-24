@@ -12,11 +12,7 @@ import NoCardsWarningsIcon from "components/NoCardsWarningsIcon/NoCardsWarningsI
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import useFilterStudysets from "lib/hooks/useFilterStudysets";
 import useSortStudysets from "lib/hooks/useSortStudysets";
-import {
-    HomeView,
-    SortDirection,
-    Studyset
-} from "lib/types";
+import { HomeView, SortDirection, Studyset } from "lib/types";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -27,14 +23,15 @@ import {
 } from "state/api/usersAPI";
 import {
     selectAuthenticated,
-    selectCognitoUser
+    selectCognitoUser,
 } from "state/slices/globalSlice";
 import { setSelectedStudySet } from "state/slices/studysetsSlice";
 import {
     DEFAULT_USER_DATA,
+    DEFAULT_USER_RESPONSE,
     HOME_LAYOUTS,
     PAGE_TITLES,
-    SORT_DIRECTIONS
+    SORT_DIRECTIONS,
 } from "utilities/constants";
 import LoginMessage from "views/LoginMessage/LoginMessage";
 import HomeGridView from "./HomeGridView";
@@ -59,22 +56,13 @@ const Home = (props: Props) => {
 
     const authenticated = useSelector(selectAuthenticated);
     const cognitoUser = useSelector(selectCognitoUser);
-    const { data: { uuid: userUUID = "" } = DEFAULT_USER_DATA } =
-        useGetUserQuery(
-            {
-                username: cognitoUser.username ?? "",
-            },
-            {
-                skip: !cognitoUser.username,
-            }
-        );
+    
+    const { data: { user: { userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
 
     /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: studysets = [], isLoading: isGetAllStudysetsLoading } =
-        useGetAllStudysetsQuery(
-            { userUUID: userUUID ?? "" },
-            { skip: !userUUID }
-        );
+    const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
+        useGetAllStudysetsQuery({});
+    const studysets = studysetsResponse?.studysets ?? [];
 
     const [
         updateUserMetadata,
@@ -207,7 +195,7 @@ const Home = (props: Props) => {
         console.log({ params, event, details });
         const { row } = params;
         dispatch(setSelectedStudySet(row));
-        navigate(`/view/${row.uuid}`);
+        navigate(`/view/${row.studysetUUID}`);
     };
 
     /* ==== Right-Click Context Menu ==== */
@@ -315,7 +303,7 @@ const Home = (props: Props) => {
                                             style: { cursor: "context-menu" },
                                         },
                                     }}
-                                    getRowId={(row) => row.uuid}
+                                    getRowId={(row) => row.studysetUUID}
                                 />
                                 <SetActionsMenu
                                     anchorPosition={
