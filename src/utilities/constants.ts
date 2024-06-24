@@ -243,7 +243,11 @@ export const DEFAULT_USER_DATA: User = {
         namedColors: [],
     },
     username: "",
-    uuid: "",
+    userUUID: "",
+};
+
+export const DEFAULT_USER_RESPONSE: { user: User } = {
+    user: DEFAULT_USER_DATA
 };
 
 export const HTML_TABLE_HEADERS = [

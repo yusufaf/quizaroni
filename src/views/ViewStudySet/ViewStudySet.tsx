@@ -1,17 +1,11 @@
 import { ArrowBack, ViewCarouselRounded } from "@mui/icons-material/";
-import {
-    Button,
-    Chip,
-    Skeleton,
-    Tooltip,
-    Typography,
-} from "@mui/material/";
+import { Button, Chip, Skeleton, Tooltip, Typography } from "@mui/material/";
 import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import useFilterViewCards from "lib/hooks/useFilterViewCards";
 import useSortViewCards from "lib/hooks/useSortViewCards";
-import { OpenCardNotes, SortDirection, UUID } from "lib/types";
+import { OpenCardNotes, SortDirection, Studyset, UUID } from "lib/types";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -35,6 +29,7 @@ import {
     DEFAULT_USER_DATA,
     SORT_DIRECTIONS,
     VIEW_SET_DIALOGS,
+    DEFAULT_USER_RESPONSE,
 } from "utilities/constants";
 import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
 import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
@@ -69,11 +64,8 @@ const ViewStudySet = (props: Props) => {
     const navigate = useNavigate();
     const { id: studysetUUID = "" } = useParams();
     const dispatch = useDispatch();
-    const cognitoUser = useSelector(selectCognitoUser);
-    const { data: { labels = [], uuid: userUUID = "" } = DEFAULT_USER_DATA } =
-        useGetUserQuery({
-            username: cognitoUser.username ?? "",
-        });
+
+    const { data: { user: { labels = [], userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
 
     const selectedDialog = useSelector(selectSelectedDialog);
 
@@ -83,19 +75,21 @@ const ViewStudySet = (props: Props) => {
         { skip: !userUUID }
     );
 
-    const {
-        data: selectedStudyset,
-        isLoading: isStudySetLoading,
-    } = useGetStudysetQuery({
-        uuid: studysetUUID,
-    });
+    const { data: studysetResponse, isLoading: isStudySetLoading } =
+        useGetStudysetQuery(
+            {
+                studysetUUID,
+            },
+            {
+                skip: !studysetUUID,
+            }
+        );
+    const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
+    console.log({ selectedStudyset, studysetResponse, studysetUUID });
 
     const [
         updateStudysetMetadata,
-        {
-            isSuccess: isUpdateMetadataSuccess,
-            isError: isUpdateMetadataError,
-        },
+        { isSuccess: isUpdateMetadataSuccess, isError: isUpdateMetadataError },
     ] = useUpdateStudysetMetadataMutation();
 
     const [updateLastViewed] = useUpdateLastViewedMutation();
@@ -285,9 +279,9 @@ const ViewStudySet = (props: Props) => {
                 <SimpleFlexContainer style={{ gap: "0.5rem" }}>
                     <Typography variant="h6">
                         Number of cards in this study set:{" "}
-                        {selectedStudyset?.cards.length ?? "N/A"}
+                        {selectedStudyset?.cards?.length ?? "N/A"}
                     </Typography>
-                    {!selectedStudyset?.cards.length && <NoCardsWarningsIcon />}
+                    {!selectedStudyset?.cards?.length && <NoCardsWarningsIcon />}
                 </SimpleFlexContainer>
                 <ViewStudysetFilters
                     selectedTab={selectedTab}

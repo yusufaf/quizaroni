@@ -31,22 +31,14 @@ import { ACTIONS, TABS } from "./constants";
 import NamedColorsList from "./NamedColorsList";
 import { Download } from "@mui/icons-material";
 import { downloadObjectAsJSON } from "utilities/functions";
-import { DEFAULT_USER_DATA } from "utilities/constants";
+import { DEFAULT_USER_RESPONSE } from "utilities/constants";
 
 type Props = {};
 const NamedColorsDialog = (props: Props) => {
     /* Redux / Hooks */
     const dispatch = useDispatch();
-
-    const cognitoUser = useSelector(selectCognitoUser);
-    const {
-        data: {
-            metadata: { namedColors = [] },
-            uuid: userUUID = "",
-        } = DEFAULT_USER_DATA,
-    } = useGetUserQuery({
-        username: cognitoUser.username ?? "",
-    });
+    
+    const { data: { user: { metadata: { namedColors = []}, userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
 
     const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
 
