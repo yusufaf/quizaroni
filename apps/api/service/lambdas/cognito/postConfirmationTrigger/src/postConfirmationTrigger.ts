@@ -22,6 +22,7 @@ export const handler: PostConfirmationTriggerHandler = async (
     const { request, userName: username, triggerSource } = event;
     const { clientMetadata, userAttributes } = request;
     const { email, email_verified: emailVerified, sub: userUUID } = userAttributes;
+    const timestamp = new Date().toISOString();
 
     try {
         switch (triggerSource) {
@@ -29,7 +30,7 @@ export const handler: PostConfirmationTriggerHandler = async (
                 const newUserItem = {
                     PK: `user#${userUUID}`,
                     SK: "userData",
-                    createdAt: Date.now(),
+                    createdAt: timestamp,
                     email,
                     emailVerified,
                     labels: [],
@@ -38,7 +39,7 @@ export const handler: PostConfirmationTriggerHandler = async (
                         homeView: "table",
                         namedColors: [],
                     },
-                    updatedAt: Date.now(),
+                    updatedAt: timestamp,
                     username,
                     userUUID,
                 }

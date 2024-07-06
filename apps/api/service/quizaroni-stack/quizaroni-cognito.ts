@@ -12,9 +12,8 @@ export class QuizaroniCognito extends Construct {
             deploymentType = "development",
             env,
         } = props;
-        const { account = "", region = "" } = env!;
 
-        const userPoolName = `${appName}-${deploymentType}-users`;
+        const userPoolName = `${appName}-users`;
         const userPool = new UserPool(this, userPoolName, {
             userPoolName,
             standardAttributes: {
@@ -49,7 +48,7 @@ export class QuizaroniCognito extends Construct {
         userPool.addTrigger(UserPoolOperation.POST_CONFIRMATION, postConfirmationTriggerLambda)
 
         const { userPoolId } = userPool;
-        const userPoolClientName = `${appName}-${deploymentType}-user-pool-client`
+        const userPoolClientName = `${appName}-user-pool-client`
         const mainUserPoolClient = new UserPoolClient(this, userPoolClientName, {
             userPool,
             userPoolClientName,

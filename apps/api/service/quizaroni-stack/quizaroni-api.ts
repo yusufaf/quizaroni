@@ -216,6 +216,10 @@ export class QuizaroniAPI extends Construct {
                 lambdaName: "getAllStudysets",
                 // methods: [HttpMethod.GET]
             },
+            {
+                route: `${studysetsPrefix}/update-studyset`,
+                lambdaName: "updateStudyset",
+            },
         ];
 
         const USERS_ROUTES: {

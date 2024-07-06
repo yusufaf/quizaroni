@@ -11,7 +11,7 @@ export default ({
 }: LambdaProps) => {
     const { appName, deploymentType = "" } = props;
 
-    const functionName = "getUser";
+    const functionName = "createNote";
     const nameAndID = `${appName}${deploymentType}-${functionName}`
     const role = getRole(`${deploymentType}-main-lambda-role`)
 
@@ -27,7 +27,7 @@ export default ({
         environment: {
             deploymentType,
             NODE_OPTIONS: '--enable-source-maps',
-            usersTable: `${appName}-${deploymentType}-users`,
+            mainTable: `${appName}-${deploymentType}-main`,
         } 
     })
 

@@ -23,38 +23,24 @@ export const handler: Handler = async (
     context
 ): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));
-
-    const { sub: userUUID, username } = event.requestContext.authorizer.lambda
-    // const body: RequestBody = JSON.parse(event.body ?? "{}");
-
     try {
-        const studysetUUID = uuidv4();
-        const timestamp = new Date().toISOString();
-        const initialMetadata = {
-            backgroundColorVisible: false,
-            createOnly: false,
-            customLabelTerminology: "",
-            customTerminology: "",
-            labelTerminolgy: "Card",
-            notesDrawerPosition: "right",
-            publiclyViewable: false,
-            terminology: "Term/Definition",
-            textColorVisible: false,
-        }
-        const initialStudySet = {
+        const { sub: userUUID, username } = event.requestContext.authorizer.lambda
+        const body: RequestBody = JSON.parse(event.body ?? "{}");
+        const { studysetUUID } = body;
+
+        const timestamp = new Date().getTime();
+        const duplicatedStudyset = {
             PK: `userUUID#${userUUID}`,
             SK: `studyset#${studysetUUID}`,
             cards: [],
             categories: [],
             createdAt: timestamp,
-            description: "",
             favorited: false,
             label: "",
             lastViewed: timestamp,
-            metadata: initialMetadata,
+            // metadata: initialMetadata,
             updatedAt: timestamp,
             studysetUUID,
-            title: "Untitled Studyset",
             username,
             userUUID,
         }

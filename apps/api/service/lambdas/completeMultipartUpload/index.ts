@@ -12,7 +12,7 @@ export default ({
     const { appName, deploymentType = "" } = props;
 
     const functionName = "completeMultipartUpload";
-    const nameAndID = `${deploymentType}-${functionName}`
+    const nameAndID = `${appName}${deploymentType}-${functionName}`
     const role = getRole(`${deploymentType}-main-lambda-role`)
 
     const lambdaFunction = new NodejsFunction(construct, nameAndID, {

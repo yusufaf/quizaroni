@@ -10,10 +10,10 @@ export default ({
     props,
     construct
 }: LambdaProps) => {
-    const { deploymentType = "" } = props;
+    const { appName = "", deploymentType = "" } = props;
 
     const functionName = "apiAuthorizer";
-    const nameAndID = `${deploymentType}-${functionName}`
+    const nameAndID = `${appName}${deploymentType}-${functionName}`
     const role = getRole(`${deploymentType}-main-lambda-role`)
 
     const lambdaFunction = new NodejsFunction(construct, nameAndID, {

@@ -29,7 +29,7 @@ export const handler: Handler = async (
 
     try {
         const studysetUUID = uuidv4();
-        const timestamp = new Date().toISOString();
+        const timestamp = new Date().getTime();
         const initialMetadata = {
             backgroundColorVisible: false,
             createOnly: false,
