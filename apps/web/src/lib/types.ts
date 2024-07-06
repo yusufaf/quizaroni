@@ -117,7 +117,8 @@ export type DuplicateStudysetParams = {
 };
 
 export type UpdateStudysetParams = {
-    studyset: Studyset;
+    studysetUUID: string;
+    updates: { [key: string]: any };
 };
 
 export type FavoriteStudysetParams = StudysetUUIDPayload & {

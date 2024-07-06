@@ -121,13 +121,13 @@ export const studysetsApi = api.injectEndpoints({
             invalidatesTags: [{ type: "Studyset", id: "LIST" }],
         }),
         updateStudyset: build.mutation<void, UpdateStudysetParams>({
-            query: ({ studyset }) => ({
-                url: "studysets/update",
+            query: ({ studysetUUID, updates }) => ({
+                url: "studysets/update-studyset",
                 method: "POST",
-                body: { studyset },
+                body: { studysetUUID, updates },
             }),
             invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.studyset.uuid },
+                { type: "Studyset", id: arg.studysetUUID },
             ],
         }),
         updateStudysetMetadata: build.mutation<void, UpdateMetadataParams>({
