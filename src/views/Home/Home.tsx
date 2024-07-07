@@ -55,7 +55,6 @@ const Home = (props: Props) => {
     const dispatch = useDispatch();
 
     const authenticated = useSelector(selectAuthenticated);
-    const cognitoUser = useSelector(selectCognitoUser);
     
     const { data: { user: { userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
 
@@ -204,7 +203,7 @@ const Home = (props: Props) => {
 
         const localStudyset = studysets.find(
             (studyset: Studyset) =>
-                studyset.uuid === event.currentTarget.getAttribute("data-id")
+                studyset.studysetUUID === event.currentTarget.getAttribute("data-id")
         );
         if (localStudyset) {
             setContextMenuStudyset(localStudyset);

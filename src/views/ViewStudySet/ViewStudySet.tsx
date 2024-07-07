@@ -1,28 +1,28 @@
-import { ArrowBack, ViewCarouselRounded } from "@mui/icons-material/";
-import { Button, Chip, Skeleton, Tooltip, Typography } from "@mui/material/";
-import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
-import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
-import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import useFilterViewCards from "lib/hooks/useFilterViewCards";
-import useSortViewCards from "lib/hooks/useSortViewCards";
-import { OpenCardNotes, SortDirection, Studyset, UUID } from "lib/types";
-import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { ArrowBack, ViewCarouselRounded } from '@mui/icons-material/';
+import { Button, Chip, Skeleton, Tooltip, Typography } from '@mui/material/';
+import { BoldTypography, SimpleFlexContainer } from 'common/AppStyles';
+import ScrollToTopFab from 'components/ScrollToTopFab/ScrollToTopFab';
+import useBrowserTitle from 'lib/hooks/useBrowserTitle';
+import useFilterViewCards from 'lib/hooks/useFilterViewCards';
+import useSortViewCards from 'lib/hooks/useSortViewCards';
+import { OpenCardNotes, SortDirection, Studyset, UUID } from 'lib/types';
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
     useGetAllStudysetsQuery,
     useGetStudysetQuery,
-    useUpdateLastViewedMutation,
     useUpdateStudysetMetadataMutation,
-} from "state/api/studysetsAPI";
+    useUpdateStudysetMutation,
+} from 'state/api/studysetsAPI';
 import {
     selectCognitoUser,
     setLabelsDialogProps,
-} from "state/slices/globalSlice";
+} from 'state/slices/globalSlice';
 import {
     selectSelectedDialog,
     setSelectedDialog,
-} from "state/slices/viewSetsSlice";
+} from 'state/slices/viewSetsSlice';
 import {
     STUDYSET_CONFIRM_DIALOGS,
     DEFAULT_CATEGORIES,
@@ -30,15 +30,15 @@ import {
     SORT_DIRECTIONS,
     VIEW_SET_DIALOGS,
     DEFAULT_USER_RESPONSE,
-} from "utilities/constants";
-import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
-import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
-import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
-import PrintDialog from "./PrintDialog.tsx/PrintDialog";
-import StudysetActions from "./StudysetActions/StudysetActions";
-import StudysetSettings from "./StudysetSettings/StudysetSettings";
-import ViewStudySetCard from "./ViewStudySetCard";
-import ViewStudysetFilters from "./ViewStudysetFilters/ViewStudysetFilters";
+} from 'utilities/constants';
+import DownloadSetModal from './DownloadSetModal/DownloadSetModal';
+import ManageCategoriesDialog from './ManageCategoriesDialog/ManageCategoriesDialog';
+import NotificationsDialog from './NotificationsDialog/NotificationsDialog';
+import PrintDialog from './PrintDialog.tsx/PrintDialog';
+import StudysetActions from './StudysetActions/StudysetActions';
+import StudysetSettings from './StudysetSettings/StudysetSettings';
+import ViewStudySetCard from './ViewStudySetCard';
+import ViewStudysetFilters from './ViewStudysetFilters/ViewStudysetFilters';
 import {
     NoCardsMessage,
     StudyModeGrid,
@@ -52,28 +52,29 @@ import {
     ViewStudysetContainer,
     ViewStudysetHeader,
     ViewStudysetPage,
-} from "./styles";
-import NotesDrawer from "./NotesDrawer/NotesDrawer";
-import { useGetUserQuery } from "state/api/usersAPI";
-import NoCardsWarningsIcon from "components/NoCardsWarningsIcon/NoCardsWarningsIcon";
+} from './styles';
+import NotesDrawer from './NotesDrawer/NotesDrawer';
+import { useGetUserQuery } from 'state/api/usersAPI';
+import NoCardsWarningsIcon from 'components/NoCardsWarningsIcon/NoCardsWarningsIcon';
 
 type Props = {};
 
 const ViewStudySet = (props: Props) => {
     /* Hooks / Redux */
     const navigate = useNavigate();
-    const { id: studysetUUID = "" } = useParams();
+    const { id: studysetUUID = '' } = useParams();
     const dispatch = useDispatch();
 
-    const { data: { user: { labels = [], userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
+    const {
+        data: { user: { labels = [], userUUID = '' } } = DEFAULT_USER_RESPONSE,
+    } = useGetUserQuery();
 
     const selectedDialog = useSelector(selectSelectedDialog);
 
     /* Skip option prevents hook from running when userUUID is undefined */
-    const { data: studysets = [] } = useGetAllStudysetsQuery(
-        { userUUID: userUUID ?? "" },
-        { skip: !userUUID }
-    );
+    const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
+        useGetAllStudysetsQuery({});
+    const studysets = studysetsResponse?.studysets ?? [];
 
     const { data: studysetResponse, isLoading: isStudySetLoading } =
         useGetStudysetQuery(
@@ -92,27 +93,31 @@ const ViewStudySet = (props: Props) => {
         { isSuccess: isUpdateMetadataSuccess, isError: isUpdateMetadataError },
     ] = useUpdateStudysetMetadataMutation();
 
-    const [updateLastViewed] = useUpdateLastViewedMutation();
+    const [updateStudySet] = useUpdateStudysetMutation();
 
-    useBrowserTitle(selectedStudyset?.title ?? "");
+    useBrowserTitle(selectedStudyset?.title ?? '');
 
     const updatedViewTimestamp = useRef<boolean>(false);
     const studyModeIconStyle = {
-        fontSize: "5rem",
+        fontSize: '5rem',
     };
 
-    const [selectedStudyMode, setSelectedStudyMode] = useState("");
+    const [selectedStudyMode, setSelectedStudyMode] = useState('');
 
     const [selectedTab, setSelectedTab] = useState(DEFAULT_CATEGORIES.ALL);
-    const [selectedSort, setSelectedSort] = useState<string>("");
+    const [selectedSort, setSelectedSort] = useState<string>('');
     const [sortDirection, setSortDirection] = useState<SortDirection>(
         SORT_DIRECTIONS.ASC
     );
 
     useEffect(() => {
         if (!updatedViewTimestamp.current && studysetUUID) {
-            updateLastViewed({
+            const updates = {
+                lastViewed: new Date().toISOString(),
+            };
+            updateStudySet({
                 studysetUUID,
+                updates,
             });
             updatedViewTimestamp.current = true;
         }
@@ -126,12 +131,12 @@ const ViewStudySet = (props: Props) => {
                 uuid: studysetUUID,
             });
         } catch (error) {
-            console.error("Error updating study set metadata");
+            console.error('Error updating study set metadata');
         }
     };
 
     const handleBackClick = () => {
-        navigate("/");
+        navigate('/');
     };
 
     const sortedViewFlashCards = useSortViewCards({
@@ -150,16 +155,16 @@ const ViewStudySet = (props: Props) => {
             setLabelsDialogProps({
                 open: true,
                 //   studyset: selectedStudyset
-                studySetUUID: selectedStudyset?.uuid ?? "",
+                studySetUUID: selectedStudyset?.uuid ?? '',
             })
         );
     };
 
     const onDialogClose = () => {
-        dispatch(setSelectedDialog(""));
+        dispatch(setSelectedDialog(''));
     };
 
-    const handleUpdateCardsClick = () => {
+    const handleUpdateCards = () => {
         navigate(`/edit/${studysetUUID}`);
     };
 
@@ -198,11 +203,11 @@ const ViewStudySet = (props: Props) => {
                                         label={
                                             selectedStudyset?.label
                                                 ? selectedStudyset?.label
-                                                : "No label selected"
+                                                : 'No label selected'
                                         }
                                         color={
                                             !selectedStudyset?.label
-                                                ? "error"
+                                                ? 'error'
                                                 : undefined
                                         }
                                         variant="outlined"
@@ -276,12 +281,14 @@ const ViewStudySet = (props: Props) => {
                         </ViewStudysetHeader>
                     </ViewStudysetContainer>
                 </ViewFlashsetPaper>
-                <SimpleFlexContainer style={{ gap: "0.5rem" }}>
+                <SimpleFlexContainer style={{ gap: '0.5rem' }}>
                     <Typography variant="h6">
-                        Number of cards in this study set:{" "}
-                        {selectedStudyset?.cards?.length ?? "N/A"}
+                        Number of cards in this study set:{' '}
+                        {selectedStudyset?.cards?.length ?? 'N/A'}
                     </Typography>
-                    {!selectedStudyset?.cards?.length && <NoCardsWarningsIcon />}
+                    {!selectedStudyset?.cards?.length && (
+                        <NoCardsWarningsIcon />
+                    )}
                 </SimpleFlexContainer>
                 <ViewStudysetFilters
                     selectedTab={selectedTab}
@@ -321,7 +328,7 @@ const ViewStudySet = (props: Props) => {
                 )}
                 <UpdateCardsButton
                     variant="contained"
-                    onClick={handleUpdateCardsClick}
+                    onClick={handleUpdateCards}
                 >
                     Update Cards
                 </UpdateCardsButton>

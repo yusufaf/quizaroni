@@ -9,7 +9,6 @@ import {
     EditCategoryParams,
     MarkCardAsImportantParams,
     DeleteStudysetParams,
-    UpdateLastViewedParams,
     GetAllStudysetsParams,
     GetStudysetParams,
     AssignCardCategoriesParams,
@@ -122,8 +121,8 @@ export const studysetsApi = api.injectEndpoints({
         }),
         updateStudyset: build.mutation<void, UpdateStudysetParams>({
             query: ({ studysetUUID, updates }) => ({
-                url: "studysets/update-studyset",
-                method: "POST",
+                url: `${BASE_API_URL}/studysets/update-studyset`,
+                ...getCommonPostRequestProps(),
                 body: { studysetUUID, updates },
             }),
             invalidatesTags: (_result, _error, arg) => [
@@ -169,16 +168,6 @@ export const studysetsApi = api.injectEndpoints({
                 url: "studysets/deleteCategory",
                 method: "POST",
                 body: { studysetUUID, categoriesToDelete },
-            }),
-            invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.studysetUUID },
-            ],
-        }),
-        updateLastViewed: build.mutation<Studyset, UpdateLastViewedParams>({
-            query: ({ studysetUUID }) => ({
-                url: "studysets/updateLastViewed",
-                method: "POST",
-                body: { studysetUUID },
             }),
             invalidatesTags: (_result, _error, arg) => [
                 { type: "Studyset", id: arg.studysetUUID },
@@ -293,7 +282,6 @@ export const {
     useCreateCategoryMutation,
     useEditCategoryMutation,
     useDeleteCategoryMutation,
-    useUpdateLastViewedMutation,
     useFavoriteStudysetMutation,
     useMarkCardAsImportantMutation,
     useAssignCardCategoriesMutation,
