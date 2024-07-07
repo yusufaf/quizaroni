@@ -191,8 +191,6 @@ export type EditNoteParams = StudysetUUIDPayload & {
     text: string;
 };
 
-export type UpdateLastViewedParams = StudysetUUIDPayload;
-
 export type CreateLabelParams = {
     userUUID: UUID;
     label: string;

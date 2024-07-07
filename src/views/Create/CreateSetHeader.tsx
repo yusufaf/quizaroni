@@ -1,13 +1,8 @@
-import { ArrowBack, Create } from "@mui/icons-material";
-import { Button, FormControl, Typography } from "@mui/material";
-import { BoldTypography } from "common/AppStyles";
-import {
-    CREATE_PAGE_PROPS,
-    CREATE_PAGE_TYPES,
-    CREATE_SET,
-    DEFAULT_USER_RESPONSE,
-} from "utilities/constants";
-import HeaderAdvancedSection from "./HeaderAdvancedSection";
+import { ArrowBack, Create } from '@mui/icons-material';
+import { FormControl, Typography } from '@mui/material';
+import { BoldTypography } from 'common/AppStyles';
+import { DEFAULT_USER_RESPONSE } from 'utilities/constants';
+import HeaderAdvancedSection from './HeaderAdvancedSection';
 import {
     PageMainButton,
     CreateSetInputsContainer,
@@ -22,14 +17,14 @@ import {
     LabelSelect,
     TitleInput,
     BackToViewButton,
-} from "./CreateSetStyles";
-import { useNavigate, useParams } from "react-router-dom";
-import { useGetUserQuery } from "state/api/usersAPI";
-import { ReactElement } from "react";
+} from './CreateSetStyles';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useGetUserQuery } from 'state/api/usersAPI';
+import { ReactElement } from 'react';
 
 type Props = {
     advancedSectionProps: any;
-    handleMainButton: () => void;
+    saveChanges: () => void;
     mainButtonDisabled: boolean;
     description: string;
     label: string | null;
@@ -37,37 +32,34 @@ type Props = {
     onLabelChange: any;
     onSelectedLabelChange: any;
     onTitleChange: any;
-    pageType: string;
     selectedLabel: string;
     title: string;
 };
 
 const CreateSetHeader = ({
     advancedSectionProps,
-    handleMainButton,
     description,
     label,
+    mainButtonDisabled,
     onDescriptionChange,
     onLabelChange,
     onSelectedLabelChange,
     onTitleChange,
+    saveChanges,
     selectedLabel,
     title,
-    pageType = "",
-    mainButtonDisabled,
 }: Props) => {
-    const isEditPage = pageType === CREATE_PAGE_TYPES.EDIT;
-
     const navigate = useNavigate();
     const { id: studySetUUID } = useParams();
 
-    const { data: { user: { labels = []} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
+    const { data: { user: { labels = [] } } = DEFAULT_USER_RESPONSE } =
+        useGetUserQuery();
 
     const renderLabelOptions = () => {
         const labelJsx: ReactElement[] = [];
 
         labelJsx.push(
-            <LabelMenuItem key="" value="" sx={{ width: "10rem" }}>
+            <LabelMenuItem key="" value="" sx={{ width: '10rem' }}>
                 <Typography variant="inherit" noWrap color="primary">
                     None
                 </Typography>
@@ -80,7 +72,7 @@ const CreateSetHeader = ({
                     <LabelMenuItem
                         key={index}
                         value={label}
-                        sx={{ width: "10rem" }}
+                        sx={{ width: '10rem' }}
                         title={label}
                     >
                         <Typography variant="inherit" noWrap>
@@ -101,16 +93,14 @@ const CreateSetHeader = ({
         <CreateSetPaper elevation={6}>
             <HeaderContainer>
                 <HeaderLeft>
-                    {isEditPage && (
-                        <BackToViewButton
-                            onClick={handleBackClick}
-                            startIcon={<ArrowBack color="primary" />}
-                        >
-                            Back to Study Set
-                        </BackToViewButton>
-                    )}
+                    <BackToViewButton
+                        onClick={handleBackClick}
+                        startIcon={<ArrowBack color="primary" />}
+                    >
+                        Back to Viewing Study Set
+                    </BackToViewButton>
                     <BoldTypography variant="h5">
-                        {CREATE_PAGE_PROPS[pageType].TITLE}
+                        Edit your study set
                     </BoldTypography>
                     <CreateSetInputsContainer>
                         <div>
@@ -119,7 +109,7 @@ const CreateSetHeader = ({
                             </BoldTypography>
                             <TitleInput
                                 variant="standard"
-                                placeholder={CREATE_SET.TITLE_PLACEHOLDER}
+                                placeholder={'Enter a title for your study set'}
                                 value={title}
                                 onChange={onTitleChange}
                                 size="small"
@@ -131,7 +121,9 @@ const CreateSetHeader = ({
                             </BoldTypography>
                             <DescriptionInput
                                 variant="outlined"
-                                placeholder={CREATE_SET.DESC_PLACEHOLDER}
+                                placeholder={
+                                    'Enter a description for your study set'
+                                }
                                 value={description}
                                 onChange={onDescriptionChange}
                                 multiline
@@ -147,7 +139,7 @@ const CreateSetHeader = ({
                                     variant="standard"
                                     size="small"
                                     placeholder={
-                                        "Enter a label for your new study set"
+                                        'Enter a label for your new study set'
                                     }
                                     value={label}
                                     onChange={onLabelChange}
@@ -170,12 +162,12 @@ const CreateSetHeader = ({
                 <HeaderRight>
                     <PageMainButton
                         variant="contained"
-                        onClick={() => handleMainButton()}
+                        onClick={() => saveChanges()}
                         size="large"
                         disabled={mainButtonDisabled}
                         startIcon={<Create />}
                     >
-                        {CREATE_PAGE_PROPS[pageType].BUTTON}
+                        Save Changes
                     </PageMainButton>
                     <HeaderAdvancedSection {...advancedSectionProps} />
                 </HeaderRight>
