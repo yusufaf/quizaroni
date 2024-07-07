@@ -33,7 +33,7 @@ export const handler: Handler = async (
         const userSK = 'userData';
         const updatedAt = new Date().toISOString();
 
-        const UpdateExpression = 'SET #labels = list_append(#labels, :newLabel), #updatedAt = :updatedAt';
+        const UpdateExpression = 'SET #labels = list_append(#labels, :newLabel), updatedAt = :updatedAt';
         const userLabelsUpdateCommand = new UpdateCommand({
             Key: {
                 PK: userPK,
@@ -42,13 +42,10 @@ export const handler: Handler = async (
             TableName: usersTable,
             ExpressionAttributeNames: {
                 '#labels': 'labels',
-                '#updatedAt': 'updatedAt',
-                '#updatedBy': 'updatedBy',
             },
             ExpressionAttributeValues: {
                 ':newLabel': [label],
                 ':updatedAt': updatedAt,
-                ':updatedBy': username,
             },
             UpdateExpression,
         });
@@ -59,7 +56,7 @@ export const handler: Handler = async (
             const studysetsSK = `studyset#${studysetUUID}`;
             const updatedAt = new Date().toISOString();
 
-            const UpdateExpression = 'SET #label = :newLabel, #updatedAt = :updatedAt, #updatedBy = :updatedBy';
+            const UpdateExpression = 'SET #label = :newLabel, updatedAt = :updatedAt, updatedBy = :updatedBy';
             const studysetLabelUpdateCommand = new UpdateCommand({
                 Key: {
                     PK: studysetsPK,
@@ -68,8 +65,6 @@ export const handler: Handler = async (
                 TableName: mainTable,
                 ExpressionAttributeNames: {
                     '#label': 'label',
-                    '#updatedAt': 'updatedAt',
-                    '#updatedBy': 'updatedBy',
                 },
                 ExpressionAttributeValues: {
                     ':newLabel': label,

@@ -224,6 +224,10 @@ export class QuizaroniAPI extends Construct {
                 route: `${studysetsPrefix}/create-label`,
                 lambdaName: "createLabel",
             },
+            {
+                route: `${studysetsPrefix}/delete-label`,
+                lambdaName: "deleteLabel",
+            },
         ];
 
         const USERS_ROUTES: {
