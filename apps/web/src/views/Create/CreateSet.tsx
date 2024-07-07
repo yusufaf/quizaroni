@@ -1,5 +1,5 @@
-import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
-import useBrowserTitle from "lib/hooks/useBrowserTitle";
+import ScrollToTopFab from 'components/ScrollToTopFab/ScrollToTopFab';
+import useBrowserTitle from 'lib/hooks/useBrowserTitle';
 import {
     ChangeEvent,
     useCallback,
@@ -7,61 +7,51 @@ import {
     useMemo,
     useRef,
     useState,
-} from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
+} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import {
     useCreateStudysetMutation,
     useGetStudysetQuery,
     useUpdateStudysetMutation,
-} from "state/api/studysetsAPI";
+} from 'state/api/studysetsAPI';
 import {
     selectAuthenticated,
     selectNamedColorsDialogProps,
-} from "state/slices/globalSlice";
-import { useTheme } from "theme/useTheme";
-import {
-    CREATE_PAGE_PROPS,
-    CREATE_PAGE_TYPES,
-    DEFAULT_USER_DATA,
-    DEFAULT_USER_RESPONSE,
-    PAGES,
-} from "utilities/constants";
-import LoginMessage from "views/LoginMessage/LoginMessage";
-import CreateSetHeader from "./CreateSetHeader";
+} from 'state/slices/globalSlice';
+import { useTheme } from 'theme/useTheme';
+import { DEFAULT_USER_RESPONSE } from 'utilities/constants';
+import LoginMessage from 'views/LoginMessage/LoginMessage';
+import CreateSetHeader from './CreateSetHeader';
 import {
     AddCardButton,
     AddCardIcon,
     PageMainButton,
     CreateSetPage,
-} from "./CreateSetStyles";
-import ImportSetModal from "./ImportSetModal/ImportSetModal";
-import NewCardInput from "./NewCardInput/NewCardInput";
-import SetModificationButtons from "./SetModificationButtons";
-import { Virtuoso } from "react-virtuoso";
-import { EMPTY_CARD } from "utilities/constants";
-import { addCard } from "utilities/createUtils";
-import { Create } from "@mui/icons-material";
+} from './CreateSetStyles';
+import ImportSetModal from './ImportSetModal/ImportSetModal';
+import NewCardInput from './NewCardInput/NewCardInput';
+import SetModificationButtons from './SetModificationButtons';
+import { Virtuoso } from 'react-virtuoso';
+import { EMPTY_CARD } from 'utilities/constants';
+import { addCard } from 'utilities/createUtils';
+import { Create } from '@mui/icons-material';
 import {
     selectShowImportModal,
     setShowImportModal,
     selectAdvancedSectionProps,
     setAdvancedSectionProps,
-} from "state/slices/createSetSlice";
-import NamedColorsDialog from "components/NamedColorsDialog/NamedColorsDialog";
-import { Card, Studyset } from "lib/types";
-import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
-import { SelectChangeEvent, Tooltip, Typography } from "@mui/material";
-import { useGetUserQuery } from "state/api/usersAPI";
-import NoCardsWarningsIcon from "components/NoCardsWarningsIcon/NoCardsWarningsIcon";
+} from 'state/slices/createSetSlice';
+import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
+import { Card, Studyset } from 'lib/types';
+import { SimpleFlexContainer, SpacedFlexContainer } from 'common/AppStyles';
+import { SelectChangeEvent, Tooltip, Typography } from '@mui/material';
+import { useGetUserQuery } from 'state/api/usersAPI';
+import NoCardsWarningsIcon from 'components/NoCardsWarningsIcon/NoCardsWarningsIcon';
 
-type Props = {
-    pageType?: "Create" | "Edit";
-};
-const CreateSet = ({ pageType = "Create" }: Props) => {
-    const pageProps = CREATE_PAGE_PROPS[pageType];
-
+type Props = {};
+const CreateSet = (props: Props) => {
     /* Hooks / Redux */
     const { id: studysetUUID } = useParams();
     const navigate = useNavigate();
@@ -69,32 +59,37 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
 
     const authenticated = useSelector(selectAuthenticated);
 
-    const { data: { user: {username = "", userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
+    const {
+        data: {
+            user: { username = '', userUUID = '' },
+        } = DEFAULT_USER_RESPONSE,
+    } = useGetUserQuery();
     const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
     const { blankCardsCount, expanded } = useSelector(
         selectAdvancedSectionProps
     );
 
     const {
-        data: selectedStudySet,
+        data: studysetResponse,
         isLoading: isStudySetLoading,
         isSuccess: isStudySetSuccess,
         isError: isStudySetError,
     } = useGetStudysetQuery(
-        { studysetUUID: studysetUUID ?? "" },
+        { studysetUUID: studysetUUID ?? '' },
         {
             skip: !studysetUUID,
         }
     );
+    const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
 
-    const [createStudySet] = useCreateStudysetMutation();
-    const [updateStudySet] = useUpdateStudysetMutation();
+    const [createStudyset] = useCreateStudysetMutation();
+    const [updateStudyset] = useUpdateStudysetMutation();
 
     /* Local State */
-    const [title, setTitle] = useState<string>("");
-    const [description, setDescription] = useState<string>("");
+    const [title, setTitle] = useState<string>('');
+    const [description, setDescription] = useState<string>('');
     const [enteredLabel, setEnteredLabel] = useState<string | null>(null);
-    const [selectedLabel, setSelectedLabel] = useState<string>("");
+    const [selectedLabel, setSelectedLabel] = useState<string>('');
     const [createdSetCards, setCreatedSetCards] = useState<Card[]>([
         { ...EMPTY_CARD },
     ]);
@@ -108,13 +103,13 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
         descInput: false,
     });
 
-    useBrowserTitle(pageType);
+    useBrowserTitle('Edit');
 
     /* ==== Actions Stack ==== */
     const handleUndoAction = useCallback(() => {
         const newActionsStack = [...actionsStack];
         const lastAction = newActionsStack.pop();
-        console.log("ENTERED HANDLEUNDO", {
+        console.log('ENTERED HANDLEUNDO', {
             newActionsStack,
             lastAction,
             createdSetCards,
@@ -131,44 +126,34 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
     /* */
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.ctrlKey && event.altKey && event.key === "z") {
+            if (event.ctrlKey && event.altKey && event.key === 'z') {
                 handleUndoAction();
             }
         };
 
-        document.addEventListener("keydown", handleKeyDown);
+        document.addEventListener('keydown', handleKeyDown);
 
         return () => {
-            document.removeEventListener("keydown", handleKeyDown);
+            document.removeEventListener('keydown', handleKeyDown);
         };
     }, [handleUndoAction]);
 
     /* Loading values for editing a studyset */
     useEffect(() => {
-        console.log("editing stuff ", { isStudySetSuccess, selectedStudySet });
-        if (isStudySetSuccess && selectedStudySet) {
-            const { label, title, description, cards } = selectedStudySet;
+        if (isStudySetSuccess && selectedStudyset) {
+            const { cards, description, label, title } = selectedStudyset;
+            setCreatedSetCards(cards);
+            setDescription(description);
             setEnteredLabel(label);
             setTitle(title);
-            setDescription(description);
-            setCreatedSetCards(cards);
         }
-    }, [selectedStudySet]);
+    }, [selectedStudyset]);
 
     /**
      * Create a new studyset
      */
     const createNewSet = () => {
         const cards = [...createdSetCards];
-
-        // TODO: Re-visit allowing user to create study set with no cards
-        // if (cards.length === 0) {
-        //     return;
-        // }
-
-        // const allCardsHaveContent = createdCardObjects.every(
-        //     (card) => card.term.trim() && card.definition.trim()
-        // );
 
         const timestamp = new Date().getTime();
         const label = (enteredLabel ?? selectedLabel) || null;
@@ -186,11 +171,11 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
             userUUID,
         };
 
-        createStudySet(studySet)
+        createStudyset(studySet)
             .unwrap()
             .then((response: any) => {
                 console.log({ response });
-                toast.success("Successfully created new study set", {
+                toast.success('Successfully created new study set', {
                     position: toast.POSITION.BOTTOM_LEFT,
                 });
                 const { studySet } = response;
@@ -199,7 +184,7 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
             })
             .catch((error) => {
                 console.log({ error });
-                toast.error("Error creating new study set", {
+                toast.error('Error creating new study set', {
                     position: toast.POSITION.BOTTOM_LEFT,
                 });
             });
@@ -209,44 +194,36 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
      * Update studyset with new changes
      */
     const saveChanges = () => {
-        console.log({ selectedStudySet, title, description });
+        if (!studysetUUID) {
+            // TODO: Some indication to the user that something is wrong if the query parameter isnt defined
+            return;
+        }
 
-        // TODO: Fix typing with cards array
+        console.log({ selectedStudyset, title, description });
 
-        // @ts-ignore
-        let studyset: Studyset = {
-            ...selectedStudySet,
-            // cards: createdSetCards,
+        const updatedStudyset: Studyset = {
+            ...selectedStudyset,
+            cards: createdSetCards,
             title,
             description,
         };
+        console.log({ updatedStudyset });
 
-        updateStudySet({ studyset })
+        updateStudyset({ studysetUUID, updates: updatedStudyset })
             .unwrap()
             .then((response: any) => {
                 console.log({ response });
-                toast.success("Successfully updating study set", {
+                toast.success('Successfully updating study set', {
                     position: toast.POSITION.BOTTOM_LEFT,
                 });
                 navigate(`/view/${studysetUUID}`);
             })
             .catch((error) => {
                 console.log({ error });
-                toast.error("Error updating study set", {
+                toast.error('Error updating study set', {
                     position: toast.POSITION.BOTTOM_LEFT,
                 });
             });
-    };
-
-    const handleMainButton = () => {
-        switch (pageType) {
-            case CREATE_PAGE_TYPES.CREATE:
-                createNewSet();
-                return;
-            case CREATE_PAGE_TYPES.EDIT:
-                saveChanges();
-                return;
-        }
     };
 
     /**
@@ -301,20 +278,20 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
 
     const onSelectedLabelChange = (e: SelectChangeEvent) => {
         const newSelectedLabelValue = e.target.value;
-        if (newSelectedLabelValue !== "") {
+        if (newSelectedLabelValue !== '') {
             setEnteredLabel(e.target.value);
         }
         setSelectedLabel(e.target.value);
     };
-    
+
     const handleAddCard = () => {
         addCard({
             createdSetCards,
             setStateCallback: setCreatedSetCards,
             actionsStack,
             setActionsStack,
-        })
-    }
+        });
+    };
 
     /* Advanced Section Functions */
 
@@ -337,7 +314,7 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
         advancedSectionProps: {
             onBlankInputsSubmit,
         },
-        handleMainButton,
+        saveChanges,
         description,
         label: enteredLabel,
         onDescriptionChange,
@@ -346,7 +323,6 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
         onTitleChange,
         selectedLabel,
         title,
-        pageType,
         mainButtonDisabled,
     };
 
@@ -359,10 +335,10 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
             <CreateSetPage>
                 <CreateSetHeader {...headerProps} />
                 <SpacedFlexContainer>
-                    <SimpleFlexContainer style={{ gap: "0.5rem" }}>
+                    <SimpleFlexContainer style={{ gap: '0.5rem' }}>
                         <Typography variant="h6">
-                            Number of cards in this study set:{" "}
-                            {createdSetCards.length ?? "N/A"}
+                            Number of cards in this study set:{' '}
+                            {createdSetCards.length ?? 'N/A'}
                         </Typography>
                         {!createdSetCards.length && <NoCardsWarningsIcon />}
                     </SimpleFlexContainer>
@@ -373,26 +349,23 @@ const CreateSet = ({ pageType = "Create" }: Props) => {
                 </SpacedFlexContainer>
                 {/* TODO: Virtual Scroll */}
                 {cardInputs}
-                <AddCardButton
-                    variant="contained"
-                    onClick={handleAddCard}
-                >
+                <AddCardButton variant="contained" onClick={handleAddCard}>
                     <AddCardIcon />
                     Add Card
                 </AddCardButton>
                 <PageMainButton
                     variant="contained"
-                    onClick={handleMainButton}
+                    onClick={saveChanges}
                     size="large"
                     disabled={mainButtonDisabled}
                     startIcon={<Create />}
                     sx={{
-                        display: "flex",
-                        marginLeft: "auto",
-                        alignSelf: "flex-end",
+                        display: 'flex',
+                        marginLeft: 'auto',
+                        alignSelf: 'flex-end',
                     }}
                 >
-                    {pageProps.BUTTON}
+                    Save Changes
                 </PageMainButton>
             </CreateSetPage>
             <ImportSetModal />

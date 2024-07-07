@@ -46,11 +46,6 @@ const HeaderAdvancedSection = ({ onBlankInputsSubmit = null }: Props) => {
 
     const handleBlankInputsSubmit = () => {
         onBlankInputsSubmit();
-
-        const successAlert = {
-            message: `${blankCardsCount} cards successfully created!`,
-            open: true,
-        };
     };
 
     return (
