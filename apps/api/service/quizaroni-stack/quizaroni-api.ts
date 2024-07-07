@@ -220,6 +220,10 @@ export class QuizaroniAPI extends Construct {
                 route: `${studysetsPrefix}/update-studyset`,
                 lambdaName: "updateStudyset",
             },
+            {
+                route: `${studysetsPrefix}/create-label`,
+                lambdaName: "createLabel",
+            },
         ];
 
         const USERS_ROUTES: {
