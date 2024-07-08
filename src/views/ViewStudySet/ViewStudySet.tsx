@@ -15,10 +15,7 @@ import {
     useUpdateStudysetMetadataMutation,
     useUpdateStudysetMutation,
 } from 'state/api/studysetsAPI';
-import {
-    selectCognitoUser,
-    setLabelsDialogProps,
-} from 'state/slices/globalSlice';
+import { setLabelsDialogProps } from 'state/slices/globalSlice';
 import {
     selectSelectedDialog,
     setSelectedDialog,
@@ -316,9 +313,10 @@ const ViewStudySet = (props: Props) => {
                     <NoCardsMessage>No cards in this study set.</NoCardsMessage>
                 ) : (
                     filteredViewFlashCards.map((card, index) => {
+                        const { cardUUID } = card;
                         return (
                             <ViewStudySetCard
-                                key={card.uuid}
+                                key={cardUUID}
                                 card={card}
                                 index={index}
                                 selectedStudyset={selectedStudyset}

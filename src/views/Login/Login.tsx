@@ -17,12 +17,9 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     setCognitoUser,
     setAuthenticated,
-    setUserData,
 } from "state/slices/globalSlice";
-import { selectStudySets, setStudySets } from "state/slices/studysetsSlice";
 import { signIn } from "@aws-amplify/auth";
 import axios from "axios";
-import { useGetAllStudysetsQuery } from "state/api/studysetsAPI";
 
 type Props = {};
 const Login = (props: Props) => {
