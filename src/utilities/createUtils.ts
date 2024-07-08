@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import type { TODO, InitialCard } from "lib/types";
+import type { TODO, Card } from "lib/types";
 import { EMPTY_CARD } from "./constants";
 import { Dispatch, SetStateAction } from 'react';
 
@@ -18,8 +18,8 @@ type ActionsStackBaseProps = {
     setActionsStack: Dispatch<SetStateAction<TODO[]>>;
 }
 
-export const generateEmptyCard = (): InitialCard => {
-    return { ...EMPTY_CARD, uuid: uuidv4() };
+export const generateEmptyCard = (): Card => {
+    return { ...EMPTY_CARD, cardUUID: uuidv4() };
 }
 
 type DeleteCardParams = ActionsStackBaseProps & CardUtilityWithIndex;
@@ -147,8 +147,8 @@ export const addCard = ({
     const newActionsStack = [...actionsStack].concat({
         actionType: "addCard",
         undoCallback: (createdSetCards: TODO[], setStateCallback: TODO) => {
-            const newCreatedSetCards = [...createdSetCards].filter((value) => value.UUID !== cardToAdd.uuid);
-            console.log({newCreatedSetCards, originalUUID: cardToAdd.uuid})
+            const newCreatedSetCards = [...createdSetCards].filter((value) => value.UUID !== cardToAdd.cardUUID);
+            console.log({newCreatedSetCards, originalUUID: cardToAdd.cardUUID})
             setStateCallback(newCreatedSetCards)
         }
     })

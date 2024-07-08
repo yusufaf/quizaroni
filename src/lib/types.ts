@@ -1,51 +1,14 @@
+// #region Utility Types
 export type TODO = any;
-
 export type UUID = string;
 export type Timestamp = number;
+// #endregion
 
 // #region Theme
 export type ThemeName = "light" | "dark";
-
 // #endregion
 
-export type InitialCard = {
-    categories: string[];
-    definition: string;
-    important: boolean;
-    notes: Note[];
-    term: string;
-    uuid: UUID;
-};
-
-export type Note = {
-    text: string;
-    uuid: UUID;
-};
-
-export type Card = {
-    backgroundColor?: string;
-    categories: string[];
-    definition: string;
-    important: boolean;
-    notes: Note[];
-    term: string;
-    textColor?: string;
-    uuid: UUID;
-};
-
-export type StudysetMetadata = {
-    backgroundColorVisible: boolean;
-    contentOnly?: boolean;
-    customLabelTerminology: string;
-    customTerminology: string;
-    labelTerminology: string;
-    notesDrawerInitial: string;
-    notesDrawerPosition: string;
-    publiclyViewable: boolean;
-    terminology: string;
-    textColorVisible: boolean;
-};
-
+// #region Studysets
 export type Studyset = {
     cards: Card[];
     categories: any[];
@@ -62,10 +25,37 @@ export type Studyset = {
     uuid: UUID;
 };
 
-export type AppTheme = "light" | "dark";
-export type HomeView = "table" | "grid" | "html";
-export type NamedColor = { color: string; name: string };
+export type Card = {
+    backgroundColor?: string;
+    categories: string[];
+    definition: string;
+    important: boolean;
+    notes: Note[];
+    term: string;
+    textColor?: string;
+    cardUUID: UUID;
+};
 
+export type Note = {
+    text: string;
+    uuid: UUID;
+};
+
+export type StudysetMetadata = {
+    backgroundColorVisible: boolean;
+    contentOnly?: boolean;
+    customLabelTerminology: string;
+    customTerminology: string;
+    labelTerminology: string;
+    notesDrawerInitial: string;
+    notesDrawerPosition: string;
+    publiclyViewable: boolean;
+    terminology: string;
+    textColorVisible: boolean;
+};
+// #endregion
+
+// #region User
 export type User = {
     createdAt: Timestamp;
     email: string;
@@ -78,6 +68,11 @@ export type User = {
     username: string;
     userUUID: UUID;
 };
+
+export type AppTheme = "light" | "dark";
+export type HomeView = "table" | "grid" | "html";
+export type NamedColor = { color: string; name: string };
+// #endregion
 
 /* RTK Query Types */
 
@@ -98,10 +93,6 @@ export type GetStudysetResponse = {
 
 export type GetStudysetParams = {
     studysetUUID: UUID;
-};
-
-export type CreateStudysetParams = {
-    // TODO
 };
 
 export type CreateStudysetResponse = { 
@@ -192,15 +183,13 @@ export type EditNoteParams = StudysetUUIDPayload & {
 };
 
 export type CreateLabelParams = {
-    userUUID: UUID;
     label: string;
-    updateStudysetLabel: boolean;
     studysetUUID?: UUID;
+    updateStudysetLabel?: boolean;
 };
 
 export type DeleteLabelParams = {
-    userUUID: UUID;
-    labelsToDelete: string;
+    labelsToDelete: string[];
 };
 
 export type EditLabelParams = {

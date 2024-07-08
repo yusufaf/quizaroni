@@ -1,5 +1,4 @@
-import type { ConfirmDialogProps, SortDirection, User } from "lib/types";
-import type { InitialCard } from "lib/types";
+import type { Card, ConfirmDialogProps, SortDirection, User } from "lib/types";
 import { v4 as uuidv4 } from "uuid";
 
 export const LIGHT = "light";
@@ -54,13 +53,13 @@ export const FLASHSET_COLUMNS = {
     LABEL: "Label",
 };
 
-export const EMPTY_CARD: InitialCard = {
+export const EMPTY_CARD: Card = {
     categories: [],
     definition: "",
     important: false,
     notes: [],
     term: "",
-    uuid: uuidv4(),
+    cardUUID: uuidv4(),
 };
 
 export const VIEW_SET = {

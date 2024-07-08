@@ -1,5 +1,5 @@
-import { BASE_API_URL, getCommonPostRequestProps } from "api/awsAPI";
-import api from "./api";
+import { BASE_API_URL, getCommonPostRequestProps } from 'api/awsAPI';
+import api from './api';
 import {
     UUID,
     Studyset,
@@ -25,7 +25,7 @@ import {
     GetAllStudysetsResponse,
     GetStudysetResponse,
     CreateStudysetResponse,
-} from "lib/types";
+} from 'lib/types';
 
 /* Endpoints
     // Studysets
@@ -66,19 +66,19 @@ export const studysetsApi = api.injectEndpoints({
                 ...getCommonPostRequestProps(),
             }),
             providesTags: (result) => {
-                console.log("In providesTags for RTK query", { result });
+                console.log('In providesTags for RTK query', { result });
                 const { studysets } = result ?? {};
 
                 if (studysets) {
                     return [
                         ...studysets.map(({ studysetUUID }) => ({
-                            type: "Studyset" as const,
+                            type: 'Studyset' as const,
                             studysetUUID,
                         })),
-                        { type: "Studyset", id: "LIST" },
+                        { type: 'Studyset', id: 'LIST' },
                     ];
                 } else {
-                    return [{ type: "Studyset", id: "LIST" }];
+                    return [{ type: 'Studyset', id: 'LIST' }];
                 }
             },
         }),
@@ -89,10 +89,10 @@ export const studysetsApi = api.injectEndpoints({
                 body: { studysetUUID },
             }),
             providesTags: (result, error, arg) => {
-                console.log({result})
+                console.log({ result });
                 // @ts-ignore - TODO: Update types
                 const { studyset } = result;
-                return [{ type: "Studyset", id: studyset.studysetUUID }];
+                return [{ type: 'Studyset', id: studyset.studysetUUID }];
             },
         }),
         createStudyset: build.mutation<CreateStudysetResponse, any>({
@@ -100,7 +100,7 @@ export const studysetsApi = api.injectEndpoints({
                 url: `${BASE_API_URL}/studysets/create-studyset`,
                 ...getCommonPostRequestProps(),
             }),
-            invalidatesTags: [{ type: "Studyset", id: "LIST" }],
+            invalidatesTags: [{ type: 'Studyset', id: 'LIST' }],
         }),
         deleteStudyset: build.mutation<void, DeleteStudysetParams>({
             query: ({ studysetUUID }) => ({
@@ -109,15 +109,15 @@ export const studysetsApi = api.injectEndpoints({
                 params: { studysetUUID },
             }),
             // invalidatesTags: ["Studyset"],
-            invalidatesTags: [{ type: "Studyset", id: "LIST" }],
+            invalidatesTags: [{ type: 'Studyset', id: 'LIST' }],
         }),
         duplicateStudyset: build.mutation<void, DuplicateStudysetParams>({
             query: ({ uuid }) => ({
-                url: "studysets/duplicate-studyset",
-                method: "POST",
+                url: 'studysets/duplicate-studyset',
+                method: 'POST',
                 body: { uuid },
             }),
-            invalidatesTags: [{ type: "Studyset", id: "LIST" }],
+            invalidatesTags: [{ type: 'Studyset', id: 'LIST' }],
         }),
         updateStudyset: build.mutation<void, UpdateStudysetParams>({
             query: ({ studysetUUID, updates }) => ({
@@ -126,13 +126,13 @@ export const studysetsApi = api.injectEndpoints({
                 body: { studysetUUID, updates },
             }),
             invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.studysetUUID },
+                { type: 'Studyset', id: arg.studysetUUID },
             ],
         }),
         updateStudysetMetadata: build.mutation<void, UpdateMetadataParams>({
             query: ({ property, newValue, uuid }) => ({
-                url: "studysets/updateMetadata",
-                method: "POST",
+                url: 'studysets/updateMetadata',
+                method: 'POST',
                 body: {
                     property,
                     newValue,
@@ -140,132 +140,132 @@ export const studysetsApi = api.injectEndpoints({
                 },
             }),
             invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.uuid },
+                { type: 'Studyset', id: arg.uuid },
             ],
         }),
         createCategory: build.mutation<Studyset, CreateCategoryParams>({
             query: ({ studysetUUID, category }) => ({
-                url: "studysets/createCategory",
-                method: "POST",
+                url: 'studysets/createCategory',
+                method: 'POST',
                 body: { studysetUUID, category },
             }),
             invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.studysetUUID },
+                { type: 'Studyset', id: arg.studysetUUID },
             ],
         }),
         editCategory: build.mutation<Studyset, EditCategoryParams>({
             query: ({ studysetUUID, index, newCategory, oldCategory }) => ({
-                url: "studysets/editCategory",
-                method: "POST",
+                url: 'studysets/editCategory',
+                method: 'POST',
                 body: { studysetUUID, index, newCategory, oldCategory },
             }),
             invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.studysetUUID },
+                { type: 'Studyset', id: arg.studysetUUID },
             ],
         }),
         deleteCategory: build.mutation<Studyset, DeleteCategoryParams>({
             query: ({ studysetUUID, categoriesToDelete }) => ({
-                url: "studysets/deleteCategory",
-                method: "POST",
+                url: 'studysets/deleteCategory',
+                method: 'POST',
                 body: { studysetUUID, categoriesToDelete },
             }),
             invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.studysetUUID },
+                { type: 'Studyset', id: arg.studysetUUID },
             ],
         }),
         favoriteStudyset: build.mutation<Studyset, FavoriteStudysetParams>({
             query: ({ studysetUUID, favorited }) => ({
-                url: "studysets/favorite",
-                method: "POST",
+                url: 'studysets/favorite',
+                method: 'POST',
                 body: { studysetUUID, favorited },
             }),
-            invalidatesTags: [{ type: "Studyset", id: "LIST" }],
+            invalidatesTags: [{ type: 'Studyset', id: 'LIST' }],
         }),
         markCardAsImportant: build.mutation<
             Studyset,
             MarkCardAsImportantParams
         >({
             query: ({ cardUUID, newValue }) => ({
-                url: "studysets/markCardAsImportant",
-                method: "POST",
+                url: 'studysets/markCardAsImportant',
+                method: 'POST',
                 body: { cardUUID, newValue },
             }),
             invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.studysetUUID },
+                { type: 'Studyset', id: arg.studysetUUID },
             ],
         }),
         assignCardCategories: build.mutation<void, AssignCardCategoriesParams>({
             query: ({ cardUUID, categories }) => ({
-                url: "studysets/assignCardCategories",
-                method: "POST",
+                url: 'studysets/assignCardCategories',
+                method: 'POST',
                 body: { cardUUID, categories },
             }),
             invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.studysetUUID },
+                { type: 'Studyset', id: arg.studysetUUID },
             ],
         }),
         createNote: build.mutation<void, CreateNoteParams>({
-            query: ({ cardUUID }) => ({
-                url: "studysets/createNote",
-                method: "POST",
-                body: { cardUUID },
+            query: ({ cardUUID, studysetUUID }) => ({
+                url: `${BASE_API_URL}/studysets/create-note`,
+                ...getCommonPostRequestProps(),
+                body: { cardUUID, studysetUUID },
             }),
             invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.studysetUUID },
+                { type: 'Studyset', id: arg.studysetUUID },
             ],
         }),
         deleteNote: build.mutation<void, DeleteNoteParams>({
-            query: ({ cardUUID, noteUUID }) => ({
-                url: "studysets/deleteNote",
-                method: "POST",
-                body: { cardUUID, noteUUID },
+            query: ({ cardUUID, noteUUID, studysetUUID }) => ({
+                url: `${BASE_API_URL}/studysets/delete-note`,
+                ...getCommonPostRequestProps(),
+                body: { cardUUID, noteUUID, studysetUUID },
             }),
             invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.studysetUUID },
+                { type: 'Studyset', id: arg.studysetUUID },
             ],
         }),
         editNote: build.mutation<void, EditNoteParams>({
             query: ({ cardUUID, noteUUID, text }) => ({
-                url: "studysets/editNote",
-                method: "POST",
+                url: 'studysets/editNote',
+                method: 'POST',
                 body: { cardUUID, noteUUID, text },
             }),
             invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.studysetUUID },
+                { type: 'Studyset', id: arg.studysetUUID },
             ],
         }),
         createLabel: build.mutation<void, CreateLabelParams>({
-            query: (body) => ({
-                url: "studysets/createLabel",
-                method: "POST",
-                body,
+            query: ({ label, studysetUUID, updateStudysetLabel }) => ({
+                url: `${BASE_API_URL}/studysets/create-label`,
+                ...getCommonPostRequestProps(),
+                body: { label, studysetUUID, updateStudysetLabel },
             }),
-            invalidatesTags: ["Studyset", "User"],
+            invalidatesTags: ['Studyset', 'User'],
         }),
         deleteLabel: build.mutation<void, DeleteLabelParams>({
-            query: ({ userUUID, labelsToDelete }) => ({
-                url: "studysets/deleteLabel",
-                method: "POST",
-                body: { userUUID, labelsToDelete },
+            query: ({ labelsToDelete }) => ({
+                url: `${BASE_API_URL}/studysets/delete-label`,
+                ...getCommonPostRequestProps(),
+                body: { labelsToDelete },
             }),
-            invalidatesTags: ["Studyset", "User"],
+            invalidatesTags: ['Studyset', 'User'],
         }),
         editLabel: build.mutation<void, EditLabelParams>({
             query: ({ userUUID, index, newLabel, oldLabel }) => ({
-                url: "studysets/editLabel",
-                method: "POST",
+                url: 'studysets/editLabel',
+                method: 'POST',
                 body: { userUUID, index, newLabel, oldLabel },
             }),
-            invalidatesTags: ["Studyset", "User"],
+            invalidatesTags: ['Studyset', 'User'],
         }),
         changeLabel: build.mutation<void, ChangeLabelParams>({
             query: ({ studysetUUID, newLabel }) => ({
-                url: "studysets/changeLabel",
-                method: "POST",
+                url: 'studysets/changeLabel',
+                method: 'POST',
                 body: { studysetUUID, newLabel },
             }),
             invalidatesTags: (_result, _error, arg) => [
-                { type: "Studyset", id: arg.studysetUUID },
+                { type: 'Studyset', id: arg.studysetUUID },
             ],
         }),
     }),

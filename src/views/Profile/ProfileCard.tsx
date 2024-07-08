@@ -15,10 +15,10 @@ type Props = {
     userData: User;
 };
 const ProfileCard = ({ userData }: Props) => {
-    const { data: studysets = [] } = useGetAllStudysetsQuery(
-        { userUUID: userData.uuid ?? "" },
-        { skip: !userData.uuid }
-    );
+
+    const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
+        useGetAllStudysetsQuery({});
+    const studysets = studysetsResponse?.studysets ?? [];
 
     useEffect(() => {}, []);
 
@@ -35,7 +35,7 @@ const ProfileCard = ({ userData }: Props) => {
                 </UserInfoContainer>
                 <UserInfoContainer>
                     <UserInfoHeading># of Study Sets Created</UserInfoHeading>
-                    <Typography>{studysets?.length ?? 0}</Typography>
+                    <Typography>{studysets.length ?? 0}</Typography>
                 </UserInfoContainer>
                 <UserInfoContainer>
                     <UserInfoHeading>Account Created</UserInfoHeading>

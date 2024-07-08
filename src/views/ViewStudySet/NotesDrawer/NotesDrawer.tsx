@@ -43,7 +43,8 @@ const transitionDuration = 1000; //can also use theme.transitions.duration
 const NotesDrawer = (props: Props) => {
     const { selectedStudyset } = props;
 
-    const { uuid: studysetUUID = "", metadata } = selectedStudyset || {};
+    const { studysetUUID = "", metadata } = selectedStudyset || {};
+    
     // TODO: Doesn't work on initial load as expected
     const [hidden, setHidden] = useState<boolean>(metadata?.notesDrawerInitial === NOTES_DRAWER_INITIAL_APPEARANCE.CLOSED);
     const [openNotes, setOpenNotes] = useState<OpenCardNotes>(new Set());
@@ -163,7 +164,7 @@ const NotesDrawer = (props: Props) => {
                 <CloseDialogButton onClose={onClose} />
             </SimpleFlexContainer>
             {selectedStudyset?.cards?.map((card: Card, index: number) => {
-                const { uuid: cardUUID } = card;
+                const { cardUUID } = card;
                 return (
                     <Accordion
                         expanded={openNotes.has(cardUUID)}
