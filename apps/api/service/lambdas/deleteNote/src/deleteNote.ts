@@ -4,9 +4,13 @@ import {
     Handler,
 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DeleteCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import {
+    DynamoDBDocumentClient,
+    GetCommand,
+    UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
 import { AuthorizerContext } from "models/auth";
+import { Studyset } from "models/studysets";
 
 const { mainTable = "" } = process.env;
 
@@ -14,6 +18,8 @@ const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 type RequestBody = {
+    cardUUID: string;
+    noteUUID: string;
     studysetUUID: string;
 };
 
@@ -23,23 +29,62 @@ export const handler: Handler = async (
 ): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));
 
-    const { sub: userUUID, username } = event.requestContext.authorizer.lambda
+    const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
     const body: RequestBody = JSON.parse(event.body ?? "{}");
-    const { studysetUUID } = body;
+    const { cardUUID, noteUUID, studysetUUID } = body;
 
     try {
-        // const deleteCommand = new DeleteCommand({
-        //     TableName: mainTable,
-        //     Item: initialStudySet
-        // })
+        const PK = `userUUID#${userUUID}`;
+        const SK = `studyset#${studysetUUID}`;
+        const updatedAt = new Date().toISOString();
 
-        // await docClient.send(deleteCommand);
+        const getCommand = new GetCommand({
+            Key: {
+                PK,
+                SK,
+            },
+            TableName: mainTable,
+        });
 
+        const { Item } = await docClient.send(getCommand);
+
+        if (!Item) {
+            throw new Error(
+                `Studyset with UUID ${studysetUUID} for user ${username} not found`
+            );
+        }
+        const studyset = Item as Studyset;
+
+        const { cards } = studyset;
+
+        const newCards = cards.map((card) => {
+            const { notes } = card;
+            if (card.cardUUID === cardUUID) {
+                card.notes = notes.filter((note) => note.noteUUID !== noteUUID)
+            }
+            return card;
+        });
+
+        const deleteNoteCommand = new UpdateCommand({
+            TableName: mainTable,
+            Key: {
+                PK,
+                SK,
+            },
+            ExpressionAttributeValues: {
+                ":newCards": newCards,
+                ":updatedAt": updatedAt,
+                ":updatedBy": username,
+            },
+            UpdateExpression:
+                "SET cards = :newCards, updatedAt = :updatedAt, updatedBy = :updatedBy",
+        });
+        await docClient.send(deleteNoteCommand);
 
         return {
             statusCode: 200,
             body: JSON.stringify({
-                // studysetUUID
+                message: "Successfully deleted note",
             }),
         };
     } catch (err) {

@@ -7,7 +7,6 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
     DynamoDBDocumentClient,
     GetCommand,
-    PutCommand,
     UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { v4 as uuidv4 } from "uuid";
@@ -68,7 +67,7 @@ export const handler: Handler = async (
         const newCards = cards.map((card) => {
             const { notes } = card;
             if (card.cardUUID === cardUUID) {
-                card.notes = notes.concat(newNote)
+                card.notes = notes.concat(newNote);
             }
             return card;
         });
