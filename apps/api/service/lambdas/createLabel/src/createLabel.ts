@@ -33,7 +33,6 @@ export const handler: Handler = async (
         const userSK = 'userData';
         const updatedAt = new Date().toISOString();
 
-        const UpdateExpression = 'SET #labels = list_append(#labels, :newLabel), updatedAt = :updatedAt';
         const userLabelsUpdateCommand = new UpdateCommand({
             Key: {
                 PK: userPK,
@@ -47,7 +46,7 @@ export const handler: Handler = async (
                 ':newLabel': [label],
                 ':updatedAt': updatedAt,
             },
-            UpdateExpression,
+            UpdateExpression: 'SET #labels = list_append(#labels, :newLabel), updatedAt = :updatedAt',
         });
         await docClient.send(userLabelsUpdateCommand);
 
@@ -56,7 +55,6 @@ export const handler: Handler = async (
             const studysetsSK = `studyset#${studysetUUID}`;
             const updatedAt = new Date().toISOString();
 
-            const UpdateExpression = 'SET #label = :newLabel, updatedAt = :updatedAt, updatedBy = :updatedBy';
             const studysetLabelUpdateCommand = new UpdateCommand({
                 Key: {
                     PK: studysetsPK,
@@ -71,7 +69,7 @@ export const handler: Handler = async (
                     ':updatedAt': updatedAt,
                     ':updatedBy': username,
                 },
-                UpdateExpression,
+                UpdateExpression: 'SET #label = :newLabel, updatedAt = :updatedAt, updatedBy = :updatedBy',
             });
             await docClient.send(studysetLabelUpdateCommand);
         }

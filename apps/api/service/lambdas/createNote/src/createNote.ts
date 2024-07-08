@@ -4,10 +4,15 @@ import {
     Handler,
 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import {
+    DynamoDBDocumentClient,
+    GetCommand,
+    PutCommand,
+    UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import { AuthorizerContext } from "models/auth";
-import { removeKeys } from "resources/dynamo/utilities";
+import { Studyset } from "models/studysets";
 
 const { mainTable = "" } = process.env;
 
@@ -15,6 +20,7 @@ const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 type RequestBody = {
+    cardUUID: string;
     studysetUUID: string;
 };
 
@@ -24,55 +30,70 @@ export const handler: Handler = async (
 ): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));
 
-    const { sub: userUUID, username } = event.requestContext.authorizer.lambda
-    // const body: RequestBody = JSON.parse(event.body ?? "{}");
+    const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
+    const body: RequestBody = JSON.parse(event.body ?? "{}");
+    const { cardUUID, studysetUUID } = body;
 
     try {
-        const studysetUUID = uuidv4();
-        const timestamp = new Date().getTime();
-        const initialMetadata = {
-            backgroundColorVisible: false,
-            createOnly: false,
-            customLabelTerminology: "",
-            customTerminology: "",
-            labelTerminolgy: "Card",
-            notesDrawerPosition: "right",
-            publiclyViewable: false,
-            terminology: "Term/Definition",
-            textColorVisible: false,
-        }
-        const initialStudySet = {
-            PK: `userUUID#${userUUID}`,
-            SK: `studyset#${studysetUUID}`,
-            cards: [],
-            categories: [],
-            createdAt: timestamp,
-            description: "",
-            favorited: false,
-            label: "",
-            lastViewed: timestamp,
-            metadata: initialMetadata,
-            updatedAt: timestamp,
-            studysetUUID,
-            title: "Untitled Studyset",
-            username,
-            userUUID,
-        }
+        const PK = `userUUID#${userUUID}`;
+        const SK = `studyset#${studysetUUID}`;
+        const updatedAt = new Date().toISOString();
 
-        const putCommand = new PutCommand({
+        const getCommand = new GetCommand({
+            Key: {
+                PK,
+                SK,
+            },
             TableName: mainTable,
-            Item: initialStudySet
-        })
+        });
 
-        await docClient.send(putCommand);
+        const { Item } = await docClient.send(getCommand);
 
-        removeKeys(initialStudySet);
+        if (!Item) {
+            throw new Error(
+                `Studyset with UUID ${studysetUUID} for user ${username} not found`
+            );
+        }
+        const studyset = Item as Studyset;
+
+        const { cards } = studyset;
+
+        const noteUUID = uuidv4();
+
+        const newNote = {
+            noteUUID,
+            text: "",
+        };
+
+        const newCards = cards.map((card) => {
+            const { notes } = card;
+            if (card.cardUUID === cardUUID) {
+                card.notes = notes.concat(newNote)
+            }
+            return card;
+        });
+
+        const createNoteCommand = new UpdateCommand({
+            TableName: mainTable,
+            Key: {
+                PK,
+                SK,
+            },
+            ExpressionAttributeValues: {
+                ":newCards": newCards,
+                ":updatedAt": updatedAt,
+                ":updatedBy": username,
+            },
+            UpdateExpression:
+                "SET cards = :newCards, updatedAt = :updatedAt, updatedBy = :updatedBy",
+        });
+        await docClient.send(createNoteCommand);
 
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: "Successfully created study set",
-                studyset: initialStudySet,
+                message: "Successfully created note",
+                // studyset: initialStudySet,
             }),
         };
     } catch (err) {

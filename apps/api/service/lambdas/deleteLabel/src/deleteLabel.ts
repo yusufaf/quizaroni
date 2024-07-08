@@ -56,8 +56,6 @@ export const handler: Handler = async (
             (label) => !labelsToDelete.includes(label)
         );
 
-        const UpdateExpression =
-            "SET #labels = :newLabels, #updatedAt = :updatedAt";
         const userLabelsUpdateCommand = new UpdateCommand({
             Key: {
                 PK: userPK,
@@ -72,7 +70,7 @@ export const handler: Handler = async (
                 ":newLabels": newLabels,
                 ":updatedAt": updatedAt,
             },
-            UpdateExpression,
+            UpdateExpression: 'SET #labels = :newLabels, #updatedAt = :updatedAt',
         });
         await docClient.send(userLabelsUpdateCommand);
 
