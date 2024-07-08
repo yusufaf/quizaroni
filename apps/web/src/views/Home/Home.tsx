@@ -23,11 +23,9 @@ import {
 } from "state/api/usersAPI";
 import {
     selectAuthenticated,
-    selectCognitoUser,
 } from "state/slices/globalSlice";
 import { setSelectedStudySet } from "state/slices/studysetsSlice";
 import {
-    DEFAULT_USER_DATA,
     DEFAULT_USER_RESPONSE,
     HOME_LAYOUTS,
     PAGE_TITLES,
@@ -58,7 +56,6 @@ const Home = (props: Props) => {
     
     const { data: { user: { userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
 
-    /* Skip option prevents hook from running when userUUID is undefined */
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
         useGetAllStudysetsQuery({});
     const studysets = studysetsResponse?.studysets ?? [];
@@ -105,9 +102,6 @@ const Home = (props: Props) => {
             studysets.find((studyset) => studyset.uuid === studysetUUID)
         )
         .filter(Boolean) as Studyset[];
-
-    // Store a reference to the HTML file <input>
-    const fileInput = useRef(null);
 
     const columns: GridColDef[] = [
         {

@@ -55,10 +55,9 @@ const ManageLabelsDialog = (props: Props) => {
 
     /* ==== RTK Query ==== */
     const { data: { user: { labels = [], userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
-    const { data: studysets = [] } = useGetAllStudysetsQuery(
-        { userUUID: userUUID ?? "" },
-        { skip: !userUUID }
-    );
+    const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
+        useGetAllStudysetsQuery({});
+    const studysets = studysetsResponse?.studysets ?? [];
 
     const { data: selectedStudyset } = useGetStudysetQuery(
         {
@@ -265,11 +264,10 @@ const ManageLabelsDialog = (props: Props) => {
     };
 
     const handleCreate = async () => {
-        if (!userUUID || !isCreateTab) {
+        if (!isCreateTab) {
             return;
         }
         createLabel({
-            userUUID,
             label: labelName,
             studysetUUID: studySetUUID,
             updateStudysetLabel: shouldUpdateLabel,

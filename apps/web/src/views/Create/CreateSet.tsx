@@ -253,7 +253,7 @@ const CreateSet = (props: Props) => {
                 cardValues,
                 createdSetCards,
                 index,
-                key: cardValues.uuid,
+                key: cardValues.cardUUID,
                 onColorChange,
                 setActionsStack,
                 setCreatedSetCards,
