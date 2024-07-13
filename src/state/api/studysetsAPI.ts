@@ -112,10 +112,10 @@ export const studysetsApi = api.injectEndpoints({
             invalidatesTags: [{ type: 'Studyset', id: 'LIST' }],
         }),
         duplicateStudyset: build.mutation<void, DuplicateStudysetParams>({
-            query: ({ uuid }) => ({
-                url: 'studysets/duplicate-studyset',
-                method: 'POST',
-                body: { uuid },
+            query: ({ studysetUUID }) => ({
+                url: `${BASE_API_URL}/studysets/duplicate-studyset`,
+                ...getCommonPostRequestProps(),
+                body: { studysetUUID },
             }),
             invalidatesTags: [{ type: 'Studyset', id: 'LIST' }],
         }),

@@ -91,21 +91,15 @@ export type GetStudysetResponse = {
     studyset: Studyset; 
 };
 
-export type GetStudysetParams = {
-    studysetUUID: UUID;
-};
+export type GetStudysetParams = StudysetUUIDPayload
 
 export type CreateStudysetResponse = { 
     studyset: Studyset; 
 };
 
-export type DeleteStudysetParams = {
-    studysetUUID: UUID;
-};
+export type DeleteStudysetParams = StudysetUUIDPayload
 
-export type DuplicateStudysetParams = {
-    uuid: UUID;
-};
+export type DuplicateStudysetParams = StudysetUUIDPayload
 
 export type UpdateStudysetParams = {
     studysetUUID: string;
