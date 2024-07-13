@@ -225,10 +225,10 @@ export const studysetsApi = api.injectEndpoints({
             ],
         }),
         editNote: build.mutation<void, EditNoteParams>({
-            query: ({ cardUUID, noteUUID, text }) => ({
-                url: 'studysets/editNote',
-                method: 'POST',
-                body: { cardUUID, noteUUID, text },
+            query: ({ cardUUID, noteUUID, studysetUUID, text }) => ({
+                url: `${BASE_API_URL}/studysets/edit-note`,
+                ...getCommonPostRequestProps(),
+                body: { cardUUID, noteUUID, studysetUUID, text },
             }),
             invalidatesTags: (_result, _error, arg) => [
                 { type: 'Studyset', id: arg.studysetUUID },
