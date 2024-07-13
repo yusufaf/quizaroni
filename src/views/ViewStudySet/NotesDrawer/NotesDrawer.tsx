@@ -1,4 +1,4 @@
-import { LoadingButton } from "@mui/lab";
+import { LoadingButton } from '@mui/lab';
 import {
     Accordion,
     AccordionDetails,
@@ -8,31 +8,34 @@ import {
     IconButton,
     Tooltip,
     Typography,
-} from "@mui/material/";
-import { Card, Note, OpenCardNotes, Studyset, UUID } from "lib/types";
-import { StyledDrawer } from "./styles";
+} from '@mui/material/';
+import { Card, Note, OpenCardNotes, Studyset, UUID } from 'lib/types';
+import { StyledDrawer } from './styles';
 import {
     BoldTypography,
     FlexColumn,
     SimpleFlexContainer,
-} from "common/AppStyles";
-import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
-import { useState } from "react";
+} from 'common/AppStyles';
+import CloseDialogButton from 'components/CloseDialogButton/CloseDialogButton';
+import { useState } from 'react';
 import {
     Add as AddIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
     ExpandMore as ExpandMoreIcon,
     MenuOpen as MenuOpenIcon,
-} from "@mui/icons-material";
-import EditableTextField from "components/EditableTextField/EditableTextField";
+} from '@mui/icons-material';
+import EditableTextField from 'components/EditableTextField/EditableTextField';
 import {
     useCreateNoteMutation,
     useDeleteNoteMutation,
     useEditNoteMutation,
-} from "state/api/studysetsAPI";
-import useCustomMutation from "lib/hooks/useCustomMutation";
-import { EMPTY_NOTE_PLACEHOLDER, NOTES_DRAWER_INITIAL_APPEARANCE } from "utilities/constants";
+} from 'state/api/studysetsAPI';
+import useCustomMutation from 'lib/hooks/useCustomMutation';
+import {
+    EMPTY_NOTE_PLACEHOLDER,
+    NOTES_DRAWER_INITIAL_APPEARANCE,
+} from 'utilities/constants';
 
 type Props = {
     selectedStudyset: Studyset;
@@ -43,10 +46,12 @@ const transitionDuration = 1000; //can also use theme.transitions.duration
 const NotesDrawer = (props: Props) => {
     const { selectedStudyset } = props;
 
-    const { studysetUUID = "", metadata } = selectedStudyset || {};
-    
+    const { studysetUUID = '', metadata } = selectedStudyset || {};
+
     // TODO: Doesn't work on initial load as expected
-    const [hidden, setHidden] = useState<boolean>(metadata?.notesDrawerInitial === NOTES_DRAWER_INITIAL_APPEARANCE.CLOSED);
+    const [hidden, setHidden] = useState<boolean>(
+        metadata?.notesDrawerInitial === NOTES_DRAWER_INITIAL_APPEARANCE.CLOSED
+    );
     const [openNotes, setOpenNotes] = useState<OpenCardNotes>(new Set());
     const [currentEditKey, setCurrentEditKey] = useState<string>();
 
@@ -59,8 +64,8 @@ const NotesDrawer = (props: Props) => {
         isError: isCreateNoteError,
     } = useCustomMutation({
         mutation: useCreateNoteMutation,
-        successMessage: "Successfully created note",
-        errorMessage: "Error creating note",
+        successMessage: 'Successfully created note',
+        errorMessage: 'Error creating note',
     });
 
     const {
@@ -70,8 +75,8 @@ const NotesDrawer = (props: Props) => {
         isError: isDeleteNoteError,
     } = useCustomMutation({
         mutation: useDeleteNoteMutation,
-        successMessage: "Successfully deleted note",
-        errorMessage: "Error deleting note",
+        successMessage: 'Successfully deleted note',
+        errorMessage: 'Error deleting note',
     });
 
     const {
@@ -81,8 +86,8 @@ const NotesDrawer = (props: Props) => {
         isError: isEditNoteError,
     } = useCustomMutation({
         mutation: useEditNoteMutation,
-        successMessage: "Successfully edited note",
-        errorMessage: "Error editing note",
+        successMessage: 'Successfully edited note',
+        errorMessage: 'Error editing note',
     });
 
     const onClose = () => {
@@ -107,7 +112,7 @@ const NotesDrawer = (props: Props) => {
         };
 
     const handleEditingNoteToggle = (uuid: UUID) => {
-        const keyToUse = uuid === currentEditKey ? "" : uuid;
+        const keyToUse = uuid === currentEditKey ? '' : uuid;
         setCurrentEditKey(keyToUse);
     };
 
@@ -122,6 +127,7 @@ const NotesDrawer = (props: Props) => {
         currentValue: string;
         editedValue: string;
     }) => {
+        console.log('In handleEditNoteBlur = ', { noteUUID });
         handleEditingNoteToggle(noteUUID);
         if (currentValue !== editedValue) {
             editNote({
@@ -142,8 +148,8 @@ const NotesDrawer = (props: Props) => {
                 aria-label="Open notes menu"
                 title="Open notes menu"
                 sx={{
-                    position: "absolute",
-                    right: "2rem",
+                    position: 'absolute',
+                    right: '2rem',
                 }}
             >
                 <MenuOpenIcon fontSize="medium" />
@@ -181,23 +187,25 @@ const NotesDrawer = (props: Props) => {
                             </BoldTypography>
                         </AccordionSummary>
                         <AccordionDetails>
-                            {card.notes?.map((note: Note, index: number) => {
-                                const { uuid } = note;
+                            {card.notes.map((note: Note, index: number) => {
+                                const { noteUUID } = note;
                                 return (
                                     <SimpleFlexContainer
-                                        key={uuid}
+                                        key={noteUUID}
                                         style={{
-                                            gap: "1rem",
+                                            gap: '1rem',
                                         }}
                                     >
                                         <EditableTextField
-                                            isEditing={currentEditKey === uuid}
-                                            value={note.text ?? "EMPTY"}
+                                            isEditing={
+                                                currentEditKey === noteUUID
+                                            }
+                                            value={note.text ?? 'EMPTY'}
                                             placeholder={EMPTY_NOTE_PLACEHOLDER}
                                             onBlur={(editedValue: any) =>
                                                 handleEditNoteBlur({
                                                     cardUUID,
-                                                    noteUUID: uuid,
+                                                    noteUUID,
                                                     currentValue: note.text,
                                                     editedValue,
                                                 })
@@ -205,7 +213,7 @@ const NotesDrawer = (props: Props) => {
                                         />
                                         <SimpleFlexContainer
                                             sx={{
-                                                height: "fit-content",
+                                                height: 'fit-content',
                                             }}
                                         >
                                             <Tooltip
@@ -215,7 +223,7 @@ const NotesDrawer = (props: Props) => {
                                                 <IconButton
                                                     onClick={() =>
                                                         handleEditingNoteToggle(
-                                                            uuid
+                                                            noteUUID
                                                         )
                                                     }
                                                 >
@@ -223,8 +231,8 @@ const NotesDrawer = (props: Props) => {
                                                         fontSize="small"
                                                         color={
                                                             currentEditKey ===
-                                                            uuid
-                                                                ? "primary"
+                                                            noteUUID
+                                                                ? 'primary'
                                                                 : undefined
                                                         }
                                                     />
@@ -239,7 +247,7 @@ const NotesDrawer = (props: Props) => {
                                                         deleteNote({
                                                             studysetUUID,
                                                             cardUUID,
-                                                            noteUUID: uuid,
+                                                            noteUUID,
                                                         })
                                                     }
                                                 >
@@ -253,7 +261,7 @@ const NotesDrawer = (props: Props) => {
                             <Button
                                 startIcon={<AddIcon />}
                                 variant="outlined"
-                                sx={{ width: "100%", marginTop: "1rem" }}
+                                sx={{ width: '100%', marginTop: '1rem' }}
                                 onClick={() => {
                                     createNote({
                                         studysetUUID,
