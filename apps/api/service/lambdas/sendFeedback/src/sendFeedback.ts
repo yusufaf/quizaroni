@@ -7,7 +7,7 @@ import {
 import { S3Client } from "@aws-sdk/client-s3";
 import { AuthorizerContext } from "models/auth";
 
-const { mainS3Bucket = "" } = process.env;
+const { mainBucket = "" } = process.env;
 
 const s3Client = new S3Client();
 

@@ -7,7 +7,7 @@ import { S3Client, CompleteMultipartUploadCommand, CompletedPart, HeadObjectComm
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { AuthorizerContext } from "models/auth";
 
-const { mainS3Bucket = "" } = process.env;
+const { mainBucket = "" } = process.env;
 
 const s3Client = new S3Client();
 
@@ -28,7 +28,7 @@ export const handler: Handler = async (
 
     try {
         const completeMultipartUploadCommand = new CompleteMultipartUploadCommand({
-            Bucket: mainS3Bucket,
+            Bucket: mainBucket,
             Key: key,
             UploadId: uploadId,
             MultipartUpload: {
@@ -41,13 +41,13 @@ export const handler: Handler = async (
         const splitKey = key.split("/");
         const [fileName] = splitKey[splitKey.length - 1];
         const headObjectCommand = new HeadObjectCommand({
-            Bucket: mainS3Bucket,
+            Bucket: mainBucket,
             Key: key,
         });
         const s3HeadObject = await s3Client.send(headObjectCommand);
         const fileSize = s3HeadObject.ContentLength || 0;
         const getObjectCommand = new GetObjectCommand({
-            Bucket: mainS3Bucket,
+            Bucket: mainBucket,
             Key: key,
         })
         const signedURL = getSignedUrl(s3Client, getObjectCommand, {

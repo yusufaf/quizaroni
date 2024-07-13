@@ -6,7 +6,7 @@ import {
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { AuthorizerContext } from "models/auth";
 
-const { mainS3Bucket = "" } = process.env;
+const { mainBucket = "" } = process.env;
 
 const s3Client = new S3Client();
 
@@ -26,7 +26,7 @@ export const handler: Handler = async (
     try {
 
         const deleteCommand = new DeleteObjectCommand({
-            Bucket: mainS3Bucket,
+            Bucket: mainBucket,
             Key: key,
         })
         const deleteResponse = await s3Client.send(deleteCommand);

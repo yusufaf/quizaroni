@@ -7,7 +7,7 @@ import { S3Client, GetObjectCommand, UploadPartCommand, UploadPartCommandInput }
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { AuthorizerContext } from "models/auth";
 
-const { mainS3Bucket = "" } = process.env;
+const { mainBucket = "" } = process.env;
 
 const s3Client = new S3Client();
 
@@ -30,7 +30,7 @@ export const handler: Handler = async (
         const promises: Promise<string>[] = [];
         for (let index = 0; index < numParts; index++) {
             const uploadPartCommand = new UploadPartCommand({
-                Bucket: mainS3Bucket,
+                Bucket: mainBucket,
                 Key: key,
                 UploadId: uploadId,
                 PartNumber: index + 1

@@ -27,7 +27,7 @@ export default ({
         environment: {
             deploymentType,
             NODE_OPTIONS: '--enable-source-maps',
-            mainS3Bucket: `${appName}-${deploymentType}-main`,
+            mainBucket: `${appName}-${deploymentType}-main`,
         } 
     })
 

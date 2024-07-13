@@ -6,7 +6,7 @@ import {
 import { S3Client, CreateMultipartUploadCommand } from "@aws-sdk/client-s3";
 import { AuthorizerContext } from "models/auth";
 
-const { mainS3Bucket = "" } = process.env;
+const { mainBucket = "" } = process.env;
 
 const s3Client = new S3Client();
 
@@ -31,7 +31,7 @@ export const handler: Handler = async (
 
     try {
         const multipartCommand = new CreateMultipartUploadCommand({
-            Bucket: mainS3Bucket,
+            Bucket: mainBucket,
             Key: key,
             ContentType: contentType,
         });
