@@ -38,7 +38,7 @@ export type Card = {
 
 export type Note = {
     text: string;
-    uuid: UUID;
+    noteUUID: UUID;
 };
 
 export type StudysetMetadata = {
