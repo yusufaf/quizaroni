@@ -91,7 +91,7 @@ export const globalSlice = createSlice({
                         dialogMessage,
                         title: `${title} ${studyset.title}?`,
                         props: {
-                            uuid: studyset.uuid,
+                            studysetUUID: studyset.studysetUUID,
                         },
                     };
                     break;
@@ -102,7 +102,7 @@ export const globalSlice = createSlice({
                     const messages: string[] = []
                     for (const studyset of studysets) {
                         messages.push(studyset.title)
-                        studysetUUIDs.push(studyset.uuid);
+                        studysetUUIDs.push(studyset.studysetUUID);
                     }
 
                     dialogProps = {

@@ -69,9 +69,9 @@ const ConfirmDialog = (props: Props) => {
                 break;
             case STUDYSET_CONFIRM_DIALOGS.DELETE_MULTIPLE: {
                 const { studysetUUIDs = [] } = { ...dialogProps.props };
-                const promises = studysetUUIDs.map((uuid: string) => {
+                const promises = studysetUUIDs.map((studysetUUID: string) => {
                     return deleteStudySet({
-                        uuid,
+                        studysetUUID,
                     }).unwrap();
                 });
                 await Promise.allSettled(promises);
@@ -82,9 +82,9 @@ const ConfirmDialog = (props: Props) => {
                 break;
             case STUDYSET_CONFIRM_DIALOGS.DUPLICATE_MULTIPLE:
                 const { studysetUUIDs = [] } = { ...dialogProps.props };
-                const promises = studysetUUIDs.map((uuid: string) => {
+                const promises = studysetUUIDs.map((studysetUUID: string) => {
                     return duplicateStudySet({
-                        uuid,
+                        studysetUUID,
                     }).unwrap();
                 });
                 await Promise.allSettled(promises);
