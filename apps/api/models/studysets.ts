@@ -2,6 +2,8 @@ export type UUID = string;
 export type Timestamp = string;
 
 export type Studyset = {
+    PK: string;
+    SK: string;
     cards: Card[];
     categories: string[];
     createdAt: Timestamp;
@@ -12,6 +14,7 @@ export type Studyset = {
     metadata: StudysetMetadata;
     studysetUUID: UUID;
     title: string;
+    updatedAt: Timestamp;
     userUUID: UUID;
     username: string;
 };

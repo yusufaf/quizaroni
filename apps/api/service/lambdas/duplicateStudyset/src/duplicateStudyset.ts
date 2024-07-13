@@ -4,10 +4,11 @@ import {
     Handler,
 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { v4 as uuidv4 } from "uuid";
 import { AuthorizerContext } from "models/auth";
 import { removeKeys } from "resources/dynamo/utilities";
+import { Studyset } from "models/studysets";
 
 const { mainTable = "" } = process.env;
 
@@ -28,37 +29,58 @@ export const handler: Handler = async (
         const body: RequestBody = JSON.parse(event.body ?? "{}");
         const { studysetUUID } = body;
 
-        const timestamp = new Date().getTime();
-        const duplicatedStudyset = {
-            PK: `userUUID#${userUUID}`,
-            SK: `studyset#${studysetUUID}`,
-            cards: [],
-            categories: [],
-            createdAt: timestamp,
-            favorited: false,
-            label: "",
-            lastViewed: timestamp,
-            // metadata: initialMetadata,
-            updatedAt: timestamp,
-            studysetUUID,
-            username,
-            userUUID,
+        const getCommand = new GetCommand({
+            Key: {
+                PK: `userUUID#${userUUID}`,
+                SK: `studyset#${studysetUUID}`,
+            },
+            TableName: mainTable,
+        })
+        const { Item } = await docClient.send(getCommand);
+
+        if (!Item) {
+            throw new Error(`Studyset with UUID ${studysetUUID} for user ${username} not found`)
         }
+
+        const studyset = Item as Studyset;
+        
+        const newStudysetUUID = uuidv4();
+        const timestamp = new Date().toISOString();
+
+        const duplicatedStudyset = structuredClone(studyset);
+        duplicatedStudyset.SK = `studyset#${newStudysetUUID}`;
+        duplicatedStudyset.title = `${duplicatedStudyset.title} Copy`;
+        duplicatedStudyset.createdAt = timestamp;
+        duplicatedStudyset.updatedAt = timestamp;
+        duplicatedStudyset.studysetUUID = newStudysetUUID;
+        duplicatedStudyset.cards = duplicatedStudyset.cards.map(card => {
+            const newCardUUID = uuidv4();
+            const newNotes = card.notes.map(note => ({
+                ...note,
+                noteUUID: uuidv4()
+            }));
+    
+            return {
+                ...card,
+                cardUUID: newCardUUID,
+                notes: newNotes
+            };
+        });
 
         const putCommand = new PutCommand({
             TableName: mainTable,
-            Item: initialStudySet
+            Item: duplicatedStudyset
         })
 
         await docClient.send(putCommand);
 
-        removeKeys(initialStudySet);
+        removeKeys(duplicatedStudyset);
 
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: "Successfully created study set",
-                studyset: initialStudySet,
+                message: "Successfully duplicated study set",
+                studyset: duplicatedStudyset,
             }),
         };
     } catch (err) {
