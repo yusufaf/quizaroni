@@ -233,6 +233,14 @@ export class QuizaroniAPI extends Construct {
                 lambdaName: "deleteLabel",
             },
             {
+                route: `${studysetsPrefix}/change-label`,
+                lambdaName: "changeLabel",
+            },
+            {
+                route: `${studysetsPrefix}/edit-label`,
+                lambdaName: "editLabel",
+            },
+            {
                 route: `${studysetsPrefix}/create-note`,
                 lambdaName: "createNote",
             },
