@@ -1,4 +1,4 @@
-import { useState, SyntheticEvent, ChangeEvent, useEffect } from "react";
+import { useState, SyntheticEvent, ChangeEvent, useEffect } from 'react';
 import {
     Button,
     Checkbox,
@@ -6,17 +6,17 @@ import {
     FormControlLabel,
     Tab,
     Tabs,
-} from "@mui/material/";
-import { TABS, ACTIONS } from "./constants";
+} from '@mui/material/';
+import { TABS, ACTIONS } from './constants';
 import {
     LabelActionWarning,
     StyledDialog,
     StyledDialogContent,
-} from "./styles";
-import { LoadingButton } from "@mui/lab";
-import LabelsList from "./LabelsList";
-import { capitalizeFirstLetter } from "utilities/functions";
-import { Studyset } from "lib/types";
+} from './styles';
+import { LoadingButton } from '@mui/lab';
+import LabelsList from './LabelsList';
+import { capitalizeFirstLetter } from 'utilities/functions';
+import { Studyset } from 'lib/types';
 import {
     useCreateLabelMutation,
     useDeleteLabelMutation,
@@ -24,47 +24,52 @@ import {
     useChangeLabelMutation,
     useGetAllStudysetsQuery,
     useGetStudysetQuery,
-} from "state/api/studysetsAPI";
-import useCustomMutation from "lib/hooks/useCustomMutation";
-import { BoldButton, StyledDialogTitle } from "common/AppStyles";
-import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
-import CreateTabView from "./CreateTabView";
-import ManageTabView from "./ManageTabView";
-import AssignTabView from "./AssignTabView";
-import {
-    selectLabelsDialogProps,
-    setLabelsDialogProps,
-} from "state/slices/globalSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { useGetUserQuery } from "state/api/usersAPI";
-import { DEFAULT_USER_RESPONSE } from "utilities/constants";
+} from 'state/api/studysetsAPI';
+import useCustomMutation from 'lib/hooks/useCustomMutation';
+import { BoldButton, StyledDialogTitle } from 'common/AppStyles';
+import CloseDialogButton from 'components/CloseDialogButton/CloseDialogButton';
+import CreateTabView from './CreateTabView';
+import ManageTabView from './ManageTabView';
+import AssignTabView from './AssignTabView';
+import { setLabelsDialogProps } from 'state/slices/globalSlice';
+import { useDispatch } from 'react-redux';
+import { useGetUserQuery } from 'state/api/usersAPI';
+import { DEFAULT_USER_RESPONSE } from 'utilities/constants';
+import { LabelsDialogProps } from 'lib/types';
 
 type ErrorInfo = {
     helperText: string;
 };
 
-type Props = {};
-const ManageLabelsDialog = (props: Props) => {
-    const {} = props;
-
+type Props = {
+    labelsDialogProps: LabelsDialogProps;
+};
+const ManageLabelsDialog = ({ labelsDialogProps }: Props) => {
     /* ==== Redux ==== */
     const dispatch = useDispatch();
-    const labelDialogProps = useSelector(selectLabelsDialogProps);
 
-    const { studySetUUID = "" } = labelDialogProps || {};
+    const { studySetUUID = '' } = labelsDialogProps || {};
 
     /* ==== RTK Query ==== */
-    const { data: { user: { labels = [], userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
+    const {
+        data: { user: { labels = [], userUUID = '' } } = DEFAULT_USER_RESPONSE,
+    } = useGetUserQuery();
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
         useGetAllStudysetsQuery({});
     const studysets = studysetsResponse?.studysets ?? [];
 
-    const { data: selectedStudyset } = useGetStudysetQuery(
+    const {
+        data: studysetResponse,
+        isLoading: isStudySetLoading,
+        isSuccess: isStudySetSuccess,
+        isError: isStudySetError,
+    } = useGetStudysetQuery(
+        { studysetUUID: labelsDialogProps.studySetUUID ?? '' },
         {
-            studysetUUID: labelDialogProps.studySetUUID ?? "",
-        },
-        { skip: !labelDialogProps.studySetUUID }
+            skip: !labelsDialogProps.studySetUUID,
+        }
     );
+    const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
 
     const {
         mutate: createLabel,
@@ -73,10 +78,10 @@ const ManageLabelsDialog = (props: Props) => {
         isError: isCreateError,
     } = useCustomMutation({
         mutation: useCreateLabelMutation,
-        successMessage: "Successfully created label",
-        errorMessage: "Error creating label",
+        successMessage: 'Successfully created label',
+        errorMessage: 'Error creating label',
         onSuccess: () => {
-            setLabelName("");
+            setLabelName('');
         },
     });
 
@@ -87,8 +92,8 @@ const ManageLabelsDialog = (props: Props) => {
         isError: isDeleteError,
     } = useCustomMutation({
         mutation: useDeleteLabelMutation,
-        successMessage: "Successfully deleted label",
-        errorMessage: "Error deleting label",
+        successMessage: 'Successfully deleted label',
+        errorMessage: 'Error deleting label',
         onSuccess: () => {
             setDeleteIndices([]);
         },
@@ -101,11 +106,11 @@ const ManageLabelsDialog = (props: Props) => {
         isError: isEditError,
     } = useCustomMutation({
         mutation: useEditLabelMutation,
-        successMessage: "Successfully edited label",
-        errorMessage: "Error editing label",
+        successMessage: 'Successfully edited label',
+        errorMessage: 'Error editing label',
         onSuccess: () => {
             setEditIndex(null);
-            setEditLabelName("");
+            setEditLabelName('');
         },
     });
 
@@ -116,16 +121,16 @@ const ManageLabelsDialog = (props: Props) => {
         isError: isChangeError,
     } = useCustomMutation({
         mutation: useChangeLabelMutation,
-        successMessage: "Successfully updated label",
-        errorMessage: "Error updated label",
+        successMessage: 'Successfully updated label',
+        errorMessage: 'Error updated label',
     });
 
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
-    const [labelName, setLabelName] = useState<string>("");
+    const [labelName, setLabelName] = useState<string>('');
     const [errorInfo, setErrorInfo] = useState(null);
     /* Edit & Delete State */
     const [editIndex, setEditIndex] = useState<number | null>(null);
-    const [editLabelName, setEditLabelName] = useState<string>("");
+    const [editLabelName, setEditLabelName] = useState<string>('');
     const [editErrorInfo, setEditErrorInfo] = useState<ErrorInfo | null>(null);
     const [selectedAction, setSelectedAction] = useState<string | null>(null);
     const [deleteIndices, setDeleteIndices] = useState<number[]>([]);
@@ -135,7 +140,7 @@ const ManageLabelsDialog = (props: Props) => {
     const [selectedStudysetUUIDs, setSelectedStudysetUUIDs] = useState<
         string[]
     >([]);
-    const [assignLabel, setAssignLabel] = useState<string>("");
+    const [assignLabel, setAssignLabel] = useState<string>('');
 
     const isCreateTab = selectedTab === TABS.CREATE;
     const isManageTab = selectedTab === TABS.MANAGE;
@@ -145,15 +150,15 @@ const ManageLabelsDialog = (props: Props) => {
 
     // TODO: Look into initial value for selectedStudysetUUIDs useState()
     useEffect(() => {
-        if (labelDialogProps.selectedStudysetUUIDs) {
+        if (labelsDialogProps.selectedStudysetUUIDs) {
             setSelectedStudysetUUIDs([
-                ...labelDialogProps.selectedStudysetUUIDs,
+                ...labelsDialogProps.selectedStudysetUUIDs,
             ]);
         }
-        if (labelDialogProps.tab) {
-            setSelectedTab(labelDialogProps.tab);
+        if (labelsDialogProps.tab) {
+            setSelectedTab(labelsDialogProps.tab);
         }
-    }, [labelDialogProps]);
+    }, [labelsDialogProps]);
 
     /* ==== Dialog Logic ==== */
     const closeLabelsDialog = () => {
@@ -180,7 +185,7 @@ const ManageLabelsDialog = (props: Props) => {
         setLabelName(label);
         if (isDuplicate) {
             setErrorInfo({
-                helperText: "Label already exists",
+                helperText: 'Label already exists',
             });
         } else {
             setErrorInfo(null);
@@ -197,7 +202,7 @@ const ManageLabelsDialog = (props: Props) => {
         setEditLabelName(newLabelName);
         if (isDuplicate) {
             setEditErrorInfo({
-                helperText: "Label already exists",
+                helperText: 'Label already exists',
             });
         } else if (!newLabelName) {
             setEditErrorInfo({
@@ -218,7 +223,7 @@ const ManageLabelsDialog = (props: Props) => {
 
     const handleDeleteClick = (index: number) => {
         setEditIndex(null);
-        setEditLabelName("");
+        setEditLabelName('');
         setEditErrorInfo(null);
 
         setSelectedAction(ACTIONS.DELETE);
@@ -238,7 +243,7 @@ const ManageLabelsDialog = (props: Props) => {
     };
 
     const handleEditOrDelete = () => {
-        console.log("Entered editOrDelete");
+        console.log('Entered editOrDelete');
         // TODO:
         switch (selectedAction) {
             case ACTIONS.EDIT:
@@ -251,7 +256,6 @@ const ManageLabelsDialog = (props: Props) => {
                     return;
                 }
                 editLabel({
-                    userUUID,
                     index: editIndex,
                     oldLabel: selectedLabelName,
                     newLabel: editLabelName,
@@ -301,7 +305,7 @@ const ManageLabelsDialog = (props: Props) => {
                     <>
                         <BoldButton
                             variant="contained"
-                            onClick={() => handleChangeCurrentLabel("")}
+                            onClick={() => handleChangeCurrentLabel('')}
                         >
                             Remove Current Label
                         </BoldButton>
@@ -310,7 +314,7 @@ const ManageLabelsDialog = (props: Props) => {
                             onClick={handleCreate}
                             disabled={!labelName || Boolean(errorInfo)}
                             // loading={}
-                            sx={{fontWeight: 600}}
+                            sx={{ fontWeight: 600 }}
                         >
                             Create
                         </LoadingButton>
@@ -325,7 +329,7 @@ const ManageLabelsDialog = (props: Props) => {
                 const isEdit = selectedAction === ACTIONS.EDIT;
                 let buttonText =
                     selectedAction === ACTIONS.EDIT
-                        ? "Save Edit"
+                        ? 'Save Edit'
                         : `Delete (${deleteIndices.length})`;
 
                 let buttonOnClick = handleEditOrDelete;
@@ -365,7 +369,7 @@ const ManageLabelsDialog = (props: Props) => {
 
     return (
         <StyledDialog
-            open={labelDialogProps.open}
+            open={labelsDialogProps.open}
             onClose={closeLabelsDialog}
             fullWidth
             maxWidth="lg"
@@ -446,7 +450,7 @@ const ManageLabelsDialog = (props: Props) => {
                     <LabelActionWarning variant="body2" color="error">
                         Are you sure you want to delete these labels? This will
                         remove the label from all of your study sets.
-                        {"\n"}
+                        {'\n'}
                         This action cannot be undone.
                     </LabelActionWarning>
                 )}

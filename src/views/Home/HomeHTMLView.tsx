@@ -54,7 +54,7 @@ const HomeHTMLView = (props: Props) => {
                                 <tr>
                                     <td>
                                         <GhostLink
-                                            to={`/view/${studyset.uuid}`}
+                                            to={`/view/${studyset.studysetUUID}`}
                                         >
                                             {studyset.title}
                                         </GhostLink>

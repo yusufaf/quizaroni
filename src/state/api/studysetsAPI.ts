@@ -21,7 +21,6 @@ import {
     DeleteNoteParams,
     EditNoteParams,
     UpdateStudysetParams,
-    FavoriteStudysetParams,
     GetAllStudysetsResponse,
     GetStudysetResponse,
     CreateStudysetResponse,
@@ -173,14 +172,6 @@ export const studysetsApi = api.injectEndpoints({
                 { type: 'Studyset', id: arg.studysetUUID },
             ],
         }),
-        favoriteStudyset: build.mutation<Studyset, FavoriteStudysetParams>({
-            query: ({ studysetUUID, favorited }) => ({
-                url: 'studysets/favorite',
-                method: 'POST',
-                body: { studysetUUID, favorited },
-            }),
-            invalidatesTags: [{ type: 'Studyset', id: 'LIST' }],
-        }),
         markCardAsImportant: build.mutation<
             Studyset,
             MarkCardAsImportantParams
@@ -251,17 +242,17 @@ export const studysetsApi = api.injectEndpoints({
             invalidatesTags: ['Studyset', 'User'],
         }),
         editLabel: build.mutation<void, EditLabelParams>({
-            query: ({ userUUID, index, newLabel, oldLabel }) => ({
-                url: 'studysets/editLabel',
-                method: 'POST',
-                body: { userUUID, index, newLabel, oldLabel },
+            query: ({ index, newLabel, oldLabel  }) => ({
+                url: `${BASE_API_URL}/studysets/edit-label`,
+                ...getCommonPostRequestProps(),
+                body: { index, newLabel, oldLabel  },
             }),
             invalidatesTags: ['Studyset', 'User'],
         }),
         changeLabel: build.mutation<void, ChangeLabelParams>({
             query: ({ studysetUUID, newLabel }) => ({
-                url: 'studysets/changeLabel',
-                method: 'POST',
+                url: `${BASE_API_URL}/studysets/change-label`,
+                ...getCommonPostRequestProps(),
                 body: { studysetUUID, newLabel },
             }),
             invalidatesTags: (_result, _error, arg) => [
@@ -282,7 +273,6 @@ export const {
     useCreateCategoryMutation,
     useEditCategoryMutation,
     useDeleteCategoryMutation,
-    useFavoriteStudysetMutation,
     useMarkCardAsImportantMutation,
     useAssignCardCategoriesMutation,
     useCreateLabelMutation,

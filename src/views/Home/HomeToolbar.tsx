@@ -42,7 +42,7 @@ import {
 } from "state/slices/globalSlice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useFavoriteStudysetMutation } from "state/api/studysetsAPI";
+import { useUpdateStudysetMutation } from "state/api/studysetsAPI";
 
 type Props = {
     handleViewChange: (_event: any, newView: string | null) => void;
@@ -72,7 +72,7 @@ const HomeToolbar = ({
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const [favoriteStudyset] = useFavoriteStudysetMutation();
+    const [updateStudyset] = useUpdateStudysetMutation();
 
     const isTableView = selectedView === HOME_LAYOUTS.TABLE;
     const firstStudyset = selectedStudysetRows[0];
@@ -109,9 +109,11 @@ const HomeToolbar = ({
             return;
         }
         const { uuid: studysetUUID, favorited: oldFavorited } = firstStudyset;
-        favoriteStudyset({
+        updateStudyset({
             studysetUUID,
-            favorited: !oldFavorited,
+            updates: {
+                favorited: !oldFavorited,
+            }
         });
     };
 
