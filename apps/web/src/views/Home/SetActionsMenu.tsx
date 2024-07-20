@@ -17,7 +17,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Studyset } from "lib/types";
 import { STUDYSET_CONFIRM_DIALOGS } from "utilities/constants";
-import { useFavoriteStudysetMutation } from "state/api/studysetsAPI";
+import { useUpdateStudysetMutation } from "state/api/studysetsAPI";
 import { showConfirmDialog } from "state/slices/globalSlice";
 import { useDispatch } from "react-redux";
 
@@ -40,9 +40,9 @@ const SetActionsMenu = ({
     anchorPosition,
     slotProps,
 }: Props) => {
-    const { favorited = false, uuid: studysetUUID = "" } = studyset ?? {};
+    const { favorited = false, studysetUUID = "" } = studyset ?? {};
 
-    const [favoriteStudyset] = useFavoriteStudysetMutation();
+    const [updateStudyset] = useUpdateStudysetMutation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -65,9 +65,11 @@ const SetActionsMenu = ({
     };
 
     const handleFavoriteAction = () => {
-        favoriteStudyset({
+        updateStudyset({
             studysetUUID,
-            favorited: !favorited,
+            updates: {
+                favorited: !favorited,
+            }
         });
     };
 

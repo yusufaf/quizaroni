@@ -187,7 +187,6 @@ export type DeleteLabelParams = {
 };
 
 export type EditLabelParams = {
-    userUUID: UUID;
     index: number;
     oldLabel: string;
     newLabel: string;
@@ -210,6 +209,8 @@ export type Part = {
     PartNumber: number;
 };
 
+// #region Redux
+
 export type SortDirection = "asc" | "dsc";
 
 export type ConfirmDialogProps = {
@@ -222,8 +223,17 @@ export type ConfirmDialogProps = {
     props?: any;
 };
 
+export type LabelsDialogProps = {
+    open: boolean;
+    studySetUUID?: string;
+    selectedStudysetUUIDs?: string[];
+    tab?: string;
+}
+
 // export type ViewSetDialog =
 
 export type OpenCardNotes = Set<UUID>;
 
 export type ColorPickerType = "textColor" | "backgroundColor";
+
+// #endregion

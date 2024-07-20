@@ -12,8 +12,8 @@ import {
     LabelChip,
     SpacedContainer,
     TermsLabel,
-} from "../HomeStyles";
-import SetActionsMenu from "../SetActionsMenu";
+} from "./HomeStyles";
+import SetActionsMenu from "./SetActionsMenu";
 import { useDispatch } from "react-redux";
 import { setSelectedStudySet } from "state/slices/studysetsSlice";
 import { useNavigate } from "react-router-dom";
@@ -31,7 +31,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
         description,
         label,
         lastViewed,
-        uuid,
+        studysetUUID,
         username,
     } = studyset;
 
@@ -44,7 +44,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
 
     const onCardClick = () => {
         dispatch(setSelectedStudySet(studyset));
-        navigate(`/view/${uuid}`);
+        navigate(`/view/${studysetUUID}`);
     };
 
     const openActionsMenu = (event) => {
@@ -62,7 +62,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
             <HomeSetCard raised onClick={onCardClick}>
                 <CardContent>
                     <CardTitle title={title} variant="h6">
-                        <GhostLink to={`/view/${uuid}`}>{title}</GhostLink>
+                        <GhostLink to={`/view/${studysetUUID}`}>{title}</GhostLink>
                     </CardTitle>
                     <Typography variant="subtitle1">
                         {`Created by ${username}`}
