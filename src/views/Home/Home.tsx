@@ -99,7 +99,7 @@ const Home = (props: Props) => {
 
     const selectedStudysetRows: Studyset[] = rowSelectionModel
         .map((studysetUUID) =>
-            studysets.find((studyset) => studyset.uuid === studysetUUID)
+            studysets.find((studyset) => studyset.studysetUUID === studysetUUID)
         )
         .filter(Boolean) as Studyset[];
 

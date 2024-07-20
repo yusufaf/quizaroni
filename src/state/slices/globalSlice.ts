@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ConfirmDialogProps, Studyset } from "lib/types";
+import { ConfirmDialogProps, LabelsDialogProps, Studyset } from "lib/types";
 import { RootState } from "state/store";
 import {
     STUDYSET_CONFIRM_DIALOG_PROPS,
@@ -20,7 +20,7 @@ type GlobalSliceState = {
     namedColorsDialogProps: any;
     userAuthInfo: any;
     userData: any;
-    labelsDialogProps: any;
+    labelsDialogProps: LabelsDialogProps;
     confirmationCodeDialogProps: any;
 };
 
@@ -35,7 +35,9 @@ const initialState: GlobalSliceState = {
     namedColorsDialogProps: {},
     userAuthInfo: {},
     userData: {},
-    labelsDialogProps: {},
+    labelsDialogProps: {
+        open: false,
+    },
     confirmationCodeDialogProps: {},
 };
 
@@ -127,7 +129,7 @@ export const globalSlice = createSlice({
         setFeedbackDialogOpen: (state, action: PayloadAction<boolean>) => {
             state.dialogOpen = action.payload;
         },
-        setLabelsDialogProps: (state, action: PayloadAction<any>) => {
+        setLabelsDialogProps: (state, action: PayloadAction<LabelsDialogProps>) => {
             state.labelsDialogProps = action.payload;
         },
         setConfirmationCodeDialogProps: (state, action: PayloadAction<any>) => {

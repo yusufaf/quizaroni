@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Pagination } from "@mui/material";
 import { CenteredTypography, HomeSetGrid } from "./HomeStyles";
 import { Studyset } from "lib/types";
-import HomeStudySetCard from "./HomeStudySetCard/HomeStudySetCard";
+import HomeStudySetCard from "./HomeStudySetCard";
 
 type Props = {
     studysets: Studyset[];
