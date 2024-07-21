@@ -4,7 +4,6 @@ import { BoldTypography } from 'common/AppStyles';
 import { DEFAULT_USER_RESPONSE } from 'utilities/constants';
 import HeaderAdvancedSection from './HeaderAdvancedSection';
 import {
-    PageMainButton,
     CreateSetInputsContainer,
     CreateSetPaper,
     DescriptionInput,
@@ -160,7 +159,7 @@ const CreateSetHeader = ({
                     </CreateSetInputsContainer>
                 </HeaderLeft>
                 <HeaderRight>
-                    <PageMainButton
+                    <Button
                         variant="contained"
                         onClick={() => saveChanges()}
                         size="large"
@@ -168,7 +167,7 @@ const CreateSetHeader = ({
                         startIcon={<Create />}
                     >
                         Save Changes
-                    </PageMainButton>
+                    </Button>
                     <HeaderAdvancedSection {...advancedSectionProps} />
                 </HeaderRight>
             </HeaderContainer>

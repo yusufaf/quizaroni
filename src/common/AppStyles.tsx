@@ -1,11 +1,7 @@
 import { styled } from "@mui/system";
-import { Button, DialogActions, DialogTitle, IconButton, Typography } from '@mui/material/';
+import { DialogActions, DialogTitle, IconButton, Typography } from '@mui/material/';
 import { Link } from "react-router-dom";
 import { ChromePicker } from 'react-color';
-
-export const BoldButton = styled(Button)({
-    fontWeight: 600
-})
 
 export const FlexRow = styled("div")({
     display: "flex",

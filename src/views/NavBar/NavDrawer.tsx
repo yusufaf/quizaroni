@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+    Button,
     Drawer,
     IconButton,
     List,
@@ -8,7 +9,6 @@ import {
 } from "@mui/material/";
 import { Create, Menu } from "@mui/icons-material";
 import { StyledNavLink } from "./NavStyles";
-import { BoldButton } from "common/AppStyles";
 import DarkModeToggleButton from "./DarkModeToggleButton";
 import { createStudyset } from "api/awsAPI";
 import { useNavigate } from "react-router-dom";
@@ -50,14 +50,14 @@ const NavDrawer = (props) => {
                             <StyledNavLink to="/explore">Explore</StyledNavLink>
                         </ListItemText>
                     </ListItem>
-                    <BoldButton
+                    <Button
                         variant="contained"
                         onClick={handleCreateStudyset}
                         size="large"
                         startIcon={<Create />}
                     >
                         Create Study Set
-                    </BoldButton>
+                    </Button>
                     <DarkModeToggleButton />
                 </List>
             </Drawer>

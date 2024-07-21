@@ -11,7 +11,7 @@ export type ThemeName = "light" | "dark";
 // #region Studysets
 export type Studyset = {
     cards: Card[];
-    categories: any[];
+    categories: string[];
     createdAt: Timestamp;
     description: string;
     favorited?: boolean;
@@ -104,6 +104,7 @@ export type DuplicateStudysetParams = StudysetUUIDPayload
 export type UpdateStudysetParams = {
     studysetUUID: string;
     updates: { [key: string]: any };
+    isMetadataUpdate?: boolean;
 };
 
 export type FavoriteStudysetParams = StudysetUUIDPayload & {
@@ -135,14 +136,6 @@ export type UpdateDefaultThemeParams = {
 export type UpdateEmailParams = {
     username: string;
     newEmail: string;
-};
-
-export type CreateCategoryParams = StudysetUUIDPayload & {
-    category: string;
-};
-
-export type DeleteCategoryParams = StudysetUUIDPayload & {
-    categoriesToDelete: string;
 };
 
 export type EditCategoryParams = StudysetUUIDPayload & {

@@ -44,9 +44,6 @@ dependencies:
   aws-amplify:
     specifier: ^6.0.5
     version: 6.3.8
-  axios:
-    specifier: ^0.26.1
-    version: 0.26.1
   babel-preset-react:
     specifier: ^6.24.1
     version: 6.24.1
@@ -2501,14 +2498,6 @@ packages:
       - aws-crt
     dev: false
 
-  /axios@0.26.1:
-    resolution: {integrity: sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==}
-    dependencies:
-      follow-redirects: 1.15.6
-    transitivePeerDependencies:
-      - debug
-    dev: false
-
   /babel-helper-builder-react-jsx@6.26.0:
     resolution: {integrity: sha512-02I9jDjnVEuGy2BR3LRm9nPRb/+Ja0pvZVLr1eI5TYAA/dB0Xoc+WBo50+aDfhGDLhlBY1+QURjn9uvcFd8gzg==}
     dependencies:
@@ -2998,16 +2987,6 @@ packages:
   /flatted@3.3.1:
     resolution: {integrity: sha512-X8cqMLLie7KsNUDSdzeN8FYK9rEt4Dt67OsG/DNGnYTSDBG4uFAJFBnUeiV+zCVAvwFy56IjM9sH51jVaEhNxw==}
     dev: true
-
-  /follow-redirects@1.15.6:
-    resolution: {integrity: sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==}
-    engines: {node: '>=4.0'}
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
-    dev: false
 
   /framer-motion@10.18.0(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-oGlDh1Q1XqYPksuTD/usb0I70hq95OUzmL9+6Zd+Hs4XV0oaISBa/UUMSjYiq6m8EUF32132mOJ8xVZS+I0S6w==}
