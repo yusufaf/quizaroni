@@ -1,6 +1,7 @@
 import { Create, Logout as LogoutIcon } from "@mui/icons-material";
 import {
     AppBar,
+    Button,
     IconButton,
     Toolbar,
     Tooltip,
@@ -29,7 +30,6 @@ import {
     StyledNavLink,
 } from "./NavStyles";
 import { signOut } from "aws-amplify/auth";
-import { BoldButton } from "common/AppStyles";
 import DarkModeToggleButton from "./DarkModeToggleButton";
 import { useCreateStudysetMutation } from "state/api/studysetsAPI";
 
@@ -106,14 +106,14 @@ const NavBar = (props: Props) => {
                             >
                                 Explore
                             </StyledNavLink>
-                            <BoldButton
+                            <Button
                                 variant="contained"
                                 onClick={handleCreateStudyset}
                                 size="large"
                                 startIcon={<Create />}
                             >
                                 Create Study Set
-                            </BoldButton>
+                            </Button>
                         </NavLinksContainer>
                         <NavRightActions>
                             {authenticated ? (

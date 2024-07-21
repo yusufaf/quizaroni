@@ -1,4 +1,5 @@
 import {
+    Button,
     Card,
     Chip,
     DialogContent,
@@ -11,7 +12,6 @@ import {
 import { styled } from "@mui/system";
 import {
     BasePage,
-    BoldButton,
     BoldTypography,
     SimpleFlexContainer,
     SpacedFlexContainer,
@@ -163,7 +163,7 @@ export const ViewCardText = styled(Typography)({});
 
 export const NoCardsMessage = styled(BoldTypography)({});
 
-export const UpdateCardsButton = styled(BoldButton)({
+export const UpdateCardsButton = styled(Button)({
     alignSelf: "center",
     width: "25%",
     textTransform: "none",

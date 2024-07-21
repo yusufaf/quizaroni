@@ -19,7 +19,6 @@ import {
     setAuthenticated,
 } from "state/slices/globalSlice";
 import { signIn } from "@aws-amplify/auth";
-import axios from "axios";
 
 type Props = {};
 const Login = (props: Props) => {
@@ -63,15 +62,6 @@ const Login = (props: Props) => {
         try {
             const user = await signIn({ username, password });
             console.log("Result of cognito sign in = ", user);
-
-            /* Retrieve user data, passing username as a query parameter */
-            const response = await axios.get("/api/users/get", {
-                params: {
-                    username,
-                },
-            });
-            console.log({ response, user });
-            const userData = response.data;
 
             /* Store cognito user and authenticated in state */
             dispatch(setCognitoUser({username}));

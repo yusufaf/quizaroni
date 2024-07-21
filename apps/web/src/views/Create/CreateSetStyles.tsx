@@ -12,7 +12,6 @@ import {
 import { styled } from "@mui/system";
 import {
     BasePage,
-    BoldButton,
     FlexColumn,
     SimpleFlexContainer,
     SpacedFlexContainer,
@@ -78,8 +77,6 @@ export const LabelInputContainer = styled(SimpleFlexContainer)({
 export const LabelInput = styled(TextField)({
     width: "18rem",
 });
-
-export const PageMainButton = styled(BoldButton)({});
 
 export const AdvancedSection = styled(FlexColumn)({});
 
