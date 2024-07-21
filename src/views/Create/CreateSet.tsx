@@ -27,7 +27,6 @@ import CreateSetHeader from './CreateSetHeader';
 import {
     AddCardButton,
     AddCardIcon,
-    PageMainButton,
     CreateSetPage,
 } from './CreateSetStyles';
 import ImportSetModal from './ImportSetModal/ImportSetModal';
@@ -46,7 +45,7 @@ import {
 import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
 import { Card, Studyset } from 'lib/types';
 import { SimpleFlexContainer, SpacedFlexContainer } from 'common/AppStyles';
-import { SelectChangeEvent, Tooltip, Typography } from '@mui/material';
+import { Button, SelectChangeEvent, Tooltip, Typography } from '@mui/material';
 import { useGetUserQuery } from 'state/api/usersAPI';
 import NoCardsWarningsIcon from 'components/NoCardsWarningsIcon/NoCardsWarningsIcon';
 
@@ -353,7 +352,7 @@ const CreateSet = (props: Props) => {
                     <AddCardIcon />
                     Add Card
                 </AddCardButton>
-                <PageMainButton
+                <Button
                     variant="contained"
                     onClick={saveChanges}
                     size="large"
@@ -366,7 +365,7 @@ const CreateSet = (props: Props) => {
                     }}
                 >
                     Save Changes
-                </PageMainButton>
+                </Button>
             </CreateSetPage>
             <ImportSetModal />
             {namedColorsDialogProps.open && <NamedColorsDialog />}

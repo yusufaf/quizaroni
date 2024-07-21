@@ -11,7 +11,6 @@ import {
     ToggleButton,
     Button,
 } from "@mui/material";
-import axios from "axios";
 import { useState, useEffect } from "react";
 import {
     selectNamedColorsDialogProps,
@@ -32,7 +31,7 @@ type Props = {
 const CustomizationTab = ({ userData }: Props) => {
     const dispatch = useDispatch();
 
-    const { uuid: userUUID = "", labels = [] } = userData;
+    const { userUUID = "", labels = [] } = userData;
     const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
     const [defaultTheme, setDefaultTheme] = useState<string>(
         userData?.metadata?.defaultTheme ?? "dark"
@@ -54,14 +53,14 @@ const CustomizationTab = ({ userData }: Props) => {
                 return;
             }
 
-            const themeUpdateResult = await axios.post(
-                "/api/users/updateDefaultTheme",
-                {
-                    uuid: userUUID,
-                    newTheme,
-                }
-            );
-            console.log({ themeUpdateResult });
+            // const themeUpdateResult = await axios.post(
+            //     "/api/users/updateDefaultTheme",
+            //     {
+            //         uuid: userUUID,
+            //         newTheme,
+            //     }
+            // );
+            // console.log({ themeUpdateResult });
 
             setDefaultTheme(newTheme);
 

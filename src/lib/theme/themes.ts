@@ -12,6 +12,21 @@ export const light = createTheme({
             gold: "#FFDF00",
         },
     },
+    components: {
+        MuiButton: {
+            styleOverrides: {
+                text: {
+                    fontWeight: 600
+                },
+                contained: {
+                    fontWeight: 600
+                },
+                outlined: {
+                    fontWeight: 600
+                }
+            }
+        }
+    }
     // body: "#F5F5F5"
 });
 
@@ -27,6 +42,21 @@ export const dark = createTheme({
             gold: "#FFDF00",
         },
     },
+    components: {
+        MuiButton: {
+            styleOverrides: {
+                text: {
+                    fontWeight: 600
+                },
+                contained: {
+                    fontWeight: 600
+                },
+                outlined: {
+                    fontWeight: 600
+                }
+            }
+        }
+    }
     // body: "#121212"
 });
 

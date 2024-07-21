@@ -1,6 +1,5 @@
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
 import {
-    BoldButton,
     StyledDialogActions,
     StyledDialogTitle,
 } from "common/AppStyles";
@@ -9,7 +8,7 @@ import {
     StyledDialog,
     StyledDialogContent,
 } from "./styles";
-import { TextField } from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import {
     selectCognitoUser,
     selectConfirmationCodeDialogProps,
@@ -139,17 +138,17 @@ const ConfirmationCodeDialog = (props: Props) => {
             </StyledDialogContent>
             <StyledDialogActions>
                 {canResend && (
-                    <BoldButton variant="outlined" onClick={handleResendCode}>
+                    <Button variant="outlined" onClick={handleResendCode}>
                         Resend Confirmation Code
-                    </BoldButton>
+                    </Button>
                 )}
-                <BoldButton
+                <Button
                     variant="contained"
                     disabled={!isValidCode}
                     onClick={handleConfirmEmail}
                 >
                     Confirm Email
-                </BoldButton>
+                </Button>
             </StyledDialogActions>
         </StyledDialog>
     );
