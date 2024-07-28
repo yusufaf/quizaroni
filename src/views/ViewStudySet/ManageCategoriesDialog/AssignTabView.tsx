@@ -9,7 +9,7 @@ type Props = {
     selectedCardUUID: string;
     setSelectedCardUUID: Dispatch<SetStateAction<string>>;
     onAssignedCategoriesChange: (e: SelectChangeEvent) => void;
-    isAssigningCategories: boolean;
+    isAssigningCategories?: boolean;
 };
 
 const AssignTabView = (props: Props) => {
@@ -18,12 +18,12 @@ const AssignTabView = (props: Props) => {
         selectedCardUUID,
         setSelectedCardUUID,
         onAssignedCategoriesChange,
-        isAssigningCategories,
+        isAssigningCategories = false,
     } = props;
 
     const { cards, categories } = selectedStudyset;
     const selectedCardCategories: string[] =
-        cards?.find((card) => card.uuid === selectedCardUUID)?.categories ?? [];
+        cards?.find((card) => card.cardUUID === selectedCardUUID)?.categories ?? [];
 
     return (
         <CategoryInputsContainer>
@@ -39,8 +39,8 @@ const AssignTabView = (props: Props) => {
                         const text = `Term: ${card.term} | Definition: ${card.definition}`;
                         return (
                             <StyledMenuItem
-                                key={card.uuid}
-                                value={card.uuid}
+                                key={card.cardUUID}
+                                value={card.cardUUID}
                                 title={text}
                             >
                                 <Typography

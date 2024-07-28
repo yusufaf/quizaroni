@@ -26,7 +26,7 @@ import {
     useGetStudysetQuery,
 } from 'state/api/studysetsAPI';
 import useCustomMutation from 'lib/hooks/useCustomMutation';
-import { BoldButton, StyledDialogTitle } from 'common/AppStyles';
+import { StyledDialogTitle } from 'common/AppStyles';
 import CloseDialogButton from 'components/CloseDialogButton/CloseDialogButton';
 import CreateTabView from './CreateTabView';
 import ManageTabView from './ManageTabView';
@@ -303,12 +303,12 @@ const ManageLabelsDialog = ({ labelsDialogProps }: Props) => {
             case TABS.CREATE:
                 return (
                     <>
-                        <BoldButton
+                        <Button
                             variant="contained"
                             onClick={() => handleChangeCurrentLabel('')}
                         >
                             Remove Current Label
-                        </BoldButton>
+                        </Button>
                         <LoadingButton
                             variant="contained"
                             onClick={handleCreate}

@@ -12,7 +12,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
     useGetAllStudysetsQuery,
     useGetStudysetQuery,
-    useUpdateStudysetMetadataMutation,
     useUpdateStudysetMutation,
 } from 'state/api/studysetsAPI';
 import { setLabelsDialogProps } from 'state/slices/globalSlice';
@@ -85,11 +84,6 @@ const ViewStudySet = (props: Props) => {
     const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
     console.log({ selectedStudyset, studysetResponse, studysetUUID });
 
-    const [
-        updateStudysetMetadata,
-        { isSuccess: isUpdateMetadataSuccess, isError: isUpdateMetadataError },
-    ] = useUpdateStudysetMetadataMutation();
-
     const [updateStudySet] = useUpdateStudysetMutation();
 
     useBrowserTitle(selectedStudyset?.title ?? '');
@@ -122,10 +116,12 @@ const ViewStudySet = (props: Props) => {
 
     const updateMetadataField = (property: string, newValue: any) => {
         try {
-            updateStudysetMetadata({
-                property,
-                newValue,
-                uuid: studysetUUID,
+            updateStudySet({
+                studysetUUID,
+                updates: {
+                    [property]: newValue
+                },
+                isMetadataUpdate: true,
             });
         } catch (error) {
             console.error('Error updating study set metadata');
