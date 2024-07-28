@@ -1,39 +1,36 @@
-import { LoadingButton } from "@mui/lab";
-import { Button, SelectChangeEvent, Tab, Tabs } from "@mui/material/";
-import useCustomMutation from "lib/hooks/useCustomMutation";
-import { Studyset } from "lib/types";
-import { ChangeEvent, ReactNode, SyntheticEvent, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { LoadingButton } from '@mui/lab';
+import { Button, SelectChangeEvent, Tab, Tabs } from '@mui/material/';
+import useCustomMutation from 'lib/hooks/useCustomMutation';
+import { Studyset } from 'lib/types';
+import { ChangeEvent, ReactNode, SyntheticEvent, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import {
-    useAssignCardCategoriesMutation,
-    useCreateCategoryMutation,
-    useDeleteCategoryMutation,
-    useEditCategoryMutation,
-} from "state/api/studysetsAPI";
+    useUpdateStudysetMutation,
+} from 'state/api/studysetsAPI';
 import {
     capitalizeFirstLetter,
     downloadObjectAsJSON,
-} from "utilities/functions";
-import AssignTabView from "./AssignTabView";
-import CategoriesList from "./CategoriesList";
-import CreateTabView from "./CreateTabView";
-import ImportTabView from "./ImportTabView";
-import ManageTabView from "./ManageTabView";
-import { ACTIONS, TABS } from "./constants";
+} from 'utilities/functions';
+import AssignTabView from './AssignTabView';
+import CategoriesList from './CategoriesList';
+import CreateTabView from './CreateTabView';
+import ImportTabView from './ImportTabView';
+import ManageTabView from './ManageTabView';
+import { ACTIONS, TABS } from './constants';
 import {
     CategoriesListColumn,
     DownloadListButton,
     StyledDialog,
     StyledDialogActions,
     StyledDialogContent,
-} from "./styles";
+} from './styles';
 import {
     BoldTypography,
     SimpleFlexContainer,
     StyledDialogTitle,
-} from "common/AppStyles";
-import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
-import { Download } from "@mui/icons-material";
+} from 'common/AppStyles';
+import CloseDialogButton from 'components/CloseDialogButton/CloseDialogButton';
+import { Download } from '@mui/icons-material';
 
 type Props = {
     open: boolean;
@@ -46,66 +43,27 @@ const ManageCategoriesDialog = (props: Props) => {
     const { open, onClose, selectedStudyset, studysets } = props;
 
     const {
-        uuid: studysetUUID = "",
+        cards,
         categories = [],
-        title: studysetTitle = "",
-    } = selectedStudyset || {};
+        title: studysetTitle = '',
+        studysetUUID = '',
+    } = selectedStudyset;
 
     const dispatch = useDispatch();
 
-    const {
-        mutate: createCategory,
-        isLoading: isCreatingCategory,
-        isSuccess: isCreateSuccess,
-        isError: isCreateError,
-    } = useCustomMutation({
-        mutation: useCreateCategoryMutation,
-        successMessage: "Successfully created category",
-        errorMessage: "Error creating category",
-        onSuccess: () => {
-            setCategoryName("");
-        },
-    });
-
-    const { mutate: editCategory, isLoading: isEditingCategory } =
-        useCustomMutation({
-            mutation: useEditCategoryMutation,
-            successMessage: "Successfully edited category",
-            errorMessage: "Error editing category",
-            onSuccess: () => {
-                setEditCategoryName("");
-                setEditIndex(null);
-            },
-        });
-
-    const { mutate: deleteCategory, isLoading: isDeletingCategory } =
-        useCustomMutation({
-            mutation: useDeleteCategoryMutation,
-            successMessage: "Successfully deleted category",
-            errorMessage: "Error deleting category",
-            onSuccess: () => {
-                setDeleteIndices([]);
-            },
-        });
-
-    const { mutate: assignCardCategories, isLoading: isAssigningCategories } =
-        useCustomMutation({
-            mutation: useAssignCardCategoriesMutation,
-            successMessage: "Categories assigned to cards",
-            errorMessage: "Error assigning categories to cards",
-        });
+    const [updateStudySet] = useUpdateStudysetMutation();
 
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
     const [errorInfo, setErrorInfo] = useState<any>(null);
-    const [categoryName, setCategoryName] = useState<string>("");
-    const [editCategoryName, setEditCategoryName] = useState<string>("");
+    const [categoryName, setCategoryName] = useState<string>('');
+    const [editCategoryName, setEditCategoryName] = useState<string>('');
     const [editErrorInfo, setEditErrorInfo] = useState<any>(null);
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [deleteIndices, setDeleteIndices] = useState<number[]>([]);
     const [selectedAction, setSelectedAction] = useState<string | null>(null);
     const [selectedStudysetUUID, setSelectedStudysetUUID] =
-        useState<string>("");
-    const [selectedCardUUID, setSelectedCardUUID] = useState<string>("");
+        useState<string>('');
+    const [selectedCardUUID, setSelectedCardUUID] = useState<string>('');
 
     const isCreateTab = selectedTab === TABS.CREATE;
     const isManageTab = selectedTab === TABS.MANAGE;
@@ -116,29 +74,47 @@ const ManageCategoriesDialog = (props: Props) => {
         setSelectedTab(newTab);
     };
 
+    // #region Create Category
     const onCreateCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
         const category = e.target.value;
         const isDuplicate = categories.includes(category);
         setCategoryName(category);
         if (isDuplicate) {
             setErrorInfo({
-                helperText: "Category already exists",
+                helperText: 'Category already exists',
             });
         } else {
             setErrorInfo(null);
         }
     };
 
+    const createCategory = () => {
+        if (!studysetUUID) {
+            return;
+        }
+        const newCategories = categories.concat(categoryName);
+
+        updateStudySet({
+            studysetUUID,
+            updates: {
+                categories: newCategories,
+            },
+        });
+    };
+    // #endregion Create Category
+
+    // #region Edit Category
     const onEditCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
         const newCategoryName = e.target.value;
         const allOtherCategories = categories.filter(
-            (_, index) => index != editIndex
+            (_, index) => index !== editIndex
         );
         const isDuplicate = allOtherCategories.includes(newCategoryName);
+        console.log({ isDuplicate, newCategoryName });
         setEditCategoryName(newCategoryName);
         if (isDuplicate) {
             setEditErrorInfo({
-                helperText: "Category already exists",
+                helperText: 'Category already exists',
             });
         } else if (!newCategoryName) {
             setEditErrorInfo({
@@ -149,26 +125,17 @@ const ManageCategoriesDialog = (props: Props) => {
         }
     };
 
-    const handleCreate = async () => {
-        if (!studysetUUID) {
-            return;
-        }
-        createCategory({
-            studysetUUID,
-            category: categoryName,
-        });
-    };
-
     const handleEditClick = (index: number) => {
         setDeleteIndices([]);
         setSelectedAction(ACTIONS.EDIT);
         setEditIndex(index);
         setEditCategoryName(categories[index]);
     };
+    // #endregion Edit Category
 
     const handleDeleteClick = (index: number) => {
         setEditIndex(null);
-        setEditCategoryName("");
+        setEditCategoryName('');
         setEditErrorInfo(null);
 
         setSelectedAction(ACTIONS.DELETE);
@@ -180,34 +147,43 @@ const ManageCategoriesDialog = (props: Props) => {
     };
 
     const handleEditOrDelete = async () => {
-        if (!studysetUUID) {
-            return;
-        }
-
         try {
             /* Don't need to check categories cause they're paired */
 
             if (selectedAction === ACTIONS.EDIT && editIndex !== null) {
-                const selectedCategoryName = categories[editIndex];
-                /* Don't make network call if it's unchanged */
-                if (editCategoryName === selectedCategoryName) {
+                const oldCategoryName = categories[editIndex];
+                // Check if it's the same
+                if (editCategoryName === oldCategoryName) {
                     return;
                 }
 
-                editCategory({
+                const categoriesAfterEdit = [...categories];
+                categoriesAfterEdit[editIndex] = editCategoryName;
+
+                /* Update the category name in all affected cards */
+                const modifiedCards = [...cards].map((card) => {
+                    const { categories: cardCategories = [] } = card;
+                    const newCardCategories = cardCategories.map((category) => {
+                        if (category === oldCategoryName) {
+                            return editCategoryName;
+                        }
+                        return category;
+                    });
+                    return {
+                        ...card,
+                        categories: newCardCategories,
+                    };
+                });
+
+                updateStudySet({
                     studysetUUID,
-                    index: editIndex,
-                    newCategory: editCategoryName,
-                    oldCategory: selectedCategoryName,
+                    updates: {
+                        cards: modifiedCards,
+                        categories: categoriesAfterEdit,
+                    },
                 });
             } else if (selectedAction === ACTIONS.DELETE) {
-                const categoriesToDelete = deleteIndices.map(
-                    (index) => categories[index]
-                );
-                deleteCategory({
-                    studysetUUID,
-                    categoriesToDelete,
-                });
+                deleteCategories();
             }
         } catch (error) {
             console.error(error);
@@ -216,11 +192,24 @@ const ManageCategoriesDialog = (props: Props) => {
         }
     };
 
+    // TODO: Debouncing?
     const onAssignedCategoriesChange = (e: SelectChangeEvent) => {
-        assignCardCategories({
+        const newCategories = e.target.value;
+        const modifiedCards = [...cards].map((card) => {
+            if (card.cardUUID === selectedCardUUID) {
+                return {
+                    ...card,
+                    categories: newCategories
+                }
+            }
+            return card;
+        });
+
+        updateStudySet({
             studysetUUID,
-            cardUUID: selectedCardUUID,
-            categories: e.target.value,
+            updates: {
+                cards: modifiedCards,
+            },
         });
     };
 
@@ -229,34 +218,71 @@ const ManageCategoriesDialog = (props: Props) => {
             return;
         }
         const importSetCategories =
-            studysets.find((studySet) => studySet.uuid === selectedStudysetUUID)
-                ?.categories ?? [];
+            studysets.find(
+                (studySet) => studySet.studysetUUID === selectedStudysetUUID
+            )?.categories ?? [];
 
         // Ensure no duplicates, filter out categories that already exist
         const categoriesToImport = importSetCategories.filter(
             (category) => !categories.includes(category)
         );
 
-        for (const category of categoriesToImport) {
-            createCategory({
-                uuid: studysetUUID,
-                category,
-            });
-        }
+        const combinedCategories = categories.concat(categoriesToImport);
+        updateStudySet({
+            studysetUUID,
+            updates: {
+                categories: combinedCategories,
+            },
+        });
     };
 
-    const deleteUnusedCategories = () => {
-        const { cards, categories, uuid } = selectedStudyset;
-        const categoriesToDelete: string[] = categories.filter((category) => {
-            return !cards.some((card) => card.categories.includes(category));
-        });
-        if (categoriesToDelete.length !== 0) {
-            deleteCategory({
-                studysetUUID,
-                categoriesToDelete,
+    // #region Delete Category
+    const deleteCategories = (
+        deletionType: 'unused' | 'standard' = 'standard'
+    ) => {
+        const isUnusedDelete = deletionType === 'unused';
+
+        let categoriesToDelete: string[];
+        if (isUnusedDelete) {
+            categoriesToDelete = categories.filter((category) => {
+                return !cards.some((card) =>
+                    card.categories.includes(category)
+                );
             });
+        } else {
+            categoriesToDelete = deleteIndices.map(
+                (index) => categories[index]
+            );
         }
+
+        const filteredCategories = categories.filter((category, index) => {
+            if (isUnusedDelete) {
+                return cards.some((card) => card.categories.includes(category));
+            }
+            return !deleteIndices.includes(index);
+        });
+
+        /* Delete the category name from the study set's cards */
+        const modifiedCards = [...cards].map((card) => {
+            const { categories: cardCategories = [] } = card;
+            const newCardCategories = cardCategories.filter((category) => {
+                return !categoriesToDelete.includes(category);
+            });
+            return {
+                ...card,
+                categories: newCardCategories,
+            };
+        });
+
+        updateStudySet({
+            studysetUUID,
+            updates: {
+                cards: modifiedCards,
+                categories: filteredCategories,
+            },
+        });
     };
+    // #endregion Delete Category
 
     const renderDialogButton = (): ReactNode => {
         switch (selectedTab) {
@@ -264,21 +290,22 @@ const ManageCategoriesDialog = (props: Props) => {
                 return (
                     <LoadingButton
                         variant="contained"
-                        onClick={handleCreate}
+                        onClick={createCategory}
                         disabled={!categoryName || Boolean(errorInfo)}
-                        loading={isCreatingCategory}
+                        // loading={isCreatingCategory}
                     >
                         Create
                     </LoadingButton>
                 );
             case TABS.MANAGE:
-                const disabled =
-                    (selectedAction === ACTIONS.EDIT && editErrorInfo) ||
-                    (selectedAction === ACTIONS.DELETE &&
-                        !deleteIndices.length);
+                const editDisabled =
+                    selectedAction === ACTIONS.EDIT && editErrorInfo;
+                const deleteDisabled =
+                    selectedAction === ACTIONS.DELETE && !deleteIndices.length;
+                const disabled = editDisabled || deleteDisabled;
                 const buttonText =
                     selectedAction === ACTIONS.EDIT
-                        ? "Save Edit"
+                        ? 'Save Edit'
                         : `Delete (${deleteIndices.length})`;
                 return (
                     selectedAction && (
@@ -297,7 +324,6 @@ const ManageCategoriesDialog = (props: Props) => {
                         variant="contained"
                         onClick={handleImport}
                         disabled={!selectedStudysetUUID}
-                        loading={isCreatingCategory}
                     >
                         Import Categories
                     </LoadingButton>
@@ -342,7 +368,9 @@ const ManageCategoriesDialog = (props: Props) => {
                             editCategoryName={editCategoryName}
                             editIndex={editIndex}
                             onEditCategoryChange={onEditCategoryChange}
-                            deleteUnusedCategories={deleteUnusedCategories}
+                            deleteUnusedCategories={() =>
+                                deleteCategories('unused')
+                            }
                         />
                     )}
                     {isImportTab && (
@@ -361,12 +389,11 @@ const ManageCategoriesDialog = (props: Props) => {
                             onAssignedCategoriesChange={
                                 onAssignedCategoriesChange
                             }
-                            isAssigningCategories={isAssigningCategories}
                         />
                     )}
                 </div>
                 <CategoriesListColumn>
-                    <SimpleFlexContainer style={{ alignItems: "baseline" }}>
+                    <SimpleFlexContainer style={{ alignItems: 'baseline' }}>
                         <BoldTypography>Categories</BoldTypography>
                         <DownloadListButton
                             variant="outlined"

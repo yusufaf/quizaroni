@@ -12,37 +12,39 @@ import {
     NOTES_DRAWER_INITIAL_APPEARANCE,
     NOTES_DRAWER_POSITIONS,
 } from "utilities/constants";
-import { useUpdateStudysetMetadataMutation } from "state/api/studysetsAPI";
+import { useUpdateStudysetMutation } from "state/api/studysetsAPI";
 
 type Props = {
     open: boolean;
     onClose: () => void;
     studyset: Studyset | undefined;
 };
-
 const StudysetSettings = ({ open, onClose, studyset }: Props) => {
-    const [updateStudysetMetadata, { isLoading: isUpdatingTerminology }] =
-        useUpdateStudysetMetadataMutation();
-
+    const [updateStudySet] = useUpdateStudysetMutation();
+    
     const handleAlignmentChange = (
         _event: React.MouseEvent<HTMLElement>,
         newAlignment: string | null
     ) => {
-        updateStudysetMetadata({
-            property: "notesDrawerPosition",
-            newValue: newAlignment,
-            uuid: studyset?.uuid ?? "",
+        updateStudySet({
+            studysetUUID: studyset?.studysetUUID ?? '',
+            updates: {
+                notesDrawerPosition: newAlignment
+            },
+            isMetadataUpdate: true,
         });
     };
 
-    const handleInitialApperanceChange = (
+    const handleInitialAppearanceChange = (
         _event: React.MouseEvent<HTMLElement>,
         newInitialAppearance: boolean | null
     ) => {
-        updateStudysetMetadata({
-            property: "notesDrawerInitial",
-            newValue: newInitialAppearance,
-            uuid: studyset?.uuid ?? "",
+        updateStudySet({
+            studysetUUID: studyset?.studysetUUID ?? '',
+            updates: {
+                notesDrawerInitial: newInitialAppearance
+            },
+            isMetadataUpdate: true,
         });
     };
 
@@ -93,7 +95,7 @@ const StudysetSettings = ({ open, onClose, studyset }: Props) => {
                             }
                             exclusive
                             aria-label="notes drawer initial appearance"
-                            onChange={handleInitialApperanceChange}
+                            onChange={handleInitialAppearanceChange}
                         >
                             <ToggleButton
                                 value={NOTES_DRAWER_INITIAL_APPEARANCE.CLOSED}

@@ -4,7 +4,6 @@ import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
 import useSpeechSynthesis from "lib/hooks/useSpeechSynthesis";
 import { Card, Studyset } from "lib/types";
 import { useRef, useState } from "react";
-import { useMarkCardAsImportantMutation } from "state/api/studysetsAPI";
 import { useTheme } from "theme/useTheme";
 import {
     DEFAULT_TERMINOLOGY,
@@ -20,6 +19,7 @@ import {
     ViewFlashsetCard,
 } from "./styles";
 import CategoriesPopover from "./CategoriesPopover";
+import { useUpdateStudysetMutation } from "state/api/studysetsAPI";
 
 type Props = {
     card: Card;
@@ -31,9 +31,15 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
     const { muiTheme } = useTheme();
     const { speak, cancel } = useSpeechSynthesis();
 
+    const [updateStudySet] = useUpdateStudysetMutation();
+
     const timeoutRef = useRef(null);
 
     const { categories = [] } = card;
+    const { 
+        cards,
+        studysetUUID
+    } = selectedStudyset;
     const {
         customTerminology,
         customLabelTerminology,
@@ -54,8 +60,6 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
             ? customLabelTerminology ?? ""
             : selectedLabelTerminology;
 
-    const [markCardAsImportant] = useMarkCardAsImportantMutation();
-
     // TODO: Adjust to clear timeout / reset if clicked multiple times
     const handleAudioPlayback = () => {
         // if (timeoutRef.current) {
@@ -73,14 +77,24 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
     };
 
     /**
-     * Marks a card as important, making an API call to do so
-     * @returns {void}
+     * Marks a card as important
      */
-    const handleMarkAsImportant = async () => {
-        await markCardAsImportant({
-            studysetUUID: selectedStudyset.uuid,
-            cardUUID: card.uuid ?? "",
-            newValue: !card.important,
+    const markCardAsImportant = async () => {
+        let updatedCards = [...cards];
+        const indexToUpdate = updatedCards.findIndex((value) => value.cardUUID === card.cardUUID);
+        if (indexToUpdate === -1) {
+            return;
+        }
+        
+        updatedCards[indexToUpdate] = {
+            ...card,
+            important: !card.important
+        }
+        updateStudySet({
+            studysetUUID,
+            updates: {
+                cards: updatedCards
+            },
         });
     };
 
@@ -130,7 +144,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                             </IconButton>
                         </Tooltip>
                         <Tooltip title="Mark as important" placement="top">
-                            <IconButton onClick={handleMarkAsImportant}>
+                            <IconButton onClick={markCardAsImportant}>
                                 {card.important ? (
                                     <Star
                                         sx={{ color: muiTheme.palette.other.gold }}

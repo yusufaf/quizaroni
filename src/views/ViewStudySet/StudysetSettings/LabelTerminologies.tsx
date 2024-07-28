@@ -5,46 +5,49 @@ import {
     FormLabel,
     Radio,
     RadioGroup,
-} from "@mui/material";
-import { Studyset } from "lib/types";
-import { ChangeEvent, useState, MouseEvent, useEffect } from "react";
-import { CustomInputsContainer, StyledTextField } from "./styles";
-import { useUpdateStudysetMetadataMutation } from "state/api/studysetsAPI";
-import { LABEL_TERMINOLOGIES } from "utilities/constants";
+} from '@mui/material';
+import { Studyset } from 'lib/types';
+import { ChangeEvent, useState, MouseEvent, useEffect } from 'react';
+import { CustomInputsContainer, StyledTextField } from './styles';
+import { LABEL_TERMINOLOGIES } from 'utilities/constants';
+import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 
 type Props = {
     studyset: Studyset | undefined;
 };
 
 const LabelTerminologies = ({ studyset }: Props) => {
-    const [customTerminology, setCustomTerminology] = useState<string>("");
+    const [updateStudySet] = useUpdateStudysetMutation();
+    const [customTerminology, setCustomTerminology] = useState<string>('');
 
     const isCustomTerminology =
         studyset?.metadata?.labelTerminology === LABEL_TERMINOLOGIES.CUSTOM;
 
-    const [updateStudysetMetadata, { isLoading: isUpdatingTerminology }] =
-        useUpdateStudysetMetadataMutation();
-
     const onTerminologyChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { uuid = "" } = studyset ?? {};
+        const { studysetUUID = '' } = studyset ?? {};
         const newValue = e.target.value;
 
-        updateStudysetMetadata({
-            property: "labelTerminology",
-            newValue,
-            uuid,
+        updateStudySet({
+            studysetUUID,
+            updates: {
+                labelTerminology: newValue,
+            },
+            isMetadataUpdate: true,
         });
     };
 
     const handleSaveCustomTerminology = (e: MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
 
-        const { uuid = "" } = studyset ?? {};
+        const { studysetUUID = '' } = studyset ?? {};
         const newValue = customTerminology;
-        updateStudysetMetadata({
-            property: "customLabelTerminology",
-            newValue,
-            uuid,
+
+        updateStudySet({
+            studysetUUID,
+            updates: {
+                customLabelTerminology: newValue,
+            },
+            isMetadataUpdate: true,
         });
     };
 
