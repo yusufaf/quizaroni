@@ -5,26 +5,27 @@ import {
     FormLabel,
     Radio,
     RadioGroup,
-} from "@mui/material";
-import { Studyset } from "lib/types";
-import { ChangeEvent, useState, MouseEvent, useEffect } from "react";
-import { FORMAT_TERMINOLOGIES } from "utilities/constants";
-import { useUpdateStudysetMetadataMutation } from "state/api/studysetsAPI";
-import { CustomInputsContainer, StyledTextField } from "./styles";
+} from '@mui/material';
+import { Studyset } from 'lib/types';
+import { ChangeEvent, useState, MouseEvent, useEffect } from 'react';
+import { FORMAT_TERMINOLOGIES } from 'utilities/constants';
+import { CustomInputsContainer, StyledTextField } from './styles';
+import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 
 type Props = {
     studyset: Studyset | undefined;
 };
+const FormatTerminologies = ({ studyset }: Props) => {
+    const [updateStudySet] = useUpdateStudysetMutation();
 
-const FormatTerminologies = ({ studyset } : Props) => {
-    const [customTerminology1, setCustomTerminology1] = useState<string>("");
-    const [customTerminology2, setCustomTerminology2] = useState<string>("");
+    const [customTerminology1, setCustomTerminology1] = useState<string>('');
+    const [customTerminology2, setCustomTerminology2] = useState<string>('');
     const [customTerminologyErrors, setCustomTerminologyErrors] = useState<
         Map<number, string>
     >(
         new Map([
-            [1, ""],
-            [2, ""],
+            [1, ''],
+            [2, ''],
         ])
     );
 
@@ -34,35 +35,37 @@ const FormatTerminologies = ({ studyset } : Props) => {
     useEffect(() => {
         if (isCustomTerminology) {
             const [term1, term2] =
-                studyset?.metadata?.customTerminology?.split("/") ?? [];
+                studyset?.metadata?.customTerminology?.split('/') ?? [];
             setCustomTerminology1(term1);
             setCustomTerminology2(term2);
         }
     }, [studyset]);
 
-    const [updateStudysetMetadata, { isLoading: isUpdatingTerminology }] =
-        useUpdateStudysetMetadataMutation();
-
     const onTerminologyChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const { uuid = "" } = studyset ?? {};
+        const { studysetUUID = '' } = studyset ?? {};
         const newValue = e.target.value;
 
-        updateStudysetMetadata({
-            property: "terminology",
-            newValue,
-            uuid,
+        updateStudySet({
+            studysetUUID,
+            updates: {
+                terminology: newValue,
+            },
+            isMetadataUpdate: true,
         });
     };
 
     const handleSaveCustomTerminology = (e: MouseEvent<HTMLButtonElement>) => {
         e.stopPropagation();
 
-        const { uuid = "" } = studyset ?? {};
+        const { studysetUUID = '' } = studyset ?? {};
         const newValue = `${customTerminology1}/${customTerminology2}`;
-        updateStudysetMetadata({
-            property: "customTerminology",
-            newValue,
-            uuid,
+
+        updateStudySet({
+            studysetUUID,
+            updates: {
+                customTerminology: newValue,
+            },
+            isMetadataUpdate: true,
         });
     };
 
@@ -75,11 +78,11 @@ const FormatTerminologies = ({ studyset } : Props) => {
 
         const newValue = e.target.value;
         const localErrorsMap = new Map(customTerminologyErrors);
-        if (newValue.includes("/")) {
-            localErrorsMap.set(inputNumber, "/ is a disallowed character.");
+        if (newValue.includes('/')) {
+            localErrorsMap.set(inputNumber, '/ is a disallowed character.');
             setCustomTerminologyErrors(localErrorsMap);
         } else {
-            localErrorsMap.set(inputNumber, "");
+            localErrorsMap.set(inputNumber, '');
             setCustomTerminologyErrors(localErrorsMap);
             setStateCallback(newValue);
         }
@@ -121,8 +124,14 @@ const FormatTerminologies = ({ studyset } : Props) => {
                                                     )
                                                 }
                                                 value={customTerminology1}
-                                                error={Boolean(customTerminologyErrors.get(1))}
-                                                helperText={customTerminologyErrors.get(1)}
+                                                error={Boolean(
+                                                    customTerminologyErrors.get(
+                                                        1
+                                                    )
+                                                )}
+                                                helperText={customTerminologyErrors.get(
+                                                    1
+                                                )}
                                             />
                                             <StyledTextField
                                                 label="Terminology 2"
@@ -133,8 +142,14 @@ const FormatTerminologies = ({ studyset } : Props) => {
                                                     )
                                                 }
                                                 value={customTerminology2}
-                                                error={Boolean(customTerminologyErrors.get(2))}
-                                                helperText={customTerminologyErrors.get(2)}
+                                                error={Boolean(
+                                                    customTerminologyErrors.get(
+                                                        2
+                                                    )
+                                                )}
+                                                helperText={customTerminologyErrors.get(
+                                                    2
+                                                )}
                                             />
                                             <Button
                                                 variant="contained"

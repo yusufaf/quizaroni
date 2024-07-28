@@ -3,15 +3,10 @@ import api from './api';
 import {
     UUID,
     Studyset,
-    CreateCategoryParams,
-    UpdateMetadataParams,
-    DeleteCategoryParams,
     EditCategoryParams,
-    MarkCardAsImportantParams,
     DeleteStudysetParams,
     GetAllStudysetsParams,
     GetStudysetParams,
-    AssignCardCategoriesParams,
     DuplicateStudysetParams,
     CreateLabelParams,
     DeleteLabelParams,
@@ -24,34 +19,8 @@ import {
     GetAllStudysetsResponse,
     GetStudysetResponse,
     CreateStudysetResponse,
+    BatchUpdateStudysetsParams,
 } from 'lib/types';
-
-/* Endpoints
-    // Studysets
-    router.post("/api/studysets/create", createStudySet);
-    router.post("/api/studysets/update", updateStudySet);
-    router.get("/api/studysets/getAll", getStudySets);
-    router.get("/api/studysets/get", getStudySet);
-    router.post("/api/studysets/delete", deleteStudySet);
-    router.post("/api/studysets/duplicate", duplicateStudySet);
-    router.post("/api/studysets/updateMetadata", updateStudySetMetadata);
-    router.post("/api/studysets/createCategory", createStudySetCategory);
-    router.post("/api/studysets/editCategory", editStudySetCategory);
-    router.post("/api/studysets/deleteCategory", deleteStudySetCategory);
-    router.post("/api/studysets/updateLastViewed", updateLastViewed);
-    router.post("/api/studysets/favorite", favoriteStudyset);
-    // Cards
-    router.post("/api/studysets/markCardAsImportant", markCardAsImportant);
-    router.post("/api/studysets/assignCardCategories", assignCardCategories);
-    router.post("/api/studysets/createNote", createNote);
-    router.post("/api/studysets/deleteNote", deleteNote);
-    router.post("/api/studysets/editNote", editNote);
-    // Labels
-    router.post("/api/studysets/createLabel", createLabel);
-    router.post("/api/studysets/deleteLabel", deleteLabel);
-    router.post("/api/studysets/editLabel", editLabel);
-    router.post("/api/studysets/changeLabel", changeLabel);
-*/
 
 // TODO: Look into set actions delete, duplicate, favorite. Currently fetches all studysets again once called.
 export const studysetsApi = api.injectEndpoints({
@@ -119,77 +88,30 @@ export const studysetsApi = api.injectEndpoints({
             invalidatesTags: [{ type: 'Studyset', id: 'LIST' }],
         }),
         updateStudyset: build.mutation<void, UpdateStudysetParams>({
-            query: ({ studysetUUID, updates }) => ({
+            query: ({ studysetUUID, updates, isMetadataUpdate }) => ({
                 url: `${BASE_API_URL}/studysets/update-studyset`,
                 ...getCommonPostRequestProps(),
-                body: { studysetUUID, updates },
+                body: { studysetUUID, updates, isMetadataUpdate },
             }),
             invalidatesTags: (_result, _error, arg) => [
                 { type: 'Studyset', id: arg.studysetUUID },
             ],
         }),
-        updateStudysetMetadata: build.mutation<void, UpdateMetadataParams>({
-            query: ({ property, newValue, uuid }) => ({
-                url: 'studysets/updateMetadata',
-                method: 'POST',
-                body: {
-                    property,
-                    newValue,
-                    uuid,
-                },
+        batchUpdateStudysets: build.mutation<void, BatchUpdateStudysetsParams>({
+            query: ({ studysetUpdates }) => ({
+                url: `${BASE_API_URL}/studysets/batch-update-studysets`,
+                ...getCommonPostRequestProps(),
+                body: { studysetUpdates },
             }),
-            invalidatesTags: (_result, _error, arg) => [
-                { type: 'Studyset', id: arg.uuid },
-            ],
-        }),
-        createCategory: build.mutation<Studyset, CreateCategoryParams>({
-            query: ({ studysetUUID, category }) => ({
-                url: 'studysets/createCategory',
-                method: 'POST',
-                body: { studysetUUID, category },
-            }),
-            invalidatesTags: (_result, _error, arg) => [
-                { type: 'Studyset', id: arg.studysetUUID },
-            ],
+            // invalidatesTags: (_result, _error, arg) => [
+                // { type: 'Studyset', id: arg.studysetUUID },
+            // ],
         }),
         editCategory: build.mutation<Studyset, EditCategoryParams>({
             query: ({ studysetUUID, index, newCategory, oldCategory }) => ({
                 url: 'studysets/editCategory',
                 method: 'POST',
                 body: { studysetUUID, index, newCategory, oldCategory },
-            }),
-            invalidatesTags: (_result, _error, arg) => [
-                { type: 'Studyset', id: arg.studysetUUID },
-            ],
-        }),
-        deleteCategory: build.mutation<Studyset, DeleteCategoryParams>({
-            query: ({ studysetUUID, categoriesToDelete }) => ({
-                url: 'studysets/deleteCategory',
-                method: 'POST',
-                body: { studysetUUID, categoriesToDelete },
-            }),
-            invalidatesTags: (_result, _error, arg) => [
-                { type: 'Studyset', id: arg.studysetUUID },
-            ],
-        }),
-        markCardAsImportant: build.mutation<
-            Studyset,
-            MarkCardAsImportantParams
-        >({
-            query: ({ cardUUID, newValue }) => ({
-                url: 'studysets/markCardAsImportant',
-                method: 'POST',
-                body: { cardUUID, newValue },
-            }),
-            invalidatesTags: (_result, _error, arg) => [
-                { type: 'Studyset', id: arg.studysetUUID },
-            ],
-        }),
-        assignCardCategories: build.mutation<void, AssignCardCategoriesParams>({
-            query: ({ cardUUID, categories }) => ({
-                url: 'studysets/assignCardCategories',
-                method: 'POST',
-                body: { cardUUID, categories },
             }),
             invalidatesTags: (_result, _error, arg) => [
                 { type: 'Studyset', id: arg.studysetUUID },
@@ -269,12 +191,8 @@ export const {
     useDeleteStudysetMutation,
     useDuplicateStudysetMutation,
     useUpdateStudysetMutation,
-    useUpdateStudysetMetadataMutation,
-    useCreateCategoryMutation,
+    useBatchUpdateStudysetsMutation,
     useEditCategoryMutation,
-    useDeleteCategoryMutation,
-    useMarkCardAsImportantMutation,
-    useAssignCardCategoriesMutation,
     useCreateLabelMutation,
     useDeleteLabelMutation,
     useEditLabelMutation,

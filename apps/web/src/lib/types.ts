@@ -101,11 +101,18 @@ export type DeleteStudysetParams = StudysetUUIDPayload
 
 export type DuplicateStudysetParams = StudysetUUIDPayload
 
+export type Updates = { [key: string]: any };
+
 export type UpdateStudysetParams = {
     studysetUUID: string;
-    updates: { [key: string]: any };
+    updates: Updates;
     isMetadataUpdate?: boolean;
 };
+
+type StudysetUpdatesMap = [UUID, Updates][];
+export type BatchUpdateStudysetsParams = {
+    studysetUpdates: StudysetUpdatesMap;
+}
 
 export type FavoriteStudysetParams = StudysetUUIDPayload & {
     favorited: boolean;
@@ -142,16 +149,6 @@ export type EditCategoryParams = StudysetUUIDPayload & {
     index: number;
     newCategory: string;
     oldCategory: string;
-};
-
-export type AssignCardCategoriesParams = StudysetUUIDPayload & {
-    cardUUID: UUID;
-    categories: string[];
-};
-
-export type MarkCardAsImportantParams = StudysetUUIDPayload & {
-    cardUUID: UUID;
-    newValue: boolean;
 };
 
 export type CreateNoteParams = StudysetUUIDPayload & {
