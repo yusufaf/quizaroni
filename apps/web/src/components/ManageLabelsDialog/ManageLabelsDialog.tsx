@@ -48,7 +48,7 @@ const ManageLabelsDialog = ({ labelsDialogProps }: Props) => {
     /* ==== Redux ==== */
     const dispatch = useDispatch();
 
-    const { studySetUUID = '' } = labelsDialogProps || {};
+    const { studysetUUID = '' } = labelsDialogProps || {};
 
     /* ==== RTK Query ==== */
     const {
@@ -64,9 +64,9 @@ const ManageLabelsDialog = ({ labelsDialogProps }: Props) => {
         isSuccess: isStudySetSuccess,
         isError: isStudySetError,
     } = useGetStudysetQuery(
-        { studysetUUID: labelsDialogProps.studySetUUID ?? '' },
+        { studysetUUID: labelsDialogProps.studysetUUID ?? '' },
         {
-            skip: !labelsDialogProps.studySetUUID,
+            skip: !labelsDialogProps.studysetUUID,
         }
     );
     const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
@@ -273,18 +273,18 @@ const ManageLabelsDialog = ({ labelsDialogProps }: Props) => {
         }
         createLabel({
             label: labelName,
-            studysetUUID: studySetUUID,
+            studysetUUID,
             updateStudysetLabel: shouldUpdateLabel,
         });
     };
 
     const handleChangeCurrentLabel = (newLabel: string) => {
-        if (!studySetUUID) {
+        if (!studysetUUID || newLabel === selectedStudyset?.label) {
             return;
         }
 
         changeLabel({
-            studysetUUID: studySetUUID,
+            studysetUUID,
             newLabel,
         });
     };

@@ -42,7 +42,6 @@ export const getCognitoTokens = (): {
 
 type InitiateMultipartUploadProps = {
     studysetUUID: UUID;
-    userUUID: UUID;
     fileName: string;
     contentType: string;
 };
@@ -53,13 +52,12 @@ type InitiateMultipartUploadResponse = {
 };
 export const initiateMultipartUpload = async ({
     studysetUUID = "",
-    userUUID,
     fileName,
     contentType,
 }: InitiateMultipartUploadProps): Promise<InitiateMultipartUploadResponse> => {
     const url = `${BASE_API_URL}/files/initiate-multipart-upload`;
     return await fetch(url, {
-        body: JSON.stringify({ studysetUUID, userUUID, fileName, contentType }),
+        body: JSON.stringify({ studysetUUID, fileName, contentType }),
         ...getCommonPostRequestProps(),
     }).then((response) => response.json());
 };
