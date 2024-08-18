@@ -84,7 +84,7 @@ const CreateSetHeader = ({
         return labelJsx;
     };
 
-    const handleBackClick = () => {
+    const handleBackToViewing = () => {
         navigate(`/view/${studySetUUID}`);
     };
 
@@ -93,7 +93,7 @@ const CreateSetHeader = ({
             <HeaderContainer>
                 <HeaderLeft>
                     <BackToViewButton
-                        onClick={handleBackClick}
+                        onClick={handleBackToViewing}
                         startIcon={<ArrowBack color="primary" />}
                     >
                         Back to Viewing Study Set
