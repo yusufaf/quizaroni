@@ -23,21 +23,20 @@ import {
     KeysToPressContainer,
 } from "./CreateSetStyles";
 import { handleReverse, swapAllCards } from "../../utilities/createUtils";
-import { useDispatch } from "react-redux";
-import { setShowImportModal } from "state/slices/createSetSlice";
 import { Dispatch, MouseEvent, SetStateAction, useState } from "react";
 import { Card } from "lib/types";
 
 type Props = {
     studysetCards: Card[];
     setCardsCallback: Dispatch<SetStateAction<Card[]>>;
+    setShowImportModal: Dispatch<SetStateAction<boolean>>;
 };
 
 const SetModificationButtons = ({
     studysetCards = [],
     setCardsCallback = () => {},
+    setShowImportModal = () => {},
 }: Props) => {
-    const dispatch = useDispatch();
     const hideButtonTextQuery = useMediaQuery(
         "only screen and (max-width:1280px)"
     );
@@ -48,7 +47,7 @@ const SetModificationButtons = ({
     const expandButtonTitle = expanded ? "Hide Buttons" : "Expand Buttons";
 
     const onImportClick = (_e: MouseEvent<HTMLButtonElement>) => {
-        dispatch(setShowImportModal(true));
+        setShowImportModal(true)
     };
 
     const onSwapAllClick = (_e: MouseEvent<HTMLButtonElement>) => {
