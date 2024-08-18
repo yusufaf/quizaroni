@@ -5,7 +5,7 @@ import {
     MenuItem,
     PopoverPosition,
     PopoverReference,
-} from "@mui/material/";
+} from '@mui/material/';
 import {
     ContentCopy as CopyIcon,
     Edit as EditIcon,
@@ -13,13 +13,13 @@ import {
     Favorite,
     FavoriteBorder,
     OpenInNewRounded,
-} from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import { Studyset } from "lib/types";
-import { STUDYSET_CONFIRM_DIALOGS } from "utilities/constants";
-import { useUpdateStudysetMutation } from "state/api/studysetsAPI";
-import { showConfirmDialog } from "state/slices/globalSlice";
-import { useDispatch } from "react-redux";
+} from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import { Studyset } from 'lib/types';
+import { STUDYSET_CONFIRM_DIALOGS } from 'utilities/constants';
+import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
+import { showConfirmDialog } from 'state/slices/globalSlice';
+import { useDispatch } from 'react-redux';
 
 type Props = {
     studyset: Studyset | null;
@@ -40,7 +40,7 @@ const SetActionsMenu = ({
     anchorPosition,
     slotProps,
 }: Props) => {
-    const { favorited = false, studysetUUID = "" } = studyset ?? {};
+    const { favorited = false, studysetUUID = '' } = studyset ?? {};
 
     const [updateStudyset] = useUpdateStudysetMutation();
     const navigate = useNavigate();
@@ -69,7 +69,7 @@ const SetActionsMenu = ({
             studysetUUID,
             updates: {
                 favorited: !favorited,
-            }
+            },
         });
     };
 
@@ -78,9 +78,14 @@ const SetActionsMenu = ({
         window.open(`${window.location.origin}/view/${studysetUUID}`);
     };
 
+    const handleEditInNewTab = () => {
+        // Doesn't seem like opening in new tab is possible with the useNavigate hook
+        window.open(`${window.location.origin}/edit/${studysetUUID}`);
+    };
+
     return (
         <Menu
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             anchorEl={anchorEl}
             open={open}
             onClose={onClose}
@@ -123,7 +128,7 @@ const SetActionsMenu = ({
                     )}
                 </ListItemIcon>
                 <ListItemText>
-                    {favorited ? "Unfavorite" : "Favorite"}
+                    {favorited ? 'Unfavorite' : 'Favorite'}
                 </ListItemText>
             </MenuItem>
             <MenuItem onClick={handleViewInNewTab}>
@@ -131,6 +136,12 @@ const SetActionsMenu = ({
                     <OpenInNewRounded />
                 </ListItemIcon>
                 <ListItemText>View in new tab</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={handleEditInNewTab}>
+                <ListItemIcon>
+                    <OpenInNewRounded />
+                </ListItemIcon>
+                <ListItemText>Edit in new tab</ListItemText>
             </MenuItem>
         </Menu>
     );

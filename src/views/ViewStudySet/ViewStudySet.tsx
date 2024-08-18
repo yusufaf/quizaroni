@@ -147,7 +147,7 @@ const ViewStudySet = (props: Props) => {
         dispatch(
             setLabelsDialogProps({
                 open: true,
-                studySetUUID: selectedStudyset.studysetUUID ?? '',
+                studysetUUID: selectedStudyset.studysetUUID ?? '',
             })
         );
     };

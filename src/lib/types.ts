@@ -215,7 +215,7 @@ export type ConfirmDialogProps = {
 
 export type LabelsDialogProps = {
     open: boolean;
-    studySetUUID?: string;
+    studysetUUID?: string;
     selectedStudysetUUIDs?: string[];
     tab?: string;
 }
