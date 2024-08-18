@@ -1,7 +1,6 @@
 import {
     Button,
     Dialog,
-    DialogActions,
     DialogContent,
     FormControl,
     FormControlLabel,
@@ -10,45 +9,41 @@ import {
     RadioGroup,
     TextField,
     Typography,
-} from "@mui/material/";
-import { useTheme } from "theme/useTheme";
-import { StyledDialogActions, StyledDialogTitle } from "common/AppStyles";
-import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
-import { useDispatch, useSelector } from "react-redux";
-import {
-    selectShowImportModal,
-    setShowImportModal,
-} from "state/slices/createSetSlice";
-import { useState } from "react";
+} from '@mui/material/';
+import { StyledDialogActions, StyledDialogTitle } from 'common/AppStyles';
+import CloseDialogButton from 'components/CloseDialogButton/CloseDialogButton';
+import { Dispatch, SetStateAction, useState } from 'react';
 
-type Props = {};
+type Props = {
+    setShowImportModal: Dispatch<SetStateAction<boolean>>;
+};
 
 const IMPORT_METHODS = {
-    JSON_INPUT: "JSON Input",
-    FILE: "File Upload",
-}
+    JSON_INPUT: 'JSON Input',
+    FILE: 'File Upload',
+} as const;
 
-const ImportSetModal = (props: Props) => {
-    const dispatch = useDispatch();
-    const showImportModal = useSelector(selectShowImportModal);
+type ImportMethod = (typeof IMPORT_METHODS)[keyof typeof IMPORT_METHODS];
 
-    const [importMethod, setImportMethod] = useState(IMPORT_METHODS.JSON_INPUT);
+const ImportCardsModal = ({ setShowImportModal }: Props) => {
+    const [importMethod, setImportMethod] = useState<ImportMethod>(
+        IMPORT_METHODS.JSON_INPUT
+    );
 
-    const handleImportMethodChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setImportMethod((event.target as HTMLInputElement).value);
+    const handleImportMethodChange = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        setImportMethod(
+            (event.target as HTMLInputElement).value as ImportMethod
+        );
     };
 
     const onClose = () => {
-        dispatch(setShowImportModal(false));
+        setShowImportModal(false);
     };
 
     return (
-        <Dialog
-            open={showImportModal}
-            onClose={onClose}
-            fullWidth
-            maxWidth="md"
-        >
+        <Dialog open={true} onClose={onClose} fullWidth maxWidth="md">
             <StyledDialogTitle>
                 Import Cards
                 <CloseDialogButton onClose={onClose} />
@@ -91,4 +86,4 @@ const ImportSetModal = (props: Props) => {
     );
 };
 
-export default ImportSetModal;
+export default ImportCardsModal;

@@ -62,7 +62,7 @@ export const globalSlice = createSlice({
         setUserData: (state, action: PayloadAction<any>) => {
             state.userData = action.payload;
         },
-        setConfirmDialogProps: (state, action: PayloadAction<any>) => {
+        setConfirmDialogProps: (state, action: PayloadAction<ConfirmDialogProps>) => {
             state.confirmDialogProps = action.payload;
         },
         // TODO: Could possibly rename to showStudysetConfirmDialog

@@ -20,16 +20,11 @@ import {
     selectAuthenticated,
     selectNamedColorsDialogProps,
 } from 'state/slices/globalSlice';
-import { useTheme } from 'theme/useTheme';
 import { DEFAULT_USER_RESPONSE } from 'utilities/constants';
 import LoginMessage from 'views/LoginMessage/LoginMessage';
 import CreateSetHeader from './CreateSetHeader';
-import {
-    AddCardButton,
-    AddCardIcon,
-    CreateSetPage,
-} from './CreateSetStyles';
-import ImportSetModal from './ImportSetModal/ImportSetModal';
+import { AddCardButton, AddCardIcon, CreateSetPage } from './CreateSetStyles';
+import ImportCardsModal from './ImportCartsModal/ImportCardsModal';
 import NewCardInput from './NewCardInput/NewCardInput';
 import SetModificationButtons from './SetModificationButtons';
 import { Virtuoso } from 'react-virtuoso';
@@ -37,8 +32,6 @@ import { EMPTY_CARD } from 'utilities/constants';
 import { addCard } from 'utilities/createUtils';
 import { Create } from '@mui/icons-material';
 import {
-    selectShowImportModal,
-    setShowImportModal,
     selectAdvancedSectionProps,
     setAdvancedSectionProps,
 } from 'state/slices/createSetSlice';
@@ -101,6 +94,8 @@ const CreateSet = (props: Props) => {
         titleInput: false,
         descInput: false,
     });
+
+    const [showImportModal, setShowImportModal] = useState<boolean>(false);
 
     useBrowserTitle('Edit');
 
@@ -367,7 +362,9 @@ const CreateSet = (props: Props) => {
                     Save Changes
                 </Button>
             </CreateSetPage>
-            <ImportSetModal />
+            {showImportModal && (
+                <ImportCardsModal setShowImportModal={setShowImportModal} />
+            )}
             {namedColorsDialogProps.open && <NamedColorsDialog />}
             <ScrollToTopFab />
         </>
