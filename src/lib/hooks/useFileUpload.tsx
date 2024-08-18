@@ -8,11 +8,10 @@ import { UUID, Part } from "lib/types";
 
 type UseFileUploadProps = {
     studysetUUID: UUID;
-    userUUID: UUID;
 };
 
 const useFileUpload = (props: UseFileUploadProps) => {
-    const { studysetUUID, userUUID } = props;
+    const { studysetUUID } = props;
 
     const [uploadUrls, setUploadUrls] = useState(null);
     const [error, setError] = useState<any>(null);
@@ -64,7 +63,6 @@ const useFileUpload = (props: UseFileUploadProps) => {
                     const { key: uploadKey, uploadId = "" } =
                         await initiateMultipartUpload({
                             studysetUUID,
-                            userUUID,
                             fileName,
                             contentType,
                         });
@@ -98,7 +96,7 @@ const useFileUpload = (props: UseFileUploadProps) => {
                 setError(error);
             }
         },
-        [studysetUUID, userUUID]
+        [studysetUUID]
     );
 
     return {

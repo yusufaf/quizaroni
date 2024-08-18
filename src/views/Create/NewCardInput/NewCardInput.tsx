@@ -18,10 +18,9 @@ import {
 import useFileUpload from "lib/hooks/useFileUpload";
 import NewCardHeader from "./NewCardHeader";
 import { useSelector } from "react-redux";
-import { useGetUserQuery } from "state/api/usersAPI";
 import { selectCognitoUser } from "state/slices/globalSlice";
-import { DEFAULT_USER_DATA } from "utilities/constants";
 import { addCard } from "utilities/createUtils";
+import { useParams } from "react-router-dom";
 
 type Props = {
     actionsStack: TODO[];
@@ -53,20 +52,13 @@ const NewCardInput = (props: Props) => {
         uuid,
     } = cardValues;
 
+    const { id: studysetUUID = "" } = useParams();
+
     const setStateCallback = setCreatedSetCards;
 
     const cognitoUser = useSelector(selectCognitoUser);
-    const {
-        data: {
-            uuid: userUUID = "",
-        } = DEFAULT_USER_DATA,
-    } = useGetUserQuery({
-        username: cognitoUser.username ?? "",
-    });
-
     const { uploadFile } = useFileUpload({
-        studysetUUID: "testStudysetUUID",
-        userUUID,
+        studysetUUID
     });
 
     const [localTextColor, setLocalTextColor] = useState(textColor);
