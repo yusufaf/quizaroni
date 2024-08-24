@@ -1,3 +1,5 @@
+import { LabelsDialogTab } from "components/ManageLabelsDialog/constants";
+
 // #region Utility Types
 export type TODO = any;
 export type UUID = string;
@@ -217,7 +219,7 @@ export type LabelsDialogProps = {
     open: boolean;
     studysetUUID?: string;
     selectedStudysetUUIDs?: string[];
-    tab?: string;
+    tab?: LabelsDialogTab;
 }
 
 // export type ViewSetDialog =
