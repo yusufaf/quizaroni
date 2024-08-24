@@ -4,17 +4,17 @@ import {
     ListItem,
     ListItemButton,
     Typography,
-} from "@mui/material";
-import { Delete, Edit } from "@mui/icons-material";
+} from '@mui/material';
+import { Delete, Edit } from '@mui/icons-material';
 import {
     LabelButtons,
     LabelsListContainer,
     LabelsListPaper,
     StyledLabelsList,
     StyledListButton,
-} from "./styles";
-import { TABS } from "./constants";
-import { Dispatch, SetStateAction } from "react";
+} from './styles';
+import { TABS } from './constants';
+import { Dispatch, SetStateAction } from 'react';
 
 type Props = {
     labels: string[];
@@ -32,33 +32,34 @@ type Props = {
 
 const LabelsList = (props: Props) => {
     const {
+        assignLabel,
+        currentLabel = '',
+        deleteIndices = [],
+        editIndex = -1,
+        handleChangeCurrentLabel = () => {},
+        handleDeleteClick = () => {},
+        handleEditClick = () => {},
         labels = [],
         selectedTab,
-        editIndex = -1,
-        deleteIndices = [],
-        handleEditClick = () => {},
-        handleDeleteClick = () => {},
-        type = "main",
-        currentLabel = "",
-        handleChangeCurrentLabel = () => {},
-        assignLabel,
         setAssignLabel,
+        type = 'main',
     } = props;
 
     const isCreateTab = selectedTab === TABS.CREATE;
     const isManageTab = selectedTab === TABS.MANAGE;
     const isAssignTab = selectedTab === TABS.ASSIGN;
 
-    const listStyle = type === "main" ? { marginTop: "4rem" } : {};
+    const listStyle = type === 'main' ? { marginTop: '4rem' } : {};
 
     const handleListItemClick = (label: string) => {
         if (isCreateTab) {
-            handleChangeCurrentLabel(label);
+            const isCurrentLabel = currentLabel === label;
+            handleChangeCurrentLabel(isCurrentLabel ? '' : label);
         }
         if (isAssignTab) {
             setAssignLabel(label);
         }
-    }
+    };
 
     const renderLabelsList = () => {
         return labels?.map((label: string, index: number) => {
@@ -68,14 +69,18 @@ const LabelsList = (props: Props) => {
             const isCurrentLabel = currentLabel === label;
             const isAssignLabel = assignLabel === label;
             const createLabelSelected = isCreateTab && isCurrentLabel;
-            const assignLabelSelected = isAssignTab && isAssignLabel
+            const assignLabelSelected = isAssignTab && isAssignLabel;
 
             let labelListItemStyling = {};
-            let chipLabel = createLabelSelected ? "Current" : assignLabelSelected ? "Selected" : "";
+            let chipLabel = createLabelSelected
+                ? 'Current'
+                : assignLabelSelected
+                  ? 'Selected'
+                  : '';
             if (createLabelSelected || assignLabelSelected) {
                 labelListItemStyling = {
-                    color: "primary.main",
-                }
+                    color: 'primary.main',
+                };
             }
 
             return (
@@ -95,7 +100,7 @@ const LabelsList = (props: Props) => {
                                     <Edit
                                         color={
                                             isEditSelected
-                                                ? "primary"
+                                                ? 'primary'
                                                 : undefined
                                         }
                                     />
@@ -109,7 +114,7 @@ const LabelsList = (props: Props) => {
                                     <Delete
                                         color={
                                             isDeleteSelected
-                                                ? "primary"
+                                                ? 'primary'
                                                 : undefined
                                         }
                                     />

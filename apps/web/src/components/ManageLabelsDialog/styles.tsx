@@ -16,7 +16,7 @@ import {
     ListItemButton,
 } from "@mui/material/";
 import styled from "@emotion/styled";
-import { SimpleFlexContainer } from "common/AppStyles";
+import { FlexColumn, SimpleFlexContainer } from "common/AppStyles";
 
 export const StyledDialog = styled(Dialog)({
     "& .MuiDialog-paper": {
@@ -39,11 +39,11 @@ export const StyledDialogContent = styled(DialogContent)({
     gap: "1rem",
 });
 
+export const MainLabelDialogContent = styled(FlexColumn)({
+    gap: "1rem",
+})
+
 export const LabelActionWarning = styled(Typography)({
-    position: "absolute",
-    bottom: "10%",
-    whiteSpace: "pre-line",
-    textAlign: "right",
 });
 
 export const LabelsListContainer = styled("div")(({ theme }) => ({
@@ -79,10 +79,6 @@ export const StyledListButton = styled(ListItemButton)<StyledListButtonProps>(
 
 export const LabelButtons = styled(SimpleFlexContainer)({
     gap: "0.5rem",
-});
-
-export const LabelField = styled(TextField)({
-    marginTop: "1.25rem",
 });
 
 export const LabelInputsContainer = styled(SimpleFlexContainer)({
