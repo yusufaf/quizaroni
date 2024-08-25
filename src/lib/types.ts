@@ -50,7 +50,7 @@ export type StudysetMetadata = {
     customTerminology: string;
     labelTerminology: string;
     notesDrawerInitial: string;
-    notesDrawerPosition: string;
+    notesDrawerPosition: 'left' | 'right';
     publiclyViewable: boolean;
     terminology: string;
     textColorVisible: boolean;
