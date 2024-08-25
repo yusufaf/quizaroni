@@ -82,7 +82,9 @@ const NavBar = (props: Props) => {
     }
 
     return (
-        <AppBar position="static" color="inherit">
+        <AppBar position="static" color="inherit" sx={{
+            zIndex: muiTheme.zIndex.drawer + 1
+        }}>
             <Toolbar>
                 {/*
                     TODO: Revisit what to do with logo 
