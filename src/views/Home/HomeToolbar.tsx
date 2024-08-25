@@ -101,14 +101,14 @@ const HomeToolbar = ({
         if (!firstStudyset) {
             return;
         }
-        navigate(`/edit/${firstStudyset.uuid}`);
+        navigate(`/edit/${firstStudyset.studysetUUID}`);
     };
 
     const handleFavoriteClick = () => {
         if (!firstStudyset) {
             return;
         }
-        const { uuid: studysetUUID, favorited: oldFavorited } = firstStudyset;
+        const { studysetUUID, favorited: oldFavorited } = firstStudyset;
         updateStudyset({
             studysetUUID,
             updates: {
