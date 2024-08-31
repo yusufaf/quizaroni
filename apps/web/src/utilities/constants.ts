@@ -201,12 +201,32 @@ export const NOTES_DRAWER_POSITIONS = {
     RIGHT: "right",
 }
 
+export const NOTES_DRAWER_POSITIONS_OPTIONS = [
+    { value: NOTES_DRAWER_POSITIONS.LEFT, ariaLabel: "left anchored", label: "Left" },
+    { value: NOTES_DRAWER_POSITIONS.RIGHT, ariaLabel: "right anchored", label: "Right" },
+]
+
 export const EMPTY_NOTE_PLACEHOLDER = "Enter text for the note";
 
 export const NOTES_DRAWER_INITIAL_APPEARANCE = {
     OPEN: "open",
     CLOSED: "closed",
 }
+
+export const NOTES_DRAWER_INITIAL_APPEARANCE_OPTIONS = [
+    { value: NOTES_DRAWER_INITIAL_APPEARANCE.OPEN, ariaLabel: "initially open", label: "Open" },
+    { value: NOTES_DRAWER_INITIAL_APPEARANCE.CLOSED, ariaLabel: "initially closed", label: "Closed" },
+]
+
+export const CARD_COUNT_VISIBILITY = {
+    HIDDEN: false,
+    VISIBLE: true,
+}
+
+export const CARD_COUNT_VISIBILITY_OPTIONS = [
+    { value: CARD_COUNT_VISIBILITY.HIDDEN, ariaLabel: "hidden", label: "Hidden" },
+    { value: CARD_COUNT_VISIBILITY.VISIBLE, ariaLabel: "visible", label: "Visible" },
+]
 
 export const DEFAULT_USER_DATA: User = {
     createdAt: new Date().getTime(),
