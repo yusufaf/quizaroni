@@ -44,6 +44,7 @@ import {
 } from "./HomeStyles";
 import HomeToolbar from "./HomeToolbar";
 import SetActionsMenu from "./SetActionsMenu";
+import { getFormattedTimestamp } from "utilities/functions";
 
 type Props = {};
 
@@ -289,6 +290,7 @@ const Home = (props: Props) => {
                                     slots={{ toolbar: GridToolbar }}
                                     slotProps={{
                                         toolbar: {
+                                            csvOptions: { fileName: `Quizaroni_Studysets_${getFormattedTimestamp()}` },
                                             showQuickFilter: true,
                                         },
                                         row: {
