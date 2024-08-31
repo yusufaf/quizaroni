@@ -46,6 +46,7 @@ export type Note = {
 export type StudysetMetadata = {
     backgroundColorVisible: boolean;
     contentOnly?: boolean;
+    cardCountVisible?: boolean;
     customLabelTerminology: string;
     customTerminology: string;
     labelTerminology: string;

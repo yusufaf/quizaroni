@@ -119,7 +119,7 @@ const ViewStudySet = (props: Props) => {
             updateStudySet({
                 studysetUUID,
                 updates: {
-                    [property]: newValue
+                    [property]: newValue,
                 },
                 isMetadataUpdate: true,
             });
