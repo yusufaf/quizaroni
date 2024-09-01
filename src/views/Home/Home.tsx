@@ -98,13 +98,28 @@ const Home = (props: Props) => {
     const [rowSelectionModel, setRowSelectionModel] =
         useState<GridRowSelectionModel>([]);
 
-    const selectedStudysetRows: Studyset[] = rowSelectionModel
+        const selectedStudysetRows: Studyset[] = rowSelectionModel
         .map((studysetUUID) =>
             studysets.find((studyset) => studyset.studysetUUID === studysetUUID)
-        )
-        .filter(Boolean) as Studyset[];
-
+    )
+    .filter(Boolean) as Studyset[];
+    
     const columns: GridColDef[] = [
+        {
+            field: "favorited",
+            headerName: "Favorited",
+            width: 75,
+            cellClassName: `favorited-cell`,
+            renderCell: (params: GridRenderCellParams<any, boolean>) => (
+                <>
+                    {params.value ? (
+                        <Favorite color="primary" />
+                    ) : (
+                        <FavoriteBorder />
+                    )}
+                </>
+            ),
+        },
         {
             field: "title",
             headerName: "Title",
@@ -150,20 +165,6 @@ const Home = (props: Props) => {
             field: "label",
             headerName: "Label",
             width: 200,
-        },
-        {
-            field: "favorited",
-            headerName: "Favorited",
-            width: 150,
-            renderCell: (params: GridRenderCellParams<any, boolean>) => (
-                <>
-                    {params.value ? (
-                        <Favorite color="primary" />
-                    ) : (
-                        <FavoriteBorder />
-                    )}
-                </>
-            ),
         },
     ];
 

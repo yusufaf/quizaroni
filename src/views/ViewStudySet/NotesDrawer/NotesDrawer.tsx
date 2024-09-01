@@ -1,7 +1,7 @@
 import {
     Add as AddIcon,
     ExpandMore as ExpandMoreIcon,
-    MenuOpen as MenuOpenIcon
+    MenuOpen as MenuOpenIcon,
 } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
@@ -9,23 +9,18 @@ import {
     AccordionDetails,
     AccordionSummary,
     Divider,
-    Fab
+    Fab,
 } from '@mui/material/';
-import {
-    BoldTypography,
-    SimpleFlexContainer
-} from 'common/AppStyles';
+import { BoldTypography, SimpleFlexContainer } from 'common/AppStyles';
 import CloseDialogButton from 'components/CloseDialogButton/CloseDialogButton';
 import useCustomMutation from 'lib/hooks/useCustomMutation';
 import { Card, OpenCardNotes, Studyset, UUID } from 'lib/types';
 import { useMemo, useState } from 'react';
 import {
     useCreateNoteMutation,
-    useEditNoteMutation
+    useEditNoteMutation,
 } from 'state/api/studysetsAPI';
-import {
-    NOTES_DRAWER_INITIAL_APPEARANCE
-} from 'utilities/constants';
+import { NOTES_DRAWER_INITIAL_APPEARANCE } from 'utilities/constants';
 import NotesList from './NotesList';
 import { StyledDrawer } from './styles';
 
@@ -38,7 +33,13 @@ const transitionDuration = 1000; //can also use theme.transitions.duration
 const NotesDrawer = (props: Props) => {
     const { selectedStudyset } = props;
 
-    const { studysetUUID = '', metadata: { notesDrawerInitial = '', notesDrawerPosition = "right" } = {} } = selectedStudyset || {};
+    const {
+        studysetUUID = '',
+        metadata: {
+            notesDrawerInitial = '',
+            notesDrawerPosition = 'right',
+        } = {},
+    } = selectedStudyset || {};
 
     // TODO: Doesn't work on initial load as expected
     const [hidden, setHidden] = useState<boolean>(
@@ -72,12 +73,11 @@ const NotesDrawer = (props: Props) => {
     });
 
     const fabPosition = useMemo(() => {
-        if (notesDrawerPosition === "right") {
-            return { right: '2rem' }
+        if (notesDrawerPosition === 'right') {
+            return { right: '2rem' };
         }
-        return { left: '2rem' }
+        return { left: '2rem' };
     }, [notesDrawerPosition]);
-
 
     const onClose = () => {
         setHidden(true);
@@ -137,7 +137,7 @@ const NotesDrawer = (props: Props) => {
                 title="Open notes menu"
                 sx={{
                     position: 'absolute',
-                    ...fabPosition
+                    ...fabPosition,
                 }}
             >
                 <MenuOpenIcon fontSize="medium" />
@@ -188,7 +188,11 @@ const NotesDrawer = (props: Props) => {
                                 }
                                 studysetUUID={studysetUUID}
                             />
-                            <Divider sx={{ width: '100%', margin: '1rem 0' }} />
+                            {card.notes.length !== 0 && (
+                                <Divider
+                                    sx={{ width: '100%', margin: '1rem 0' }}
+                                />
+                            )}
                             <LoadingButton
                                 loading={isCreateNoteLoading}
                                 startIcon={<AddIcon />}
