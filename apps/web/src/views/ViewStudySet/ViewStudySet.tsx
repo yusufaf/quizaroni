@@ -273,15 +273,17 @@ const ViewStudySet = (props: Props) => {
                         </ViewStudysetHeader>
                     </ViewStudysetContainer>
                 </ViewFlashsetPaper>
-                <SimpleFlexContainer style={{ gap: '0.5rem' }}>
-                    <Typography variant="h6">
-                        Number of cards in this study set:{' '}
-                        {selectedStudyset?.cards?.length ?? 'N/A'}
-                    </Typography>
-                    {!selectedStudyset?.cards?.length && (
-                        <NoCardsWarningsIcon />
-                    )}
-                </SimpleFlexContainer>
+                {selectedStudyset?.metadata?.cardCountVisible && (
+                    <SimpleFlexContainer style={{ gap: '0.5rem' }}>
+                        <Typography variant="h6">
+                            Number of cards in this study set:{' '}
+                            {selectedStudyset?.cards?.length ?? 'N/A'}
+                        </Typography>
+                        {!selectedStudyset?.cards?.length && (
+                            <NoCardsWarningsIcon />
+                        )}
+                    </SimpleFlexContainer>
+                )}
                 <ViewStudysetFilters
                     selectedTab={selectedTab}
                     setSelectedTab={setSelectedTab}
