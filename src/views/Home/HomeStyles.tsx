@@ -47,6 +47,9 @@ export const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
         background: "#555",
         // background: theme.palette.grey[300],
     },
+    '& .favorited-cell': {
+        justifyContent: "center"
+    },
 }));
 
 // TODO:

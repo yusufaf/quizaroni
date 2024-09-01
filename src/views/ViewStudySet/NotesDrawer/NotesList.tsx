@@ -6,7 +6,7 @@ import { Card, Note } from 'lib/types';
 import { useDeleteNoteMutation } from 'state/api/studysetsAPI';
 import { EMPTY_NOTE_PLACEHOLDER } from 'utilities/constants';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface NoteListProps {
     card: Card;
@@ -23,6 +23,7 @@ const NoteList = ({
     handleEditingNoteToggle,
     studysetUUID = '',
 }: NoteListProps) => {
+    const [noteBeingDeleted, setNoteBeingDeleted] = useState<string>('');
     const { cardUUID } = useMemo(() => card, [card]);
 
     const {
@@ -34,7 +35,23 @@ const NoteList = ({
         mutation: useDeleteNoteMutation,
         successMessage: 'Successfully deleted note',
         errorMessage: 'Error deleting note',
+        onSuccess: () => {
+            setNoteBeingDeleted('');
+        },
+        onError: () => {
+            setNoteBeingDeleted('');
+        },
     });
+
+    const handleDeleteNote = (noteUUID: string) => {
+        setNoteBeingDeleted(noteUUID);
+
+        deleteNote({
+            studysetUUID,
+            cardUUID,
+            noteUUID,
+        });
+    };
 
     return (
         <FlexColumn>
@@ -78,13 +95,8 @@ const NoteList = ({
                             </Tooltip>
                             <Tooltip title="Delete this note" placement="top">
                                 <IconButton
-                                    onClick={() =>
-                                        deleteNote({
-                                            studysetUUID,
-                                            cardUUID,
-                                            noteUUID,
-                                        })
-                                    }
+                                    disabled={isDeleteNoteLoading && noteUUID === noteBeingDeleted}
+                                    onClick={() => handleDeleteNote(noteUUID)}
                                 >
                                     <DeleteIcon fontSize="small" />
                                 </IconButton>
