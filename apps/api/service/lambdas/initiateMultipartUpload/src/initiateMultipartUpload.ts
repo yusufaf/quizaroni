@@ -13,7 +13,6 @@ const s3Client = new S3Client();
 type RequestBody = {
     studysetUUID: string;
     uploadType: string;
-    userUUID: string;
     fileName: string;
     contentType: string;
 };
@@ -24,8 +23,10 @@ export const handler: Handler = async (
 ): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));
     
+    const { sub: userUUID, username } = event.requestContext.authorizer.lambda
+
     const body: RequestBody = JSON.parse(event.body ?? "{}");
-    const { contentType, fileName, studysetUUID, uploadType, userUUID } = body;
+    const { contentType, fileName, studysetUUID, uploadType } = body;
     
     const key = `${studysetUUID}/${userUUID}/${fileName}`;
 

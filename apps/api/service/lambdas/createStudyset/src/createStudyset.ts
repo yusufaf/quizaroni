@@ -32,6 +32,7 @@ export const handler: Handler = async (
         const timestamp = new Date().toISOString();
         const initialMetadata = {
             backgroundColorVisible: false,
+            cardCountVisible: true,
             createOnly: false,
             customLabelTerminology: "",
             customTerminology: "",
