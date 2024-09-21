@@ -331,8 +331,7 @@ const CreateSet = (props: Props) => {
                 <SpacedFlexContainer>
                     <SimpleFlexContainer style={{ gap: '0.5rem' }}>
                         <Typography variant="h6">
-                            Number of cards in this study set:{' '}
-                            {createdSetCards.length ?? 'N/A'}
+                            {`${createdSetCards.length ?? 'N/A'} ${createdSetCards.length === 1 ? 'Card' : 'Cards'}`}
                         </Typography>
                         {!createdSetCards.length && <NoCardsWarningsIcon />}
                     </SimpleFlexContainer>
