@@ -24,7 +24,6 @@ export default ({
         memorySize: 1000,
         entry: path.join(__dirname, `./src/${functionName}.ts`),
         handler: "handler",
-        awsSdkConnectionReuse: true,
         environment: {
             NODE_OPTIONS: '--enable-source-maps',
             userPoolId: USER_POOL_IDS[deploymentType],

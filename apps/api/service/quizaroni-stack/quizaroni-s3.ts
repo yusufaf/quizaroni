@@ -19,9 +19,9 @@ export class QuizaroniS3 extends Construct {
         } = props;
         const { account = "", region = "" } = env!;
 
-        const mainTableNameAndID = `${appName}-${deploymentType}-main`;
+        const mainBucketName = `${appName}-${deploymentType}-main`;
         this.createS3Bucket({
-            bucketName: mainTableNameAndID,
+            bucketName: mainBucketName,
             cors: [
                 {
                     allowedMethods: [
@@ -33,13 +33,14 @@ export class QuizaroniS3 extends Construct {
                     allowedOrigins: DEFAULT_ALLOWED_ORIGINS,
                     allowedHeaders: ["*"],
                     maxAge: 3600, // 1hr
+                    exposedHeaders: ["ETag"],
                 },
             ],
         });
 
-        const assetsBucketNameAndID = `${appName}-${deploymentType}-assets`;
+        const assetsBucketName = `${appName}-${deploymentType}-assets`;
         this.createS3Bucket({
-            bucketName: assetsBucketNameAndID,
+            bucketName: assetsBucketName,
             cors: [
                 {
                     allowedMethods: [HttpMethods.GET],

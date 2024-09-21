@@ -11,10 +11,10 @@ const { mainBucket = "" } = process.env;
 const s3Client = new S3Client();
 
 type RequestBody = {
+    contentType: string;
+    fileName: string;
     studysetUUID: string;
     uploadType: string;
-    fileName: string;
-    contentType: string;
 };
 
 export const handler: Handler = async (

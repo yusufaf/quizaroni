@@ -6,15 +6,21 @@ import {
 import { S3Client, CompleteMultipartUploadCommand, CompletedPart, HeadObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { AuthorizerContext } from "models/auth";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient,     UpdateCommand,
+} from "@aws-sdk/lib-dynamodb";
 
-const { mainBucket = "" } = process.env;
+const { mainBucket = "", mainTable = '' } = process.env;
 
+const dynamoClient = new DynamoDBClient({});
+const docClient = DynamoDBDocumentClient.from(dynamoClient);
 const s3Client = new S3Client();
 
 type RequestBody = {
     key: string;
-    uploadId: string;
     parts: CompletedPart[]
+    studysetUUID?: string;
+    uploadId: string;
 };
 
 export const handler: Handler = async (
@@ -23,8 +29,9 @@ export const handler: Handler = async (
 ): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));
 
+    const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
     const body: RequestBody = JSON.parse(event.body ?? "{}");
-    const { key, uploadId, parts } = body;
+    const { key, parts, studysetUUID, uploadId } = body;
 
     try {
         const completeMultipartUploadCommand = new CompleteMultipartUploadCommand({
@@ -39,7 +46,7 @@ export const handler: Handler = async (
 
         // Getting file metadata
         const splitKey = key.split("/");
-        const [fileName] = splitKey[splitKey.length - 1];
+        const fileName = splitKey[splitKey.length - 1];
         const headObjectCommand = new HeadObjectCommand({
             Bucket: mainBucket,
             Key: key,
@@ -50,18 +57,42 @@ export const handler: Handler = async (
             Bucket: mainBucket,
             Key: key,
         })
-        const signedURL = getSignedUrl(s3Client, getObjectCommand, {
+        const signedURL = await getSignedUrl(s3Client, getObjectCommand, {
             expiresIn: 86400 // One day in seconds
         })
+
+        const fileMetadata = {
+            name: fileName,
+            key,
+            size: fileSize,
+            signedURL,
+        }
+        
+        if (studysetUUID) {
+            const PK = `userUUID#${userUUID}`;
+            const SK = `studyset#${studysetUUID}`;
+            const updatedAt = new Date().toISOString();
+    
+            const updateCommand = new UpdateCommand({
+                TableName: mainTable,
+                Key: {
+                    PK,
+                    SK,
+                },
+                ExpressionAttributeValues: {
+                    // ":newCards": newCards,
+                    ":updatedAt": updatedAt,
+                    ":updatedBy": username,
+                },
+                UpdateExpression:
+                    "SET cards = :newCards, updatedAt = :updatedAt, updatedBy = :updatedBy",
+            });
+            await docClient.send(updateCommand);
+        }
         
         return {
             statusCode: 200,
-            body: JSON.stringify({
-                name: fileName,
-                key,
-                size: fileSize,
-                signedURL,
-            }),
+            body: JSON.stringify(fileMetadata),
         };
     } catch (err) {
         console.error(err);
