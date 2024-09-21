@@ -9,7 +9,7 @@ import {
     ExpandMore as ExpandMoreIcon,
     ExpandLess as ExpandLessIcon,
 } from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import {
     selectAdvancedSectionProps,
     setAdvancedSectionProps,
@@ -20,9 +20,9 @@ type Props = {
 };
 
 const HeaderAdvancedSection = ({ onBlankInputsSubmit = null }: Props) => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
-    const { blankCardsCount, expanded } = useSelector(
+    const { blankCardsCount, expanded } = useAppSelector(
         selectAdvancedSectionProps
     );
 

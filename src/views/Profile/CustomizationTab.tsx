@@ -20,7 +20,7 @@ import {
 } from "state/slices/globalSlice";
 import { LIGHT, DARK } from "utilities/constants";
 import { ActionColumn, ActionHeader } from "./ProfileStyles";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import NamedColorsDialog from "components/NamedColorsDialog/NamedColorsDialog";
 import { User } from "lib/types";
 
@@ -29,10 +29,10 @@ type Props = {
 };
 
 const CustomizationTab = ({ userData }: Props) => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const { userUUID = "", labels = [] } = userData;
-    const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
+    const namedColorsDialogProps = useAppSelector(selectNamedColorsDialogProps);
     const [defaultTheme, setDefaultTheme] = useState<string>(
         userData?.metadata?.defaultTheme ?? "dark"
     );

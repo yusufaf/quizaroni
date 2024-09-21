@@ -9,7 +9,7 @@ import {
     useMediaQuery,
 } from "@mui/material/";
 import { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useNavigate } from "react-router-dom";
 import {
     selectAuthenticated,
@@ -41,8 +41,8 @@ const NavBar = (props: Props) => {
     // TODO: Verify that a medium breakpoint works to handle mobile cases, can always add more breakpoints
     const isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
 
-    const dispatch = useDispatch();
-    const authenticated = useSelector(selectAuthenticated);
+    const dispatch = useAppDispatch();
+    const authenticated = useAppSelector(selectAuthenticated);
 
     const navigate = useNavigate();
 

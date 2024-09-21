@@ -13,7 +13,7 @@ import { IconButton, Tooltip } from "@mui/material/";
 import CustomIconButton from "components/CustomIconButton/CustomIconButton";
 import { Studyset } from "lib/types";
 import { useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from 'state/reduxHooks';
 import { useNavigate, useParams } from "react-router-dom";
 import { showConfirmDialog } from "state/slices/globalSlice";
 import { setSelectedDialog } from "state/slices/viewSetsSlice";
@@ -34,7 +34,7 @@ const StudysetActions = (props: Props) => {
 
     const navigate = useNavigate();
     const { id: studySetUUID } = useParams();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const [showControlMenu, setShowControlMenu] = useState<boolean>(false);
     const controlAnchorRef = useRef(null);

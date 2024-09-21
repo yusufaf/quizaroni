@@ -6,7 +6,7 @@ import {
     DialogContent,
     DialogContentText,
 } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { selectFeedbackDialogOpen, setFeedbackDialogOpen } from "state/slices/globalSlice";
 import { StyledDialogTitle, StyledDialogActions } from "common/AppStyles";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
@@ -16,8 +16,8 @@ import { useState } from "react";
 type Props = {};
 
 const FeedbackDialog = (props: Props) => {
-    const open = useSelector(selectFeedbackDialogOpen);
-    const dispatch = useDispatch();
+    const open = useAppSelector(selectFeedbackDialogOpen);
+    const dispatch = useAppDispatch();
 
     const onClose = () => {
         dispatch(setFeedbackDialogOpen(false));

@@ -19,7 +19,7 @@ import { Studyset } from 'lib/types';
 import { STUDYSET_CONFIRM_DIALOGS } from 'utilities/constants';
 import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 import { showConfirmDialog } from 'state/slices/globalSlice';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from "state/reduxHooks";
 
 type Props = {
     studyset: Studyset | null;
@@ -44,7 +44,7 @@ const SetActionsMenu = ({
 
     const [updateStudyset] = useUpdateStudysetMutation();
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const handleConfirmAction = (
         e: React.MouseEvent<HTMLLIElement, MouseEvent>,

@@ -8,7 +8,7 @@ import {
     useRef,
     useState,
 } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
@@ -47,17 +47,17 @@ const CreateSet = (props: Props) => {
     /* Hooks / Redux */
     const { id: studysetUUID } = useParams();
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
-    const authenticated = useSelector(selectAuthenticated);
+    const authenticated = useAppSelector(selectAuthenticated);
 
     const {
         data: {
             user: { username = '', userUUID = '' },
         } = DEFAULT_USER_RESPONSE,
     } = useGetUserQuery();
-    const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
-    const { blankCardsCount, expanded } = useSelector(
+    const namedColorsDialogProps = useAppSelector(selectNamedColorsDialogProps);
+    const { blankCardsCount, expanded } = useAppSelector(
         selectAdvancedSectionProps
     );
 
