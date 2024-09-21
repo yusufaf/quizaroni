@@ -29,7 +29,7 @@ import CreateTabView from './CreateTabView';
 import ManageTabView from './ManageTabView';
 import AssignTabView from './AssignTabView';
 import { setLabelsDialogProps } from 'state/slices/globalSlice';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from 'state/reduxHooks';
 import { useGetUserQuery } from 'state/api/usersAPI';
 import { DEFAULT_USER_RESPONSE } from 'utilities/constants';
 import { LabelsDialogProps } from 'lib/types';
@@ -39,7 +39,7 @@ type Props = {
 };
 const ManageLabelsDialog = ({ labelsDialogProps }: Props) => {
     /* ==== Redux ==== */
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const { studysetUUID = '' } = labelsDialogProps || {};
 

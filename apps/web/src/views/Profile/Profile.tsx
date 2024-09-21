@@ -1,6 +1,6 @@
 import { Tabs } from "@mui/material/";
 import { SyntheticEvent, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import {
     selectAuthenticated,
     selectCognitoUser,
@@ -27,8 +27,8 @@ const TABS = {
 type Props = {};
 
 const Profile = (props: Props) => {
-    const dispatch = useDispatch();
-    const authenticated = useSelector(selectAuthenticated);
+    const dispatch = useAppDispatch();
+    const authenticated = useAppSelector(selectAuthenticated);
 
     const { data: { user: userData } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
 

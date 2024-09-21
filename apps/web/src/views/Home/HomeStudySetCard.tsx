@@ -14,7 +14,7 @@ import {
     TermsLabel,
 } from "./HomeStyles";
 import SetActionsMenu from "./SetActionsMenu";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from 'state/reduxHooks';
 import { setSelectedStudySet } from "state/slices/studysetsSlice";
 import { useNavigate } from "react-router-dom";
 import { Studyset } from "lib/types";
@@ -35,7 +35,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
         username,
     } = studyset;
 
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { muiTheme } = useTheme();
 

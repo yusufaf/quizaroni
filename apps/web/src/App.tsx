@@ -11,14 +11,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import GlobalConfirmDialog from 'components/GlobalConfirmDialog/GlobalConfirmDialog';
 import ManageLabelsDialog from 'components/ManageLabelsDialog/ManageLabelsDialog';
 import ConfirmationCodeDialog from 'components/ConfirmationCodeDialog/ConfirmationCodeDialog';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from 'state/reduxHooks';
 import { selectLabelsDialogProps } from 'state/slices/globalSlice';
 
 const App = () => {
     const { setTheme, theme } = useTheme();
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
-    const labelsDialogProps = useSelector(selectLabelsDialogProps);
+    const labelsDialogProps = useAppSelector(selectLabelsDialogProps);
 
     useEffect(() => {
         prefersDarkMode ? setTheme(DARK) : setTheme(LIGHT);

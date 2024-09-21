@@ -17,7 +17,7 @@ import {
 } from "../CreateSetStyles";
 import useFileUpload from "lib/hooks/useFileUpload";
 import NewCardHeader from "./NewCardHeader";
-import { useSelector } from "react-redux";
+import { useAppSelector } from 'state/reduxHooks';
 import { selectCognitoUser } from "state/slices/globalSlice";
 import { addCard } from "utilities/createUtils";
 import { useParams } from "react-router-dom";
@@ -56,7 +56,7 @@ const NewCardInput = (props: Props) => {
 
     const setStateCallback = setCreatedSetCards;
 
-    const cognitoUser = useSelector(selectCognitoUser);
+    const cognitoUser = useAppSelector(selectCognitoUser);
     const { uploadFile } = useFileUpload({
         studysetUUID
     });

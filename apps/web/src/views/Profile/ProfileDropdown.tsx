@@ -2,13 +2,13 @@ import { Link } from "react-router-dom";
 import { Menu, MenuItem } from '@mui/material/';
 import { useTheme } from "theme/useTheme";
 import { styled } from '@mui/system';
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from 'state/reduxHooks';
 import { setDialogOpen } from "state/slices/globalSlice";
 
 const ProfileDropdown = props => {
     const { dropdownRef, showDropdown, onClose } = props;
     const { muiTheme } = useTheme();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const StyledProfileLink = styled(Link)({
         fontSize: "1.25rem",

@@ -13,7 +13,7 @@ import {
     LoginButton,
 } from "./LoginStyles";
 import { StyledLink } from "common/AppStyles";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import {
     setCognitoUser,
     setAuthenticated,
@@ -23,7 +23,7 @@ import { signIn } from "@aws-amplify/auth";
 type Props = {};
 const Login = (props: Props) => {
     useBrowserTitle(PAGE_TITLES.LOGIN);
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     /* OAuth Variables */

@@ -16,7 +16,7 @@ import {
 import { EMAIL_REGEX } from "utilities/constants";
 import { useNavigate } from "react-router-dom";
 import { User } from "lib/types";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from 'state/reduxHooks';
 import { setConfirmationCodeDialogProps } from "state/slices/globalSlice";
 import ChangePasswordSection from "./ChangePasswordSection/ChangePasswordSection";
 
@@ -27,7 +27,7 @@ const AccountTab = (props: Props) => {
     const { userData } = props;
 
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [deletePassword, setDeletePassword] = useState<string>("");

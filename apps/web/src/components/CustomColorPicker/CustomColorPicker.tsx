@@ -7,7 +7,7 @@ import {
 import { Tooltip } from "@mui/material";
 import { ExtraPickerButton } from "../../views/Create/CreateSetStyles";
 import { ColorPickerContainer, ExtraPickerContainer } from "./styles";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from 'state/reduxHooks';
 import { setNamedColorsDialogProps } from "state/slices/globalSlice";
 import { StyledChromePicker } from "common/AppStyles";
 import { useClickAway } from "lib/hooks/useClickAway";
@@ -36,7 +36,7 @@ const CustomColorPicker = (props: Props) => {
     } = props;
 
     const ref = useClickAway(onClose, additionalRefs);
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const openNamedColorsDialog = () => {
         dispatch(

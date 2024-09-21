@@ -1,6 +1,6 @@
 import { getCurrentUser } from "aws-amplify/auth";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppSelector, useAppDispatch } from 'state/reduxHooks';
 import {
     selectAuthenticated,
     setAuthenticated,
@@ -11,9 +11,9 @@ type Props = {
     children: any;
 };
 const AuthProvider = ({ children }: Props) => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
-    const authenticated = useSelector(selectAuthenticated);
+    const authenticated = useAppSelector(selectAuthenticated);
 
     const checkAuthState = async () => {
         try {
