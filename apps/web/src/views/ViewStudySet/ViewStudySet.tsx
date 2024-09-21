@@ -276,8 +276,7 @@ const ViewStudySet = (props: Props) => {
                 {selectedStudyset?.metadata?.cardCountVisible && (
                     <SimpleFlexContainer style={{ gap: '0.5rem' }}>
                         <Typography variant="h6">
-                            Number of cards in this study set:{' '}
-                            {selectedStudyset?.cards?.length ?? 'N/A'}
+                            {`${selectedStudyset?.cards?.length ?? 'N/A'} ${selectedStudyset?.cards?.length === 1 ? 'Card' : 'Cards'}`}
                         </Typography>
                         {!selectedStudyset?.cards?.length && (
                             <NoCardsWarningsIcon />

@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 import {
     initiateMultipartUpload,
     getMultipartSignedUploadUrls,
     completeMultipartUpload,
-} from "api/awsAPI";
-import { UUID, Part } from "lib/types";
+} from 'api/awsAPI';
+import { UUID, Part } from 'lib/types';
 
 type UseFileUploadProps = {
     studysetUUID: UUID;
@@ -22,30 +22,33 @@ const useFileUpload = (props: UseFileUploadProps) => {
         chunkSize: number
     ): Promise<Part[]> => {
         const keys = Object.keys(signedURLs);
-        const promises: Promise<Response>[] = keys.map((indexStr) => {
+        const putPartPromises: Promise<Response>[] = keys.map((indexStr) => {
             const index = parseInt(indexStr);
             const start = index * chunkSize;
             const end = (index + 1) * chunkSize;
-            const blob = index < keys.length ? file.slice(start, end) : file.slice(start);
+            const blob =
+                index < keys.length
+                    ? file.slice(start, end)
+                    : file.slice(start);
             const url = signedURLs[index];
             return fetch(url, {
-                method: "PUT",
+                method: 'PUT',
                 body: blob,
-            })
+            });
         });
 
-        const resultOfParts = await Promise.all(promises);
+        const resultOfParts = await Promise.all(putPartPromises);
         const parts: Part[] = [];
         for (const [index, part] of resultOfParts.entries()) {
-            const ETag = part.headers.get("ETag");
+            const ETag = part.headers.get('ETag');
             const PartNumber = index + 1;
             if (ETag && PartNumber) {
                 parts.push({
                     ETag,
                     PartNumber,
-                })
+                });
             } else {
-                console.error("Failed multipart upload");
+                console.error('Failed multipart upload');
             }
         }
         return parts;
@@ -58,22 +61,20 @@ const useFileUpload = (props: UseFileUploadProps) => {
 
                 for (const file of files) {
                     const { name: fileName, type: contentType, size } = file;
-                    console.log({file});
 
-                    const { key: uploadKey, uploadId = "" } =
+                    const { key, uploadId = '' } =
                         await initiateMultipartUpload({
                             studysetUUID,
                             fileName,
                             contentType,
                         });
-                    console.log({uploadKey, uploadId });
 
                     const numParts = Math.ceil(size / FILE_CHUNK_SIZE);
 
                     const { signedURLs } = await getMultipartSignedUploadUrls({
-                        key: uploadKey,
-                        uploadId,
+                        key,
                         numParts,
+                        uploadId,
                     });
 
                     const parts = await uploadParts(
@@ -83,14 +84,10 @@ const useFileUpload = (props: UseFileUploadProps) => {
                     );
 
                     const fileMetadata = await completeMultipartUpload({
-                        key: uploadKey,
+                        key,
+                        parts,
                         uploadId,
-                        parts
-                    })
-
-                    // currentFiles.push(fileMetadata);
-
-                    // Further processing with initiateMultipartResponse if needed
+                    });
                 }
             } catch (error) {
                 setError(error);
