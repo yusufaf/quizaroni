@@ -1,6 +1,6 @@
 import { Button, Tabs, Tab } from "@mui/material";
 import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import {
     selectNamedColorsDialogProps,
     setNamedColorsDialogProps,
@@ -36,11 +36,11 @@ import { DEFAULT_USER_RESPONSE } from "utilities/constants";
 type Props = {};
 const NamedColorsDialog = (props: Props) => {
     /* Redux / Hooks */
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     
     const { data: { user: { metadata: { namedColors = []}, userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
 
-    const namedColorsDialogProps = useSelector(selectNamedColorsDialogProps);
+    const namedColorsDialogProps = useAppSelector(selectNamedColorsDialogProps);
 
     const [
         updateUserMetadata,

@@ -14,7 +14,7 @@ import useFilterStudysets from "lib/hooks/useFilterStudysets";
 import useSortStudysets from "lib/hooks/useSortStudysets";
 import { HomeView, SortDirection, Studyset } from "lib/types";
 import { useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useNavigate } from "react-router-dom";
 import { useGetAllStudysetsQuery } from "state/api/studysetsAPI";
 import {
@@ -51,9 +51,9 @@ type Props = {};
 const Home = (props: Props) => {
     /* Hooks / Redux */
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
-    const authenticated = useSelector(selectAuthenticated);
+    const authenticated = useAppSelector(selectAuthenticated);
     
     const { data: { user: { userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
 

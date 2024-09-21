@@ -7,7 +7,7 @@ import useFilterViewCards from 'lib/hooks/useFilterViewCards';
 import useSortViewCards from 'lib/hooks/useSortViewCards';
 import { OpenCardNotes, SortDirection, Studyset, UUID } from 'lib/types';
 import { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     useGetAllStudysetsQuery,
@@ -59,13 +59,13 @@ const ViewStudySet = (props: Props) => {
     /* Hooks / Redux */
     const navigate = useNavigate();
     const { id: studysetUUID = '' } = useParams();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const {
         data: { user: { labels = [], userUUID = '' } } = DEFAULT_USER_RESPONSE,
     } = useGetUserQuery();
 
-    const selectedDialog = useSelector(selectSelectedDialog);
+    const selectedDialog = useAppSelector(selectSelectedDialog);
 
     /* Skip option prevents hook from running when userUUID is undefined */
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =

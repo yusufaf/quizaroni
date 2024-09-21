@@ -14,7 +14,7 @@ import {
     selectConfirmationCodeDialogProps,
     setConfirmationCodeDialogProps,
 } from "state/slices/globalSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useState } from "react";
 import {
     confirmSignUp,
@@ -27,12 +27,12 @@ import { useUpdateEmailMutation } from "state/api/usersAPI";
 type Props = {};
 const ConfirmationCodeDialog = (props: Props) => {
     /* Redux / Hooks */
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    const cognitoUser = useSelector(selectCognitoUser);
+    const cognitoUser = useAppSelector(selectCognitoUser);
     const { username } = cognitoUser;
-    const confirmationCodeDialogProps = useSelector(
+    const confirmationCodeDialogProps = useAppSelector(
         selectConfirmationCodeDialogProps
     );
 

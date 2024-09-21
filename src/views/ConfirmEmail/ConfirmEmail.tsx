@@ -5,7 +5,7 @@ import {
     resendSignUpCode,
     confirmUserAttribute,
 } from "aws-amplify/auth";
-import { useSelector } from "react-redux";
+import { useAppSelector } from 'state/reduxHooks';
 import { selectCognitoUser } from "state/slices/globalSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -20,7 +20,7 @@ import { useUpdateEmailMutation } from "state/api/usersAPI";
 
 type Props = {};
 const ConfirmEmail = (props: Props) => {
-    const cognitoUser = useSelector(selectCognitoUser);
+    const cognitoUser = useAppSelector(selectCognitoUser);
     console.log({ cognitoUser });
     const { username } = cognitoUser;
 

@@ -13,7 +13,7 @@ import {
 } from "views/Login/LoginStyles";
 import { StyledLink } from "common/AppStyles";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from 'state/reduxHooks';
 import {
     setCognitoUser,
     setConfirmationCodeDialogProps,
@@ -29,7 +29,7 @@ const Signup = (props: Props) => {
     // const provider = new GoogleAuthProvider();
     // provider.setCustomParameters({ prompt: "select_account" });
 
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [createUser] = useCreateUserMutation();
 

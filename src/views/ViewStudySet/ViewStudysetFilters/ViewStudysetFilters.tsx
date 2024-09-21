@@ -21,7 +21,7 @@ import {
     SelectChangeEvent,
 } from "@mui/material";
 import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from 'state/reduxHooks';
 import { setSelectedDialog } from "state/slices/viewSetsSlice";
 
 type Props = {
@@ -43,7 +43,7 @@ const ViewStudysetFilters = ({
     selectedSort,
     setSelectedSort,
 }: Props) => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     const categoryTabs = useMemo(() => {
         const jointCategories = [

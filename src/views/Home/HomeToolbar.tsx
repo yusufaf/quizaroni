@@ -40,7 +40,7 @@ import {
     setLabelsDialogProps,
     showConfirmDialog,
 } from "state/slices/globalSlice";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from 'state/reduxHooks';
 import { useNavigate } from "react-router-dom";
 import { useUpdateStudysetMutation } from "state/api/studysetsAPI";
 
@@ -69,7 +69,7 @@ const HomeToolbar = ({
     selectedStudysetRows,
     selectedStudysetUUIDs,
 }: Props) => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     const [updateStudyset] = useUpdateStudysetMutation();

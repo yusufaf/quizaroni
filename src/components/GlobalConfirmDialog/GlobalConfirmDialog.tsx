@@ -6,7 +6,7 @@ import {
     Typography,
     DialogContent,
 } from "@mui/material/";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import {
     selectConfirmDialogProps,
     setConfirmDialogProps,
@@ -32,8 +32,8 @@ import { v4 as uuidv4 } from "uuid";
 type Props = {};
 const ConfirmDialog = (props: Props) => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const dialogProps = useSelector(selectConfirmDialogProps);
+    const dispatch = useAppDispatch();
+    const dialogProps = useAppSelector(selectConfirmDialogProps);
 
     const { mutate: deleteStudySet } = useCustomMutation({
         mutation: useDeleteStudysetMutation,
