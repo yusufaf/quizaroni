@@ -22,6 +22,8 @@ export const handler: Handler = async (
     console.log(JSON.stringify({ event, context }, null, 4));
 
     const body: RequestBody = JSON.parse(event.body ?? "{}");
+    console.log(JSON.stringify({body}, null, 4));
+
     const { key } = body;    
 
     try {

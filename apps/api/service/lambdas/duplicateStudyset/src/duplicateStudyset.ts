@@ -27,6 +27,8 @@ export const handler: Handler = async (
     try {
         const { sub: userUUID, username } = event.requestContext.authorizer.lambda
         const body: RequestBody = JSON.parse(event.body ?? "{}");
+        console.log(JSON.stringify({body}, null, 4));
+        
         const { studysetUUID } = body;
 
         const getCommand = new GetCommand({

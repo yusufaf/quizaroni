@@ -32,6 +32,8 @@ export const handler: Handler = async (
 
     const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
     const body: RequestBody = JSON.parse(event.body ?? "{}");
+    console.log(JSON.stringify({body}, null, 4));
+
     const { cardUUID, noteUUID, studysetUUID, text: newText } = body;
 
     try {
