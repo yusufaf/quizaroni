@@ -31,6 +31,7 @@ export type Card = {
     backgroundColor?: string;
     categories: string[];
     definition: string;
+    files: CardFileMetadata[];
     important: boolean;
     notes: Note[];
     term: string;
@@ -56,6 +57,11 @@ export type StudysetMetadata = {
     terminology: string;
     textColorVisible: boolean;
 };
+
+export type CardFileMetadata = FileMetadata & {
+    association: 'term' | 'definition';
+}
+
 // #endregion
 
 // #region User

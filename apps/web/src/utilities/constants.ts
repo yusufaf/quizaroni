@@ -56,6 +56,7 @@ export const FLASHSET_COLUMNS = {
 export const EMPTY_CARD: Card = {
     categories: [],
     definition: "",
+    files: [],
     important: false,
     notes: [],
     term: "",
