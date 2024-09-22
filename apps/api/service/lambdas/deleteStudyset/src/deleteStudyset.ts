@@ -3,7 +3,7 @@ import {
     APIGatewayProxyResultV2,
     Handler,
 } from "aws-lambda";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, ReturnValue } from "@aws-sdk/client-dynamodb";
 import { DeleteCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { AuthorizerContext } from "models/auth";
@@ -29,13 +29,20 @@ export const handler: Handler = async (
     const { studysetUUID } = body;
 
     try {
-        // const deleteCommand = new DeleteCommand({
-        //     TableName: mainTable,
-        //     Item: initialStudySet
-        // })
+        
+        const deleteCommand = new DeleteCommand({
+            TableName: mainTable,
+            Key: {
+                PK: `userUUID#${userUUID}`,
+                SK: `studyset#${studysetUUID}`,
+            },
+            ReturnValues: ReturnValue.ALL_OLD
+        })
 
-        // await docClient.send(deleteCommand);
+        const deleteResponse = await docClient.send(deleteCommand);
+        console.log(JSON.stringify(deleteResponse, null, 4));
 
+        // TODO: Delete all associated files
 
         return {
             statusCode: 200,
