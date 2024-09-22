@@ -1,18 +1,18 @@
-import { FileMetadata, Part, UUID } from "lib/types";
+import { FileMetadata, Part, UUID } from 'lib/types';
 
 export const BASE_API_URL =
-    "https://c0yfrps22e.execute-api.us-west-2.amazonaws.com/api";
+    'https://c0yfrps22e.execute-api.us-west-2.amazonaws.com/api';
 
 export const getCommonPostRequestProps = (): RequestInit => {
     const { accessToken, idToken } = getCognitoTokens();
 
     return {
-        credentials: "omit",
+        credentials: 'omit',
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             authorization: `${accessToken} ${idToken}`,
         },
-        method: "POST",
+        method: 'POST',
     };
 };
 
@@ -21,7 +21,7 @@ export const getCognitoTokens = (): {
     idToken: string;
     refreshToken: string;
 } => {
-    const propertiesToRetrieve = ["idToken", "refreshToken", "accessToken"];
+    const propertiesToRetrieve = ['idToken', 'refreshToken', 'accessToken'];
     const tokens = {};
 
     for (const key in localStorage) {
@@ -29,8 +29,8 @@ export const getCognitoTokens = (): {
             continue;
         }
 
-        const value = localStorage.getItem(key) ?? "";
-        const propertyName = key.split(".")[3];
+        const value = localStorage.getItem(key) ?? '';
+        const propertyName = key.split('.')[3];
         if (propertyName && value) {
             tokens[propertyName] = value;
         }
@@ -41,9 +41,9 @@ export const getCognitoTokens = (): {
 };
 
 type InitiateMultipartUploadProps = {
-    studysetUUID: UUID;
-    fileName: string;
     contentType: string;
+    fileName: string;
+    studysetUUID?: UUID;
 };
 
 type InitiateMultipartUploadResponse = {
@@ -51,9 +51,9 @@ type InitiateMultipartUploadResponse = {
     uploadId: string | undefined;
 };
 export const initiateMultipartUpload = async ({
-    studysetUUID = "",
-    fileName,
     contentType,
+    fileName,
+    studysetUUID = '',
 }: InitiateMultipartUploadProps): Promise<InitiateMultipartUploadResponse> => {
     const url = `${BASE_API_URL}/files/initiate-multipart-upload`;
     return await fetch(url, {
@@ -64,8 +64,8 @@ export const initiateMultipartUpload = async ({
 
 type GetMultipartSignedUploadUrlsProps = {
     key: string;
-    uploadId: string;
     numParts: number;
+    uploadId: string;
 };
 
 type GetMultipartSignedUploadUrlsResponse = {
@@ -73,8 +73,8 @@ type GetMultipartSignedUploadUrlsResponse = {
 };
 export const getMultipartSignedUploadUrls = async ({
     key,
-    uploadId,
     numParts,
+    uploadId,
 }: GetMultipartSignedUploadUrlsProps): Promise<GetMultipartSignedUploadUrlsResponse> => {
     const url = `${BASE_API_URL}/files/get-multipart-signed-upload-urls`;
     return await fetch(url, {
@@ -84,20 +84,33 @@ export const getMultipartSignedUploadUrls = async ({
 };
 
 type CompleteMultipartUploadProps = {
+    association?: 'term' | 'definition';
+    cardUUID?: string;
     key: string;
-    uploadId: string;
     parts: Part[];
+    studysetUUID?: UUID;
+    uploadId: string;
 };
 
 type CompleteMultipartUploadResponse = FileMetadata;
 export const completeMultipartUpload = async ({
+    association,
+    cardUUID,
     key,
-    uploadId,
     parts,
+    studysetUUID,
+    uploadId,
 }: CompleteMultipartUploadProps): Promise<CompleteMultipartUploadResponse> => {
     const url = `${BASE_API_URL}/files/complete-multipart-upload`;
     return await fetch(url, {
-        body: JSON.stringify({ key, uploadId, parts }),
+        body: JSON.stringify({
+            association,
+            cardUUID,
+            key,
+            parts,
+            studysetUUID,
+            uploadId,
+        }),
         ...getCommonPostRequestProps(),
     }).then((response) => response.json());
 };
@@ -120,46 +133,6 @@ export const sendFeedback = async ({ key }: SendFeedbackProps) => {
     const url = `${BASE_API_URL}/files/sendFeedback`;
     return await fetch(url, {
         body: JSON.stringify({ key }),
-        ...getCommonPostRequestProps(),
-    }).then((response) => response.json());
-};
-
-/* ==== Studysets ==== */
-type CreateStudysetProps = {};
-export const createStudyset = async () => {
-    const url = `${BASE_API_URL}/studysets/create-studyset`;
-    return await fetch(url, {
-        // body: JSON.stringify({}),
-        ...getCommonPostRequestProps(),
-    }).then((response) => response.json());
-};
-
-type DeleteStudysetProps = {
-    studysetUUID: UUID;
-};
-export const deleteStudyset = async ({ studysetUUID }: DeleteStudysetProps) => {
-    const url = `${BASE_API_URL}/studysets/delete-studyset`;
-    return await fetch(url, {
-        body: JSON.stringify({ studysetUUID }),
-        ...getCommonPostRequestProps(),
-    }).then((response) => response.json());
-};
-
-type GetStudysetProps = {
-    studysetUUID: UUID;
-};
-export const getStudyset = async ({ studysetUUID }: GetStudysetProps) => {
-    const url = `${BASE_API_URL}/studysets/get-studyset`;
-    return await fetch(url, {
-        body: JSON.stringify({ studysetUUID }),
-        ...getCommonPostRequestProps(),
-    }).then((response) => response.json());
-};
-
-type GetAllStudysetsProps = {};
-export const getAllStudysets = async () => {
-    const url = `${BASE_API_URL}/studysets/get-all-studysets`;
-    return await fetch(url, {
         ...getCommonPostRequestProps(),
     }).then((response) => response.json());
 };

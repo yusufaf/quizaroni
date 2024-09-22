@@ -74,7 +74,7 @@ export const studysetsApi = api.injectEndpoints({
             query: ({ studysetUUID }) => ({
                 url: `${BASE_API_URL}/studysets/delete-studyset`,
                 ...getCommonPostRequestProps(),
-                params: { studysetUUID },
+                body: { studysetUUID },
             }),
             // invalidatesTags: ["Studyset"],
             invalidatesTags: [{ type: 'Studyset', id: 'LIST' }],

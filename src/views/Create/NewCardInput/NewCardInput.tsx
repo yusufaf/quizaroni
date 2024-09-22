@@ -1,9 +1,7 @@
-import {
-    Add,
-} from "@mui/icons-material";
-import FileUpload from "components/FileUpload/FileUpload";
-import type { TODO } from "lib/types";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Add } from '@mui/icons-material';
+import FileUpload from 'components/FileUpload/FileUpload';
+import type { Card, TODO } from 'lib/types';
+import { Dispatch, SetStateAction, useState } from 'react';
 import {
     AddCardBelowButton,
     BottomActions,
@@ -14,51 +12,50 @@ import {
     NewCardLabel,
     NewCardRow,
     NewCardTerm,
-} from "../CreateSetStyles";
-import useFileUpload from "lib/hooks/useFileUpload";
-import NewCardHeader from "./NewCardHeader";
+} from '../CreateSetStyles';
+import useFileUpload from 'lib/hooks/useFileUpload';
+import NewCardHeader from './NewCardHeader';
 import { useAppSelector } from 'state/reduxHooks';
-import { selectCognitoUser } from "state/slices/globalSlice";
-import { addCard } from "utilities/createUtils";
-import { useParams } from "react-router-dom";
+import { selectCognitoUser } from 'state/slices/globalSlice';
+import { addCard } from 'utilities/createUtils';
+import { useParams } from 'react-router-dom';
 
 type Props = {
     actionsStack: TODO[];
-    cardValues: any;
-    createdSetCards: any;
+    card: Card;
+    createdSetCards: Card[];
     index: number;
-    onColorChange: any;
+    onColorChange: (event: any, property: string, index: number) => void;
     setActionsStack: Dispatch<SetStateAction<TODO[]>>;
-    setCreatedSetCards: any;
-    updateCardValue: any;
+    setCreatedSetCards: Dispatch<SetStateAction<Card[]>>;
+    updateCardValue: (index: number, property: string, value: any) => void;
 };
-const NewCardInput = (props: Props) => {
+const NewCardInput = ({
+    actionsStack,
+    card,
+    createdSetCards,
+    index,
+    onColorChange,
+    setActionsStack,
+    setCreatedSetCards,
+    updateCardValue,
+}: Props) => {
     const {
-        actionsStack,
-        cardValues,
-        createdSetCards,
-        index,
-        onColorChange,
-        setActionsStack,
-        setCreatedSetCards,
-        updateCardValue,
-    } = props;
-
-    const {
+        cardUUID,
         term,
         definition,
-        backgroundColor = "",
-        textColor = "",
-        uuid,
-    } = cardValues;
+        backgroundColor = '',
+        textColor = '',
+    } = card;
 
-    const { id: studysetUUID = "" } = useParams();
+    const { id: studysetUUID = '' } = useParams();
 
     const setStateCallback = setCreatedSetCards;
 
     const cognitoUser = useAppSelector(selectCognitoUser);
     const { uploadFile } = useFileUpload({
-        studysetUUID
+        cardUUID,
+        studysetUUID,
     });
 
     const [localTextColor, setLocalTextColor] = useState(textColor);
@@ -74,7 +71,7 @@ const NewCardInput = (props: Props) => {
     return (
         <NewCard
             raised
-            key={uuid}
+            key={cardUUID}
             sx={{
                 background: displayBackgroundColor
                     ? localBackgroundColor
@@ -104,9 +101,9 @@ const NewCardInput = (props: Props) => {
                         <NewCardLabel variant="subtitle1">Term</NewCardLabel>
                         <NewCardInputField
                             variant="standard"
-                            placeholder={"Enter a term"}
+                            placeholder={'Enter a term'}
                             onChange={(e) =>
-                                updateCardValue(index, "term", e.target.value)
+                                updateCardValue(index, 'term', e.target.value)
                             }
                             multiline
                             maxRows={4}
@@ -120,25 +117,21 @@ const NewCardInput = (props: Props) => {
                             }}
                         />
                     </NewCardTerm>
-                    <FileUpload 
-                        handleFiles={uploadFile}
-                    />
-                </NewCardRow>
+                    <FileUpload handleFiles={(files) => uploadFile(files, 'term')} />
+                    </NewCardRow>
                 <NewCardRow>
-                    <FileUpload 
-                        handleFiles={uploadFile}
-                    />
-                    <NewCardDefinition>
+                <FileUpload handleFiles={(files) => uploadFile(files, 'definition')} />
+                <NewCardDefinition>
                         <NewCardLabel variant="subtitle1">
                             Definition
                         </NewCardLabel>
                         <NewCardInputField
                             variant="standard"
-                            placeholder={"Enter a definition"}
+                            placeholder={'Enter a definition'}
                             onChange={(e) =>
                                 updateCardValue(
                                     index,
-                                    "definition",
+                                    'definition',
                                     e.target.value
                                 )
                             }
@@ -160,9 +153,11 @@ const NewCardInput = (props: Props) => {
                         <AddCardBelowButton
                             onClick={() =>
                                 addCard({
+                                    actionsStack,
                                     createdSetCards,
                                     index,
                                     setStateCallback,
+                                    setActionsStack,
                                 })
                             }
                             title="Add card below"
