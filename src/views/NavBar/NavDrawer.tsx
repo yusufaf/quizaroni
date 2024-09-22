@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
     Button,
     Drawer,
@@ -10,13 +10,14 @@ import {
 import { Create, Menu } from "@mui/icons-material";
 import { StyledNavLink } from "./NavStyles";
 import DarkModeToggleButton from "./DarkModeToggleButton";
-import { createStudyset } from "api/awsAPI";
 import { useNavigate } from "react-router-dom";
+import { useCreateStudysetMutation } from "state/api/studysetsAPI";
 
 const NavDrawer = (props) => {
     const [openDrawer, setOpenDrawer] = useState(false);
 
     const navigate = useNavigate();
+    const [createStudyset] = useCreateStudysetMutation();
 
     const handleCloseDrawer = () => {
         setOpenDrawer(false);
@@ -28,8 +29,10 @@ const NavDrawer = (props) => {
 
     // TODO: Switch to RTK query after
     const handleCreateStudyset = async () => {
-        const { studyset } = await createStudyset();
-        navigate(`/create/${studyset.studysetUUID}`)
+        createStudyset({}).unwrap().then((response) => {
+            const { studyset } = response;
+            navigate(`/edit/${studyset.studysetUUID}`)
+        })
     }
 
     return (

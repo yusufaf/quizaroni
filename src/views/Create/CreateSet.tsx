@@ -143,46 +143,46 @@ const CreateSet = (props: Props) => {
         }
     }, [selectedStudyset]);
 
-    /**
-     * Create a new studyset
-     */
-    const createNewSet = () => {
-        const cards = [...createdSetCards];
+    // /**
+    //  * Create a new studyset
+    //  */
+    // const createNewSet = () => {
+    //     const cards = [...createdSetCards];
 
-        const timestamp = new Date().getTime();
-        const label = (enteredLabel ?? selectedLabel) || null;
-        const metadata = {};
+    //     const timestamp = new Date().getTime();
+    //     const label = (enteredLabel ?? selectedLabel) || null;
+    //     const metadata = {};
 
-        const studySet = {
-            cards,
-            createdAt: timestamp,
-            description,
-            label,
-            lastViewed: timestamp,
-            metadata,
-            title,
-            username,
-            userUUID,
-        };
+    //     const studySet = {
+    //         cards,
+    //         createdAt: timestamp,
+    //         description,
+    //         label,
+    //         lastViewed: timestamp,
+    //         metadata,
+    //         title,
+    //         username,
+    //         userUUID,
+    //     };
 
-        createStudyset(studySet)
-            .unwrap()
-            .then((response: any) => {
-                console.log({ response });
-                toast.success('Successfully created new study set', {
-                    position: toast.POSITION.BOTTOM_LEFT,
-                });
-                const { studySet } = response;
-                const { uuid } = studySet;
-                navigate(`/view/${uuid}`);
-            })
-            .catch((error) => {
-                console.log({ error });
-                toast.error('Error creating new study set', {
-                    position: toast.POSITION.BOTTOM_LEFT,
-                });
-            });
-    };
+    //     createStudyset(studySet)
+    //         .unwrap()
+    //         .then((response: any) => {
+    //             console.log({ response });
+    //             toast.success('Successfully created new study set', {
+    //                 position: toast.POSITION.BOTTOM_LEFT,
+    //             });
+    //             const { studySet } = response;
+    //             const { uuid } = studySet;
+    //             navigate(`/view/${uuid}`);
+    //         })
+    //         .catch((error) => {
+    //             console.log({ error });
+    //             toast.error('Error creating new study set', {
+    //                 position: toast.POSITION.BOTTOM_LEFT,
+    //             });
+    //         });
+    // };
 
     /**
      * Update studyset with new changes
@@ -241,13 +241,13 @@ const CreateSet = (props: Props) => {
     */
     const cardInputs = useMemo(() => {
         return createdSetCards.map((_, index: number) => {
-            const cardValues = createdSetCards[index];
+            const card = createdSetCards[index];
             const props = {
                 actionsStack,
-                cardValues,
+                card,
                 createdSetCards,
                 index,
-                key: cardValues.cardUUID,
+                key: card.cardUUID,
                 onColorChange,
                 setActionsStack,
                 setCreatedSetCards,

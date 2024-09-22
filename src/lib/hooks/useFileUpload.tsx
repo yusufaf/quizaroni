@@ -7,12 +7,14 @@ import {
 import { UUID, Part } from 'lib/types';
 
 type UseFileUploadProps = {
-    studysetUUID: UUID;
+    cardUUID?: UUID;
+    studysetUUID?: UUID;
 };
 
-const useFileUpload = (props: UseFileUploadProps) => {
-    const { studysetUUID } = props;
-
+const useFileUpload = ({
+    cardUUID,
+    studysetUUID,
+}: UseFileUploadProps) => {
     const [uploadUrls, setUploadUrls] = useState(null);
     const [error, setError] = useState<any>(null);
 
@@ -55,7 +57,7 @@ const useFileUpload = (props: UseFileUploadProps) => {
     };
 
     const uploadFile = useCallback(
-        async (files: File[]) => {
+        async (files: File[], association: 'term' | 'definition') => {
             try {
                 const FILE_CHUNK_SIZE = 10_000_000; // 10 MB
 
@@ -84,8 +86,11 @@ const useFileUpload = (props: UseFileUploadProps) => {
                     );
 
                     const fileMetadata = await completeMultipartUpload({
+                        association,
+                        cardUUID,
                         key,
                         parts,
+                        studysetUUID,
                         uploadId,
                     });
                 }
