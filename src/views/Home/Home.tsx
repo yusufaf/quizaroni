@@ -1,39 +1,45 @@
-import { Favorite, FavoriteBorder } from "@mui/icons-material";
+import { Favorite, FavoriteBorder, Save } from '@mui/icons-material';
 import {
+    GridCallbackDetails,
     GridColDef,
+    GridColumnVisibilityModel,
     GridEventListener,
     GridRenderCellParams,
     GridRowSelectionModel,
+    GridSlotsComponentsProps,
     GridSortModel,
     GridToolbar,
-} from "@mui/x-data-grid";
-import { GhostLink, SimpleFlexContainer } from "common/AppStyles";
-import NoCardsWarningsIcon from "components/NoCardsWarningsIcon/NoCardsWarningsIcon";
-import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import useFilterStudysets from "lib/hooks/useFilterStudysets";
-import useSortStudysets from "lib/hooks/useSortStudysets";
-import { HomeView, SortDirection, Studyset } from "lib/types";
-import { useEffect, useRef, useState } from "react";
+    GridToolbarColumnsButton,
+    GridToolbarContainer,
+    GridToolbarDensitySelector,
+    GridToolbarExport,
+    GridToolbarFilterButton,
+} from '@mui/x-data-grid';
+import { GhostLink, SimpleFlexContainer } from 'common/AppStyles';
+import NoCardsWarningsIcon from 'components/NoCardsWarningsIcon/NoCardsWarningsIcon';
+import useBrowserTitle from 'lib/hooks/useBrowserTitle';
+import useFilterStudysets from 'lib/hooks/useFilterStudysets';
+import useSortStudysets from 'lib/hooks/useSortStudysets';
+import { HomeView, SortDirection, Studyset } from 'lib/types';
+import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import { useNavigate } from "react-router-dom";
-import { useGetAllStudysetsQuery } from "state/api/studysetsAPI";
+import { useNavigate } from 'react-router-dom';
+import { useGetAllStudysetsQuery } from 'state/api/studysetsAPI';
 import {
     useGetUserQuery,
     useUpdateUserMetadataMutation,
-} from "state/api/usersAPI";
-import {
-    selectAuthenticated,
-} from "state/slices/globalSlice";
-import { setSelectedStudySet } from "state/slices/studysetsSlice";
+} from 'state/api/usersAPI';
+import { selectAuthenticated } from 'state/slices/globalSlice';
+import { setSelectedStudySet } from 'state/slices/studysetsSlice';
 import {
     DEFAULT_USER_RESPONSE,
     HOME_LAYOUTS,
     PAGE_TITLES,
     SORT_DIRECTIONS,
-} from "utilities/constants";
-import LoginMessage from "views/LoginMessage/LoginMessage";
-import HomeGridView from "./HomeGridView";
-import HomeHTMLView from "./HomeHTMLView";
+} from 'utilities/constants';
+import LoginMessage from 'views/LoginMessage/LoginMessage';
+import HomeGridView from './HomeGridView';
+import HomeHTMLView from './HomeHTMLView';
 import {
     HomeContainer,
     HomePage,
@@ -41,12 +47,60 @@ import {
     HomeSetsContainer,
     HomeSetsHeading,
     StyledDataGrid,
-} from "./HomeStyles";
-import HomeToolbar from "./HomeToolbar";
-import SetActionsMenu from "./SetActionsMenu";
-import { getFormattedTimestamp } from "utilities/functions";
+} from './HomeStyles';
+import HomeToolbar from './HomeToolbar';
+import SetActionsMenu from './SetActionsMenu';
+import { getFormattedTimestamp } from 'utilities/functions';
+import { Box } from '@mui/system';
+import { Button, Tooltip } from '@mui/material';
+
+// augment the props for the toolbar slot
+declare module '@mui/x-data-grid' {
+    interface ToolbarPropsOverrides {
+        columnVisibilityModel: GridColumnVisibilityModel;
+    }
+}
 
 type Props = {};
+
+const CustomToolbar = ({
+    columnVisibilityModel,
+}: NonNullable<GridSlotsComponentsProps['toolbar']>) => {
+    const [
+        updateUserMetadata,
+        {
+            isLoading: isUpdateMetadataLoading,
+            isSuccess: isUpdateMetadataSuccess,
+            isError: isUpdateMetadataError,
+        },
+    ] = useUpdateUserMetadataMutation();
+
+    const handleSaveColumns = async () => {
+        updateUserMetadata({
+            updates: {
+                visibleColumns: columnVisibilityModel,
+            },
+        });
+    };
+
+    return (
+        <GridToolbarContainer>
+            <GridToolbarColumnsButton />
+            <GridToolbarFilterButton />
+            <GridToolbarDensitySelector />
+            <GridToolbarExport />
+            <Tooltip title="Save your current column visibility preferences">
+                <Button
+                    variant="text"
+                    startIcon={<Save />}
+                    onClick={handleSaveColumns}
+                >
+                    Save Columns
+                </Button>
+            </Tooltip>
+        </GridToolbarContainer>
+    );
+};
 
 const Home = (props: Props) => {
     /* Hooks / Redux */
@@ -54,8 +108,9 @@ const Home = (props: Props) => {
     const dispatch = useAppDispatch();
 
     const authenticated = useAppSelector(selectAuthenticated);
-    
-    const { data: { user: { userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
+
+    const { data: { user: { userUUID = '' } } = DEFAULT_USER_RESPONSE } =
+        useGetUserQuery();
 
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
         useGetAllStudysetsQuery({});
@@ -73,14 +128,14 @@ const Home = (props: Props) => {
     useBrowserTitle(PAGE_TITLES.HOME);
 
     /* State */
-    const [searchText, setSearchText] = useState<string>("");
-    const [selectedSort, setSelectedSort] = useState<string>("lastViewed");
+    const [searchText, setSearchText] = useState<string>('');
+    const [selectedSort, setSelectedSort] = useState<string>('lastViewed');
     const [sortDirection, setSortDirection] = useState<SortDirection>(
         SORT_DIRECTIONS.DSC
     );
 
     const [selectedView, setSelectedView] = useState<HomeView>(
-        (localStorage.getItem("homeView") as HomeView) ?? "table"
+        (localStorage.getItem('homeView') as HomeView) ?? 'table'
     );
 
     const [contextMenuStudyset, setContextMenuStudyset] =
@@ -91,23 +146,23 @@ const Home = (props: Props) => {
     } | null>(null);
     const [sortModel, setSortModel] = useState<GridSortModel>([
         {
-            field: "lastViewed",
-            sort: "desc",
+            field: 'lastViewed',
+            sort: 'desc',
         },
     ]);
     const [rowSelectionModel, setRowSelectionModel] =
         useState<GridRowSelectionModel>([]);
 
-        const selectedStudysetRows: Studyset[] = rowSelectionModel
+    const selectedStudysetRows: Studyset[] = rowSelectionModel
         .map((studysetUUID) =>
             studysets.find((studyset) => studyset.studysetUUID === studysetUUID)
-    )
-    .filter(Boolean) as Studyset[];
-    
+        )
+        .filter(Boolean) as Studyset[];
+
     const columns: GridColDef[] = [
         {
-            field: "favorited",
-            headerName: "Favorited",
+            field: 'favorited',
+            headerName: 'Favorited',
             width: 75,
             cellClassName: `favorited-cell`,
             renderCell: (params: GridRenderCellParams<any, boolean>) => (
@@ -121,52 +176,71 @@ const Home = (props: Props) => {
             ),
         },
         {
-            field: "title",
-            headerName: "Title",
+            field: 'title',
+            headerName: 'Title',
             width: 300,
             renderCell: (params: GridRenderCellParams<any, any>) => (
                 <GhostLink to={`/view/${params.id}`}>{params.value}</GhostLink>
             ),
         },
         {
-            field: "description",
-            headerName: "Description",
+            field: 'description',
+            headerName: 'Description',
             width: 300,
         },
         {
-            field: "createdAt",
-            headerName: "Date Created",
-            type: "date",
+            field: 'createdAt',
+            headerName: 'Date Created',
+            type: 'date',
             width: 150,
-            valueGetter: ({ value }) => value && new Date(value),
+            valueGetter: (value) => value && new Date(value),
         },
         {
-            field: "lastViewed",
-            headerName: "Last Viewed",
-            type: "date",
+            field: 'lastViewed',
+            headerName: 'Last Viewed',
+            type: 'date',
             width: 150,
-            valueGetter: ({ value }) => value && new Date(value),
+            valueGetter: (value) => value && new Date(value),
         },
         {
-            field: "numberOfCards",
-            headerName: "# of Cards",
+            field: 'updatedAt',
+            headerName: 'Last Updated',
+            type: 'date',
+            width: 150,
+            valueGetter: (value) => value && new Date(value),
+        },
+        {
+            field: 'numberOfCards',
+            headerName: '# of Cards',
             width: 100,
-            valueGetter: (params) => {
-                return params.row?.cards?.length;
+            valueGetter: (_value, row) => {
+                return row.cards.length;
             },
             renderCell: (params: GridRenderCellParams<any, any>) => (
-                <SimpleFlexContainer style={{ gap: "0.5rem" }}>
+                <SimpleFlexContainer style={{ gap: '0.5rem' }}>
                     <span>{params.row?.cards?.length}</span>
                     {params.row?.cards?.length === 0 && <NoCardsWarningsIcon />}
                 </SimpleFlexContainer>
             ),
         },
         {
-            field: "label",
-            headerName: "Label",
+            field: 'label',
+            headerName: 'Label',
             width: 200,
         },
     ];
+
+    // Create default visibility model where all columns are visible by default
+    const defaultVisibilityModel: GridColumnVisibilityModel = columns.reduce(
+        (acc, column) => {
+            acc[column.field] = true;
+            return acc;
+        },
+        {} as GridColumnVisibilityModel
+    );
+
+    const [columnVisibilityModel, setColumnVisibilityModel] =
+        useState<GridColumnVisibilityModel>(defaultVisibilityModel);
 
     const handleViewChange = (_event: any, newView: string | null) => {
         // Enforces one view always being selected
@@ -174,15 +248,15 @@ const Home = (props: Props) => {
             return;
         }
         updateUserMetadata({
-            uuid: userUUID,
-            property: "homeView",
-            newValue: newView,
+            updates: {
+                homeView: newView,
+            },
         });
         setSelectedView(newView as HomeView);
-        localStorage.setItem("homeView", newView);
+        localStorage.setItem('homeView', newView);
     };
 
-    const onRowDoubleClick: GridEventListener<"rowDoubleClick"> = (
+    const onRowDoubleClick: GridEventListener<'rowDoubleClick'> = (
         params, // GridRowParams
         event, // MuiEvent<React.MouseEvent<HTMLElement>>
         details // GridCallbackDetails
@@ -199,7 +273,8 @@ const Home = (props: Props) => {
 
         const localStudyset = studysets.find(
             (studyset: Studyset) =>
-                studyset.studysetUUID === event.currentTarget.getAttribute("data-id")
+                studyset.studysetUUID ===
+                event.currentTarget.getAttribute('data-id')
         );
         if (localStudyset) {
             setContextMenuStudyset(localStudyset);
@@ -240,6 +315,13 @@ const Home = (props: Props) => {
         searchText,
         studysets: sortedStudysets,
     });
+
+    const handleColumnVisibilityChange = (
+        newModel: GridColumnVisibilityModel,
+        _details: GridCallbackDetails
+    ) => {
+        setColumnVisibilityModel(newModel);
+    };
 
     // TODO: Replace this
     if (!authenticated) {
@@ -288,18 +370,29 @@ const Home = (props: Props) => {
                                     checkboxSelection
                                     // disableSelectionOnClick
                                     onRowDoubleClick={onRowDoubleClick}
-                                    slots={{ toolbar: GridToolbar }}
+                                    slots={{
+                                        toolbar: CustomToolbar
+                                    }}
                                     slotProps={{
                                         toolbar: {
-                                            csvOptions: { fileName: `Quizaroni_Studysets_${getFormattedTimestamp()}` },
+                                            csvOptions: {
+                                                fileName: `Quizaroni_Studysets_${getFormattedTimestamp()}`,
+                                            },
                                             showQuickFilter: true,
+                                            columnVisibilityModel
                                         },
                                         row: {
                                             onContextMenu: handleContextMenu,
-                                            style: { cursor: "context-menu" },
+                                            style: { cursor: 'context-menu' },
                                         },
                                     }}
                                     getRowId={(row) => row.studysetUUID}
+                                    columnVisibilityModel={
+                                        columnVisibilityModel
+                                    }
+                                    onColumnVisibilityModelChange={
+                                        handleColumnVisibilityChange
+                                    }
                                 />
                                 <SetActionsMenu
                                     anchorPosition={

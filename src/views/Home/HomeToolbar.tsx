@@ -143,7 +143,7 @@ const HomeToolbar = ({
     };
 
     return (
-        <SpacedFlexContainer style={{ alignItems: "baseline" }}>
+        (<SpacedFlexContainer style={{ alignItems: "baseline" }}>
             {!isTableView && (
                 <SimpleFlexContainer style={{ gap: "1rem" }}>
                     <TextField
@@ -162,7 +162,7 @@ const HomeToolbar = ({
                                 </InputAdornment>
                             ) : (
                                 // Spacing div to prevent moving when no search text
-                                <div style={{ width: "3rem" }} />
+                                (<div style={{ width: "3rem" }} />)
                             ),
                         }}
                         variant="standard"
@@ -293,7 +293,7 @@ const HomeToolbar = ({
                     <HTMLIcon />
                 </ToggleButton>
             </ToggleButtonGroup>
-        </SpacedFlexContainer>
+        </SpacedFlexContainer>)
     );
 };
 
