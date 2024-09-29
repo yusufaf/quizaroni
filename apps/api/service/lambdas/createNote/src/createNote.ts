@@ -93,7 +93,7 @@ export const handler: Handler = async (
             statusCode: 200,
             body: JSON.stringify({
                 message: "Successfully created note",
-                // studyset: initialStudySet,
+                noteUUID,
             }),
         };
     } catch (err) {
