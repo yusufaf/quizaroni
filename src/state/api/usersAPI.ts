@@ -1,6 +1,6 @@
 import { BASE_API_URL, getCommonPostRequestProps } from "api/awsAPI";
 import api from "./api";
-import { CreateUserParams, GetUserParams, GetUserResponse, UpdateDefaultThemeParams, UpdateEmailParams, UpdateMetadataParams, User } from "lib/types";
+import { CreateUserParams, GetUserParams, GetUserResponse, UpdateDefaultThemeParams, UpdateEmailParams, UpdateUserMetadataParams, User } from "lib/types";
 
 /* Endpoints
     router.post("/api/users/create", createUser);
@@ -32,15 +32,11 @@ export const usersApi = api.injectEndpoints({
                 ]
             },
         }),
-        updateUserMetadata: build.mutation<void, UpdateMetadataParams>({
-            query: ({ property, newValue, uuid }) => ({
-                url: "users/updateMetadata",
-                method: "POST",
-                body: {
-                    property,
-                    newValue,
-                    uuid,
-                },
+        updateUserMetadata: build.mutation<void, UpdateUserMetadataParams>({
+            query: ({ updates }) => ({
+                url: `${BASE_API_URL}/users/update-metadata`,
+                ...getCommonPostRequestProps(),
+                body: { updates },
             }),
             invalidatesTags: ["User"],
         }),

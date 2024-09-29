@@ -94,9 +94,9 @@ const NamedColorsDialog = (props: Props) => {
         };
         const newNamedColors = [...namedColors, newColorObject];
         updateUserMetadata({
-            uuid: userUUID,
-            property: "namedColors",
-            newValue: newNamedColors,
+            updates: {
+                namedColors: newNamedColors
+            }
         });
     };
 

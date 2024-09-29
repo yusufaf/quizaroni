@@ -138,10 +138,8 @@ export type CreateUserParams = {
     username: string;
 };
 
-export type UpdateMetadataParams = {
-    uuid: UUID;
-    property: string;
-    newValue: any;
+export type UpdateUserMetadataParams = {
+    updates: Updates;
 };
 
 export type UpdateDefaultThemeParams = {
