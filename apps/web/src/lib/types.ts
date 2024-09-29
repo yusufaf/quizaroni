@@ -160,6 +160,10 @@ export type EditCategoryParams = StudysetUUIDPayload & {
     oldCategory: string;
 };
 
+export type CreateNoteResponse = { 
+    noteUUID: string; 
+};
+
 export type CreateNoteParams = StudysetUUIDPayload & {
     cardUUID: UUID;
 };

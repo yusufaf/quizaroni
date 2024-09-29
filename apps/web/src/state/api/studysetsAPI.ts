@@ -20,6 +20,7 @@ import {
     GetStudysetResponse,
     CreateStudysetResponse,
     BatchUpdateStudysetsParams,
+    CreateNoteResponse,
 } from 'lib/types';
 
 // TODO: Look into set actions delete, duplicate, favorite. Currently fetches all studysets again once called.
@@ -104,7 +105,7 @@ export const studysetsApi = api.injectEndpoints({
                 body: { studysetUpdates },
             }),
             // invalidatesTags: (_result, _error, arg) => [
-                // { type: 'Studyset', id: arg.studysetUUID },
+            // { type: 'Studyset', id: arg.studysetUUID },
             // ],
         }),
         editCategory: build.mutation<Studyset, EditCategoryParams>({
@@ -117,7 +118,7 @@ export const studysetsApi = api.injectEndpoints({
                 { type: 'Studyset', id: arg.studysetUUID },
             ],
         }),
-        createNote: build.mutation<void, CreateNoteParams>({
+        createNote: build.mutation<CreateNoteResponse, CreateNoteParams>({
             query: ({ cardUUID, studysetUUID }) => ({
                 url: `${BASE_API_URL}/studysets/create-note`,
                 ...getCommonPostRequestProps(),
@@ -126,6 +127,70 @@ export const studysetsApi = api.injectEndpoints({
             invalidatesTags: (_result, _error, arg) => [
                 { type: 'Studyset', id: arg.studysetUUID },
             ],
+            async onQueryStarted(
+                { cardUUID, studysetUUID },
+                { dispatch, queryFulfilled }
+            ) {
+                // Optimistically update the cache
+                const patchResult = dispatch(
+                    api.util.updateQueryData(
+                        // @ts-ignore
+                        'getStudyset',
+                        studysetUUID,
+                        (draft) => {
+                            // @ts-ignore
+                            const cachedStudyset: Studyset = draft.studyset;
+                            const cardToUpdate = cachedStudyset.cards.find(
+                                (card) => card.cardUUID === cardUUID
+                            );
+
+                            if (cardToUpdate) {
+                                cardToUpdate.notes.push({
+                                    noteUUID: 'temporary-id', // Temporary ID until the real one is returned
+                                    text: '',
+                                });
+                            } else {
+                                console.error(
+                                    `Card with cardUUID ${cardUUID} not found in the studyset.`
+                                );
+                            }
+                        }
+                    )
+                );
+
+                try {
+                    const { data } = await queryFulfilled;
+                    console.log("We out here");
+                    // Update the cache to replace the `temporary-id` with the real noteUUID
+                    dispatch(
+                        api.util.updateQueryData(
+                            // @ts-ignore
+                            'getStudyset',
+                            studysetUUID,
+                            (draft) => {
+                                const cardToUpdate = draft.studyset.cards.find(
+                                    (card) => card.cardUUID === cardUUID
+                                );
+                                const noteToUpdate = cardToUpdate?.notes.find(
+                                    (note) => note.noteUUID === 'temporary-id'
+                                );
+
+                                if (noteToUpdate) {
+                                    // Replace the temporary-id with the real ID from the server
+                                    noteToUpdate.noteUUID = data.noteUUID; // Assuming the server response contains `noteUUID`
+                                }
+                            }
+                        )
+                    );
+                } catch {
+                    // Invalidate the cache for the Studyset to trigger a re-fetch
+                    dispatch(
+                        api.util.invalidateTags([
+                            { type: 'Studyset', id: studysetUUID },
+                        ])
+                    );
+                }
+            },
         }),
         deleteNote: build.mutation<void, DeleteNoteParams>({
             query: ({ cardUUID, noteUUID, studysetUUID }) => ({
@@ -164,10 +229,10 @@ export const studysetsApi = api.injectEndpoints({
             invalidatesTags: ['Studyset', 'User'],
         }),
         editLabel: build.mutation<void, EditLabelParams>({
-            query: ({ index, newLabel, oldLabel  }) => ({
+            query: ({ index, newLabel, oldLabel }) => ({
                 url: `${BASE_API_URL}/studysets/edit-label`,
                 ...getCommonPostRequestProps(),
-                body: { index, newLabel, oldLabel  },
+                body: { index, newLabel, oldLabel },
             }),
             invalidatesTags: ['Studyset', 'User'],
         }),
