@@ -9,19 +9,16 @@ import {
     GetCommand,
     UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { v4 as uuidv4 } from 'uuid';
 import { AuthorizerContext } from 'models/auth';
 import { removeKeys } from 'resources/dynamo/utilities';
 
-const { mainTable = '' } = process.env;
+const { usersTable = '' } = process.env;
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 type RequestBody = {
-    studysetUUID: string;
     updates: { [key: string]: any };
-    isMetadataUpdate?: boolean;
 };
 
 export const handler: Handler = async (
@@ -34,11 +31,11 @@ export const handler: Handler = async (
     const body: RequestBody = JSON.parse(event.body ?? '{}');
     console.log(JSON.stringify({ body }, null, 4));
 
-    const { isMetadataUpdate = false, studysetUUID, updates } = body;
+    const { updates } = body;
 
     try {
         const PK = `userUUID#${userUUID}`;
-        const SK = `studyset#${studysetUUID}`;
+        const SK = `userData`;
         const updatedAt = new Date().toISOString();
 
         // Ensure `updatedAt` and `updatedBy` are at the top level
@@ -60,18 +57,14 @@ export const handler: Handler = async (
             ExpressionAttributeValues[attributeValue] = value;
         }
 
-        if (isMetadataUpdate) {
-            // Ensure #metadata is set only once
-            ExpressionAttributeNames[`#metadata`] = 'metadata';
-        }
+        // Ensure #metadata is set only once
+        ExpressionAttributeNames[`#metadata`] = 'metadata';
 
         for (const [key, value] of Object.entries(updates)) {
             const attributeValue = `:${key}`;
 
             // Determine the correct key path for metadata vs. standard update
-            const attributeKey = isMetadataUpdate
-                ? `#metadata.#${key}`
-                : `#${key}`;
+            const attributeKey = `#metadata.#${key}`;
 
             // Add the key to ExpressionAttributeNames (same for both cases)
             ExpressionAttributeNames[`#${key}`] = key;
@@ -95,7 +88,7 @@ export const handler: Handler = async (
                 PK,
                 SK,
             },
-            TableName: mainTable,
+            TableName: usersTable,
             ExpressionAttributeNames,
             ExpressionAttributeValues,
             UpdateExpression,
@@ -104,21 +97,21 @@ export const handler: Handler = async (
 
         const getCommand = new GetCommand({
             Key: {
-                PK: `userUUID#${userUUID}`,
-                SK: `studyset#${studysetUUID}`,
+                PK,
+                SK,
             },
-            TableName: mainTable,
+            TableName: usersTable,
         });
         const getResult = await docClient.send(getCommand);
-        const updatedStudyset = getResult.Item;
+        const updatedUser = getResult.Item;
 
-        console.log(JSON.stringify({ updatedStudyset }, null, 4));
+        console.log(JSON.stringify({ updatedStudyset: updatedUser }, null, 4));
 
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: 'Successfully updated study set',
-                studyset: removeKeys(updatedStudyset ?? {}),
+                message: 'Successfully updated user metadata',
+                user: removeKeys(updatedUser ?? {}),
             }),
         };
     } catch (err) {
@@ -126,7 +119,7 @@ export const handler: Handler = async (
         return {
             statusCode: 500,
             body: JSON.stringify({
-                message: 'Error updating study set',
+                message: 'Error updating user metadata',
             }),
         };
     }

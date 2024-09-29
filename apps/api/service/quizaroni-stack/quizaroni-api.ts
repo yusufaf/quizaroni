@@ -133,6 +133,7 @@ export class QuizaroniAPI extends Construct {
         new HttpStage(this, `${deploymentType}-stage}`, {
             httpApi: api,
             stageName: deploymentType,
+            autoDeploy: true,
         });
 
         this.createUpdateLambdaRoles();
@@ -262,6 +263,10 @@ export class QuizaroniAPI extends Construct {
             {
                 route: `${usersPrefix}/get-user`,
                 lambdaName: "getUser",
+            },
+            {
+                route: `${usersPrefix}/update-metadata`,
+                lambdaName: "updateUserMetadata",
             },
         ];
 
