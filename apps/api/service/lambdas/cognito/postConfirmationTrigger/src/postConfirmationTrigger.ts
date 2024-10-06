@@ -1,17 +1,15 @@
-import { SES } from "@aws-sdk/client-ses";
-import {
-    PostConfirmationTriggerHandler
-} from "aws-lambda";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { SES } from '@aws-sdk/client-ses';
+import { PostConfirmationTriggerHandler } from 'aws-lambda';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 
-const { usersTable = "" } = process.env;
+const { usersTable = '' } = process.env;
 
 const client = new DynamoDBClient();
 const docClient = DynamoDBDocumentClient.from(client);
 
 /**
- * @see https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-post-confirmation.html 
+ * @see https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-post-confirmation.html
  */
 export const handler: PostConfirmationTriggerHandler = async (
     event,
@@ -21,36 +19,41 @@ export const handler: PostConfirmationTriggerHandler = async (
 
     const { request, userName: username, triggerSource } = event;
     const { clientMetadata, userAttributes } = request;
-    const { email, email_verified: emailVerified, sub: userUUID } = userAttributes;
+    const {
+        email,
+        email_verified: emailVerified,
+        sub: userUUID,
+    } = userAttributes;
     const timestamp = new Date().toISOString();
 
     try {
         switch (triggerSource) {
-            case "PostConfirmation_ConfirmSignUp":
+            case 'PostConfirmation_ConfirmSignUp':
                 const newUserItem = {
                     PK: `user#${userUUID}`,
-                    SK: "userData",
+                    SK: 'userData',
                     createdAt: timestamp,
                     email,
                     emailVerified,
                     labels: [],
                     metadata: {
-                        defaultTheme: "dark",
-                        homeView: "table",
+                        defaultTheme: 'dark',
+                        homeView: 'table',
                         namedColors: [],
+                        visibleColumns: {},
                     },
                     updatedAt: timestamp,
                     username,
                     userUUID,
-                }
+                };
                 const putCommand = new PutCommand({
                     TableName: usersTable,
-                    Item: newUserItem
-                })
+                    Item: newUserItem,
+                });
                 await docClient.send(putCommand);
 
                 break;
-            case "PostConfirmation_ConfirmForgotPassword":
+            case 'PostConfirmation_ConfirmForgotPassword':
                 break;
         }
 
