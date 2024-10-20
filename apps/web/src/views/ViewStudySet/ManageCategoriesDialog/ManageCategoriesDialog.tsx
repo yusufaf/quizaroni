@@ -4,9 +4,7 @@ import useCustomMutation from 'lib/hooks/useCustomMutation';
 import { Studyset } from 'lib/types';
 import { ChangeEvent, ReactNode, SyntheticEvent, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import {
-    useUpdateStudysetMutation,
-} from 'state/api/studysetsAPI';
+import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 import {
     capitalizeFirstLetter,
     downloadObjectAsJSON,
@@ -29,8 +27,9 @@ import {
     SimpleFlexContainer,
     StyledDialogTitle,
 } from 'common/AppStyles';
-import CloseDialogButton from 'components/CloseDialogButton/CloseDialogButton';
+import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
 import { Download } from '@mui/icons-material';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 
 type Props = {
     open: boolean;
@@ -199,8 +198,8 @@ const ManageCategoriesDialog = (props: Props) => {
             if (card.cardUUID === selectedCardUUID) {
                 return {
                     ...card,
-                    categories: newCategories
-                }
+                    categories: newCategories,
+                };
             }
             return card;
         });
@@ -340,10 +339,10 @@ const ManageCategoriesDialog = (props: Props) => {
 
     return (
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
-            <StyledDialogTitle>
-                {capitalizeFirstLetter(selectedTab.toLowerCase())} Categories
-                <CloseDialogButton onClose={onClose} />
-            </StyledDialogTitle>
+            <StandardDialogTitle
+                title={`${capitalizeFirstLetter(selectedTab.toLowerCase())} Categories`}
+                onClose={onClose}
+            />
             <StyledDialogContent>
                 <div>
                     <Tabs

@@ -1,38 +1,44 @@
-import { Person, RemoveCircleOutline, EmailRounded } from "@mui/icons-material";
-import { Typography, TextField } from "@mui/material";
-import DeleteAccountDialog from "./DeleteAccountDialog/DeleteAccountDialog";
+import {
+    Person,
+    RemoveCircleOutline,
+    EmailRounded,
+    DataUsageRounded,
+} from '@mui/icons-material';
+import { Typography, TextField } from '@mui/material';
+import DeleteAccountDialog from './DeleteAccountDialog';
 import {
     AccountViewContainer,
     ActionHeader,
     ActionSection,
     ActionSubmitButton,
     InfoChangeContainer,
-} from "./ProfileStyles";
-import { useState } from "react";
+} from './ProfileStyles';
+import { useState } from 'react';
 import {
     type UpdateUserAttributeOutput,
     updateUserAttribute,
-} from "@aws-amplify/auth";
-import { EMAIL_REGEX } from "utilities/constants";
-import { useNavigate } from "react-router-dom";
-import { User } from "lib/types";
+} from '@aws-amplify/auth';
+import { EMAIL_REGEX } from 'utilities/constants';
+import { useNavigate } from 'react-router-dom';
+import { User } from 'lib/types';
 import { useAppDispatch } from 'state/reduxHooks';
-import { setConfirmationCodeDialogProps } from "state/slices/globalSlice";
-import ChangePasswordSection from "./ChangePasswordSection/ChangePasswordSection";
+import { setConfirmationCodeDialogProps } from 'state/slices/globalSlice';
+import ChangePasswordSection from './ChangePasswordSection';
+import DownloadDataDialog from './DownloadDataDialog';
 
 type Props = {
     userData: User;
 };
-const AccountTab = (props: Props) => {
-    const { userData } = props;
-
+const AccountTab = ({ userData }: Props) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [deletePassword, setDeletePassword] = useState<string>("");
-    const [enteredNewUsername, setEnteredNewUsername] = useState<string>("");
-    const [newEmail, setNewEmail] = useState<string>("");
+    const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
+    const [showDownloadDialog, setShowDownloadDialog] =
+        useState<boolean>(false);
+    const [deletePassword, setDeletePassword] = useState<string>('');
+    const [enteredNewUsername, setEnteredNewUsername] = useState<string>('');
+    const [newEmail, setNewEmail] = useState<string>('');
 
     const isNewEmailValid = EMAIL_REGEX.test(newEmail);
 
@@ -47,12 +53,12 @@ const AccountTab = (props: Props) => {
         // TODO
     };
 
-    const handleShowDeleteDialog = () => {
-        setShowDeleteDialog(true);
+    const toggleDeleteDialog = () => {
+        setShowDeleteDialog((prevShowDelete) => !prevShowDelete);
     };
 
-    const handleCloseDeleteDialog = () => {
-        setShowDeleteDialog(false);
+    const toggleDownloadDataDialog = () => {
+        setShowDownloadDialog((prevShowDownload) => !prevShowDownload);
     };
 
     const handleUpdateUserAttribute = async (
@@ -78,38 +84,38 @@ const AccountTab = (props: Props) => {
         const { nextStep } = output;
 
         switch (nextStep.updateAttributeStep) {
-            case "CONFIRM_ATTRIBUTE_WITH_CODE":
+            case 'CONFIRM_ATTRIBUTE_WITH_CODE':
                 dispatch(
                     setConfirmationCodeDialogProps({
                         open: true,
-                        actionType: "changeEmail",
+                        actionType: 'changeEmail',
                         canResend: false,
                         description: `To confirm you want to change the email associated with your account to ${newEmail}, we've sent a 6-digit confirmation code.`,
                         newEmail,
-                        title: "Confirm Email Change",
+                        title: 'Confirm Email Change',
                     })
                 );
 
                 break;
-            case "DONE":
+            case 'DONE':
                 console.log(`attribute was successfully updated.`);
                 break;
         }
     };
 
     const handleChangeEmail = async () => {
-        handleUpdateUserAttribute("email", newEmail);
-        setNewEmail("");
+        handleUpdateUserAttribute('email', newEmail);
+        setNewEmail('');
     };
 
     const getChangeEmailHelperText = () => {
         if (newEmail && !isNewEmailValid) {
-            return "Please enter a valid email";
+            return 'Please enter a valid email';
         }
 
         // Existing email would satisfy regex
         if (newEmail === userData.email) {
-            return "Same as current email";
+            return 'Same as current email';
         }
     };
 
@@ -132,7 +138,7 @@ const AccountTab = (props: Props) => {
                     <ActionSubmitButton
                         variant="contained"
                         onClick={() => handleChangeUsername()}
-                        disabled={enteredNewUsername === ""}
+                        disabled={enteredNewUsername === ''}
                     >
                         Submit
                     </ActionSubmitButton>
@@ -172,16 +178,33 @@ const AccountTab = (props: Props) => {
                 <ActionSubmitButton
                     variant="outlined"
                     color="error"
-                    onClick={handleShowDeleteDialog}
+                    onClick={toggleDeleteDialog}
                     fullWidth
                 >
                     Delete Account
                 </ActionSubmitButton>
                 <DeleteAccountDialog
                     open={showDeleteDialog}
-                    handleClose={handleCloseDeleteDialog}
+                    handleClose={toggleDeleteDialog}
                     deletePassword={deletePassword}
                     setDeletePassword={setDeletePassword}
+                />
+            </ActionSection>
+            <ActionSection>
+                <ActionHeader>
+                    <DataUsageRounded />
+                    <Typography variant="h6">Download Data</Typography>
+                </ActionHeader>
+                <ActionSubmitButton
+                    variant="outlined"
+                    onClick={toggleDownloadDataDialog}
+                    fullWidth
+                >
+                    Download Data
+                </ActionSubmitButton>
+                <DownloadDataDialog
+                    open={showDownloadDialog}
+                    handleClose={toggleDownloadDataDialog}
                 />
             </ActionSection>
         </AccountViewContainer>

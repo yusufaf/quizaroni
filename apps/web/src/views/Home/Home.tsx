@@ -3,6 +3,7 @@ import {
     GridCallbackDetails,
     GridColDef,
     GridColumnVisibilityModel,
+    GridDensity,
     GridEventListener,
     GridRenderCellParams,
     GridRowSelectionModel,
@@ -51,13 +52,13 @@ import {
 import HomeToolbar from './HomeToolbar';
 import SetActionsMenu from './SetActionsMenu';
 import { getFormattedTimestamp } from 'utilities/functions';
-import { Box } from '@mui/system';
-import { Button, Tooltip } from '@mui/material';
+import { Button, Menu, MenuItem, Tooltip } from '@mui/material';
 
 // augment the props for the toolbar slot
 declare module '@mui/x-data-grid' {
     interface ToolbarPropsOverrides {
         columnVisibilityModel: GridColumnVisibilityModel;
+        density: GridDensity;
     }
 }
 
@@ -65,6 +66,7 @@ type Props = {};
 
 const CustomToolbar = ({
     columnVisibilityModel,
+    density,
 }: NonNullable<GridSlotsComponentsProps['toolbar']>) => {
     const [
         updateUserMetadata,
@@ -75,10 +77,11 @@ const CustomToolbar = ({
         },
     ] = useUpdateUserMetadataMutation();
 
-    const handleSaveColumns = async () => {
+    const handleSavePreferences = async () => {
         updateUserMetadata({
             updates: {
                 visibleColumns: columnVisibilityModel,
+                density,
             },
         });
     };
@@ -89,13 +92,13 @@ const CustomToolbar = ({
             <GridToolbarFilterButton />
             <GridToolbarDensitySelector />
             <GridToolbarExport />
-            <Tooltip title="Save your current column visibility preferences">
+            <Tooltip title="Save visible columns and density">
                 <Button
                     variant="text"
                     startIcon={<Save />}
-                    onClick={handleSaveColumns}
+                    onClick={handleSavePreferences}
                 >
-                    Save Columns
+                    Save Table Preferences
                 </Button>
             </Tooltip>
         </GridToolbarContainer>
@@ -152,6 +155,7 @@ const Home = (props: Props) => {
     ]);
     const [rowSelectionModel, setRowSelectionModel] =
         useState<GridRowSelectionModel>([]);
+    const [density, setDensity] = useState<GridDensity>('compact');
 
     const selectedStudysetRows: Studyset[] = rowSelectionModel
         .map((studysetUUID) =>
@@ -161,6 +165,7 @@ const Home = (props: Props) => {
 
     const columns: GridColDef[] = [
         {
+            display: 'flex',
             field: 'favorited',
             headerName: 'Favorited',
             width: 75,
@@ -323,6 +328,10 @@ const Home = (props: Props) => {
         setColumnVisibilityModel(newModel);
     };
 
+    const handleDensityChange = (newDensity: GridDensity) => {
+        setDensity(newDensity);
+    };
+
     // TODO: Replace this
     if (!authenticated) {
         return <LoginMessage page="home" />;
@@ -371,15 +380,17 @@ const Home = (props: Props) => {
                                     // disableSelectionOnClick
                                     onRowDoubleClick={onRowDoubleClick}
                                     slots={{
-                                        toolbar: CustomToolbar
+                                        toolbar: CustomToolbar,
                                     }}
+                                    // density=
                                     slotProps={{
                                         toolbar: {
                                             csvOptions: {
                                                 fileName: `Quizaroni_Studysets_${getFormattedTimestamp()}`,
                                             },
                                             showQuickFilter: true,
-                                            columnVisibilityModel
+                                            columnVisibilityModel,
+                                            density,
                                         },
                                         row: {
                                             onContextMenu: handleContextMenu,
@@ -393,6 +404,8 @@ const Home = (props: Props) => {
                                     onColumnVisibilityModelChange={
                                         handleColumnVisibilityChange
                                     }
+                                    density={density}
+                                    onDensityChange={handleDensityChange}
                                 />
                                 <SetActionsMenu
                                     anchorPosition={

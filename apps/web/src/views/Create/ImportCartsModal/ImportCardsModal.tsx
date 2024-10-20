@@ -11,7 +11,8 @@ import {
     Typography,
 } from '@mui/material/';
 import { StyledDialogActions, StyledDialogTitle } from 'common/AppStyles';
-import CloseDialogButton from 'components/CloseDialogButton/CloseDialogButton';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
+import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
 import { Dispatch, SetStateAction, useState } from 'react';
 
 type Props = {
@@ -44,10 +45,7 @@ const ImportCardsModal = ({ setShowImportModal }: Props) => {
 
     return (
         <Dialog open={true} onClose={onClose} fullWidth maxWidth="md">
-            <StyledDialogTitle>
-                Import Cards
-                <CloseDialogButton onClose={onClose} />
-            </StyledDialogTitle>
+            <StandardDialogTitle title="Import Cards" onClose={onClose} />
             <DialogContent>
                 <FormControl>
                     <FormLabel id="import-method-radio-group-label">

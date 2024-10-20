@@ -12,7 +12,7 @@ import {
     Fab,
 } from '@mui/material/';
 import { BoldTypography, SimpleFlexContainer } from 'common/AppStyles';
-import CloseDialogButton from 'components/CloseDialogButton/CloseDialogButton';
+import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
 import useCustomMutation from 'lib/hooks/useCustomMutation';
 import { Card, OpenCardNotes, Studyset, UUID } from 'lib/types';
 import { useMemo, useState } from 'react';

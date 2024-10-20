@@ -5,9 +5,10 @@ import {
     DialogContentText,
     DialogActions,
     Button,
-} from "@mui/material";
-import { StyledDialogActions, StyledDialogTitle } from "common/AppStyles";
-import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
+} from '@mui/material';
+import { StyledDialogActions, StyledDialogTitle } from 'common/AppStyles';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
+import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
 
 type Props = {
     open: boolean;
@@ -18,10 +19,7 @@ type Props = {
 const ProfilePictureDialog = ({ open, onClose, handleImageChange }: Props) => {
     return (
         <Dialog open={open} onClose={onClose} fullWidth>
-            <StyledDialogTitle>
-                Profile Picture
-                <CloseDialogButton onClose={onClose} />
-            </StyledDialogTitle>
+            <StandardDialogTitle title="Profile Picture" onClose={onClose} />
             <DialogContent>
                 <DialogContentText>
                     Select a new profile picture
