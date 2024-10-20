@@ -1,7 +1,6 @@
 import { Studyset } from 'lib/types';
 import { StyledDialog, StyledDialogContent } from './styles';
-import { FlexColumn, StyledDialogTitle } from 'common/AppStyles';
-import CloseDialogButton from 'components/CloseDialogButton/CloseDialogButton';
+import { FlexColumn } from 'common/AppStyles';
 import FormatTerminologies from './FormatTerminologies';
 import LabelTerminologies from './LabelTerminologies';
 import {
@@ -11,6 +10,7 @@ import {
 } from 'utilities/constants';
 import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 import SettingsToggle from 'components/SettingsToggle/SettingsToggle';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 
 type Props = {
     open: boolean;
@@ -39,10 +39,7 @@ const StudysetSettings = ({ open, onClose, studyset }: Props) => {
 
     return (
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
-            <StyledDialogTitle>
-                Studyset Settings
-                <CloseDialogButton onClose={onClose} />
-            </StyledDialogTitle>
+            <StandardDialogTitle title="Studyset Settings" onClose={onClose} />
             <StyledDialogContent>
                 <FormatTerminologies studyset={studyset} />
                 <LabelTerminologies studyset={studyset} />
@@ -51,14 +48,14 @@ const StudysetSettings = ({ open, onClose, studyset }: Props) => {
                         label={`Notes Drawer Alignment`}
                         options={NOTES_DRAWER_POSITIONS_OPTIONS}
                         selectedValue={studyset?.metadata?.notesDrawerPosition}
-                        property='notesDrawerPosition'
+                        property="notesDrawerPosition"
                         onChange={handleSettingToggleChange}
                     />
                     <SettingsToggle
                         label={`Notes Drawer Initial Appearance`}
                         options={NOTES_DRAWER_INITIAL_APPEARANCE_OPTIONS}
                         selectedValue={studyset?.metadata?.notesDrawerInitial}
-                        property='notesDrawerInitial'
+                        property="notesDrawerInitial"
                         onChange={handleSettingToggleChange}
                     />
                     <SettingsToggle

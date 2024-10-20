@@ -1,44 +1,51 @@
-import { Button, Tabs, Tab } from "@mui/material";
-import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
+import { Button, Tabs, Tab } from '@mui/material';
+import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import {
     selectNamedColorsDialogProps,
     setNamedColorsDialogProps,
     selectCognitoUser,
-} from "state/slices/globalSlice";
+} from 'state/slices/globalSlice';
 import {
     BoldTypography,
     SimpleFlexContainer,
-    StyledDialogTitle,
-} from "common/AppStyles";
-import { ChangeEvent, ReactNode, SyntheticEvent, useState } from "react";
+} from 'common/AppStyles';
+import { ChangeEvent, ReactNode, SyntheticEvent, useState } from 'react';
 import {
     ColorsListColumn,
     DownloadListButton,
     StyledDialog,
     StyledDialogActions,
     StyledDialogContent,
-} from "./styles";
-import CreateTabView from "./CreateTabView";
-import NamedColorPicker from "./NamedColorPicker";
-import { LoadingButton } from "@mui/lab";
+} from './styles';
+import CreateTabView from './CreateTabView';
+import NamedColorPicker from './NamedColorPicker';
+import { LoadingButton } from '@mui/lab';
 import {
     useGetUserQuery,
     useUpdateUserMetadataMutation,
-} from "state/api/usersAPI";
-import ManageTabView from "./ManageTabView";
-import { ACTIONS, TABS } from "./constants";
-import NamedColorsList from "./NamedColorsList";
-import { Download } from "@mui/icons-material";
-import { downloadObjectAsJSON } from "utilities/functions";
-import { DEFAULT_USER_RESPONSE } from "utilities/constants";
+} from 'state/api/usersAPI';
+import ManageTabView from './ManageTabView';
+import { ACTIONS, TABS } from './constants';
+import NamedColorsList from './NamedColorsList';
+import { Download } from '@mui/icons-material';
+import { downloadObjectAsJSON } from 'utilities/functions';
+import { DEFAULT_USER_RESPONSE } from 'utilities/constants';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 
 type Props = {};
 const NamedColorsDialog = (props: Props) => {
     /* Redux / Hooks */
     const dispatch = useAppDispatch();
-    
-    const { data: { user: { metadata: { namedColors = []}, userUUID = ""} } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
+
+    const {
+        data: {
+            user: {
+                metadata: { namedColors = [] },
+                userUUID = '',
+            },
+        } = DEFAULT_USER_RESPONSE,
+    } = useGetUserQuery();
 
     const namedColorsDialogProps = useAppSelector(selectNamedColorsDialogProps);
 
@@ -52,13 +59,13 @@ const NamedColorsDialog = (props: Props) => {
     ] = useUpdateUserMetadataMutation();
 
     const [color, setColor] = useState<string>(
-        namedColorsDialogProps.color ? namedColorsDialogProps.color : "#000000"
+        namedColorsDialogProps.color ? namedColorsDialogProps.color : '#000000'
     );
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
-    const [colorName, setColorName] = useState<string>(""); // From Create/Edit page
+    const [colorName, setColorName] = useState<string>(''); // From Create/Edit page
     const [errorInfo, setErrorInfo] = useState<any>(null);
 
-    const [editColorName, setEditColorName] = useState<string>("");
+    const [editColorName, setEditColorName] = useState<string>('');
     const [editErrorInfo, setEditErrorInfo] = useState<any>(null);
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [deleteIndices, setDeleteIndices] = useState<number[]>([]);
@@ -95,8 +102,8 @@ const NamedColorsDialog = (props: Props) => {
         const newNamedColors = [...namedColors, newColorObject];
         updateUserMetadata({
             updates: {
-                namedColors: newNamedColors
-            }
+                namedColors: newNamedColors,
+            },
         });
     };
 
@@ -109,7 +116,7 @@ const NamedColorsDialog = (props: Props) => {
         setColorName(name);
         const localErrorInfo = isDuplicate
             ? {
-                  helperText: "Color with that name already exists",
+                  helperText: 'Color with that name already exists',
               }
             : null;
         setErrorInfo(localErrorInfo);
@@ -118,7 +125,7 @@ const NamedColorsDialog = (props: Props) => {
     const onColorChange = (e) => {
         // hex, hsl, hsv, rgb
         const { hex } = e;
-        console.log("e in onColorChange = ", { e });
+        console.log('e in onColorChange = ', { e });
         setColor(hex);
     };
 
@@ -133,7 +140,7 @@ const NamedColorsDialog = (props: Props) => {
         setEditColorName(newNamedColorName);
         if (isDuplicate) {
             setEditErrorInfo({
-                helperText: "Color with that name already exists",
+                helperText: 'Color with that name already exists',
             });
         } else if (!newNamedColorName) {
             setEditErrorInfo({
@@ -153,7 +160,7 @@ const NamedColorsDialog = (props: Props) => {
 
     const handleDeleteClick = (index: number) => {
         setEditIndex(null);
-        setEditColorName("");
+        setEditColorName('');
         setEditErrorInfo(null);
 
         setSelectedAction(ACTIONS.DELETE);
@@ -184,7 +191,7 @@ const NamedColorsDialog = (props: Props) => {
                 };
                 updateUserMetadata({
                     uuid: userUUID,
-                    property: "namedColors",
+                    property: 'namedColors',
                     newValue: newNamedColors,
                 });
             }
@@ -194,7 +201,7 @@ const NamedColorsDialog = (props: Props) => {
                 );
                 updateUserMetadata({
                     uuid: userUUID,
-                    property: "namedColors",
+                    property: 'namedColors',
                     newValue: newNamedColors,
                 });
             }
@@ -206,7 +213,7 @@ const NamedColorsDialog = (props: Props) => {
     };
 
     const downloadNamedColorsList = () => {
-        downloadObjectAsJSON(namedColors, "Quizaroni_NamedColors.json");
+        downloadObjectAsJSON(namedColors, 'Quizaroni_NamedColors.json');
     };
 
     const renderDialogButtons = (): ReactNode => {
@@ -229,7 +236,7 @@ const NamedColorsDialog = (props: Props) => {
                     (selectedAction === ACTIONS.DELETE &&
                         !deleteIndices.length);
                 const buttonText = isEditAction
-                    ? "Save Edit"
+                    ? 'Save Edit'
                     : `Delete (${deleteIndices.length})`;
                 return (
                     selectedAction && (
@@ -263,10 +270,10 @@ const NamedColorsDialog = (props: Props) => {
             fullWidth
             maxWidth="lg"
         >
-            <StyledDialogTitle>
-                Named Colors
-                <CloseDialogButton onClose={closeNamedColorsDialog} />
-            </StyledDialogTitle>
+            <StandardDialogTitle
+                title="Named Colors"
+                onClose={closeNamedColorsDialog}
+            />
             <StyledDialogContent>
                 <div>
                     <Tabs
@@ -316,7 +323,7 @@ const NamedColorsDialog = (props: Props) => {
                 </div>
                 <NamedColorPicker color={color} onChange={onColorChange} />
                 <ColorsListColumn>
-                    <SimpleFlexContainer style={{ alignItems: "baseline" }}>
+                    <SimpleFlexContainer style={{ alignItems: 'baseline' }}>
                         <BoldTypography>Named Colors</BoldTypography>
                         <DownloadListButton
                             variant="outlined"

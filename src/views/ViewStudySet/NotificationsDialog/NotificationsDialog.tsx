@@ -4,11 +4,10 @@ import {
     DialogActions,
     DialogContent,
     IconButton,
-} from "@mui/material/";
-import { Email } from "@mui/icons-material";
-import { StyledDialogTitle } from "common/AppStyles";
-import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
-import { StyledDialog } from "./styles";
+} from '@mui/material/';
+import { Email } from '@mui/icons-material';
+import { StyledDialog } from './styles';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 
 type Props = {
     onClose: () => void;
@@ -20,10 +19,10 @@ const NotificationsDialog = (props: Props) => {
 
     return (
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
-            <StyledDialogTitle>
-                Manage Notifications
-                <CloseDialogButton onClose={onClose} />
-            </StyledDialogTitle>
+            <StandardDialogTitle
+                title="Manage Notifications"
+                onClose={onClose}
+            />
 
             <DialogContent>
                 <IconButton

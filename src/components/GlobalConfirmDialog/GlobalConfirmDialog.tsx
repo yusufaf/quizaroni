@@ -5,29 +5,26 @@ import {
     DialogActions,
     Typography,
     DialogContent,
-} from "@mui/material/";
+} from '@mui/material/';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import {
     selectConfirmDialogProps,
     setConfirmDialogProps,
-} from "state/slices/globalSlice";
-import { ConfirmDialogProps } from "lib/types";
+} from 'state/slices/globalSlice';
+import { ConfirmDialogProps } from 'lib/types';
 import {
     STUDYSET_CONFIRM_DIALOGS,
     INITIAL_CONFIRM_DIALOG_PROPS,
-} from "utilities/constants";
-import useCustomMutation from "lib/hooks/useCustomMutation";
+} from 'utilities/constants';
+import useCustomMutation from 'lib/hooks/useCustomMutation';
 import {
     useDeleteStudysetMutation,
     useDuplicateStudysetMutation,
-} from "state/api/studysetsAPI";
-import {
-    StyledDialogActions,
-    StyledDialogTitle,
-} from "common/AppStyles";
-import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
-import { useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
+} from 'state/api/studysetsAPI';
+import { StyledDialogActions } from 'common/AppStyles';
+import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 
 type Props = {};
 const ConfirmDialog = (props: Props) => {
@@ -37,8 +34,8 @@ const ConfirmDialog = (props: Props) => {
 
     const { mutate: deleteStudySet } = useCustomMutation({
         mutation: useDeleteStudysetMutation,
-        successMessage: "Successfully deleted study set",
-        errorMessage: "Error deleting study set",
+        successMessage: 'Successfully deleted study set',
+        errorMessage: 'Error deleting study set',
     });
 
     const {
@@ -48,8 +45,8 @@ const ConfirmDialog = (props: Props) => {
         isError: isDuplicateStudySetError,
     } = useCustomMutation({
         mutation: useDuplicateStudysetMutation,
-        successMessage: "Successfully duplicated study set",
-        errorMessage: "Error duplicating study set",
+        successMessage: 'Successfully duplicated study set',
+        errorMessage: 'Error duplicating study set',
     });
 
     const isTableMultiAction = [
@@ -65,7 +62,7 @@ const ConfirmDialog = (props: Props) => {
         switch (dialogProps.type) {
             case STUDYSET_CONFIRM_DIALOGS.DELETE:
                 deleteStudySet({ ...dialogProps.props });
-                navigate("/");
+                navigate('/');
                 break;
             case STUDYSET_CONFIRM_DIALOGS.DELETE_MULTIPLE: {
                 const { studysetUUIDs = [] } = { ...dialogProps.props };
@@ -95,10 +92,10 @@ const ConfirmDialog = (props: Props) => {
 
     return (
         <Dialog open={dialogProps?.open} onClose={onClose} fullWidth>
-            <StyledDialogTitle>
-                {dialogProps?.title}
-                <CloseDialogButton onClose={onClose} />
-            </StyledDialogTitle>
+                                        <StandardDialogTitle
+                    title={dialogProps?.title}
+                    onClose={onClose}
+                />
             <DialogContent
                 sx={{
                     paddingBottom: 0,
@@ -121,10 +118,10 @@ const ConfirmDialog = (props: Props) => {
             </DialogContent>
             <StyledDialogActions>
                 <Button onClick={onClose}>
-                    {dialogProps?.cancelButtonText || "Cancel"}
+                    {dialogProps?.cancelButtonText || 'Cancel'}
                 </Button>
                 <Button variant="contained" onClick={handleConfirm}>
-                    {dialogProps?.confirmButtonText || "Confirm"}
+                    {dialogProps?.confirmButtonText || 'Confirm'}
                 </Button>
             </StyledDialogActions>
         </Dialog>

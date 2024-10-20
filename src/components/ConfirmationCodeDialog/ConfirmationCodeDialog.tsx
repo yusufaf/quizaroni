@@ -1,28 +1,26 @@
-import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
-import {
-    StyledDialogActions,
-    StyledDialogTitle,
-} from "common/AppStyles";
+import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
+import { StyledDialogActions, StyledDialogTitle } from 'common/AppStyles';
 import {
     ConfirmDescription,
     StyledDialog,
     StyledDialogContent,
-} from "./styles";
-import { Button, TextField } from "@mui/material";
+} from './styles';
+import { Button, TextField } from '@mui/material';
 import {
     selectCognitoUser,
     selectConfirmationCodeDialogProps,
     setConfirmationCodeDialogProps,
-} from "state/slices/globalSlice";
+} from 'state/slices/globalSlice';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import { useState } from "react";
+import { useState } from 'react';
 import {
     confirmSignUp,
     resendSignUpCode,
     confirmUserAttribute,
-} from "aws-amplify/auth";
-import { useNavigate } from "react-router-dom";
-import { useUpdateEmailMutation } from "state/api/usersAPI";
+} from 'aws-amplify/auth';
+import { useNavigate } from 'react-router-dom';
+import { useUpdateEmailMutation } from 'state/api/usersAPI';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 
 type Props = {};
 const ConfirmationCodeDialog = (props: Props) => {
@@ -39,16 +37,16 @@ const ConfirmationCodeDialog = (props: Props) => {
     // TODO: Toast notification?
     const [updateEmail] = useUpdateEmailMutation();
 
-    const [confirmationCode, setConfirmationCode] = useState<string>("");
+    const [confirmationCode, setConfirmationCode] = useState<string>('');
     const isValidCode = /^\d{6}$/.test(confirmationCode);
 
     const {
-        actionType = "signUp",
+        actionType = 'signUp',
         canResend = false,
-        description = "Check your email for a six-digit confirmation code.",
-        newEmail = "",
+        description = 'Check your email for a six-digit confirmation code.',
+        newEmail = '',
         open,
-        title = "Confirm Email",
+        title = 'Confirm Email',
     } = confirmationCodeDialogProps;
 
     const closeDialog = () => {
@@ -61,30 +59,30 @@ const ConfirmationCodeDialog = (props: Props) => {
 
     const handleResendCode = async () => {
         try {
-            const result = await resendSignUpCode({ username: "" });
-            console.log("Code resent succesfully", result);
+            const result = await resendSignUpCode({ username: '' });
+            console.log('Code resent succesfully', result);
         } catch (err) {
-            console.error("error resending code: ", err);
+            console.error('error resending code: ', err);
         }
     };
 
     const handleConfirmEmail = async () => {
         try {
             switch (actionType) {
-                case "signUp":
+                case 'signUp':
                     const result = await confirmSignUp({
                         username,
                         confirmationCode,
                     });
-                    
+
                     closeDialog();
 
                     /* Send user to login page if successfully confirmed email */
-                    navigate("/login");
+                    navigate('/login');
                     break;
-                case "changeEmail":
+                case 'changeEmail':
                     const changeEmailResult = await confirmUserAttribute({
-                        userAttributeKey: "email",
+                        userAttributeKey: 'email',
                         confirmationCode,
                     });
                     console.log({ changeEmailResult });
@@ -97,16 +95,13 @@ const ConfirmationCodeDialog = (props: Props) => {
                     closeDialog();
             }
         } catch (error) {
-            console.error("Error confirming sign up", error);
+            console.error('Error confirming sign up', error);
         }
     };
 
     return (
         <StyledDialog open={open} onClose={closeDialog} fullWidth>
-            <StyledDialogTitle>
-                {title}
-                <CloseDialogButton onClose={closeDialog} />
-            </StyledDialogTitle>
+            <StandardDialogTitle title={title} onClose={closeDialog} />
             <StyledDialogContent>
                 <div>
                     <ConfirmDescription variant="body1">
@@ -115,8 +110,8 @@ const ConfirmationCodeDialog = (props: Props) => {
                     <ConfirmDescription
                         variant="body1"
                         sx={{
-                            fontWeight: "600",
-                            marginTop: "0.25rem",
+                            fontWeight: '600',
+                            marginTop: '0.25rem',
                         }}
                     >
                         Be sure to check your spam folder.

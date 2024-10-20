@@ -23,8 +23,6 @@ import {
     useGetStudysetQuery,
 } from 'state/api/studysetsAPI';
 import useCustomMutation from 'lib/hooks/useCustomMutation';
-import { StyledDialogTitle } from 'common/AppStyles';
-import CloseDialogButton from 'components/CloseDialogButton/CloseDialogButton';
 import CreateTabView from './CreateTabView';
 import ManageTabView from './ManageTabView';
 import AssignTabView from './AssignTabView';
@@ -33,6 +31,7 @@ import { useAppDispatch } from 'state/reduxHooks';
 import { useGetUserQuery } from 'state/api/usersAPI';
 import { DEFAULT_USER_RESPONSE } from 'utilities/constants';
 import { LabelsDialogProps } from 'lib/types';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 
 type Props = {
     labelsDialogProps: LabelsDialogProps;
@@ -152,7 +151,7 @@ const ManageLabelsDialog = ({ labelsDialogProps }: Props) => {
 
         if (selectedTab === TABS.MANAGE) {
             clearEditState();
-            clearDeleteState()
+            clearDeleteState();
         }
 
         setSelectedTab(newTab);
@@ -260,10 +259,10 @@ const ManageLabelsDialog = ({ labelsDialogProps }: Props) => {
             fullWidth
             maxWidth="lg"
         >
-            <StyledDialogTitle>
-                {capitalizeFirstLetter(selectedTab.toLowerCase())} Labels
-                <CloseDialogButton onClose={closeLabelsDialog} />
-            </StyledDialogTitle>
+            <StandardDialogTitle
+                title={`${capitalizeFirstLetter(selectedTab.toLowerCase())} Labels`}
+                onClose={closeLabelsDialog}
+            />
             <StyledDialogContent>
                 <MainLabelDialogContent>
                     <Tabs value={selectedTab} onChange={onTabChange}>

@@ -1,23 +1,23 @@
-import { Password } from "@mui/icons-material";
-import { Typography, TextField } from "@mui/material";
-import PasswordToggle from "components/PasswordToggle/PasswordToggle";
+import { Password } from '@mui/icons-material';
+import { Typography, TextField } from '@mui/material';
+import PasswordToggle from 'components/PasswordToggle/PasswordToggle';
 import {
     ActionSection,
     ActionHeader,
     InfoChangeContainer,
     ActionSubmitButton,
-} from "../ProfileStyles";
-import { useRef, useState } from "react";
-import { updatePassword } from "@aws-amplify/auth";
-import { toast } from "react-toastify";
-import PasswordValidator from "components/PasswordValidator/PasswordValidator";
+} from './ProfileStyles';
+import { useRef, useState } from 'react';
+import { updatePassword } from '@aws-amplify/auth';
+import { toast } from 'react-toastify';
+import PasswordValidator from 'components/PasswordValidator/PasswordValidator';
 
 type Props = {};
 
 const ChangePasswordSection = ({}: Props) => {
-    const [oldPassword, setOldPassword] = useState<string>("");
-    const [newPassword, setNewPassword] = useState<string>("");
-    const [confirmPassword, setConfirmPassword] = useState<string>("");
+    const [oldPassword, setOldPassword] = useState<string>('');
+    const [newPassword, setNewPassword] = useState<string>('');
+    const [confirmPassword, setConfirmPassword] = useState<string>('');
     const [passwordValid, setPasswordValid] = useState<boolean>(false);
 
     const [oldPasswordVisibility, setOldPasswordVisibility] =
@@ -38,12 +38,12 @@ const ChangePasswordSection = ({}: Props) => {
     const handleUpdatePassword = async () => {
         try {
             await updatePassword({ oldPassword, newPassword });
-            toast.success("Password successfully updated", {
+            toast.success('Password successfully updated', {
                 position: toast.POSITION.BOTTOM_LEFT,
             });
-            setOldPassword("");
-            setNewPassword("");
-            setConfirmPassword("");
+            setOldPassword('');
+            setNewPassword('');
+            setConfirmPassword('');
         } catch (err) {
             console.log(err);
         }
@@ -60,7 +60,7 @@ const ChangePasswordSection = ({}: Props) => {
                     variant="standard"
                     placeholder="Enter old password"
                     label="Old Password"
-                    type={oldPasswordVisibility ? "text" : "password"}
+                    type={oldPasswordVisibility ? 'text' : 'password'}
                     value={oldPassword}
                     name="oldPasswordInput"
                     onChange={(e) => setOldPassword(e.target.value)}
@@ -79,7 +79,7 @@ const ChangePasswordSection = ({}: Props) => {
                     variant="standard"
                     placeholder="Enter new password"
                     label="Password"
-                    type={newPasswordVisibility ? "text" : "password"}
+                    type={newPasswordVisibility ? 'text' : 'password'}
                     value={newPassword}
                     name="passInput"
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -106,7 +106,7 @@ const ChangePasswordSection = ({}: Props) => {
                     variant="standard"
                     placeholder="Confirm new password"
                     label="Confirm Password"
-                    type={newPasswordVisibility ? "text" : "password"}
+                    type={newPasswordVisibility ? 'text' : 'password'}
                     value={confirmPassword}
                     name="passInput"
                     onChange={(e) => setConfirmPassword(e.target.value)}

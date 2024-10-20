@@ -9,19 +9,18 @@ import {
     FormControlLabel,
     MenuItem,
     Select,
-} from "@mui/material/";
-import { Card, Studyset } from "lib/types";
-import { useState } from "react";
+} from '@mui/material/';
+import { Card, Studyset } from 'lib/types';
+import { useState } from 'react';
 import {
     DOWNLOAD_FILE_TYPES,
     MIME_TYPES,
     DOWNLOAD_FILE_TITLES,
     DEFAULT_CSV_HEADERS,
     METADATA_CSV_HEADERS,
-} from "utilities/constants";
-import { StyledDialogTitle } from "common/AppStyles";
-import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
-import { DownloadDialogContent } from "../styles";
+} from 'utilities/constants';
+import { DownloadDialogContent } from '../styles';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 
 const downloadTypeItems = Object.values(DOWNLOAD_FILE_TYPES).map(
     (value, index) => {
@@ -59,7 +58,7 @@ const DownloadSetModal = (props: Props) => {
 
     const downloadFile = ({ data, fileName, fileType }: DownloadFileParams) => {
         const blob = new Blob([data], { type: MIME_TYPES[fileType] });
-        const anchor = document.createElement("a");
+        const anchor = document.createElement('a');
         anchor.download = fileName;
         anchor.href = window.URL.createObjectURL(blob);
         anchor.click();
@@ -70,7 +69,7 @@ const DownloadSetModal = (props: Props) => {
         const { description, label, title, cards } = studyset;
         const fileExtension = downloadFileType.toLowerCase();
         const fileName = `${title}_Studyset.${fileExtension}`;
-        const downloadTimestamp = new Date().toLocaleString().replace(",", "");
+        const downloadTimestamp = new Date().toLocaleString().replace(',', '');
 
         let blobData: any = null;
 
@@ -91,26 +90,26 @@ const DownloadSetModal = (props: Props) => {
                     (acc: string[], card: Card, index) => {
                         const { term, definition } = card;
 
-                        let startString = "";
+                        let startString = '';
                         if (includeMetadata && index === 0) {
-                            startString = Object.values(metadata).join(",");
+                            startString = Object.values(metadata).join(',');
                         } else if (includeMetadata) {
                             startString = [
                                 ...Array(Object.values(metadata).length).keys(),
                             ]
-                                .map(() => "#")
-                                .join(",");
+                                .map(() => '#')
+                                .join(',');
                         }
                         const csvStrings = [term, definition];
                         if (startString) {
                             csvStrings.unshift(startString);
                         }
-                        acc.push(csvStrings.join(","));
+                        acc.push(csvStrings.join(','));
                         return acc;
                     },
                     []
                 );
-                const csvData = [headers, ...studysetCSV].join("\n");
+                const csvData = [headers, ...studysetCSV].join('\n');
                 blobData = csvData;
                 break;
             }
@@ -124,7 +123,7 @@ const DownloadSetModal = (props: Props) => {
                     }:\n\t ${termString} \n\t ${definitionString} \n`;
                 });
 
-                const newLineSeparatedCardText = `${cardText.join("\n")}`;
+                const newLineSeparatedCardText = `${cardText.join('\n')}`;
                 let textData: string = `${newLineSeparatedCardText}`;
                 if (includeMetadata) {
                     const metadataText = `Title: ${title}\nDescription: ${description}\nLabel: ${label}\nDownloaded on: ${downloadTimestamp} \n\n`;
@@ -161,7 +160,7 @@ const DownloadSetModal = (props: Props) => {
                         index + 1
                     }\n\n**Term:** ${term}\n\n**Definition:** ${definition}\n\n`;
                 });
-                const cardsMarkdownText = `${cardText.join("\n")}`
+                const cardsMarkdownText = `${cardText.join('\n')}`;
                 let mdData = cardsMarkdownText;
                 if (includeMetadata) {
                     const metadataText = `# ${title}\n\n## Description\n${description}\n\n## Label\n${label}\n\n## Downloaded on\n${downloadTimestamp}\n\n`;
@@ -181,17 +180,14 @@ const DownloadSetModal = (props: Props) => {
 
     return (
         <Dialog open={open} onClose={onClose}>
-            <StyledDialogTitle>
-                Download Study Set
-                <CloseDialogButton onClose={onClose} />
-            </StyledDialogTitle>
+            <StandardDialogTitle title="Download Study Set" onClose={onClose} />
             <DownloadDialogContent>
                 <DialogContentText>
                     Choose what format you'd like to download the study set as:
                 </DialogContentText>
                 <FormControl
                     sx={{
-                        marginTop: "1rem",
+                        marginTop: '1rem',
                     }}
                 >
                     <Select
