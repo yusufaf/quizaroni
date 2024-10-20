@@ -4,10 +4,9 @@ import {
     DialogActions,
     DialogContent,
     IconButton,
-} from "@mui/material/";
-import { StyledDialogTitle } from "common/AppStyles";
-import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
-import { StyledDialog } from "./styles";
+} from '@mui/material/';
+import { StyledDialog } from './styles';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 
 type Props = {
     onClose: () => void;
@@ -19,13 +18,8 @@ const NotificationsDialog = (props: Props) => {
 
     return (
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
-            <StyledDialogTitle>
-                Share
-                <CloseDialogButton onClose={onClose} />
-            </StyledDialogTitle>
-
-            <DialogContent>
-            </DialogContent>
+            <StandardDialogTitle title="Share" onClose={onClose} />
+            <DialogContent></DialogContent>
         </StyledDialog>
     );
 };

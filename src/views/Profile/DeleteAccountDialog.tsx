@@ -5,12 +5,13 @@ import {
     DialogContentText,
     Typography,
     TextField,
-} from "@mui/material/";
-import * as C from "utilities/constants";
-import { StyledDialogTitle } from "common/AppStyles";
-import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
-import { Dispatch, SetStateAction } from "react";
-import { DeleteDialogContent, StyledDialogActions } from "../ProfileStyles";
+} from '@mui/material/';
+import * as C from 'utilities/constants';
+import { StyledDialogTitle, StyledDialogActions } from 'common/AppStyles';
+import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
+import { Dispatch, SetStateAction } from 'react';
+import { DeleteDialogContent } from './ProfileStyles';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 
 type Props = {
     open: boolean;
@@ -37,10 +38,7 @@ const DeleteAccountDialog = (props: Props) => {
 
     return (
         <Dialog open={open} onClose={handleClose}>
-            <StyledDialogTitle>
-                Delete Account
-                <CloseDialogButton onClose={handleClose} />
-            </StyledDialogTitle>
+            <StandardDialogTitle title="Delete Account" onClose={handleClose} />
             <DeleteDialogContent>
                 <DialogContentText>{C.DELETE_ACCOUNT_MSG}</DialogContentText>
                 <TextField
@@ -61,7 +59,7 @@ const DeleteAccountDialog = (props: Props) => {
                     variant="contained"
                     color="error"
                     onClick={() => handleDeleteAccount()}
-                    disabled={deletePassword === ""}
+                    disabled={deletePassword === ''}
                 >
                     Delete Account
                 </Button>

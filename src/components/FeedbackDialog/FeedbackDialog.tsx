@@ -5,13 +5,17 @@ import {
     DialogActions,
     DialogContent,
     DialogContentText,
-} from "@mui/material";
+} from '@mui/material';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import { selectFeedbackDialogOpen, setFeedbackDialogOpen } from "state/slices/globalSlice";
-import { StyledDialogTitle, StyledDialogActions } from "common/AppStyles";
-import CloseDialogButton from "components/CloseDialogButton/CloseDialogButton";
-import { toast } from "react-toastify";
-import { useState } from "react";
+import {
+    selectFeedbackDialogOpen,
+    setFeedbackDialogOpen,
+} from 'state/slices/globalSlice';
+import { StyledDialogTitle, StyledDialogActions } from 'common/AppStyles';
+import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
+import { toast } from 'react-toastify';
+import { useState } from 'react';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 
 type Props = {};
 
@@ -23,20 +27,17 @@ const FeedbackDialog = (props: Props) => {
         dispatch(setFeedbackDialogOpen(false));
     };
 
-    const [feedbackText, setFeedbackText] = useState<string>("");
+    const [feedbackText, setFeedbackText] = useState<string>('');
 
-    const onSubmit = () => {
-        
-        
-    }
+    const onSubmit = () => {};
 
     return (
         <div>
             <Dialog open={open} onClose={onClose}>
-                <StyledDialogTitle>
-                    Submit Feedback
-                    <CloseDialogButton onClose={onClose} />
-                </StyledDialogTitle>
+                <StandardDialogTitle
+                    title="Submit Feedback"
+                    onClose={onClose}
+                />
                 <DialogContent>
                     <DialogContentText>
                         Submit any feedback you have about your experience with
@@ -49,7 +50,7 @@ const FeedbackDialog = (props: Props) => {
                         multiline={true}
                         minRows={4}
                         sx={{
-                            marginTop: "1rem",
+                            marginTop: '1rem',
                         }}
                     />
                 </DialogContent>
@@ -58,8 +59,8 @@ const FeedbackDialog = (props: Props) => {
                         Cancel
                     </Button>
                     <Button
-                        variant="contained" 
-                        disabled={!feedbackText} 
+                        variant="contained"
+                        disabled={!feedbackText}
                         onClick={onClose}
                     >
                         Submit
