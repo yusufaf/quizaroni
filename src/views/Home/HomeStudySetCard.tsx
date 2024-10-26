@@ -38,7 +38,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { muiTheme } = useTheme();
-
+    
     const [actionsMenuOpen, setActionsMenuOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -47,7 +47,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
         navigate(`/view/${studysetUUID}`);
     };
 
-    const openActionsMenu = (event) => {
+    const openActionsMenu = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         setAnchorEl(event.currentTarget);
         setActionsMenuOpen(true);
     };

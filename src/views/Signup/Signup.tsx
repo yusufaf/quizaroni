@@ -15,7 +15,7 @@ import { StyledLink } from "common/AppStyles";
 import useBrowserTitle from "lib/hooks/useBrowserTitle";
 import { useAppDispatch } from 'state/reduxHooks';
 import {
-    setCognitoUser,
+    // setCognitoUser,
     setConfirmationCodeDialogProps,
 } from "state/slices/globalSlice";
 import { signUp } from "@aws-amplify/auth";
@@ -74,11 +74,11 @@ const Signup = (props: Props) => {
             console.log({ signUpResult });
 
             /* Store newly created cognito user in Redux */
-            dispatch(
-                setCognitoUser({
-                    username,
-                })
-            );
+            // dispatch(
+            //     setCognitoUser({
+            //         username,
+            //     })
+            // );
 
             createUser({
                 email,

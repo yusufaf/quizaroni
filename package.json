@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@aws-amplify/auth": "^6.0.5",
+    "@aws-amplify/ui-react": "^6.5.4",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@mui/icons-material": "^5.16.7",

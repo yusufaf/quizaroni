@@ -1,13 +1,11 @@
-import { useState } from "react";
-import { Paper } from "@mui/material";
+import { useState } from 'react';
+import { Paper } from '@mui/material';
 import {
     confirmSignUp,
     resendSignUpCode,
     confirmUserAttribute,
-} from "aws-amplify/auth";
-import { useAppSelector } from 'state/reduxHooks';
-import { selectCognitoUser } from "state/slices/globalSlice";
-import { useLocation, useNavigate } from "react-router-dom";
+} from 'aws-amplify/auth';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
     ConfirmBtn,
     ConfirmEmailContainer,
@@ -15,39 +13,40 @@ import {
     ConfirmEmailPage,
     ConfirmEmailTitle,
     ConfirmationField,
-} from "./styles";
-import { useUpdateEmailMutation } from "state/api/usersAPI";
+} from './styles';
+import { useUpdateEmailMutation } from 'state/api/usersAPI';
 
 type Props = {};
 const ConfirmEmail = (props: Props) => {
-    const cognitoUser = useAppSelector(selectCognitoUser);
-    console.log({ cognitoUser });
-    const { username } = cognitoUser;
+    // const cognitoUser = useAppSelector(selectCognitoUser);
+    // console.log({ cognitoUser });
+    // const { username } = cognitoUser;
+    const username = '';
 
     const navigate = useNavigate();
     const { state } = useLocation();
 
     const [updateEmail] = useUpdateEmailMutation();
 
-    const { actionType = "signUp", canResend = false, newEmail = "" } = state;
+    const { actionType = 'signUp', canResend = false, newEmail = '' } = state;
 
-    const [confirmationCode, setConfirmationCode] = useState<string>("");
+    const [confirmationCode, setConfirmationCode] = useState<string>('');
 
     const handleConfirmEmail = async () => {
         try {
             switch (actionType) {
-                case "signUp":
+                case 'signUp':
                     const result = await confirmSignUp({
                         username,
                         confirmationCode,
                     });
 
                     /* Send user to login page if successfully confirmed email */
-                    navigate("/login");
+                    navigate('/login');
                     break;
-                case "changeEmail":
+                case 'changeEmail':
                     const changeEmailResult = await confirmUserAttribute({
-                        userAttributeKey: "email",
+                        userAttributeKey: 'email',
                         confirmationCode,
                     });
                     console.log({ changeEmailResult });
@@ -56,25 +55,25 @@ const ConfirmEmail = (props: Props) => {
                         username,
                         newEmail,
                     });
-                    navigate("/profile");
+                    navigate('/profile');
             }
         } catch (error) {
-            console.error("Error confirming sign up", error);
+            console.error('Error confirming sign up', error);
         }
     };
 
     const handleResendCode = async () => {
         try {
             const result = await resendSignUpCode({ username });
-            console.log("Code resent succesfully", result);
+            console.log('Code resent succesfully', result);
         } catch (err) {
-            console.error("error resending code: ", err);
+            console.error('error resending code: ', err);
         }
     };
 
     const enterKeyHandler = (e: any) => {
         const key = e.key.trim();
-        if (key === "Enter") {
+        if (key === 'Enter') {
             handleConfirmEmail();
         }
     };
@@ -94,7 +93,7 @@ const ConfirmEmail = (props: Props) => {
                     <ConfirmEmailDesc
                         variant="body1"
                         sx={{
-                            fontWeight: "600",
+                            fontWeight: '600',
                         }}
                     >
                         Be sure to check your spam folder.

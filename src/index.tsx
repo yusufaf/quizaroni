@@ -1,29 +1,30 @@
-import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import { Provider } from "react-redux";
-import { CustomThemeProvider } from "./lib/theme/ThemeProvider";
-import { CssBaseline } from "@mui/material";
-import AuthProvider from "./components/AuthProvider/AuthProvider";
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { CustomThemeProvider } from './lib/theme/ThemeProvider';
+import { CssBaseline } from '@mui/material';
 
-import "./index.css";
-import App from "./App";
-import { store } from "./state/store";
+import './index.css';
+import '@aws-amplify/ui-react/styles.css';
+import App from './App';
+import { store } from './state/store';
 
-import { Amplify } from "aws-amplify";
-import awsconfig from "./aws-exports";
-Amplify.configure(awsconfig);
+import { Amplify } from 'aws-amplify';
+import awsExports from './aws-exports';
+import { Authenticator } from '@aws-amplify/ui-react';
+Amplify.configure(awsExports);
 
-const domElement = document.getElementById("root") as Element;
+const domElement = document.getElementById('root') as Element;
 const root = createRoot(domElement);
 root.render(
-    <Provider store={store}>
-        <BrowserRouter>
-            <CustomThemeProvider>
-                <CssBaseline />
-                <AuthProvider>
+    <Authenticator.Provider>
+        <Provider store={store}>
+            <BrowserRouter>
+                <CustomThemeProvider>
+                    <CssBaseline />
                     <App />
-                </AuthProvider>
-            </CustomThemeProvider>
-        </BrowserRouter>
-    </Provider>
+                </CustomThemeProvider>
+            </BrowserRouter>
+        </Provider>
+    </Authenticator.Provider>
 );

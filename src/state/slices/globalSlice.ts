@@ -13,7 +13,7 @@ type CognitoUser = {
 
 type GlobalSliceState = {
     authenticated: boolean;
-    cognitoUser: CognitoUser;
+    // cognitoUser: CognitoUser;
     dialogOpen: boolean;
     confirmDialogProps: ConfirmDialogProps;
     feedbackDialogOpen: boolean;
@@ -26,9 +26,9 @@ type GlobalSliceState = {
 
 const initialState: GlobalSliceState = {
     authenticated: false,
-    cognitoUser: {
-        username: "",
-    },
+    // cognitoUser: {
+    //     username: "",
+    // },
     dialogOpen: false,
     confirmDialogProps: {...INITIAL_CONFIRM_DIALOG_PROPS},
     feedbackDialogOpen: false,
@@ -50,9 +50,9 @@ export const globalSlice = createSlice({
         setUserAuthState: (state, action: PayloadAction<any>) => {
             state.userAuthInfo = action.payload;
         },
-        setCognitoUser: (state, action: PayloadAction<CognitoUser>) => {
-            state.cognitoUser = action.payload;
-        },
+        // setCognitoUser: (state, action: PayloadAction<CognitoUser>) => {
+        //     state.cognitoUser = action.payload;
+        // },
         setDialogOpen: (state, action: PayloadAction<boolean>) => {
             state.dialogOpen = action.payload;
         },
@@ -140,7 +140,7 @@ export const globalSlice = createSlice({
 
 export const {
     setAuthenticated,
-    setCognitoUser,
+    // setCognitoUser,
     setDialogOpen,
     setConfirmDialogProps,
     setFeedbackDialogOpen,
@@ -157,8 +157,8 @@ export const selectDialogOpen = (state: RootState) =>
     state[sliceName].dialogOpen;
 export const selectUserAuthState = (state: RootState) =>
     state[sliceName].userAuthInfo;
-export const selectCognitoUser = (state: RootState) =>
-    state[sliceName].cognitoUser;
+// export const selectCognitoUser = (state: RootState) =>
+//     state[sliceName].cognitoUser;
 export const selectAuthenticated = (state: RootState) =>
     state[sliceName].authenticated;
 export const selectUserData = (state: RootState) => state[sliceName].userData;
