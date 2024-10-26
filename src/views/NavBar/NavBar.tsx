@@ -1,4 +1,4 @@
-import { Create, Logout as LogoutIcon } from "@mui/icons-material";
+import { Create, Logout as LogoutIcon } from '@mui/icons-material';
 import {
     AppBar,
     Button,
@@ -7,18 +7,18 @@ import {
     Tooltip,
     Typography,
     useMediaQuery,
-} from "@mui/material/";
-import { useRef, useState } from "react";
+} from '@mui/material/';
+import { useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import {
     selectAuthenticated,
     setAuthenticated,
-} from "state/slices/globalSlice";
-import ProfileDropdown from "views/Profile/ProfileDropdown";
-import { useTheme } from "theme/useTheme";
-import { ROUTES } from "utilities/constants";
-import NavDrawer from "./NavDrawer";
+} from 'state/slices/globalSlice';
+import ProfileDropdown from 'views/Profile/ProfileDropdown';
+import { useTheme } from 'theme/useTheme';
+import { ROUTES } from 'utilities/constants';
+import NavDrawer from './NavDrawer';
 import {
     AuthenticationButton,
     LoginButtonsContainer,
@@ -28,10 +28,10 @@ import {
     ProfileIconContainer,
     StyledAccountIcon,
     StyledNavLink,
-} from "./NavStyles";
-import { signOut } from "aws-amplify/auth";
-import DarkModeToggleButton from "./DarkModeToggleButton";
-import { useCreateStudysetMutation } from "state/api/studysetsAPI";
+} from './NavStyles';
+import { signOut } from 'aws-amplify/auth';
+import DarkModeToggleButton from './DarkModeToggleButton';
+import { useCreateStudysetMutation } from 'state/api/studysetsAPI';
 
 type Props = {};
 
@@ -39,7 +39,7 @@ const NavBar = (props: Props) => {
     const { isDarkMode, toggleDarkMode, muiTheme } = useTheme();
 
     // TODO: Verify that a medium breakpoint works to handle mobile cases, can always add more breakpoints
-    const isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
+    const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
 
     const dispatch = useAppDispatch();
     const authenticated = useAppSelector(selectAuthenticated);
@@ -48,21 +48,21 @@ const NavBar = (props: Props) => {
 
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
-    const [createStudyset] = useCreateStudysetMutation()
+    const [createStudyset] = useCreateStudysetMutation();
 
     const activeLinkStyle = ({ isActive }) => ({
-        borderBottom: isActive ? "0.2rem solid orange" : "none",
+        borderBottom: isActive ? '0.2rem solid orange' : 'none',
         color: `${muiTheme.palette.text.primary}`,
     });
 
     const handleLogout = async () => {
         try {
             const result = await signOut();
-            console.log("Sign-In Result = ", result);
+            console.log('Sign-In Result = ', result);
 
             dispatch(setAuthenticated(false));
         } catch (error) {
-            console.log("error signing out: ", error);
+            console.log('error signing out: ', error);
         }
     };
 
@@ -78,13 +78,17 @@ const NavBar = (props: Props) => {
         // @ts-ignore
         const { data } = await createStudyset({});
         const { studyset } = data;
-        navigate(`/create/${studyset.studysetUUID}`)
-    }
+        navigate(`/create/${studyset.studysetUUID}`);
+    };
 
     return (
-        <AppBar position="static" color="inherit" sx={{
-            zIndex: muiTheme.zIndex.drawer + 1
-        }}>
+        <AppBar
+            position="static"
+            color="inherit"
+            sx={{
+                zIndex: muiTheme.zIndex.drawer + 1,
+            }}
+        >
             <Toolbar>
                 {/*
                     TODO: Revisit what to do with logo 
