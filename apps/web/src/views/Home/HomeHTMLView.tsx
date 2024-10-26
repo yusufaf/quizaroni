@@ -1,23 +1,21 @@
-import { Studyset } from "lib/types";
-import { HTML_TABLE_HEADERS } from "utilities/constants";
+import { Studyset } from 'lib/types';
+import { HTML_TABLE_HEADERS } from 'utilities/constants';
 import {
     HomeHTMLTableWrapper,
     HomeHTMLTable,
     HTMLTableThead,
-} from "./HomeStyles";
-import { IconButton } from "@mui/material";
-import { MoreHoriz } from "@mui/icons-material";
-import { useState } from "react";
-import SetActionsMenu from "./SetActionsMenu";
-import { GhostLink } from "common/AppStyles";
+} from './HomeStyles';
+import { IconButton } from '@mui/material';
+import { MoreHoriz } from '@mui/icons-material';
+import { useState } from 'react';
+import SetActionsMenu from './SetActionsMenu';
+import { GhostLink } from 'common/AppStyles';
 
 type Props = {
     studysets: Studyset[];
 };
 
-const HomeHTMLView = (props: Props) => {
-    const { studysets } = props;
-
+const HomeHTMLView = ({ studysets }: Props) => {
     const [localSelectedStudyset, setLocalSelectedStudyset] =
         useState<Studyset | null>(null);
     const [actionsMenuOpen, setActionsMenuOpen] = useState<boolean>(false);
@@ -74,9 +72,9 @@ const HomeHTMLView = (props: Props) => {
                                     <td>
                                         {studyset.label
                                             ? studyset.label
-                                            : "No label"}
+                                            : 'No label'}
                                     </td>
-                                    <td>{studyset.favorited ? "✅" : "❌"}</td>
+                                    <td>{studyset.favorited ? '✅' : '❌'}</td>
                                     <td>
                                         <IconButton
                                             onClick={(e) => {
@@ -84,8 +82,8 @@ const HomeHTMLView = (props: Props) => {
                                                 openActionsMenu(e, studyset);
                                             }}
                                             sx={{
-                                                height: "2rem",
-                                                width: "2rem",
+                                                height: '2rem',
+                                                width: '2rem',
                                             }}
                                         >
                                             <MoreHoriz />

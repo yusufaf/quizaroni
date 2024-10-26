@@ -1,5 +1,4 @@
-import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
-import { StyledDialogActions, StyledDialogTitle } from 'common/AppStyles';
+import { StyledDialogActions } from 'common/AppStyles';
 import {
     ConfirmDescription,
     StyledDialog,
@@ -7,7 +6,6 @@ import {
 } from './styles';
 import { Button, TextField } from '@mui/material';
 import {
-    selectCognitoUser,
     selectConfirmationCodeDialogProps,
     setConfirmationCodeDialogProps,
 } from 'state/slices/globalSlice';
@@ -28,8 +26,9 @@ const ConfirmationCodeDialog = (props: Props) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
-    const cognitoUser = useAppSelector(selectCognitoUser);
-    const { username } = cognitoUser;
+    // const cognitoUser = useAppSelector(selectCognitoUser);
+    // const { username } = cognitoUser;
+    const username = '';
     const confirmationCodeDialogProps = useAppSelector(
         selectConfirmationCodeDialogProps
     );
