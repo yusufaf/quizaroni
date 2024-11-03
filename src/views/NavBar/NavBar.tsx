@@ -32,6 +32,7 @@ import {
 import { signOut } from 'aws-amplify/auth';
 import DarkModeToggleButton from './DarkModeToggleButton';
 import { useCreateStudysetMutation } from 'state/api/studysetsAPI';
+import { useAuthenticator } from '@aws-amplify/ui-react';
 
 type Props = {};
 
@@ -42,8 +43,9 @@ const NavBar = (props: Props) => {
     const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
 
     const dispatch = useAppDispatch();
-    const authenticated = useAppSelector(selectAuthenticated);
-
+    const { authStatus } = useAuthenticator((context) => [context.authStatus]);
+    const authenticated = authStatus === 'authenticated';
+    
     const navigate = useNavigate();
 
     const [showDropdown, setShowDropdown] = useState(false);

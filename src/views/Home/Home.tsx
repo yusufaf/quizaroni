@@ -30,7 +30,6 @@ import {
     useGetUserQuery,
     useUpdateUserMetadataMutation,
 } from 'state/api/usersAPI';
-import { selectAuthenticated } from 'state/slices/globalSlice';
 import { setSelectedStudySet } from 'state/slices/studysetsSlice';
 import {
     DEFAULT_USER_RESPONSE,
@@ -38,7 +37,6 @@ import {
     PAGE_TITLES,
     SORT_DIRECTIONS,
 } from 'utilities/constants';
-import LoginMessage from 'views/LoginMessage/LoginMessage';
 import HomeGridView from './HomeGridView';
 import HomeHTMLView from './HomeHTMLView';
 import {
@@ -109,8 +107,6 @@ const Home = (props: Props) => {
     /* Hooks / Redux */
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-
-    const authenticated = useAppSelector(selectAuthenticated);
 
     const { data: { user: { userUUID = '' } } = DEFAULT_USER_RESPONSE } =
         useGetUserQuery();
@@ -331,11 +327,6 @@ const Home = (props: Props) => {
     const handleDensityChange = (newDensity: GridDensity) => {
         setDensity(newDensity);
     };
-
-    // TODO: Replace this
-    if (!authenticated) {
-        return <LoginMessage page="home" />;
-    }
 
     return (
         <HomePage>

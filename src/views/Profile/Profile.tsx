@@ -1,41 +1,36 @@
-import { Tabs } from "@mui/material/";
-import { SyntheticEvent, useState } from "react";
+import { Tabs } from '@mui/material/';
+import { SyntheticEvent, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import {
-    selectAuthenticated,
-    selectCognitoUser,
-} from "state/slices/globalSlice";
-import LoginMessage from "views/LoginMessage/LoginMessage";
-import AccountTab from "./AccountTab";
-import CustomizationTab from "./CustomizationTab";
-import ProfileCard from "./ProfileCard";
+import AccountTab from './AccountTab';
+import CustomizationTab from './CustomizationTab';
+import ProfileCard from './ProfileCard';
 import {
     ProfileContainer,
     ProfilePage,
     ProfilePaper,
     ProfileTab,
-} from "./ProfileStyles";
-import { useGetUserQuery } from "state/api/usersAPI";
-import { DEFAULT_USER_RESPONSE, PAGE_TITLES } from "utilities/constants";
-import useBrowserTitle from "lib/hooks/useBrowserTitle";
+} from './ProfileStyles';
+import { useGetUserQuery } from 'state/api/usersAPI';
+import { DEFAULT_USER_RESPONSE, PAGE_TITLES } from 'utilities/constants';
+import useBrowserTitle from 'lib/hooks/useBrowserTitle';
 
 const TABS = {
-    ACCOUNT: "Account",
-    CUSTOMIZATION: "Customization",
+    ACCOUNT: 'Account',
+    CUSTOMIZATION: 'Customization',
 };
 
 type Props = {};
 
 const Profile = (props: Props) => {
     const dispatch = useAppDispatch();
-    const authenticated = useAppSelector(selectAuthenticated);
 
-    const { data: { user: userData } = DEFAULT_USER_RESPONSE } = useGetUserQuery();
+    const { data: { user: userData } = DEFAULT_USER_RESPONSE } =
+        useGetUserQuery();
 
     useBrowserTitle(PAGE_TITLES.PROFILE);
 
     const [selectedProfileTab, setSelectedProfileTab] = useState<string>(
-        localStorage.getItem("profileTab") ?? TABS.CUSTOMIZATION
+        localStorage.getItem('profileTab') ?? TABS.CUSTOMIZATION
     );
 
     /* User Input Error Checking */
@@ -44,13 +39,9 @@ const Profile = (props: Props) => {
     });
 
     const onTabChange = (_e: SyntheticEvent, newTab: string) => {
-        localStorage.setItem("profileTab", newTab);
+        localStorage.setItem('profileTab', newTab);
         setSelectedProfileTab(newTab);
     };
-
-    if (!authenticated) {
-        return <LoginMessage page="profile" />;
-    }
 
     return (
         <>
