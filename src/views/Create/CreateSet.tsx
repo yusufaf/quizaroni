@@ -16,12 +16,8 @@ import {
     useGetStudysetQuery,
     useUpdateStudysetMutation,
 } from 'state/api/studysetsAPI';
-import {
-    selectAuthenticated,
-    selectNamedColorsDialogProps,
-} from 'state/slices/globalSlice';
+import { selectNamedColorsDialogProps } from 'state/slices/globalSlice';
 import { DEFAULT_USER_RESPONSE } from 'utilities/constants';
-import LoginMessage from 'views/LoginMessage/LoginMessage';
 import CreateSetHeader from './CreateSetHeader';
 import { AddCardButton, AddCardIcon, CreateSetPage } from './CreateSetStyles';
 import ImportCardsModal from './ImportCartsModal/ImportCardsModal';
@@ -48,8 +44,6 @@ const CreateSet = (props: Props) => {
     const { id: studysetUUID } = useParams();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-
-    const authenticated = useAppSelector(selectAuthenticated);
 
     const {
         data: {
@@ -319,10 +313,6 @@ const CreateSet = (props: Props) => {
         title,
         mainButtonDisabled,
     };
-
-    if (!authenticated) {
-        return <LoginMessage page="createSet" />;
-    }
 
     return (
         <>
