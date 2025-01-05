@@ -1,6 +1,14 @@
-import { BASE_API_URL, getCommonPostRequestProps } from "api/awsAPI";
-import api from "./api";
-import { CreateUserParams, GetUserParams, GetUserResponse, UpdateDefaultThemeParams, UpdateEmailParams, UpdateUserMetadataParams, User } from "lib/types";
+import { BASE_API_URL, getCommonPostRequestProps } from 'state/api/awsAPI';
+import api from './api';
+import {
+    CreateUserParams,
+    GetUserParams,
+    GetUserResponse,
+    UpdateDefaultThemeParams,
+    UpdateEmailParams,
+    UpdateUserMetadataParams,
+    User,
+} from 'shared/types';
 
 /* Endpoints
     router.post("/api/users/create", createUser);
@@ -14,8 +22,8 @@ export const usersApi = api.injectEndpoints({
     endpoints: (build) => ({
         createUser: build.mutation<void, CreateUserParams>({
             query: ({ email, username }) => ({
-                url: "users/create",
-                method: "POST",
+                url: 'users/create',
+                method: 'POST',
                 params: { email, username },
             }),
         }),
@@ -27,9 +35,7 @@ export const usersApi = api.injectEndpoints({
             providesTags: (result, _error, _arg) => {
                 // @ts-ignore - TODO: Update types
                 const { user } = result;
-                return [
-                    { type: "User", id: user.userUUID },
-                ]
+                return [{ type: 'User', id: user.userUUID }];
             },
         }),
         updateUserMetadata: build.mutation<void, UpdateUserMetadataParams>({
@@ -38,29 +44,29 @@ export const usersApi = api.injectEndpoints({
                 ...getCommonPostRequestProps(),
                 body: { updates },
             }),
-            invalidatesTags: ["User"],
+            invalidatesTags: ['User'],
         }),
         updateDefaultTheme: build.mutation<void, UpdateDefaultThemeParams>({
             query: ({ newTheme, uuid }) => ({
-                url: "users/updateDefaultTheme",
-                method: "POST",
+                url: 'users/updateDefaultTheme',
+                method: 'POST',
                 body: {
                     uuid,
-                    newTheme
+                    newTheme,
                 },
             }),
-            invalidatesTags: ["User"],
+            invalidatesTags: ['User'],
         }),
         updateEmail: build.mutation<void, UpdateEmailParams>({
             query: ({ username, newEmail }) => ({
-                url: "users/updateEmail",
-                method: "POST",
+                url: 'users/updateEmail',
+                method: 'POST',
                 body: {
-                    username, 
-                    newEmail
+                    username,
+                    newEmail,
                 },
             }),
-            invalidatesTags: ["User"],
+            invalidatesTags: ['User'],
         }),
     }),
 });

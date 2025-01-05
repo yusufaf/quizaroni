@@ -4,11 +4,11 @@ import {
     FormControlLabel,
     Switch,
     Typography,
-} from "@mui/material";
-import { SET_METADATA_FIELDS, ENABLED, DISABLED } from "utilities/constants";
-import { Studyset, TODO } from "lib/types";
-import { useTheme } from "theme/useTheme";
-import { useMemo } from "react";
+} from '@mui/material';
+import { SET_METADATA_FIELDS, ENABLED, DISABLED } from 'shared/constants';
+import { Studyset, TODO } from 'shared/types';
+import { useTheme } from 'theme/useTheme';
+import { useMemo } from 'react';
 
 type Props = {
     anchorEl: Element | null;
@@ -44,23 +44,23 @@ const ControlMenu = ({
             {
                 condition: textColorVisible,
                 updateProperty: SET_METADATA_FIELDS.TEXT,
-                label: "Text Color",
+                label: 'Text Color',
                 description:
-                    "If enabled, text color for the term/definition will be applied/visible.",
+                    'If enabled, text color for the term/definition will be applied/visible.',
             },
             {
                 condition: backgroundColorVisible,
                 updateProperty: SET_METADATA_FIELDS.BACKGROUND,
-                label: "Background Color",
+                label: 'Background Color',
                 description:
-                    "If enabled, background color for cards will be applied/visible.",
+                    'If enabled, background color for cards will be applied/visible.',
             },
             {
                 condition: contentOnly,
                 updateProperty: SET_METADATA_FIELDS.CONTENT_ONLY,
-                label: "Content Only",
+                label: 'Content Only',
                 description:
-                    "If enabled, buttons and labels on all cards will be hidden.",
+                    'If enabled, buttons and labels on all cards will be hidden.',
             },
         ],
         [textColorVisible, backgroundColorVisible, contentOnly]

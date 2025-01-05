@@ -1,26 +1,26 @@
-import { useEffect, useState } from "react";
-import { Box, Paper, Popover, Typography } from "@mui/material/";
-import { useNavigate } from "react-router-dom";
-import PasswordToggle from "components/PasswordToggle/PasswordToggle";
-import { PAGE_TITLES } from "utilities/constants";
-import { BoldTypography } from "common/AppStyles";
+import { useEffect, useState } from 'react';
+import { Box, Paper, Popover, Typography } from '@mui/material/';
+import { useNavigate } from 'react-router-dom';
+import PasswordToggle from 'components/PasswordToggle/PasswordToggle';
+import { PAGE_TITLES } from 'shared/constants';
+import { BoldTypography } from 'styles/AppStyles';
 import {
     LoginButton as SignupButton,
     LoginContainer as SignupContainer,
     LoginField as SignupField,
     LoginPageContainer as SignupPageContainer,
     LoginTitle as SignupTitle,
-} from "views/Login/LoginStyles";
-import { StyledLink } from "common/AppStyles";
-import useBrowserTitle from "lib/hooks/useBrowserTitle";
+} from 'views/Login/LoginStyles';
+import { StyledLink } from 'styles/AppStyles';
+import useBrowserTitle from 'hooks/useBrowserTitle';
 import { useAppDispatch } from 'state/reduxHooks';
 import {
     // setCognitoUser,
     setConfirmationCodeDialogProps,
-} from "state/slices/globalSlice";
-import { signUp } from "@aws-amplify/auth";
-import PasswordValidator from "components/PasswordValidator/PasswordValidator";
-import { useCreateUserMutation } from "state/api/usersAPI";
+} from 'state/slices/globalSlice';
+import { signUp } from '@aws-amplify/auth';
+import PasswordValidator from 'components/PasswordValidator/PasswordValidator';
+import { useCreateUserMutation } from 'state/api/usersAPI';
 
 type Props = {};
 
@@ -34,11 +34,11 @@ const Signup = (props: Props) => {
     const [createUser] = useCreateUserMutation();
 
     /* Signup Input States */
-    const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [confirmPassword, setConfirmPassword] = useState<string>("");
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [confirmPassword, setConfirmPassword] = useState<string>('');
 
-    const [username, setUsername] = useState<string>("");
+    const [username, setUsername] = useState<string>('');
     const [passVisibility, setPassVisibility] = useState<boolean>(false);
 
     const [passwordValid, setPasswordValid] = useState<boolean>(false);
@@ -88,12 +88,12 @@ const Signup = (props: Props) => {
             dispatch(
                 setConfirmationCodeDialogProps({
                     open: true,
-                    actionType: "signUp",
-                    title: "Confirm Sign Up",
+                    actionType: 'signUp',
+                    title: 'Confirm Sign Up',
                 })
             );
         } catch (error) {
-            console.log("error signing up:", error);
+            console.log('error signing up:', error);
         }
     };
 
@@ -103,7 +103,7 @@ const Signup = (props: Props) => {
      */
     const enterKeyHandler = (e: any) => {
         const key = e.key.trim();
-        if (key === "Enter") {
+        if (key === 'Enter') {
             handleSignup();
         }
     };
@@ -142,7 +142,7 @@ const Signup = (props: Props) => {
                     <SignupField
                         label="Password"
                         name="passInput"
-                        type={passVisibility ? "text" : "password"}
+                        type={passVisibility ? 'text' : 'password'}
                         value={password}
                         onChange={handlePasswordChange}
                         error={showErrorText.passInput}
@@ -163,18 +163,18 @@ const Signup = (props: Props) => {
                             setIsPasswordValid={setPasswordValid}
                             password={password}
                             style={{
-                                marginTop: "0.5rem",
+                                marginTop: '0.5rem',
                             }}
                         />
                     )}
                     <SignupField
                         label="Confirm Password"
                         name="passInput"
-                        type={passVisibility ? "text" : "password"}
+                        type={passVisibility ? 'text' : 'password'}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         helperText={
-                            showErrorText.passInput && "A password is required"
+                            showErrorText.passInput && 'A password is required'
                         }
                         error={showErrorText.passInput}
                         size="small"

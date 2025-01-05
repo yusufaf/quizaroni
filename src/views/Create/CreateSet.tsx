@@ -1,5 +1,5 @@
 import ScrollToTopFab from 'components/ScrollToTopFab/ScrollToTopFab';
-import useBrowserTitle from 'lib/hooks/useBrowserTitle';
+import useBrowserTitle from 'hooks/useBrowserTitle';
 import {
     ChangeEvent,
     useCallback,
@@ -17,23 +17,23 @@ import {
     useUpdateStudysetMutation,
 } from 'state/api/studysetsAPI';
 import { selectNamedColorsDialogProps } from 'state/slices/globalSlice';
-import { DEFAULT_USER_RESPONSE } from 'utilities/constants';
+import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import CreateSetHeader from './CreateSetHeader';
 import { AddCardButton, AddCardIcon, CreateSetPage } from './CreateSetStyles';
 import ImportCardsModal from './ImportCartsModal/ImportCardsModal';
 import NewCardInput from './NewCardInput/NewCardInput';
 import SetModificationButtons from './SetModificationButtons';
 import { Virtuoso } from 'react-virtuoso';
-import { EMPTY_CARD } from 'utilities/constants';
-import { addCard } from 'utilities/createUtils';
+import { EMPTY_CARD } from 'shared/constants';
+import { addCard } from 'shared/utilities/createUtils';
 import { Create } from '@mui/icons-material';
 import {
     selectAdvancedSectionProps,
     setAdvancedSectionProps,
 } from 'state/slices/createSetSlice';
 import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
-import { Card, Studyset } from 'lib/types';
-import { SimpleFlexContainer, SpacedFlexContainer } from 'common/AppStyles';
+import { Card, Studyset } from 'shared/types';
+import { SimpleFlexContainer, SpacedFlexContainer } from 'styles/AppStyles';
 import { Button, SelectChangeEvent, Tooltip, Typography } from '@mui/material';
 import { useGetUserQuery } from 'state/api/usersAPI';
 import NoCardsWarningsIcon from 'components/NoCardsWarningsIcon/NoCardsWarningsIcon';

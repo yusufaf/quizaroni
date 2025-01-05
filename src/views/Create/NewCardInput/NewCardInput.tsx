@@ -1,6 +1,6 @@
 import { Add } from '@mui/icons-material';
 import FileUpload from 'components/FileUpload/FileUpload';
-import type { Card, TODO } from 'lib/types';
+import type { Card, TODO } from 'shared/types';
 import { Dispatch, SetStateAction, useState } from 'react';
 import {
     AddCardBelowButton,
@@ -13,9 +13,9 @@ import {
     NewCardRow,
     NewCardTerm,
 } from '../CreateSetStyles';
-import useFileUpload from 'lib/hooks/useFileUpload';
+import useFileUpload from 'hooks/useFileUpload';
 import NewCardHeader from './NewCardHeader';
-import { addCard } from 'utilities/createUtils';
+import { addCard } from 'shared/utilities/createUtils';
 import { useParams } from 'react-router-dom';
 
 type Props = {

@@ -1,14 +1,14 @@
-import { Dispatch, SetStateAction } from "react";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { Studyset } from "lib/types";
+import { Dispatch, SetStateAction } from 'react';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { Studyset } from 'shared/types';
 import {
     CategoryFormControl,
     CategoryInputsContainer,
     StyledMenuItem,
-} from "./styles";
-import { InputLabel, Typography } from "@mui/material";
-import CategoriesList from "./CategoriesList";
-import { TABS } from "./constants";
+} from './styles';
+import { InputLabel, Typography } from '@mui/material';
+import CategoriesList from './CategoriesList';
+import { TABS } from './constants';
 
 type Props = {
     selectedStudyset: Studyset;

@@ -1,6 +1,6 @@
 import { Dialog } from '@mui/material';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
-import { Studyset } from 'lib/types';
+import { Studyset } from 'shared/types';
 
 type Props = {
     open: boolean;
@@ -13,10 +13,7 @@ const PrintDialog = (props: Props) => {
 
     return (
         <Dialog open={open} onClose={onClose} fullScreen>
-                                        <StandardDialogTitle
-                    title="Print"
-                    onClose={onClose}
-                />
+            <StandardDialogTitle title="Print" onClose={onClose} />
         </Dialog>
     );
 };

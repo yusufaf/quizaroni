@@ -17,7 +17,7 @@ import {
 } from 'state/slices/globalSlice';
 import ProfileDropdown from 'views/Profile/ProfileDropdown';
 import { useTheme } from 'theme/useTheme';
-import { ROUTES } from 'utilities/constants';
+import { ROUTES } from 'shared/constants';
 import NavDrawer from './NavDrawer';
 import {
     AuthenticationButton,
@@ -45,7 +45,7 @@ const NavBar = (props: Props) => {
     const dispatch = useAppDispatch();
     const { authStatus } = useAuthenticator((context) => [context.authStatus]);
     const authenticated = authStatus === 'authenticated';
-    
+
     const navigate = useNavigate();
 
     const [showDropdown, setShowDropdown] = useState(false);

@@ -1,17 +1,17 @@
-import { Dispatch, SetStateAction, SyntheticEvent, useMemo } from "react";
+import { Dispatch, SetStateAction, SyntheticEvent, useMemo } from 'react';
 import {
     CardFiltersContainer,
     CategoryTab,
     CategoryTabs,
     SortCardsDropdown,
-} from "../styles";
-import { SimpleFlexContainer } from "common/AppStyles";
+} from '../styles';
+import { SimpleFlexContainer } from 'styles/AppStyles';
 import {
     DEFAULT_CATEGORIES,
     SORT_DIRECTIONS,
     VIEW_SET_DIALOGS,
-} from "utilities/constants";
-import { Studyset, SortDirection } from "lib/types";
+} from 'shared/constants';
+import { Studyset, SortDirection } from 'shared/types';
 import {
     Button,
     IconButton,
@@ -19,10 +19,10 @@ import {
     MenuItem,
     Select,
     SelectChangeEvent,
-} from "@mui/material";
-import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
+} from '@mui/material';
+import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { useAppDispatch } from 'state/reduxHooks';
-import { setSelectedDialog } from "state/slices/viewSetsSlice";
+import { setSelectedDialog } from 'state/slices/viewSetsSlice';
 
 type Props = {
     selectedTab: string;
@@ -75,7 +75,7 @@ const ViewStudysetFilters = ({
 
     return (
         <CardFiltersContainer>
-            <SimpleFlexContainer style={{ gap: "1rem" }}>
+            <SimpleFlexContainer style={{ gap: '1rem' }}>
                 <CategoryTabs
                     value={selectedTab}
                     onChange={onTabChange}
@@ -112,11 +112,11 @@ const ViewStudysetFilters = ({
                         <MenuItem value="">
                             <em>None</em>
                         </MenuItem>
-                        <MenuItem value={"term"}>Alphabetical - Term</MenuItem>
-                        <MenuItem value={"definition"}>
+                        <MenuItem value={'term'}>Alphabetical - Term</MenuItem>
+                        <MenuItem value={'definition'}>
                             Alphabetical - Definition
                         </MenuItem>
-                        <MenuItem value={"label"}>
+                        <MenuItem value={'label'}>
                             Alphabetical - Label
                         </MenuItem>
                     </Select>

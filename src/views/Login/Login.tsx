@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Paper } from "@mui/material/";
-import PasswordToggle from "components/PasswordToggle/PasswordToggle";
-import { PAGE_TITLES } from "utilities/constants";
-import useBrowserTitle from "lib/hooks/useBrowserTitle";
+import { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Paper } from '@mui/material/';
+import PasswordToggle from 'components/PasswordToggle/PasswordToggle';
+import { PAGE_TITLES } from 'shared/constants';
+import useBrowserTitle from 'hooks/useBrowserTitle';
 import {
     ForgotPasswordLink,
     LoginPageContainer,
@@ -11,14 +11,11 @@ import {
     LoginField,
     LoginTitle,
     LoginButton,
-} from "./LoginStyles";
-import { StyledLink } from "common/AppStyles";
+} from './LoginStyles';
+import { StyledLink } from 'styles/AppStyles';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import {
-    setCognitoUser,
-    setAuthenticated,
-} from "state/slices/globalSlice";
-import { signIn } from "@aws-amplify/auth";
+import { setCognitoUser, setAuthenticated } from 'state/slices/globalSlice';
+import { signIn } from '@aws-amplify/auth';
 
 type Props = {};
 const Login = (props: Props) => {
@@ -30,8 +27,8 @@ const Login = (props: Props) => {
     // const provider = new GoogleAuthProvider();
     // provider.setCustomParameters({ prompt: 'select_account' });
 
-    const [username, setUsername] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
+    const [username, setUsername] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
     const [passVisibility, setPassVisibility] = useState<boolean>(false);
     const [showErrorText, setShowErrorText] = useState({
         emailInput: false,
@@ -61,23 +58,23 @@ const Login = (props: Props) => {
     const handleLogin = async () => {
         try {
             const user = await signIn({ username, password });
-            console.log("Result of cognito sign in = ", user);
+            console.log('Result of cognito sign in = ', user);
 
             /* Store cognito user and authenticated in state */
-            dispatch(setCognitoUser({username}));
+            dispatch(setCognitoUser({ username }));
             dispatch(setAuthenticated(true));
 
             // Navigate to home page
-            navigate("/");
+            navigate('/');
         } catch (error) {
-            console.error("Error signing in", error);
+            console.error('Error signing in', error);
         }
     };
 
     /* Function to check if "Enter" key was hit and call function */
     const enterKeyHandler = (e) => {
         const key = e.key.trim();
-        if (key === "Enter") {
+        if (key === 'Enter') {
             handleLogin();
         }
     };
@@ -106,7 +103,7 @@ const Login = (props: Props) => {
                         />
                         <LoginField
                             label="Password"
-                            type={passVisibility ? "text" : "password"}
+                            type={passVisibility ? 'text' : 'password'}
                             value={password}
                             name="passInput"
                             onChange={handlePasswordChange}

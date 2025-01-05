@@ -11,16 +11,16 @@ import {
     Divider,
     Fab,
 } from '@mui/material/';
-import { BoldTypography, SimpleFlexContainer } from 'common/AppStyles';
+import { BoldTypography, SimpleFlexContainer } from 'styles/AppStyles';
 import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
-import useCustomMutation from 'lib/hooks/useCustomMutation';
-import { Card, OpenCardNotes, Studyset, UUID } from 'lib/types';
+import useCustomMutation from 'hooks/useCustomMutation';
+import { Card, OpenCardNotes, Studyset, UUID } from 'shared/types';
 import { useMemo, useState } from 'react';
 import {
     useCreateNoteMutation,
     useEditNoteMutation,
 } from 'state/api/studysetsAPI';
-import { NOTES_DRAWER_INITIAL_APPEARANCE } from 'utilities/constants';
+import { NOTES_DRAWER_INITIAL_APPEARANCE } from 'shared/constants';
 import NotesList from './NotesList';
 import { StyledDrawer } from './styles';
 

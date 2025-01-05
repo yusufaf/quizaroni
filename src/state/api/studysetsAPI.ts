@@ -1,4 +1,4 @@
-import { BASE_API_URL, getCommonPostRequestProps } from 'api/awsAPI';
+import { BASE_API_URL, getCommonPostRequestProps } from 'state/api/awsAPI';
 import api from './api';
 import {
     UUID,
@@ -21,7 +21,7 @@ import {
     CreateStudysetResponse,
     BatchUpdateStudysetsParams,
     CreateNoteResponse,
-} from 'lib/types';
+} from 'shared/types';
 
 // TODO: Look into set actions delete, duplicate, favorite. Currently fetches all studysets again once called.
 export const studysetsApi = api.injectEndpoints({
@@ -160,7 +160,7 @@ export const studysetsApi = api.injectEndpoints({
 
                 try {
                     const { data } = await queryFulfilled;
-                    console.log("We out here");
+                    console.log('We out here');
                     // Update the cache to replace the `temporary-id` with the real noteUUID
                     dispatch(
                         api.util.updateQueryData(

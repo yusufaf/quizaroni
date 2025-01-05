@@ -6,7 +6,7 @@ import {
     DialogContentText,
     FormControlLabel,
 } from '@mui/material/';
-import { StyledDialogActions } from 'common/AppStyles';
+import { StyledDialogActions } from 'styles/AppStyles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import { DeleteDialogContent } from './ProfileStyles';
 

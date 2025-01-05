@@ -6,9 +6,9 @@ import {
     Radio,
     RadioGroup,
 } from '@mui/material';
-import { Studyset } from 'lib/types';
+import { Studyset } from 'shared/types';
 import { ChangeEvent, useState, MouseEvent, useEffect } from 'react';
-import { FORMAT_TERMINOLOGIES } from 'utilities/constants';
+import { FORMAT_TERMINOLOGIES } from 'shared/constants';
 import { CustomInputsContainer, StyledTextField } from './styles';
 import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 
