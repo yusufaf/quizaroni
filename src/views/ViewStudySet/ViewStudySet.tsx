@@ -1,11 +1,11 @@
 import { ArrowBack, ViewCarouselRounded } from '@mui/icons-material/';
 import { Button, Chip, Skeleton, Tooltip, Typography } from '@mui/material/';
-import { BoldTypography, SimpleFlexContainer } from 'common/AppStyles';
+import { BoldTypography, SimpleFlexContainer } from 'styles/AppStyles';
 import ScrollToTopFab from 'components/ScrollToTopFab/ScrollToTopFab';
-import useBrowserTitle from 'lib/hooks/useBrowserTitle';
-import useFilterViewCards from 'lib/hooks/useFilterViewCards';
-import useSortViewCards from 'lib/hooks/useSortViewCards';
-import { OpenCardNotes, SortDirection, Studyset, UUID } from 'lib/types';
+import useBrowserTitle from 'hooks/useBrowserTitle';
+import useFilterViewCards from 'hooks/useFilterViewCards';
+import useSortViewCards from 'hooks/useSortViewCards';
+import { OpenCardNotes, SortDirection, Studyset, UUID } from 'shared/types';
 import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -26,7 +26,7 @@ import {
     SORT_DIRECTIONS,
     VIEW_SET_DIALOGS,
     DEFAULT_USER_RESPONSE,
-} from 'utilities/constants';
+} from 'shared/constants';
 import DownloadSetModal from './DownloadSetModal/DownloadSetModal';
 import ManageCategoriesDialog from './ManageCategoriesDialog/ManageCategoriesDialog';
 import NotificationsDialog from './NotificationsDialog/NotificationsDialog';

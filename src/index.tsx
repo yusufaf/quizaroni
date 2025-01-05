@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { CustomThemeProvider } from './lib/theme/ThemeProvider';
+import { CustomThemeProvider } from './shared/theme/ThemeProvider';
 import { CssBaseline } from '@mui/material';
 
 import './index.css';

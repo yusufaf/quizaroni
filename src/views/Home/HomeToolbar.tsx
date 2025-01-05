@@ -12,7 +12,7 @@ import {
     TextField,
     ToggleButton,
     ToggleButtonGroup,
-} from "@mui/material";
+} from '@mui/material';
 import {
     GridView as GridViewIcon,
     Search as SearchIcon,
@@ -27,22 +27,22 @@ import {
     FavoriteBorderRounded,
     ContentCopyRounded,
     LabelRounded,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 import {
     HOME_LAYOUTS,
     SORT_DIRECTIONS,
     STUDYSET_CONFIRM_DIALOGS,
-} from "utilities/constants";
-import { SimpleFlexContainer, SpacedFlexContainer } from "common/AppStyles";
-import { ChangeEvent, Dispatch, SetStateAction } from "react";
-import { SortDirection, Studyset } from "lib/types";
+} from 'shared/constants';
+import { SimpleFlexContainer, SpacedFlexContainer } from 'styles/AppStyles';
+import { ChangeEvent, Dispatch, SetStateAction } from 'react';
+import { SortDirection, Studyset } from 'shared/types';
 import {
     setLabelsDialogProps,
     showConfirmDialog,
-} from "state/slices/globalSlice";
+} from 'state/slices/globalSlice';
 import { useAppDispatch } from 'state/reduxHooks';
-import { useNavigate } from "react-router-dom";
-import { useUpdateStudysetMutation } from "state/api/studysetsAPI";
+import { useNavigate } from 'react-router-dom';
+import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 
 type Props = {
     handleViewChange: (_event: any, newView: string | null) => void;
@@ -83,7 +83,7 @@ const HomeToolbar = ({
     };
 
     const clearSearchText = () => {
-        setSearchText("");
+        setSearchText('');
     };
 
     const onSortChange = (event: SelectChangeEvent<string>) => {
@@ -113,7 +113,7 @@ const HomeToolbar = ({
             studysetUUID,
             updates: {
                 favorited: !oldFavorited,
-            }
+            },
         });
     };
 
@@ -137,15 +137,15 @@ const HomeToolbar = ({
             setLabelsDialogProps({
                 open: true,
                 selectedStudysetUUIDs,
-                tab: "ASSIGN",
+                tab: 'ASSIGN',
             })
         );
     };
 
     return (
-        (<SpacedFlexContainer style={{ alignItems: "baseline" }}>
+        <SpacedFlexContainer style={{ alignItems: 'baseline' }}>
             {!isTableView && (
-                <SimpleFlexContainer style={{ gap: "1rem" }}>
+                <SimpleFlexContainer style={{ gap: '1rem' }}>
                     <TextField
                         label="Search"
                         InputProps={{
@@ -162,7 +162,7 @@ const HomeToolbar = ({
                                 </InputAdornment>
                             ) : (
                                 // Spacing div to prevent moving when no search text
-                                (<div style={{ width: "3rem" }} />)
+                                <div style={{ width: '3rem' }} />
                             ),
                         }}
                         variant="standard"
@@ -195,14 +195,14 @@ const HomeToolbar = ({
                                 <MenuItem value="">
                                     <em>None</em>
                                 </MenuItem>
-                                <MenuItem value={"title"}>Title</MenuItem>
-                                <MenuItem value={"lastViewed"}>
+                                <MenuItem value={'title'}>Title</MenuItem>
+                                <MenuItem value={'lastViewed'}>
                                     Last Viewed
                                 </MenuItem>
-                                <MenuItem value={"createdAt"}>
+                                <MenuItem value={'createdAt'}>
                                     Date Created
                                 </MenuItem>
-                                <MenuItem value={"numCards"}>
+                                <MenuItem value={'numCards'}>
                                     # of Cards
                                 </MenuItem>
                             </Select>
@@ -211,7 +211,7 @@ const HomeToolbar = ({
                 </SimpleFlexContainer>
             )}
             {isTableView && selectedStudysetRows.length > 0 && (
-                <SimpleFlexContainer style={{ gap: "1rem" }}>
+                <SimpleFlexContainer style={{ gap: '1rem' }}>
                     {!(selectedStudysetRows.length > 1) && (
                         <>
                             <Button
@@ -231,8 +231,8 @@ const HomeToolbar = ({
                                 onClick={handleFavoriteClick}
                             >
                                 {firstStudyset?.favorited
-                                    ? "Unfavorite"
-                                    : "Favorite"}
+                                    ? 'Unfavorite'
+                                    : 'Favorite'}
                             </Button>
                         </>
                     )}
@@ -269,7 +269,7 @@ const HomeToolbar = ({
                 exclusive
                 onChange={handleViewChange}
                 value={selectedView}
-                sx={{ marginLeft: "auto" }}
+                sx={{ marginLeft: 'auto' }}
             >
                 <ToggleButton
                     value={HOME_LAYOUTS.TABLE}
@@ -293,7 +293,7 @@ const HomeToolbar = ({
                     <HTMLIcon />
                 </ToggleButton>
             </ToggleButtonGroup>
-        </SpacedFlexContainer>)
+        </SpacedFlexContainer>
     );
 };
 

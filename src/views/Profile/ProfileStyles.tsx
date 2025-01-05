@@ -9,7 +9,7 @@ import {
     Tab,
     Typography,
 } from '@mui/material';
-import { BasePage, FlexColumn } from 'common/AppStyles';
+import { BasePage, FlexColumn } from 'styles/AppStyles';
 
 export const ProfilePage = styled(BasePage)({
     display: 'grid',

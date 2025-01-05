@@ -1,19 +1,19 @@
-import { Button, IconButton, TextField, Typography } from "@mui/material";
-import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
+import { Button, IconButton, TextField, Typography } from '@mui/material';
+import { BoldTypography, SimpleFlexContainer } from 'styles/AppStyles';
 import {
     AdvancedSection,
     BlankInputsContainer,
     BlankInputsField,
-} from "./CreateSetStyles";
+} from './CreateSetStyles';
 import {
     ExpandMore as ExpandMoreIcon,
     ExpandLess as ExpandLessIcon,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import {
     selectAdvancedSectionProps,
     setAdvancedSectionProps,
-} from "state/slices/createSetSlice";
+} from 'state/slices/createSetSlice';
 
 type Props = {
     onBlankInputsSubmit: any;

@@ -1,33 +1,29 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {
-  Studyset
-} from "lib/types";
+import { Studyset } from 'shared/types';
 
 type ViewSetsSliceState = {
     selectedDialog: string;
-}
+};
 
 const initialState: ViewSetsSliceState = {
-    selectedDialog: ""
-}
+    selectedDialog: '',
+};
 
-const sliceName = "viewSets";
+const sliceName = 'viewSets';
 
 export const viewSetsSlice = createSlice({
-  name: sliceName,
-  initialState,
-  reducers: {
-    setSelectedDialog: (state, action: PayloadAction<any>) => {
-        state.selectedDialog = action.payload;
-    }
-  },
-})
+    name: sliceName,
+    initialState,
+    reducers: {
+        setSelectedDialog: (state, action: PayloadAction<any>) => {
+            state.selectedDialog = action.payload;
+        },
+    },
+});
 
-export const { 
-    setSelectedDialog
-} = viewSetsSlice.actions
+export const { setSelectedDialog } = viewSetsSlice.actions;
 
 /* Selectors */
 export const selectSelectedDialog = (state) => state[sliceName].selectedDialog;
 
-export default viewSetsSlice.reducer
+export default viewSetsSlice.reducer;

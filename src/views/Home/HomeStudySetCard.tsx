@@ -1,7 +1,7 @@
-import { MoreHoriz } from "@mui/icons-material/";
-import { IconButton, Typography } from "@mui/material/";
-import { useState } from "react";
-import { useTheme } from "theme/useTheme";
+import { MoreHoriz } from '@mui/icons-material/';
+import { IconButton, Typography } from '@mui/material/';
+import { useState } from 'react';
+import { useTheme } from 'theme/useTheme';
 import {
     CardBottom,
     CardContent,
@@ -12,13 +12,13 @@ import {
     LabelChip,
     SpacedContainer,
     TermsLabel,
-} from "./HomeStyles";
-import SetActionsMenu from "./SetActionsMenu";
+} from './HomeStyles';
+import SetActionsMenu from './SetActionsMenu';
 import { useAppDispatch } from 'state/reduxHooks';
-import { setSelectedStudySet } from "state/slices/studysetsSlice";
-import { useNavigate } from "react-router-dom";
-import { Studyset } from "lib/types";
-import { GhostLink } from "common/AppStyles";
+import { setSelectedStudySet } from 'state/slices/studysetsSlice';
+import { useNavigate } from 'react-router-dom';
+import { Studyset } from 'shared/types';
+import { GhostLink } from 'styles/AppStyles';
 
 type Props = {
     studyset: Studyset;
@@ -38,7 +38,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { muiTheme } = useTheme();
-    
+
     const [actionsMenuOpen, setActionsMenuOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
@@ -47,7 +47,9 @@ const HomeStudySetCard = ({ studyset }: Props) => {
         navigate(`/view/${studysetUUID}`);
     };
 
-    const openActionsMenu = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const openActionsMenu = (
+        event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ) => {
         setAnchorEl(event.currentTarget);
         setActionsMenuOpen(true);
     };
@@ -62,7 +64,9 @@ const HomeStudySetCard = ({ studyset }: Props) => {
             <HomeSetCard raised onClick={onCardClick}>
                 <CardContent>
                     <CardTitle title={title} variant="h6">
-                        <GhostLink to={`/view/${studysetUUID}`}>{title}</GhostLink>
+                        <GhostLink to={`/view/${studysetUUID}`}>
+                            {title}
+                        </GhostLink>
                     </CardTitle>
                     <Typography variant="subtitle1">
                         {`Created by ${username}`}
@@ -87,9 +91,9 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                     </CardInfo>
                     <CardBottom>
                         <LabelChip
-                            label={label ? label : "No label selected"}
+                            label={label ? label : 'No label selected'}
                             variant="outlined"
-                            color={!label ? "error" : undefined}
+                            color={!label ? 'error' : undefined}
                         />
                         <IconButton
                             onClick={(e) => {

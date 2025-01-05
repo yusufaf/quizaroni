@@ -1,21 +1,20 @@
-import { AddPhotoAlternate as AddPhotoIcon } from "@mui/icons-material";
-import { Typography } from "@mui/material/";
-import { useEffect, useRef } from "react";
+import { AddPhotoAlternate as AddPhotoIcon } from '@mui/icons-material';
+import { Typography } from '@mui/material/';
+import { useEffect, useRef } from 'react';
 import {
     ProfilePicture,
     StyledProfileCard,
     UploadImageButton,
     UserInfoContainer,
     UserInfoHeading,
-} from "./ProfileStyles";
-import { useGetAllStudysetsQuery } from "state/api/studysetsAPI";
-import { User } from "lib/types";
+} from './ProfileStyles';
+import { useGetAllStudysetsQuery } from 'state/api/studysetsAPI';
+import { User } from 'shared/types';
 
 type Props = {
     userData: User;
 };
 const ProfileCard = ({ userData }: Props) => {
-
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
         useGetAllStudysetsQuery({});
     const studysets = studysetsResponse?.studysets ?? [];
@@ -27,11 +26,10 @@ const ProfileCard = ({ userData }: Props) => {
     return (
         <>
             <StyledProfileCard elevation={6}>
-                <ProfilePicture>
-                </ProfilePicture>
+                <ProfilePicture></ProfilePicture>
                 <UserInfoContainer>
                     <UserInfoHeading>Username</UserInfoHeading>
-                    <Typography>{userData?.username ?? "N/A"}</Typography>
+                    <Typography>{userData?.username ?? 'N/A'}</Typography>
                 </UserInfoContainer>
                 <UserInfoContainer>
                     <UserInfoHeading># of Study Sets Created</UserInfoHeading>
@@ -41,7 +39,7 @@ const ProfileCard = ({ userData }: Props) => {
                     <UserInfoHeading>Account Created</UserInfoHeading>
                     <Typography>
                         {new Date(userData.createdAt).toLocaleDateString() ??
-                            "N/A"}
+                            'N/A'}
                     </Typography>
                 </UserInfoContainer>
             </StyledProfileCard>

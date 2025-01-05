@@ -11,8 +11,8 @@ import {
     ProfileTab,
 } from './ProfileStyles';
 import { useGetUserQuery } from 'state/api/usersAPI';
-import { DEFAULT_USER_RESPONSE, PAGE_TITLES } from 'utilities/constants';
-import useBrowserTitle from 'lib/hooks/useBrowserTitle';
+import { DEFAULT_USER_RESPONSE, PAGE_TITLES } from 'shared/constants';
+import useBrowserTitle from 'hooks/useBrowserTitle';
 
 const TABS = {
     ACCOUNT: 'Account',

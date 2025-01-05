@@ -8,21 +8,18 @@ import {
     Print,
     Settings,
     Share,
-} from "@mui/icons-material/";
-import { IconButton, Tooltip } from "@mui/material/";
-import CustomIconButton from "components/CustomIconButton/CustomIconButton";
-import { Studyset } from "lib/types";
-import { useRef, useState } from "react";
+} from '@mui/icons-material/';
+import { IconButton, Tooltip } from '@mui/material/';
+import CustomIconButton from 'components/CustomIconButton/CustomIconButton';
+import { Studyset } from 'shared/types';
+import { useRef, useState } from 'react';
 import { useAppDispatch } from 'state/reduxHooks';
-import { useNavigate, useParams } from "react-router-dom";
-import { showConfirmDialog } from "state/slices/globalSlice";
-import { setSelectedDialog } from "state/slices/viewSetsSlice";
-import {
-    STUDYSET_CONFIRM_DIALOGS,
-    VIEW_SET_DIALOGS,
-} from "utilities/constants";
-import { ActionButtonsRow } from "../styles";
-import ControlMenu from "./ControlMenu";
+import { useNavigate, useParams } from 'react-router-dom';
+import { showConfirmDialog } from 'state/slices/globalSlice';
+import { setSelectedDialog } from 'state/slices/viewSetsSlice';
+import { STUDYSET_CONFIRM_DIALOGS, VIEW_SET_DIALOGS } from 'shared/constants';
+import { ActionButtonsRow } from '../styles';
+import ControlMenu from './ControlMenu';
 
 type Props = {
     updateMetadataField: any;
@@ -102,59 +99,59 @@ const StudysetActions = (props: Props) => {
                 /> */}
                 <CustomIconButton
                     iconButtonProps={{
-                        color: "primary",
+                        color: 'primary',
                         icon: <Edit />,
                         onClick: handleEditClick,
                     }}
                     tooltipProps={{
-                        title: "Edit Study Set",
+                        title: 'Edit Study Set',
                     }}
                 />
                 <CustomIconButton
                     iconButtonProps={{
-                        color: "primary",
+                        color: 'primary',
                         icon: <Download />,
                         onClick: () =>
                             handleShowDialog(VIEW_SET_DIALOGS.DOWNLOAD),
                     }}
                     tooltipProps={{
-                        title: "Download",
+                        title: 'Download',
                     }}
                 />
                 <CustomIconButton
                     iconButtonProps={{
-                        color: "primary",
+                        color: 'primary',
                         icon: <EditNotifications />,
                         onClick: () =>
                             handleShowDialog(VIEW_SET_DIALOGS.NOTIFICATIONS),
                     }}
                     tooltipProps={{
-                        title: "Manage Notifications",
+                        title: 'Manage Notifications',
                     }}
                 />
                 <CustomIconButton
                     iconButtonProps={{
-                        color: "primary",
+                        color: 'primary',
                         icon: <MenuOpen />,
                         onClick: handleOpenControlMenu,
                     }}
                     tooltipProps={{
-                        title: "Control Menu",
+                        title: 'Control Menu',
                     }}
                 />
                 <CustomIconButton
                     iconButtonProps={{
-                        color: "primary",
+                        color: 'primary',
                         icon: <Print />,
                         onClick: () => handleShowDialog(VIEW_SET_DIALOGS.PRINT),
                     }}
                     tooltipProps={{
-                        title: "Print",
+                        title: 'Print',
                     }}
                 />
                 <CustomIconButton
                     iconButtonProps={{
-                        color: "primary",
+                        color: 'primary',
                         icon: <Delete />,
                         onClick: () =>
                             handleConfirmAction(
@@ -162,12 +159,12 @@ const StudysetActions = (props: Props) => {
                             ),
                     }}
                     tooltipProps={{
-                        title: "Delete Study Set",
+                        title: 'Delete Study Set',
                     }}
                 />
                 <CustomIconButton
                     iconButtonProps={{
-                        color: "primary",
+                        color: 'primary',
                         icon: <ContentCopyRounded />,
                         onClick: () =>
                             handleConfirmAction(
@@ -175,28 +172,28 @@ const StudysetActions = (props: Props) => {
                             ),
                     }}
                     tooltipProps={{
-                        title: "Duplicate Study Set",
+                        title: 'Duplicate Study Set',
                     }}
                 />
                 <CustomIconButton
                     iconButtonProps={{
-                        color: "primary",
+                        color: 'primary',
                         icon: <Settings />,
                         onClick: () =>
                             handleShowDialog(VIEW_SET_DIALOGS.SETTINGS),
                     }}
                     tooltipProps={{
-                        title: "Study Set Settings",
+                        title: 'Study Set Settings',
                     }}
                 />
                 <CustomIconButton
                     iconButtonProps={{
-                        color: "primary",
+                        color: 'primary',
                         icon: <Share />,
                         onClick: () => handleShowDialog(VIEW_SET_DIALOGS.SHARE),
                     }}
                     tooltipProps={{
-                        title: "Share",
+                        title: 'Share',
                     }}
                 />
             </ActionButtonsRow>

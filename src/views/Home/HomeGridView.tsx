@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Pagination } from '@mui/material';
 import { CenteredTypography, HomeSetGrid } from './HomeStyles';
-import { Studyset } from 'lib/types';
+import { Studyset } from 'shared/types';
 import HomeStudySetCard from './HomeStudySetCard';
 
 type Props = {

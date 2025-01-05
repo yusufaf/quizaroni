@@ -1,17 +1,17 @@
-import { IconButton } from "@mui/material/";
-import { FooterPaper, StyledFooter } from "./styles";
-import { GitHub, LinkedIn } from "@mui/icons-material";
-import { BoldTypography, FlexColumn } from "common/AppStyles";
+import { IconButton } from '@mui/material/';
+import { FooterPaper, StyledFooter } from './styles';
+import { GitHub, LinkedIn } from '@mui/icons-material';
+import { BoldTypography, FlexColumn } from 'styles/AppStyles';
 
 type Props = {};
 const Footer = (_props: Props) => {
     return (
         <StyledFooter>
             <FooterPaper elevation={1}>
-                <FlexColumn style={{alignItems: "flex-start", marginLeft: "auto"}}>
-                    <BoldTypography>
-                        Socials
-                    </BoldTypography>
+                <FlexColumn
+                    style={{ alignItems: 'flex-start', marginLeft: 'auto' }}
+                >
+                    <BoldTypography>Socials</BoldTypography>
                     <IconButton
                         href="https://github.com/yusufaf"
                         target="_blank"

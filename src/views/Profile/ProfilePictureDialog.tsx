@@ -6,7 +6,7 @@ import {
     DialogActions,
     Button,
 } from '@mui/material';
-import { StyledDialogActions, StyledDialogTitle } from 'common/AppStyles';
+import { StyledDialogActions, StyledDialogTitle } from 'styles/AppStyles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
 

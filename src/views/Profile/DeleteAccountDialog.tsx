@@ -6,8 +6,8 @@ import {
     Typography,
     TextField,
 } from '@mui/material/';
-import * as C from 'utilities/constants';
-import { StyledDialogTitle, StyledDialogActions } from 'common/AppStyles';
+import * as C from 'shared/constants';
+import { StyledDialogTitle, StyledDialogActions } from 'styles/AppStyles';
 import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
 import { Dispatch, SetStateAction } from 'react';
 import { DeleteDialogContent } from './ProfileStyles';

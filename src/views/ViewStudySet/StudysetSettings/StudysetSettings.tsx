@@ -1,13 +1,13 @@
-import { Studyset } from 'lib/types';
+import { Studyset } from 'shared/types';
 import { StyledDialog, StyledDialogContent } from './styles';
-import { FlexColumn } from 'common/AppStyles';
+import { FlexColumn } from 'styles/AppStyles';
 import FormatTerminologies from './FormatTerminologies';
 import LabelTerminologies from './LabelTerminologies';
 import {
     CARD_COUNT_VISIBILITY_OPTIONS,
     NOTES_DRAWER_INITIAL_APPEARANCE_OPTIONS,
     NOTES_DRAWER_POSITIONS_OPTIONS,
-} from 'utilities/constants';
+} from 'shared/constants';
 import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 import SettingsToggle from 'components/SettingsToggle/SettingsToggle';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';

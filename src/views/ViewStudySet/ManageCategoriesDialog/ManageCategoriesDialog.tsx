@@ -1,14 +1,14 @@
 import { LoadingButton } from '@mui/lab';
 import { Button, SelectChangeEvent, Tab, Tabs } from '@mui/material/';
-import useCustomMutation from 'lib/hooks/useCustomMutation';
-import { Studyset } from 'lib/types';
+import useCustomMutation from 'hooks/useCustomMutation';
+import { Studyset } from 'shared/types';
 import { ChangeEvent, ReactNode, SyntheticEvent, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 import {
     capitalizeFirstLetter,
     downloadObjectAsJSON,
-} from 'utilities/functions';
+} from 'shared/utilities/functions';
 import AssignTabView from './AssignTabView';
 import CategoriesList from './CategoriesList';
 import CreateTabView from './CreateTabView';
@@ -26,7 +26,7 @@ import {
     BoldTypography,
     SimpleFlexContainer,
     StyledDialogTitle,
-} from 'common/AppStyles';
+} from 'styles/AppStyles';
 import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
 import { Download } from '@mui/icons-material';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';

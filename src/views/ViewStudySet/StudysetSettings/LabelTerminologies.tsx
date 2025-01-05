@@ -6,10 +6,10 @@ import {
     Radio,
     RadioGroup,
 } from '@mui/material';
-import { Studyset } from 'lib/types';
+import { Studyset } from 'shared/types';
 import { ChangeEvent, useState, MouseEvent, useEffect } from 'react';
 import { CustomInputsContainer, StyledTextField } from './styles';
-import { LABEL_TERMINOLOGIES } from 'utilities/constants';
+import { LABEL_TERMINOLOGIES } from 'shared/constants';
 import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 
 type Props = {

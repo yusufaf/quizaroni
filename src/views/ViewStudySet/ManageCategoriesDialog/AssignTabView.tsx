@@ -1,8 +1,12 @@
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { Studyset } from "lib/types";
-import { CategoryFormControl, CategoryInputsContainer, StyledMenuItem} from "./styles";
-import { InputLabel, Typography } from "@mui/material";
-import { Dispatch, SetStateAction } from "react";
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { Studyset } from 'shared/types';
+import {
+    CategoryFormControl,
+    CategoryInputsContainer,
+    StyledMenuItem,
+} from './styles';
+import { InputLabel, Typography } from '@mui/material';
+import { Dispatch, SetStateAction } from 'react';
 
 type Props = {
     selectedStudyset: Studyset;
@@ -13,8 +17,8 @@ type Props = {
 };
 
 const AssignTabView = (props: Props) => {
-    const { 
-        selectedStudyset, 
+    const {
+        selectedStudyset,
         selectedCardUUID,
         setSelectedCardUUID,
         onAssignedCategoriesChange,
@@ -23,7 +27,8 @@ const AssignTabView = (props: Props) => {
 
     const { cards, categories } = selectedStudyset;
     const selectedCardCategories: string[] =
-        cards?.find((card) => card.cardUUID === selectedCardUUID)?.categories ?? [];
+        cards?.find((card) => card.cardUUID === selectedCardUUID)?.categories ??
+        [];
 
     return (
         <CategoryInputsContainer>
