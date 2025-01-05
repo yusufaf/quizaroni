@@ -1,16 +1,16 @@
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useEffect } from 'react';
-import FeedbackDialog from 'components/FeedbackDialog/FeedbackDialog';
+import FeedbackDialog from 'shared/components/FeedbackDialog/FeedbackDialog';
 import Footer from 'views/Footer/Footer';
 import NavBar from 'views/NavBar/NavBar';
-import { useTheme } from 'theme/useTheme';
-import { DARK, LIGHT } from 'utilities/constants';
+import { useTheme } from 'shared/theme/useTheme';
+import { DARK, LIGHT } from 'shared/constants/index';
 import AppRoutes from './AppRoutes';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import GlobalConfirmDialog from 'components/GlobalConfirmDialog/GlobalConfirmDialog';
-import ManageLabelsDialog from 'components/ManageLabelsDialog/ManageLabelsDialog';
-import ConfirmationCodeDialog from 'components/ConfirmationCodeDialog/ConfirmationCodeDialog';
+import GlobalConfirmDialog from 'shared/components/GlobalConfirmDialog/GlobalConfirmDialog';
+import ManageLabelsDialog from 'shared/components/ManageLabelsDialog/ManageLabelsDialog';
+import ConfirmationCodeDialog from 'shared/components/ConfirmationCodeDialog/ConfirmationCodeDialog';
 import { useAppSelector } from 'state/reduxHooks';
 import { selectLabelsDialogProps } from 'state/slices/globalSlice';
 

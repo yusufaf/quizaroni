@@ -15,11 +15,11 @@ import {
     OpenInNewRounded,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { Studyset } from 'lib/types';
-import { STUDYSET_CONFIRM_DIALOGS } from 'utilities/constants';
+import { Studyset } from 'shared/types';
+import { STUDYSET_CONFIRM_DIALOGS } from 'shared/constants';
 import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 import { showConfirmDialog } from 'state/slices/globalSlice';
-import { useAppDispatch } from "state/reduxHooks";
+import { useAppDispatch } from 'state/reduxHooks';
 
 type Props = {
     studyset: Studyset | null;

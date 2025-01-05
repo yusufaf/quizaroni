@@ -1,10 +1,10 @@
 import { Tooltip, IconButton } from '@mui/material';
-import { SimpleFlexContainer, FlexColumn } from 'common/AppStyles';
+import { SimpleFlexContainer, FlexColumn } from 'styles/AppStyles';
 import EditableTextField from 'components/EditableTextField/EditableTextField';
-import useCustomMutation from 'lib/hooks/useCustomMutation';
-import { Card, Note } from 'lib/types';
+import useCustomMutation from 'hooks/useCustomMutation';
+import { Card, Note } from 'shared/types';
 import { useDeleteNoteMutation } from 'state/api/studysetsAPI';
-import { EMPTY_NOTE_PLACEHOLDER } from 'utilities/constants';
+import { EMPTY_NOTE_PLACEHOLDER } from 'shared/constants';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -95,7 +95,10 @@ const NoteList = ({
                             </Tooltip>
                             <Tooltip title="Delete this note" placement="top">
                                 <IconButton
-                                    disabled={isDeleteNoteLoading && noteUUID === noteBeingDeleted}
+                                    disabled={
+                                        isDeleteNoteLoading &&
+                                        noteUUID === noteBeingDeleted
+                                    }
                                     onClick={() => handleDeleteNote(noteUUID)}
                                 >
                                     <DeleteIcon fontSize="small" />

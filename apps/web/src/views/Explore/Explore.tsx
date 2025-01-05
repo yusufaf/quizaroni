@@ -1,15 +1,12 @@
-import useBrowserTitle from "lib/hooks/useBrowserTitle";
-import { PAGE_TITLES } from "utilities/constants";
+import useBrowserTitle from 'hooks/useBrowserTitle';
+import { PAGE_TITLES } from 'shared/constants';
 
-type Props = {}
+type Props = {};
 
 const Explore = (props: Props) => {
+    useBrowserTitle(PAGE_TITLES.EXPLORE);
 
-  useBrowserTitle(PAGE_TITLES.EXPLORE);
-
-  return (
-    <div>Explore</div>
-  )
-}
+    return <div>Explore</div>;
+};
 
 export default Explore;

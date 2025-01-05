@@ -1,5 +1,5 @@
-import { Studyset } from 'lib/types';
-import { HTML_TABLE_HEADERS } from 'utilities/constants';
+import { Studyset } from 'shared/types';
+import { HTML_TABLE_HEADERS } from 'shared/constants';
 import {
     HomeHTMLTableWrapper,
     HomeHTMLTable,
@@ -9,7 +9,7 @@ import { IconButton } from '@mui/material';
 import { MoreHoriz } from '@mui/icons-material';
 import { useState } from 'react';
 import SetActionsMenu from './SetActionsMenu';
-import { GhostLink } from 'common/AppStyles';
+import { GhostLink } from 'styles/AppStyles';
 
 type Props = {
     studysets: Studyset[];

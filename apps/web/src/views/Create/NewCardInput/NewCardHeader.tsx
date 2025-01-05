@@ -4,15 +4,19 @@ import {
     SwapHoriz,
     ContentCopy,
     Delete,
-} from "@mui/icons-material";
-import { Tooltip, IconButton } from "@mui/material";
-import { BoldTypography, SpacedFlexContainer } from "common/AppStyles";
-import CustomColorPicker from "components/CustomColorPicker/CustomColorPicker";
-import { swapCard, duplicateCard, deleteCard } from "utilities/createUtils";
-import { CenterActions, RightActions } from "../CreateSetStyles";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { useTheme } from "theme/useTheme";
-import { ColorPickerType, TODO } from "lib/types";
+} from '@mui/icons-material';
+import { Tooltip, IconButton } from '@mui/material';
+import { BoldTypography, SpacedFlexContainer } from 'styles/AppStyles';
+import CustomColorPicker from 'components/CustomColorPicker/CustomColorPicker';
+import {
+    swapCard,
+    duplicateCard,
+    deleteCard,
+} from 'shared/utilities/createUtils';
+import { CenterActions, RightActions } from '../CreateSetStyles';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { useTheme } from 'theme/useTheme';
+import { ColorPickerType, TODO } from 'shared/types';
 
 type Props = {
     actionsStack: TODO[];
@@ -59,9 +63,9 @@ const NewCardHeader = ({
 
     useEffect(() => {
         if (showTextColorPicker || showBackgroundColorPicker) {
-            const elements = document.querySelectorAll("[id]");
+            const elements = document.querySelectorAll('[id]');
             for (const el of elements) {
-                if (el.id.startsWith("rc-editable-input")) {
+                if (el.id.startsWith('rc-editable-input')) {
                     const domElement = document.getElementById(el.id);
                     // @ts-ignore
                     domElement.style.color = muiTheme.palette.text.primary;
@@ -86,20 +90,20 @@ const NewCardHeader = ({
 
     const onColorPickerChange = (e, type: ColorPickerType) => {
         const localStateCallback =
-            type === "textColor" ? setLocalTextColor : setLocalBackgroundColor;
+            type === 'textColor' ? setLocalTextColor : setLocalBackgroundColor;
         onColorChange(e, type, index);
         localStateCallback(e.hex);
     };
 
     const resetColor = (type: ColorPickerType) => {
         const localStateCallback =
-            type === "textColor" ? setLocalTextColor : setLocalBackgroundColor;
-        updateCardValue(index, type, "");
-        localStateCallback("");
+            type === 'textColor' ? setLocalTextColor : setLocalBackgroundColor;
+        updateCardValue(index, type, '');
+        localStateCallback('');
     };
 
     const toggleApplyColor = (type: ColorPickerType) => {
-        if (type === "textColor") {
+        if (type === 'textColor') {
             setApplyTextColor(!applyTextColor);
         } else {
             setApplyBackgroundColor(!applyBackgroundColor);
@@ -129,9 +133,9 @@ const NewCardHeader = ({
                         color={localTextColor}
                         additionalRefs={[textColorButtonRef]}
                         onClose={() => setShowTextColorPicker(false)}
-                        onChange={(e) => onColorPickerChange(e, "textColor")}
-                        onResetColor={() => resetColor("textColor")}
-                        onApplyColor={() => toggleApplyColor("textColor")}
+                        onChange={(e) => onColorPickerChange(e, 'textColor')}
+                        onResetColor={() => resetColor('textColor')}
+                        onApplyColor={() => toggleApplyColor('textColor')}
                     />
                 )}
                 <Tooltip title="Change card background color" placement="top">
@@ -154,12 +158,12 @@ const NewCardHeader = ({
                         additionalRefs={[backgroundColorButtonRef]}
                         onClose={() => setShowBackgroundColorPicker(false)}
                         onChange={(e) =>
-                            onColorPickerChange(e, "backgroundColor")
+                            onColorPickerChange(e, 'backgroundColor')
                         }
-                        onResetColor={() => resetColor("backgroundColor")}
-                        onApplyColor={() => toggleApplyColor("backgroundColor")}
+                        onResetColor={() => resetColor('backgroundColor')}
+                        onApplyColor={() => toggleApplyColor('backgroundColor')}
                         style={{
-                            left: "4rem",
+                            left: '4rem',
                         }}
                     />
                 )}

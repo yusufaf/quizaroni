@@ -1,7 +1,7 @@
 import { ArrowBack, Create } from '@mui/icons-material';
 import { Button, FormControl, Typography } from '@mui/material';
-import { BoldTypography } from 'common/AppStyles';
-import { DEFAULT_USER_RESPONSE } from 'utilities/constants';
+import { BoldTypography } from 'styles/AppStyles';
+import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import HeaderAdvancedSection from './HeaderAdvancedSection';
 import {
     CreateSetInputsContainer,

@@ -18,9 +18,9 @@ import {
     type UpdateUserAttributeOutput,
     updateUserAttribute,
 } from '@aws-amplify/auth';
-import { EMAIL_REGEX } from 'utilities/constants';
+import { EMAIL_REGEX } from 'shared/constants';
 import { useNavigate } from 'react-router-dom';
-import { User } from 'lib/types';
+import { User } from 'shared/types';
 import { useAppDispatch } from 'state/reduxHooks';
 import { setConfirmationCodeDialogProps } from 'state/slices/globalSlice';
 import ChangePasswordSection from './ChangePasswordSection';

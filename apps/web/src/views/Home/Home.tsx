@@ -16,16 +16,19 @@ import {
     GridToolbarExport,
     GridToolbarFilterButton,
 } from '@mui/x-data-grid';
-import { GhostLink, SimpleFlexContainer } from 'common/AppStyles';
+import { GhostLink, SimpleFlexContainer } from 'styles/AppStyles';
 import NoCardsWarningsIcon from 'components/NoCardsWarningsIcon/NoCardsWarningsIcon';
-import useBrowserTitle from 'lib/hooks/useBrowserTitle';
-import useFilterStudysets from 'lib/hooks/useFilterStudysets';
-import useSortStudysets from 'lib/hooks/useSortStudysets';
-import { HomeView, SortDirection, Studyset } from 'lib/types';
+import useBrowserTitle from 'hooks/useBrowserTitle';
+import useFilterStudysets from 'hooks/useFilterStudysets';
+import useSortStudysets from 'hooks/useSortStudysets';
+import { HomeView, SortDirection, Studyset } from 'shared/types';
 import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useNavigate } from 'react-router-dom';
-import { useGetAllStudysetsQuery } from 'state/api/studysetsAPI';
+import {
+    useGetAllStudysetsQuery,
+    useUpdateStudysetMutation,
+} from 'state/api/studysetsAPI';
 import {
     useGetUserQuery,
     useUpdateUserMetadataMutation,
@@ -36,7 +39,7 @@ import {
     HOME_LAYOUTS,
     PAGE_TITLES,
     SORT_DIRECTIONS,
-} from 'utilities/constants';
+} from 'shared/constants';
 import HomeGridView from './HomeGridView';
 import HomeHTMLView from './HomeHTMLView';
 import {
@@ -49,8 +52,8 @@ import {
 } from './HomeStyles';
 import HomeToolbar from './HomeToolbar';
 import SetActionsMenu from './SetActionsMenu';
-import { getFormattedTimestamp } from 'utilities/functions';
-import { Button, Menu, MenuItem, Tooltip } from '@mui/material';
+import { getFormattedTimestamp } from 'shared/utilities/functions';
+import { Button, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 
 // augment the props for the toolbar slot
 declare module '@mui/x-data-grid' {
@@ -115,6 +118,7 @@ const Home = (props: Props) => {
         useGetAllStudysetsQuery({});
     const studysets = studysetsResponse?.studysets ?? [];
 
+    const [updateStudyset] = useUpdateStudysetMutation();
     const [
         updateUserMetadata,
         {
@@ -166,15 +170,28 @@ const Home = (props: Props) => {
             headerName: 'Favorited',
             width: 75,
             cellClassName: `favorited-cell`,
-            renderCell: (params: GridRenderCellParams<any, boolean>) => (
-                <>
-                    {params.value ? (
-                        <Favorite color="primary" />
-                    ) : (
-                        <FavoriteBorder />
-                    )}
-                </>
-            ),
+            renderCell: (params: GridRenderCellParams<any, boolean>) => {
+                const currentFavorited = params.value;
+                return (
+                    <IconButton
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            updateStudyset({
+                                studysetUUID: params.id as string,
+                                updates: {
+                                    favorited: !currentFavorited,
+                                },
+                            });
+                        }}
+                    >
+                        {currentFavorited ? (
+                            <Favorite color="primary" />
+                        ) : (
+                            <FavoriteBorder />
+                        )}
+                    </IconButton>
+                );
+            },
         },
         {
             field: 'title',

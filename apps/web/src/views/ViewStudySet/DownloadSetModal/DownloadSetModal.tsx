@@ -10,7 +10,7 @@ import {
     MenuItem,
     Select,
 } from '@mui/material/';
-import { Card, Studyset } from 'lib/types';
+import { Card, Studyset } from 'shared/types';
 import { useState } from 'react';
 import {
     DOWNLOAD_FILE_TYPES,
@@ -18,7 +18,7 @@ import {
     DOWNLOAD_FILE_TITLES,
     DEFAULT_CSV_HEADERS,
     METADATA_CSV_HEADERS,
-} from 'utilities/constants';
+} from 'shared/constants';
 import { DownloadDialogContent } from '../styles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 

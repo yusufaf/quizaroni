@@ -1,15 +1,15 @@
-import { Star, StarBorder, VolumeUp } from "@mui/icons-material";
-import { IconButton, Popover, Tooltip, Typography } from "@mui/material/";
-import { BoldTypography, SimpleFlexContainer } from "common/AppStyles";
-import useSpeechSynthesis from "lib/hooks/useSpeechSynthesis";
-import { Card, Studyset } from "lib/types";
-import { useRef, useState } from "react";
-import { useTheme } from "theme/useTheme";
+import { Star, StarBorder, VolumeUp } from '@mui/icons-material';
+import { IconButton, Popover, Tooltip, Typography } from '@mui/material/';
+import { BoldTypography, SimpleFlexContainer } from 'styles/AppStyles';
+import useSpeechSynthesis from 'hooks/useSpeechSynthesis';
+import { Card, Studyset } from 'shared/types';
+import { useRef, useState } from 'react';
+import { useTheme } from 'theme/useTheme';
 import {
     DEFAULT_TERMINOLOGY,
     FORMAT_TERMINOLOGIES,
     LABEL_TERMINOLOGIES,
-} from "utilities/constants";
+} from 'shared/constants';
 import {
     CategoryChip,
     CategoryChips,
@@ -17,9 +17,9 @@ import {
     ViewCardInfo,
     ViewFlashCardActions,
     ViewFlashsetCard,
-} from "./styles";
-import CategoriesPopover from "./CategoriesPopover";
-import { useUpdateStudysetMutation } from "state/api/studysetsAPI";
+} from './styles';
+import CategoriesPopover from './CategoriesPopover';
+import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 
 type Props = {
     card: Card;
@@ -36,10 +36,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
     const timeoutRef = useRef(null);
 
     const { categories = [] } = card;
-    const { 
-        cards,
-        studysetUUID
-    } = selectedStudyset;
+    const { cards, studysetUUID } = selectedStudyset;
     const {
         customTerminology,
         customLabelTerminology,
@@ -51,13 +48,13 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
     const selectedTerminology = terminology ?? DEFAULT_TERMINOLOGY;
     const [terminology1, terminology2] =
         selectedTerminology === FORMAT_TERMINOLOGIES.CUSTOM
-            ? customTerminology?.split("/") ?? []
-            : selectedTerminology.split("/");
+            ? customTerminology?.split('/') ?? []
+            : selectedTerminology.split('/');
     const selectedLabelTerminology =
         labelTerminology ?? LABEL_TERMINOLOGIES.CARD;
     const currentLabelTerminology =
         selectedLabelTerminology === LABEL_TERMINOLOGIES.CUSTOM
-            ? customLabelTerminology ?? ""
+            ? customLabelTerminology ?? ''
             : selectedLabelTerminology;
 
     // TODO: Adjust to clear timeout / reset if clicked multiple times
@@ -81,19 +78,21 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
      */
     const markCardAsImportant = async () => {
         let updatedCards = [...cards];
-        const indexToUpdate = updatedCards.findIndex((value) => value.cardUUID === card.cardUUID);
+        const indexToUpdate = updatedCards.findIndex(
+            (value) => value.cardUUID === card.cardUUID
+        );
         if (indexToUpdate === -1) {
             return;
         }
-        
+
         updatedCards[indexToUpdate] = {
             ...card,
-            important: !card.important
-        }
+            important: !card.important,
+        };
         updateStudySet({
             studysetUUID,
             updates: {
-                cards: updatedCards
+                cards: updatedCards,
             },
         });
     };
@@ -107,7 +106,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                     card?.backgroundColor &&
                     selectedStudyset?.metadata?.backgroundColorVisible
                         ? card.backgroundColor
-                        : ""
+                        : ''
                 }`,
             }}
             tabIndex={index}
@@ -119,9 +118,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                     </BoldTypography>
                     <CategoryChips>
                         {categories.length > 3 ? (
-                            <CategoriesPopover 
-                                categories={categories}
-                            />
+                            <CategoriesPopover categories={categories} />
                         ) : (
                             <>
                                 {categories.map(
@@ -147,7 +144,9 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                             <IconButton onClick={markCardAsImportant}>
                                 {card.important ? (
                                     <Star
-                                        sx={{ color: muiTheme.palette.other.gold }}
+                                        sx={{
+                                            color: muiTheme.palette.other.gold,
+                                        }}
                                     />
                                 ) : (
                                     <StarBorder />
@@ -161,7 +160,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                 <ViewCardInfo>
                     {!contentOnly && (
                         <Typography variant="h6" color="primary">
-                            {terminology1 ?? "Term"}
+                            {terminology1 ?? 'Term'}
                         </Typography>
                     )}
                     <Typography
@@ -170,7 +169,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                                 card?.textColor &&
                                 selectedStudyset?.metadata?.textColorVisible
                                     ? card.textColor
-                                    : ""
+                                    : ''
                             }`,
                         }}
                     >
@@ -181,7 +180,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                 <ViewCardInfo>
                     {!contentOnly && (
                         <Typography variant="h6" color="primary">
-                            {terminology2 ?? "Definition"}
+                            {terminology2 ?? 'Definition'}
                         </Typography>
                     )}
                     <Typography
@@ -190,7 +189,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                                 card?.textColor &&
                                 selectedStudyset?.metadata?.textColorVisible
                                     ? card.textColor
-                                    : ""
+                                    : ''
                             }`,
                         }}
                     >

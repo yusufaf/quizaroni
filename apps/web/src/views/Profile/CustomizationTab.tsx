@@ -4,25 +4,25 @@ import {
     DarkMode,
     Label,
     Launch,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 import {
     Typography,
     ToggleButtonGroup,
     ToggleButton,
     Button,
-} from "@mui/material";
-import { useState, useEffect } from "react";
+} from '@mui/material';
+import { useState, useEffect } from 'react';
 import {
     selectNamedColorsDialogProps,
     setLabelsDialogProps,
     setNamedColorsDialogProps,
     setUserData,
-} from "state/slices/globalSlice";
-import { LIGHT, DARK } from "utilities/constants";
-import { ActionColumn, ActionHeader } from "./ProfileStyles";
+} from 'state/slices/globalSlice';
+import { LIGHT, DARK } from 'shared/constants';
+import { ActionColumn, ActionHeader } from './ProfileStyles';
 import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import NamedColorsDialog from "components/NamedColorsDialog/NamedColorsDialog";
-import { User } from "lib/types";
+import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
+import { User } from 'shared/types';
 
 type Props = {
     userData: User;
@@ -31,10 +31,10 @@ type Props = {
 const CustomizationTab = ({ userData }: Props) => {
     const dispatch = useAppDispatch();
 
-    const { userUUID = "", labels = [] } = userData;
+    const { userUUID = '', labels = [] } = userData;
     const namedColorsDialogProps = useAppSelector(selectNamedColorsDialogProps);
     const [defaultTheme, setDefaultTheme] = useState<string>(
-        userData?.metadata?.defaultTheme ?? "dark"
+        userData?.metadata?.defaultTheme ?? 'dark'
     );
 
     useEffect(() => {
@@ -74,7 +74,7 @@ const CustomizationTab = ({ userData }: Props) => {
             console.log({ newUserData });
             dispatch(setUserData(newUserData));
         } catch (error) {
-            console.error("Error updating default theme");
+            console.error('Error updating default theme');
         }
     };
 

@@ -1,11 +1,11 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ConfirmDialogProps, LabelsDialogProps, Studyset } from "lib/types";
-import { RootState } from "state/store";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ConfirmDialogProps, LabelsDialogProps, Studyset } from 'shared/types';
+import { RootState } from 'state/store';
 import {
     STUDYSET_CONFIRM_DIALOG_PROPS,
     STUDYSET_CONFIRM_DIALOGS,
-    INITIAL_CONFIRM_DIALOG_PROPS
-} from "utilities/constants";
+    INITIAL_CONFIRM_DIALOG_PROPS,
+} from 'shared/constants';
 
 type CognitoUser = {
     username: string;
@@ -30,7 +30,7 @@ const initialState: GlobalSliceState = {
     //     username: "",
     // },
     dialogOpen: false,
-    confirmDialogProps: {...INITIAL_CONFIRM_DIALOG_PROPS},
+    confirmDialogProps: { ...INITIAL_CONFIRM_DIALOG_PROPS },
     feedbackDialogOpen: false,
     namedColorsDialogProps: {},
     userAuthInfo: {},
@@ -41,7 +41,7 @@ const initialState: GlobalSliceState = {
     confirmationCodeDialogProps: {},
 };
 
-const sliceName = "globalState";
+const sliceName = 'globalState';
 
 export const globalSlice = createSlice({
     name: sliceName,
@@ -62,7 +62,10 @@ export const globalSlice = createSlice({
         setUserData: (state, action: PayloadAction<any>) => {
             state.userData = action.payload;
         },
-        setConfirmDialogProps: (state, action: PayloadAction<ConfirmDialogProps>) => {
+        setConfirmDialogProps: (
+            state,
+            action: PayloadAction<ConfirmDialogProps>
+        ) => {
             state.confirmDialogProps = action.payload;
         },
         // TODO: Could possibly rename to showStudysetConfirmDialog
@@ -70,17 +73,17 @@ export const globalSlice = createSlice({
             state,
             action: PayloadAction<{ type: string; studysets: Studyset[] }>
         ) => {
-            console.log("Entered showConfirmDialog with = ", {
+            console.log('Entered showConfirmDialog with = ', {
                 state,
-                action
-            })
+                action,
+            });
             const { type, studysets } = action.payload;
             const initialProps = STUDYSET_CONFIRM_DIALOG_PROPS.get(type)!;
             const { title, dialogMessage } = initialProps;
 
             let dialogProps: ConfirmDialogProps = {
                 open: true,
-                title: "",
+                title: '',
                 type,
             };
 
@@ -101,9 +104,9 @@ export const globalSlice = createSlice({
                 case STUDYSET_CONFIRM_DIALOGS.DELETE_MULTIPLE:
                 case STUDYSET_CONFIRM_DIALOGS.DUPLICATE_MULTIPLE: {
                     const studysetUUIDs: string[] = [];
-                    const messages: string[] = []
+                    const messages: string[] = [];
                     for (const studyset of studysets) {
-                        messages.push(studyset.title)
+                        messages.push(studyset.title);
                         studysetUUIDs.push(studyset.studysetUUID);
                     }
 
@@ -129,7 +132,10 @@ export const globalSlice = createSlice({
         setFeedbackDialogOpen: (state, action: PayloadAction<boolean>) => {
             state.dialogOpen = action.payload;
         },
-        setLabelsDialogProps: (state, action: PayloadAction<LabelsDialogProps>) => {
+        setLabelsDialogProps: (
+            state,
+            action: PayloadAction<LabelsDialogProps>
+        ) => {
             state.labelsDialogProps = action.payload;
         },
         setConfirmationCodeDialogProps: (state, action: PayloadAction<any>) => {
