@@ -1,25 +1,25 @@
-import { Table, AttributeType, BillingMode } from "aws-cdk-lib/aws-dynamodb";
-import { Construct } from "constructs";
-import { ExtendedStackProps } from "models/stack";
+import { Table, AttributeType, BillingMode } from 'aws-cdk-lib/aws-dynamodb';
+import { Construct } from 'constructs';
+import { ExtendedStackProps } from 'models/stack';
 
 export class QuizaroniDynamoDB extends Construct {
     constructor(scope: Construct, id: string, props: ExtendedStackProps) {
         super(scope, id);
         const {
-            appName = "quizaroni",
-            deploymentType = "development",
+            appName = 'quizaroni',
+            deploymentType = 'development',
             env,
         } = props;
-        const { account = "", region = "" } = env!;
+        const { account = '', region = '' } = env!;
 
         const mainTableNameAndID = `${appName}-${deploymentType}-main`;
         this.createDynamoDBTable({
-            tableName: mainTableNameAndID
+            tableName: mainTableNameAndID,
         });
 
         const usersTableNameAndID = `${appName}-${deploymentType}-users`;
         this.createDynamoDBTable({
-            tableName: usersTableNameAndID
+            tableName: usersTableNameAndID,
         });
     }
 
@@ -34,8 +34,8 @@ export class QuizaroniDynamoDB extends Construct {
     }): Table => {
         const dynamoDBTable = new Table(this, tableName, {
             tableName,
-            partitionKey: { name: "PK", type: AttributeType.STRING },
-            sortKey: { name: "SK", type: AttributeType.STRING },
+            partitionKey: { name: 'PK', type: AttributeType.STRING },
+            sortKey: { name: 'SK', type: AttributeType.STRING },
             billingMode: BillingMode.PAY_PER_REQUEST,
             pointInTimeRecovery: true,
         });

@@ -105,7 +105,7 @@ export const handler: Handler = async (
         const getResult = await docClient.send(getCommand);
         const updatedUser = getResult.Item;
 
-        console.log(JSON.stringify({ updatedStudyset: updatedUser }, null, 4));
+        console.log(JSON.stringify({ updatedUser }, null, 4));
 
         return {
             statusCode: 200,

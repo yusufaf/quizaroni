@@ -6,13 +6,16 @@ type DynamoItem = {
     PK3?: string;
     SK3?: string;
     PK4?: string;
-    SK4?: string; 
+    SK4?: string;
     PK5?: string;
     SK5?: string;
     PK6?: string;
-    SK6?: string; 
-}
-export const removeKeys = (item: DynamoItem) => {
+    SK6?: string;
+};
+
+export const removeKeys = <T extends DynamoItem>(
+    item: T
+): Omit<T, keyof DynamoItem> => {
     delete item.PK;
     delete item.SK;
     delete item.PK2;
@@ -25,4 +28,5 @@ export const removeKeys = (item: DynamoItem) => {
     delete item.SK5;
     delete item.PK6;
     delete item.SK6;
-}
+    return item;
+};
