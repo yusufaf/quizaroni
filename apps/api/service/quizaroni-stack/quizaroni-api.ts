@@ -1,19 +1,19 @@
-import { Construct } from "constructs";
-import { ExtendedStackProps, LambdaProps } from "models/stack";
-import { LambdaIntegration, Resource } from "aws-cdk-lib/aws-apigateway";
-import { Function as LambdaFunction } from "aws-cdk-lib/aws-lambda";
+import { Construct } from 'constructs';
+import { ExtendedStackProps, LambdaProps } from 'models/stack';
+import { LambdaIntegration, Resource } from 'aws-cdk-lib/aws-apigateway';
+import { Function as LambdaFunction } from 'aws-cdk-lib/aws-lambda';
 import {
     Role,
     ServicePrincipal,
     PolicyStatement,
     ManagedPolicy,
     Effect,
-} from "aws-cdk-lib/aws-iam";
-import { addRole } from "../../resources/roles";
+} from 'aws-cdk-lib/aws-iam';
+import { addRole } from '../../resources/roles';
 import {
     capitalizeFirstLetter,
     getDefaultExportForLambda,
-} from "../../utilities/generalUtils";
+} from '../../utilities/generalUtils';
 import {
     CfnStage,
     CorsHttpMethod,
@@ -23,12 +23,12 @@ import {
     HttpMethod,
     HttpStage,
     IHttpRouteAuthorizer,
-} from "aws-cdk-lib/aws-apigatewayv2";
-import { HttpLambdaIntegration } from "aws-cdk-lib/aws-apigatewayv2-integrations";
-import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
-import { LogGroup } from "aws-cdk-lib/aws-logs";
-import { DEFAULT_ALLOWED_ORIGINS } from "../../constants";
-import apiAuthorizer from "../lambdas/apiAuthorizer/index";
+} from 'aws-cdk-lib/aws-apigatewayv2';
+import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { DEFAULT_ALLOWED_ORIGINS } from '../../constants';
+import apiAuthorizer from '../lambdas/apiAuthorizer/index';
 
 type CreateLambdaProxyIntegrationProps = {
     lambda: LambdaFunction;
@@ -48,12 +48,12 @@ export class QuizaroniAPI extends Construct {
         super(scope, id);
 
         const {
-            appName = "quizaroni",
-            deploymentType = "development",
+            appName = 'quizaroni',
+            deploymentType = 'development',
             env,
         } = props;
         // @ts-ignore env should be defined
-        const { account = "", region = "" } = env;
+        const { account = '', region = '' } = env;
 
         this.account = account;
         this.region = region;
@@ -69,10 +69,10 @@ export class QuizaroniAPI extends Construct {
             )} API for Quizaroni`,
             corsPreflight: {
                 allowHeaders: [
-                    "Content-Type",
-                    "X-Amz-Date",
-                    "Authorization",
-                    "X-Api-Key",
+                    'Content-Type',
+                    'X-Amz-Date',
+                    'Authorization',
+                    'X-Api-Key',
                 ],
                 allowMethods: [
                     CorsHttpMethod.OPTIONS,
@@ -96,36 +96,36 @@ export class QuizaroniAPI extends Construct {
         stage.accessLogSettings = {
             destinationArn: accessLogs.logGroupArn,
             format: JSON.stringify({
-                requestId: "$context.requestId",
-                userAgent: "$context.identity.userAgent",
-                sourceIp: "$context.identity.sourceIp",
-                requestTime: "$context.requestTime",
-                requestTimeEpoch: "$context.requestTimeEpoch",
-                httpMethod: "$context.httpMethod",
-                path: "$context.path",
-                status: "$context.status",
-                protocol: "$context.protocol",
-                responseLength: "$context.responseLength",
-                domainName: "$context.domainName",
-                authorizerError: "$context.authorizer.error",
+                requestId: '$context.requestId',
+                userAgent: '$context.identity.userAgent',
+                sourceIp: '$context.identity.sourceIp',
+                requestTime: '$context.requestTime',
+                requestTimeEpoch: '$context.requestTimeEpoch',
+                httpMethod: '$context.httpMethod',
+                path: '$context.path',
+                status: '$context.status',
+                protocol: '$context.protocol',
+                responseLength: '$context.responseLength',
+                domainName: '$context.domainName',
+                authorizerError: '$context.authorizer.error',
             }),
         };
 
-        const apiGatewayLogWriterRole = new Role(this, "ApiGWLogWriterRole", {
-            assumedBy: new ServicePrincipal("apigateway.amazonaws.com"),
+        const apiGatewayLogWriterRole = new Role(this, 'ApiGWLogWriterRole', {
+            assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
         });
 
         const policy = new PolicyStatement({
             actions: [
-                "logs:CreateLogGroup",
-                "logs:CreateLogStream",
-                "logs:DescribeLogGroups",
-                "logs:DescribeLogStreams",
-                "logs:PutLogEvents",
-                "logs:GetLogEvents",
-                "logs:FilterLogEvents",
+                'logs:CreateLogGroup',
+                'logs:CreateLogStream',
+                'logs:DescribeLogGroups',
+                'logs:DescribeLogStreams',
+                'logs:PutLogEvents',
+                'logs:GetLogEvents',
+                'logs:FilterLogEvents',
             ],
-            resources: ["*"],
+            resources: ['*'],
         });
         apiGatewayLogWriterRole.addToPolicy(policy);
         accessLogs.grantWrite(apiGatewayLogWriterRole);
@@ -148,7 +148,7 @@ export class QuizaroniAPI extends Construct {
 
         // Grant API Gateway permission to invoke the authorizer Lambda function
         apiAuthorizerLambda.grantInvoke(
-            new ServicePrincipal("apigateway.amazonaws.com")
+            new ServicePrincipal('apigateway.amazonaws.com')
         );
 
         const authorizerUri = `arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/${apiAuthorizerLambda.functionArn}/invocations`;
@@ -156,7 +156,7 @@ export class QuizaroniAPI extends Construct {
             authorizerName: authorizerNameAndID,
             authorizerUri,
             httpApi: api,
-            identitySource: ["$request.header.Authorization"],
+            identitySource: ['$request.header.Authorization'],
             // identitySources: [IdentitySource.header("Authorization")]
             type: HttpAuthorizerType.LAMBDA,
             enableSimpleResponses: true,
@@ -167,7 +167,7 @@ export class QuizaroniAPI extends Construct {
             `http-route-authorizer`,
             {
                 authorizerId: httpAuthorizer.authorizerId,
-                authorizerType: "CUSTOM",
+                authorizerType: 'CUSTOM',
             }
         );
 
@@ -178,19 +178,19 @@ export class QuizaroniAPI extends Construct {
         const FILES_ROUTES = [
             {
                 route: `${filesPrefix}/initiate-multipart-upload`,
-                lambdaName: "initiateMultipartUpload",
+                lambdaName: 'initiateMultipartUpload',
             },
             {
                 route: `${filesPrefix}/complete-multipart-upload`,
-                lambdaName: "completeMultipartUpload",
+                lambdaName: 'completeMultipartUpload',
             },
             {
                 route: `${filesPrefix}/get-multipart-signed-upload-urls`,
-                lambdaName: "getMultipartSignedUploadUrls",
+                lambdaName: 'getMultipartSignedUploadUrls',
             },
             {
                 route: `${filesPrefix}/delete-file`,
-                lambdaName: "deleteFile",
+                lambdaName: 'deleteFile',
             },
         ];
 
@@ -201,57 +201,65 @@ export class QuizaroniAPI extends Construct {
         }[] = [
             {
                 route: `${studysetsPrefix}/create-studyset`,
-                lambdaName: "createStudyset",
+                lambdaName: 'createStudyset',
             },
             {
                 route: `${studysetsPrefix}/delete-studyset`,
-                lambdaName: "deleteStudyset",
+                lambdaName: 'deleteStudyset',
             },
             {
                 route: `${studysetsPrefix}/get-studyset`,
-                lambdaName: "getStudyset",
+                lambdaName: 'getStudyset',
                 // methods: [HttpMethod.GET]
             },
             {
                 route: `${studysetsPrefix}/get-all-studysets`,
-                lambdaName: "getAllStudysets",
+                lambdaName: 'getAllStudysets',
                 // methods: [HttpMethod.GET]
             },
             {
                 route: `${studysetsPrefix}/update-studyset`,
-                lambdaName: "updateStudyset",
+                lambdaName: 'updateStudyset',
             },
             {
                 route: `${studysetsPrefix}/duplicate-studyset`,
-                lambdaName: "duplicateStudyset",
+                lambdaName: 'duplicateStudyset',
+            },
+            {
+                route: `${studysetsPrefix}/batch-delete-studysets`,
+                lambdaName: 'batchDeleteStudysets',
+            },
+            {
+                route: `${studysetsPrefix}/batch-duplicate-studysets`,
+                lambdaName: 'batchDuplicateStudysets',
             },
             {
                 route: `${studysetsPrefix}/create-label`,
-                lambdaName: "createLabel",
+                lambdaName: 'createLabel',
             },
             {
                 route: `${studysetsPrefix}/delete-label`,
-                lambdaName: "deleteLabel",
+                lambdaName: 'deleteLabel',
             },
             {
                 route: `${studysetsPrefix}/change-label`,
-                lambdaName: "changeLabel",
+                lambdaName: 'changeLabel',
             },
             {
                 route: `${studysetsPrefix}/edit-label`,
-                lambdaName: "editLabel",
+                lambdaName: 'editLabel',
             },
             {
                 route: `${studysetsPrefix}/create-note`,
-                lambdaName: "createNote",
+                lambdaName: 'createNote',
             },
             {
                 route: `${studysetsPrefix}/delete-note`,
-                lambdaName: "deleteNote",
+                lambdaName: 'deleteNote',
             },
             {
                 route: `${studysetsPrefix}/edit-note`,
-                lambdaName: "editNote",
+                lambdaName: 'editNote',
             },
         ];
 
@@ -262,16 +270,19 @@ export class QuizaroniAPI extends Construct {
         }[] = [
             {
                 route: `${usersPrefix}/get-user`,
-                lambdaName: "getUser",
+                lambdaName: 'getUser',
             },
             {
                 route: `${usersPrefix}/update-metadata`,
-                lambdaName: "updateUserMetadata",
+                lambdaName: 'updateUserMetadata',
             },
         ];
 
-
-        const API_ROUTES = [...FILES_ROUTES, ...STUDYSETS_ROUTES, ...USERS_ROUTES];
+        const API_ROUTES = [
+            ...FILES_ROUTES,
+            ...STUDYSETS_ROUTES,
+            ...USERS_ROUTES,
+        ];
 
         for (const { route, lambdaName } of API_ROUTES) {
             this.createLambdaHttpIntegration({
@@ -294,11 +305,11 @@ export class QuizaroniAPI extends Construct {
     createUpdateLambdaRoles = () => {
         const mainLambdaRoleNameAndID = `${this.deploymentType}-main-lambda-role`;
         const mainLambdaRole = new Role(this, mainLambdaRoleNameAndID, {
-            assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
+            assumedBy: new ServicePrincipal('lambda.amazonaws.com'),
             roleName: mainLambdaRoleNameAndID,
             managedPolicies: [
                 ManagedPolicy.fromAwsManagedPolicyName(
-                    "service-role/AWSLambdaBasicExecutionRole"
+                    'service-role/AWSLambdaBasicExecutionRole'
                 ),
             ],
         });
@@ -311,12 +322,12 @@ export class QuizaroniAPI extends Construct {
         const dynamoDBPolicyStatement = new PolicyStatement({
             effect: Effect.ALLOW,
             actions: [
-                "dynamodb:GetItem",
-                "dynamodb:Query",
-                "dynamodb:Scan",
-                "dynamodb:PutItem",
-                "dynamodb:UpdateItem",
-                "dynamodb:DeleteItem",
+                'dynamodb:GetItem',
+                'dynamodb:Query',
+                'dynamodb:Scan',
+                'dynamodb:PutItem',
+                'dynamodb:UpdateItem',
+                'dynamodb:DeleteItem',
             ],
             resources: dynamoTableResources,
         });
@@ -332,17 +343,17 @@ export class QuizaroniAPI extends Construct {
         const s3PolicyStatement = new PolicyStatement({
             effect: Effect.ALLOW,
             actions: [
-                "s3:GetObject",
-                "s3:PutObject",
-                "s3:ListBucket",
-                "s3:DeleteObject",
-                "s3:AbortMultipartUpload",
-                "s3:ListMultipartUploadParts",
+                's3:GetObject',
+                's3:PutObject',
+                's3:ListBucket',
+                's3:DeleteObject',
+                's3:AbortMultipartUpload',
+                's3:ListMultipartUploadParts',
             ],
             resources: s3BucketResources,
         });
         mainLambdaRole.addToPolicy(s3PolicyStatement);
-        addRole(mainLambdaRoleNameAndID, mainLambdaRole)
+        addRole(mainLambdaRoleNameAndID, mainLambdaRole);
     };
 
     createLambdaProxyIntegration = ({

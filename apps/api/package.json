@@ -11,22 +11,22 @@
 		"cdk": "cdk"
 	},
 	"dependencies": {
-		"@aws-sdk/client-cognito-identity-provider": "^3.554.0",
-		"@aws-sdk/client-dynamodb": "^3.540.0",
-		"@aws-sdk/client-lambda": "^3.540.0",
-		"@aws-sdk/client-s3": "^3.540.0",
-		"@aws-sdk/client-ses": "^3.556.0",
-		"@aws-sdk/lib-dynamodb": "^3.540.0",
-		"@aws-sdk/s3-request-presigner": "^3.540.0",
-		"aws-cdk-lib": "^2.159.1",
+		"@aws-sdk/client-cognito-identity-provider": "^3.721.0",
+		"@aws-sdk/client-dynamodb": "^3.721.0",
+		"@aws-sdk/client-lambda": "^3.721.0",
+		"@aws-sdk/client-s3": "^3.722.0",
+		"@aws-sdk/client-ses": "^3.721.0",
+		"@aws-sdk/lib-dynamodb": "^3.721.0",
+		"@aws-sdk/s3-request-presigner": "^3.722.0",
+		"aws-cdk-lib": "^2.174.0",
 		"aws-jwt-verify": "^4.0.1",
-		"constructs": "^10.3.0",
+		"constructs": "^10.4.2",
 		"dotenv": "^16.4.5",
 		"source-map-support": "^0.5.21",
 		"uuid": "^9.0.1"
 	},
 	"devDependencies": {
-		"@types/aws-lambda": "^8.10.136",
+		"@types/aws-lambda": "^8.10.147",
 		"@types/jest": "^29.5.12",
 		"@types/node": "^20.12.2",
 		"@types/uuid": "^9.0.8",
@@ -37,6 +37,6 @@
 		"prettier": "3.3.3",
 		"ts-jest": "^29.1.2",
 		"ts-node": "^10.9.2",
-		"typescript": "^5.4.3"
+		"typescript": "^5.7.2"
 	}
 }
