@@ -1,4 +1,4 @@
-import { LabelsDialogTab } from "components/ManageLabelsDialog/constants";
+import { LabelsDialogTab } from 'components/ManageLabelsDialog/constants';
 
 // #region Utility Types
 export type TODO = any;
@@ -7,7 +7,7 @@ export type Timestamp = number;
 // #endregion
 
 // #region Theme
-export type ThemeName = "light" | "dark";
+export type ThemeName = 'light' | 'dark';
 // #endregion
 
 // #region Studysets
@@ -60,7 +60,7 @@ export type StudysetMetadata = {
 
 export type CardFileMetadata = FileMetadata & {
     association: 'term' | 'definition';
-}
+};
 
 // #endregion
 
@@ -78,37 +78,52 @@ export type User = {
     userUUID: UUID;
 };
 
-export type AppTheme = "light" | "dark";
-export type HomeView = "table" | "grid" | "html";
+export type AppTheme = 'light' | 'dark';
+export type HomeView = 'table' | 'grid' | 'html';
 export type NamedColor = { color: string; name: string };
 // #endregion
 
 /* RTK Query Types */
 
+export type BaseResponse = {
+    message: string;
+};
+
 export type StudysetUUIDPayload = {
     studysetUUID: UUID;
 };
 
-export type GetAllStudysetsParams = {
+export type GetAllStudysetsParams = {};
+
+export type GetAllStudysetsResponse = {
+    studysets: Studyset[];
 };
 
-export type GetAllStudysetsResponse = { 
-    studysets: Studyset[] 
+export type GetStudysetResponse = {
+    studyset: Studyset;
 };
 
-export type GetStudysetResponse = { 
-    studyset: Studyset; 
+export type GetStudysetParams = StudysetUUIDPayload;
+
+export type CreateStudysetResponse = {
+    studyset: Studyset;
 };
 
-export type GetStudysetParams = StudysetUUIDPayload
+export type DeleteStudysetParams = StudysetUUIDPayload;
 
-export type CreateStudysetResponse = { 
-    studyset: Studyset; 
+export type BatchDeleteStudysetsParams = {
+    studysetUUIDs: UUID[];
 };
 
-export type DeleteStudysetParams = StudysetUUIDPayload
+export type BatchDeleteStudysetsResponse = BaseResponse;
 
-export type DuplicateStudysetParams = StudysetUUIDPayload
+export type DuplicateStudysetParams = StudysetUUIDPayload;
+
+export type BatchDuplicateStudysetsParams = {
+    studysetUUIDs: UUID[];
+};
+
+export type BatchDuplicateStudysetsResponse = BaseResponse;
 
 export type Updates = { [key: string]: any };
 
@@ -118,10 +133,14 @@ export type UpdateStudysetParams = {
     isMetadataUpdate?: boolean;
 };
 
+export type UpdateStudysetResponse = BaseResponse & {
+    studyset: Studyset;
+};
+
 type StudysetUpdatesMap = [UUID, Updates][];
 export type BatchUpdateStudysetsParams = {
     studysetUpdates: StudysetUpdatesMap;
-}
+};
 
 export type FavoriteStudysetParams = StudysetUUIDPayload & {
     favorited: boolean;
@@ -131,7 +150,7 @@ export type FavoriteStudysetParams = StudysetUUIDPayload & {
 export type GetUserParams = {};
 export type GetUserResponse = {
     user: User;
-}
+};
 
 export type CreateUserParams = {
     email: string;
@@ -144,7 +163,7 @@ export type UpdateUserMetadataParams = {
 
 export type UpdateDefaultThemeParams = {
     uuid: UUID;
-    newTheme: "light" | "dark";
+    newTheme: 'light' | 'dark';
 };
 
 export type UpdateEmailParams = {
@@ -158,8 +177,8 @@ export type EditCategoryParams = StudysetUUIDPayload & {
     oldCategory: string;
 };
 
-export type CreateNoteResponse = { 
-    noteUUID: string; 
+export type CreateNoteResponse = {
+    noteUUID: string;
 };
 
 export type CreateNoteParams = StudysetUUIDPayload & {
@@ -212,7 +231,7 @@ export type Part = {
 
 // #region Redux
 
-export type SortDirection = "asc" | "dsc";
+export type SortDirection = 'asc' | 'dsc';
 
 export type ConfirmDialogProps = {
     cancelButtonText?: string;
@@ -229,12 +248,12 @@ export type LabelsDialogProps = {
     studysetUUID?: string;
     selectedStudysetUUIDs?: string[];
     tab?: LabelsDialogTab;
-}
+};
 
 // export type ViewSetDialog =
 
 export type OpenCardNotes = Set<UUID>;
 
-export type ColorPickerType = "textColor" | "backgroundColor";
+export type ColorPickerType = 'textColor' | 'backgroundColor';
 
 // #endregion
