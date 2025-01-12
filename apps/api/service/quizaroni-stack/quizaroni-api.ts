@@ -328,6 +328,7 @@ export class QuizaroniAPI extends Construct {
                 'dynamodb:PutItem',
                 'dynamodb:UpdateItem',
                 'dynamodb:DeleteItem',
+                'dynamodb:BatchWriteItem',
             ],
             resources: dynamoTableResources,
         });
