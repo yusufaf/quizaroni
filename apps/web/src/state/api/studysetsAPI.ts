@@ -21,6 +21,11 @@ import {
     CreateStudysetResponse,
     BatchUpdateStudysetsParams,
     CreateNoteResponse,
+    UpdateStudysetResponse,
+    BatchDuplicateStudysetsParams,
+    BatchDeleteStudysetsParams,
+    BatchDeleteStudysetsResponse,
+    BatchDuplicateStudysetsResponse,
 } from 'shared/types';
 
 // TODO: Look into set actions delete, duplicate, favorite. Currently fetches all studysets again once called.
@@ -80,6 +85,17 @@ export const studysetsApi = api.injectEndpoints({
             // invalidatesTags: ["Studyset"],
             invalidatesTags: [{ type: 'Studyset', id: 'LIST' }],
         }),
+        batchDeleteStudysets: build.mutation<
+            BatchDeleteStudysetsResponse,
+            BatchDeleteStudysetsParams
+        >({
+            query: ({ studysetUUIDs }) => ({
+                url: `${BASE_API_URL}/studysets/batch-delete-studysets`,
+                ...getCommonPostRequestProps(),
+                body: { studysetUUIDs },
+            }),
+            invalidatesTags: [{ type: 'Studyset', id: 'LIST' }],
+        }),
         duplicateStudyset: build.mutation<void, DuplicateStudysetParams>({
             query: ({ studysetUUID }) => ({
                 url: `${BASE_API_URL}/studysets/duplicate-studyset`,
@@ -88,7 +104,21 @@ export const studysetsApi = api.injectEndpoints({
             }),
             invalidatesTags: [{ type: 'Studyset', id: 'LIST' }],
         }),
-        updateStudyset: build.mutation<void, UpdateStudysetParams>({
+        batchDuplicateStudysets: build.mutation<
+            BatchDuplicateStudysetsResponse,
+            BatchDuplicateStudysetsParams
+        >({
+            query: ({ studysetUUIDs }) => ({
+                url: `${BASE_API_URL}/studysets/batch-duplicate-studysets`,
+                ...getCommonPostRequestProps(),
+                body: { studysetUUIDs },
+            }),
+            invalidatesTags: [{ type: 'Studyset', id: 'LIST' }],
+        }),
+        updateStudyset: build.mutation<
+            UpdateStudysetResponse,
+            UpdateStudysetParams
+        >({
             query: ({ studysetUUID, updates, isMetadataUpdate }) => ({
                 url: `${BASE_API_URL}/studysets/update-studyset`,
                 ...getCommonPostRequestProps(),
@@ -104,6 +134,7 @@ export const studysetsApi = api.injectEndpoints({
                 ...getCommonPostRequestProps(),
                 body: { studysetUpdates },
             }),
+
             // invalidatesTags: (_result, _error, arg) => [
             // { type: 'Studyset', id: arg.studysetUUID },
             // ],
@@ -265,4 +296,6 @@ export const {
     useCreateNoteMutation,
     useDeleteNoteMutation,
     useEditNoteMutation,
+    useBatchDeleteStudysetsMutation,
+    useBatchDuplicateStudysetsMutation,
 } = studysetsApi;

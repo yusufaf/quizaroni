@@ -177,10 +177,10 @@ export const DEFAULT_CATEGORIES = {
     IMPORTANT: 'Important',
 };
 
-export const SORT_DIRECTIONS: { [key: string]: SortDirection } = {
+export const SORT_DIRECTIONS = {
     ASC: 'asc',
     DSC: 'dsc',
-};
+} as const;
 
 export const DEFAULT_TERMINOLOGY = 'Term/Definition';
 

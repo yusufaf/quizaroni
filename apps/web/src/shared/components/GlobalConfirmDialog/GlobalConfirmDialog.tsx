@@ -20,6 +20,8 @@ import useCustomMutation from 'hooks/useCustomMutation';
 import {
     useDeleteStudysetMutation,
     useDuplicateStudysetMutation,
+    useBatchDeleteStudysetsMutation,
+    useBatchDuplicateStudysetsMutation,
 } from 'state/api/studysetsAPI';
 import { StyledDialogActions } from 'styles/AppStyles';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +41,17 @@ const ConfirmDialog = (props: Props) => {
     });
 
     const {
+        mutate: batchDeleteStudysets,
+        isLoading: isBatchDeletingStudysets,
+        isSuccess: isBatchDeletingStudysetsSuccess,
+        isError: isBatchDeletingStudysetsError,
+    } = useCustomMutation({
+        mutation: useBatchDeleteStudysetsMutation,
+        successMessage: 'Successfully deleted study sets',
+        errorMessage: 'Error deleting study sets',
+    });
+
+    const {
         mutate: duplicateStudySet,
         isLoading: isDuplicatingStudySet,
         isSuccess: isDuplicateStudySetSuccess,
@@ -47,6 +60,17 @@ const ConfirmDialog = (props: Props) => {
         mutation: useDuplicateStudysetMutation,
         successMessage: 'Successfully duplicated study set',
         errorMessage: 'Error duplicating study set',
+    });
+
+    const {
+        mutate: batchDuplicateStudysets,
+        isLoading: isBatchDuplicatingStudySets,
+        isSuccess: isBatchDuplicatingStudySetsSuccess,
+        isError: isBatchDuplicatingStudySetsError,
+    } = useCustomMutation({
+        mutation: useBatchDuplicateStudysetsMutation,
+        successMessage: 'Successfully duplicated study sets',
+        errorMessage: 'Error duplicating study sets',
     });
 
     const isTableMultiAction = [
@@ -66,12 +90,7 @@ const ConfirmDialog = (props: Props) => {
                 break;
             case STUDYSET_CONFIRM_DIALOGS.DELETE_MULTIPLE: {
                 const { studysetUUIDs = [] } = { ...dialogProps.props };
-                const promises = studysetUUIDs.map((studysetUUID: string) => {
-                    return deleteStudySet({
-                        studysetUUID,
-                    }).unwrap();
-                });
-                await Promise.allSettled(promises);
+                batchDeleteStudysets({ studysetUUIDs });
                 break;
             }
             case STUDYSET_CONFIRM_DIALOGS.DUPLICATE:
@@ -79,12 +98,7 @@ const ConfirmDialog = (props: Props) => {
                 break;
             case STUDYSET_CONFIRM_DIALOGS.DUPLICATE_MULTIPLE:
                 const { studysetUUIDs = [] } = { ...dialogProps.props };
-                const promises = studysetUUIDs.map((studysetUUID: string) => {
-                    return duplicateStudySet({
-                        studysetUUID,
-                    }).unwrap();
-                });
-                await Promise.allSettled(promises);
+                batchDuplicateStudysets({ studysetUUIDs });
                 break;
         }
         onClose();

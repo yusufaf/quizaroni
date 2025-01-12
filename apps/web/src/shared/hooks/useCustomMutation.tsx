@@ -1,9 +1,9 @@
-import { useEffect } from "react";
-import { toast } from "react-toastify";
-import { UseMutation } from "@reduxjs/toolkit/dist/query/react/buildHooks";
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { TODO } from 'shared/types';
 
 type UseCustomMutationProps = {
-    mutation: UseMutation<any>;
+    mutation: TODO;
     successMessage: string;
     errorMessage: string;
     onSuccess?: () => void;
@@ -13,14 +13,14 @@ type UseCustomMutationProps = {
 export default function useCustomMutation(props: UseCustomMutationProps) {
     const {
         mutation,
-        successMessage = "Success!",
-        errorMessage = "Error!",
+        successMessage = 'Success!',
+        errorMessage = 'Error!',
         onSuccess,
         onError,
     } = props;
-    
+
     const [mutate, { isLoading, isSuccess, isError }] = mutation();
-    
+
     useEffect(() => {
         if (isSuccess) {
             onSuccess?.();
@@ -41,5 +41,5 @@ export default function useCustomMutation(props: UseCustomMutationProps) {
         isLoading,
         isSuccess,
         isError,
-    }
-};
+    };
+}
