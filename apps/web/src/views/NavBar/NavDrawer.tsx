@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
     Button,
     Drawer,
@@ -6,17 +6,21 @@ import {
     List,
     ListItem,
     ListItemText,
-} from "@mui/material/";
-import { Create, Menu } from "@mui/icons-material";
-import { StyledNavLink } from "./NavStyles";
-import DarkModeToggleButton from "./DarkModeToggleButton";
-import { useNavigate } from "react-router-dom";
-import { useCreateStudysetMutation } from "state/api/studysetsAPI";
+} from '@mui/material/';
+import { Create, Menu } from '@mui/icons-material';
+import { StyledNavLink } from './NavStyles';
+import DarkModeToggleButton from './DarkModeToggleButton';
+import { useNavigate } from 'react-router-dom';
+import { useCreateStudysetMutation } from 'state/api/studysetsAPI';
+import { setLoadingAdd, setLoadingRemove } from 'state/slices/globalSlice';
+import { useAppDispatch } from 'state/reduxHooks';
 
 const NavDrawer = (props) => {
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+
     const [openDrawer, setOpenDrawer] = useState(false);
 
-    const navigate = useNavigate();
     const [createStudyset] = useCreateStudysetMutation();
 
     const handleCloseDrawer = () => {
@@ -29,11 +33,13 @@ const NavDrawer = (props) => {
 
     // TODO: Switch to RTK query after
     const handleCreateStudyset = async () => {
+        dispatch(setLoadingAdd("CREATE_STUDYSET"));
         createStudyset({}).unwrap().then((response) => {
             const { studyset } = response;
-            navigate(`/edit/${studyset.studysetUUID}`)
+            navigate(`/edit/${studyset.studysetUUID}`);
+            dispatch(setLoadingRemove("CREATE_STUDYSET"));
         })
-    }
+    };
 
     return (
         <>
