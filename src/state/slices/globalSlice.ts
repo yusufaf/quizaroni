@@ -22,6 +22,7 @@ type GlobalSliceState = {
     userData: any;
     labelsDialogProps: LabelsDialogProps;
     confirmationCodeDialogProps: any;
+    loadingActions: string[];
 };
 
 const initialState: GlobalSliceState = {
@@ -39,6 +40,7 @@ const initialState: GlobalSliceState = {
         open: false,
     },
     confirmationCodeDialogProps: {},
+    loadingActions: [],
 };
 
 const sliceName = 'globalState';
@@ -141,6 +143,16 @@ export const globalSlice = createSlice({
         setConfirmationCodeDialogProps: (state, action: PayloadAction<any>) => {
             state.confirmationCodeDialogProps = action.payload;
         },
+        setLoadingAdd: (state, action: PayloadAction<string>) => {
+            if (!state.loadingActions.includes(action.payload)) {
+                state.loadingActions.push(action.payload);
+            }
+        },
+        setLoadingRemove: (state, action: PayloadAction<string>) => {
+            state.loadingActions = state.loadingActions.filter(
+                (actionId) => actionId !== action.payload
+            );
+        },
     },
 });
 
@@ -156,6 +168,8 @@ export const {
     setLabelsDialogProps,
     setConfirmationCodeDialogProps,
     showConfirmDialog,
+    setLoadingAdd,
+    setLoadingRemove,
 } = globalSlice.actions;
 
 /* Selectors */
@@ -178,5 +192,7 @@ export const selectLabelsDialogProps = (state: RootState) =>
     state[sliceName].labelsDialogProps;
 export const selectConfirmationCodeDialogProps = (state: RootState) =>
     state[sliceName].confirmationCodeDialogProps;
+export const selectLoadingActions = (state: RootState) =>
+    state[sliceName].loadingActions;
 
 export default globalSlice.reducer;

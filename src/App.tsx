@@ -12,13 +12,18 @@ import GlobalConfirmDialog from 'shared/components/GlobalConfirmDialog/GlobalCon
 import ManageLabelsDialog from 'shared/components/ManageLabelsDialog/ManageLabelsDialog';
 import ConfirmationCodeDialog from 'shared/components/ConfirmationCodeDialog/ConfirmationCodeDialog';
 import { useAppSelector } from 'state/reduxHooks';
-import { selectLabelsDialogProps } from 'state/slices/globalSlice';
+import {
+    selectLabelsDialogProps,
+    selectLoadingActions,
+} from 'state/slices/globalSlice';
+import LoadingIndicator from 'shared/components/LoadingIndicator/LoadingIndicator';
 
 const App = () => {
     const { setTheme, theme } = useTheme();
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
     const labelsDialogProps = useAppSelector(selectLabelsDialogProps);
+    const loadingActions = useAppSelector(selectLoadingActions);
 
     useEffect(() => {
         prefersDarkMode ? setTheme(DARK) : setTheme(LIGHT);
@@ -27,6 +32,7 @@ const App = () => {
     return (
         <>
             <NavBar />
+            {loadingActions.length > 0 && <LoadingIndicator />}
             <AppRoutes />
             <Footer />
             <FeedbackDialog />
