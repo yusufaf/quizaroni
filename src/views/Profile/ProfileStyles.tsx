@@ -83,7 +83,7 @@ export const ProfilePicture = styled('div')({
 export const UserInfoContainer = styled('div')({
     display: 'flex',
     flexDirection: 'column',
-    gap: '1rem',
+    gap: '0.5rem',
 });
 
 export const UserInfoHeading = styled(Typography)({
