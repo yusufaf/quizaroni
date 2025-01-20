@@ -1,10 +1,10 @@
-import { configureStore } from "@reduxjs/toolkit";
-import globalReducer from "state/slices/globalSlice";
-import studySetsReducer from "state/slices/studysetsSlice";
-import viewSetsReducer from "state/slices/viewSetsSlice";
-import createSetReducer from "state/slices/createSetSlice";
-import api from "./api/api";
-import loggerMiddleware from "./middleware/logger";
+import { configureStore } from '@reduxjs/toolkit';
+import globalReducer from 'state/slices/globalSlice';
+import studySetsReducer from 'state/slices/studysetsSlice';
+import viewSetsReducer from 'state/slices/viewSetsSlice';
+import createSetReducer from 'state/slices/createSetSlice';
+import api from './api/api';
+import loggerMiddleware from './middleware/logger';
 
 const isDevelopment = import.meta.env.DEV;
 
@@ -29,7 +29,7 @@ export const store = configureStore({
     devTools: isDevelopment,
 });
 
-export type AppStore = typeof store
+export type AppStore = typeof store;
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;
 // export type AppThunk = ThunkAction<void, RootState, unknown, Action<string>>;

@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router-dom';
 import {
     selectAuthenticated,
     setAuthenticated,
+    setLoadingAdd,
+    setLoadingRemove,
 } from 'state/slices/globalSlice';
 import ProfileDropdown from 'views/Profile/ProfileDropdown';
 import { useTheme } from 'theme/useTheme';
@@ -77,10 +79,14 @@ const NavBar = (props: Props) => {
     };
 
     const handleCreateStudyset = async () => {
-        // @ts-ignore
-        const { data } = await createStudyset({});
-        const { studyset } = data;
-        navigate(`/create/${studyset.studysetUUID}`);
+        dispatch(setLoadingAdd('CREATE_STUDYSET'));
+        createStudyset({})
+            .unwrap()
+            .then((response) => {
+                const { studyset } = response;
+                navigate(`/edit/${studyset.studysetUUID}`);
+                dispatch(setLoadingRemove('CREATE_STUDYSET'));
+            });
     };
 
     return (
