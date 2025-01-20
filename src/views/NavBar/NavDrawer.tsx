@@ -33,12 +33,14 @@ const NavDrawer = (props) => {
 
     // TODO: Switch to RTK query after
     const handleCreateStudyset = async () => {
-        dispatch(setLoadingAdd("CREATE_STUDYSET"));
-        createStudyset({}).unwrap().then((response) => {
-            const { studyset } = response;
-            navigate(`/edit/${studyset.studysetUUID}`);
-            dispatch(setLoadingRemove("CREATE_STUDYSET"));
-        })
+        dispatch(setLoadingAdd('CREATE_STUDYSET'));
+        createStudyset({})
+            .unwrap()
+            .then((response) => {
+                const { studyset } = response;
+                navigate(`/edit/${studyset.studysetUUID}`);
+                dispatch(setLoadingRemove('CREATE_STUDYSET'));
+            });
     };
 
     return (
