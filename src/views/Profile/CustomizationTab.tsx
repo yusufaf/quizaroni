@@ -1,28 +1,34 @@
 import {
-    Palette,
-    LightMode,
     DarkMode,
     Label,
     Launch,
+    LightMode,
+    Palette
 } from '@mui/icons-material';
 import {
-    Typography,
-    ToggleButtonGroup,
-    ToggleButton,
     Button,
+    CircularProgress,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography
 } from '@mui/material';
-import { useState, useEffect } from 'react';
+import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
+import { useEffect, useState } from 'react';
+import { DARK, DATE_FORMATS, LIGHT } from 'shared/constants';
+import { SimpleFlexContainer } from 'shared/styles/AppStyles';
+import { PreferredDateFormat, User } from 'shared/types';
+import { useUpdateUserMetadataMutation } from 'state/api/usersAPI';
+import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import {
     selectNamedColorsDialogProps,
     setLabelsDialogProps,
     setNamedColorsDialogProps,
     setUserData,
 } from 'state/slices/globalSlice';
-import { LIGHT, DARK } from 'shared/constants';
 import { ActionColumn, ActionHeader } from './ProfileStyles';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
-import { User } from 'shared/types';
 
 type Props = {
     userData: User;
@@ -31,11 +37,25 @@ type Props = {
 const CustomizationTab = ({ userData }: Props) => {
     const dispatch = useAppDispatch();
 
-    const { userUUID = '', labels = [] } = userData;
+    const {
+        userUUID = '',
+        labels = [],
+        metadata: { preferredDateFormat },
+    } = userData;
     const namedColorsDialogProps = useAppSelector(selectNamedColorsDialogProps);
     const [defaultTheme, setDefaultTheme] = useState<string>(
         userData?.metadata?.defaultTheme ?? 'dark'
     );
+    const [isSelectLoading, setIsSelectLoading] = useState<boolean>(false);
+
+    const [
+        updateUserMetadata,
+        {
+            isLoading: isUpdateMetadataLoading,
+            isSuccess: isUpdateMetadataSuccess,
+            isError: isUpdateMetadataError,
+        },
+    ] = useUpdateUserMetadataMutation();
 
     useEffect(() => {
         if (userData?.metadata?.defaultTheme) {
@@ -94,6 +114,27 @@ const CustomizationTab = ({ userData }: Props) => {
         );
     };
 
+    const handlePreferredDateFormatChange = (
+        event: SelectChangeEvent<PreferredDateFormat>
+    ) => {
+        setIsSelectLoading(true);
+        updateUserMetadata({
+            updates: {
+                preferredDateFormat: event.target.value,
+            },
+        })
+            .unwrap()
+            .then(() => {
+                console.log('Date format updated successfully');
+            })
+            .catch((error) => {
+                console.error('Failed to update date format:', error);
+            })
+            .finally(() => {
+                setIsSelectLoading(false);
+            });
+    };
+
     return (
         <>
             <ActionColumn>
@@ -147,6 +188,22 @@ const CustomizationTab = ({ userData }: Props) => {
                     Manage Named Colors
                 </Button>
                 {namedColorsDialogProps.open && <NamedColorsDialog />}
+            </ActionColumn>
+            <ActionColumn>
+                <SimpleFlexContainer style={{ gap: '1rem' }}>
+                    <Select
+                        value={preferredDateFormat ?? DATE_FORMATS.MDY}
+                        onChange={handlePreferredDateFormatChange}
+                        disabled={isSelectLoading}
+                    >
+                        {Object.entries(DATE_FORMATS).map(([key, value]) => (
+                            <MenuItem key={key} value={value}>
+                                {value}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                    {isSelectLoading && <CircularProgress size={24} />}{' '}
+                </SimpleFlexContainer>
             </ActionColumn>
         </>
     );
