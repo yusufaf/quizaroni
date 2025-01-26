@@ -1,3 +1,4 @@
+import { DATE_FORMATS } from './constants/';
 import { LabelsDialogTab } from 'components/ManageLabelsDialog/constants';
 
 // #region Utility Types
@@ -73,6 +74,7 @@ export type User = {
         defaultTheme: AppTheme;
         homeView: HomeView;
         namedColors: NamedColor[];
+        preferredDateFormat: PreferredDateFormat;
     };
     username: string;
     userUUID: UUID;
@@ -81,6 +83,9 @@ export type User = {
 export type AppTheme = 'light' | 'dark';
 export type HomeView = 'table' | 'grid' | 'html';
 export type NamedColor = { color: string; name: string };
+
+export type PreferredDateFormat = keyof typeof DATE_FORMATS;
+
 // #endregion
 
 /* RTK Query Types */
