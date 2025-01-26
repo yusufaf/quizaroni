@@ -41,6 +41,7 @@ export const handler: PostConfirmationTriggerHandler = async (
                         homeView: 'table',
                         namedColors: [],
                         visibleColumns: {},
+                        preferredDateFormat: 'MM/DD/YYYY',
                     },
                     updatedAt: timestamp,
                     username,

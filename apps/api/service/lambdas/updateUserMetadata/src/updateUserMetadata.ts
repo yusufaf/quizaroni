@@ -34,7 +34,7 @@ export const handler: Handler = async (
     const { updates } = body;
 
     try {
-        const PK = `userUUID#${userUUID}`;
+        const PK = `user#${userUUID}`;
         const SK = `userData`;
         const updatedAt = new Date().toISOString();
 
