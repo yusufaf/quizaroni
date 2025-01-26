@@ -295,3 +295,9 @@ export const HTML_TABLE_HEADERS = [
     'Label',
     'Favorited',
 ];
+
+export const DATE_FORMATS = {
+    ISO_8601: 'YYYY-MM-DD',
+    DMY: 'DD/MM/YYYY',
+    MDY: 'MM/DD/YYYY',
+} as const;
