@@ -5,6 +5,7 @@ import {
     LightMode,
     Palette,
     DateRange as DateRangeIcon,
+    Download as DownloadIcon,
 } from '@mui/icons-material';
 import {
     Button,
@@ -17,7 +18,7 @@ import {
     Typography,
 } from '@mui/material';
 import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DARK, DATE_FORMATS, LIGHT } from 'shared/constants';
 import { SimpleFlexContainer } from 'shared/styles/AppStyles';
 import { PreferredDateFormat, User } from 'shared/types';
@@ -30,6 +31,12 @@ import {
     setUserData,
 } from 'state/slices/globalSlice';
 import { ActionColumn, ActionHeader } from './ProfileStyles';
+import { downloadTypeItems } from 'views/ViewStudySet/DownloadSetModal/DownloadSetModal';
+
+const FIELD_NAMES = {
+    DATE_FORMAT: 'preferredDateFormat',
+    DOWNLOAD_FORMAT: 'defaultDownloadFormat',
+};
 
 type Props = {
     userData: User;
@@ -41,13 +48,22 @@ const CustomizationTab = ({ userData }: Props) => {
     const {
         userUUID = '',
         labels = [],
-        metadata: { preferredDateFormat },
+        metadata: { preferredDateFormat, defaultDownloadFormat },
     } = userData;
+
     const namedColorsDialogProps = useAppSelector(selectNamedColorsDialogProps);
     const [defaultTheme, setDefaultTheme] = useState<string>(
         userData?.metadata?.defaultTheme ?? 'dark'
     );
-    const [isSelectLoading, setIsSelectLoading] = useState<boolean>(false);
+    const [selectLoadingID, setSelectLoadingID] = useState<string>('');
+
+    const dateFormatLoading = useMemo(() => {
+        return selectLoadingID === FIELD_NAMES.DATE_FORMAT;
+    }, [selectLoadingID]);
+
+    const downloadFormatLoading = useMemo(() => {
+        return selectLoadingID === FIELD_NAMES.DOWNLOAD_FORMAT;
+    }, [selectLoadingID]);
 
     const [
         updateUserMetadata,
@@ -99,6 +115,7 @@ const CustomizationTab = ({ userData }: Props) => {
         }
     };
 
+    // #region Named Colors
     const openNamedColorsDialog = () => {
         dispatch(
             setNamedColorsDialogProps({
@@ -106,7 +123,9 @@ const CustomizationTab = ({ userData }: Props) => {
             })
         );
     };
+    // #endregion
 
+    // #region Labels
     const showManageLabelsDialog = () => {
         dispatch(
             setLabelsDialogProps({
@@ -114,27 +133,31 @@ const CustomizationTab = ({ userData }: Props) => {
             })
         );
     };
+    // #endregion
 
-    const handlePreferredDateFormatChange = (
+    // #region Date Format, Default Download Format
+    const handleSelectChange = (
         event: SelectChangeEvent<PreferredDateFormat>
     ) => {
-        setIsSelectLoading(true);
+        setSelectLoadingID(event.target.name);
         updateUserMetadata({
             updates: {
-                preferredDateFormat: event.target.value,
+                [event.target.name]: event.target.value,
             },
         })
             .unwrap()
             .then(() => {
-                console.log('Date format updated successfully');
+                console.log(`${event.target.name} updated successfully`);
             })
             .catch((error) => {
-                console.error('Failed to update date format:', error);
+                console.error(`Failed to update ${event.target.name}:`, error);
             })
             .finally(() => {
-                setIsSelectLoading(false);
+                setSelectLoadingID('');
             });
     };
+
+    // #endregion
 
     return (
         <>
@@ -197,9 +220,13 @@ const CustomizationTab = ({ userData }: Props) => {
                 </ActionHeader>
                 <SimpleFlexContainer style={{ gap: '1rem' }}>
                     <Select
-                        value={preferredDateFormat ?? DATE_FORMATS.MDY}
-                        onChange={handlePreferredDateFormatChange}
-                        disabled={isSelectLoading}
+                        value={preferredDateFormat}
+                        onChange={handleSelectChange}
+                        disabled={dateFormatLoading}
+                        name={FIELD_NAMES.DATE_FORMAT}
+                        sx={{
+                            width: '10rem',
+                        }}
                     >
                         {Object.entries(DATE_FORMATS).map(([key, value]) => (
                             <MenuItem key={key} value={value}>
@@ -207,7 +234,30 @@ const CustomizationTab = ({ userData }: Props) => {
                             </MenuItem>
                         ))}
                     </Select>
-                    {isSelectLoading && <CircularProgress size={24} />}{' '}
+                    {dateFormatLoading && <CircularProgress size={24} />}{' '}
+                </SimpleFlexContainer>
+            </ActionColumn>
+            <ActionColumn>
+                <ActionHeader>
+                    <DownloadIcon />
+                    <Typography variant="h6">
+                        Default Download Format
+                    </Typography>
+                </ActionHeader>
+                <SimpleFlexContainer style={{ gap: '1rem' }}>
+                    <Select
+                        // @ts-ignore
+                        value={defaultDownloadFormat}
+                        onChange={handleSelectChange}
+                        disabled={downloadFormatLoading}
+                        name={FIELD_NAMES.DOWNLOAD_FORMAT}
+                        sx={{
+                            width: '10rem',
+                        }}
+                    >
+                        {downloadTypeItems}
+                    </Select>
+                    {downloadFormatLoading && <CircularProgress size={24} />}{' '}
                 </SimpleFlexContainer>
             </ActionColumn>
         </>

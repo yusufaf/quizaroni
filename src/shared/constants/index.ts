@@ -83,7 +83,7 @@ export const DOWNLOAD_FILE_TYPES = {
     JSON: 'JSON',
     CSV: 'CSV',
     MD: 'MD',
-};
+} as const;
 
 export const DOWNLOAD_FILE_TITLES = {
     [DOWNLOAD_FILE_TYPES.TXT]: 'Text File',
