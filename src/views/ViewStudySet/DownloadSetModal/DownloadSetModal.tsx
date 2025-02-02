@@ -18,11 +18,13 @@ import {
     DOWNLOAD_FILE_TITLES,
     DEFAULT_CSV_HEADERS,
     METADATA_CSV_HEADERS,
+    DEFAULT_USER_RESPONSE,
 } from 'shared/constants';
 import { DownloadDialogContent } from '../styles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
+import { useGetUserQuery } from 'state/api/usersAPI';
 
-const downloadTypeItems = Object.values(DOWNLOAD_FILE_TYPES).map(
+export const downloadTypeItems = Object.values(DOWNLOAD_FILE_TYPES).map(
     (value, index) => {
         return (
             <MenuItem
@@ -48,11 +50,17 @@ type Props = {
     studyset: Studyset;
 };
 
-const DownloadSetModal = (props: Props) => {
-    const { open, onClose, studyset } = props;
+const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
+    const {
+        data: {
+            user: {
+                metadata: { defaultDownloadFormat },
+            },
+        } = DEFAULT_USER_RESPONSE,
+    } = useGetUserQuery();
 
     const [downloadFileType, setDownloadFileType] = useState<string>(
-        DOWNLOAD_FILE_TYPES.TXT
+        defaultDownloadFormat ?? DOWNLOAD_FILE_TYPES.JSON
     );
     const [includeMetadata, setIncludeMetadata] = useState<boolean>(false);
 
