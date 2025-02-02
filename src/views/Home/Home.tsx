@@ -52,7 +52,10 @@ import {
 } from './HomeStyles';
 import HomeToolbar from './HomeToolbar';
 import SetActionsMenu from './SetActionsMenu';
-import { getFormattedTimestamp } from 'shared/utilities/functions';
+import {
+    formatDateUsingPreferred,
+    getFormattedTimestamp,
+} from 'shared/utilities/general';
 import { Button, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 
 // augment the props for the toolbar slot
@@ -111,8 +114,13 @@ const Home = (props: Props) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
-    const { data: { user: { userUUID = '' } } = DEFAULT_USER_RESPONSE } =
-        useGetUserQuery();
+    const {
+        data: {
+            user: {
+                metadata: { preferredDateFormat },
+            },
+        } = DEFAULT_USER_RESPONSE,
+    } = useGetUserQuery();
 
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
         useGetAllStudysetsQuery({});
@@ -209,23 +217,26 @@ const Home = (props: Props) => {
         {
             field: 'createdAt',
             headerName: 'Date Created',
-            type: 'date',
             width: 150,
-            valueGetter: (value) => value && new Date(value),
+            valueFormatter: (value) => {
+                return formatDateUsingPreferred(value, preferredDateFormat);
+            },
         },
         {
             field: 'lastViewed',
             headerName: 'Last Viewed',
-            type: 'date',
             width: 150,
-            valueGetter: (value) => value && new Date(value),
+            valueFormatter: (value) => {
+                return formatDateUsingPreferred(value, preferredDateFormat);
+            },
         },
         {
             field: 'updatedAt',
             headerName: 'Last Updated',
-            type: 'date',
             width: 150,
-            valueGetter: (value) => value && new Date(value),
+            valueFormatter: (value) => {
+                return formatDateUsingPreferred(value, preferredDateFormat);
+            },
         },
         {
             field: 'numberOfCards',

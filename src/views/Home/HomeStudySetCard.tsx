@@ -19,6 +19,9 @@ import { setSelectedStudySet } from 'state/slices/studysetsSlice';
 import { useNavigate } from 'react-router-dom';
 import { Studyset } from 'shared/types';
 import { GhostLink } from 'styles/AppStyles';
+import { DEFAULT_USER_RESPONSE } from 'shared/constants';
+import { useGetUserQuery } from 'state/api/usersAPI';
+import { formatDateUsingPreferred } from 'shared/utilities/general';
 
 type Props = {
     studyset: Studyset;
@@ -38,6 +41,15 @@ const HomeStudySetCard = ({ studyset }: Props) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { muiTheme } = useTheme();
+
+    const {
+        data: {
+            user: {
+                userUUID = '',
+                metadata: { preferredDateFormat },
+            },
+        } = DEFAULT_USER_RESPONSE,
+    } = useGetUserQuery();
 
     const [actionsMenuOpen, setActionsMenuOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -79,13 +91,19 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                         <SpacedContainer>
                             <Typography>Date Created</Typography>
                             <Typography>
-                                {new Date(createdAt).toLocaleDateString()}
+                                {formatDateUsingPreferred(
+                                    createdAt,
+                                    preferredDateFormat
+                                )}
                             </Typography>
                         </SpacedContainer>
                         <SpacedContainer>
                             <Typography>Last Viewed</Typography>
                             <Typography>
-                                {new Date(lastViewed).toLocaleDateString()}
+                                {formatDateUsingPreferred(
+                                    lastViewed,
+                                    preferredDateFormat
+                                )}
                             </Typography>
                         </SpacedContainer>
                     </CardInfo>

@@ -26,7 +26,7 @@ import ManageTabView from './ManageTabView';
 import { ACTIONS, TABS } from './constants';
 import NamedColorsList from './NamedColorsList';
 import { Download } from '@mui/icons-material';
-import { downloadObjectAsJSON } from 'shared/utilities/functions';
+import { downloadObjectAsJSON } from 'shared/utilities/general';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 

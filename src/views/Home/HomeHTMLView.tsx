@@ -1,5 +1,5 @@
 import { Studyset } from 'shared/types';
-import { HTML_TABLE_HEADERS } from 'shared/constants';
+import { DEFAULT_USER_RESPONSE, HTML_TABLE_HEADERS } from 'shared/constants';
 import {
     HomeHTMLTableWrapper,
     HomeHTMLTable,
@@ -10,6 +10,8 @@ import { MoreHoriz } from '@mui/icons-material';
 import { useState } from 'react';
 import SetActionsMenu from './SetActionsMenu';
 import { GhostLink } from 'styles/AppStyles';
+import { useGetUserQuery } from 'state/api/usersAPI';
+import { formatDateUsingPreferred } from 'shared/utilities/general';
 
 type Props = {
     studysets: Studyset[];
@@ -20,6 +22,14 @@ const HomeHTMLView = ({ studysets }: Props) => {
         useState<Studyset | null>(null);
     const [actionsMenuOpen, setActionsMenuOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+    const {
+        data: {
+            user: {
+                metadata: { preferredDateFormat },
+            },
+        } = DEFAULT_USER_RESPONSE,
+    } = useGetUserQuery();
 
     const openActionsMenu = (
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -59,14 +69,16 @@ const HomeHTMLView = ({ studysets }: Props) => {
                                     </td>
                                     <td>{studyset.description}</td>
                                     <td>
-                                        {new Date(
-                                            studyset.createdAt
-                                        ).toLocaleDateString()}
+                                        {formatDateUsingPreferred(
+                                            studyset.createdAt,
+                                            preferredDateFormat
+                                        )}
                                     </td>
                                     <td>
-                                        {new Date(
-                                            studyset.lastViewed
-                                        ).toLocaleDateString()}
+                                        {formatDateUsingPreferred(
+                                            studyset.lastViewed,
+                                            preferredDateFormat
+                                        )}
                                     </td>
                                     <td>{studyset.cards.length}</td>
                                     <td>

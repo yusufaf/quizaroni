@@ -4,7 +4,7 @@ import { LabelsDialogTab } from 'components/ManageLabelsDialog/constants';
 // #region Utility Types
 export type TODO = any;
 export type UUID = string;
-export type Timestamp = number;
+export type Timestamp = string;
 // #endregion
 
 // #region Theme
@@ -84,7 +84,8 @@ export type AppTheme = 'light' | 'dark';
 export type HomeView = 'table' | 'grid' | 'html';
 export type NamedColor = { color: string; name: string };
 
-export type PreferredDateFormat = keyof typeof DATE_FORMATS;
+export type PreferredDateFormat =
+    (typeof DATE_FORMATS)[keyof typeof DATE_FORMATS];
 
 // #endregion
 

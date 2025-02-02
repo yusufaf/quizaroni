@@ -269,14 +269,21 @@ export const CARD_COUNT_VISIBILITY_OPTIONS = [
     },
 ];
 
+export const DATE_FORMATS = {
+    ISO_8601: 'YYYY-MM-DD',
+    DMY: 'DD/MM/YYYY',
+    MDY: 'MM/DD/YYYY',
+} as const;
+
 export const DEFAULT_USER_DATA: User = {
-    createdAt: new Date().getTime(),
+    createdAt: new Date().toISOString(),
     email: '',
     labels: [],
     metadata: {
         defaultTheme: 'dark',
         homeView: 'table',
         namedColors: [],
+        preferredDateFormat: DATE_FORMATS.MDY,
     },
     username: '',
     userUUID: '',
@@ -295,9 +302,3 @@ export const HTML_TABLE_HEADERS = [
     'Label',
     'Favorited',
 ];
-
-export const DATE_FORMATS = {
-    ISO_8601: 'YYYY-MM-DD',
-    DMY: 'DD/MM/YYYY',
-    MDY: 'MM/DD/YYYY',
-} as const;

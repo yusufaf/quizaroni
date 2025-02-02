@@ -13,7 +13,7 @@ import {
     StyledDialogContent,
 } from './styles';
 import LabelsList from './LabelsList';
-import { capitalizeFirstLetter } from 'shared/utilities/functions';
+import { capitalizeFirstLetter } from 'shared/utilities/general';
 import { Studyset, LabelsDialogProps } from 'shared/types';
 import {
     useDeleteLabelMutation,

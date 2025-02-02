@@ -3,7 +3,8 @@ import {
     Label,
     Launch,
     LightMode,
-    Palette
+    Palette,
+    DateRange as DateRangeIcon,
 } from '@mui/icons-material';
 import {
     Button,
@@ -13,7 +14,7 @@ import {
     SelectChangeEvent,
     ToggleButton,
     ToggleButtonGroup,
-    Typography
+    Typography,
 } from '@mui/material';
 import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
 import { useEffect, useState } from 'react';
@@ -190,6 +191,10 @@ const CustomizationTab = ({ userData }: Props) => {
                 {namedColorsDialogProps.open && <NamedColorsDialog />}
             </ActionColumn>
             <ActionColumn>
+                <ActionHeader>
+                    <DateRangeIcon />
+                    <Typography variant="h6">Date Format</Typography>
+                </ActionHeader>
                 <SimpleFlexContainer style={{ gap: '1rem' }}>
                     <Select
                         value={preferredDateFormat ?? DATE_FORMATS.MDY}
