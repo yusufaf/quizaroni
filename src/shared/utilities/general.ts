@@ -1,4 +1,5 @@
-import { MIME_TYPES } from '../constants';
+import { PreferredDateFormat } from 'shared/types';
+import { DATE_FORMATS, MIME_TYPES } from '../constants';
 
 export const getFormattedTimestamp = (): string => {
     const isoString = new Date().toISOString();
@@ -38,4 +39,28 @@ export const downloadObjectAsJSON = (data: Object, fileName: string) => {
     anchor.href = window.URL.createObjectURL(blob);
     anchor.click();
     anchor.remove();
+};
+
+export const formatDateUsingPreferred = (
+    value: string,
+    format: PreferredDateFormat
+): string => {
+    const dateValue = new Date(value);
+    let formattedValue: string = value;
+
+    switch (format) {
+        case DATE_FORMATS.ISO_8601:
+            formattedValue = dateValue.toISOString().split('T')[0] ?? value;
+            break;
+        case DATE_FORMATS.MDY:
+            formattedValue = dateValue.toLocaleDateString('en-US');
+            break;
+        case DATE_FORMATS.DMY:
+            formattedValue = dateValue.toLocaleDateString('en-GB');
+            break;
+        default:
+            console.error(`Unsupported format: ${format}`);
+    }
+
+    return `${formattedValue} ${dateValue.toLocaleTimeString()}`;
 };

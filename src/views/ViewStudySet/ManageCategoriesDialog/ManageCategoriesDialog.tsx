@@ -8,7 +8,7 @@ import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 import {
     capitalizeFirstLetter,
     downloadObjectAsJSON,
-} from 'shared/utilities/functions';
+} from 'shared/utilities/general';
 import AssignTabView from './AssignTabView';
 import CategoriesList from './CategoriesList';
 import CreateTabView from './CreateTabView';
