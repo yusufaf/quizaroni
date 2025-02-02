@@ -42,6 +42,7 @@ export const handler: PostConfirmationTriggerHandler = async (
                         namedColors: [],
                         visibleColumns: {},
                         preferredDateFormat: 'MM/DD/YYYY',
+                        defaultDownloadFormat: 'JSON',
                     },
                     updatedAt: timestamp,
                     username,

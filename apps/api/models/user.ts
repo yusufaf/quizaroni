@@ -12,12 +12,15 @@ export type User = {
     userUUID: UUID;
 };
 
-export type AppTheme = "light" | "dark";
-export type HomeView = "table" | "grid" | "html";
+export type AppTheme = 'light' | 'dark';
+export type HomeView = 'table' | 'grid' | 'html';
 export type NamedColor = { color: string; name: string };
 
 export type UserMetadata = {
     defaultTheme: AppTheme;
     homeView: HomeView;
     namedColors: NamedColor[];
+    visibleColumns: Record<string, boolean>;
+    preferredDateFormat: string;
+    defaultDownloadFormat: string;
 };
