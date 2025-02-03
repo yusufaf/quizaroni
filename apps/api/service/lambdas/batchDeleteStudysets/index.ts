@@ -14,7 +14,7 @@ export default ({ props, construct }: LambdaProps) => {
 
     const lambdaFunction = new NodejsFunction(construct, nameAndID, {
         functionName: nameAndID,
-        runtime: Runtime.NODEJS_20_X,
+        runtime: Runtime.NODEJS_22_X,
         timeout: Duration.seconds(30),
         role,
         memorySize: 1000,
