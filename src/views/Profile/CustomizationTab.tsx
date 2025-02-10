@@ -33,9 +33,10 @@ import {
 import { ActionColumn, ActionHeader } from './ProfileStyles';
 import { downloadTypeItems } from 'views/ViewStudySet/DownloadSetModal/DownloadSetModal';
 
-const FIELD_NAMES = {
+const LOADING_IDS = {
     DATE_FORMAT: 'preferredDateFormat',
     DOWNLOAD_FORMAT: 'defaultDownloadFormat',
+    DEFAULT_THEME: 'defaultTheme',
 };
 
 type Props = {
@@ -48,22 +49,27 @@ const CustomizationTab = ({ userData }: Props) => {
     const {
         userUUID = '',
         labels = [],
-        metadata: { preferredDateFormat, defaultDownloadFormat },
+        metadata: {
+            defaultTheme = 'dark',
+            preferredDateFormat,
+            defaultDownloadFormat,
+        },
     } = userData;
 
     const namedColorsDialogProps = useAppSelector(selectNamedColorsDialogProps);
-    const [defaultTheme, setDefaultTheme] = useState<string>(
-        userData?.metadata?.defaultTheme ?? 'dark'
-    );
-    const [selectLoadingID, setSelectLoadingID] = useState<string>('');
+    const [loadingID, setLoadingID] = useState<string>('');
+
+    const defaultThemeLoading = useMemo(() => {
+        return loadingID === LOADING_IDS.DEFAULT_THEME;
+    }, [loadingID]);
 
     const dateFormatLoading = useMemo(() => {
-        return selectLoadingID === FIELD_NAMES.DATE_FORMAT;
-    }, [selectLoadingID]);
+        return loadingID === LOADING_IDS.DATE_FORMAT;
+    }, [loadingID]);
 
     const downloadFormatLoading = useMemo(() => {
-        return selectLoadingID === FIELD_NAMES.DOWNLOAD_FORMAT;
-    }, [selectLoadingID]);
+        return loadingID === LOADING_IDS.DOWNLOAD_FORMAT;
+    }, [loadingID]);
 
     const [
         updateUserMetadata,
@@ -74,42 +80,34 @@ const CustomizationTab = ({ userData }: Props) => {
         },
     ] = useUpdateUserMetadataMutation();
 
-    useEffect(() => {
-        if (userData?.metadata?.defaultTheme) {
-            setDefaultTheme(userData.metadata.defaultTheme);
-        }
-    }, []);
-
     /**
      * Update user's selected default theme
      */
     const handleDefaultTheme = async (event, newTheme) => {
         try {
+            console.log({ newTheme });
             /* Don't take any action if selected theme is the same */
             if (!userUUID || newTheme === null || newTheme === defaultTheme) {
                 return;
             }
 
-            // const themeUpdateResult = await axios.post(
-            //     "/api/users/updateDefaultTheme",
-            //     {
-            //         uuid: userUUID,
-            //         newTheme,
-            //     }
-            // );
-            // console.log({ themeUpdateResult });
+            setLoadingID(LOADING_IDS.DEFAULT_THEME);
 
-            setDefaultTheme(newTheme);
-
-            const newUserData = {
-                ...userData,
-                metadata: {
-                    ...userData.metadata,
+            updateUserMetadata({
+                updates: {
                     defaultTheme: newTheme,
                 },
-            };
-            console.log({ newUserData });
-            dispatch(setUserData(newUserData));
+            })
+                .unwrap()
+                .then(() => {
+                    console.log(`Default theme updated successfully`);
+                })
+                .catch((error) => {
+                    console.error(`Failed to update default theme:`, error);
+                })
+                .finally(() => {
+                    setLoadingID('');
+                });
         } catch (error) {
             console.error('Error updating default theme');
         }
@@ -139,7 +137,7 @@ const CustomizationTab = ({ userData }: Props) => {
     const handleSelectChange = (
         event: SelectChangeEvent<PreferredDateFormat>
     ) => {
-        setSelectLoadingID(event.target.name);
+        setLoadingID(event.target.name);
         updateUserMetadata({
             updates: {
                 [event.target.name]: event.target.value,
@@ -153,7 +151,7 @@ const CustomizationTab = ({ userData }: Props) => {
                 console.error(`Failed to update ${event.target.name}:`, error);
             })
             .finally(() => {
-                setSelectLoadingID('');
+                setLoadingID('');
             });
     };
 
@@ -166,25 +164,29 @@ const CustomizationTab = ({ userData }: Props) => {
                     <DarkMode />
                     <Typography variant="h6">Default Theme</Typography>
                 </ActionHeader>
-                <ToggleButtonGroup
-                    aria-label="Set default theme"
-                    exclusive
-                    onChange={handleDefaultTheme}
-                    value={defaultTheme}
-                >
-                    <ToggleButton
-                        value={LIGHT}
-                        title="Switch default to Light mode"
+                <SimpleFlexContainer style={{ gap: '1rem' }}>
+                    <ToggleButtonGroup
+                        aria-label="Set default theme"
+                        exclusive
+                        onChange={handleDefaultTheme}
+                        value={defaultTheme}
+                        disabled={defaultThemeLoading}
                     >
-                        <LightMode />
-                    </ToggleButton>
-                    <ToggleButton
-                        value={DARK}
-                        title="Switch default to Dark mode"
-                    >
-                        <DarkMode />
-                    </ToggleButton>
-                </ToggleButtonGroup>
+                        <ToggleButton
+                            value={LIGHT}
+                            title="Switch default to Light mode"
+                        >
+                            <LightMode />
+                        </ToggleButton>
+                        <ToggleButton
+                            value={DARK}
+                            title="Switch default to Dark mode"
+                        >
+                            <DarkMode />
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                    {defaultThemeLoading && <CircularProgress size={24} />}
+                </SimpleFlexContainer>
             </ActionColumn>
             <ActionColumn>
                 <ActionHeader>
@@ -223,7 +225,7 @@ const CustomizationTab = ({ userData }: Props) => {
                         value={preferredDateFormat}
                         onChange={handleSelectChange}
                         disabled={dateFormatLoading}
-                        name={FIELD_NAMES.DATE_FORMAT}
+                        name={LOADING_IDS.DATE_FORMAT}
                         sx={{
                             width: '10rem',
                         }}
@@ -250,7 +252,7 @@ const CustomizationTab = ({ userData }: Props) => {
                         value={defaultDownloadFormat}
                         onChange={handleSelectChange}
                         disabled={downloadFormatLoading}
-                        name={FIELD_NAMES.DOWNLOAD_FORMAT}
+                        name={LOADING_IDS.DOWNLOAD_FORMAT}
                         sx={{
                             width: '10rem',
                         }}
