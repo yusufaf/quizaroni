@@ -25,7 +25,7 @@ import {
 } from 'state/api/studysetsAPI';
 import { StyledDialogActions } from 'styles/AppStyles';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
+
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 
 type Props = {};
@@ -120,7 +120,7 @@ const ConfirmDialog = (props: Props) => {
                         <ul>
                             {dialogProps?.props?.messages?.map(
                                 (message: string) => {
-                                    return <li key={uuidv4()}>{message}</li>;
+                                    return <li key={crypto.randomUUID()}>{message}</li>;
                                 }
                             )}
                         </ul>
