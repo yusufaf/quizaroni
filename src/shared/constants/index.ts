@@ -4,7 +4,6 @@ import type {
     SortDirection,
     User,
 } from 'shared/types';
-import { v4 as uuidv4 } from 'uuid';
 
 export const LIGHT = 'light';
 export const DARK = 'dark';
@@ -65,7 +64,7 @@ export const EMPTY_CARD: Card = {
     important: false,
     notes: [],
     term: '',
-    cardUUID: uuidv4(),
+    cardUUID: crypto.randomUUID(),
 };
 
 export const VIEW_SET = {

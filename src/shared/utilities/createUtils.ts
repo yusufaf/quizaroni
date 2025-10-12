@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import type { TODO, Card } from 'shared/types';
 import { EMPTY_CARD } from '../constants';
 import { Dispatch, SetStateAction } from 'react';
@@ -18,7 +17,7 @@ type ActionsStackBaseProps = {
 };
 
 export const generateEmptyCard = (): Card => {
-    return { ...EMPTY_CARD, cardUUID: uuidv4() };
+    return { ...EMPTY_CARD, cardUUID: crypto.randomUUID() };
 };
 
 type DeleteCardParams = ActionsStackBaseProps & CardUtilityWithIndex;
@@ -64,7 +63,7 @@ export const addCreateCardInput = ({
     EMPTY_CARD,
     setStateCallback,
 }: AddCreateCardInputParams): void => {
-    const newEmptyCard = { ...EMPTY_CARD, uuid: uuidv4() };
+    const newEmptyCard = { ...EMPTY_CARD, uuid: crypto.randomUUID() };
     setStateCallback(createdSetCards.concat(newEmptyCard));
 };
 
