@@ -12,12 +12,12 @@ import { StyledNavLink } from './NavStyles';
 import DarkModeToggleButton from './DarkModeToggleButton';
 import { useNavigate } from 'react-router-dom';
 import { useCreateStudysetMutation } from 'state/api/studysetsAPI';
-import { setLoadingAdd, setLoadingRemove } from 'state/slices/globalSlice';
-import { useAppDispatch } from 'state/reduxHooks';
+import { useGlobalStore } from 'state/stores/global';
 
 const NavDrawer = (props) => {
-    const dispatch = useAppDispatch();
     const navigate = useNavigate();
+
+    const { setLoadingAdd, setLoadingRemove } = useGlobalStore();
 
     const [openDrawer, setOpenDrawer] = useState(false);
 
@@ -33,13 +33,13 @@ const NavDrawer = (props) => {
 
     // TODO: Switch to RTK query after
     const handleCreateStudyset = async () => {
-        dispatch(setLoadingAdd('CREATE_STUDYSET'));
+        setLoadingAdd('CREATE_STUDYSET');
         createStudyset({})
             .unwrap()
             .then((response) => {
                 const { studyset } = response;
                 navigate(`/edit/${studyset.studysetUUID}`);
-                dispatch(setLoadingRemove('CREATE_STUDYSET'));
+                setLoadingRemove('CREATE_STUDYSET');
             });
     };
 

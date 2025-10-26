@@ -8,7 +8,6 @@ import {
     useRef,
     useState,
 } from 'react';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
@@ -16,7 +15,6 @@ import {
     useGetStudysetQuery,
     useUpdateStudysetMutation,
 } from 'state/api/studysetsAPI';
-import { selectNamedColorsDialogProps } from 'state/slices/globalSlice';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import CreateSetHeader from './CreateSetHeader';
 import { AddCardButton, AddCardIcon, CreateSetPage } from './CreateSetStyles';
@@ -27,33 +25,31 @@ import { Virtuoso } from 'react-virtuoso';
 import { EMPTY_CARD } from 'shared/constants';
 import { addCard } from 'shared/utilities/createUtils';
 import { Create } from '@mui/icons-material';
-import {
-    selectAdvancedSectionProps,
-    setAdvancedSectionProps,
-} from 'state/slices/createSetSlice';
 import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
 import { Card, Studyset } from 'shared/types';
 import { SimpleFlexContainer, SpacedFlexContainer } from 'styles/AppStyles';
 import { Button, SelectChangeEvent, Tooltip, Typography } from '@mui/material';
 import { useGetUserQuery } from 'state/api/usersAPI';
 import NoCardsWarningsIcon from 'components/NoCardsWarningsIcon/NoCardsWarningsIcon';
+import { useGlobalStore } from 'state/stores/global';
+import { useCreateSetStore } from 'state/stores/createSet';
 
 type Props = {};
 const CreateSet = (props: Props) => {
     /* Hooks / Redux */
     const { id: studysetUUID } = useParams();
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
+
+    const { namedColorsDialogProps } = useGlobalStore();
+    const { advancedSectionProps, setAdvancedSectionProps } =
+        useCreateSetStore();
 
     const {
         data: {
             user: { username = '', userUUID = '' },
         } = DEFAULT_USER_RESPONSE,
     } = useGetUserQuery();
-    const namedColorsDialogProps = useAppSelector(selectNamedColorsDialogProps);
-    const { blankCardsCount, expanded } = useAppSelector(
-        selectAdvancedSectionProps
-    );
+    const { blankCardsCount, expanded } = advancedSectionProps;
 
     const {
         data: studysetResponse,
@@ -289,13 +285,11 @@ const CreateSet = (props: Props) => {
             newCreatedSetCards.push({ ...EMPTY_CARD });
         }
         setCreatedSetCards(newCreatedSetCards);
-        /* Clear the blank cards count input */
-        dispatch(
-            setAdvancedSectionProps({
-                blankCardsCount: 0,
-                expanded,
-            })
-        );
+        /* Clear the blank cards count input */    
+        setAdvancedSectionProps({
+            blankCardsCount: 0,
+            expanded,
+        })
     };
 
     const headerProps = {

@@ -9,7 +9,6 @@ import {
     selectConfirmationCodeDialogProps,
     setConfirmationCodeDialogProps,
 } from 'state/slices/globalSlice';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useState } from 'react';
 import {
     confirmSignUp,
@@ -19,19 +18,18 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useUpdateEmailMutation } from 'state/api/usersAPI';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
+import { useGlobalStore } from 'state/stores/global';
 
 type Props = {};
 const ConfirmationCodeDialog = (props: Props) => {
     /* Redux / Hooks */
-    const dispatch = useAppDispatch();
     const navigate = useNavigate();
+
+    const { confirmationCodeDialogProps } = useGlobalStore();
 
     // const cognitoUser = useAppSelector(selectCognitoUser);
     // const { username } = cognitoUser;
     const username = '';
-    const confirmationCodeDialogProps = useAppSelector(
-        selectConfirmationCodeDialogProps
-    );
 
     // TODO: Toast notification?
     const [updateEmail] = useUpdateEmailMutation();
@@ -49,11 +47,9 @@ const ConfirmationCodeDialog = (props: Props) => {
     } = confirmationCodeDialogProps;
 
     const closeDialog = () => {
-        dispatch(
-            setConfirmationCodeDialogProps({
-                open: false,
-            })
-        );
+        setConfirmationCodeDialogProps({
+            open: false,
+        });
     };
 
     const handleResendCode = async () => {

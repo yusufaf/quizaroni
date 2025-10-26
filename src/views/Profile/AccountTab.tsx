@@ -21,17 +21,18 @@ import {
 import { EMAIL_REGEX } from 'shared/constants';
 import { useNavigate } from 'react-router-dom';
 import { User } from 'shared/types';
-import { useAppDispatch } from 'state/reduxHooks';
 import { setConfirmationCodeDialogProps } from 'state/slices/globalSlice';
 import ChangePasswordSection from './ChangePasswordSection';
 import DownloadDataDialog from './DownloadDataDialog';
+import { useGlobalStore } from 'state/stores/global';
 
 type Props = {
     userData: User;
 };
 const AccountTab = ({ userData }: Props) => {
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
+
+    const { setConfirmationCodeDialogProps } = useGlobalStore();
 
     const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
     const [showDownloadDialog, setShowDownloadDialog] =
@@ -85,16 +86,14 @@ const AccountTab = ({ userData }: Props) => {
 
         switch (nextStep.updateAttributeStep) {
             case 'CONFIRM_ATTRIBUTE_WITH_CODE':
-                dispatch(
-                    setConfirmationCodeDialogProps({
-                        open: true,
-                        actionType: 'changeEmail',
-                        canResend: false,
-                        description: `To confirm you want to change the email associated with your account to ${newEmail}, we've sent a 6-digit confirmation code.`,
-                        newEmail,
-                        title: 'Confirm Email Change',
-                    })
-                );
+                setConfirmationCodeDialogProps({
+                    open: true,
+                    actionType: 'changeEmail',
+                    canResend: false,
+                    description: `To confirm you want to change the email associated with your account to ${newEmail}, we've sent a 6-digit confirmation code.`,
+                    newEmail,
+                    title: 'Confirm Email Change',
+                });
 
                 break;
             case 'DONE':

@@ -1,11 +1,5 @@
 import { Button, Tabs, Tab } from '@mui/material';
 import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import {
-    selectNamedColorsDialogProps,
-    setNamedColorsDialogProps,
-    selectCognitoUser,
-} from 'state/slices/globalSlice';
 import { BoldTypography, SimpleFlexContainer } from 'styles/AppStyles';
 import { ChangeEvent, ReactNode, SyntheticEvent, useState } from 'react';
 import {
@@ -29,11 +23,12 @@ import { Download } from '@mui/icons-material';
 import { downloadObjectAsJSON } from 'shared/utilities/general';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
+import { useGlobalStore } from 'state/stores/global';
 
 type Props = {};
 const NamedColorsDialog = (props: Props) => {
-    /* Redux / Hooks */
-    const dispatch = useAppDispatch();
+    const { namedColorsDialogProps, setNamedColorsDialogProps } =
+        useGlobalStore();
 
     const {
         data: {
@@ -43,8 +38,6 @@ const NamedColorsDialog = (props: Props) => {
             },
         } = DEFAULT_USER_RESPONSE,
     } = useGetUserQuery();
-
-    const namedColorsDialogProps = useAppSelector(selectNamedColorsDialogProps);
 
     const [
         updateUserMetadata,
@@ -76,11 +69,9 @@ const NamedColorsDialog = (props: Props) => {
     const isAssignTab = selectedTab === TABS.ASSIGN;
 
     const closeNamedColorsDialog = () => {
-        dispatch(
-            setNamedColorsDialogProps({
-                open: false,
-            })
-        );
+        setNamedColorsDialogProps({
+            open: false,
+        });
     };
 
     const onTabChange = (_e: SyntheticEvent, newTab: string) => {

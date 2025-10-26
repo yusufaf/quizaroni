@@ -6,11 +6,7 @@ import {
     Typography,
     DialogContent,
 } from '@mui/material/';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import {
-    selectConfirmDialogProps,
-    setConfirmDialogProps,
-} from 'state/slices/globalSlice';
+import { useGlobalStore } from 'state/stores/global';
 import { ConfirmDialogProps } from 'shared/types';
 import {
     STUDYSET_CONFIRM_DIALOGS,
@@ -31,8 +27,7 @@ import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTi
 type Props = {};
 const ConfirmDialog = (props: Props) => {
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
-    const dialogProps = useAppSelector(selectConfirmDialogProps);
+    const { confirmDialogProps: dialogProps, setConfirmDialogProps } = useGlobalStore();
 
     const { mutate: deleteStudySet } = useCustomMutation({
         mutation: useDeleteStudysetMutation,
@@ -79,7 +74,7 @@ const ConfirmDialog = (props: Props) => {
     ].includes(dialogProps.type);
 
     const onClose = () => {
-        dispatch(setConfirmDialogProps({ ...INITIAL_CONFIRM_DIALOG_PROPS }));
+        setConfirmDialogProps({ ...INITIAL_CONFIRM_DIALOG_PROPS });
     };
 
     const handleConfirm = async () => {

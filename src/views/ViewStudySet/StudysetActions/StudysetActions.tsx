@@ -13,10 +13,9 @@ import { IconButton, Tooltip } from '@mui/material/';
 import CustomIconButton from 'components/CustomIconButton/CustomIconButton';
 import { Studyset } from 'shared/types';
 import { useRef, useState } from 'react';
-import { useAppDispatch } from 'state/reduxHooks';
 import { useNavigate, useParams } from 'react-router-dom';
-import { showConfirmDialog } from 'state/slices/globalSlice';
-import { setSelectedDialog } from 'state/slices/viewSetsSlice';
+import { useGlobalStore } from 'state/stores/global';
+import { useViewSetsStore } from 'state/stores/viewSets';
 import { STUDYSET_CONFIRM_DIALOGS, VIEW_SET_DIALOGS } from 'shared/constants';
 import { ActionButtonsRow } from '../styles';
 import ControlMenu from './ControlMenu';
@@ -31,7 +30,9 @@ const StudysetActions = (props: Props) => {
 
     const navigate = useNavigate();
     const { id: studySetUUID } = useParams();
-    const dispatch = useAppDispatch();
+
+    const { showConfirmDialog } = useGlobalStore();
+    const { setSelectedDialog } = useViewSetsStore();
 
     const [showControlMenu, setShowControlMenu] = useState<boolean>(false);
     const controlAnchorRef = useRef(null);
@@ -59,7 +60,7 @@ const StudysetActions = (props: Props) => {
     };
 
     const handleShowDialog = (dialog: string) => {
-        dispatch(setSelectedDialog(dialog));
+        setSelectedDialog(dialog);
     };
 
     /**
@@ -70,12 +71,10 @@ const StudysetActions = (props: Props) => {
             return;
         }
 
-        dispatch(
-            showConfirmDialog({
-                type: action,
-                studysets: [selectedStudyset],
-            })
-        );
+        showConfirmDialog({
+            type: action,
+            studysets: [selectedStudyset],
+        });
     };
 
     /*

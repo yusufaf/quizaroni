@@ -18,8 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { Studyset } from 'shared/types';
 import { STUDYSET_CONFIRM_DIALOGS } from 'shared/constants';
 import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
-import { showConfirmDialog } from 'state/slices/globalSlice';
-import { useAppDispatch } from 'state/reduxHooks';
+import { useGlobalStore } from 'state/stores/global';
 
 type Props = {
     studyset: Studyset | null;
@@ -44,7 +43,8 @@ const SetActionsMenu = ({
 
     const [updateStudyset] = useUpdateStudysetMutation();
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
+
+    const { showConfirmDialog } = useGlobalStore();
 
     const handleConfirmAction = (
         e: React.MouseEvent<HTMLLIElement, MouseEvent>,
@@ -56,12 +56,10 @@ const SetActionsMenu = ({
             return;
         }
 
-        dispatch(
-            showConfirmDialog({
-                type: action,
-                studysets: [studyset],
-            })
-        );
+        showConfirmDialog({
+            type: action,
+            studysets: [studyset],
+        });
     };
 
     const handleFavoriteAction = () => {

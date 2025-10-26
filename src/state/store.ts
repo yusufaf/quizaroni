@@ -1,8 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit';
-import globalReducer from 'state/slices/globalSlice';
-import studySetsReducer from 'state/slices/studysetsSlice';
-import viewSetsReducer from 'state/slices/viewSetsSlice';
-import createSetReducer from 'state/slices/createSetSlice';
 import api from './api/api';
 import loggerMiddleware from './middleware/logger';
 
@@ -18,10 +14,6 @@ if (isDevelopment) {
 export const store = configureStore({
     reducer: {
         [apiPath]: apiReducer,
-        globalState: globalReducer,
-        studySets: studySetsReducer,
-        viewSets: viewSetsReducer,
-        createSet: createSetReducer,
     },
     middleware: (getDefaultMiddleware) => {
         return getDefaultMiddleware().concat(middlewares);
