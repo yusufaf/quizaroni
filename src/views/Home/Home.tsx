@@ -23,7 +23,6 @@ import useFilterStudysets from 'hooks/useFilterStudysets';
 import useSortStudysets from 'hooks/useSortStudysets';
 import { HomeView, SortDirection, Studyset } from 'shared/types';
 import { useEffect, useRef, useState } from 'react';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useNavigate } from 'react-router-dom';
 import {
     useGetAllStudysetsQuery,
@@ -33,7 +32,6 @@ import {
     useGetUserQuery,
     useUpdateUserMetadataMutation,
 } from 'state/api/usersAPI';
-import { setSelectedStudySet } from 'state/slices/studysetsSlice';
 import {
     DEFAULT_USER_RESPONSE,
     HOME_LAYOUTS,
@@ -57,6 +55,7 @@ import {
     getFormattedTimestamp,
 } from 'shared/utilities/general';
 import { Button, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { useStudySetsStore } from 'state/stores/studysets';
 
 // augment the props for the toolbar slot
 declare module '@mui/x-data-grid' {
@@ -112,7 +111,11 @@ const CustomToolbar = ({
 const Home = (props: Props) => {
     /* Hooks / Redux */
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
+
+    const { 
+        selectedStudySet,
+        setSelectedStudySet,
+    } = useStudySetsStore();
 
     const {
         data: {
@@ -292,7 +295,7 @@ const Home = (props: Props) => {
     ) => {
         console.log({ params, event, details });
         const { row } = params;
-        dispatch(setSelectedStudySet(row));
+        setSelectedStudySet(row);
         navigate(`/view/${row.studysetUUID}`);
     };
 

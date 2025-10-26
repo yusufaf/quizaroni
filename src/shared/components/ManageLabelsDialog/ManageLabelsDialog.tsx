@@ -26,19 +26,13 @@ import useCustomMutation from 'hooks/useCustomMutation';
 import CreateTabView from './CreateTabView';
 import ManageTabView from './ManageTabView';
 import AssignTabView from './AssignTabView';
-import { setLabelsDialogProps } from 'state/slices/globalSlice';
-import { useAppDispatch } from 'state/reduxHooks';
 import { useGetUserQuery } from 'state/api/usersAPI';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
+import { useGlobalStore } from 'state/stores/global';
 
-type Props = {
-    labelsDialogProps: LabelsDialogProps;
-};
-const ManageLabelsDialog = ({ labelsDialogProps }: Props) => {
-    /* ==== Redux ==== */
-    const dispatch = useAppDispatch();
-
+const ManageLabelsDialog = () => {
+    const { labelsDialogProps, setLabelsDialogProps } = useGlobalStore();
     const { studysetUUID = '' } = labelsDialogProps || {};
 
     /* ==== RTK Query ==== */
@@ -136,11 +130,9 @@ const ManageLabelsDialog = ({ labelsDialogProps }: Props) => {
 
     /* ==== Dialog Logic ==== */
     const closeLabelsDialog = () => {
-        dispatch(
-            setLabelsDialogProps({
-                open: false,
-            })
-        );
+        setLabelsDialogProps({
+            open: false,
+        });
     };
 
     const onTabChange = (_e: SyntheticEvent, newTab: LabelsDialogTab) => {

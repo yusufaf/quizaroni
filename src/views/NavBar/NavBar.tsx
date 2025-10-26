@@ -9,14 +9,7 @@ import {
     useMediaQuery,
 } from '@mui/material/';
 import { useRef, useState } from 'react';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useNavigate } from 'react-router-dom';
-import {
-    selectAuthenticated,
-    setAuthenticated,
-    setLoadingAdd,
-    setLoadingRemove,
-} from 'state/slices/globalSlice';
 import ProfileDropdown from 'views/Profile/ProfileDropdown';
 import { useTheme } from 'theme/useTheme';
 import { ROUTES } from 'shared/constants';
@@ -35,6 +28,7 @@ import { signOut } from 'aws-amplify/auth';
 import DarkModeToggleButton from './DarkModeToggleButton';
 import { useCreateStudysetMutation } from 'state/api/studysetsAPI';
 import { useAuthenticator } from '@aws-amplify/ui-react';
+import { useGlobalStore } from 'state/stores/global';
 
 type Props = {};
 
@@ -44,7 +38,9 @@ const NavBar = (props: Props) => {
     // TODO: Verify that a medium breakpoint works to handle mobile cases, can always add more breakpoints
     const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
 
-    const dispatch = useAppDispatch();
+    const { setAuthenticated, setLoadingAdd, setLoadingRemove } =
+        useGlobalStore();
+
     const { authStatus } = useAuthenticator((context) => [context.authStatus]);
     const authenticated = authStatus === 'authenticated';
 
@@ -64,7 +60,7 @@ const NavBar = (props: Props) => {
             const result = await signOut();
             console.log('Sign-In Result = ', result);
 
-            dispatch(setAuthenticated(false));
+            setAuthenticated(false);
         } catch (error) {
             console.log('error signing out: ', error);
         }
@@ -79,13 +75,13 @@ const NavBar = (props: Props) => {
     };
 
     const handleCreateStudyset = async () => {
-        dispatch(setLoadingAdd('CREATE_STUDYSET'));
+        setLoadingAdd('CREATE_STUDYSET');
         createStudyset({})
             .unwrap()
             .then((response) => {
                 const { studyset } = response;
                 navigate(`/edit/${studyset.studysetUUID}`);
-                dispatch(setLoadingRemove('CREATE_STUDYSET'));
+                setLoadingRemove('CREATE_STUDYSET');
             });
     };
 

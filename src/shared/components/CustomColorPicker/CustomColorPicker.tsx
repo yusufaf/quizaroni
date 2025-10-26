@@ -7,10 +7,9 @@ import {
 import { Tooltip } from '@mui/material';
 import { ExtraPickerButton } from 'views/Create/CreateSetStyles';
 import { ColorPickerContainer, ExtraPickerContainer } from './styles';
-import { useAppDispatch } from 'state/reduxHooks';
-import { setNamedColorsDialogProps } from 'state/slices/globalSlice';
 import { StyledChromePicker } from 'styles/AppStyles';
 import { useClickAway } from 'hooks/useClickAway';
+import { useGlobalStore } from 'state/stores/global';
 
 type Props = {
     color: string;
@@ -35,16 +34,15 @@ const CustomColorPicker = (props: Props) => {
         additionalRefs,
     } = props;
 
+    const { setNamedColorsDialogProps } = useGlobalStore();
+
     const ref = useClickAway(onClose, additionalRefs);
-    const dispatch = useAppDispatch();
 
     const openNamedColorsDialog = () => {
-        dispatch(
-            setNamedColorsDialogProps({
-                open: true,
-                color,
-            })
-        );
+        setNamedColorsDialogProps({
+            open: true,
+            color,
+        });
     };
 
     return (

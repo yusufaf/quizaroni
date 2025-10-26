@@ -23,15 +23,9 @@ import { DARK, DATE_FORMATS, LIGHT } from 'shared/constants';
 import { SimpleFlexContainer } from 'shared/styles/AppStyles';
 import { PreferredDateFormat, User } from 'shared/types';
 import { useUpdateUserMetadataMutation } from 'state/api/usersAPI';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import {
-    selectNamedColorsDialogProps,
-    setLabelsDialogProps,
-    setNamedColorsDialogProps,
-    setUserData,
-} from 'state/slices/globalSlice';
 import { ActionColumn, ActionHeader } from './ProfileStyles';
 import { downloadTypeItems } from 'views/ViewStudySet/DownloadSetModal/DownloadSetModal';
+import { useGlobalStore } from 'state/stores/global';
 
 const LOADING_IDS = {
     DATE_FORMAT: 'preferredDateFormat',
@@ -44,7 +38,11 @@ type Props = {
 };
 
 const CustomizationTab = ({ userData }: Props) => {
-    const dispatch = useAppDispatch();
+    const {
+        setNamedColorsDialogProps,
+        setLabelsDialogProps,
+        namedColorsDialogProps,
+    } = useGlobalStore();
 
     const {
         userUUID = '',
@@ -56,7 +54,6 @@ const CustomizationTab = ({ userData }: Props) => {
         },
     } = userData;
 
-    const namedColorsDialogProps = useAppSelector(selectNamedColorsDialogProps);
     const [loadingID, setLoadingID] = useState<string>('');
 
     const defaultThemeLoading = useMemo(() => {
@@ -115,21 +112,17 @@ const CustomizationTab = ({ userData }: Props) => {
 
     // #region Named Colors
     const openNamedColorsDialog = () => {
-        dispatch(
-            setNamedColorsDialogProps({
-                open: true,
-            })
-        );
+        setNamedColorsDialogProps({
+            open: true,
+        });
     };
     // #endregion
 
     // #region Labels
     const showManageLabelsDialog = () => {
-        dispatch(
-            setLabelsDialogProps({
-                open: true,
-            })
-        );
+        setLabelsDialogProps({
+            open: true,
+        });
     };
     // #endregion
 

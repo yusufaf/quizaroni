@@ -6,25 +6,20 @@ import {
     DialogContent,
     DialogContentText,
 } from '@mui/material';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import {
-    selectFeedbackDialogOpen,
-    setFeedbackDialogOpen,
-} from 'state/slices/globalSlice';
 import { StyledDialogTitle, StyledDialogActions } from 'styles/AppStyles';
-import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
 import { toast } from 'react-toastify';
 import { useState } from 'react';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
+import { useGlobalStore } from 'state/stores/global';
 
 type Props = {};
 
 const FeedbackDialog = (props: Props) => {
-    const open = useAppSelector(selectFeedbackDialogOpen);
-    const dispatch = useAppDispatch();
+    const { feedbackDialogOpen: open, setFeedbackDialogOpen } =
+        useGlobalStore();
 
     const onClose = () => {
-        dispatch(setFeedbackDialogOpen(false));
+        setFeedbackDialogOpen(false);
     };
 
     const [feedbackText, setFeedbackText] = useState<string>('');

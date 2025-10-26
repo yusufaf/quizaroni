@@ -9,39 +9,30 @@ import {
     ExpandMore as ExpandMoreIcon,
     ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import {
-    selectAdvancedSectionProps,
-    setAdvancedSectionProps,
-} from 'state/slices/createSetSlice';
+import { useCreateSetStore } from 'state/stores/createSet';
 
 type Props = {
     onBlankInputsSubmit: any;
 };
 
 const HeaderAdvancedSection = ({ onBlankInputsSubmit = null }: Props) => {
-    const dispatch = useAppDispatch();
+    const { advancedSectionProps, setAdvancedSectionProps } =
+        useCreateSetStore();
 
-    const { blankCardsCount, expanded } = useAppSelector(
-        selectAdvancedSectionProps
-    );
+    const { blankCardsCount, expanded } = advancedSectionProps;
 
     const onBlankInputsChange = (e: any) => {
-        dispatch(
-            setAdvancedSectionProps({
-                blankCardsCount: e.target.value,
-                expanded,
-            })
-        );
+        setAdvancedSectionProps({
+            blankCardsCount: e.target.value,
+            expanded,
+        });
     };
 
     const onToggleExpanded = () => {
-        dispatch(
-            setAdvancedSectionProps({
-                blankCardsCount,
-                expanded: !expanded,
-            })
-        );
+        setAdvancedSectionProps({
+            blankCardsCount,
+            expanded: !expanded,
+        });
     };
 
     const handleBlankInputsSubmit = () => {
