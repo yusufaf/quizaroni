@@ -36,13 +36,9 @@ import {
 import { SimpleFlexContainer, SpacedFlexContainer } from 'styles/AppStyles';
 import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { SortDirection, Studyset } from 'shared/types';
-import {
-    setLabelsDialogProps,
-    showConfirmDialog,
-} from 'state/slices/globalSlice';
-import { useAppDispatch } from 'state/reduxHooks';
 import { useNavigate } from 'react-router-dom';
 import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
+import { useGlobalStore } from 'state/stores/global';
 
 type Props = {
     handleViewChange: (_event: any, newView: string | null) => void;
@@ -69,8 +65,9 @@ const HomeToolbar = ({
     selectedStudysetRows,
     selectedStudysetUUIDs,
 }: Props) => {
-    const dispatch = useAppDispatch();
     const navigate = useNavigate();
+
+    const { setLabelsDialogProps, showConfirmDialog } = useGlobalStore();
 
     const [updateStudyset] = useUpdateStudysetMutation();
 
@@ -124,22 +121,19 @@ const HomeToolbar = ({
         const modifiedType = multipleStudysetsSelected
             ? `${type}_MULTIPLE`
             : type;
-        dispatch(
-            showConfirmDialog({
-                type: modifiedType,
-                studysets: selectedStudysetRows,
-            })
-        );
+
+        showConfirmDialog({
+            type: modifiedType,
+            studysets: selectedStudysetRows,
+        });
     };
 
     const handleAssignLabelsClick = () => {
-        dispatch(
-            setLabelsDialogProps({
-                open: true,
-                selectedStudysetUUIDs,
-                tab: 'ASSIGN',
-            })
-        );
+        setLabelsDialogProps({
+            open: true,
+            selectedStudysetUUIDs,
+            tab: 'ASSIGN',
+        });
     };
 
     return (

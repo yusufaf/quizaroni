@@ -7,18 +7,12 @@ import useFilterViewCards from 'hooks/useFilterViewCards';
 import useSortViewCards from 'hooks/useSortViewCards';
 import { OpenCardNotes, SortDirection, Studyset, UUID } from 'shared/types';
 import { useEffect, useRef, useState } from 'react';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     useGetAllStudysetsQuery,
     useGetStudysetQuery,
     useUpdateStudysetMutation,
 } from 'state/api/studysetsAPI';
-import { setLabelsDialogProps } from 'state/slices/globalSlice';
-import {
-    selectSelectedDialog,
-    setSelectedDialog,
-} from 'state/slices/viewSetsSlice';
 import {
     STUDYSET_CONFIRM_DIALOGS,
     DEFAULT_CATEGORIES,
@@ -52,6 +46,8 @@ import {
 import NotesDrawer from './NotesDrawer/NotesDrawer';
 import { useGetUserQuery } from 'state/api/usersAPI';
 import NoCardsWarningsIcon from 'components/NoCardsWarningsIcon/NoCardsWarningsIcon';
+import { useViewSetsStore } from 'state/stores/viewSets';
+import { useGlobalStore } from 'state/stores/global';
 
 type Props = {};
 
@@ -59,13 +55,13 @@ const ViewStudySet = (props: Props) => {
     /* Hooks / Redux */
     const navigate = useNavigate();
     const { id: studysetUUID = '' } = useParams();
-    const dispatch = useAppDispatch();
+
+    const { setLabelsDialogProps } = useGlobalStore();
+    const { selectedDialog, setSelectedDialog } = useViewSetsStore();
 
     const {
         data: { user: { labels = [], userUUID = '' } } = DEFAULT_USER_RESPONSE,
     } = useGetUserQuery();
-
-    const selectedDialog = useAppSelector(selectSelectedDialog);
 
     /* Skip option prevents hook from running when userUUID is undefined */
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
@@ -144,16 +140,14 @@ const ViewStudySet = (props: Props) => {
     });
 
     const showManageLabelsDialog = () => {
-        dispatch(
-            setLabelsDialogProps({
-                open: true,
-                studysetUUID: selectedStudyset.studysetUUID ?? '',
-            })
-        );
+        setLabelsDialogProps({
+            open: true,
+            studysetUUID: selectedStudyset.studysetUUID ?? '',
+        });
     };
 
     const onDialogClose = () => {
-        dispatch(setSelectedDialog(''));
+        setSelectedDialog('');
     };
 
     const handleUpdateCards = () => {

@@ -3,7 +3,6 @@ import { Button, SelectChangeEvent, Tab, Tabs } from '@mui/material/';
 import useCustomMutation from 'hooks/useCustomMutation';
 import { Studyset } from 'shared/types';
 import { ChangeEvent, ReactNode, SyntheticEvent, useState } from 'react';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
 import {
     capitalizeFirstLetter,
@@ -47,8 +46,6 @@ const ManageCategoriesDialog = (props: Props) => {
         title: studysetTitle = '',
         studysetUUID = '',
     } = selectedStudyset;
-
-    const dispatch = useAppDispatch();
 
     const [updateStudySet] = useUpdateStudysetMutation();
 

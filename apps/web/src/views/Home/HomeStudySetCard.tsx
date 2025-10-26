@@ -14,14 +14,13 @@ import {
     TermsLabel,
 } from './HomeStyles';
 import SetActionsMenu from './SetActionsMenu';
-import { useAppDispatch } from 'state/reduxHooks';
-import { setSelectedStudySet } from 'state/slices/studysetsSlice';
 import { useNavigate } from 'react-router-dom';
 import { Studyset } from 'shared/types';
 import { GhostLink } from 'styles/AppStyles';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import { useGetUserQuery } from 'state/api/usersAPI';
 import { formatDateUsingPreferred } from 'shared/utilities/general';
+import { useStudySetsStore } from 'state/stores/studysets';
 
 type Props = {
     studyset: Studyset;
@@ -38,9 +37,10 @@ const HomeStudySetCard = ({ studyset }: Props) => {
         username,
     } = studyset;
 
-    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const { muiTheme } = useTheme();
+
+    const { setSelectedStudySet } = useStudySetsStore();
 
     const {
         data: {
@@ -55,7 +55,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
     const onCardClick = () => {
-        dispatch(setSelectedStudySet(studyset));
+        setSelectedStudySet(studyset);
         navigate(`/view/${studysetUUID}`);
     };
 

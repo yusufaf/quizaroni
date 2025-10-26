@@ -13,19 +13,19 @@ import {
     LoginButton,
 } from './LoginStyles';
 import { StyledLink } from 'styles/AppStyles';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
-import { setCognitoUser, setAuthenticated } from 'state/slices/globalSlice';
 import { signIn } from '@aws-amplify/auth';
+import { useGlobalStore } from 'state/stores/global';
 
 type Props = {};
 const Login = (props: Props) => {
     useBrowserTitle(PAGE_TITLES.LOGIN);
-    const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     /* OAuth Variables */
     // const provider = new GoogleAuthProvider();
     // provider.setCustomParameters({ prompt: 'select_account' });
+
+    const { setAuthenticated } = useGlobalStore();
 
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
@@ -61,8 +61,8 @@ const Login = (props: Props) => {
             console.log('Result of cognito sign in = ', user);
 
             /* Store cognito user and authenticated in state */
-            dispatch(setCognitoUser({ username }));
-            dispatch(setAuthenticated(true));
+            // setCognitoUser({ username });
+            setAuthenticated(true);
 
             // Navigate to home page
             navigate('/');

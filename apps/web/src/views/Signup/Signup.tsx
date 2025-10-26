@@ -13,14 +13,10 @@ import {
 } from 'views/Login/LoginStyles';
 import { StyledLink } from 'styles/AppStyles';
 import useBrowserTitle from 'hooks/useBrowserTitle';
-import { useAppDispatch } from 'state/reduxHooks';
-import {
-    // setCognitoUser,
-    setConfirmationCodeDialogProps,
-} from 'state/slices/globalSlice';
 import { signUp } from '@aws-amplify/auth';
 import PasswordValidator from 'components/PasswordValidator/PasswordValidator';
 import { useCreateUserMutation } from 'state/api/usersAPI';
+import { useGlobalStore } from 'state/stores/global';
 
 type Props = {};
 
@@ -29,9 +25,9 @@ const Signup = (props: Props) => {
     // const provider = new GoogleAuthProvider();
     // provider.setCustomParameters({ prompt: "select_account" });
 
-    const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const [createUser] = useCreateUserMutation();
+    const { setConfirmationCodeDialogProps } = useGlobalStore();
 
     /* Signup Input States */
     const [email, setEmail] = useState<string>('');
@@ -85,13 +81,11 @@ const Signup = (props: Props) => {
                 username,
             });
 
-            dispatch(
-                setConfirmationCodeDialogProps({
-                    open: true,
-                    actionType: 'signUp',
-                    title: 'Confirm Sign Up',
-                })
-            );
+            setConfirmationCodeDialogProps({
+                open: true,
+                actionType: 'signUp',
+                title: 'Confirm Sign Up',
+            });
         } catch (error) {
             console.log('error signing up:', error);
         }

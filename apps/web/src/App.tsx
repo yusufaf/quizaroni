@@ -11,19 +11,14 @@ import 'react-toastify/dist/ReactToastify.css';
 import GlobalConfirmDialog from 'shared/components/GlobalConfirmDialog/GlobalConfirmDialog';
 import ManageLabelsDialog from 'shared/components/ManageLabelsDialog/ManageLabelsDialog';
 import ConfirmationCodeDialog from 'shared/components/ConfirmationCodeDialog/ConfirmationCodeDialog';
-import { useAppSelector } from 'state/reduxHooks';
-import {
-    selectLabelsDialogProps,
-    selectLoadingActions,
-} from 'state/slices/globalSlice';
+import { useGlobalStore } from 'state/stores/global';
 import LoadingIndicator from 'shared/components/LoadingIndicator/LoadingIndicator';
 
 const App = () => {
     const { setTheme, theme } = useTheme();
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
-    const labelsDialogProps = useAppSelector(selectLabelsDialogProps);
-    const loadingActions = useAppSelector(selectLoadingActions);
+    const { loadingActions } = useGlobalStore();
 
     useEffect(() => {
         prefersDarkMode ? setTheme(DARK) : setTheme(LIGHT);
@@ -38,9 +33,7 @@ const App = () => {
             <FeedbackDialog />
             <ToastContainer theme={theme} />
             <GlobalConfirmDialog />
-            {labelsDialogProps.open && (
-                <ManageLabelsDialog labelsDialogProps={labelsDialogProps} />
-            )}
+            <ManageLabelsDialog />
             <ConfirmationCodeDialog />
         </>
     );

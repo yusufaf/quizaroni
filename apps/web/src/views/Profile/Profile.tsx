@@ -1,6 +1,5 @@
 import { Tabs } from '@mui/material/';
 import { SyntheticEvent, useState } from 'react';
-import { useAppDispatch, useAppSelector } from 'state/reduxHooks';
 import AccountTab from './AccountTab';
 import CustomizationTab from './CustomizationTab';
 import ProfileCard from './ProfileCard';
@@ -22,8 +21,6 @@ const TABS = {
 type Props = {};
 
 const Profile = (props: Props) => {
-    const dispatch = useAppDispatch();
-
     const { data: { user: userData } = DEFAULT_USER_RESPONSE } =
         useGetUserQuery();
 
