@@ -19,11 +19,16 @@ import {
 } from '@mui/material';
 import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
 import { useEffect, useMemo, useState } from 'react';
-import { DARK, DATE_FORMATS, LIGHT } from 'shared/constants';
+import {
+    DARK,
+    DATE_FORMATS,
+    DOWNLOAD_FILE_TYPES,
+    LIGHT,
+} from 'shared/constants';
 import { SimpleFlexContainer } from 'shared/styles/AppStyles';
 import { PreferredDateFormat, User } from 'shared/types';
 import { useUpdateUserMetadataMutation } from 'state/api/usersAPI';
-import { ActionColumn, ActionHeader } from './ProfileStyles';
+import { ActionColumn, ActionHeader, SimpleSelect } from './ProfileStyles';
 import { downloadTypeItems } from 'views/ViewStudySet/DownloadSetModal/DownloadSetModal';
 import { useGlobalStore } from 'state/stores/global';
 
@@ -50,7 +55,7 @@ const CustomizationTab = ({ userData }: Props) => {
         metadata: {
             defaultTheme = 'dark',
             preferredDateFormat,
-            defaultDownloadFormat,
+            defaultDownloadFormat = DOWNLOAD_FILE_TYPES.JSON,
         },
     } = userData;
 
@@ -127,9 +132,7 @@ const CustomizationTab = ({ userData }: Props) => {
     // #endregion
 
     // #region Date Format, Default Download Format
-    const handleSelectChange = (
-        event: SelectChangeEvent<PreferredDateFormat>
-    ) => {
+    const handleSelectChange = (event: SelectChangeEvent<string>) => {
         setLoadingID(event.target.name);
         updateUserMetadata({
             updates: {
@@ -214,12 +217,13 @@ const CustomizationTab = ({ userData }: Props) => {
                     <Typography variant="h6">Date Format</Typography>
                 </ActionHeader>
                 <SimpleFlexContainer style={{ gap: '1rem' }}>
-                    <Select
+                    <SimpleSelect
                         value={preferredDateFormat}
                         onChange={handleSelectChange}
                         disabled={dateFormatLoading}
                         name={LOADING_IDS.DATE_FORMAT}
                         sx={{
+                            height: '2.5rem',
                             width: '10rem',
                         }}
                     >
@@ -228,7 +232,7 @@ const CustomizationTab = ({ userData }: Props) => {
                                 {value}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </SimpleSelect>
                     {dateFormatLoading && <CircularProgress size={24} />}{' '}
                 </SimpleFlexContainer>
             </ActionColumn>
@@ -240,18 +244,18 @@ const CustomizationTab = ({ userData }: Props) => {
                     </Typography>
                 </ActionHeader>
                 <SimpleFlexContainer style={{ gap: '1rem' }}>
-                    <Select
-                        // @ts-ignore
+                    <SimpleSelect
                         value={defaultDownloadFormat}
                         onChange={handleSelectChange}
                         disabled={downloadFormatLoading}
                         name={LOADING_IDS.DOWNLOAD_FORMAT}
                         sx={{
+                            height: '2.5rem',
                             width: '10rem',
                         }}
                     >
                         {downloadTypeItems}
-                    </Select>
+                    </SimpleSelect>
                     {downloadFormatLoading && <CircularProgress size={24} />}{' '}
                 </SimpleFlexContainer>
             </ActionColumn>

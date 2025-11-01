@@ -156,7 +156,7 @@ const ViewStudySet = (props: Props) => {
 
     return (
         <>
-            <ViewStudysetPage>
+            <ViewStudysetPage className="view-set-page">
                 <ViewFlashsetPaper elevation={6}>
                     <ViewStudysetContainer>
                         <ViewStudysetHeader id="viewStudysetHeader">

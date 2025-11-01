@@ -8,16 +8,15 @@ const ProfileDropdown = (props) => {
     const { dropdownRef, showDropdown, onClose } = props;
     const { muiTheme } = useTheme();
 
-    const { setDialogOpen } = useGlobalStore();
+    const { setFeedbackDialogOpen } = useGlobalStore();
 
     const StyledProfileLink = styled(Link)({
-        fontSize: '1.25rem',
         textDecoration: 'none',
         color: muiTheme.palette.text.primary,
     });
 
     const openFeedbackDialog = () => {
-        setDialogOpen(true);
+        setFeedbackDialogOpen(true);
     };
 
     return (

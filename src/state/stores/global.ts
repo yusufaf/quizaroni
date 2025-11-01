@@ -29,7 +29,7 @@ type GlobalState = {
         studysets: Studyset[];
     }) => void;
     setNamedColorsDialogProps: (props: any) => void;
-    setFeedbackDialogOpen: (open: boolean) => void;
+    setFeedbackDialogOpen: (feedbackDialogOpen: boolean) => void;
     setLabelsDialogProps: (props: LabelsDialogProps) => void;
     setConfirmationCodeDialogProps: (props: any) => void;
     setLoadingAdd: (actionId: string) => void;
@@ -105,7 +105,7 @@ export const useGlobalStore = create<GlobalState>((set, get) => ({
     },
     setNamedColorsDialogProps: (props) =>
         set({ namedColorsDialogProps: props }),
-    setFeedbackDialogOpen: (open) => set({ dialogOpen: open }),
+    setFeedbackDialogOpen: (feedbackDialogOpen) => set({ feedbackDialogOpen }),
     setLabelsDialogProps: (props) => set({ labelsDialogProps: props }),
     setConfirmationCodeDialogProps: (props) =>
         set({ confirmationCodeDialogProps: props }),
@@ -123,21 +123,3 @@ export const useGlobalStore = create<GlobalState>((set, get) => ({
         }));
     },
 }));
-
-// Selector functions (optional, for convenience)
-export const selectDialogOpen = (state: GlobalState) => state.dialogOpen;
-export const selectUserAuthState = (state: GlobalState) => state.userAuthInfo;
-export const selectAuthenticated = (state: GlobalState) => state.authenticated;
-export const selectUserData = (state: GlobalState) => state.userData;
-export const selectConfirmDialogProps = (state: GlobalState) =>
-    state.confirmDialogProps;
-export const selectNamedColorsDialogProps = (state: GlobalState) =>
-    state.namedColorsDialogProps;
-export const selectFeedbackDialogOpen = (state: GlobalState) =>
-    state.dialogOpen;
-export const selectLabelsDialogProps = (state: GlobalState) =>
-    state.labelsDialogProps;
-export const selectConfirmationCodeDialogProps = (state: GlobalState) =>
-    state.confirmationCodeDialogProps;
-export const selectLoadingActions = (state: GlobalState) =>
-    state.loadingActions;
