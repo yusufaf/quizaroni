@@ -5,10 +5,6 @@ import {
     StyledDialogContent,
 } from './styles';
 import { Button, TextField } from '@mui/material';
-import {
-    selectConfirmationCodeDialogProps,
-    setConfirmationCodeDialogProps,
-} from 'state/slices/globalSlice';
 import { useState } from 'react';
 import {
     confirmSignUp,
@@ -25,7 +21,8 @@ const ConfirmationCodeDialog = (props: Props) => {
     /* Redux / Hooks */
     const navigate = useNavigate();
 
-    const { confirmationCodeDialogProps } = useGlobalStore();
+    const { confirmationCodeDialogProps, setConfirmationCodeDialogProps } =
+        useGlobalStore();
 
     // const cognitoUser = useAppSelector(selectCognitoUser);
     // const { username } = cognitoUser;

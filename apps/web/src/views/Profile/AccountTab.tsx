@@ -21,7 +21,6 @@ import {
 import { EMAIL_REGEX } from 'shared/constants';
 import { useNavigate } from 'react-router-dom';
 import { User } from 'shared/types';
-import { setConfirmationCodeDialogProps } from 'state/slices/globalSlice';
 import ChangePasswordSection from './ChangePasswordSection';
 import DownloadDataDialog from './DownloadDataDialog';
 import { useGlobalStore } from 'state/stores/global';
