@@ -6,7 +6,7 @@ import {
 
 type Props = {
     onClose: () => void;
-    title: string;
+    title?: string;
 };
 
 const CloseDialogButton = ({ onClose, title }: Props) => {

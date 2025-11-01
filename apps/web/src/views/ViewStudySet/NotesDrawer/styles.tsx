@@ -3,12 +3,15 @@ import styled from '@emotion/styled';
 
 export const StyledDrawer = styled(Drawer)({
     '& .MuiDrawer-paper': {
-        // marginTop: "4rem",
-        // width: "22rem",
-        position: 'absolute',
-        top: '4rem', // This aligns the drawer beneath the header
-        height: `calc(100% - 4rem - 3rem)`, // Full height minus header and footer
+        position: 'fixed',
+        top: '5.5rem', // Align with the main content
+        height: 'calc(100vh - 5.5rem)', // Adjust height to start from top position
         width: '22rem',
-        overflowY: 'auto', // Allow scrolling if needed
+        overflowY: 'auto',
+        border: 'none',
+        background: 'transparent',
+        '& > div': {
+            background: 'inherit',
+        }
     },
 });

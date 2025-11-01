@@ -230,21 +230,25 @@ const CreateSet = (props: Props) => {
        Re-compute the JSX array when the "createdSetCards" prop changes. 
     */
     const cardInputs = useMemo(() => {
-        return createdSetCards.map((_, index: number) => {
-            const card = createdSetCards[index];
-            const props = {
-                actionsStack,
-                card,
-                createdSetCards,
-                index,
-                key: card.cardUUID,
-                onColorChange,
-                setActionsStack,
-                setCreatedSetCards,
-                updateCardValue,
-            };
-            return <NewCardInput {...props} />;
-        });
+        return createdSetCards
+            .map((_, index: number) => {
+                const card = createdSetCards[index];
+                if (!card) {
+                    return null;
+                }
+                const props = {
+                    actionsStack,
+                    card,
+                    createdSetCards,
+                    index,
+                    onColorChange,
+                    setActionsStack,
+                    setCreatedSetCards,
+                    updateCardValue,
+                };
+                return <NewCardInput key={card.cardUUID} {...props} />;
+            })
+            .filter((Boolean) => Boolean);
     }, [createdSetCards]);
 
     /* Create Set Inputs */
@@ -285,11 +289,11 @@ const CreateSet = (props: Props) => {
             newCreatedSetCards.push({ ...EMPTY_CARD });
         }
         setCreatedSetCards(newCreatedSetCards);
-        /* Clear the blank cards count input */    
+        /* Clear the blank cards count input */
         setAdvancedSectionProps({
             blankCardsCount: 0,
             expanded,
-        })
+        });
     };
 
     const headerProps = {
@@ -310,7 +314,7 @@ const CreateSet = (props: Props) => {
 
     return (
         <>
-            <CreateSetPage>
+            <CreateSetPage className="create-set-page">
                 <CreateSetHeader {...headerProps} />
                 <SpacedFlexContainer>
                     <SimpleFlexContainer style={{ gap: '0.5rem' }}>
