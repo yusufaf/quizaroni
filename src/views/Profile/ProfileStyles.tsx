@@ -5,6 +5,7 @@ import {
     DialogContent,
     IconButton,
     Paper,
+    Select,
     styled,
     Tab,
     Typography,
@@ -60,7 +61,9 @@ export const ActionSubmitButton = styled(Button)({
     width: '50%',
 });
 
-/* Profile Card Styles */
+//#region ProfileCard
+
+//#endregion
 
 export const StyledProfileCard = styled(Card)({
     display: 'flex',
@@ -113,3 +116,10 @@ export const DeleteDialogContent = styled(DialogContent)({
     flexDirection: 'column',
     gap: '1rem',
 });
+
+//#region CustomizationTab
+export const SimpleSelect = styled(Select)(({ theme }) => ({
+    height: '2.5rem',
+    width: '10rem',
+}));
+//#endregion

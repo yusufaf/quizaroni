@@ -10,8 +10,13 @@ import {
     AccordionSummary,
     Divider,
     Fab,
+    Tooltip,
 } from '@mui/material/';
-import { BoldTypography, SimpleFlexContainer } from 'styles/AppStyles';
+import {
+    BoldTypography,
+    SimpleFlexContainer,
+    SpacedFlexContainer,
+} from 'styles/AppStyles';
 import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
 import useCustomMutation from 'hooks/useCustomMutation';
 import { Card, OpenCardNotes, Studyset, UUID } from 'shared/types';
@@ -133,8 +138,8 @@ const NotesDrawer = (props: Props) => {
                 onClick={() => setHidden(false)}
                 color="primary"
                 size="small"
-                aria-label="Open notes menu"
-                title="Open notes menu"
+                aria-label="Open notes drawer"
+                title="Open notes drawer"
                 sx={{
                     position: 'absolute',
                     ...fabPosition,
@@ -153,10 +158,10 @@ const NotesDrawer = (props: Props) => {
                 exit: transitionDuration,
             }}
         >
-            <SimpleFlexContainer>
+            <SpacedFlexContainer>
                 <BoldTypography variant="h5">Notes</BoldTypography>
                 <CloseDialogButton onClose={onClose} />
-            </SimpleFlexContainer>
+            </SpacedFlexContainer>
             {selectedStudyset?.cards?.map((card: Card, index: number) => {
                 const { cardUUID } = card;
                 return (
