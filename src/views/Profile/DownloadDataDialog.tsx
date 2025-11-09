@@ -9,6 +9,7 @@ import {
 import { StyledDialogActions } from 'styles/AppStyles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import { DeleteDialogContent } from './ProfileStyles';
+import { useDownloadUserData } from 'state/api/usersAPI';
 
 type Props = {
     open: boolean;
@@ -18,7 +19,30 @@ type Props = {
 const DownloadDataDialog = ({ open, handleClose }: Props) => {
     const [includeStudysets, setIncludeStudysets] = useState(false);
 
-    const handleDownloadData = () => {};
+    // const [
+    //     downloadUserData,
+    //     {
+    //         isLoading: isDownloadLoading,
+    //         isSuccess: isDownloadSuccess,
+    //         isError: isDownloadError,
+    //     },
+    // ] = useDownloadUserDataMutation();
+
+    const handleDownloadData = () => {
+        // downloadUserData({
+        //     includeStudysets,
+        // })
+        //     .unwrap()
+        //     .then(() => {
+        //         // console.log(`${event.target.name} updated successfully`);
+        //     })
+        //     .catch((error) => {
+        //         // console.error(`Failed to update ${event.target.name}:`, error);
+        //     })
+        //     .finally(() => {
+        //         // setLoadingID('');
+        //     });
+    };
 
     const handleCheckboxChange = (
         event: React.ChangeEvent<HTMLInputElement>
@@ -54,10 +78,7 @@ const DownloadDataDialog = ({ open, handleClose }: Props) => {
                 />
             </DeleteDialogContent>
             <StyledDialogActions>
-                <Button
-                    variant="contained"
-                    onClick={() => handleDownloadData()}
-                >
+                <Button variant="contained" onClick={handleDownloadData}>
                     Download Data
                 </Button>
             </StyledDialogActions>

@@ -37,7 +37,7 @@ import { SimpleFlexContainer, SpacedFlexContainer } from 'styles/AppStyles';
 import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { SortDirection, Studyset } from 'shared/types';
 import { useNavigate } from 'react-router-dom';
-import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
+import { useUpdateStudyset } from 'state/api/studysetsAPI';
 import { useGlobalStore } from 'state/stores/global';
 
 type Props = {
@@ -69,7 +69,7 @@ const HomeToolbar = ({
 
     const { setLabelsDialogProps, showConfirmDialog } = useGlobalStore();
 
-    const [updateStudyset] = useUpdateStudysetMutation();
+    const { mutate: updateStudyset } = useUpdateStudyset();
 
     const isTableView = selectedView === HOME_LAYOUTS.TABLE;
     const firstStudyset = selectedStudysetRows[0];

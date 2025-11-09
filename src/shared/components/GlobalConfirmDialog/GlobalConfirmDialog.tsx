@@ -12,13 +12,13 @@ import {
     STUDYSET_CONFIRM_DIALOGS,
     INITIAL_CONFIRM_DIALOG_PROPS,
 } from 'shared/constants';
-import useCustomMutation from 'hooks/useCustomMutation';
 import {
-    useDeleteStudysetMutation,
-    useDuplicateStudysetMutation,
-    useBatchDeleteStudysetsMutation,
-    useBatchDuplicateStudysetsMutation,
+    useDeleteStudyset,
+    useDuplicateStudyset,
+    useBatchDeleteStudysets,
+    useBatchDuplicateStudysets,
 } from 'state/api/studysetsAPI';
+import useCustomMutation from 'shared/hooks/useCustomMutation';
 import { StyledDialogActions } from 'styles/AppStyles';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,45 +27,51 @@ import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTi
 type Props = {};
 const ConfirmDialog = (props: Props) => {
     const navigate = useNavigate();
-    const { confirmDialogProps: dialogProps, setConfirmDialogProps } = useGlobalStore();
+    const { confirmDialogProps: dialogProps, setConfirmDialogProps } =
+        useGlobalStore();
 
-    const { mutate: deleteStudySet } = useCustomMutation({
-        mutation: useDeleteStudysetMutation,
+    const {
+        mutate: deleteStudySet,
+        isLoading: isDeletingStudySet,
+        isSuccess: isDeleteStudySetSuccess,
+        isError: isDeleteStudySetError
+    } = useCustomMutation({
+        mutation: useDeleteStudyset,
         successMessage: 'Successfully deleted study set',
-        errorMessage: 'Error deleting study set',
+        errorMessage: 'Error deleting study set'
     });
 
     const {
         mutate: batchDeleteStudysets,
         isLoading: isBatchDeletingStudysets,
         isSuccess: isBatchDeletingStudysetsSuccess,
-        isError: isBatchDeletingStudysetsError,
+        isError: isBatchDeletingStudysetsError
     } = useCustomMutation({
-        mutation: useBatchDeleteStudysetsMutation,
+        mutation: useBatchDeleteStudysets,
         successMessage: 'Successfully deleted study sets',
-        errorMessage: 'Error deleting study sets',
+        errorMessage: 'Error deleting study sets'
     });
 
     const {
         mutate: duplicateStudySet,
         isLoading: isDuplicatingStudySet,
         isSuccess: isDuplicateStudySetSuccess,
-        isError: isDuplicateStudySetError,
+        isError: isDuplicateStudySetError
     } = useCustomMutation({
-        mutation: useDuplicateStudysetMutation,
+        mutation: useDuplicateStudyset,
         successMessage: 'Successfully duplicated study set',
-        errorMessage: 'Error duplicating study set',
+        errorMessage: 'Error duplicating study set'
     });
 
     const {
         mutate: batchDuplicateStudysets,
         isLoading: isBatchDuplicatingStudySets,
         isSuccess: isBatchDuplicatingStudySetsSuccess,
-        isError: isBatchDuplicatingStudySetsError,
+        isError: isBatchDuplicatingStudySetsError
     } = useCustomMutation({
-        mutation: useBatchDuplicateStudysetsMutation,
+        mutation: useBatchDuplicateStudysets,
         successMessage: 'Successfully duplicated study sets',
-        errorMessage: 'Error duplicating study sets',
+        errorMessage: 'Error duplicating study sets'
     });
 
     const isTableMultiAction = [
@@ -115,7 +121,11 @@ const ConfirmDialog = (props: Props) => {
                         <ul>
                             {dialogProps?.props?.messages?.map(
                                 (message: string) => {
-                                    return <li key={crypto.randomUUID()}>{message}</li>;
+                                    return (
+                                        <li key={crypto.randomUUID()}>
+                                            {message}
+                                        </li>
+                                    );
                                 }
                             )}
                         </ul>

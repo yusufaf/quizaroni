@@ -15,7 +15,7 @@ import { StyledLink } from 'styles/AppStyles';
 import useBrowserTitle from 'hooks/useBrowserTitle';
 import { signUp } from '@aws-amplify/auth';
 import PasswordValidator from 'components/PasswordValidator/PasswordValidator';
-import { useCreateUserMutation } from 'state/api/usersAPI';
+import { useCreateUser } from 'state/api/usersAPI';
 import { useGlobalStore } from 'state/stores/global';
 
 type Props = {};
@@ -26,7 +26,7 @@ const Signup = (props: Props) => {
     // provider.setCustomParameters({ prompt: "select_account" });
 
     const navigate = useNavigate();
-    const [createUser] = useCreateUserMutation();
+    const { mutate: createUser } = useCreateUser();
     const { setConfirmationCodeDialogProps } = useGlobalStore();
 
     /* Signup Input States */

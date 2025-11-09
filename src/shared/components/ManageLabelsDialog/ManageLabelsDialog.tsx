@@ -16,17 +16,17 @@ import LabelsList from './LabelsList';
 import { capitalizeFirstLetter } from 'shared/utilities/general';
 import { Studyset, LabelsDialogProps } from 'shared/types';
 import {
-    useDeleteLabelMutation,
-    useEditLabelMutation,
-    useChangeLabelMutation,
-    useGetAllStudysetsQuery,
-    useGetStudysetQuery,
+    useDeleteLabel,
+    useEditLabel,
+    useChangeLabel,
+    useGetAllStudysets,
+    useGetStudyset,
 } from 'state/api/studysetsAPI';
 import useCustomMutation from 'hooks/useCustomMutation';
 import CreateTabView from './CreateTabView';
 import ManageTabView from './ManageTabView';
 import AssignTabView from './AssignTabView';
-import { useGetUserQuery } from 'state/api/usersAPI';
+import { useGetUser } from 'state/api/usersAPI';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import { useGlobalStore } from 'state/stores/global';
@@ -38,9 +38,9 @@ const ManageLabelsDialog = () => {
     /* ==== RTK Query ==== */
     const {
         data: { user: { labels = [], userUUID = '' } } = DEFAULT_USER_RESPONSE,
-    } = useGetUserQuery();
+    } = useGetUser();
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
-        useGetAllStudysetsQuery({});
+        useGetAllStudysets();
     const studysets = studysetsResponse?.studysets ?? [];
 
     const {
@@ -48,11 +48,8 @@ const ManageLabelsDialog = () => {
         isLoading: isStudySetLoading,
         isSuccess: isStudySetSuccess,
         isError: isStudySetError,
-    } = useGetStudysetQuery(
+    } = useGetStudyset(
         { studysetUUID: labelsDialogProps.studysetUUID ?? '' },
-        {
-            skip: !labelsDialogProps.studysetUUID,
-        }
     );
     const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
 
@@ -62,7 +59,7 @@ const ManageLabelsDialog = () => {
         isSuccess: isDeleteSuccess,
         isError: isDeleteError,
     } = useCustomMutation({
-        mutation: useDeleteLabelMutation,
+        mutation: useDeleteLabel,
         successMessage: 'Successfully deleted label',
         errorMessage: 'Error deleting label',
         onSuccess: () => {
@@ -76,7 +73,7 @@ const ManageLabelsDialog = () => {
         isSuccess: isEditSuccess,
         isError: isEditError,
     } = useCustomMutation({
-        mutation: useEditLabelMutation,
+        mutation: useEditLabel,
         successMessage: 'Successfully edited label',
         errorMessage: 'Error editing label',
         onSuccess: () => {
@@ -90,7 +87,7 @@ const ManageLabelsDialog = () => {
         isSuccess: isChangeSuccess,
         isError: isChangeError,
     } = useCustomMutation({
-        mutation: useChangeLabelMutation,
+        mutation: useChangeLabel,
         successMessage: 'Successfully updated label',
         errorMessage: 'Error updated label',
     });

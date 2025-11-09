@@ -1,12 +1,13 @@
-import { BASE_API_URL, getCommonPostRequestProps } from 'state/api/awsAPI';
-import api from './api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { BASE_API_URL, getCommonPostRequestProps } from './awsAPI';
 import {
-    CreateUserParams,
-    GetUserParams,
+    CreateUserRequest,
+    DownloadUserDataRequest,
+    GetUserRequest,
     GetUserResponse,
-    UpdateDefaultThemeParams,
-    UpdateEmailParams,
-    UpdateUserMetadataParams,
+    UpdateDefaultThemeRequest,
+    UpdateEmailRequest,
+    UpdateUserMetadataRequest,
     User,
 } from 'shared/types';
 
@@ -18,63 +19,90 @@ import {
     router.post("/api/users/updateEmail", updateUserEmail);
 */
 
-export const usersApi = api.injectEndpoints({
-    endpoints: (build) => ({
-        createUser: build.mutation<void, CreateUserParams>({
-            query: ({ email, username }) => ({
-                url: 'users/create',
-                method: 'POST',
-                params: { email, username },
-            }),
-        }),
-        getUser: build.query<GetUserResponse, void>({
-            query: () => ({
-                url: `${BASE_API_URL}/users/get-user`,
+export const useGetUser = () => {
+    return useQuery({
+        queryKey: ['user'],
+        queryFn: async () => {
+            const response = await fetch(`${BASE_API_URL}/users/get-user`, {
                 ...getCommonPostRequestProps(),
-            }),
-            providesTags: (result, _error, _arg) => {
-                // @ts-ignore - TODO: Update types
-                const { user } = result;
-                return [{ type: 'User', id: user.userUUID }];
-            },
-        }),
-        updateUserMetadata: build.mutation<void, UpdateUserMetadataParams>({
-            query: ({ updates }) => ({
-                url: `${BASE_API_URL}/users/update-metadata`,
-                ...getCommonPostRequestProps(),
-                body: { updates },
-            }),
-            invalidatesTags: ['User'],
-        }),
-        updateDefaultTheme: build.mutation<void, UpdateDefaultThemeParams>({
-            query: ({ newTheme, uuid }) => ({
-                url: 'users/updateDefaultTheme',
-                method: 'POST',
-                body: {
-                    uuid,
-                    newTheme,
-                },
-            }),
-            invalidatesTags: ['User'],
-        }),
-        updateEmail: build.mutation<void, UpdateEmailParams>({
-            query: ({ username, newEmail }) => ({
-                url: 'users/updateEmail',
-                method: 'POST',
-                body: {
-                    username,
-                    newEmail,
-                },
-            }),
-            invalidatesTags: ['User'],
-        }),
-    }),
-});
+            });
+            return response.json() as Promise<GetUserResponse>;
+        },
+    });
+};
 
-export const {
-    useCreateUserMutation,
-    useGetUserQuery,
-    useUpdateUserMetadataMutation,
-    useUpdateDefaultThemeMutation,
-    useUpdateEmailMutation,
-} = usersApi;
+export const useCreateUser = () => {
+    return useMutation({
+        mutationFn: async ({ email, username }: CreateUserRequest) => {
+            await fetch('users/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, username }),
+            });
+        },
+    });
+};
+
+export const useUpdateUserMetadata = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ updates }: UpdateUserMetadataRequest) => {
+            await fetch(`${BASE_API_URL}/users/update-metadata`, {
+                ...getCommonPostRequestProps(),
+                body: JSON.stringify({ updates }),
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['user'] });
+        },
+    });
+};
+
+export const useUpdateDefaultTheme = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ newTheme, uuid }: UpdateDefaultThemeRequest) => {
+            await fetch('users/updateDefaultTheme', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ uuid, newTheme }),
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['user'] });
+        },
+    });
+};
+
+export const useUpdateEmail = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ username, newEmail }: UpdateEmailRequest) => {
+            await fetch('users/updateEmail', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, newEmail }),
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['user'] });
+        },
+    });
+};
+
+export const useDownloadUserData = () => {
+    return useMutation({
+        mutationFn: async (params: DownloadUserDataRequest) => {
+            await fetch(`${BASE_API_URL}/users/download-user-data`, {
+                ...getCommonPostRequestProps(),
+                body: JSON.stringify(params),
+            });
+        },
+    });
+};

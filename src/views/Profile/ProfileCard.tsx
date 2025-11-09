@@ -8,7 +8,7 @@ import {
     UserInfoContainer,
     UserInfoHeading,
 } from './ProfileStyles';
-import { useGetAllStudysetsQuery } from 'state/api/studysetsAPI';
+import { useGetAllStudysets } from 'state/api/studysetsAPI';
 import { User } from 'shared/types';
 
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
 };
 const ProfileCard = ({ userData }: Props) => {
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
-        useGetAllStudysetsQuery({});
+        useGetAllStudysets();
     const studysets = studysetsResponse?.studysets ?? [];
 
     useEffect(() => {}, []);

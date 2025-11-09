@@ -18,7 +18,7 @@ import {
     BackToViewButton,
 } from './CreateSetStyles';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useGetUserQuery } from 'state/api/usersAPI';
+import { useGetUser } from 'state/api/usersAPI';
 import { ReactElement } from 'react';
 
 type Props = {
@@ -52,7 +52,7 @@ const CreateSetHeader = ({
     const { id: studySetUUID } = useParams();
 
     const { data: { user: { labels = [] } } = DEFAULT_USER_RESPONSE } =
-        useGetUserQuery();
+        useGetUser();
 
     const renderLabelOptions = () => {
         const labelJsx: ReactElement[] = [];

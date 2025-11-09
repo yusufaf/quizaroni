@@ -24,14 +24,8 @@ import useSortStudysets from 'hooks/useSortStudysets';
 import { HomeView, SortDirection, Studyset } from 'shared/types';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-    useGetAllStudysetsQuery,
-    useUpdateStudysetMutation,
-} from 'state/api/studysetsAPI';
-import {
-    useGetUserQuery,
-    useUpdateUserMetadataMutation,
-} from 'state/api/usersAPI';
+import { useGetAllStudysets, useUpdateStudyset } from 'state/api/studysetsAPI';
+import { useGetUser, useUpdateUserMetadata } from 'state/api/usersAPI';
 import {
     DEFAULT_USER_RESPONSE,
     HOME_LAYOUTS,
@@ -71,14 +65,12 @@ const CustomToolbar = ({
     columnVisibilityModel,
     density,
 }: NonNullable<GridSlotsComponentsProps['toolbar']>) => {
-    const [
-        updateUserMetadata,
-        {
-            isLoading: isUpdateMetadataLoading,
-            isSuccess: isUpdateMetadataSuccess,
-            isError: isUpdateMetadataError,
-        },
-    ] = useUpdateUserMetadataMutation();
+    const {
+        mutate: updateUserMetadata,
+        isPending: isUpdateMetadataLoading,
+        isSuccess: isUpdateMetadataSuccess,
+        isError: isUpdateMetadataError,
+    } = useUpdateUserMetadata();
 
     const handleSavePreferences = async () => {
         updateUserMetadata({
@@ -112,32 +104,22 @@ const Home = (props: Props) => {
     /* Hooks / Redux */
     const navigate = useNavigate();
 
-    const { 
-        selectedStudySet,
-        setSelectedStudySet,
-    } = useStudySetsStore();
+    const { selectedStudySet, setSelectedStudySet } = useStudySetsStore();
 
-    const {
-        data: {
-            user: {
-                metadata: { preferredDateFormat },
-            },
-        } = DEFAULT_USER_RESPONSE,
-    } = useGetUserQuery();
+    const { data: userData = DEFAULT_USER_RESPONSE } = useGetUser();
+    const preferredDateFormat = userData.user?.metadata?.preferredDateFormat;
 
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
-        useGetAllStudysetsQuery({});
+        useGetAllStudysets();
     const studysets = studysetsResponse?.studysets ?? [];
 
-    const [updateStudyset] = useUpdateStudysetMutation();
-    const [
-        updateUserMetadata,
-        {
-            isLoading: isUpdateMetadataLoading,
-            isSuccess: isUpdateMetadataSuccess,
-            isError: isUpdateMetadataError,
-        },
-    ] = useUpdateUserMetadataMutation();
+    const { mutate: updateStudyset } = useUpdateStudyset();
+    const {
+        mutate: updateUserMetadata,
+        isPending: isUpdateMetadataLoading,
+        isSuccess: isUpdateMetadataSuccess,
+        isError: isUpdateMetadataError,
+    } = useUpdateUserMetadata();
 
     useBrowserTitle(PAGE_TITLES.HOME);
 

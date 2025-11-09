@@ -88,7 +88,8 @@ export type NamedColor = { color: string; name: string };
 export type PreferredDateFormat =
     (typeof DATE_FORMATS)[keyof typeof DATE_FORMATS];
 
-export type DownloadSetFormat = (typeof DOWNLOAD_FILE_TYPES)[keyof typeof DOWNLOAD_FILE_TYPES]
+export type DownloadSetFormat =
+    (typeof DOWNLOAD_FILE_TYPES)[keyof typeof DOWNLOAD_FILE_TYPES];
 
 // #endregion
 
@@ -102,7 +103,7 @@ export type StudysetUUIDPayload = {
     studysetUUID: UUID;
 };
 
-export type GetAllStudysetsParams = {};
+export type GetAllStudysetsRequest = {};
 
 export type GetAllStudysetsResponse = {
     studysets: Studyset[];
@@ -112,23 +113,23 @@ export type GetStudysetResponse = {
     studyset: Studyset;
 };
 
-export type GetStudysetParams = StudysetUUIDPayload;
+export type GetStudysetRequest = StudysetUUIDPayload;
 
 export type CreateStudysetResponse = {
     studyset: Studyset;
 };
 
-export type DeleteStudysetParams = StudysetUUIDPayload;
+export type DeleteStudysetRequest = StudysetUUIDPayload;
 
-export type BatchDeleteStudysetsParams = {
+export type BatchDeleteStudysetsRequest = {
     studysetUUIDs: UUID[];
 };
 
 export type BatchDeleteStudysetsResponse = BaseResponse;
 
-export type DuplicateStudysetParams = StudysetUUIDPayload;
+export type DuplicateStudysetRequest = StudysetUUIDPayload;
 
-export type BatchDuplicateStudysetsParams = {
+export type BatchDuplicateStudysetsRequest = {
     studysetUUIDs: UUID[];
 };
 
@@ -136,7 +137,7 @@ export type BatchDuplicateStudysetsResponse = BaseResponse;
 
 export type Updates = { [key: string]: any };
 
-export type UpdateStudysetParams = {
+export type UpdateStudysetRequest = {
     studysetUUID: string;
     updates: Updates;
     isMetadataUpdate?: boolean;
@@ -147,40 +148,44 @@ export type UpdateStudysetResponse = BaseResponse & {
 };
 
 type StudysetUpdatesMap = [UUID, Updates][];
-export type BatchUpdateStudysetsParams = {
+export type BatchUpdateStudysetsRequest = {
     studysetUpdates: StudysetUpdatesMap;
 };
 
-export type FavoriteStudysetParams = StudysetUUIDPayload & {
+export type FavoriteStudysetRequest = StudysetUUIDPayload & {
     favorited: boolean;
 };
 
 // Users API
-export type GetUserParams = {};
+export type GetUserRequest = {};
 export type GetUserResponse = {
     user: User;
 };
 
-export type CreateUserParams = {
+export type CreateUserRequest = {
     email: string;
     username: string;
 };
 
-export type UpdateUserMetadataParams = {
+export type UpdateUserMetadataRequest = {
     updates: Updates;
 };
 
-export type UpdateDefaultThemeParams = {
+export type UpdateDefaultThemeRequest = {
     uuid: UUID;
     newTheme: 'light' | 'dark';
 };
 
-export type UpdateEmailParams = {
+export type UpdateEmailRequest = {
     username: string;
     newEmail: string;
 };
 
-export type EditCategoryParams = StudysetUUIDPayload & {
+export type DownloadUserDataRequest = {
+    includeStudysets: boolean;
+};
+
+export type EditCategoryRequest = StudysetUUIDPayload & {
     index: number;
     newCategory: string;
     oldCategory: string;
@@ -190,38 +195,38 @@ export type CreateNoteResponse = {
     noteUUID: string;
 };
 
-export type CreateNoteParams = StudysetUUIDPayload & {
+export type CreateNoteRequest = StudysetUUIDPayload & {
     cardUUID: UUID;
 };
 
-export type DeleteNoteParams = StudysetUUIDPayload & {
+export type DeleteNoteRequest = StudysetUUIDPayload & {
     cardUUID: UUID;
     noteUUID: UUID;
 };
 
-export type EditNoteParams = StudysetUUIDPayload & {
+export type EditNoteRequest = StudysetUUIDPayload & {
     cardUUID: UUID;
     noteUUID: UUID;
     text: string;
 };
 
-export type CreateLabelParams = {
+export type CreateLabelRequest = {
     label: string;
     studysetUUID?: UUID;
     updateStudysetLabel?: boolean;
 };
 
-export type DeleteLabelParams = {
+export type DeleteLabelRequest = {
     labelsToDelete: string[];
 };
 
-export type EditLabelParams = {
+export type EditLabelRequest = {
     index: number;
     oldLabel: string;
     newLabel: string;
 };
 
-export type ChangeLabelParams = {
+export type ChangeLabelRequest = {
     studysetUUID: UUID;
     newLabel: string;
 };
@@ -237,6 +242,46 @@ export type Part = {
     ETag: string;
     PartNumber: number;
 };
+
+// #region File Upload
+export type InitiateMultipartUploadRequest = {
+    contentType: string;
+    fileName: string;
+    studysetUUID?: UUID;
+};
+
+export type InitiateMultipartUploadResponse = {
+    key: string;
+    uploadId: string | undefined;
+};
+
+export type GetMultipartSignedUploadUrlsRequest = {
+    key: string;
+    numParts: number;
+    uploadId: string;
+};
+
+export type GetMultipartSignedUploadUrlsResponse = {
+    signedURLs: Record<number, string>;
+};
+
+export type CompleteMultipartUploadRequest = {
+    association?: 'term' | 'definition';
+    cardUUID?: string;
+    key: string;
+    parts: Part[];
+    studysetUUID?: UUID;
+    uploadId: string;
+};
+
+export type DeleteFileRequest = {
+    key: string;
+};
+
+export type SendFeedbackRequest = {
+    key: string;
+};
+// #endregion
 
 // #region Redux
 

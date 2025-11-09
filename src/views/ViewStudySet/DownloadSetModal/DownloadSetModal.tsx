@@ -22,7 +22,7 @@ import {
 } from 'shared/constants';
 import { DownloadDialogContent } from '../styles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
-import { useGetUserQuery } from 'state/api/usersAPI';
+import { useGetUser } from 'state/api/usersAPI';
 
 export const downloadTypeItems = Object.values(DOWNLOAD_FILE_TYPES).map(
     (value, index) => {
@@ -57,7 +57,7 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
                 metadata: { defaultDownloadFormat },
             },
         } = DEFAULT_USER_RESPONSE,
-    } = useGetUserQuery();
+    } = useGetUser();
 
     const [downloadFileType, setDownloadFileType] = useState<string>(
         defaultDownloadFormat ?? DOWNLOAD_FILE_TYPES.JSON

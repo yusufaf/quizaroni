@@ -3,7 +3,7 @@ import { Button, SelectChangeEvent, Tab, Tabs } from '@mui/material/';
 import useCustomMutation from 'hooks/useCustomMutation';
 import { Studyset } from 'shared/types';
 import { ChangeEvent, ReactNode, SyntheticEvent, useState } from 'react';
-import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
+import { useUpdateStudyset } from 'state/api/studysetsAPI';
 import {
     capitalizeFirstLetter,
     downloadObjectAsJSON,
@@ -47,7 +47,7 @@ const ManageCategoriesDialog = (props: Props) => {
         studysetUUID = '',
     } = selectedStudyset;
 
-    const [updateStudySet] = useUpdateStudysetMutation();
+    const { mutate: updateStudySet } = useUpdateStudyset();
 
     const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
     const [errorInfo, setErrorInfo] = useState<any>(null);
