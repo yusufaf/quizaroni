@@ -12,7 +12,7 @@ import { Studyset } from 'shared/types';
 import { LabelActionWarning, SelectChipsContainer } from './styles';
 import { Dispatch, SetStateAction, useMemo } from 'react';
 import useCustomMutation from 'hooks/useCustomMutation';
-import { useChangeLabelMutation } from 'state/api/studysetsAPI';
+import { useChangeLabel } from 'state/api/studysetsAPI';
 import { FlexColumn, SpacedFlexContainer } from 'styles/AppStyles';
 
 type Props = {
@@ -34,7 +34,7 @@ const AssignTabView = ({
         isSuccess: isChangeSuccess,
         isError: isChangeError,
     } = useCustomMutation({
-        mutation: useChangeLabelMutation,
+        mutation: useChangeLabel,
         successMessage: 'Successfully updated label',
         errorMessage: 'Error updated label',
     });

@@ -27,7 +27,7 @@ import {
 } from 'shared/constants';
 import { SimpleFlexContainer } from 'shared/styles/AppStyles';
 import { PreferredDateFormat, User } from 'shared/types';
-import { useUpdateUserMetadataMutation } from 'state/api/usersAPI';
+import { useUpdateUserMetadata } from 'state/api/usersAPI';
 import { ActionColumn, ActionHeader, SimpleSelect } from './ProfileStyles';
 import { downloadTypeItems } from 'views/ViewStudySet/DownloadSetModal/DownloadSetModal';
 import { useGlobalStore } from 'state/stores/global';
@@ -73,14 +73,12 @@ const CustomizationTab = ({ userData }: Props) => {
         return loadingID === LOADING_IDS.DOWNLOAD_FORMAT;
     }, [loadingID]);
 
-    const [
-        updateUserMetadata,
-        {
-            isLoading: isUpdateMetadataLoading,
-            isSuccess: isUpdateMetadataSuccess,
-            isError: isUpdateMetadataError,
-        },
-    ] = useUpdateUserMetadataMutation();
+    const {
+        mutate: updateUserMetadata,
+        isPending: isUpdateMetadataLoading,
+        isSuccess: isUpdateMetadataSuccess,
+        isError: isUpdateMetadataError,
+    } = useUpdateUserMetadata();
 
     /**
      * Update user's selected default theme

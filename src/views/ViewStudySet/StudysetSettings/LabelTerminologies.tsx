@@ -10,14 +10,14 @@ import { Studyset } from 'shared/types';
 import { ChangeEvent, useState, MouseEvent, useEffect } from 'react';
 import { CustomInputsContainer, StyledTextField } from './styles';
 import { LABEL_TERMINOLOGIES } from 'shared/constants';
-import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
+import { useUpdateStudyset } from 'state/api/studysetsAPI';
 
 type Props = {
     studyset: Studyset | undefined;
 };
 
 const LabelTerminologies = ({ studyset }: Props) => {
-    const [updateStudySet] = useUpdateStudysetMutation();
+    const { mutate: updateStudySet } = useUpdateStudyset();
     const [customTerminology, setCustomTerminology] = useState<string>('');
 
     const isCustomTerminology =

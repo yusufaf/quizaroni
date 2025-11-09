@@ -11,7 +11,7 @@ import { Create, Menu } from '@mui/icons-material';
 import { StyledNavLink } from './NavStyles';
 import DarkModeToggleButton from './DarkModeToggleButton';
 import { useNavigate } from 'react-router-dom';
-import { useCreateStudysetMutation } from 'state/api/studysetsAPI';
+import { useCreateStudyset } from 'state/api/studysetsAPI';
 import { useGlobalStore } from 'state/stores/global';
 
 const NavDrawer = (props) => {
@@ -21,7 +21,7 @@ const NavDrawer = (props) => {
 
     const [openDrawer, setOpenDrawer] = useState(false);
 
-    const [createStudyset] = useCreateStudysetMutation();
+    const { mutate: createStudyset } = useCreateStudyset();
 
     const handleCloseDrawer = () => {
         setOpenDrawer(false);

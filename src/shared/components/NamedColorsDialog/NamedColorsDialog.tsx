@@ -12,10 +12,7 @@ import {
 import CreateTabView from './CreateTabView';
 import NamedColorPicker from './NamedColorPicker';
 import { LoadingButton } from '@mui/lab';
-import {
-    useGetUserQuery,
-    useUpdateUserMetadataMutation,
-} from 'state/api/usersAPI';
+import { useGetUser, useUpdateUserMetadata } from 'state/api/usersAPI';
 import ManageTabView from './ManageTabView';
 import { ACTIONS, TABS } from './constants';
 import NamedColorsList from './NamedColorsList';
@@ -30,23 +27,16 @@ const NamedColorsDialog = (props: Props) => {
     const { namedColorsDialogProps, setNamedColorsDialogProps } =
         useGlobalStore();
 
-    const {
-        data: {
-            user: {
-                metadata: { namedColors = [] },
-                userUUID = '',
-            },
-        } = DEFAULT_USER_RESPONSE,
-    } = useGetUserQuery();
+    const { data: userData = DEFAULT_USER_RESPONSE } = useGetUser();
+    const namedColors = userData.user?.metadata?.namedColors ?? [];
+    const userUUID = userData.user?.userUUID ?? '';
 
-    const [
-        updateUserMetadata,
-        {
-            isLoading: isUpdateMetadataLoading,
-            isSuccess: isUpdateMetadataSuccess,
-            isError: isUpdateMetadataError,
-        },
-    ] = useUpdateUserMetadataMutation();
+    const { 
+        mutate: updateUserMetadata,
+        isPending: isUpdateMetadataLoading,
+        isSuccess: isUpdateMetadataSuccess,
+        isError: isUpdateMetadataError 
+    } = useUpdateUserMetadata();
 
     const [color, setColor] = useState<string>(
         namedColorsDialogProps.color ? namedColorsDialogProps.color : '#000000'
@@ -143,7 +133,10 @@ const NamedColorsDialog = (props: Props) => {
         setDeleteIndices([]);
         setSelectedAction(ACTIONS.EDIT);
         setEditIndex(index);
-        setEditColorName(namedColors[index].name);
+        const namedColor = namedColors[index];
+        if (namedColor) {
+            setEditColorName(namedColor.name);
+        }
     };
 
     const handleDeleteClick = (index: number) => {
@@ -167,6 +160,9 @@ const NamedColorsDialog = (props: Props) => {
         try {
             if (selectedAction === ACTIONS.EDIT && editIndex !== null) {
                 const selectedColor = namedColors[editIndex];
+                if (!selectedColor) {
+                    return;
+                }
                 /* Don't make network call if it's unchanged */
                 if (editColorName === selectedColor.name) {
                     return;
@@ -178,9 +174,9 @@ const NamedColorsDialog = (props: Props) => {
                     name: editColorName,
                 };
                 updateUserMetadata({
-                    uuid: userUUID,
-                    property: 'namedColors',
-                    newValue: newNamedColors,
+                    updates: {
+                        namedColors: newNamedColors,
+                    },
                 });
             }
             if (selectedAction === ACTIONS.DELETE) {
@@ -188,9 +184,9 @@ const NamedColorsDialog = (props: Props) => {
                     (_value, index) => deleteIndices.includes(index)
                 );
                 updateUserMetadata({
-                    uuid: userUUID,
-                    property: 'namedColors',
-                    newValue: newNamedColors,
+                    updates: {
+                        namedColors: newNamedColors,
+                    },
                 });
             }
         } catch (error) {

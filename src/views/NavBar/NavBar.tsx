@@ -26,7 +26,7 @@ import {
 } from './NavStyles';
 import { signOut } from 'aws-amplify/auth';
 import DarkModeToggleButton from './DarkModeToggleButton';
-import { useCreateStudysetMutation } from 'state/api/studysetsAPI';
+import { useCreateStudyset } from 'state/api/studysetsAPI';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { useGlobalStore } from 'state/stores/global';
 
@@ -48,7 +48,7 @@ const NavBar = (props: Props) => {
 
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
-    const [createStudyset] = useCreateStudysetMutation();
+    const { mutate: createStudyset } = useCreateStudyset();
 
     const activeLinkStyle = ({ isActive }) => ({
         borderBottom: isActive ? '0.2rem solid orange' : 'none',

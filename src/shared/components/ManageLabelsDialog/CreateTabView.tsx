@@ -3,7 +3,7 @@ import { ChangeEvent, useState } from 'react';
 import { Checkbox, FormControlLabel, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import useCustomMutation from 'hooks/useCustomMutation';
-import { useCreateLabelMutation } from 'state/api/studysetsAPI';
+import { useCreateLabel } from 'state/api/studysetsAPI';
 import { type ErrorInfo } from './constants';
 
 type Props = {
@@ -21,7 +21,7 @@ const CreateTabView = ({ labels, studysetUUID }: Props) => {
         isSuccess: isCreateSuccess,
         isError: isCreateError,
     } = useCustomMutation({
-        mutation: useCreateLabelMutation,
+        mutation: useCreateLabel,
         successMessage: 'Successfully created label',
         errorMessage: 'Error creating label',
         onSuccess: () => {

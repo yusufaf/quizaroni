@@ -11,10 +11,11 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
-    useCreateStudysetMutation,
-    useGetStudysetQuery,
-    useUpdateStudysetMutation,
+    useCreateStudyset,
+    useGetStudyset,
+    useUpdateStudyset,
 } from 'state/api/studysetsAPI';
+import { useGetUser } from 'state/api/usersAPI';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import CreateSetHeader from './CreateSetHeader';
 import { AddCardButton, AddCardIcon, CreateSetPage } from './CreateSetStyles';
@@ -29,7 +30,6 @@ import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
 import { Card, Studyset } from 'shared/types';
 import { SimpleFlexContainer, SpacedFlexContainer } from 'styles/AppStyles';
 import { Button, SelectChangeEvent, Tooltip, Typography } from '@mui/material';
-import { useGetUserQuery } from 'state/api/usersAPI';
 import NoCardsWarningsIcon from 'components/NoCardsWarningsIcon/NoCardsWarningsIcon';
 import { useGlobalStore } from 'state/stores/global';
 import { useCreateSetStore } from 'state/stores/createSet';
@@ -44,11 +44,8 @@ const CreateSet = (props: Props) => {
     const { advancedSectionProps, setAdvancedSectionProps } =
         useCreateSetStore();
 
-    const {
-        data: {
-            user: { username = '', userUUID = '' },
-        } = DEFAULT_USER_RESPONSE,
-    } = useGetUserQuery();
+    const { data: userData = DEFAULT_USER_RESPONSE } = useGetUser();
+    const { username = '', userUUID = '' } = userData.user ?? {};
     const { blankCardsCount, expanded } = advancedSectionProps;
 
     const {
@@ -56,16 +53,11 @@ const CreateSet = (props: Props) => {
         isLoading: isStudySetLoading,
         isSuccess: isStudySetSuccess,
         isError: isStudySetError,
-    } = useGetStudysetQuery(
-        { studysetUUID: studysetUUID ?? '' },
-        {
-            skip: !studysetUUID,
-        }
-    );
+    } = useGetStudyset({ studysetUUID: studysetUUID ?? '' });
     const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
 
-    const [createStudyset] = useCreateStudysetMutation();
-    const [updateStudyset] = useUpdateStudysetMutation();
+    const { mutate: createStudyset } = useCreateStudyset();
+    const { mutate: updateStudyset } = useUpdateStudyset();
 
     /* Local State */
     const [title, setTitle] = useState<string>('');
@@ -193,21 +185,24 @@ const CreateSet = (props: Props) => {
         };
         console.log({ updatedStudyset });
 
-        updateStudyset({ studysetUUID, updates: updatedStudyset })
-            .unwrap()
-            .then((response: any) => {
-                console.log({ response });
-                toast.success('Successfully updating study set', {
-                    position: toast.POSITION.BOTTOM_LEFT,
-                });
-                navigate(`/view/${studysetUUID}`);
-            })
-            .catch((error) => {
-                console.log({ error });
-                toast.error('Error updating study set', {
-                    position: toast.POSITION.BOTTOM_LEFT,
-                });
-            });
+        updateStudyset(
+            { studysetUUID, updates: updatedStudyset },
+            {
+                onSuccess: (response: any) => {
+                    console.log({ response });
+                    toast.success('Successfully updated study set', {
+                        position: toast.POSITION.BOTTOM_LEFT,
+                    });
+                    navigate(`/view/${studysetUUID}`);
+                },
+                onError: (error) => {
+                    console.log({ error });
+                    toast.error('Error updating study set', {
+                        position: toast.POSITION.BOTTOM_LEFT,
+                    });
+                },
+            }
+        );
     };
 
     /**

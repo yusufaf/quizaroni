@@ -10,7 +10,7 @@ import { MoreHoriz } from '@mui/icons-material';
 import { useState } from 'react';
 import SetActionsMenu from './SetActionsMenu';
 import { GhostLink } from 'styles/AppStyles';
-import { useGetUserQuery } from 'state/api/usersAPI';
+import { useGetUser } from 'state/api/usersAPI';
 import { formatDateUsingPreferred } from 'shared/utilities/general';
 
 type Props = {
@@ -29,7 +29,7 @@ const HomeHTMLView = ({ studysets }: Props) => {
                 metadata: { preferredDateFormat },
             },
         } = DEFAULT_USER_RESPONSE,
-    } = useGetUserQuery();
+    } = useGetUser();
 
     const openActionsMenu = (
         event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
