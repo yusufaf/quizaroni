@@ -6,15 +6,17 @@ import {
 } from './styles';
 import { Button, TextField } from '@mui/material';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 import {
     confirmSignUp,
     resendSignUpCode,
     confirmUserAttribute,
 } from 'aws-amplify/auth';
 import { useNavigate } from 'react-router-dom';
-import { useUpdateEmailMutation } from 'state/api/usersAPI';
+import { useUpdateEmail } from 'state/api/usersAPI';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import { useGlobalStore } from 'state/stores/global';
+import useCustomMutation from 'shared/hooks/useCustomMutation';
 
 type Props = {};
 const ConfirmationCodeDialog = (props: Props) => {
@@ -29,7 +31,19 @@ const ConfirmationCodeDialog = (props: Props) => {
     const username = '';
 
     // TODO: Toast notification?
-    const [updateEmail] = useUpdateEmailMutation();
+    const {
+        mutate: updateEmail,
+        isLoading: isUpdatingEmail,
+        isSuccess: isUpdateEmailSuccess,
+        isError: isUpdateEmailError
+    } = useCustomMutation({
+        mutation: useUpdateEmail,
+        successMessage: 'Email updated successfully',
+        errorMessage: 'Error updating email',
+        onSuccess: () => {
+            closeDialog();
+        }
+    });
 
     const [confirmationCode, setConfirmationCode] = useState<string>('');
     const isValidCode = /^\d{6}$/.test(confirmationCode);
@@ -52,9 +66,11 @@ const ConfirmationCodeDialog = (props: Props) => {
     const handleResendCode = async () => {
         try {
             const result = await resendSignUpCode({ username: '' });
-            console.log('Code resent succesfully', result);
+            console.log('Code resent successfully', result);
+            toast.success('Confirmation code resent');
         } catch (err) {
             console.error('error resending code: ', err);
+            toast.error('Error resending confirmation code');
         }
     };
 
@@ -68,6 +84,7 @@ const ConfirmationCodeDialog = (props: Props) => {
                     });
 
                     closeDialog();
+                    toast.success('Email confirmed successfully');
 
                     /* Send user to login page if successfully confirmed email */
                     navigate('/login');
@@ -79,12 +96,7 @@ const ConfirmationCodeDialog = (props: Props) => {
                     });
                     console.log({ changeEmailResult });
 
-                    updateEmail({
-                        username,
-                        newEmail,
-                    });
-
-                    closeDialog();
+                    updateEmail({ username, newEmail });
             }
         } catch (error) {
             console.error('Error confirming sign up', error);

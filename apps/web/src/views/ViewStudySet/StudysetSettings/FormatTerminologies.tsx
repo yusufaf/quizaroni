@@ -10,13 +10,13 @@ import { Studyset } from 'shared/types';
 import { ChangeEvent, useState, MouseEvent, useEffect } from 'react';
 import { FORMAT_TERMINOLOGIES } from 'shared/constants';
 import { CustomInputsContainer, StyledTextField } from './styles';
-import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
+import { useUpdateStudyset } from 'state/api/studysetsAPI';
 
 type Props = {
     studyset: Studyset | undefined;
 };
 const FormatTerminologies = ({ studyset }: Props) => {
-    const [updateStudySet] = useUpdateStudysetMutation();
+    const { mutate: updateStudySet } = useUpdateStudyset();
 
     const [customTerminology1, setCustomTerminology1] = useState<string>('');
     const [customTerminology2, setCustomTerminology2] = useState<string>('');

@@ -9,7 +9,7 @@ import {
     ProfilePaper,
     ProfileTab,
 } from './ProfileStyles';
-import { useGetUserQuery } from 'state/api/usersAPI';
+import { useGetUser } from 'state/api/usersAPI';
 import { DEFAULT_USER_RESPONSE, PAGE_TITLES } from 'shared/constants';
 import useBrowserTitle from 'hooks/useBrowserTitle';
 
@@ -22,7 +22,7 @@ type Props = {};
 
 const Profile = (props: Props) => {
     const { data: { user: userData } = DEFAULT_USER_RESPONSE } =
-        useGetUserQuery();
+        useGetUser();
 
     useBrowserTitle(PAGE_TITLES.PROFILE);
 

@@ -283,6 +283,7 @@ export const DEFAULT_USER_DATA: User = {
         homeView: 'table',
         namedColors: [],
         preferredDateFormat: DATE_FORMATS.MDY,
+        defaultDownloadFormat: DOWNLOAD_FILE_TYPES.JSON,
     },
     username: '',
     userUUID: '',

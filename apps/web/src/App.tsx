@@ -13,6 +13,8 @@ import ManageLabelsDialog from 'shared/components/ManageLabelsDialog/ManageLabel
 import ConfirmationCodeDialog from 'shared/components/ConfirmationCodeDialog/ConfirmationCodeDialog';
 import { useGlobalStore } from 'state/stores/global';
 import LoadingIndicator from 'shared/components/LoadingIndicator/LoadingIndicator';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from 'state/queryClient';
 
 const App = () => {
     const { setTheme, theme } = useTheme();
@@ -25,7 +27,7 @@ const App = () => {
     }, [prefersDarkMode]);
 
     return (
-        <>
+        <QueryClientProvider client={queryClient}>
             <NavBar />
             {loadingActions.length > 0 && <LoadingIndicator />}
             <AppRoutes />
@@ -35,7 +37,7 @@ const App = () => {
             <GlobalConfirmDialog />
             <ManageLabelsDialog />
             <ConfirmationCodeDialog />
-        </>
+        </QueryClientProvider>
     );
 };
 

@@ -3,7 +3,7 @@ import { SimpleFlexContainer, FlexColumn } from 'styles/AppStyles';
 import EditableTextField from 'components/EditableTextField/EditableTextField';
 import useCustomMutation from 'hooks/useCustomMutation';
 import { Card, Note } from 'shared/types';
-import { useDeleteNoteMutation } from 'state/api/studysetsAPI';
+import { useDeleteNote } from 'state/api/studysetsAPI';
 import { EMPTY_NOTE_PLACEHOLDER } from 'shared/constants';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useEffect, useMemo, useState } from 'react';
@@ -32,7 +32,7 @@ const NoteList = ({
         isSuccess: isDeleteNoteSuccess,
         isError: isDeleteNoteError,
     } = useCustomMutation({
-        mutation: useDeleteNoteMutation,
+        mutation: useDeleteNote,
         successMessage: 'Successfully deleted note',
         errorMessage: 'Error deleting note',
         onSuccess: () => {

@@ -1,16 +1,18 @@
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { TODO } from 'shared/types';
+import { UseMutationResult } from '@tanstack/react-query';
 
-type UseCustomMutationProps = {
-    mutation: TODO;
+type UseCustomMutationProps<TData = unknown, TError = unknown, TVariables = void, TContext = unknown> = {
+    mutation: () => UseMutationResult<TData, TError, TVariables, TContext>;
     successMessage: string;
     errorMessage: string;
     onSuccess?: () => void;
     onError?: () => void;
 };
 
-export default function useCustomMutation(props: UseCustomMutationProps) {
+export default function useCustomMutation<TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
+    props: UseCustomMutationProps<TData, TError, TVariables, TContext>
+) {
     const {
         mutation,
         successMessage = 'Success!',
@@ -19,7 +21,7 @@ export default function useCustomMutation(props: UseCustomMutationProps) {
         onError,
     } = props;
 
-    const [mutate, { isLoading, isSuccess, isError }] = mutation();
+    const { mutate, isPending, isSuccess, isError } = mutation();
 
     useEffect(() => {
         if (isSuccess) {
@@ -34,11 +36,11 @@ export default function useCustomMutation(props: UseCustomMutationProps) {
                 position: toast.POSITION.BOTTOM_LEFT,
             });
         }
-    }, [isSuccess, isError, successMessage, errorMessage]);
+    }, [isSuccess, isError, successMessage, errorMessage, onSuccess, onError]);
 
     return {
         mutate,
-        isLoading,
+        isLoading: isPending,
         isSuccess,
         isError,
     };

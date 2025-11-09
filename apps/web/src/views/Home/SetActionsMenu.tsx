@@ -17,7 +17,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { Studyset } from 'shared/types';
 import { STUDYSET_CONFIRM_DIALOGS } from 'shared/constants';
-import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
+import { useUpdateStudyset } from 'state/api/studysetsAPI';
 import { useGlobalStore } from 'state/stores/global';
 
 type Props = {
@@ -41,7 +41,7 @@ const SetActionsMenu = ({
 }: Props) => {
     const { favorited = false, studysetUUID = '' } = studyset ?? {};
 
-    const [updateStudyset] = useUpdateStudysetMutation();
+    const { mutate: updateStudyset } = useUpdateStudyset();
     const navigate = useNavigate();
 
     const { showConfirmDialog } = useGlobalStore();

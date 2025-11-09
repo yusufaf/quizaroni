@@ -19,7 +19,7 @@ import {
     ViewFlashsetCard,
 } from './styles';
 import CategoriesPopover from './CategoriesPopover';
-import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
+import { useUpdateStudyset } from 'state/api/studysetsAPI';
 
 type Props = {
     card: Card;
@@ -31,7 +31,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
     const { muiTheme } = useTheme();
     const { speak, cancel } = useSpeechSynthesis();
 
-    const [updateStudySet] = useUpdateStudysetMutation();
+    const { mutate: updateStudySet } = useUpdateStudyset();
 
     const timeoutRef = useRef(null);
 

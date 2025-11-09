@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { Studyset } from 'shared/types';
 import { GhostLink } from 'styles/AppStyles';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
-import { useGetUserQuery } from 'state/api/usersAPI';
+import { useGetUser } from 'state/api/usersAPI';
 import { formatDateUsingPreferred } from 'shared/utilities/general';
 import { useStudySetsStore } from 'state/stores/studysets';
 
@@ -49,7 +49,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                 metadata: { preferredDateFormat },
             },
         } = DEFAULT_USER_RESPONSE,
-    } = useGetUserQuery();
+    } = useGetUser();
 
     const [actionsMenuOpen, setActionsMenuOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);

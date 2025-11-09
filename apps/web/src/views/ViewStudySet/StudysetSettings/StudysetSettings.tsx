@@ -8,7 +8,7 @@ import {
     NOTES_DRAWER_INITIAL_APPEARANCE_OPTIONS,
     NOTES_DRAWER_POSITIONS_OPTIONS,
 } from 'shared/constants';
-import { useUpdateStudysetMutation } from 'state/api/studysetsAPI';
+import { useUpdateStudyset } from 'state/api/studysetsAPI';
 import SettingsToggle from 'components/SettingsToggle/SettingsToggle';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 
@@ -18,7 +18,7 @@ type Props = {
     studyset: Studyset | undefined;
 };
 const StudysetSettings = ({ open, onClose, studyset }: Props) => {
-    const [updateStudySet] = useUpdateStudysetMutation();
+    const { mutate: updateStudySet } = useUpdateStudyset();
 
     const handleSettingToggleChange = (
         _event: React.MouseEvent<HTMLElement, MouseEvent>,

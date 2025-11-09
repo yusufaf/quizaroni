@@ -14,7 +14,7 @@ import {
     ConfirmEmailTitle,
     ConfirmationField,
 } from './styles';
-import { useUpdateEmailMutation } from 'state/api/usersAPI';
+import { useUpdateEmail } from 'state/api/usersAPI';
 
 type Props = {};
 const ConfirmEmail = (props: Props) => {
@@ -26,7 +26,7 @@ const ConfirmEmail = (props: Props) => {
     const navigate = useNavigate();
     const { state } = useLocation();
 
-    const [updateEmail] = useUpdateEmailMutation();
+    const { mutate: updateEmail } = useUpdateEmail();
 
     const { actionType = 'signUp', canResend = false, newEmail = '' } = state;
 

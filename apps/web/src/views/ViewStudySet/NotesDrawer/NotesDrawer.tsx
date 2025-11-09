@@ -22,8 +22,8 @@ import useCustomMutation from 'hooks/useCustomMutation';
 import { Card, OpenCardNotes, Studyset, UUID } from 'shared/types';
 import { useMemo, useState } from 'react';
 import {
-    useCreateNoteMutation,
-    useEditNoteMutation,
+    useCreateNote,
+    useEditNote,
 } from 'state/api/studysetsAPI';
 import { NOTES_DRAWER_INITIAL_APPEARANCE } from 'shared/constants';
 import NotesList from './NotesList';
@@ -61,7 +61,7 @@ const NotesDrawer = (props: Props) => {
         isSuccess: isCreateNoteSuccess,
         isError: isCreateNoteError,
     } = useCustomMutation({
-        mutation: useCreateNoteMutation,
+        mutation: useCreateNote,
         successMessage: 'Successfully created note',
         errorMessage: 'Error creating note',
     });
@@ -72,7 +72,7 @@ const NotesDrawer = (props: Props) => {
         isSuccess: isEditNoteSuccess,
         isError: isEditNoteError,
     } = useCustomMutation({
-        mutation: useEditNoteMutation,
+        mutation: useEditNote,
         successMessage: 'Successfully edited note',
         errorMessage: 'Error editing note',
     });

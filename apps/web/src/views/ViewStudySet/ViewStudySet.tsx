@@ -9,10 +9,11 @@ import { OpenCardNotes, SortDirection, Studyset, UUID } from 'shared/types';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-    useGetAllStudysetsQuery,
-    useGetStudysetQuery,
-    useUpdateStudysetMutation,
+    useGetAllStudysets,
+    useGetStudyset,
+    useUpdateStudyset,
 } from 'state/api/studysetsAPI';
+import { useGetUser } from 'state/api/usersAPI';
 import {
     STUDYSET_CONFIRM_DIALOGS,
     DEFAULT_CATEGORIES,
@@ -44,7 +45,6 @@ import {
     ViewStudysetPage,
 } from './styles';
 import NotesDrawer from './NotesDrawer/NotesDrawer';
-import { useGetUserQuery } from 'state/api/usersAPI';
 import NoCardsWarningsIcon from 'components/NoCardsWarningsIcon/NoCardsWarningsIcon';
 import { useViewSetsStore } from 'state/stores/viewSets';
 import { useGlobalStore } from 'state/stores/global';
@@ -59,28 +59,20 @@ const ViewStudySet = (props: Props) => {
     const { setLabelsDialogProps } = useGlobalStore();
     const { selectedDialog, setSelectedDialog } = useViewSetsStore();
 
-    const {
-        data: { user: { labels = [], userUUID = '' } } = DEFAULT_USER_RESPONSE,
-    } = useGetUserQuery();
+    const { data: userData = DEFAULT_USER_RESPONSE } = useGetUser();
+    const { labels = [], userUUID = '' } = userData.user ?? {};
 
     /* Skip option prevents hook from running when userUUID is undefined */
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
-        useGetAllStudysetsQuery({});
+        useGetAllStudysets();
     const studysets = studysetsResponse?.studysets ?? [];
 
     const { data: studysetResponse, isLoading: isStudySetLoading } =
-        useGetStudysetQuery(
-            {
-                studysetUUID,
-            },
-            {
-                skip: !studysetUUID,
-            }
-        );
+        useGetStudyset({ studysetUUID });
     const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
     console.log({ selectedStudyset, studysetResponse, studysetUUID });
 
-    const [updateStudySet] = useUpdateStudysetMutation();
+    const { mutate: updateStudySet } = useUpdateStudyset();
 
     useBrowserTitle(selectedStudyset?.title ?? '');
 
