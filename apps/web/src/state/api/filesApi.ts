@@ -1,5 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
 import { BASE_API_URL, getCommonPostRequestProps } from './awsAPI';
+import { validate } from 'shared/validation';
+import {
+    BaseResponseSchema,
+    InitiateMultipartUploadResponseSchema,
+    GetMultipartSignedUploadUrlsResponseSchema,
+    FileMetadataSchema,
+} from 'shared/schemas';
 import {
     FileMetadata,
     InitiateMultipartUploadRequest,
@@ -40,7 +47,13 @@ export const useInitiateMultipartUpload = () => {
                     }),
                 }
             );
-            return response.json() as Promise<InitiateMultipartUploadResponse>;
+            const data = await response.json();
+            return validate({
+                schema: InitiateMultipartUploadResponseSchema,
+                data,
+                type: 'response',
+                context: 'InitiateMultipartUpload'
+            });
         },
     });
 };
@@ -59,7 +72,13 @@ export const useGetMultipartSignedUploadUrls = () => {
                     body: JSON.stringify({ key, uploadId, numParts }),
                 }
             );
-            return response.json() as Promise<GetMultipartSignedUploadUrlsResponse>;
+            const data = await response.json();
+            return validate({
+                schema: GetMultipartSignedUploadUrlsResponseSchema,
+                data,
+                type: 'response',
+                context: 'GetMultipartSignedUploadUrls'
+            });
         },
     });
 };
@@ -88,7 +107,13 @@ export const useCompleteMultipartUpload = () => {
                     }),
                 }
             );
-            return response.json() as Promise<FileMetadata>;
+            const data = await response.json();
+            return validate({
+                schema: FileMetadataSchema,
+                data,
+                type: 'response',
+                context: 'CompleteMultipartUpload'
+            });
         },
     });
 };
@@ -100,7 +125,13 @@ export const useDeleteFile = () => {
                 ...getCommonPostRequestProps(),
                 body: JSON.stringify({ key }),
             });
-            return response.json();
+            const data = await response.json();
+            return validate({
+                schema: BaseResponseSchema,
+                data,
+                type: 'response',
+                context: 'DeleteFile'
+            });
         },
     });
 };
@@ -112,7 +143,13 @@ export const useSendFeedback = () => {
                 ...getCommonPostRequestProps(),
                 body: JSON.stringify({ key }),
             });
-            return response.json();
+            const data = await response.json();
+            return validate({
+                schema: BaseResponseSchema,
+                data,
+                type: 'response',
+                context: 'SendFeedback'
+            });
         },
     });
 };
