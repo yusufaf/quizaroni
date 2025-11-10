@@ -135,7 +135,7 @@ export type BatchDuplicateStudysetsRequest = {
 
 export type BatchDuplicateStudysetsResponse = BaseResponse;
 
-export type Updates = { [key: string]: any };
+export type Updates = Record<string, any>;
 
 export type UpdateStudysetRequest = {
     studysetUUID: string;
