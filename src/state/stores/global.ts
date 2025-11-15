@@ -4,6 +4,7 @@ import {
     STUDYSET_CONFIRM_DIALOG_PROPS,
     STUDYSET_CONFIRM_DIALOGS,
     INITIAL_CONFIRM_DIALOG_PROPS,
+    LoadingAction,
 } from 'shared/constants';
 
 type GlobalState = {
@@ -16,7 +17,7 @@ type GlobalState = {
     userData: any;
     labelsDialogProps: LabelsDialogProps;
     confirmationCodeDialogProps: any;
-    loadingActions: string[];
+    loadingActions: LoadingAction[];
 
     // Actions
     setUserAuthState: (info: any) => void;
@@ -32,8 +33,8 @@ type GlobalState = {
     setFeedbackDialogOpen: (feedbackDialogOpen: boolean) => void;
     setLabelsDialogProps: (props: LabelsDialogProps) => void;
     setConfirmationCodeDialogProps: (props: any) => void;
-    setLoadingAdd: (actionId: string) => void;
-    setLoadingRemove: (actionId: string) => void;
+    setLoadingAdd: (actionId: LoadingAction) => void;
+    setLoadingRemove: (actionId: LoadingAction) => void;
 };
 
 export const useGlobalStore = create<GlobalState>((set, get) => ({

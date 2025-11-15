@@ -13,6 +13,7 @@ import DarkModeToggleButton from './DarkModeToggleButton';
 import { useNavigate } from 'react-router-dom';
 import { useCreateStudyset } from 'state/api/studysetsAPI';
 import { useGlobalStore } from 'state/stores/global';
+import { LOADING_ACTIONS } from 'shared/constants';
 
 const NavDrawer = (props) => {
     const navigate = useNavigate();
@@ -21,7 +22,7 @@ const NavDrawer = (props) => {
 
     const [openDrawer, setOpenDrawer] = useState(false);
 
-    const { mutate: createStudyset } = useCreateStudyset();
+    const { mutateAsync: createStudyset } = useCreateStudyset();
 
     const handleCloseDrawer = () => {
         setOpenDrawer(false);
@@ -31,16 +32,17 @@ const NavDrawer = (props) => {
         setOpenDrawer(!openDrawer);
     };
 
-    // TODO: Switch to RTK query after
     const handleCreateStudyset = async () => {
-        setLoadingAdd('CREATE_STUDYSET');
-        createStudyset({})
-            .unwrap()
-            .then((response) => {
-                const { studyset } = response;
-                navigate(`/edit/${studyset.studysetUUID}`);
-                setLoadingRemove('CREATE_STUDYSET');
-            });
+        setLoadingAdd(LOADING_ACTIONS.CREATE_STUDYSET);
+        try {
+            const response = await createStudyset();
+            const { studyset } = response;
+            navigate(`/edit/${studyset.studysetUUID}`);
+            setLoadingRemove(LOADING_ACTIONS.CREATE_STUDYSET);
+        } catch (error) {
+            console.error('Error creating studyset:', error);
+            setLoadingRemove(LOADING_ACTIONS.CREATE_STUDYSET);
+        }
     };
 
     return (

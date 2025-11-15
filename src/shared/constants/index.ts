@@ -302,3 +302,9 @@ export const HTML_TABLE_HEADERS = [
     'Label',
     'Favorited',
 ];
+
+export const LOADING_ACTIONS = {
+    CREATE_STUDYSET: 'CREATE_STUDYSET',
+} as const;
+
+export type LoadingAction = typeof LOADING_ACTIONS[keyof typeof LOADING_ACTIONS];
