@@ -1,4 +1,4 @@
-import { Star, StarBorder, VolumeUp } from '@mui/icons-material';
+import { DragIndicator, Star, StarBorder, VolumeUp } from '@mui/icons-material';
 import { IconButton, Popover, Tooltip, Typography } from '@mui/material/';
 import { BoldTypography, SimpleFlexContainer } from 'styles/AppStyles';
 import useSpeechSynthesis from 'hooks/useSpeechSynthesis';
@@ -10,6 +10,8 @@ import {
     FORMAT_TERMINOLOGIES,
     LABEL_TERMINOLOGIES,
 } from 'shared/constants';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
     CategoryChip,
     CategoryChips,
@@ -97,11 +99,28 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
         });
     };
 
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: card.cardUUID });
+
+    const sortableStyle = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
     return (
         <ViewFlashsetCard
+            ref={setNodeRef}
+            style={sortableStyle}
             elevation={6}
             key={index}
-            style={{
+            sx={{
                 backgroundColor: `${
                     card?.backgroundColor &&
                     selectedStudyset?.metadata?.backgroundColorVisible
@@ -135,6 +154,17 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                         )}
                     </CategoryChips>
                     <ViewFlashCardActions>
+                        <Tooltip title="Drag to reorder" placement="top">
+                            <IconButton
+                                {...attributes}
+                                {...listeners}
+                                sx={{
+                                    cursor: isDragging ? 'grabbing' : 'grab',
+                                }}
+                            >
+                                <DragIndicator />
+                            </IconButton>
+                        </Tooltip>
                         <Tooltip title="Play TTS" placement="top">
                             <IconButton onClick={handleAudioPlayback}>
                                 <VolumeUp />
