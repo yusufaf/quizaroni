@@ -33,6 +33,21 @@ import { Button, SelectChangeEvent, Tooltip, Typography } from '@mui/material';
 import NoCardsWarningsIcon from 'components/NoCardsWarningsIcon/NoCardsWarningsIcon';
 import { useGlobalStore } from 'state/stores/global';
 import { useCreateSetStore } from 'state/stores/createSet';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
 type Props = {};
 const CreateSet = (props: Props) => {
@@ -81,6 +96,32 @@ const CreateSet = (props: Props) => {
 
     useBrowserTitle('Edit');
 
+    /* #region Drag and Drop */
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            setCreatedSetCards((items) => {
+                const oldIndex = items.findIndex(
+                    (item) => item.cardUUID === active.id
+                );
+                const newIndex = items.findIndex(
+                    (item) => item.cardUUID === over.id
+                );
+
+                return arrayMove(items, oldIndex, newIndex);
+            });
+        }
+    };
+    // #endregion
+
     /* ==== Actions Stack ==== */
     const handleUndoAction = useCallback(() => {
         const newActionsStack = [...actionsStack];
@@ -124,47 +165,6 @@ const CreateSet = (props: Props) => {
             setTitle(title);
         }
     }, [selectedStudyset]);
-
-    // /**
-    //  * Create a new studyset
-    //  */
-    // const createNewSet = () => {
-    //     const cards = [...createdSetCards];
-
-    //     const timestamp = new Date().getTime();
-    //     const label = (enteredLabel ?? selectedLabel) || null;
-    //     const metadata = {};
-
-    //     const studySet = {
-    //         cards,
-    //         createdAt: timestamp,
-    //         description,
-    //         label,
-    //         lastViewed: timestamp,
-    //         metadata,
-    //         title,
-    //         username,
-    //         userUUID,
-    //     };
-
-    //     createStudyset(studySet)
-    //         .unwrap()
-    //         .then((response: any) => {
-    //             console.log({ response });
-    //             toast.success('Successfully created new study set', {
-    //                 position: toast.POSITION.BOTTOM_LEFT,
-    //             });
-    //             const { studySet } = response;
-    //             const { uuid } = studySet;
-    //             navigate(`/view/${uuid}`);
-    //         })
-    //         .catch((error) => {
-    //             console.log({ error });
-    //             toast.error('Error creating new study set', {
-    //                 position: toast.POSITION.BOTTOM_LEFT,
-    //             });
-    //         });
-    // };
 
     /**
      * Update studyset with new changes
@@ -325,7 +325,18 @@ const CreateSet = (props: Props) => {
                     />
                 </SpacedFlexContainer>
                 {/* TODO: Virtual Scroll */}
-                {cardInputs}
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                >
+                    <SortableContext
+                        items={createdSetCards.map((card) => card.cardUUID)}
+                        strategy={verticalListSortingStrategy}
+                    >
+                        {cardInputs}
+                    </SortableContext>
+                </DndContext>
                 <AddCardButton variant="contained" onClick={handleAddCard}>
                     <AddCardIcon />
                     Add Card

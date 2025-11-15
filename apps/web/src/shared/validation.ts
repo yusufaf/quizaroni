@@ -7,6 +7,7 @@ export interface ValidateParams<T extends z.ZodTypeAny> {
     data: unknown;
     type: ValidationType;
     context?: string;
+    reThrow?: boolean;
 }
 
 /**
@@ -16,14 +17,15 @@ export interface ValidateParams<T extends z.ZodTypeAny> {
  * @param params.data - Data to validate
  * @param params.type - Type of validation ('request' or 'response')
  * @param params.context - Optional context for error messages (e.g., 'GetAllStudysets')
+ * @param params.reThrow - Whether to re-throw validation errors
  * @returns Validated and typed data
- * @throws Error if validation fails
  */
 export function validate<T extends z.ZodTypeAny>({
     schema,
     data,
     type,
-    context
+    context,
+    reThrow = false,
 }: ValidateParams<T>): z.infer<T> {
     try {
         return schema.parse(data);
@@ -34,12 +36,18 @@ export function validate<T extends z.ZodTypeAny>({
                 `${typeLabel} validation failed${context ? ` for ${context}` : ''}:`,
                 error.issues
             );
-            throw new Error(
-                `Invalid ${type}${context ? ` for ${context}` : ''}: ${formatZodError(error)}`
-            );
+            if (reThrow) {
+                throw new Error(
+                    `Invalid ${type}${context ? ` for ${context}` : ''}: ${formatZodError(error)}`
+                );
+            }
         }
-        throw error;
+        if (reThrow) {
+            throw error;
+        }
     }
+    // Fallback return in case of error
+    return data as z.infer<T>;
 }
 
 /**

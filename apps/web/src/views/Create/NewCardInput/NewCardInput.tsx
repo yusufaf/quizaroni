@@ -1,4 +1,4 @@
-import { Add } from '@mui/icons-material';
+import { Add, DragIndicator } from '@mui/icons-material';
 import FileUpload from 'components/FileUpload/FileUpload';
 import type { Card, TODO } from 'shared/types';
 import { Dispatch, SetStateAction, useState } from 'react';
@@ -17,6 +17,10 @@ import useFileUpload from 'hooks/useFileUpload';
 import NewCardHeader from './NewCardHeader';
 import { addCard } from 'shared/utilities/createUtils';
 import { useParams } from 'react-router-dom';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { IconButton, Tooltip } from '@mui/material';
+import { SimpleFlexContainer } from 'shared/styles/AppStyles';
 
 type Props = {
     actionsStack: TODO[];
@@ -65,8 +69,25 @@ const NewCardInput = ({
     const displayBackgroundColor = applyBackgroundColor && localBackgroundColor;
     const displayTextColor = applyTextColor && localTextColor;
 
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({ id: cardUUID });
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
     return (
         <NewCard
+            ref={setNodeRef}
+            style={style}
             raised
             key={cardUUID}
             sx={{
@@ -75,23 +96,43 @@ const NewCardInput = ({
                     : undefined,
             }}
         >
-            <NewCardHeader
-                actionsStack={actionsStack}
-                setActionsStack={setActionsStack}
-                applyBackgroundColor={applyBackgroundColor}
-                applyTextColor={applyTextColor}
-                createdSetCards={createdSetCards}
-                index={index}
-                localBackgroundColor={localBackgroundColor}
-                localTextColor={localTextColor}
-                onColorChange={onColorChange}
-                setApplyBackgroundColor={setApplyBackgroundColor}
-                setApplyTextColor={setApplyTextColor}
-                setLocalBackgroundColor={setLocalBackgroundColor}
-                setLocalTextColor={setLocalTextColor}
-                setStateCallback={setStateCallback}
-                updateCardValue={updateCardValue}
-            />
+            <SimpleFlexContainer
+                style={{
+                    gap: '0.5rem',
+                }}
+            >
+                <Tooltip title="Drag to reorder" placement="left">
+                    <IconButton
+                        {...attributes}
+                        {...listeners}
+                        sx={{
+                            cursor: isDragging ? 'grabbing' : 'grab',
+                            padding: '0.25rem',
+                        }}
+                    >
+                        <DragIndicator />
+                    </IconButton>
+                </Tooltip>
+                <div style={{ flex: 1 }}>
+                    <NewCardHeader
+                        actionsStack={actionsStack}
+                        setActionsStack={setActionsStack}
+                        applyBackgroundColor={applyBackgroundColor}
+                        applyTextColor={applyTextColor}
+                        createdSetCards={createdSetCards}
+                        index={index}
+                        localBackgroundColor={localBackgroundColor}
+                        localTextColor={localTextColor}
+                        onColorChange={onColorChange}
+                        setApplyBackgroundColor={setApplyBackgroundColor}
+                        setApplyTextColor={setApplyTextColor}
+                        setLocalBackgroundColor={setLocalBackgroundColor}
+                        setLocalTextColor={setLocalTextColor}
+                        setStateCallback={setStateCallback}
+                        updateCardValue={updateCardValue}
+                    />
+                </div>
+            </SimpleFlexContainer>
             <NewCardInputs>
                 <NewCardRow>
                     <NewCardTerm>

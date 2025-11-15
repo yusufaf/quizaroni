@@ -12,7 +12,7 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfileDropdown from 'views/Profile/ProfileDropdown';
 import { useTheme } from 'theme/useTheme';
-import { ROUTES } from 'shared/constants';
+import { ROUTES, LOADING_ACTIONS } from 'shared/constants';
 import NavDrawer from './NavDrawer';
 import {
     AuthenticationButton,
@@ -48,7 +48,7 @@ const NavBar = (props: Props) => {
 
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
-    const { mutate: createStudyset } = useCreateStudyset();
+    const { mutateAsync: createStudyset } = useCreateStudyset();
 
     const activeLinkStyle = ({ isActive }) => ({
         borderBottom: isActive ? '0.2rem solid orange' : 'none',
@@ -75,14 +75,16 @@ const NavBar = (props: Props) => {
     };
 
     const handleCreateStudyset = async () => {
-        setLoadingAdd('CREATE_STUDYSET');
-        createStudyset({})
-            .unwrap()
-            .then((response) => {
-                const { studyset } = response;
-                navigate(`/edit/${studyset.studysetUUID}`);
-                setLoadingRemove('CREATE_STUDYSET');
-            });
+        setLoadingAdd(LOADING_ACTIONS.CREATE_STUDYSET);
+        try {
+            const response = await createStudyset();
+            const { studyset } = response;
+            navigate(`/edit/${studyset.studysetUUID}`);
+            setLoadingRemove(LOADING_ACTIONS.CREATE_STUDYSET);
+        } catch (error) {
+            console.error('Error creating studyset:', error);
+            setLoadingRemove(LOADING_ACTIONS.CREATE_STUDYSET);
+        }
     };
 
     return (

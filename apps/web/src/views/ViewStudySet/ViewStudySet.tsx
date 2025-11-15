@@ -22,6 +22,21 @@ import {
     VIEW_SET_DIALOGS,
     DEFAULT_USER_RESPONSE,
 } from 'shared/constants';
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import DownloadSetModal from './DownloadSetModal/DownloadSetModal';
 import ManageCategoriesDialog from './ManageCategoriesDialog/ManageCategoriesDialog';
 import NotificationsDialog from './NotificationsDialog/NotificationsDialog';
@@ -130,6 +145,38 @@ const ViewStudySet = (props: Props) => {
         selectedTab,
         sortedViewFlashCards,
     });
+
+    /* #region Drag and Drop */
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (over && active.id !== over.id) {
+            const cards = selectedStudyset.cards ?? [];
+            const oldIndex = cards.findIndex(
+                (item) => item.cardUUID === active.id
+            );
+            const newIndex = cards.findIndex(
+                (item) => item.cardUUID === over.id
+            );
+
+            const reorderedCards = arrayMove(cards, oldIndex, newIndex);
+
+            updateStudySet({
+                studysetUUID,
+                updates: {
+                    cards: reorderedCards,
+                },
+            });
+        }
+    };
+    // #endregion
 
     const showManageLabelsDialog = () => {
         setLabelsDialogProps({
@@ -294,17 +341,30 @@ const ViewStudySet = (props: Props) => {
                 ) : filteredViewFlashCards.length === 0 ? (
                     <NoCardsMessage>No cards in this study set.</NoCardsMessage>
                 ) : (
-                    filteredViewFlashCards.map((card, index) => {
-                        const { cardUUID } = card;
-                        return (
-                            <ViewStudySetCard
-                                key={cardUUID}
-                                card={card}
-                                index={index}
-                                selectedStudyset={selectedStudyset}
-                            />
-                        );
-                    })
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <SortableContext
+                            items={filteredViewFlashCards.map(
+                                (card) => card.cardUUID
+                            )}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            {filteredViewFlashCards.map((card, index) => {
+                                const { cardUUID } = card;
+                                return (
+                                    <ViewStudySetCard
+                                        key={cardUUID}
+                                        card={card}
+                                        index={index}
+                                        selectedStudyset={selectedStudyset}
+                                    />
+                                );
+                            })}
+                        </SortableContext>
+                    </DndContext>
                 )}
                 <UpdateCardsButton
                     variant="contained"
