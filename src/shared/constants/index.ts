@@ -296,7 +296,7 @@ export const DEFAULT_USER_RESPONSE: { user: User } = {
 export const HTML_TABLE_HEADERS = [
     'Title',
     'Description',
-    'Date Created',
+    'Created',
     'Last Viewed',
     '# of Cards',
     'Label',
@@ -307,4 +307,5 @@ export const LOADING_ACTIONS = {
     CREATE_STUDYSET: 'CREATE_STUDYSET',
 } as const;
 
-export type LoadingAction = typeof LOADING_ACTIONS[keyof typeof LOADING_ACTIONS];
+export type LoadingAction =
+    (typeof LOADING_ACTIONS)[keyof typeof LOADING_ACTIONS];

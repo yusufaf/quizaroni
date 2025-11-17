@@ -7,15 +7,20 @@ import styled from '@emotion/styled';
 import { Box, Card, Chip, Paper, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
-export const HomePage = styled(BasePage)({
+export const HomePage = styled(BasePage)(({ theme }) => ({
     marginTop: '0',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     padding: '2rem 20rem',
-});
+    background: `linear-gradient(to bottom, ${theme.palette.background.default}, ${theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5'})`,
+}));
 
-export const HomePaper = styled(Paper)({});
+export const HomePaper = styled(Paper)(({ theme }) => ({
+    boxShadow: theme.palette.mode === 'dark'
+        ? '0 8px 32px rgba(0, 0, 0, 0.4)'
+        : '0 8px 32px rgba(0, 0, 0, 0.08)',
+}));
 
 export const HomeContainer = styled(Box)({
     width: '70rem',
@@ -23,7 +28,10 @@ export const HomeContainer = styled(Box)({
     borderRadius: '0.75rem',
 });
 
-export const HomeSetsHeading = styled(BoldTypography)({});
+export const HomeSetsHeading = styled(BoldTypography)({
+    letterSpacing: '0.5px',
+    fontWeight: 700,
+});
 
 export const HomeSetsContainer = styled('div')({
     display: 'flex',
@@ -52,55 +60,75 @@ export const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
     },
 }));
 
-// TODO:
 export const HomeSetGrid = styled('div')({
     display: 'grid',
-    gridTemplateRows: 'repeat(auto-fit, minmax(15rem, auto))', // modified
-    gridTemplateColumns: 'repeat(3, auto)',
-    height: 'calc(100vh - 20rem)', // add a fixed height to prevent movement of the Pagination component
+    gridTemplateRows: 'repeat(2, 18rem)',
+    gridTemplateColumns: 'repeat(3, 20rem)',
+    gap: '1.5rem',
+    height: 'calc(100vh - 20rem)',
+    justifyContent: 'center',
 });
 
 /* Grid View - Card Styling */
 export const HomeSetCard = styled(Card)(({ theme }) => ({
-    maxHeight: '15rem',
+    height: '18rem',
     width: '20rem',
-    padding: '1rem',
-    transition: '0.2s ease',
+    padding: '1.25rem',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     cursor: 'pointer',
+    border: `1px solid transparent`,
+    boxShadow: theme.palette.mode === 'dark'
+        ? '0 2px 8px rgba(0, 0, 0, 0.3)'
+        : '0 2px 8px rgba(0, 0, 0, 0.06)',
     '&&': {
         borderRadius: '0.75rem',
     },
-    /* TODO */
     '&:hover': {
-        // transition: "background 0.2s ease",
         background: theme.palette.action.hover,
+        boxShadow: theme.palette.mode === 'dark'
+            ? '0 8px 24px rgba(0, 0, 0, 0.5)'
+            : '0 8px 24px rgba(0, 0, 0, 0.12)',
+        transform: 'translateY(-4px)',
+        borderColor: theme.palette.primary.main,
     },
 }));
 
 export const CardContent = styled('div')({
     display: 'flex',
     flexDirection: 'column',
+    height: '100%',
 });
 
 export const CardTitle = styled(Typography)({
-    fontWeight: 'bold',
+    fontWeight: 700,
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
 });
 
-export const CardDescription = styled(Typography)({
+export const CardDescription = styled(Typography)(({ theme }) => ({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-});
+    color: theme.palette.text.secondary,
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    minHeight: '2.5rem',
+    marginBottom: 'auto',
+}));
 
 export const CardInfo = styled('div')({
-    marginTop: '1rem',
+    marginTop: '1.5rem',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
 });
 
-export const TermsLabel = styled(Typography)({
-    fontWeight: 'bold',
-});
+export const TermsLabel = styled(Typography)(({ theme }) => ({
+    fontWeight: 600,
+    color: theme.palette.text.secondary,
+    fontSize: '0.875rem',
+}));
 
 export const SpacedContainer = styled(SimpleFlexContainer)({
     justifyContent: 'space-between',
