@@ -46,21 +46,27 @@ export const formatDateUsingPreferred = (
     format: PreferredDateFormat
 ): string => {
     const dateValue = new Date(value);
-    let formattedValue: string = value;
-
+    let formattedDate: string = value;
     switch (format) {
         case DATE_FORMATS.ISO_8601:
-            formattedValue = dateValue.toISOString().split('T')[0] ?? value;
+            formattedDate = dateValue.toISOString().split('T')[0] ?? value;
             break;
         case DATE_FORMATS.MDY:
-            formattedValue = dateValue.toLocaleDateString('en-US');
+            formattedDate = dateValue.toLocaleDateString('en-US');
             break;
         case DATE_FORMATS.DMY:
-            formattedValue = dateValue.toLocaleDateString('en-GB');
+            formattedDate = dateValue.toLocaleDateString('en-GB');
             break;
         default:
             console.error(`Unsupported format: ${format}`);
     }
 
-    return `${formattedValue} ${dateValue.toLocaleTimeString()}`;
+    const formattedTime = dateValue.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+    });
+
+    return `${formattedDate} ${formattedTime}`;
 };
