@@ -201,7 +201,7 @@ const Home = (props: Props) => {
         },
         {
             field: 'createdAt',
-            headerName: 'Date Created',
+            headerName: 'Created',
             width: 150,
             valueFormatter: (value) => {
                 return formatDateUsingPreferred(value, preferredDateFormat);
@@ -437,7 +437,10 @@ const Home = (props: Props) => {
                             </>
                         )}
                         {selectedView === HOME_LAYOUTS.GRID && (
-                            <HomeGridView studysets={searchedStudysets} />
+                            <HomeGridView
+                                studysets={searchedStudysets}
+                                isLoading={isGetAllStudysetsLoading}
+                            />
                         )}
                         {selectedView === HOME_LAYOUTS.HTML && (
                             <HomeHTMLView studysets={searchedStudysets} />

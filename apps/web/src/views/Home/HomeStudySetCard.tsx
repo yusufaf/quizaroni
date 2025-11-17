@@ -1,6 +1,7 @@
-import { MoreHoriz } from '@mui/icons-material/';
-import { IconButton, Typography } from '@mui/material/';
+import { Favorite, FavoriteBorder, MoreHoriz } from '@mui/icons-material/';
+import { Chip, IconButton, Tooltip, Typography } from '@mui/material/';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useTheme } from 'theme/useTheme';
 import {
     CardBottom,
@@ -21,6 +22,7 @@ import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import { useGetUser } from 'state/api/usersAPI';
 import { formatDateUsingPreferred } from 'shared/utilities/general';
 import { useStudySetsStore } from 'state/stores/studysets';
+import { useUpdateStudyset } from 'state/api/studysetsAPI';
 
 type Props = {
     studyset: Studyset;
@@ -35,12 +37,14 @@ const HomeStudySetCard = ({ studyset }: Props) => {
         lastViewed,
         studysetUUID,
         username,
+        favorited,
     } = studyset;
 
     const navigate = useNavigate();
     const { muiTheme } = useTheme();
 
     const { setSelectedStudySet } = useStudySetsStore();
+    const { mutate: updateStudyset } = useUpdateStudyset();
 
     const {
         data: {
@@ -71,15 +75,53 @@ const HomeStudySetCard = ({ studyset }: Props) => {
         setActionsMenuOpen(false);
     };
 
+    const handleFavoriteClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        updateStudyset({
+            studysetUUID,
+            updates: {
+                favorited: !favorited,
+            },
+        });
+    };
+
     return (
         <>
             <HomeSetCard raised onClick={onCardClick}>
                 <CardContent>
-                    <CardTitle title={title} variant="h6">
-                        <GhostLink to={`/view/${studysetUUID}`}>
-                            {title}
-                        </GhostLink>
-                    </CardTitle>
+                    <SpacedContainer>
+                        <CardTitle title={title} variant="h6">
+                            <GhostLink to={`/view/${studysetUUID}`}>
+                                {title || (
+                                    <span style={{ opacity: 0.5 }}>
+                                        Untitled Set
+                                    </span>
+                                )}
+                            </GhostLink>
+                        </CardTitle>
+                        <Tooltip title={favorited ? 'Unfavorite' : 'Favorite'}>
+                            <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.9 }}
+                            >
+                                <IconButton
+                                    onClick={handleFavoriteClick}
+                                    size="small"
+                                    sx={{
+                                        color: favorited
+                                            ? muiTheme.palette.primary.main
+                                            : undefined,
+                                    }}
+                                >
+                                    {favorited ? (
+                                        <Favorite />
+                                    ) : (
+                                        <FavoriteBorder />
+                                    )}
+                                </IconButton>
+                            </motion.div>
+                        </Tooltip>
+                    </SpacedContainer>
                     <Typography variant="subtitle1">
                         {`Created by ${username}`}
                     </Typography>
@@ -87,9 +129,15 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                         {description}
                     </CardDescription>
                     <CardInfo>
-                        <TermsLabel>{cards.length} Cards</TermsLabel>
+                        <Chip
+                            label={`${cards.length} Card${cards.length !== 1 ? 's' : ''}`}
+                            size="small"
+                            color="primary"
+                            variant="outlined"
+                            sx={{ fontWeight: 600 }}
+                        />
                         <SpacedContainer>
-                            <Typography>Date Created</Typography>
+                            <Typography>Created</Typography>
                             <Typography>
                                 {formatDateUsingPreferred(
                                     createdAt,

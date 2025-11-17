@@ -141,7 +141,7 @@ const HomeToolbar = ({
             {!isTableView && (
                 <SimpleFlexContainer style={{ gap: '1rem' }}>
                     <TextField
-                        label="Search"
+                        placeholder="Search study sets..."
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
@@ -149,19 +149,28 @@ const HomeToolbar = ({
                                 </InputAdornment>
                             ),
                             endAdornment: searchText ? (
-                                <InputAdornment position="start">
-                                    <IconButton onClick={clearSearchText}>
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        onClick={clearSearchText}
+                                        size="small"
+                                    >
                                         <CloseRounded />
                                     </IconButton>
                                 </InputAdornment>
-                            ) : (
-                                // Spacing div to prevent moving when no search text
-                                <div style={{ width: '3rem' }} />
-                            ),
+                            ) : null,
                         }}
-                        variant="standard"
+                        variant="outlined"
                         onChange={onSearchChange}
                         value={searchText}
+                        size="small"
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: '1.5rem',
+                                paddingRight: searchText
+                                    ? '0.25rem'
+                                    : '0.875rem',
+                            },
+                        }}
                     />
                     {/* TODO: Display a modal on mobile? */}
 
@@ -177,14 +186,16 @@ const HomeToolbar = ({
                                 <ArrowDownward />
                             )}
                         </IconButton>
-                        <FormControl sx={{ m: 1, minWidth: 120 }}>
-                            <InputLabel id="sort-label">Sort</InputLabel>
+                        <FormControl sx={{ minWidth: 140 }} size="small">
+                            <InputLabel id="sort-label">Sort by</InputLabel>
                             <Select
                                 labelId="sort-label"
-                                label="Sort"
+                                label="Sort by"
                                 onChange={onSortChange}
-                                autoWidth
                                 value={selectedSort}
+                                sx={{
+                                    borderRadius: '0.5rem',
+                                }}
                             >
                                 <MenuItem value="">
                                     <em>None</em>
@@ -193,9 +204,7 @@ const HomeToolbar = ({
                                 <MenuItem value={'lastViewed'}>
                                     Last Viewed
                                 </MenuItem>
-                                <MenuItem value={'createdAt'}>
-                                    Date Created
-                                </MenuItem>
+                                <MenuItem value={'createdAt'}>Created</MenuItem>
                                 <MenuItem value={'numCards'}>
                                     # of Cards
                                 </MenuItem>
