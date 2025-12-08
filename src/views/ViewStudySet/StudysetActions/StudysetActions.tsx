@@ -137,6 +137,7 @@ const StudysetActions = (props: Props) => {
                     tooltipProps={{
                         title: 'Control Menu',
                     }}
+                    ref={controlAnchorRef}
                 />
                 <CustomIconButton
                     iconButtonProps={{

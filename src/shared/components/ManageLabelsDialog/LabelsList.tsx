@@ -70,6 +70,7 @@ const LabelsList = (props: Props) => {
             const isAssignLabel = assignLabel === label;
             const createLabelSelected = isCreateTab && isCurrentLabel;
             const assignLabelSelected = isAssignTab && isAssignLabel;
+            const isLastItem = index === labels.length - 1;
 
             let labelListItemStyling = {};
             let chipLabel = createLabelSelected
@@ -86,7 +87,7 @@ const LabelsList = (props: Props) => {
             return (
                 <ListItem
                     disablePadding
-                    divider
+                    divider={!isLastItem}
                     key={index}
                     secondaryAction={
                         isManageTab && (

@@ -36,10 +36,11 @@ const CategoriesList = (props: Props) => {
         return categories?.map((value, index) => {
             const isEditSelected = editIndex === index;
             const isDeleteSelected = deleteIndices.includes(index);
+            const isLastItem = index === categories.length - 1;
 
             return (
                 <ListItem
-                    divider
+                    divider={!isLastItem}
                     key={index}
                     secondaryAction={
                         isManageTab && (
