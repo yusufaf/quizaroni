@@ -46,7 +46,7 @@ export const MainLabelDialogContent = styled(FlexColumn)({
 export const LabelActionWarning = styled(Typography)({});
 
 export const LabelsListContainer = styled('div')(({ theme }) => ({
-    maxHeight: '20rem',
+    maxHeight: '18rem',
     overflowY: 'auto',
     '&::-webkit-scrollbar': {
         width: '0.5rem',

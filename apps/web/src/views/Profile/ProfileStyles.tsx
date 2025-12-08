@@ -15,8 +15,11 @@ import { BasePage, FlexColumn } from 'styles/AppStyles';
 export const ProfilePage = styled(BasePage)({
     display: 'grid',
     gridTemplateColumns: 'auto 2fr',
+    gridTemplateRows: '1fr',
     padding: '0 2rem 2rem 2rem',
     gap: '4rem',
+    minHeight: 'calc(100vh - 10rem)',
+    marginBottom: '2rem',
 });
 
 export const ProfileContainer = styled(FlexColumn)({
@@ -26,7 +29,9 @@ export const ProfileContainer = styled(FlexColumn)({
     padding: '1.25rem',
 });
 
-export const ProfilePaper = styled(Paper)({});
+export const ProfilePaper = styled(Paper)({
+    height: '100%',
+});
 
 export const InfoChangeContainer = styled('div')({
     display: 'flex',
@@ -44,6 +49,7 @@ export const AccountViewContainer = styled(FlexColumn)({
     alignItems: 'flex-start',
     gap: '1rem',
     width: '100%',
+    height: '100%',
 });
 
 export const ActionSection = styled(FlexColumn)({

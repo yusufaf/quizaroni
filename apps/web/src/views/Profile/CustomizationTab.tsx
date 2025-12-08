@@ -28,7 +28,7 @@ import {
 import { SimpleFlexContainer } from 'shared/styles/AppStyles';
 import { PreferredDateFormat, User } from 'shared/types';
 import { useUpdateUserMetadata } from 'state/api/usersAPI';
-import { ActionColumn, ActionHeader, SimpleSelect } from './ProfileStyles';
+import { ActionColumn, ActionHeader, SimpleSelect, AccountViewContainer } from './ProfileStyles';
 import { downloadTypeItems } from 'views/ViewStudySet/DownloadSetModal/DownloadSetModal';
 import { useGlobalStore } from 'state/stores/global';
 
@@ -152,7 +152,7 @@ const CustomizationTab = ({ userData }: Props) => {
     // #endregion
 
     return (
-        <>
+        <AccountViewContainer>
             <ActionColumn>
                 <ActionHeader>
                     <DarkMode />
@@ -257,7 +257,7 @@ const CustomizationTab = ({ userData }: Props) => {
                     {downloadFormatLoading && <CircularProgress size={24} />}{' '}
                 </SimpleFlexContainer>
             </ActionColumn>
-        </>
+        </AccountViewContainer>
     );
 };
 

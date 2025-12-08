@@ -71,7 +71,7 @@ const ControlMenu = ({
             {menuItems.map(
                 ({ condition, updateProperty, label, description }) => {
                     return (
-                        <MenuItem>
+                        <MenuItem key={updateProperty}>
                             <FormControlLabel
                                 control={
                                     <Switch
