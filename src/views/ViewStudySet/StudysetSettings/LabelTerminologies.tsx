@@ -1,16 +1,18 @@
 import {
-    Button,
     FormControl,
     FormControlLabel,
     FormLabel,
     Radio,
     RadioGroup,
+    Typography,
+    Chip,
 } from '@mui/material';
 import { Studyset } from 'shared/types';
-import { ChangeEvent, useState, MouseEvent, useEffect } from 'react';
-import { CustomInputsContainer, StyledTextField } from './styles';
+import { ChangeEvent, useState, useEffect, useCallback, useRef } from 'react';
+import { CustomInputsContainer, CustomInputRow, StyledTextField } from './styles';
 import { LABEL_TERMINOLOGIES } from 'shared/constants';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
+import { Check } from '@mui/icons-material';
 
 type Props = {
     studyset: Studyset | undefined;
@@ -19,9 +21,17 @@ type Props = {
 const LabelTerminologies = ({ studyset }: Props) => {
     const { mutate: updateStudySet } = useUpdateStudyset();
     const [customTerminology, setCustomTerminology] = useState<string>('');
+    const [isSaved, setIsSaved] = useState<boolean>(true);
+    const saveTimeoutRef = useRef<NodeJS.Timeout>();
 
     const isCustomTerminology =
         studyset?.metadata?.labelTerminology === LABEL_TERMINOLOGIES.CUSTOM;
+
+    useEffect(() => {
+        if (isCustomTerminology) {
+            setCustomTerminology(studyset?.metadata?.customLabelTerminology || '');
+        }
+    }, [studyset, isCustomTerminology]);
 
     const onTerminologyChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { studysetUUID = '' } = studyset ?? {};
@@ -36,19 +46,47 @@ const LabelTerminologies = ({ studyset }: Props) => {
         });
     };
 
-    const handleSaveCustomTerminology = (e: MouseEvent<HTMLButtonElement>) => {
-        e.stopPropagation();
+    const saveCustomTerminology = useCallback(
+        (value: string) => {
+            const { studysetUUID = '' } = studyset ?? {};
 
-        const { studysetUUID = '' } = studyset ?? {};
-        const newValue = customTerminology;
+            updateStudySet({
+                studysetUUID,
+                updates: {
+                    customLabelTerminology: value,
+                },
+                isMetadataUpdate: true,
+            });
+            setIsSaved(true);
 
-        updateStudySet({
-            studysetUUID,
-            updates: {
-                customLabelTerminology: newValue,
-            },
-            isMetadataUpdate: true,
-        });
+            // Hide saved indicator after 2 seconds
+            setTimeout(() => {
+                setIsSaved(false);
+            }, 2000);
+        },
+        [studyset, updateStudySet]
+    );
+
+    const debouncedSave = useCallback(
+        (value: string) => {
+            if (saveTimeoutRef.current) {
+                clearTimeout(saveTimeoutRef.current);
+            }
+
+            setIsSaved(false);
+            saveTimeoutRef.current = setTimeout(() => {
+                if (value) {
+                    saveCustomTerminology(value);
+                }
+            }, 1000);
+        },
+        [saveCustomTerminology]
+    );
+
+    const onCustomTerminologyChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const newValue = e.target.value;
+        setCustomTerminology(newValue);
+        debouncedSave(newValue);
     };
 
     return (
@@ -69,38 +107,43 @@ const LabelTerminologies = ({ studyset }: Props) => {
                     }
                 >
                     {Object.values(LABEL_TERMINOLOGIES).map((value) => (
-                        <FormControlLabel
-                            key={value}
-                            value={value}
-                            control={<Radio />}
-                            label={
-                                <>
-                                    {value}
-                                    {value === LABEL_TERMINOLOGIES.CUSTOM && (
-                                        <CustomInputsContainer>
+                        <div key={value}>
+                            <FormControlLabel
+                                value={value}
+                                control={<Radio />}
+                                label={value}
+                            />
+                            {value === LABEL_TERMINOLOGIES.CUSTOM &&
+                                isCustomTerminology && (
+                                    <CustomInputsContainer>
+                                        <Typography
+                                            variant="body2"
+                                            color="text.secondary"
+                                            sx={{ marginBottom: '0.25rem' }}
+                                        >
+                                            Define your custom label terminology:
+                                        </Typography>
+                                        <CustomInputRow>
                                             <StyledTextField
-                                                label="Terminology"
-                                                onChange={(e) =>
-                                                    setCustomTerminology(
-                                                        e.target.value
-                                                    )
-                                                }
+                                                placeholder="e.g., Card, Item, Entry"
+                                                label="Custom terminology"
+                                                size="small"
+                                                onChange={onCustomTerminologyChange}
                                                 value={customTerminology}
                                             />
-                                            <Button
-                                                variant="contained"
-                                                disabled={!customTerminology}
-                                                onClick={
-                                                    handleSaveCustomTerminology
-                                                }
-                                            >
-                                                Save
-                                            </Button>
-                                        </CustomInputsContainer>
-                                    )}
-                                </>
-                            }
-                        />
+                                        </CustomInputRow>
+                                        {customTerminology && isSaved && (
+                                            <Chip
+                                                icon={<Check />}
+                                                label="Saved"
+                                                color="success"
+                                                size="small"
+                                                sx={{ width: 'fit-content' }}
+                                            />
+                                        )}
+                                    </CustomInputsContainer>
+                                )}
+                        </div>
                     ))}
                 </RadioGroup>
             </FormControl>
