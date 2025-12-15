@@ -309,3 +309,52 @@ export const LOADING_ACTIONS = {
 
 export type LoadingAction =
     (typeof LOADING_ACTIONS)[keyof typeof LOADING_ACTIONS];
+
+export const PRINT_LAYOUTS = {
+    FLASHCARD: 'flashcard',
+    LIST: 'list',
+    GRID: 'grid',
+} as const;
+
+export const PRINT_LAYOUT_OPTIONS = [
+    {
+        value: PRINT_LAYOUTS.FLASHCARD,
+        ariaLabel: 'flashcard layout',
+        label: 'Flashcard',
+    },
+    {
+        value: PRINT_LAYOUTS.LIST,
+        ariaLabel: 'list layout',
+        label: 'List',
+    },
+    {
+        value: PRINT_LAYOUTS.GRID,
+        ariaLabel: 'grid layout',
+        label: 'Grid',
+    },
+];
+
+export const PRINT_INCLUDE_NOTES_OPTIONS = [
+    { value: false, ariaLabel: 'exclude notes', label: 'Exclude' },
+    { value: true, ariaLabel: 'include notes', label: 'Include' },
+];
+
+export const PRINT_INCLUDE_FILES_OPTIONS = [
+    { value: false, ariaLabel: 'exclude files', label: 'Exclude' },
+    { value: true, ariaLabel: 'include files', label: 'Include' },
+];
+
+export const PRINT_INCLUDE_CATEGORIES_OPTIONS = [
+    { value: false, ariaLabel: 'exclude categories', label: 'Exclude' },
+    { value: true, ariaLabel: 'include categories', label: 'Include' },
+];
+
+export const PRINT_SHOW_COLORS_OPTIONS = [
+    { value: false, ariaLabel: 'hide colors', label: 'Hide' },
+    { value: true, ariaLabel: 'show colors', label: 'Show' },
+];
+
+export const PRINT_IMPORTANT_ONLY_OPTIONS = [
+    { value: false, ariaLabel: 'all cards', label: 'All Cards' },
+    { value: true, ariaLabel: 'important only', label: 'Important Only' },
+];

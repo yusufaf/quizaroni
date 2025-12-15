@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
 import { BASE_API_URL, getCommonPostRequestProps } from './awsAPI';
 import { validate } from 'shared/validation';
 import { BaseResponseSchema, GetUserResponseSchema } from 'shared/schemas';
@@ -21,7 +21,7 @@ import {
     router.post("/api/users/updateEmail", updateUserEmail);
 */
 
-export const useGetUser = () => {
+export const useGetUser = (options?: Omit<UseQueryOptions<GetUserResponse>, 'queryKey' | 'queryFn'>) => {
     return useQuery({
         queryKey: ['user'],
         queryFn: async () => {
@@ -36,6 +36,7 @@ export const useGetUser = () => {
                 context: 'GetUser'
             });
         },
+        ...options,
     });
 };
 

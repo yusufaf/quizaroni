@@ -36,11 +36,10 @@ const ManageLabelsDialog = () => {
     const { studysetUUID = '' } = labelsDialogProps || {};
 
     /* ==== RTK Query ==== */
-    const {
-        data: { user: { labels = [], userUUID = '' } } = DEFAULT_USER_RESPONSE,
-    } = useGetUser();
+    const { data = DEFAULT_USER_RESPONSE } = useGetUser({ enabled: labelsDialogProps.open });
+    const { labels = [], userUUID = '' } = data?.user ?? DEFAULT_USER_RESPONSE.user;
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
-        useGetAllStudysets();
+        useGetAllStudysets({ enabled: labelsDialogProps.open });
     const studysets = studysetsResponse?.studysets ?? [];
 
     const {
@@ -50,6 +49,7 @@ const ManageLabelsDialog = () => {
         isError: isStudySetError,
     } = useGetStudyset(
         { studysetUUID: labelsDialogProps.studysetUUID ?? '' },
+        { enabled: labelsDialogProps.open }
     );
     const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
 
