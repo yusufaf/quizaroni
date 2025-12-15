@@ -45,6 +45,15 @@ export type Note = {
     noteUUID: UUID;
 };
 
+export type PrintConfig = {
+    layout: 'flashcard' | 'list' | 'grid';
+    includeNotes: boolean;
+    includeFiles: boolean;
+    includeCategories: boolean;
+    showColors: boolean;
+    importantOnly: boolean;
+};
+
 export type StudysetMetadata = {
     backgroundColorVisible: boolean;
     contentOnly?: boolean;
@@ -54,6 +63,7 @@ export type StudysetMetadata = {
     labelTerminology: string;
     notesDrawerInitial: string;
     notesDrawerPosition: 'left' | 'right';
+    printConfig?: PrintConfig;
     publiclyViewable: boolean;
     terminology: string;
     textColorVisible: boolean;

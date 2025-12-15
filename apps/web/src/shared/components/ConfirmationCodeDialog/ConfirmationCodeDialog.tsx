@@ -53,7 +53,7 @@ const ConfirmationCodeDialog = (props: Props) => {
         canResend = false,
         description = 'Check your email for a six-digit confirmation code.',
         newEmail = '',
-        open,
+        open = false,
         title = 'Confirm Email',
     } = confirmationCodeDialogProps;
 

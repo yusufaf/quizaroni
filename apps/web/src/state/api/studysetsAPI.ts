@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
 import { BASE_API_URL, getCommonPostRequestProps } from './awsAPI';
 import { validate } from 'shared/validation';
 import {
@@ -66,7 +66,7 @@ import {
 } from 'shared/types';
 
 // Queries
-export const useGetAllStudysets = () => {
+export const useGetAllStudysets = (options?: Omit<UseQueryOptions<GetAllStudysetsResponse>, 'queryKey' | 'queryFn'>) => {
     return useQuery({
         queryKey: ['studysets'],
         queryFn: async () => {
@@ -84,10 +84,11 @@ export const useGetAllStudysets = () => {
                 context: 'GetAllStudysets'
             });
         },
+        ...options,
     });
 };
 
-export const useGetStudyset = ({ studysetUUID }: GetStudysetRequest) => {
+export const useGetStudyset = ({ studysetUUID }: GetStudysetRequest, options?: Omit<UseQueryOptions<GetStudysetResponse>, 'queryKey' | 'queryFn'>) => {
     return useQuery({
         queryKey: ['studysets', studysetUUID],
         queryFn: async () => {
@@ -106,6 +107,7 @@ export const useGetStudyset = ({ studysetUUID }: GetStudysetRequest) => {
                 context: 'GetStudyset'
             });
         },
+        ...options,
     });
 };
 
