@@ -1,305 +1,144 @@
-import { useState, SyntheticEvent, ChangeEvent, useEffect } from 'react';
-import { Tab, Tabs } from '@mui/material/';
+import { Box } from '@mui/material';
+import { Edit as EditIcon, Label as LabelIcon } from '@mui/icons-material';
 import {
-    TABS,
-    ACTIONS,
-    LabelsDialogTab,
-    ErrorInfo,
-    LabelsDialogAction,
-} from './constants';
-import {
-    MainLabelDialogContent,
-    StyledDialog,
-    StyledDialogContent,
-} from './styles';
-import LabelsList from './LabelsList';
-import { capitalizeFirstLetter } from 'shared/utilities/general';
-import { Studyset, LabelsDialogProps } from 'shared/types';
-import {
-    useDeleteLabel,
-    useEditLabel,
-    useChangeLabel,
-    useGetAllStudysets,
-    useGetStudyset,
-} from 'state/api/studysetsAPI';
-import useCustomMutation from 'hooks/useCustomMutation';
-import CreateTabView from './CreateTabView';
-import ManageTabView from './ManageTabView';
-import AssignTabView from './AssignTabView';
-import { useGetUser } from 'state/api/usersAPI';
-import { DEFAULT_USER_RESPONSE } from 'shared/constants';
-import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
-import { useGlobalStore } from 'state/stores/global';
+    MetadataDialogShell,
+    ItemListHeader,
+    TabConfig,
+    CascadePreviewDialog,
+} from 'shared/components/MetadataDialogs';
+import { useLabelsDialog } from './useLabelsDialog';
+import { LabelsCreateTab } from './LabelsCreateTab';
+import { LabelsManageTab } from './LabelsManageTab';
+import { LabelsAssignTab } from './LabelsAssignTab';
+import { downloadObjectAsJSON } from 'shared/utilities/general';
+
+const tabs: TabConfig[] = [
+    { value: 'MANAGE', label: 'Manage', icon: <EditIcon /> },
+    { value: 'ASSIGN', label: 'Assign', icon: <LabelIcon /> },
+];
 
 const ManageLabelsDialog = () => {
-    const { labelsDialogProps, setLabelsDialogProps } = useGlobalStore();
-    const { studysetUUID = '' } = labelsDialogProps || {};
-
-    /* ==== RTK Query ==== */
-    const { data = DEFAULT_USER_RESPONSE } = useGetUser({ enabled: labelsDialogProps.open });
-    const { labels = [], userUUID = '' } = data?.user ?? DEFAULT_USER_RESPONSE.user;
-    const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
-        useGetAllStudysets({ enabled: labelsDialogProps.open });
-    const studysets = studysetsResponse?.studysets ?? [];
-
     const {
-        data: studysetResponse,
-        isLoading: isStudySetLoading,
-        isSuccess: isStudySetSuccess,
-        isError: isStudySetError,
-    } = useGetStudyset(
-        { studysetUUID: labelsDialogProps.studysetUUID ?? '' },
-        { enabled: labelsDialogProps.open }
-    );
-    const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
+        open,
+        onClose,
+        selectedTab,
+        setSelectedTab,
+        labels,
+        studysets,
+        studysetUUID,
+        editIndex,
+        deleteIndices,
+        selectedStudysetUUIDs,
+        setSelectedStudysetUUIDs,
+        assignLabel,
+        setAssignLabel,
+        validateName,
+        handleCreate,
+        handleEdit,
+        handleDelete,
+        handleDeleteToggle,
+        handleEditStart,
+        handleEditCancel,
+        handleAssignLabel,
+        isCreatingLabel,
+        isPending,
+        showCascadePreview,
+        cascadeAction,
+        affectedItems,
+        handleCloseCascadePreview,
+        handleConfirmCascade,
+    } = useLabelsDialog();
 
-    const {
-        mutate: deleteLabel,
-        isLoading: isDeletingLabel,
-        isSuccess: isDeleteSuccess,
-        isError: isDeleteError,
-    } = useCustomMutation({
-        mutation: useDeleteLabel,
-        successMessage: 'Successfully deleted label',
-        errorMessage: 'Error deleting label',
-        onSuccess: () => {
-            clearDeleteState();
-        },
-    });
-
-    const {
-        mutate: editLabel,
-        isLoading: isEditingLabel,
-        isSuccess: isEditSuccess,
-        isError: isEditError,
-    } = useCustomMutation({
-        mutation: useEditLabel,
-        successMessage: 'Successfully edited label',
-        errorMessage: 'Error editing label',
-        onSuccess: () => {
-            clearEditState();
-        },
-    });
-
-    const {
-        mutate: changeLabel,
-        isLoading: isChangingLabel,
-        isSuccess: isChangeSuccess,
-        isError: isChangeError,
-    } = useCustomMutation({
-        mutation: useChangeLabel,
-        successMessage: 'Successfully updated label',
-        errorMessage: 'Error updated label',
-    });
-
-    const [selectedTab, setSelectedTab] = useState<LabelsDialogTab>(
-        TABS.CREATE
-    );
-    /* Edit & Delete State */
-    const [selectedAction, setSelectedAction] =
-        useState<LabelsDialogAction | null>(null);
-    const [editLabelName, setEditLabelName] = useState<string>('');
-    const [editErrorInfo, setEditErrorInfo] = useState<ErrorInfo>(null);
-    const [editIndex, setEditIndex] = useState<number | null>(null);
-    const [deleteIndices, setDeleteIndices] = useState<number[]>([]);
-    const [showDeleteConfirmation, setShowDeleteConfirmation] =
-        useState<boolean>(false);
-    const [selectedStudysetUUIDs, setSelectedStudysetUUIDs] = useState<
-        string[]
-    >([]);
-    const [assignLabel, setAssignLabel] = useState<string>('');
-
-    const isCreateTab = selectedTab === TABS.CREATE;
-    const isManageTab = selectedTab === TABS.MANAGE;
-    const isAssignTab = selectedTab === TABS.ASSIGN;
-
-    // TODO: Look into initial value for selectedStudysetUUIDs useState()
-    useEffect(() => {
-        if (labelsDialogProps.selectedStudysetUUIDs) {
-            setSelectedStudysetUUIDs([
-                ...labelsDialogProps.selectedStudysetUUIDs,
-            ]);
-        }
-        if (labelsDialogProps.tab) {
-            setSelectedTab(labelsDialogProps.tab);
-        }
-    }, [labelsDialogProps]);
-
-    /* ==== Dialog Logic ==== */
-    const closeLabelsDialog = () => {
-        setLabelsDialogProps({
-            open: false,
-        });
-    };
-
-    const onTabChange = (_e: SyntheticEvent, newTab: LabelsDialogTab) => {
-        if (newTab === selectedTab) {
-            return;
-        }
-
-        if (selectedTab === TABS.MANAGE) {
-            clearEditState();
-            clearDeleteState();
-        }
-
-        setSelectedTab(newTab);
-    };
-
-    const clearEditState = (actionToSet: LabelsDialogAction | null = null) => {
-        setEditIndex(null);
-        setEditLabelName('');
-        setEditErrorInfo(null);
-        setSelectedAction(actionToSet);
-    };
-
-    const clearDeleteState = (
-        actionToSet: LabelsDialogAction | null = null
-    ) => {
-        setDeleteIndices([]);
-        setShowDeleteConfirmation(false);
-        setSelectedAction(actionToSet);
-    };
-
-    const handleEditClick = (index: number) => {
-        clearDeleteState(ACTIONS.EDIT);
-        setEditIndex(index);
-        setEditLabelName(labels[index]);
-    };
-
-    const handleDeleteClick = (index: number) => {
-        clearEditState(ACTIONS.DELETE);
-        if (deleteIndices.includes(index)) {
-            setDeleteIndices(deleteIndices.filter((value) => value !== index));
-        } else {
-            setDeleteIndices(deleteIndices.concat(index));
-        }
-    };
-
-    const handleDeleteConfirmation = () => {
-        const labelsToDelete = deleteIndices.map((index) => labels[index]);
-        deleteLabel({
-            userUUID,
-            labelsToDelete,
-        });
-    };
-
-    const handleEditOrDelete = () => {
-        console.log('Entered editOrDelete');
-        // TODO:
-        switch (selectedAction) {
-            case ACTIONS.EDIT:
-                if (!editIndex) {
-                    return;
-                }
-                // TODO: Move this logic into the validation function
-                const selectedLabelName = labels[editIndex];
-                if (editLabelName === selectedLabelName) {
-                    return;
-                }
-                editLabel({
-                    index: editIndex,
-                    oldLabel: selectedLabelName,
-                    newLabel: editLabelName,
-                });
-                break;
-            case ACTIONS.DELETE:
-                setShowDeleteConfirmation(true);
-                break;
-        }
-    };
-
-    const onEditLabelChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const newLabelName = e.target.value;
-
-        const allOtherLabels = [...labels].filter(
-            (_, index) => index != editIndex
-        );
-        const isDuplicate = allOtherLabels.includes(newLabelName);
-        setEditLabelName(newLabelName);
-        if (isDuplicate) {
-            setEditErrorInfo({
-                helperText: 'Label already exists',
-            });
-        } else if (!newLabelName) {
-            setEditErrorInfo({
-                helperText: "Label name can't be empty",
-            });
-        } else {
-            setEditErrorInfo(null);
-        }
-    };
-
-    const handleChangeCurrentLabel = (newLabel: string) => {
-        if (!studysetUUID || newLabel === selectedStudyset?.label) {
-            return;
-        }
-
-        changeLabel({
-            studysetUUID,
-            newLabel,
-        });
+    const downloadLabelsList = () => {
+        downloadObjectAsJSON(labels, 'Quizaroni_Labels.json');
     };
 
     return (
-        <StyledDialog
-            open={labelsDialogProps.open}
-            onClose={closeLabelsDialog}
-            fullWidth
-            maxWidth="lg"
-        >
-            <StandardDialogTitle
-                title={`${capitalizeFirstLetter(selectedTab.toLowerCase())} Labels`}
-                onClose={closeLabelsDialog}
+        <>
+            <MetadataDialogShell
+                open={open}
+                onClose={onClose}
+                title="Manage Labels"
+                tabs={tabs}
+                selectedTab={selectedTab}
+                onTabChange={setSelectedTab}
+                maxWidth="lg"
+            >
+                <Box
+                    sx={{
+                        display: 'grid',
+                        gridTemplateColumns:
+                            selectedTab === 'MANAGE' ? '1fr 1fr' : '1fr',
+                        gap: '1.25rem',
+                        '@media (max-width: 900px)': {
+                            gridTemplateColumns: '1fr',
+                        },
+                    }}
+                >
+                    {/* MANAGE tab: 2 columns (form + list) */}
+                    {selectedTab === 'MANAGE' && (
+                        <>
+                            {/* Left: Create form */}
+                            <Box>
+                                <LabelsCreateTab
+                                    labels={labels}
+                                    studysetUUID={studysetUUID}
+                                    onSubmit={handleCreate}
+                                    isLoading={isCreatingLabel}
+                                />
+                            </Box>
+
+                            {/* Right: Labels List */}
+                            <Box>
+                                <ItemListHeader
+                                    title="Labels"
+                                    onDownload={downloadLabelsList}
+                                    itemCount={labels.length}
+                                />
+                                <LabelsManageTab
+                                    labels={labels}
+                                    editIndex={editIndex}
+                                    deleteIndices={deleteIndices}
+                                    onEdit={handleEditStart}
+                                    onDelete={handleDeleteToggle}
+                                    onSave={handleEdit}
+                                    onCancel={handleEditCancel}
+                                    validateFn={validateName}
+                                    onDeleteSelected={handleDelete}
+                                    isLoading={isPending}
+                                />
+                            </Box>
+                        </>
+                    )}
+
+                    {/* ASSIGN tab: 1 column (full width form) */}
+                    {selectedTab === 'ASSIGN' && (
+                        <Box>
+                            <LabelsAssignTab
+                                labels={labels}
+                                studysets={studysets}
+                                selectedStudysetUUIDs={selectedStudysetUUIDs}
+                                assignLabel={assignLabel}
+                                onStudysetsChange={setSelectedStudysetUUIDs}
+                                onLabelChange={setAssignLabel}
+                                onAssign={handleAssignLabel}
+                                isLoading={isPending}
+                            />
+                        </Box>
+                    )}
+                </Box>
+            </MetadataDialogShell>
+
+            <CascadePreviewDialog
+                open={showCascadePreview}
+                onClose={handleCloseCascadePreview}
+                actionType={cascadeAction === 'edit' ? 'edit' : 'delete'}
+                itemType="label"
+                affectedItems={affectedItems}
+                onConfirm={handleConfirmCascade}
+                isLoading={isPending}
             />
-            <StyledDialogContent>
-                <MainLabelDialogContent>
-                    <Tabs value={selectedTab} onChange={onTabChange}>
-                        {[...Object.values(TABS)].map((tab, index) => (
-                            <Tab key={index} label={tab} value={tab} />
-                        ))}
-                    </Tabs>
-                    {isCreateTab && (
-                        <CreateTabView
-                            labels={labels}
-                            studysetUUID={studysetUUID}
-                        />
-                    )}
-                    {isManageTab && (
-                        <ManageTabView
-                            deleteIndices={deleteIndices}
-                            editErrorInfo={editErrorInfo}
-                            editLabelName={editLabelName}
-                            editIndex={editIndex}
-                            handleEditOrDelete={handleEditOrDelete}
-                            handleDeleteConfirmation={handleDeleteConfirmation}
-                            onEditLabelChange={onEditLabelChange}
-                            showDeleteConfirmation={showDeleteConfirmation}
-                            selectedAction={selectedAction}
-                        />
-                    )}
-                    {isAssignTab && (
-                        <AssignTabView
-                            assignLabel={assignLabel}
-                            studysets={studysets}
-                            selectedStudysetUUIDs={selectedStudysetUUIDs}
-                            setSelectedStudysetUUIDs={setSelectedStudysetUUIDs}
-                        />
-                    )}
-                </MainLabelDialogContent>
-                <LabelsList
-                    labels={labels}
-                    selectedTab={selectedTab}
-                    handleEditClick={handleEditClick}
-                    handleDeleteClick={handleDeleteClick}
-                    editIndex={editIndex}
-                    deleteIndices={deleteIndices}
-                    currentLabel={selectedStudyset?.label}
-                    handleChangeCurrentLabel={handleChangeCurrentLabel}
-                    assignLabel={assignLabel}
-                    setAssignLabel={setAssignLabel}
-                />
-            </StyledDialogContent>
-        </StyledDialog>
+        </>
     );
 };
 

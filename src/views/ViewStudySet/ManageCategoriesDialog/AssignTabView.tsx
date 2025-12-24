@@ -1,11 +1,6 @@
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Studyset } from 'shared/types';
-import {
-    CategoryFormControl,
-    CategoryInputsContainer,
-    StyledMenuItem,
-} from './styles';
-import { InputLabel, Typography } from '@mui/material';
+import { Box, FormControl, InputLabel, Typography, MenuItem } from '@mui/material';
 import { Dispatch, SetStateAction } from 'react';
 
 type Props = {
@@ -31,59 +26,63 @@ const AssignTabView = (props: Props) => {
         [];
 
     return (
-        <CategoryInputsContainer>
-            <CategoryFormControl fullWidth>
-                <InputLabel id="card-select-label">Card</InputLabel>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <FormControl fullWidth>
+                <InputLabel id="card-select-label">Select Card</InputLabel>
                 <Select
                     labelId="card-select-label"
-                    label="Card"
+                    label="Select Card"
                     value={selectedCardUUID}
                     onChange={(e) => setSelectedCardUUID(e.target.value)}
                 >
-                    {cards.map((card, index) => {
+                    {cards.map((card) => {
                         const text = `Term: ${card.term} | Definition: ${card.definition}`;
                         return (
-                            <StyledMenuItem
+                            <MenuItem
                                 key={card.cardUUID}
                                 value={card.cardUUID}
-                                title={text}
                             >
-                                <Typography
-                                    variant="inherit"
-                                    noWrap
-                                    title={text}
-                                >
+                                <Typography variant="inherit" noWrap title={text}>
                                     {text}
                                 </Typography>
-                            </StyledMenuItem>
+                            </MenuItem>
                         );
                     })}
                 </Select>
-            </CategoryFormControl>
+            </FormControl>
+
             {selectedCardUUID && (
-                <CategoryFormControl fullWidth>
+                <FormControl fullWidth>
                     <InputLabel id="category-select-label">
-                        Categories
+                        Assign Categories
                     </InputLabel>
                     <Select
                         labelId="category-select-label"
-                        label="Categories"
+                        label="Assign Categories"
                         multiple
                         value={selectedCardCategories}
                         onChange={onAssignedCategoriesChange}
                         disabled={isAssigningCategories}
                     >
-                        {categories.map((category, index) => {
+                        {categories.map((category) => {
                             return (
-                                <StyledMenuItem key={category} value={category}>
+                                <MenuItem key={category} value={category}>
                                     {category}
-                                </StyledMenuItem>
+                                </MenuItem>
                             );
                         })}
                     </Select>
-                </CategoryFormControl>
+                </FormControl>
             )}
-        </CategoryInputsContainer>
+
+            {selectedCardUUID && (
+                <Typography variant="body2" color="text.secondary">
+                    {selectedCardCategories.length === 0
+                        ? 'No categories assigned to this card'
+                        : `${selectedCardCategories.length} categor${selectedCardCategories.length === 1 ? 'y' : 'ies'} assigned`}
+                </Typography>
+            )}
+        </Box>
     );
 };
 
