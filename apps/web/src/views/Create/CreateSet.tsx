@@ -80,7 +80,7 @@ const CreateSet = (props: Props) => {
     const [enteredLabel, setEnteredLabel] = useState<string | null>(null);
     const [selectedLabel, setSelectedLabel] = useState<string>('');
     const [createdSetCards, setCreatedSetCards] = useState<Card[]>([
-        { ...EMPTY_CARD },
+        { ...EMPTY_CARD, cardUUID: crypto.randomUUID() },
     ]);
     const [actionsStack, setActionsStack] = useState<any[]>([]);
 

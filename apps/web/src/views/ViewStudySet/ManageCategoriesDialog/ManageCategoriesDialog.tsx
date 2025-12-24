@@ -1,34 +1,14 @@
-import { LoadingButton } from '@mui/lab';
-import { Button, SelectChangeEvent, Tab, Tabs } from '@mui/material/';
-import useCustomMutation from 'hooks/useCustomMutation';
+import { Box, SelectChangeEvent } from '@mui/material';
 import { Studyset } from 'shared/types';
-import { ChangeEvent, ReactNode, SyntheticEvent, useState } from 'react';
+import { ChangeEvent, useState, useCallback } from 'react';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
-import {
-    capitalizeFirstLetter,
-    downloadObjectAsJSON,
-} from 'shared/utilities/general';
 import AssignTabView from './AssignTabView';
-import CategoriesList from './CategoriesList';
-import CreateTabView from './CreateTabView';
+import { CategoriesCreateTab } from './CategoriesCreateTab';
+import { CategoriesManageTab } from './CategoriesManageTab';
 import ImportTabView from './ImportTabView';
-import ManageTabView from './ManageTabView';
-import { ACTIONS, TABS } from './constants';
-import {
-    CategoriesListColumn,
-    DownloadListButton,
-    StyledDialog,
-    StyledDialogActions,
-    StyledDialogContent,
-} from './styles';
-import {
-    BoldTypography,
-    SimpleFlexContainer,
-    StyledDialogTitle,
-} from 'styles/AppStyles';
-import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
-import { Download } from '@mui/icons-material';
-import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
+import { TABS } from './constants';
+import { MetadataDialogShell, TabConfig, ErrorInfo } from 'shared/components/MetadataDialogs';
+import { Edit as EditIcon, SwapHoriz as ImportIcon, Label as AssignIcon } from '@mui/icons-material';
 
 type Props = {
     open: boolean;
@@ -49,19 +29,21 @@ const ManageCategoriesDialog = (props: Props) => {
 
     const { mutate: updateStudySet } = useUpdateStudyset();
 
-    const [selectedTab, setSelectedTab] = useState<string>(TABS.CREATE);
-    const [errorInfo, setErrorInfo] = useState<any>(null);
+    const [selectedTab, setSelectedTab] = useState<string>(TABS.MANAGE);
+    const [errorInfo, setErrorInfo] = useState<ErrorInfo>(null);
     const [categoryName, setCategoryName] = useState<string>('');
-    const [editCategoryName, setEditCategoryName] = useState<string>('');
-    const [editErrorInfo, setEditErrorInfo] = useState<any>(null);
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [deleteIndices, setDeleteIndices] = useState<number[]>([]);
-    const [selectedAction, setSelectedAction] = useState<string | null>(null);
-    const [selectedStudysetUUID, setSelectedStudysetUUID] =
-        useState<string>('');
+    const [selectedStudysetUUID, setSelectedStudysetUUID] = useState<string>('');
     const [selectedCardUUID, setSelectedCardUUID] = useState<string>('');
+    const [isUpdating, setIsUpdating] = useState(false);
 
-    const isCreateTab = selectedTab === TABS.CREATE;
+    const tabs: TabConfig[] = [
+        { value: TABS.MANAGE, label: 'Manage', icon: <EditIcon /> },
+        { value: TABS.IMPORT, label: 'Import', icon: <ImportIcon /> },
+        { value: TABS.ASSIGN, label: 'Assign', icon: <AssignIcon /> },
+    ];
+
     const isManageTab = selectedTab === TABS.MANAGE;
     const isImportTab = selectedTab === TABS.IMPORT;
     const isAssignTab = selectedTab === TABS.ASSIGN;
@@ -70,123 +52,149 @@ const ManageCategoriesDialog = (props: Props) => {
         setSelectedTab(newTab);
     };
 
-    // #region Create Category
-    const onCreateCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const category = e.target.value;
-        const isDuplicate = categories.includes(category);
-        setCategoryName(category);
-        if (isDuplicate) {
-            setErrorInfo({
-                helperText: 'Category already exists',
-            });
-        } else {
-            setErrorInfo(null);
-        }
-    };
+    // Validation
+    const validateCategory = useCallback(
+        (value: string, excludeIndex?: number): ErrorInfo => {
+            if (!value.trim()) {
+                return { helperText: 'Name cannot be empty' };
+            }
+            const isDuplicate = categories.some(
+                (cat, i) => cat === value && i !== excludeIndex
+            );
+            if (isDuplicate) {
+                return { helperText: 'Category already exists' };
+            }
+            return null;
+        },
+        [categories]
+    );
 
-    const createCategory = () => {
-        if (!studysetUUID) {
+    // Create Category
+    const onCreateCategoryChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        const category = e.target.value;
+        setCategoryName(category);
+        const error = validateCategory(category);
+        setErrorInfo(error);
+    }, [validateCategory]);
+
+    const createCategory = useCallback(() => {
+        if (!studysetUUID || !categoryName.trim() || errorInfo) {
             return;
         }
-        const newCategories = categories.concat(categoryName);
-
-        updateStudySet({
-            studysetUUID,
-            updates: {
-                categories: newCategories,
+        const newCategories = [...categories, categoryName.trim()];
+        setIsUpdating(true);
+        updateStudySet(
+            {
+                studysetUUID,
+                updates: {
+                    categories: newCategories,
+                },
             },
-        });
-    };
-    // #endregion Create Category
-
-    // #region Edit Category
-    const onEditCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const newCategoryName = e.target.value;
-        const allOtherCategories = categories.filter(
-            (_, index) => index !== editIndex
+            {
+                onSuccess: () => {
+                    setCategoryName('');
+                    setErrorInfo(null);
+                    setIsUpdating(false);
+                },
+                onError: () => {
+                    setIsUpdating(false);
+                },
+            }
         );
-        const isDuplicate = allOtherCategories.includes(newCategoryName);
-        console.log({ isDuplicate, newCategoryName });
-        setEditCategoryName(newCategoryName);
-        if (isDuplicate) {
-            setEditErrorInfo({
-                helperText: 'Category already exists',
-            });
-        } else if (!newCategoryName) {
-            setEditErrorInfo({
-                helperText: "Category name can't be empty",
-            });
-        } else {
-            setEditErrorInfo(null);
-        }
-    };
+    }, [studysetUUID, categoryName, errorInfo, categories, updateStudySet, validateCategory]);
 
-    const handleEditClick = (index: number) => {
-        setDeleteIndices([]);
-        setSelectedAction(ACTIONS.EDIT);
+    // Edit Category (inline)
+    const handleEditStart = useCallback((index: number) => {
         setEditIndex(index);
-        setEditCategoryName(categories[index]);
-    };
-    // #endregion Edit Category
+        setDeleteIndices([]);
+    }, []);
 
-    const handleDeleteClick = (index: number) => {
+    const handleEditCancel = useCallback(() => {
         setEditIndex(null);
-        setEditCategoryName('');
-        setEditErrorInfo(null);
+    }, []);
 
-        setSelectedAction(ACTIONS.DELETE);
-        if (deleteIndices.includes(index)) {
-            setDeleteIndices(deleteIndices.filter((value) => value !== index));
-        } else {
-            setDeleteIndices(deleteIndices.concat(index));
-        }
-    };
+    const handleEdit = useCallback(
+        (index: number, newName: string) => {
+            const oldCategoryName = categories[index];
+            if (!oldCategoryName || newName === oldCategoryName) {
+                setEditIndex(null);
+                return;
+            }
 
-    const handleEditOrDelete = async () => {
-        try {
-            /* Don't need to check categories cause they're paired */
+            const categoriesAfterEdit = [...categories];
+            categoriesAfterEdit[index] = newName.trim();
 
-            if (selectedAction === ACTIONS.EDIT && editIndex !== null) {
-                const oldCategoryName = categories[editIndex];
-                // Check if it's the same
-                if (editCategoryName === oldCategoryName) {
-                    return;
-                }
+            // Update category name in all affected cards
+            const modifiedCards = cards.map((card) => ({
+                ...card,
+                categories: card.categories.map((cat) =>
+                    cat === oldCategoryName ? newName.trim() : cat
+                ),
+            }));
 
-                const categoriesAfterEdit = [...categories];
-                categoriesAfterEdit[editIndex] = editCategoryName;
-
-                /* Update the category name in all affected cards */
-                const modifiedCards = [...cards].map((card) => {
-                    const { categories: cardCategories = [] } = card;
-                    const newCardCategories = cardCategories.map((category) => {
-                        if (category === oldCategoryName) {
-                            return editCategoryName;
-                        }
-                        return category;
-                    });
-                    return {
-                        ...card,
-                        categories: newCardCategories,
-                    };
-                });
-
-                updateStudySet({
+            setIsUpdating(true);
+            updateStudySet(
+                {
                     studysetUUID,
                     updates: {
                         cards: modifiedCards,
                         categories: categoriesAfterEdit,
                     },
-                });
-            } else if (selectedAction === ACTIONS.DELETE) {
-                deleteCategories();
+                },
+                {
+                    onSuccess: () => {
+                        setEditIndex(null);
+                        setIsUpdating(false);
+                    },
+                    onError: () => {
+                        setIsUpdating(false);
+                    },
+                }
+            );
+        },
+        [studysetUUID, categories, cards, updateStudySet]
+    );
+
+    // Delete Categories
+    const handleDeleteToggle = useCallback((index: number) => {
+        setDeleteIndices((prev) =>
+            prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+        );
+        setEditIndex(null);
+    }, []);
+
+    const handleDelete = useCallback(() => {
+        if (deleteIndices.length === 0) return;
+
+        const categoriesToDelete = deleteIndices.map((i) => categories[i]);
+        const filteredCategories = categories.filter((_, i) => !deleteIndices.includes(i));
+
+        // Remove categories from all cards
+        const modifiedCards = cards.map((card) => ({
+            ...card,
+            categories: card.categories.filter((cat) => !categoriesToDelete.includes(cat)),
+        }));
+
+        setIsUpdating(true);
+        updateStudySet(
+            {
+                studysetUUID,
+                updates: {
+                    cards: modifiedCards,
+                    categories: filteredCategories,
+                },
+            },
+            {
+                onSuccess: () => {
+                    setDeleteIndices([]);
+                    setIsUpdating(false);
+                },
+                onError: () => {
+                    setIsUpdating(false);
+                },
             }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setSelectedAction(null);
-        }
-    };
+        );
+    }, [studysetUUID, deleteIndices, categories, cards, updateStudySet]);
 
     // TODO: Debouncing?
     const onAssignedCategoriesChange = (e: SelectChangeEvent) => {
@@ -232,185 +240,114 @@ const ManageCategoriesDialog = (props: Props) => {
         });
     };
 
-    // #region Delete Category
-    const deleteCategories = (
-        deletionType: 'unused' | 'standard' = 'standard'
-    ) => {
-        const isUnusedDelete = deletionType === 'unused';
+    // Delete Unused Categories
+    const handleDeleteUnused = useCallback(() => {
+        const usedCategories = new Set(cards.flatMap((card) => card.categories));
+        const unusedCategories = categories.filter((cat) => !usedCategories.has(cat));
 
-        let categoriesToDelete: string[];
-        if (isUnusedDelete) {
-            categoriesToDelete = categories.filter((category) => {
-                return !cards.some((card) =>
-                    card.categories.includes(category)
-                );
-            });
-        } else {
-            categoriesToDelete = deleteIndices.map(
-                (index) => categories[index]
-            );
+        if (unusedCategories.length === 0) {
+            alert('No unused categories to delete');
+            return;
         }
 
-        const filteredCategories = categories.filter((category, index) => {
-            if (isUnusedDelete) {
-                return cards.some((card) => card.categories.includes(category));
-            }
-            return !deleteIndices.includes(index);
-        });
+        const filteredCategories = categories.filter((cat) => usedCategories.has(cat));
 
-        /* Delete the category name from the study set's cards */
-        const modifiedCards = [...cards].map((card) => {
-            const { categories: cardCategories = [] } = card;
-            const newCardCategories = cardCategories.filter((category) => {
-                return !categoriesToDelete.includes(category);
-            });
-            return {
-                ...card,
-                categories: newCardCategories,
-            };
-        });
-
-        updateStudySet({
-            studysetUUID,
-            updates: {
-                cards: modifiedCards,
-                categories: filteredCategories,
+        setIsUpdating(true);
+        updateStudySet(
+            {
+                studysetUUID,
+                updates: {
+                    categories: filteredCategories,
+                },
             },
-        });
-    };
-    // #endregion Delete Category
-
-    const renderDialogButton = (): ReactNode => {
-        switch (selectedTab) {
-            case TABS.CREATE:
-                return (
-                    <LoadingButton
-                        variant="contained"
-                        onClick={createCategory}
-                        disabled={!categoryName || Boolean(errorInfo)}
-                        // loading={isCreatingCategory}
-                    >
-                        Create
-                    </LoadingButton>
-                );
-            case TABS.MANAGE:
-                const editDisabled =
-                    selectedAction === ACTIONS.EDIT && editErrorInfo;
-                const deleteDisabled =
-                    selectedAction === ACTIONS.DELETE && !deleteIndices.length;
-                const disabled = editDisabled || deleteDisabled;
-                const buttonText =
-                    selectedAction === ACTIONS.EDIT
-                        ? 'Save Edit'
-                        : `Delete (${deleteIndices.length})`;
-                return (
-                    selectedAction && (
-                        <Button
-                            variant="contained"
-                            onClick={handleEditOrDelete}
-                            disabled={disabled}
-                        >
-                            {buttonText}
-                        </Button>
-                    )
-                );
-            case TABS.IMPORT:
-                return (
-                    <LoadingButton
-                        variant="contained"
-                        onClick={handleImport}
-                        disabled={!selectedStudysetUUID}
-                    >
-                        Import Categories
-                    </LoadingButton>
-                );
-        }
-    };
-
-    const downloadCategoriesList = () => {
-        downloadObjectAsJSON(
-            categories,
-            `Quizaroni_${studysetTitle}_Categories.json`
+            {
+                onSuccess: () => {
+                    setIsUpdating(false);
+                },
+                onError: () => {
+                    setIsUpdating(false);
+                },
+            }
         );
-    };
+    }, [studysetUUID, categories, cards, updateStudySet]);
+
 
     return (
-        <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
-            <StandardDialogTitle
-                title={`${capitalizeFirstLetter(selectedTab.toLowerCase())} Categories`}
-                onClose={onClose}
-            />
-            <StyledDialogContent>
-                <div>
-                    <Tabs
-                        value={selectedTab}
-                        onChange={onTabChange}
-                        scrollButtons="auto"
-                    >
-                        {[...Object.values(TABS)].map((tab, index) => (
-                            <Tab key={index} label={tab} value={tab} />
-                        ))}
-                    </Tabs>
-                    {isCreateTab && (
-                        <CreateTabView
-                            categoryName={categoryName}
-                            errorInfo={errorInfo}
-                            onCreateCategoryChange={onCreateCategoryChange}
-                        />
-                    )}
-                    {isManageTab && (
-                        <ManageTabView
-                            editErrorInfo={editErrorInfo}
-                            editCategoryName={editCategoryName}
-                            editIndex={editIndex}
-                            onEditCategoryChange={onEditCategoryChange}
-                            deleteUnusedCategories={() =>
-                                deleteCategories('unused')
-                            }
-                        />
-                    )}
-                    {isImportTab && (
-                        <ImportTabView
-                            selectedStudysetUUID={selectedStudysetUUID}
-                            studysets={studysets}
-                            selectedStudyset={selectedStudyset}
-                            setSelectedStudysetUUID={setSelectedStudysetUUID}
-                        />
-                    )}
-                    {isAssignTab && (
-                        <AssignTabView
-                            selectedCardUUID={selectedCardUUID}
-                            setSelectedCardUUID={setSelectedCardUUID}
-                            selectedStudyset={selectedStudyset}
-                            onAssignedCategoriesChange={
-                                onAssignedCategoriesChange
-                            }
-                        />
-                    )}
-                </div>
-                <CategoriesListColumn>
-                    <SimpleFlexContainer style={{ alignItems: 'baseline' }}>
-                        <BoldTypography>Categories</BoldTypography>
-                        <DownloadListButton
-                            variant="outlined"
-                            startIcon={<Download />}
-                            onClick={downloadCategoriesList}
-                        >
-                            Download
-                        </DownloadListButton>
-                    </SimpleFlexContainer>
-                    <CategoriesList
-                        categories={selectedStudyset?.categories ?? []}
-                        selectedTab={selectedTab}
-                        editIndex={editIndex}
-                        deleteIndices={deleteIndices}
-                        handleEditClick={handleEditClick}
-                        handleDeleteClick={handleDeleteClick}
+        <MetadataDialogShell
+            open={open}
+            onClose={onClose}
+            title="Manage Categories"
+            tabs={tabs}
+            selectedTab={selectedTab}
+            onTabChange={setSelectedTab}
+            maxWidth="lg"
+        >
+            <Box
+                sx={{
+                    display: 'grid',
+                    gridTemplateColumns: selectedTab === TABS.MANAGE ? '1fr 1fr' : '1fr',
+                    gap: '1.25rem',
+                    '@media (max-width: 900px)': {
+                        gridTemplateColumns: '1fr',
+                    },
+                }}
+            >
+                {/* MANAGE tab: 2 columns (form + list) */}
+                {isManageTab && (
+                    <>
+                        {/* Left: Create form */}
+                        <Box>
+                            <CategoriesCreateTab
+                                categoryName={categoryName}
+                                errorInfo={errorInfo}
+                                onCategoryChange={onCreateCategoryChange}
+                                onSubmit={createCategory}
+                                isLoading={isUpdating}
+                            />
+                        </Box>
+
+                        {/* Right: Categories List */}
+                        <Box>
+                            <CategoriesManageTab
+                                categories={categories}
+                                studysetTitle={studysetTitle}
+                                editIndex={editIndex}
+                                deleteIndices={deleteIndices}
+                                onEdit={handleEditStart}
+                                onDelete={handleDeleteToggle}
+                                onSave={handleEdit}
+                                onCancel={handleEditCancel}
+                                validateFn={validateCategory}
+                                onDeleteSelected={handleDelete}
+                                onDeleteUnused={handleDeleteUnused}
+                                isLoading={isUpdating}
+                            />
+                        </Box>
+                    </>
+                )}
+
+                {/* IMPORT tab: 1 column */}
+                {isImportTab && (
+                    <ImportTabView
+                        selectedStudysetUUID={selectedStudysetUUID}
+                        studysets={studysets}
+                        selectedStudyset={selectedStudyset}
+                        setSelectedStudysetUUID={setSelectedStudysetUUID}
+                        handleImport={handleImport}
                     />
-                </CategoriesListColumn>
-            </StyledDialogContent>
-            <StyledDialogActions>{renderDialogButton()}</StyledDialogActions>
-        </StyledDialog>
+                )}
+
+                {/* ASSIGN tab: 1 column */}
+                {isAssignTab && (
+                    <AssignTabView
+                        selectedCardUUID={selectedCardUUID}
+                        setSelectedCardUUID={setSelectedCardUUID}
+                        selectedStudyset={selectedStudyset}
+                        onAssignedCategoriesChange={onAssignedCategoriesChange}
+                    />
+                )}
+            </Box>
+        </MetadataDialogShell>
     );
 };
 
