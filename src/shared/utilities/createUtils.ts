@@ -43,7 +43,7 @@ export const deleteCard = ({
             const newCreatedSetCards = [...createdSetCards];
             console.log({
                 newCreatedSetCards,
-                originalUUID: cardBeingDeleted.uuid,
+                originalUUID: cardBeingDeleted.cardUUID,
             });
             newCreatedSetCards.splice(index, 0, cardBeingDeleted);
             setStateCallback(newCreatedSetCards);
@@ -63,7 +63,7 @@ export const addCreateCardInput = ({
     EMPTY_CARD,
     setStateCallback,
 }: AddCreateCardInputParams): void => {
-    const newEmptyCard = { ...EMPTY_CARD, uuid: crypto.randomUUID() };
+    const newEmptyCard = { ...EMPTY_CARD, cardUUID: crypto.randomUUID() };
     setStateCallback(createdSetCards.concat(newEmptyCard));
 };
 
@@ -76,7 +76,10 @@ export const duplicateCard = ({
     createdSetCards,
     setStateCallback,
 }: DuplicateCardParams): void => {
-    const duplicateCard = { ...createdSetCards[index] };
+    const duplicateCard = {
+        ...createdSetCards[index],
+        cardUUID: crypto.randomUUID(),
+    };
     setStateCallback([...createdSetCards].concat(duplicateCard));
 };
 
@@ -154,7 +157,7 @@ export const addCard = ({
         actionType: 'addCard',
         undoCallback: (createdSetCards: TODO[], setStateCallback: TODO) => {
             const newCreatedSetCards = [...createdSetCards].filter(
-                (value) => value.UUID !== cardToAdd.cardUUID
+                (value) => value.cardUUID !== cardToAdd.cardUUID
             );
             console.log({
                 newCreatedSetCards,

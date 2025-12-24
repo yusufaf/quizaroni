@@ -203,14 +203,17 @@ export const LABEL_TERMINOLOGIES = {
     CUSTOM: 'Custom',
 };
 
-export const VIEW_SET_DIALOGS: { [key: string]: string } = {
+export const VIEW_SET_DIALOGS = {
     NOTIFICATIONS: 'NOTIFICATIONS',
     DOWNLOAD: 'DOWNLOAD',
     CATEGORIES: 'CATEGORIES',
     SETTINGS: 'SETTINGS',
     PRINT: 'PRINT',
     SHARE: 'SHARE',
-};
+} as const;
+
+export type ViewSetDialog =
+    (typeof VIEW_SET_DIALOGS)[keyof typeof VIEW_SET_DIALOGS];
 
 export const NOTES_DRAWER_POSITIONS = {
     LEFT: 'left',

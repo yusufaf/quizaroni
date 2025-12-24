@@ -1,8 +1,9 @@
 import { create } from 'zustand';
+import { type ViewSetDialog } from 'constants/index';
 
 type ViewSetsState = {
-    selectedDialog: string;
-    setSelectedDialog: (dialog: string) => void;
+    selectedDialog: ViewSetDialog | '';
+    setSelectedDialog: (dialog: ViewSetDialog | '') => void;
 };
 
 export const useViewSetsStore = create<ViewSetsState>((set) => ({
@@ -11,4 +12,5 @@ export const useViewSetsStore = create<ViewSetsState>((set) => ({
 }));
 
 // Selector functions (optional, for convenience)
-export const selectSelectedDialog = (state: ViewSetsState) => state.selectedDialog;
+export const selectSelectedDialog = (state: ViewSetsState) =>
+    state.selectedDialog;
