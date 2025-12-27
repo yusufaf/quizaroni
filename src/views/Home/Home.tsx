@@ -48,7 +48,7 @@ import {
     formatDateUsingPreferred,
     getFormattedTimestamp,
 } from 'shared/utilities/general';
-import { Button, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Box, Button, Chip, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
 import { useStudySetsStore } from 'state/stores/studysets';
 
 // augment the props for the toolbar slot
@@ -238,9 +238,25 @@ const Home = (props: Props) => {
             ),
         },
         {
-            field: 'label',
-            headerName: 'Label',
-            width: 200,
+            field: 'labels',
+            headerName: 'Labels',
+            width: 300,
+            renderCell: (params: any) => {
+                const labels = params.value as string[];
+                if (!labels || labels.length === 0) {
+                    return <Typography variant="body2" color="text.secondary">None</Typography>;
+                }
+                return (
+                    <Box sx={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {labels.slice(0, 3).map((label: string, idx: number) => (
+                            <Chip key={idx} label={label} size="small" />
+                        ))}
+                        {labels.length > 3 && (
+                            <Chip label={`+${labels.length - 3}`} size="small" />
+                        )}
+                    </Box>
+                );
+            },
         },
     ];
 

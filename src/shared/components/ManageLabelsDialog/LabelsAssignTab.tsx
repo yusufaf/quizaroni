@@ -6,9 +6,9 @@ type Props = {
     labels: string[];
     studysets: Studyset[];
     selectedStudysetUUIDs: string[];
-    assignLabel: string;
+    assignLabels: string[];
     onStudysetsChange: (uuids: string[]) => void;
-    onLabelChange: (label: string) => void;
+    onLabelsChange: (labels: string[]) => void;
     onAssign: () => void;
     isLoading: boolean;
 };
@@ -17,9 +17,9 @@ export const LabelsAssignTab = ({
     labels,
     studysets,
     selectedStudysetUUIDs,
-    assignLabel,
+    assignLabels,
     onStudysetsChange,
-    onLabelChange,
+    onLabelsChange,
     onAssign,
     isLoading,
 }: Props) => {
@@ -28,11 +28,12 @@ export const LabelsAssignTab = ({
         onStudysetsChange(typeof value === 'string' ? value.split(',') : value);
     };
 
-    const handleLabelChange = (event: SelectChangeEvent<string>) => {
-        onLabelChange(event.target.value);
+    const handleLabelsChange = (event: SelectChangeEvent<string[]>) => {
+        const value = event.target.value;
+        onLabelsChange(typeof value === 'string' ? value.split(',') : value);
     };
 
-    const canAssign = assignLabel && selectedStudysetUUIDs.length > 0;
+    const canAssign = assignLabels.length > 0 && selectedStudysetUUIDs.length > 0;
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -64,12 +65,20 @@ export const LabelsAssignTab = ({
             </FormControl>
 
             <FormControl fullWidth>
-                <InputLabel id="label-select-label">Select Label</InputLabel>
+                <InputLabel id="labels-select-label">Select Labels</InputLabel>
                 <Select
-                    labelId="label-select-label"
-                    label="Select Label"
-                    value={assignLabel}
-                    onChange={handleLabelChange}
+                    labelId="labels-select-label"
+                    label="Select Labels"
+                    multiple
+                    value={assignLabels}
+                    onChange={handleLabelsChange}
+                    renderValue={(selectedLabels) => (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            {selectedLabels.map((label) => (
+                                <Chip key={label} label={label} size="small" />
+                            ))}
+                        </Box>
+                    )}
                 >
                     {labels.map((label) => (
                         <MenuItem key={label} value={label}>
@@ -79,9 +88,9 @@ export const LabelsAssignTab = ({
                 </Select>
             </FormControl>
 
-            {selectedStudysetUUIDs.length > 0 && assignLabel && (
+            {selectedStudysetUUIDs.length > 0 && assignLabels.length > 0 && (
                 <Alert severity="warning">
-                    This will assign "{assignLabel}" to {selectedStudysetUUIDs.length} study set
+                    This will set {assignLabels.length} label{assignLabels.length > 1 ? 's' : ''} to {selectedStudysetUUIDs.length} study set
                     {selectedStudysetUUIDs.length > 1 ? 's' : ''}, replacing any existing labels.
                 </Alert>
             )}
@@ -94,7 +103,7 @@ export const LabelsAssignTab = ({
                     loading={isLoading}
                     sx={{ fontWeight: 600 }}
                 >
-                    Assign Label
+                    Assign Labels
                 </LoadingButton>
             </Box>
         </Box>

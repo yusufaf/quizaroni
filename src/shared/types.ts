@@ -18,7 +18,7 @@ export type Studyset = {
     createdAt: Timestamp;
     description: string;
     favorited?: boolean;
-    label: string;
+    labels: string[];
     lastViewed: Timestamp;
     metadata: StudysetMetadata;
     studysetUUID: UUID;
@@ -238,7 +238,16 @@ export type EditLabelRequest = {
 
 export type ChangeLabelRequest = {
     studysetUUID: UUID;
-    newLabel: string;
+    newLabel: string; // deprecated - use UpdateStudysetLabelsRequest
+};
+
+export type UpdateStudysetLabelsRequest = {
+    studysetUUID: UUID;
+    labels: string[];
+};
+
+export type BatchUpdateStudysetLabelsRequest = {
+    studysetUpdates: [UUID, string[]][]; // [studysetUUID, labels[]]
 };
 
 export type FileMetadata = {

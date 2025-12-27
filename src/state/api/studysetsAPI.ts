@@ -31,10 +31,10 @@ import {
     router.post("/api/studysets/edit-note", editNote);
     
     Label Operations
-    router.post("/api/studysets/create-label", createLabel);
-    router.post("/api/studysets/delete-label", deleteLabel);
-    router.post("/api/studysets/edit-label", editLabel);
-    router.post("/api/studysets/change-label", changeLabel);
+    router.post("/api/studysets/create-labels", createLabels);
+    router.post("/api/studysets/delete-labels", deleteLabels);
+    router.post("/api/studysets/edit-labels", editLabels);
+    router.post("/api/studysets/update-studyset-labels", updateStudysetLabels);
 */
 
 import {
@@ -422,7 +422,7 @@ export const useCreateLabel = () => {
             studysetUUID,
             updateStudysetLabel,
         }: CreateLabelRequest) => {
-            const response = await fetch(`${BASE_API_URL}/studysets/create-label`, {
+            const response = await fetch(`${BASE_API_URL}/studysets/create-labels`, {
                 ...getCommonPostRequestProps(),
                 body: JSON.stringify({
                     label,
@@ -449,7 +449,7 @@ export const useDeleteLabel = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ labelsToDelete }: DeleteLabelRequest) => {
-            const response = await fetch(`${BASE_API_URL}/studysets/delete-label`, {
+            const response = await fetch(`${BASE_API_URL}/studysets/delete-labels`, {
                 ...getCommonPostRequestProps(),
                 body: JSON.stringify({ labelsToDelete }),
             });
@@ -472,7 +472,7 @@ export const useEditLabel = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ index, newLabel, oldLabel }: EditLabelRequest) => {
-            const response = await fetch(`${BASE_API_URL}/studysets/edit-label`, {
+            const response = await fetch(`${BASE_API_URL}/studysets/edit-labels`, {
                 ...getCommonPostRequestProps(),
                 body: JSON.stringify({ index, newLabel, oldLabel }),
             });
@@ -491,13 +491,15 @@ export const useEditLabel = () => {
     });
 };
 
+// Deprecated - use useUpdateStudysetLabels instead
 export const useChangeLabel = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ studysetUUID, newLabel }: ChangeLabelRequest) => {
-            const response = await fetch(`${BASE_API_URL}/studysets/change-label`, {
+            // Convert single label to array for backwards compatibility
+            const response = await fetch(`${BASE_API_URL}/studysets/update-studyset-labels`, {
                 ...getCommonPostRequestProps(),
-                body: JSON.stringify({ studysetUUID, newLabel }),
+                body: JSON.stringify({ studysetUUID, labels: [newLabel] }),
             });
             const data = await response.json();
             return validate({
@@ -510,6 +512,55 @@ export const useChangeLabel = () => {
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({
                 queryKey: ['studysets', variables.studysetUUID],
+            });
+        },
+    });
+};
+
+export const useUpdateStudysetLabels = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ studysetUUID, labels }: import('shared/types').UpdateStudysetLabelsRequest) => {
+            const response = await fetch(`${BASE_API_URL}/studysets/update-studyset-labels`, {
+                ...getCommonPostRequestProps(),
+                body: JSON.stringify({ studysetUUID, labels }),
+            });
+            const data = await response.json();
+            return validate({
+                schema: BaseResponseSchema,
+                data,
+                type: 'response',
+                context: 'UpdateStudysetLabels'
+            });
+        },
+        onSuccess: (_data, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: ['studysets', variables.studysetUUID],
+            });
+        },
+    });
+};
+
+export const useBatchUpdateStudysetLabels = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ studysetUpdates }: import('shared/types').BatchUpdateStudysetLabelsRequest) => {
+            const response = await fetch(`${BASE_API_URL}/studysets/batch-update-studyset-labels`, {
+                ...getCommonPostRequestProps(),
+                body: JSON.stringify({ studysetUpdates }),
+            });
+            const data = await response.json();
+            return validate({
+                schema: BaseResponseSchema,
+                data,
+                type: 'response',
+                context: 'BatchUpdateStudysetLabels'
+            });
+        },
+        onSuccess: () => {
+            // Invalidate all studysets queries to refresh data
+            queryClient.invalidateQueries({
+                queryKey: ['studysets'],
             });
         },
     });

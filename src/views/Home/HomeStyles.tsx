@@ -134,7 +134,10 @@ export const SpacedContainer = styled(SimpleFlexContainer)({
     justifyContent: 'space-between',
 });
 
-export const CardBottom = styled(SpacedContainer)({});
+export const CardBottom = styled(SpacedContainer)({
+    flexWrap: 'wrap',
+    gap: '0.5rem',
+});
 
 export const LabelChip = styled(Chip)({});
 
