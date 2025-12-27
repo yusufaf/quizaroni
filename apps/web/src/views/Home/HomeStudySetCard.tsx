@@ -156,7 +156,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                         </SpacedContainer>
                     </CardInfo>
                     <CardBottom>
-                        {labels.length === 0 ? (
+                        {!labels || labels.length === 0 ? (
                             <LabelChip
                                 label="No labels"
                                 variant="outlined"
