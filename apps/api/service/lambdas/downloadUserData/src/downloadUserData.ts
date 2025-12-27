@@ -11,16 +11,19 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthorizerContext } from 'models/auth';
-import { removeKeys } from 'resources/dynamo/utilities';
-import { Studyset } from 'models/studysets';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { S3Client } from '@aws-sdk/client-s3';
+import * as zlib from 'zlib';
 
-const { mainTable = '' } = process.env;
+const { mainTable = '', usersTable = '' } = process.env;
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
+const s3Client = new S3Client();
+
 type RequestBody = {
-    studysetUUIDs: string[];
+    includeStudysets: boolean;
 };
 
 export const handler: Handler = async (
@@ -34,13 +37,32 @@ export const handler: Handler = async (
         const body: RequestBody = JSON.parse(event.body ?? '{}');
         console.log(JSON.stringify({ body }, null, 4));
 
-        const { studysetUUIDs } = body;
+        const { includeStudysets } = body;
 
-        const duplicateStudysetPromises = studysetUUIDs.map((studysetUUID) =>
-            duplicateIndividualStudyset({ studysetUUID, username, userUUID })
-        );
+        const getCommand = new GetCommand({
+            Key: {
+                PK: `user#${userUUID}`,
+                SK: 'userData',
+            },
+            TableName: usersTable,
+        });
 
-        await Promise.allSettled(duplicateStudysetPromises);
+        const result = await docClient.send(getCommand);
+        const user = result.Item;
+
+        const userDataJSON = JSON.stringify(user, null, 4);
+
+        if (!includeStudysets) {
+            // Return the user data as JSON with a timestamp
+            return {
+                statusCode: 200,
+                headers: {
+                    'Content-Disposition': `attachment; filename="user_data.json"`,
+                    'Content-Type': 'application/json',
+                },
+                body: userDataJSON,
+            };
+        }
 
         return {
             statusCode: 200,

@@ -8,7 +8,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 export default ({ props, construct }: LambdaProps) => {
     const { appName, deploymentType = '' } = props;
 
-    const functionName = 'createLabel';
+    const functionName = 'createLabels';
     const nameAndID = `${appName}-${deploymentType}-${functionName}`;
     const role = getRole(`${deploymentType}-main-lambda-role`);
 

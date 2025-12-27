@@ -11,7 +11,7 @@ export type Studyset = {
     createdAt: Timestamp;
     description: string;
     favorited: boolean;
-    label: string;
+    labels: string[];
     lastViewed: Timestamp;
     metadata: StudysetMetadata;
     studysetUUID: UUID;

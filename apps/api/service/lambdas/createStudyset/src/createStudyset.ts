@@ -50,7 +50,7 @@ export const handler: Handler = async (
             createdAt: timestamp,
             description: "",
             favorited: false,
-            label: "",
+            labels: [],
             lastViewed: timestamp,
             metadata: initialMetadata,
             updatedAt: timestamp,

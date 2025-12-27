@@ -13,7 +13,7 @@ const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 type RequestBody = {
-    newLabel: string;
+    labels: string[];
     studysetUUID: string;
 };
 
@@ -27,29 +27,29 @@ export const handler: Handler = async (
     const body: RequestBody = JSON.parse(event.body ?? "{}");
     console.log(JSON.stringify({body}, null, 4));
     
-    const { newLabel, studysetUUID = "" } = body;
+    const { labels, studysetUUID = "" } = body;
 
     try {
         const updatedAt = new Date().toISOString();
 
-        const changeLabelCommand = new UpdateCommand({
+        const updateLabelsCommand = new UpdateCommand({
             Key: {
                 PK: `userUUID#${userUUID}`,
                 SK: `studyset#${studysetUUID}`,
             },
             TableName: mainTable,
             ExpressionAttributeValues: {
-                ':newLabel': newLabel,
+                ':labels': labels,
                 ':updatedAt': updatedAt,
             },
-            UpdateExpression: 'SET label = :newLabel, updatedAt = :updatedAt',
+            UpdateExpression: 'SET labels = :labels, updatedAt = :updatedAt',
         });
-        await docClient.send(changeLabelCommand);
+        await docClient.send(updateLabelsCommand);
 
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: "Successfully changed label",
+                message: "Successfully updated studyset labels",
             }),
         };
     } catch (err) {

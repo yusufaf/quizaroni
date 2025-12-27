@@ -234,20 +234,24 @@ export class QuizaroniAPI extends Construct {
                 lambdaName: 'batchDuplicateStudysets',
             },
             {
-                route: `${studysetsPrefix}/create-label`,
-                lambdaName: 'createLabel',
+                route: `${studysetsPrefix}/create-labels`,
+                lambdaName: 'createLabels',
             },
             {
-                route: `${studysetsPrefix}/delete-label`,
-                lambdaName: 'deleteLabel',
+                route: `${studysetsPrefix}/delete-labels`,
+                lambdaName: 'deleteLabels',
             },
             {
-                route: `${studysetsPrefix}/change-label`,
-                lambdaName: 'changeLabel',
+                route: `${studysetsPrefix}/update-studyset-labels`,
+                lambdaName: 'updateStudysetLabels',
             },
             {
-                route: `${studysetsPrefix}/edit-label`,
-                lambdaName: 'editLabel',
+                route: `${studysetsPrefix}/edit-labels`,
+                lambdaName: 'editLabels',
+            },
+            {
+                route: `${studysetsPrefix}/batch-update-studyset-labels`,
+                lambdaName: 'batchUpdateStudysetLabels',
             },
             {
                 route: `${studysetsPrefix}/create-note`,
@@ -275,6 +279,10 @@ export class QuizaroniAPI extends Construct {
             {
                 route: `${usersPrefix}/update-metadata`,
                 lambdaName: 'updateUserMetadata',
+            },
+            {
+                route: `${usersPrefix}/download-user-data`,
+                lambdaName: 'downloadUserData',
             },
         ];
 

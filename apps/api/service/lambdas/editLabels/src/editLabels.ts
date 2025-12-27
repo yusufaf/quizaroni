@@ -2,19 +2,25 @@ import {
     APIGatewayProxyEventV2WithLambdaAuthorizer,
     APIGatewayProxyResultV2,
     Handler,
-} from "aws-lambda";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { BatchWriteCommand, DynamoDBDocumentClient, GetCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { AuthorizerContext } from "models/auth";
-import { User } from "models/user";
+} from 'aws-lambda';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import {
+    BatchWriteCommand,
+    DynamoDBDocumentClient,
+    GetCommand,
+    QueryCommand,
+    UpdateCommand,
+} from '@aws-sdk/lib-dynamodb';
+import { AuthorizerContext } from 'models/auth';
+import { User } from 'models/user';
 
-const { mainTable = "", usersTable = "" } = process.env;
+const { mainTable = '', usersTable = '' } = process.env;
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 type RequestBody = {
-    index: number; 
+    index: number;
     oldLabel: string;
     newLabel: string;
 };
@@ -25,15 +31,15 @@ export const handler: Handler = async (
 ): Promise<APIGatewayProxyResultV2> => {
     console.log(JSON.stringify({ event, context }, null, 4));
 
-    const { sub: userUUID, username } = event.requestContext.authorizer.lambda
-    const body: RequestBody = JSON.parse(event.body ?? "{}");
-    console.log(JSON.stringify({body}, null, 4));
+    const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
+    const body: RequestBody = JSON.parse(event.body ?? '{}');
+    console.log(JSON.stringify({ body }, null, 4));
 
     const { index, newLabel, oldLabel } = body;
 
     try {
         const userPK = `user#${userUUID}`;
-        const userSK = "userData";
+        const userSK = 'userData';
         const updatedAt = new Date().toISOString();
 
         const getCommand = new GetCommand({
@@ -53,31 +59,31 @@ export const handler: Handler = async (
         const newLabels = [...currentLabels];
         newLabels[index] = newLabel;
 
-        const editLabelCommand = new UpdateCommand({
+        const editLabelsCommand = new UpdateCommand({
             Key: {
                 PK: userPK,
                 SK: userSK,
             },
-            TableName: mainTable,
+            TableName: usersTable,
             ExpressionAttributeValues: {
-                ":newLabels": newLabels,
+                ':newLabels': newLabels,
                 ':updatedAt': updatedAt,
             },
             UpdateExpression: 'SET labels = :newLabels, updatedAt = :updatedAt',
         });
-        await docClient.send(editLabelCommand);
+        await docClient.send(editLabelsCommand);
 
-        await editLabelInAffectedStudysets({
+        await editLabelsInAffectedStudysets({
             newLabel,
             oldLabel,
             PK: userPK,
             username,
-        })
+        });
 
         return {
             statusCode: 200,
             body: JSON.stringify({
-                message: "Successfully edited label",
+                message: 'Successfully edited label',
             }),
         };
     } catch (err) {
@@ -85,47 +91,52 @@ export const handler: Handler = async (
         return {
             statusCode: 500,
             body: JSON.stringify({
-                message: "Error",
+                message: 'Error',
             }),
         };
     }
 };
 
-const editLabelInAffectedStudysets = async ({
+const editLabelsInAffectedStudysets = async ({
     newLabel,
     oldLabel,
     PK,
-    username
+    username,
 }: {
-    oldLabel: string,
-    newLabel: string,
+    oldLabel: string;
+    newLabel: string;
     PK: string;
     username: string;
 }) => {
     // Query for all study sets of the user
     const queryCommand = new QueryCommand({
         TableName: mainTable,
-        KeyConditionExpression: "PK = :pk AND begins_with(SK, :skPrefix)",
+        KeyConditionExpression: 'PK = :pk AND begins_with(SK, :skPrefix)',
         ExpressionAttributeValues: {
-            ":pk": PK,
-            ":skPrefix": "studyset",
+            ':pk': PK,
+            ':skPrefix': 'studyset',
         },
     });
     const { Items: studysets } = await docClient.send(queryCommand);
 
     if (!studysets || studysets.length === 0) {
-        throw new Error("No study sets found for the user");
+        throw new Error('No study sets found for the user');
     }
 
     const updatedAt = new Date().toISOString();
     const updatedStudysets = studysets
-        .filter((studyset) => studyset.label === oldLabel)
+        .filter((studyset) => studyset.labels?.includes(oldLabel))
         .map((item) => {
+            // Update labels array: replace oldLabel with newLabel
+            const updatedLabels = item.labels.map((label: string) =>
+                label === oldLabel ? newLabel : label
+            );
+
             return {
                 PutRequest: {
                     Item: {
                         ...item,
-                        label: newLabel,
+                        labels: updatedLabels,
                         updatedAt: updatedAt,
                         updatedBy: username,
                     },

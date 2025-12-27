@@ -125,13 +125,20 @@ const deleteLabelsFromStudysets = async ({
 
     const updatedAt = new Date().toISOString();
     const updatedStudysets = studysets
-        .filter((studyset) => labelsToDelete.includes(studyset.label))
+        .filter((studyset) =>
+            studyset.labels?.some((l: string) => labelsToDelete.includes(l))
+        )
         .map((item) => {
+            // Remove deleted labels from labels array while preserving others
+            const updatedLabels = item.labels.filter(
+                (l: string) => !labelsToDelete.includes(l)
+            );
+
             return {
                 PutRequest: {
                     Item: {
                         ...item,
-                        label: "",
+                        labels: updatedLabels,
                         updatedAt: updatedAt,
                         updatedBy: username,
                     },

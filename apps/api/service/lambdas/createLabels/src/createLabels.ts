@@ -64,14 +64,15 @@ export const handler: Handler = async (
                 },
                 TableName: mainTable,
                 ExpressionAttributeNames: {
-                    '#label': 'label',
+                    '#labels': 'labels',
                 },
                 ExpressionAttributeValues: {
-                    ':newLabel': label,
+                    ':newLabelArray': [label],
+                    ':emptyList': [],
                     ':updatedAt': updatedAt,
                     ':updatedBy': username,
                 },
-                UpdateExpression: 'SET #label = :newLabel, updatedAt = :updatedAt, updatedBy = :updatedBy',
+                UpdateExpression: 'SET #labels = list_append(if_not_exists(#labels, :emptyList), :newLabelArray), updatedAt = :updatedAt, updatedBy = :updatedBy',
             });
             await docClient.send(studysetLabelUpdateCommand);
         }

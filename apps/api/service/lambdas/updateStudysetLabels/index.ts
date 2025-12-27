@@ -8,7 +8,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 export default ({ props, construct }: LambdaProps) => {
     const { appName, deploymentType = '' } = props;
 
-    const functionName = 'editLabel';
+    const functionName = 'updateStudysetLabels';
     const nameAndID = `${appName}-${deploymentType}-${functionName}`;
     const role = getRole(`${deploymentType}-main-lambda-role`);
 
@@ -24,7 +24,6 @@ export default ({ props, construct }: LambdaProps) => {
             deploymentType,
             NODE_OPTIONS: '--enable-source-maps',
             mainTable: `${appName}-${deploymentType}-main`,
-            usersTable: `${appName}-${deploymentType}-users`,
         },
     });
 
