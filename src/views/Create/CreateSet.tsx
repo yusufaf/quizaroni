@@ -77,8 +77,7 @@ const CreateSet = (props: Props) => {
     /* Local State */
     const [title, setTitle] = useState<string>('');
     const [description, setDescription] = useState<string>('');
-    const [enteredLabel, setEnteredLabel] = useState<string | null>(null);
-    const [selectedLabel, setSelectedLabel] = useState<string>('');
+    const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
     const [createdSetCards, setCreatedSetCards] = useState<Card[]>([
         { ...EMPTY_CARD, cardUUID: crypto.randomUUID() },
     ]);
@@ -158,10 +157,10 @@ const CreateSet = (props: Props) => {
     /* Loading values for editing a studyset */
     useEffect(() => {
         if (isStudySetSuccess && selectedStudyset) {
-            const { cards, description, label, title } = selectedStudyset;
+            const { cards, description, labels, title } = selectedStudyset;
             setCreatedSetCards(cards);
             setDescription(description);
-            setEnteredLabel(label);
+            setSelectedLabels(labels || []);
             setTitle(title);
         }
     }, [selectedStudyset]);
@@ -182,6 +181,7 @@ const CreateSet = (props: Props) => {
             cards: createdSetCards,
             title,
             description,
+            labels: selectedLabels,
         };
         console.log({ updatedStudyset });
 
@@ -255,16 +255,8 @@ const CreateSet = (props: Props) => {
         setDescription(e.target.value);
     };
 
-    const onLabelChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setEnteredLabel(e.target.value);
-    };
-
-    const onSelectedLabelChange = (e: SelectChangeEvent) => {
-        const newSelectedLabelValue = e.target.value;
-        if (newSelectedLabelValue !== '') {
-            setEnteredLabel(e.target.value);
-        }
-        setSelectedLabel(e.target.value);
+    const onLabelsChange = (newLabels: string[]) => {
+        setSelectedLabels(newLabels);
     };
 
     const handleAddCard = () => {
@@ -297,12 +289,10 @@ const CreateSet = (props: Props) => {
         },
         saveChanges,
         description,
-        label: enteredLabel,
+        labels: selectedLabels,
         onDescriptionChange,
-        onLabelChange,
-        onSelectedLabelChange,
+        onLabelsChange,
         onTitleChange,
-        selectedLabel,
         title,
         mainButtonDisabled,
     };

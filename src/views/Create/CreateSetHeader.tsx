@@ -1,5 +1,5 @@
 import { ArrowBack, Create } from '@mui/icons-material';
-import { Button, FormControl, Typography } from '@mui/material';
+import { Button, Typography, Autocomplete, TextField, Chip } from '@mui/material';
 import { BoldTypography } from 'styles/AppStyles';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import HeaderAdvancedSection from './HeaderAdvancedSection';
@@ -10,79 +10,40 @@ import {
     HeaderContainer,
     HeaderLeft,
     HeaderRight,
-    LabelInput,
-    LabelInputContainer,
-    LabelMenuItem,
-    LabelSelect,
     TitleInput,
     BackToViewButton,
 } from './CreateSetStyles';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetUser } from 'state/api/usersAPI';
-import { ReactElement } from 'react';
 
 type Props = {
     advancedSectionProps: any;
     saveChanges: () => void;
     mainButtonDisabled: boolean;
     description: string;
-    label: string | null;
+    labels: string[];
     onDescriptionChange: any;
-    onLabelChange: any;
-    onSelectedLabelChange: any;
+    onLabelsChange: (labels: string[]) => void;
     onTitleChange: any;
-    selectedLabel: string;
     title: string;
 };
 
 const CreateSetHeader = ({
     advancedSectionProps,
     description,
-    label,
+    labels: selectedLabels,
     mainButtonDisabled,
     onDescriptionChange,
-    onLabelChange,
-    onSelectedLabelChange,
+    onLabelsChange,
     onTitleChange,
     saveChanges,
-    selectedLabel,
     title,
 }: Props) => {
     const navigate = useNavigate();
     const { id: studySetUUID } = useParams();
 
-    const { data: { user: { labels = [] } } = DEFAULT_USER_RESPONSE } =
+    const { data: { user: { labels: userLabels = [] } } = DEFAULT_USER_RESPONSE } =
         useGetUser();
-
-    const renderLabelOptions = () => {
-        const labelJsx: ReactElement[] = [];
-
-        labelJsx.push(
-            <LabelMenuItem key="" value="" sx={{ width: '10rem' }}>
-                <Typography variant="inherit" noWrap color="primary">
-                    None
-                </Typography>
-            </LabelMenuItem>
-        );
-
-        labelJsx.push(
-            ...labels.map((label, index: number) => {
-                return (
-                    <LabelMenuItem
-                        key={index}
-                        value={label}
-                        sx={{ width: '10rem' }}
-                        title={label}
-                    >
-                        <Typography variant="inherit" noWrap>
-                            {label}
-                        </Typography>
-                    </LabelMenuItem>
-                );
-            })
-        );
-        return labelJsx;
-    };
 
     const handleBackToViewing = () => {
         navigate(`/view/${studySetUUID}`);
@@ -131,30 +92,40 @@ const CreateSetHeader = ({
                         </div>
                         <div>
                             <BoldTypography variant="subtitle1">
-                                Label
+                                Labels
                             </BoldTypography>
-                            <LabelInputContainer>
-                                <LabelInput
-                                    variant="standard"
-                                    size="small"
-                                    placeholder={
-                                        'Enter a label for your new study set'
+                            <Autocomplete
+                                multiple
+                                freeSolo
+                                options={userLabels}
+                                value={selectedLabels}
+                                onChange={(_event, newValue) => {
+                                    // Soft limit warning at 10 labels
+                                    if (newValue.length > 10) {
+                                        console.warn('Consider using fewer than 10 labels for better organization');
                                     }
-                                    value={label}
-                                    onChange={onLabelChange}
-                                />
-                                <Typography component="span">
-                                    or select an existing one
-                                </Typography>
-                                <FormControl variant="standard">
-                                    <LabelSelect
-                                        value={selectedLabel}
-                                        onChange={onSelectedLabelChange}
-                                    >
-                                        {renderLabelOptions()}
-                                    </LabelSelect>
-                                </FormControl>
-                            </LabelInputContainer>
+                                    onLabelsChange(newValue);
+                                }}
+                                renderTags={(value, getTagProps) =>
+                                    value.map((option, index) => (
+                                        <Chip
+                                            label={option}
+                                            size="small"
+                                            {...getTagProps({ index })}
+                                            key={index}
+                                        />
+                                    ))
+                                }
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        variant="outlined"
+                                        placeholder={selectedLabels.length === 0 ? "Add labels..." : ""}
+                                        size="small"
+                                    />
+                                )}
+                                sx={{ width: '100%', maxWidth: '40rem' }}
+                            />
                         </div>
                     </CreateSetInputsContainer>
                 </HeaderLeft>
