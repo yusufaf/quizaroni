@@ -33,7 +33,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
         createdAt,
         title,
         description,
-        label,
+        labels,
         lastViewed,
         studysetUUID,
         username,
@@ -156,11 +156,41 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                         </SpacedContainer>
                     </CardInfo>
                     <CardBottom>
-                        <LabelChip
-                            label={label ? label : 'No label selected'}
-                            variant="outlined"
-                            color={!label ? 'error' : undefined}
-                        />
+                        {labels.length === 0 ? (
+                            <LabelChip
+                                label="No labels"
+                                variant="outlined"
+                                color="error"
+                                size="small"
+                            />
+                        ) : labels.length > 3 ? (
+                            <>
+                                {labels.slice(0, 3).map((label, idx) => (
+                                    <LabelChip
+                                        key={idx}
+                                        label={label}
+                                        variant="outlined"
+                                        size="small"
+                                    />
+                                ))}
+                                <Tooltip title={labels.slice(3).join(', ')}>
+                                    <LabelChip
+                                        label={`+${labels.length - 3}`}
+                                        variant="outlined"
+                                        size="small"
+                                    />
+                                </Tooltip>
+                            </>
+                        ) : (
+                            labels.map((label, idx) => (
+                                <LabelChip
+                                    key={idx}
+                                    label={label}
+                                    variant="outlined"
+                                    size="small"
+                                />
+                            ))
+                        )}
                         <IconButton
                             onClick={(e) => {
                                 e.stopPropagation();

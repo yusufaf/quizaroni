@@ -4,7 +4,7 @@ import { useGetUser } from 'state/api/usersAPI';
 import {
     useDeleteLabel,
     useEditLabel,
-    useChangeLabel,
+    useBatchUpdateStudysetLabels,
     useGetAllStudysets,
     useGetStudyset,
     useCreateLabel,
@@ -40,7 +40,7 @@ export const useLabelsDialog = () => {
     const [showCascadePreview, setShowCascadePreview] = useState(false);
     const [cascadeAction, setCascadeAction] = useState<'edit' | 'delete' | null>(null);
     const [selectedStudysetUUIDs, setSelectedStudysetUUIDs] = useState<string[]>([]);
-    const [assignLabel, setAssignLabel] = useState('');
+    const [assignLabels, setAssignLabels] = useState<string[]>([]);
 
     const { mutate: createLabel, isPending: isCreatingLabel } = useCustomMutation({
         mutation: useCreateLabel,
@@ -71,10 +71,10 @@ export const useLabelsDialog = () => {
         },
     });
 
-    const { mutate: changeLabel, isPending: isChangingLabel } = useCustomMutation({
-        mutation: useChangeLabel,
-        successMessage: 'Successfully assigned label',
-        errorMessage: 'Error assigning label',
+    const { mutate: batchUpdateLabels, isPending: isAssigningLabels } = useCustomMutation({
+        mutation: useBatchUpdateStudysetLabels,
+        successMessage: 'Successfully assigned labels',
+        errorMessage: 'Error assigning labels',
     });
 
     useEffect(() => {
@@ -107,10 +107,10 @@ export const useLabelsDialog = () => {
     const getAffectedStudysetsForLabel = useCallback(
         (labelName: string): AffectedItem[] => {
             return studysets
-                .filter((ss) => ss.label === labelName)
+                .filter((ss) => ss.labels?.includes(labelName))
                 .map((ss) => ({
                     name: ss.title,
-                    detail: `Current label: ${ss.label}`,
+                    detail: `Labels: ${ss.labels?.join(', ') || 'None'}`,
                 }));
         },
         [studysets]
@@ -119,10 +119,10 @@ export const useLabelsDialog = () => {
     const getAffectedStudysetsForDelete = useCallback((): AffectedItem[] => {
         const labelsToDelete = deleteIndices.map((i) => labels[i]);
         return studysets
-            .filter((ss) => labelsToDelete.includes(ss.label))
+            .filter((ss) => ss.labels?.some((l: string) => labelsToDelete.includes(l)))
             .map((ss) => ({
                 name: ss.title,
-                detail: `Current label: ${ss.label}`,
+                detail: `Labels: ${ss.labels?.join(', ') || 'None'}`,
             }));
     }, [deleteIndices, labels, studysets]);
 
@@ -205,16 +205,16 @@ export const useLabelsDialog = () => {
     }, [cascadeAction, confirmDelete]);
 
     const handleAssignLabel = useCallback(() => {
-        if (!assignLabel || selectedStudysetUUIDs.length === 0) {
+        if (!assignLabels.length || selectedStudysetUUIDs.length === 0) {
             return;
         }
-        selectedStudysetUUIDs.forEach((uuid) => {
-            changeLabel({
-                studysetUUID: uuid,
-                newLabel: assignLabel,
-            });
+        if (assignLabels.length > 10) {
+            console.warn('Consider using fewer than 10 labels for better organization');
+        }
+        batchUpdateLabels({
+            studysetUpdates: selectedStudysetUUIDs.map((uuid) => [uuid, assignLabels]),
         });
-    }, [assignLabel, selectedStudysetUUIDs, changeLabel]);
+    }, [assignLabels, selectedStudysetUUIDs, batchUpdateLabels]);
 
     const onClose = useCallback(() => {
         setLabelsDialogProps({
@@ -260,8 +260,8 @@ export const useLabelsDialog = () => {
         deleteIndices,
         selectedStudysetUUIDs,
         setSelectedStudysetUUIDs,
-        assignLabel,
-        setAssignLabel,
+        assignLabels,
+        setAssignLabels,
         validateName,
         handleCreate,
         handleEdit,
@@ -273,8 +273,8 @@ export const useLabelsDialog = () => {
         isCreatingLabel,
         isEditingLabel,
         isDeletingLabel,
-        isChangingLabel,
-        isPending: isCreatingLabel || isEditingLabel || isDeletingLabel || isChangingLabel,
+        isAssigningLabels,
+        isPending: isCreatingLabel || isEditingLabel || isDeletingLabel || isAssigningLabels,
         showCascadePreview,
         cascadeAction,
         affectedItems,

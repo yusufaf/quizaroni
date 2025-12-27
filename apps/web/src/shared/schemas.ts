@@ -55,7 +55,7 @@ export const StudysetSchema = z.object({
     createdAt: TimestampSchema,
     description: z.string(),
     favorited: z.boolean().optional(),
-    label: z.string(),
+    labels: z.array(z.string()),
     lastViewed: TimestampSchema,
     metadata: StudysetMetadataSchema,
     studysetUUID: UUIDSchema,
@@ -188,8 +188,17 @@ export const EditLabelRequestSchema = z.object({
 });
 
 export const ChangeLabelRequestSchema = z.object({
-    newLabel: z.string(),
+    newLabel: z.string(), // deprecated
     studysetUUID: UUIDSchema,
+});
+
+export const UpdateStudysetLabelsRequestSchema = z.object({
+    labels: z.array(z.string()),
+    studysetUUID: UUIDSchema,
+});
+
+export const BatchUpdateStudysetLabelsRequestSchema = z.object({
+    studysetUpdates: z.array(z.tuple([UUIDSchema, z.array(z.string())])),
 });
 
 // Categories
