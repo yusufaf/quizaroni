@@ -268,6 +268,11 @@ const CreateSet = (props: Props) => {
         });
     };
 
+    const handleImportCards = (importedCards: Card[]) => {
+        // Append imported cards to existing cards
+        setCreatedSetCards([...createdSetCards, ...importedCards]);
+    };
+
     /* Advanced Section Functions */
 
     const onBlankInputsSubmit = () => {
@@ -347,7 +352,10 @@ const CreateSet = (props: Props) => {
                 </Button>
             </CreateSetPage>
             {showImportModal && (
-                <ImportCardsModal setShowImportModal={setShowImportModal} />
+                <ImportCardsModal
+                    setShowImportModal={setShowImportModal}
+                    onImportCards={handleImportCards}
+                />
             )}
             {namedColorsDialogProps.open && <NamedColorsDialog />}
             <ScrollToTopFab />
