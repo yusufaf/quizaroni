@@ -127,7 +127,7 @@ const FormatTerminologies = ({ studyset }: Props) => {
     return (
         <div>
             <FormControl>
-                <FormLabel id="terminology-radio-group-label">
+                <FormLabel id="terminology-radio-group-label" sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}>
                     Terminology
                 </FormLabel>
                 <RadioGroup
