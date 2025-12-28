@@ -1,12 +1,13 @@
 import { Drawer, Box, Typography } from '@mui/material/';
 import styled from '@emotion/styled';
 
-export const StyledDrawer = styled(Drawer)(({ theme }) => ({
+export const StyledDrawer = styled(Drawer)<{ anchor?: 'left' | 'right' }>(({ theme, anchor }) => ({
     '& .MuiDrawer-paper': {
         position: 'fixed',
         top: '5rem',
         height: 'calc(100vh - 5rem)',
         width: '24rem',
+        ...(anchor === 'left' ? { left: '1.5rem' } : { right: '1.5rem' }),
         overflowY: 'auto',
         border: 'none',
         background: 'transparent',

@@ -1,4 +1,4 @@
-import { ArrowBack, ViewCarouselRounded, CreditCard } from '@mui/icons-material/';
+import { ArrowBack, ViewCarouselRounded, CreditCard, LocalOffer } from '@mui/icons-material/';
 import { Button, Chip, Skeleton, Tooltip, Typography, Box } from '@mui/material/';
 import { BoldTypography, SimpleFlexContainer } from 'styles/AppStyles';
 import ScrollToTopFab from 'components/ScrollToTopFab/ScrollToTopFab';
@@ -205,12 +205,16 @@ const ViewStudySet = (props: Props) => {
         navigate(`/edit/${studysetUUID}`);
     };
 
+    const notesDrawerPosition = selectedStudyset?.metadata?.notesDrawerPosition || 'right';
+    const drawerPadding = isNotesDrawerHidden ? '22rem' : '27.5rem';
+
     return (
         <>
             <ViewStudysetPage
                 className="view-set-page"
                 sx={{
-                    paddingRight: isNotesDrawerHidden ? '22rem' : '26rem',
+                    paddingLeft: drawerPadding,
+                    paddingRight: drawerPadding,
                     transition: 'padding 0.3s ease',
                 }}
             >
@@ -238,25 +242,6 @@ const ViewStudySet = (props: Props) => {
                                         <>{`Created by ${selectedStudyset?.username}`}</>
                                     )}
                                 </Typography>
-                                <Tooltip
-                                    title="Manage Labels"
-                                    placement="right"
-                                >
-                                    <Chip
-                                        label={
-                                            selectedStudyset?.label
-                                                ? selectedStudyset?.label
-                                                : 'No label selected'
-                                        }
-                                        color={
-                                            !selectedStudyset?.label
-                                                ? 'error'
-                                                : undefined
-                                        }
-                                        variant="outlined"
-                                        onClick={showManageLabelsDialog}
-                                    />
-                                </Tooltip>
                                 <StudysetDescription variant="body1">
                                     {isStudySetLoading ? (
                                         <Skeleton />
@@ -264,6 +249,42 @@ const ViewStudySet = (props: Props) => {
                                         <>{selectedStudyset?.description}</>
                                     )}
                                 </StudysetDescription>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        flexWrap: 'wrap',
+                                        mt: '1rem',
+                                        mb: '1rem',
+                                    }}
+                                >
+                                    <LocalOffer
+                                        sx={{
+                                            fontSize: '1.25rem',
+                                            color: 'primary.main',
+                                        }}
+                                    />
+                                    <Tooltip
+                                        title="Manage Labels"
+                                        placement="right"
+                                    >
+                                        <Chip
+                                            label={
+                                                selectedStudyset?.label
+                                                    ? selectedStudyset?.label
+                                                    : 'No label selected'
+                                            }
+                                            color={
+                                                !selectedStudyset?.label
+                                                    ? 'error'
+                                                    : undefined
+                                            }
+                                            variant="outlined"
+                                            onClick={showManageLabelsDialog}
+                                        />
+                                    </Tooltip>
+                                </Box>
                                 <StudysetActions
                                     updateMetadataField={updateMetadataField}
                                     selectedStudyset={selectedStudyset}
