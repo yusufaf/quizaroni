@@ -114,6 +114,11 @@ export const NewCard = styled(Card)({
     flexDirection: 'column',
     gap: '0.5rem',
     width: '100%',
+    transition: 'all 0.2s ease',
+    boxShadow: '0 0.25rem 0.75rem rgba(255,160,0,0.15)',
+    '&:hover': {
+        boxShadow: '0 0.375rem 1rem rgba(255,160,0,0.25)',
+    },
 });
 
 export const AddCardButton = styled(Button)({
