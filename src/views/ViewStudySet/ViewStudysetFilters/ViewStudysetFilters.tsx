@@ -19,8 +19,9 @@ import {
     MenuItem,
     Select,
     SelectChangeEvent,
+    Tooltip,
 } from '@mui/material';
-import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, Category } from '@mui/icons-material';
 import { useViewSetsStore } from 'state/stores/viewSets';
 
 type Props = {
@@ -83,9 +84,15 @@ const ViewStudysetFilters = ({
                 >
                     {categoryTabs}
                 </CategoryTabs>
-                <Button variant="outlined" onClick={handleShowCategoriesDialog}>
-                    Manage Categories
-                </Button>
+                <Tooltip title="Manage Categories">
+                    <IconButton
+                        color="primary"
+                        onClick={handleShowCategoriesDialog}
+                        aria-label="Manage Categories"
+                    >
+                        <Category />
+                    </IconButton>
+                </Tooltip>
             </SimpleFlexContainer>
             <SimpleFlexContainer>
                 <IconButton

@@ -30,8 +30,8 @@ const ManageLabelsDialog = () => {
         deleteIndices,
         selectedStudysetUUIDs,
         setSelectedStudysetUUIDs,
-        assignLabel,
-        setAssignLabel,
+        assignLabels,
+        setAssignLabels,
         validateName,
         handleCreate,
         handleEdit,
@@ -118,9 +118,9 @@ const ManageLabelsDialog = () => {
                                 labels={labels}
                                 studysets={studysets}
                                 selectedStudysetUUIDs={selectedStudysetUUIDs}
-                                assignLabel={assignLabel}
+                                assignLabels={assignLabels}
                                 onStudysetsChange={setSelectedStudysetUUIDs}
-                                onLabelChange={setAssignLabel}
+                                onLabelsChange={setAssignLabels}
                                 onAssign={handleAssignLabel}
                                 isLoading={isPending}
                             />

@@ -266,7 +266,7 @@ const NotesDrawer = (props: Props) => {
                             onClick={handleSortMenuOpen}
                             size="small"
                             sx={{
-                                color: 'text.secondary',
+                                color: 'white',
                                 '&:hover': { color: 'primary.main' },
                             }}
                         >
