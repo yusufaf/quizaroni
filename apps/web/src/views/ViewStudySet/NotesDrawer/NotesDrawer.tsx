@@ -2,6 +2,7 @@ import {
     Add as AddIcon,
     ExpandMore as ExpandMoreIcon,
     MenuOpen as MenuOpenIcon,
+    Sort as SortIcon,
     StickyNote2 as NoteIcon,
 } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
@@ -14,6 +15,9 @@ import {
     Chip,
     Divider,
     Fab,
+    IconButton,
+    Menu,
+    MenuItem,
     Tooltip,
     Typography,
 } from '@mui/material/';
@@ -29,6 +33,7 @@ import { useMemo, useState } from 'react';
 import {
     useCreateNote,
     useEditNote,
+    useUpdateStudyset,
 } from 'state/api/studysetsAPI';
 import { NOTES_DRAWER_INITIAL_APPEARANCE } from 'shared/constants';
 import NotesList from './NotesList';
@@ -58,7 +63,8 @@ const NotesDrawer = (props: Props) => {
         notesDrawerInitial === NOTES_DRAWER_INITIAL_APPEARANCE.CLOSED
     );
 
-    const hidden = externalHidden !== undefined ? externalHidden : internalHidden;
+    const hidden =
+        externalHidden !== undefined ? externalHidden : internalHidden;
     const setHidden = (value: boolean) => {
         if (onToggle) {
             onToggle(value);
@@ -68,8 +74,14 @@ const NotesDrawer = (props: Props) => {
     };
     const [openNotes, setOpenNotes] = useState<OpenCardNotes>(new Set());
     const [currentEditKey, setCurrentEditKey] = useState<string>('');
+    const [sortAnchorEl, setSortAnchorEl] = useState<null | HTMLElement>(null);
 
     const [noteActionsStack, setNoteActionsStack] = useState([]);
+
+    const sortMenuOpen = Boolean(sortAnchorEl);
+    const notesSortBy = selectedStudyset?.metadata?.notesSortBy || 'cardOrder';
+    const notesSortDirection =
+        selectedStudyset?.metadata?.notesSortDirection || 'asc';
 
     const {
         mutate: createNote,
@@ -93,6 +105,8 @@ const NotesDrawer = (props: Props) => {
         errorMessage: 'Error editing note',
     });
 
+    const { mutate: updateStudyset } = useUpdateStudyset();
+
     const fabPosition = useMemo(() => {
         if (notesDrawerPosition === 'right') {
             return { right: '1.5rem', top: '5.5rem' };
@@ -100,8 +114,61 @@ const NotesDrawer = (props: Props) => {
         return { left: '1.5rem', top: '5.5rem' };
     }, [notesDrawerPosition]);
 
+    const sortedCards = useMemo(() => {
+        if (!selectedStudyset?.cards) return [];
+
+        return selectedStudyset.cards.map((card) => {
+            const sortedNotes = [...card.notes];
+
+            if (notesSortBy === 'alphabetical') {
+                sortedNotes.sort((a, b) => {
+                    const comparison = a.text.localeCompare(b.text);
+                    return notesSortDirection === 'asc'
+                        ? comparison
+                        : -comparison;
+                });
+            } else if (notesSortBy === 'date') {
+                sortedNotes.sort((a, b) => {
+                    const aTime = a.createdAt
+                        ? new Date(a.createdAt).getTime()
+                        : 0;
+                    const bTime = b.createdAt
+                        ? new Date(b.createdAt).getTime()
+                        : 0;
+                    const comparison = aTime - bTime;
+                    return notesSortDirection === 'asc'
+                        ? comparison
+                        : -comparison;
+                });
+            }
+            // cardOrder doesn't need sorting (preserves original order)
+
+            return { ...card, notes: sortedNotes };
+        });
+    }, [selectedStudyset, notesSortBy, notesSortDirection]);
+
     const onClose = () => {
         setHidden(true);
+    };
+
+    const handleSortMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setSortAnchorEl(event.currentTarget);
+    };
+
+    const handleSortMenuClose = () => {
+        setSortAnchorEl(null);
+    };
+
+    const handleSortChange = (sortBy: string, direction: string) => {
+        updateStudyset({
+            studysetUUID,
+            updates: {
+                notesSortBy: sortBy,
+                notesSortDirection: direction,
+            },
+            isMetadataUpdate: true,
+        });
+        handleSortMenuClose();
     };
 
     /**
@@ -174,17 +241,77 @@ const NotesDrawer = (props: Props) => {
                 exit: transitionDuration,
             }}
         >
-            <SpacedFlexContainer sx={{ mb: '1.5rem', pl: '1rem', pr: '1.5rem', pt: '1rem' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <SpacedFlexContainer
+                sx={{ mb: '1.5rem', pl: '1rem', pr: '1.5rem', pt: '1rem' }}
+            >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                    }}
+                >
                     <NoteIcon sx={{ color: 'primary.main' }} />
                     <BoldTypography variant="h5">Notes</BoldTypography>
                 </Box>
-                <CloseDialogButton onClose={onClose} />
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                    }}
+                >
+                    <Tooltip title="Sort notes">
+                        <IconButton
+                            onClick={handleSortMenuOpen}
+                            size="small"
+                            sx={{
+                                color: 'text.secondary',
+                                '&:hover': { color: 'primary.main' },
+                            }}
+                        >
+                            <SortIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <CloseDialogButton onClose={onClose} />
+                </Box>
             </SpacedFlexContainer>
 
-            {selectedStudyset?.cards && selectedStudyset.cards.length > 0 ? (
+            {/* Sort Menu */}
+            <Menu
+                anchorEl={sortAnchorEl}
+                open={sortMenuOpen}
+                onClose={handleSortMenuClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+                <MenuItem
+                    onClick={() => handleSortChange('alphabetical', 'asc')}
+                >
+                    A → Z
+                </MenuItem>
+                <MenuItem
+                    onClick={() => handleSortChange('alphabetical', 'desc')}
+                >
+                    Z → A
+                </MenuItem>
+                <MenuItem onClick={() => handleSortChange('date', 'desc')}>
+                    Newest First
+                </MenuItem>
+                <MenuItem onClick={() => handleSortChange('date', 'asc')}>
+                    Oldest First
+                </MenuItem>
+                <MenuItem onClick={() => handleSortChange('cardOrder', 'asc')}>
+                    Card Order ↑
+                </MenuItem>
+                <MenuItem onClick={() => handleSortChange('cardOrder', 'desc')}>
+                    Card Order ↓
+                </MenuItem>
+            </Menu>
+
+            {sortedCards && sortedCards.length > 0 ? (
                 <Box sx={{ pl: '0.5rem', pr: '1.5rem', pb: '1rem' }}>
-                    {selectedStudyset.cards.map((card: Card, index: number) => {
+                    {sortedCards.map((card: Card, index: number) => {
                         const { cardUUID, term, definition, notes = [] } = card;
                         const noteCount = notes.length;
 
@@ -202,9 +329,11 @@ const NotesDrawer = (props: Props) => {
                                     mb: '0.75rem',
                                     borderRadius: '0.5rem !important',
                                     '&:before': { display: 'none' },
-                                    boxShadow: '0 0.125rem 0.375rem rgba(0,0,0,0.1)',
+                                    boxShadow:
+                                        '0 0.125rem 0.375rem rgba(0,0,0,0.1)',
                                     '&.Mui-expanded': {
-                                        boxShadow: '0 0.25rem 0.75rem rgba(255,160,0,0.15)',
+                                        boxShadow:
+                                            '0 0.25rem 0.75rem rgba(255,160,0,0.15)',
                                     },
                                 }}
                             >
@@ -219,13 +348,28 @@ const NotesDrawer = (props: Props) => {
                                             flexDirection: 'column',
                                             gap: '0.25rem',
                                         },
-                                        '& .MuiAccordionSummary-content.Mui-expanded': {
-                                            my: '0.75rem',
-                                        },
+                                        '& .MuiAccordionSummary-content.Mui-expanded':
+                                            {
+                                                my: '0.75rem',
+                                            },
                                     }}
                                 >
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem', mb: '0.25rem', flexShrink: 0 }}>
-                                        <BoldTypography variant="subtitle1" sx={{ fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.5rem',
+                                            mb: '0.25rem',
+                                            flexShrink: 0,
+                                        }}
+                                    >
+                                        <BoldTypography
+                                            variant="subtitle1"
+                                            sx={{
+                                                fontSize: '0.875rem',
+                                                whiteSpace: 'nowrap',
+                                            }}
+                                        >
                                             Card {index + 1}
                                         </BoldTypography>
                                         {noteCount > 0 && (
@@ -246,15 +390,30 @@ const NotesDrawer = (props: Props) => {
                                     <CardPreviewText variant="body2">
                                         {term || 'No term'}
                                     </CardPreviewText>
-                                    <CardPreviewText variant="caption" sx={{ fontStyle: 'italic', opacity: 0.7 }}>
+                                    <CardPreviewText
+                                        variant="caption"
+                                        sx={{
+                                            fontStyle: 'italic',
+                                            opacity: 0.7,
+                                        }}
+                                    >
                                         {definition || 'No definition'}
                                     </CardPreviewText>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ pt: 0 }}>
                                     {noteCount === 0 ? (
                                         <EmptyStateBox>
-                                            <NoteIcon sx={{ fontSize: '2rem', opacity: 0.3, mb: '0.5rem' }} />
-                                            <Typography variant="body2" color="text.secondary">
+                                            <NoteIcon
+                                                sx={{
+                                                    fontSize: '2rem',
+                                                    opacity: 0.3,
+                                                    mb: '0.5rem',
+                                                }}
+                                            />
+                                            <Typography
+                                                variant="body2"
+                                                color="text.secondary"
+                                            >
                                                 No notes yet
                                             </Typography>
                                         </EmptyStateBox>
@@ -263,14 +422,19 @@ const NotesDrawer = (props: Props) => {
                                             <NotesList
                                                 card={card}
                                                 currentEditKey={currentEditKey}
-                                                handleEditNoteBlur={handleEditNoteBlur}
+                                                handleEditNoteBlur={
+                                                    handleEditNoteBlur
+                                                }
                                                 handleEditingNoteToggle={
                                                     handleEditingNoteToggle
                                                 }
                                                 studysetUUID={studysetUUID}
                                             />
                                             <Divider
-                                                sx={{ width: '100%', margin: '1rem 0' }}
+                                                sx={{
+                                                    width: '100%',
+                                                    margin: '1rem 0',
+                                                }}
                                             />
                                         </>
                                     )}
@@ -297,7 +461,9 @@ const NotesDrawer = (props: Props) => {
                 </Box>
             ) : (
                 <EmptyStateBox sx={{ mt: '2rem' }}>
-                    <NoteIcon sx={{ fontSize: '3rem', opacity: 0.2, mb: '1rem' }} />
+                    <NoteIcon
+                        sx={{ fontSize: '3rem', opacity: 0.2, mb: '1rem' }}
+                    />
                     <Typography variant="h6" color="text.secondary">
                         No cards in this study set
                     </Typography>

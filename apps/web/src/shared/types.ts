@@ -43,6 +43,7 @@ export type Card = {
 export type Note = {
     text: string;
     noteUUID: UUID;
+    createdAt?: Timestamp;
 };
 
 export type PrintConfig = {
@@ -63,6 +64,8 @@ export type StudysetMetadata = {
     labelTerminology: string;
     notesDrawerInitial: string;
     notesDrawerPosition: 'left' | 'right';
+    notesSortBy?: 'alphabetical' | 'date' | 'cardOrder';
+    notesSortDirection?: 'asc' | 'desc';
     printConfig?: PrintConfig;
     publiclyViewable: boolean;
     terminology: string;
