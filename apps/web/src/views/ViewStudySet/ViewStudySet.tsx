@@ -21,6 +21,7 @@ import {
     SORT_DIRECTIONS,
     VIEW_SET_DIALOGS,
     DEFAULT_USER_RESPONSE,
+    NOTES_DRAWER_INITIAL_APPEARANCE,
 } from 'shared/constants';
 import {
     DndContext,
@@ -103,6 +104,7 @@ const ViewStudySet = (props: Props) => {
     const [sortDirection, setSortDirection] = useState<SortDirection>(
         SORT_DIRECTIONS.ASC
     );
+    const [isNotesDrawerHidden, setIsNotesDrawerHidden] = useState<boolean>(true);
 
     useEffect(() => {
         if (!updatedViewTimestamp.current && studysetUUID) {
@@ -116,6 +118,16 @@ const ViewStudySet = (props: Props) => {
             updatedViewTimestamp.current = true;
         }
     }, [studysetUUID]);
+
+    // Sync drawer initial state from metadata
+    useEffect(() => {
+        if (selectedStudyset?.metadata?.notesDrawerInitial) {
+            const shouldBeHidden =
+                selectedStudyset.metadata.notesDrawerInitial ===
+                NOTES_DRAWER_INITIAL_APPEARANCE.CLOSED;
+            setIsNotesDrawerHidden(shouldBeHidden);
+        }
+    }, [selectedStudyset?.metadata?.notesDrawerInitial]);
 
     const updateMetadataField = (property: string, newValue: any) => {
         try {
@@ -195,7 +207,13 @@ const ViewStudySet = (props: Props) => {
 
     return (
         <>
-            <ViewStudysetPage className="view-set-page">
+            <ViewStudysetPage
+                className="view-set-page"
+                sx={{
+                    paddingRight: isNotesDrawerHidden ? '22rem' : '26rem',
+                    transition: 'padding 0.3s ease',
+                }}
+            >
                 <ViewFlashsetPaper elevation={6}>
                     <ViewStudysetContainer>
                         <ViewStudysetHeader id="viewStudysetHeader">
@@ -372,7 +390,11 @@ const ViewStudySet = (props: Props) => {
                 >
                     Update Cards
                 </UpdateCardsButton>
-                <NotesDrawer selectedStudyset={selectedStudyset} />
+                <NotesDrawer
+                    selectedStudyset={selectedStudyset}
+                    isHidden={isNotesDrawerHidden}
+                    onToggle={setIsNotesDrawerHidden}
+                />
             </ViewStudysetPage>
             <NotificationsDialog
                 open={selectedDialog === VIEW_SET_DIALOGS.NOTIFICATIONS}

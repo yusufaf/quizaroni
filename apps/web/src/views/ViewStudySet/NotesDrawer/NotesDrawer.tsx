@@ -2,15 +2,20 @@ import {
     Add as AddIcon,
     ExpandMore as ExpandMoreIcon,
     MenuOpen as MenuOpenIcon,
+    StickyNote2 as NoteIcon,
 } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
+    Badge,
+    Box,
+    Chip,
     Divider,
     Fab,
     Tooltip,
+    Typography,
 } from '@mui/material/';
 import {
     BoldTypography,
@@ -27,16 +32,18 @@ import {
 } from 'state/api/studysetsAPI';
 import { NOTES_DRAWER_INITIAL_APPEARANCE } from 'shared/constants';
 import NotesList from './NotesList';
-import { StyledDrawer } from './styles';
+import { StyledDrawer, CardPreviewText, EmptyStateBox } from './styles';
 
 type Props = {
     selectedStudyset: Studyset;
+    isHidden?: boolean;
+    onToggle?: (hidden: boolean) => void;
 };
 
 const transitionDuration = 1000; //can also use theme.transitions.duration
 
 const NotesDrawer = (props: Props) => {
-    const { selectedStudyset } = props;
+    const { selectedStudyset, isHidden: externalHidden, onToggle } = props;
 
     const {
         studysetUUID = '',
@@ -46,10 +53,19 @@ const NotesDrawer = (props: Props) => {
         } = {},
     } = selectedStudyset || {};
 
-    // TODO: Doesn't work on initial load as expected
-    const [hidden, setHidden] = useState<boolean>(
+    // Use external hidden state if provided, otherwise use internal state
+    const [internalHidden, setInternalHidden] = useState<boolean>(
         notesDrawerInitial === NOTES_DRAWER_INITIAL_APPEARANCE.CLOSED
     );
+
+    const hidden = externalHidden !== undefined ? externalHidden : internalHidden;
+    const setHidden = (value: boolean) => {
+        if (onToggle) {
+            onToggle(value);
+        } else {
+            setInternalHidden(value);
+        }
+    };
     const [openNotes, setOpenNotes] = useState<OpenCardNotes>(new Set());
     const [currentEditKey, setCurrentEditKey] = useState<string>('');
 
@@ -79,9 +95,9 @@ const NotesDrawer = (props: Props) => {
 
     const fabPosition = useMemo(() => {
         if (notesDrawerPosition === 'right') {
-            return { right: '2rem' };
+            return { right: '1.5rem', top: '5.5rem' };
         }
-        return { left: '2rem' };
+        return { left: '1.5rem', top: '5.5rem' };
     }, [notesDrawerPosition]);
 
     const onClose = () => {
@@ -141,7 +157,7 @@ const NotesDrawer = (props: Props) => {
                 aria-label="Open notes drawer"
                 title="Open notes drawer"
                 sx={{
-                    position: 'absolute',
+                    position: 'fixed',
                     ...fabPosition,
                 }}
             >
@@ -158,66 +174,135 @@ const NotesDrawer = (props: Props) => {
                 exit: transitionDuration,
             }}
         >
-            <SpacedFlexContainer>
-                <BoldTypography variant="h5">Notes</BoldTypography>
+            <SpacedFlexContainer sx={{ mb: '1.5rem', pl: '1rem', pr: '1.5rem', pt: '1rem' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <NoteIcon sx={{ color: 'primary.main' }} />
+                    <BoldTypography variant="h5">Notes</BoldTypography>
+                </Box>
                 <CloseDialogButton onClose={onClose} />
             </SpacedFlexContainer>
-            {selectedStudyset?.cards?.map((card: Card, index: number) => {
-                const { cardUUID } = card;
-                return (
-                    <Accordion
-                        expanded={openNotes.has(cardUUID)}
-                        onChange={handleAccordionChange(cardUUID)}
-                        slotProps={{
-                            transition: {
-                                unmountOnExit: true,
-                            },
-                        }}
-                        key={cardUUID}
-                    >
-                        <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls={`Card ${index + 1} content`}
-                        >
-                            <BoldTypography variant="h6">
-                                Card {index + 1}
-                            </BoldTypography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                            <NotesList
-                                card={card}
-                                currentEditKey={currentEditKey}
-                                handleEditNoteBlur={handleEditNoteBlur}
-                                handleEditingNoteToggle={
-                                    handleEditingNoteToggle
-                                }
-                                studysetUUID={studysetUUID}
-                            />
-                            {card.notes.length !== 0 && (
-                                <Divider
-                                    sx={{ width: '100%', margin: '1rem 0' }}
-                                />
-                            )}
-                            <LoadingButton
-                                loading={isCreateNoteLoading}
-                                startIcon={<AddIcon />}
-                                variant="outlined"
-                                onClick={() => {
-                                    createNote({
-                                        studysetUUID,
-                                        cardUUID,
-                                    });
+
+            {selectedStudyset?.cards && selectedStudyset.cards.length > 0 ? (
+                <Box sx={{ pl: '0.5rem', pr: '1.5rem', pb: '1rem' }}>
+                    {selectedStudyset.cards.map((card: Card, index: number) => {
+                        const { cardUUID, term, definition, notes = [] } = card;
+                        const noteCount = notes.length;
+
+                        return (
+                            <Accordion
+                                expanded={openNotes.has(cardUUID)}
+                                onChange={handleAccordionChange(cardUUID)}
+                                slotProps={{
+                                    transition: {
+                                        unmountOnExit: true,
+                                    },
                                 }}
+                                key={cardUUID}
                                 sx={{
-                                    width: '100%',
+                                    mb: '0.75rem',
+                                    borderRadius: '0.5rem !important',
+                                    '&:before': { display: 'none' },
+                                    boxShadow: '0 0.125rem 0.375rem rgba(0,0,0,0.1)',
+                                    '&.Mui-expanded': {
+                                        boxShadow: '0 0.25rem 0.75rem rgba(255,160,0,0.15)',
+                                    },
                                 }}
                             >
-                                Add Note
-                            </LoadingButton>
-                        </AccordionDetails>
-                    </Accordion>
-                );
-            })}
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls={`Card ${index + 1} content`}
+                                    sx={{
+                                        minHeight: '4rem !important',
+                                        '& .MuiAccordionSummary-content': {
+                                            my: '0.75rem',
+                                            overflow: 'hidden',
+                                            flexDirection: 'column',
+                                            gap: '0.25rem',
+                                        },
+                                        '& .MuiAccordionSummary-content.Mui-expanded': {
+                                            my: '0.75rem',
+                                        },
+                                    }}
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem', mb: '0.25rem', flexShrink: 0 }}>
+                                        <BoldTypography variant="subtitle1" sx={{ fontSize: '0.875rem', whiteSpace: 'nowrap' }}>
+                                            Card {index + 1}
+                                        </BoldTypography>
+                                        {noteCount > 0 && (
+                                            <Chip
+                                                label={`${noteCount} ${noteCount === 1 ? 'note' : 'notes'}`}
+                                                size="small"
+                                                sx={{
+                                                    height: '1.25rem',
+                                                    fontSize: '0.75rem',
+                                                    bgcolor: 'primary.main',
+                                                    color: 'primary.contrastText',
+                                                    fontWeight: 600,
+                                                    flexShrink: 0,
+                                                }}
+                                            />
+                                        )}
+                                    </Box>
+                                    <CardPreviewText variant="body2">
+                                        {term || 'No term'}
+                                    </CardPreviewText>
+                                    <CardPreviewText variant="caption" sx={{ fontStyle: 'italic', opacity: 0.7 }}>
+                                        {definition || 'No definition'}
+                                    </CardPreviewText>
+                                </AccordionSummary>
+                                <AccordionDetails sx={{ pt: 0 }}>
+                                    {noteCount === 0 ? (
+                                        <EmptyStateBox>
+                                            <NoteIcon sx={{ fontSize: '2rem', opacity: 0.3, mb: '0.5rem' }} />
+                                            <Typography variant="body2" color="text.secondary">
+                                                No notes yet
+                                            </Typography>
+                                        </EmptyStateBox>
+                                    ) : (
+                                        <>
+                                            <NotesList
+                                                card={card}
+                                                currentEditKey={currentEditKey}
+                                                handleEditNoteBlur={handleEditNoteBlur}
+                                                handleEditingNoteToggle={
+                                                    handleEditingNoteToggle
+                                                }
+                                                studysetUUID={studysetUUID}
+                                            />
+                                            <Divider
+                                                sx={{ width: '100%', margin: '1rem 0' }}
+                                            />
+                                        </>
+                                    )}
+                                    <LoadingButton
+                                        loading={isCreateNoteLoading}
+                                        startIcon={<AddIcon />}
+                                        variant="outlined"
+                                        onClick={() => {
+                                            createNote({
+                                                studysetUUID,
+                                                cardUUID,
+                                            });
+                                        }}
+                                        sx={{
+                                            width: '100%',
+                                        }}
+                                    >
+                                        Add Note
+                                    </LoadingButton>
+                                </AccordionDetails>
+                            </Accordion>
+                        );
+                    })}
+                </Box>
+            ) : (
+                <EmptyStateBox sx={{ mt: '2rem' }}>
+                    <NoteIcon sx={{ fontSize: '3rem', opacity: 0.2, mb: '1rem' }} />
+                    <Typography variant="h6" color="text.secondary">
+                        No cards in this study set
+                    </Typography>
+                </EmptyStateBox>
+            )}
         </StyledDrawer>
     );
 };

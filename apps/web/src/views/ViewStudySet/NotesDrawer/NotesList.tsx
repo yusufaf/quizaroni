@@ -54,13 +54,31 @@ const NoteList = ({
     };
 
     return (
-        <FlexColumn>
+        <FlexColumn sx={{ gap: '0.75rem' }}>
             {card.notes.map((note: Note, index: number) => {
                 const { noteUUID } = note;
+                const isEditing = currentEditKey === noteUUID;
+                const isDeleting = isDeleteNoteLoading && noteUUID === noteBeingDeleted;
+
                 return (
-                    <SimpleFlexContainer key={noteUUID} style={{ gap: '1rem' }}>
+                    <SimpleFlexContainer
+                        key={noteUUID}
+                        sx={{
+                            gap: '0.5rem',
+                            p: '0.75rem',
+                            bgcolor: 'background.paper',
+                            borderRadius: '0.5rem',
+                            border: '0.0625rem solid',
+                            borderColor: isEditing ? 'primary.main' : 'divider',
+                            transition: 'all 0.2s ease',
+                            '&:hover': {
+                                borderColor: 'primary.light',
+                                boxShadow: '0 0.125rem 0.375rem rgba(0,0,0,0.05)',
+                            },
+                        }}
+                    >
                         <EditableTextField
-                            isEditing={currentEditKey === noteUUID}
+                            isEditing={isEditing}
                             value={note.text ?? 'EMPTY'}
                             placeholder={EMPTY_NOTE_PLACEHOLDER}
                             onBlur={(editedValue: any) =>
@@ -71,35 +89,50 @@ const NoteList = ({
                                     editedValue,
                                 })
                             }
+                            style={{
+                                '& .MuiInput-underline:after': {
+                                    borderBottomColor: '#ffa000',
+                                },
+                                '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
+                                    borderBottomColor: '#ffa000',
+                                },
+                            }}
                         />
                         <SimpleFlexContainer
                             sx={{
                                 height: 'fit-content',
+                                gap: '0.25rem',
                             }}
                         >
-                            <Tooltip title="Edit this note" placement="top">
+                            <Tooltip title={isEditing ? "Save note" : "Edit note"} placement="top">
                                 <IconButton
                                     onClick={() =>
                                         handleEditingNoteToggle(noteUUID)
                                     }
+                                    size="small"
+                                    sx={{
+                                        color: isEditing ? 'primary.main' : 'text.secondary',
+                                        '&:hover': {
+                                            color: 'primary.main',
+                                            bgcolor: 'rgba(255,160,0,0.08)',
+                                        },
+                                    }}
                                 >
-                                    <EditIcon
-                                        fontSize="small"
-                                        color={
-                                            currentEditKey === noteUUID
-                                                ? 'primary'
-                                                : undefined
-                                        }
-                                    />
+                                    <EditIcon fontSize="small" />
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip title="Delete this note" placement="top">
+                            <Tooltip title="Delete note" placement="top">
                                 <IconButton
-                                    disabled={
-                                        isDeleteNoteLoading &&
-                                        noteUUID === noteBeingDeleted
-                                    }
+                                    disabled={isDeleting}
                                     onClick={() => handleDeleteNote(noteUUID)}
+                                    size="small"
+                                    sx={{
+                                        color: 'text.secondary',
+                                        '&:hover': {
+                                            color: 'error.main',
+                                            bgcolor: 'rgba(211,47,47,0.08)',
+                                        },
+                                    }}
                                 >
                                     <DeleteIcon fontSize="small" />
                                 </IconButton>
