@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { UseMutationResult } from '@tanstack/react-query';
 
@@ -23,20 +23,30 @@ export default function useCustomMutation<TData = unknown, TError = unknown, TVa
 
     const { mutate, isPending, isSuccess, isError } = mutation();
 
+    const prevSuccessRef = useRef(false);
+    const prevErrorRef = useRef(false);
+
     useEffect(() => {
-        if (isSuccess) {
+        if (isSuccess && !prevSuccessRef.current) {
             onSuccess?.();
             toast.success(successMessage, {
                 position: toast.POSITION.BOTTOM_LEFT,
             });
+            prevSuccessRef.current = true;
+        } else if (!isSuccess) {
+            prevSuccessRef.current = false;
         }
-        if (isError) {
+
+        if (isError && !prevErrorRef.current) {
             onError?.();
             toast.error(errorMessage, {
                 position: toast.POSITION.BOTTOM_LEFT,
             });
+            prevErrorRef.current = true;
+        } else if (!isError) {
+            prevErrorRef.current = false;
         }
-    }, [isSuccess, isError, successMessage, errorMessage, onSuccess, onError]);
+    }, [isSuccess, isError, successMessage, errorMessage]);
 
     return {
         mutate,
