@@ -63,6 +63,7 @@ export const handler: Handler = async (
         const newNote = {
             noteUUID,
             text: "",
+            createdAt: new Date().toISOString(),
         };
 
         const newCards = cards.map((card) => {

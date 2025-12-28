@@ -24,6 +24,7 @@ export type Studyset = {
 export type Note = {
     text: string;
     noteUUID: UUID;
+    createdAt: Timestamp;
 };
 
 export type Card = {
@@ -46,6 +47,8 @@ export type StudysetMetadata = {
     labelTerminology: string;
     notesDrawerInitial: string;
     notesDrawerPosition: string;
+    notesSortBy?: 'alphabetical' | 'date' | 'cardOrder';
+    notesSortDirection?: 'asc' | 'desc';
     publiclyViewable: boolean;
     terminology: string;
     textColorVisible: boolean;
