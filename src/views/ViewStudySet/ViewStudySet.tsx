@@ -1,5 +1,5 @@
-import { ArrowBack, ViewCarouselRounded } from '@mui/icons-material/';
-import { Button, Chip, Skeleton, Tooltip, Typography } from '@mui/material/';
+import { ArrowBack, ViewCarouselRounded, CreditCard } from '@mui/icons-material/';
+import { Button, Chip, Skeleton, Tooltip, Typography, Box } from '@mui/material/';
 import { BoldTypography, SimpleFlexContainer } from 'styles/AppStyles';
 import ScrollToTopFab from 'components/ScrollToTopFab/ScrollToTopFab';
 import useBrowserTitle from 'hooks/useBrowserTitle';
@@ -325,14 +325,32 @@ const ViewStudySet = (props: Props) => {
                     </ViewStudysetContainer>
                 </ViewFlashsetPaper>
                 {selectedStudyset?.metadata?.cardCountVisible && (
-                    <SimpleFlexContainer style={{ gap: '0.5rem' }}>
-                        <Typography variant="h6">
+                    <Box
+                        sx={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '1.5rem',
+                            backgroundColor: 'rgba(255, 160, 0, 0.1)',
+                            border: '0.0625rem solid rgba(255, 160, 0, 0.3)',
+                            width: 'fit-content',
+                        }}
+                    >
+                        <CreditCard sx={{ color: 'primary.main', fontSize: '1.25rem' }} />
+                        <Typography
+                            variant="subtitle1"
+                            sx={{
+                                fontWeight: 600,
+                                color: 'text.primary',
+                            }}
+                        >
                             {`${selectedStudyset?.cards?.length ?? 'N/A'} ${selectedStudyset?.cards?.length === 1 ? 'Card' : 'Cards'}`}
                         </Typography>
                         {!selectedStudyset?.cards?.length && (
                             <NoCardsWarningsIcon />
                         )}
-                    </SimpleFlexContainer>
+                    </Box>
                 )}
                 <ViewStudysetFilters
                     selectedTab={selectedTab}

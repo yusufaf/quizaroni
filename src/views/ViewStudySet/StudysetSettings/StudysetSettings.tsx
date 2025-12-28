@@ -11,6 +11,7 @@ import {
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
 import SettingsToggle from 'components/SettingsToggle/SettingsToggle';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
+import { FormControl, FormLabel } from '@mui/material';
 
 type Props = {
     open: boolean;
@@ -43,29 +44,37 @@ const StudysetSettings = ({ open, onClose, studyset }: Props) => {
             <StyledDialogContent>
                 <FormatTerminologies studyset={studyset} />
                 <LabelTerminologies studyset={studyset} />
-                <FlexColumn style={{ gap: '1rem' }}>
-                    <SettingsToggle
-                        label={`Notes Drawer Alignment`}
-                        options={NOTES_DRAWER_POSITIONS_OPTIONS}
-                        selectedValue={studyset?.metadata?.notesDrawerPosition}
-                        property="notesDrawerPosition"
-                        onChange={handleSettingToggleChange}
-                    />
-                    <SettingsToggle
-                        label={`Notes Drawer Initial Appearance`}
-                        options={NOTES_DRAWER_INITIAL_APPEARANCE_OPTIONS}
-                        selectedValue={studyset?.metadata?.notesDrawerInitial}
-                        property="notesDrawerInitial"
-                        onChange={handleSettingToggleChange}
-                    />
-                    <SettingsToggle
-                        label="Show Card Count"
-                        options={CARD_COUNT_VISIBILITY_OPTIONS}
-                        selectedValue={studyset?.metadata?.cardCountVisible}
-                        property="cardCountVisible"
-                        onChange={handleSettingToggleChange}
-                    />
-                </FlexColumn>
+                <FormControl>
+                    <FormLabel sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}>Cards</FormLabel>
+                    <FlexColumn style={{ gap: '1rem', marginTop: '0.5rem' }}>
+                        <SettingsToggle
+                            label="Show Card Count"
+                            options={CARD_COUNT_VISIBILITY_OPTIONS}
+                            selectedValue={studyset?.metadata?.cardCountVisible}
+                            property="cardCountVisible"
+                            onChange={handleSettingToggleChange}
+                        />
+                    </FlexColumn>
+                </FormControl>
+                <FormControl>
+                    <FormLabel sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}>Notes</FormLabel>
+                    <FlexColumn style={{ gap: '1rem', marginTop: '0.5rem' }}>
+                        <SettingsToggle
+                            label={`Notes Drawer Alignment`}
+                            options={NOTES_DRAWER_POSITIONS_OPTIONS}
+                            selectedValue={studyset?.metadata?.notesDrawerPosition}
+                            property="notesDrawerPosition"
+                            onChange={handleSettingToggleChange}
+                        />
+                        <SettingsToggle
+                            label={`Notes Drawer Initial Appearance`}
+                            options={NOTES_DRAWER_INITIAL_APPEARANCE_OPTIONS}
+                            selectedValue={studyset?.metadata?.notesDrawerInitial}
+                            property="notesDrawerInitial"
+                            onChange={handleSettingToggleChange}
+                        />
+                    </FlexColumn>
+                </FormControl>
             </StyledDialogContent>
         </StyledDialog>
     );
