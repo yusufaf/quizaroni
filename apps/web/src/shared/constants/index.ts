@@ -107,6 +107,11 @@ export const HOME_LAYOUTS = {
     HTML: 'html',
 };
 
+export const VIEWSET_LAYOUTS = {
+    LIST: 'list',
+    GRID: 'grid',
+};
+
 // Define regex patterns for each requirement
 export const PWD_REGEX = {
     uppercase: /(?=.*[A-Z])/,

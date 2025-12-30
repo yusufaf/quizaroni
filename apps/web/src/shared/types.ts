@@ -70,6 +70,7 @@ export type StudysetMetadata = {
     publiclyViewable: boolean;
     terminology: string;
     textColorVisible: boolean;
+    viewSetLayout?: ViewSetLayout;
 };
 
 export type CardFileMetadata = FileMetadata & {
@@ -96,6 +97,7 @@ export type User = {
 
 export type AppTheme = 'light' | 'dark';
 export type HomeView = 'table' | 'grid' | 'html';
+export type ViewSetLayout = 'list' | 'grid';
 export type NamedColor = { color: string; name: string };
 
 export type PreferredDateFormat =

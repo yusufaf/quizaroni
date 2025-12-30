@@ -17,14 +17,16 @@ import {
     SpacedFlexContainer,
 } from 'styles/AppStyles';
 
-export const ViewStudysetPage = styled(BasePage)({
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '2rem',
-    padding: '0rem 22rem 2rem 22rem',
-    position: 'relative', // Allows the sticky positioning
-});
+export const ViewStudysetPage = styled(BasePage)<{ viewMode?: 'list' | 'grid' }>(
+    ({ viewMode = 'list' }) => ({
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: viewMode === 'grid' ? '1.5rem' : '2rem',
+        padding: '0rem 22rem 2rem 22rem',
+        position: 'relative', // Allows the sticky positioning
+    })
+);
 
 export const ViewFlashsetPaper = styled(Paper)({});
 
@@ -179,4 +181,33 @@ export const UpdateCardsButton = styled(Button)({
 export const DownloadDialogContent = styled(DialogContent)({
     display: 'flex',
     flexDirection: 'column',
+});
+
+// Grid View Styles
+export const ViewCardsGridContainer = styled('div')({
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(18rem, 1fr))',
+    gap: '1.5rem',
+});
+
+export const ViewGridCard = styled(Card)({
+    padding: '1rem',
+    borderRadius: '0.75rem',
+    transition: 'all 0.2s ease',
+    boxShadow: '0 0.25rem 0.75rem rgba(255,160,0,0.15)',
+    '&:hover': {
+        boxShadow: '0 0.375rem 1rem rgba(255,160,0,0.25)',
+    },
+});
+
+export const GridCardContent = styled('div')({
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+});
+
+export const GridCardSection = styled('div')({
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.25rem',
 });
