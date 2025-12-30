@@ -52,6 +52,7 @@ export type StudysetMetadata = {
     publiclyViewable: boolean;
     terminology: string;
     textColorVisible: boolean;
+    viewSetLayout?: string;
 };
 
 export type CardFileMetadata = FileMetadata & {
