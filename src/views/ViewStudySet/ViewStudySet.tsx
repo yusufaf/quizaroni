@@ -22,6 +22,7 @@ import {
     VIEW_SET_DIALOGS,
     DEFAULT_USER_RESPONSE,
     NOTES_DRAWER_INITIAL_APPEARANCE,
+    VIEWSET_LAYOUTS,
 } from 'shared/constants';
 import {
     DndContext,
@@ -45,9 +46,11 @@ import PrintDialog from './PrintDialog.tsx/PrintDialog';
 import StudysetActions from './StudysetActions/StudysetActions';
 import StudysetSettings from './StudysetSettings/StudysetSettings';
 import ViewStudySetCard from './ViewStudySetCard';
+import ViewStudySetCardGrid from './ViewStudySetCardGrid';
 import ViewStudysetFilters from './ViewStudysetFilters/ViewStudysetFilters';
 import {
     NoCardsMessage,
+    ViewCardsGridContainer,
     StudyModeGrid,
     StudyModePaper,
     StudyModeTitle,
@@ -105,6 +108,9 @@ const ViewStudySet = (props: Props) => {
         SORT_DIRECTIONS.ASC
     );
     const [isNotesDrawerHidden, setIsNotesDrawerHidden] = useState<boolean>(true);
+    const [viewMode, setViewMode] = useState<string>(
+        selectedStudyset?.metadata?.viewSetLayout ?? VIEWSET_LAYOUTS.LIST
+    );
 
     useEffect(() => {
         if (!updatedViewTimestamp.current && studysetUUID) {
@@ -128,6 +134,20 @@ const ViewStudySet = (props: Props) => {
             setIsNotesDrawerHidden(shouldBeHidden);
         }
     }, [selectedStudyset?.metadata?.notesDrawerInitial]);
+
+    // Sync view mode from metadata
+    useEffect(() => {
+        if (selectedStudyset?.metadata?.viewSetLayout) {
+            setViewMode(selectedStudyset.metadata.viewSetLayout);
+        }
+    }, [selectedStudyset?.metadata?.viewSetLayout]);
+
+    // Persist view mode to metadata
+    useEffect(() => {
+        if (viewMode && selectedStudyset?.studysetUUID && selectedStudyset?.metadata?.viewSetLayout !== viewMode) {
+            updateMetadataField('viewSetLayout', viewMode);
+        }
+    }, [viewMode]);
 
     const updateMetadataField = (property: string, newValue: any) => {
         try {
@@ -212,6 +232,7 @@ const ViewStudySet = (props: Props) => {
         <>
             <ViewStudysetPage
                 className="view-set-page"
+                viewMode={viewMode}
                 sx={{
                     paddingLeft: drawerPadding,
                     paddingRight: drawerPadding,
@@ -381,6 +402,8 @@ const ViewStudySet = (props: Props) => {
                     selectedStudyset={selectedStudyset}
                     setSortDirection={setSortDirection}
                     sortDirection={sortDirection}
+                    viewMode={viewMode}
+                    setViewMode={setViewMode}
                 />
                 {/* Testing out virtual scrolling */}
                 {/* <Virtuoso
@@ -397,6 +420,17 @@ const ViewStudySet = (props: Props) => {
                     </NoCardsMessage>
                 ) : filteredViewFlashCards.length === 0 ? (
                     <NoCardsMessage>No cards in this study set.</NoCardsMessage>
+                ) : viewMode === VIEWSET_LAYOUTS.GRID ? (
+                    <ViewCardsGridContainer>
+                        {filteredViewFlashCards.map((card, index) => (
+                            <ViewStudySetCardGrid
+                                key={card.cardUUID}
+                                card={card}
+                                index={index}
+                                selectedStudyset={selectedStudyset}
+                            />
+                        ))}
+                    </ViewCardsGridContainer>
                 ) : (
                     <DndContext
                         sensors={sensors}
