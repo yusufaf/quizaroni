@@ -10,6 +10,7 @@ import {
     DEFAULT_CATEGORIES,
     SORT_DIRECTIONS,
     VIEW_SET_DIALOGS,
+    VIEWSET_LAYOUTS,
 } from 'shared/constants';
 import { Studyset, SortDirection } from 'shared/types';
 import {
@@ -19,9 +20,11 @@ import {
     MenuItem,
     Select,
     SelectChangeEvent,
+    ToggleButton,
+    ToggleButtonGroup,
     Tooltip,
 } from '@mui/material';
-import { ArrowUpward, ArrowDownward, Category } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, Category, ViewList, ViewModule } from '@mui/icons-material';
 import { useViewSetsStore } from 'state/stores/viewSets';
 
 type Props = {
@@ -32,6 +35,8 @@ type Props = {
     setSortDirection: Dispatch<SetStateAction<SortDirection>>;
     selectedSort: string;
     setSelectedSort: Dispatch<SetStateAction<string>>;
+    viewMode: string;
+    setViewMode: Dispatch<SetStateAction<string>>;
 };
 
 const ViewStudysetFilters = ({
@@ -42,6 +47,8 @@ const ViewStudysetFilters = ({
     setSortDirection,
     selectedSort,
     setSelectedSort,
+    viewMode,
+    setViewMode,
 }: Props) => {
     const { setSelectedDialog } = useViewSetsStore();
 
@@ -71,6 +78,12 @@ const ViewStudysetFilters = ({
 
     const handleShowCategoriesDialog = () => {
         setSelectedDialog(VIEW_SET_DIALOGS.CATEGORIES);
+    };
+
+    const handleViewModeChange = (_event: React.MouseEvent<HTMLElement>, newView: string | null) => {
+        if (newView !== null) {
+            setViewMode(newView);
+        }
     };
 
     return (
@@ -107,13 +120,14 @@ const ViewStudysetFilters = ({
                     )}
                 </IconButton>
                 <SortCardsDropdown>
-                    <InputLabel id="sort-label">Sort</InputLabel>
+                    <InputLabel id="sort-label" size="small">Sort</InputLabel>
                     <Select
                         labelId="sort-label"
                         label="Sort"
                         value={selectedSort}
                         onChange={onSortChange}
                         autoWidth
+                        size="small"
                     >
                         <MenuItem value="">
                             <em>None</em>
@@ -127,6 +141,21 @@ const ViewStudysetFilters = ({
                         </MenuItem>
                     </Select>
                 </SortCardsDropdown>
+                <ToggleButtonGroup
+                    aria-label="View mode toggle"
+                    exclusive
+                    onChange={handleViewModeChange}
+                    value={viewMode}
+                    size="small"
+                    sx={{ marginLeft: '1rem' }}
+                >
+                    <ToggleButton value={VIEWSET_LAYOUTS.LIST} title="List View">
+                        <ViewList />
+                    </ToggleButton>
+                    <ToggleButton value={VIEWSET_LAYOUTS.GRID} title="Grid View">
+                        <ViewModule />
+                    </ToggleButton>
+                </ToggleButtonGroup>
             </SimpleFlexContainer>
         </CardFiltersContainer>
     );
