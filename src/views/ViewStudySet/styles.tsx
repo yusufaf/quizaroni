@@ -32,15 +32,16 @@ export const ViewFlashsetPaper = styled(Paper)({});
 
 export const ViewStudysetContainer = styled('div')({
     gridRow: '1',
-    height: '25rem',
+    height: '20rem',
     padding: '1rem 1.25rem',
     borderRadius: '0.75rem',
 });
 
 export const ViewStudysetHeader = styled('div')({
     display: 'grid',
-    gridTemplateColumns: '30rem auto',
+    gridTemplateColumns: '28rem auto',
     height: '100%',
+    gap: '1rem',
 });
 
 export const StudysetInfo = styled('div')(({ theme }) => ({
@@ -77,25 +78,30 @@ export const StudyModeGrid = styled('div')({
     display: 'grid',
     gridTemplateColumns: 'repeat(3, 1fr)',
     gridTemplateRows: 'repeat(2, auto)',
-    gap: '1rem',
+    gap: '0.5rem',
 });
 
 export const StudyModePaper = styled(Paper)(({ theme }) => ({
-    fontSize: '1.25rem',
+    fontSize: '1rem',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: '0.75rem',
     userSelect: 'none',
     cursor: 'pointer',
-    '&: hover': {
+    minHeight: '6rem',
+    position: 'relative',
+    overflow: 'hidden',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    '&:hover': {
         background: theme.palette.action.hover,
-        transition: '0.2s ease',
+        transform: 'translateY(-0.25rem)',
     },
 }));
 
 export const StudyModeTitle = styled(BoldTypography)({
-    fontSize: '1.25rem',
+    fontSize: '0.875rem',
 });
 
 export const CategoryTab = styled(Tab)({

@@ -106,6 +106,90 @@ export type PreferredDateFormat =
 export type DownloadSetFormat =
     (typeof DOWNLOAD_FILE_TYPES)[keyof typeof DOWNLOAD_FILE_TYPES];
 
+// Study Mode Types
+export type StudyMode = 'flashcards' | 'multiple-choice' | 'matching' | 'type-write';
+
+export type StudySessionState = {
+    studysetUUID: UUID;
+    mode: StudyMode;
+    currentCardIndex: number;
+    cards: Card[];
+    answers: StudyAnswer[];
+    startTime: Timestamp;
+    endTime?: Timestamp;
+    score: number;
+    streak: number;
+    maxStreak: number;
+    settings: StudySessionSettings;
+};
+
+export type StudyAnswer = {
+    cardUUID: UUID;
+    correct: boolean;
+    timeSpent: number;
+    hintsUsed: number;
+    answer?: string;
+    selectedOption?: number;
+};
+
+export type StudySessionSettings = {
+    shuffleCards: boolean;
+    timedMode: boolean;
+    timePerCard?: number;
+    audioEnabled: boolean;
+    autoAdvance: boolean;
+    difficulty: 'easy' | 'medium' | 'hard';
+};
+
+export type StudySessionResult = {
+    sessionUUID: UUID;
+    studysetUUID: UUID;
+    mode: StudyMode;
+    totalCards: number;
+    correctAnswers: number;
+    score: number;
+    timeSpent: number;
+    accuracy: number;
+    streak: number;
+    completedAt: Timestamp;
+    achievements: string[];
+};
+
+export type CardProgress = {
+    cardUUID: UUID;
+    lastStudied: Timestamp;
+    nextReview: Timestamp;
+    easeFactor: number;
+    interval: number;
+    repetitions: number;
+    masteryLevel: 'new' | 'learning' | 'review' | 'mastered';
+};
+
+export type Achievement = {
+    id: string;
+    unlockedAt: Timestamp;
+    title: string;
+    description: string;
+    icon: string;
+};
+
+export type StudyStatistics = {
+    totalSessions: number;
+    totalCardsStudied: number;
+    averageAccuracy: number;
+    totalTimeSpent: number;
+    achievements: Achievement[];
+    progressByStudyset: Map<UUID, StudysetProgress>;
+};
+
+export type StudysetProgress = {
+    studysetUUID: UUID;
+    cardsProgress: CardProgress[];
+    lastSessionDate: Timestamp;
+    sessionsCount: number;
+    masteredCards: number;
+};
+
 // #endregion
 
 /* RTK Query Types */

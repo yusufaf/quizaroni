@@ -72,10 +72,6 @@ export const VIEW_SET = {
     TEXT: 'TEXT',
 };
 
-export const STUDY_MODES = {
-    FLASHCARDS: 'FLASHCARDS',
-};
-
 /* ==== Download ==== */
 export const DOWNLOAD_FILE_TYPES = {
     TXT: 'TXT',
@@ -110,6 +106,71 @@ export const HOME_LAYOUTS = {
 export const VIEWSET_LAYOUTS = {
     LIST: 'list',
     GRID: 'grid',
+};
+
+export const STUDY_MODES = {
+    FLASHCARDS: 'flashcards',
+    MULTIPLE_CHOICE: 'multiple-choice',
+    MATCHING: 'matching',
+    TYPE_WRITE: 'type-write',
+} as const;
+
+export const STUDY_MODE_CONFIG = {
+    [STUDY_MODES.FLASHCARDS]: {
+        id: 'flashcards',
+        title: 'Flashcards',
+        description: 'Classic flip cards - learn at your own pace',
+        icon: 'ViewCarousel',
+        color: '#FF6B6B',
+        features: ['Self-paced', 'Audio support', 'Progress tracking'],
+    },
+    [STUDY_MODES.MULTIPLE_CHOICE]: {
+        id: 'multiple-choice',
+        title: 'Multiple Choice',
+        description: 'Test knowledge with quiz-style questions',
+        icon: 'Quiz',
+        color: '#4ECDC4',
+        features: ['Timed mode', 'Instant feedback', 'Score tracking'],
+    },
+    [STUDY_MODES.MATCHING]: {
+        id: 'matching',
+        title: 'Matching Game',
+        description: 'Match terms with definitions',
+        icon: 'Extension',
+        color: '#FFD93D',
+        features: ['Interactive', 'Time challenge', 'Visual feedback'],
+    },
+    [STUDY_MODES.TYPE_WRITE]: {
+        id: 'type-write',
+        title: 'Type & Write',
+        description: 'Practice by typing answers',
+        icon: 'Keyboard',
+        color: '#95E1D3',
+        features: ['Active recall', 'Hint system', 'Smart matching'],
+    },
+};
+
+export const SCORING = {
+    CORRECT_ANSWER: 100,
+    TIME_BONUS_MAX: 50,
+    STREAK_MULTIPLIER: 1.5,
+    HINT_PENALTY: -20,
+    SKIP_PENALTY: -10,
+};
+
+export const ACHIEVEMENTS = {
+    FIRST_PERFECT: { id: 'first-perfect', threshold: 1, icon: '🌟' },
+    SPEED_DEMON: { id: 'speed-demon', threshold: 5, icon: '⚡' },
+    STREAK_MASTER: { id: 'streak-master', threshold: 10, icon: '🔥' },
+    MARATHON: { id: 'marathon', threshold: 50, icon: '🏃' },
+    SCHOLAR: { id: 'scholar', threshold: 100, icon: '🎓' },
+};
+
+export const SM2_INTERVALS = {
+    AGAIN: 0,
+    HARD: 1,
+    GOOD: 3,
+    EASY: 7,
 };
 
 // Define regex patterns for each requirement

@@ -10,6 +10,7 @@ import Profile from 'views/Profile/Profile';
 import ViewStudySet from 'views/ViewStudySet/ViewStudySet';
 import Explore from 'views/Explore/Explore';
 import NotFound from 'views/NotFound/NotFound';
+import StudyMode from 'views/Study/StudyMode';
 import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react';
 
 type RequireAuthProps = {
@@ -34,6 +35,7 @@ const AppRoutes = () => {
         { path: '/explore', element: <Explore /> },
         { path: '/view/:id', element: <ViewStudySet /> },
         { path: '/edit/:id', element: <CreateSet /> },
+        { path: '/study/:studysetId/:mode', element: <StudyMode /> },
     ];
 
     // Determine initial state based on the current route
