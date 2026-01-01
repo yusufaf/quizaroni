@@ -48,6 +48,7 @@ import StudysetSettings from './StudysetSettings/StudysetSettings';
 import ViewStudySetCard from './ViewStudySetCard';
 import ViewStudySetCardGrid from './ViewStudySetCardGrid';
 import ViewStudysetFilters from './ViewStudysetFilters/ViewStudysetFilters';
+import StudyModesGrid from './StudyModesGrid/StudyModesGrid';
 import {
     NoCardsMessage,
     ViewCardsGridContainer,
@@ -312,56 +313,10 @@ const ViewStudySet = (props: Props) => {
                                 />
                             </StudysetInfo>
                             <StudyModesSection>
-                                <StudyModeGrid>
-                                    <StudyModePaper>
-                                        <ViewCarouselRounded
-                                            sx={studyModeIconStyle}
-                                        />
-                                        <StudyModeTitle variant="subtitle1">
-                                            Flashcards
-                                        </StudyModeTitle>
-                                    </StudyModePaper>
-                                    <StudyModePaper>
-                                        <ViewCarouselRounded
-                                            sx={studyModeIconStyle}
-                                        />
-                                        <StudyModeTitle variant="subtitle1">
-                                            Flashcards
-                                        </StudyModeTitle>
-                                    </StudyModePaper>
-                                    <StudyModePaper>
-                                        <ViewCarouselRounded
-                                            sx={studyModeIconStyle}
-                                        />
-                                        <StudyModeTitle variant="subtitle1">
-                                            Flashcards
-                                        </StudyModeTitle>
-                                    </StudyModePaper>
-                                    <StudyModePaper>
-                                        <ViewCarouselRounded
-                                            sx={studyModeIconStyle}
-                                        />
-                                        <StudyModeTitle variant="subtitle1">
-                                            Flashcards
-                                        </StudyModeTitle>
-                                    </StudyModePaper>
-                                    <StudyModePaper>
-                                        <ViewCarouselRounded
-                                            sx={studyModeIconStyle}
-                                        />
-                                        <StudyModeTitle variant="subtitle1">
-                                            Flashcards
-                                        </StudyModeTitle>
-                                    </StudyModePaper>
-                                    <StudyModePaper>
-                                        <ViewCarouselRounded
-                                            sx={studyModeIconStyle}
-                                        />
-                                        <StudyModeTitle variant="subtitle1">
-                                            Flashcards
-                                        </StudyModeTitle>
-                                    </StudyModePaper>
-                                </StudyModeGrid>
+                                <StudyModesGrid
+                                    studysetUUID={studysetUUID}
+                                    cardCount={selectedStudyset?.cards?.length ?? 0}
+                                />
                             </StudyModesSection>
                         </ViewStudysetHeader>
                     </ViewStudysetContainer>

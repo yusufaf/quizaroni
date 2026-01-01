@@ -1,203 +1,472 @@
-import { useEffect, useState } from "react"
+import { useState, useEffect } from 'react';
 import {
-    Button,
+    Box,
     Card,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
+    CardContent,
     IconButton,
-    LinearProgress,
+    Rating,
+    Typography,
+    Stepper,
+    Step,
+    StepLabel,
+    Fade,
     Tooltip,
-    Typography
-} from '@mui/material/';
-import { ArrowBack, ArrowForward, VolumeUp } from '@mui/icons-material/';
-import { useTheme } from "theme/useTheme";
-import { ViewFlashCardActions } from "./ViewFlashSetStyles";
-import ConfirmDialog from "components/GlobalConfirmDialog/GlobalConfirmDialog";
+} from '@mui/material';
 import {
-    StudyElements
-} from "./StudyModeStyles";
+    ArrowBack,
+    ArrowForward,
+    Replay,
+    VolumeUp,
+    VolumeOff,
+} from '@mui/icons-material';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useGetStudyset } from 'state/api/studysetsAPI';
+import { useStudySessionStore } from 'state/stores/studySession';
+import { Card as CardType, Studyset } from 'shared/types';
+import { STUDY_MODES } from 'shared/constants';
+import StudyHeader from './shared/StudyHeader';
+import StudyResults from './shared/StudyResults';
+import SettingsDialog from './shared/SettingsDialog';
+import { BasePage } from 'styles/AppStyles';
 
 type Props = {
-    
-}
+    studysetId: string;
+};
 
-const FlashcardsStudy = (props: Props) => {
-    const { theme } = useTheme();
+const FlashcardsStudy = ({ studysetId }: Props) => {
+    const { data: studysetResponse, isLoading } = useGetStudyset({ studysetUUID: studysetId });
+    const studyset = studysetResponse?.studyset ?? ({} as Studyset);
 
-    // const [currentCard, setCurrentCard] = useState(selectedFlashSet.cards[0]);
-    const [currentCard, setCurrentCard] = useState("");
+    const {
+        activeSession,
+        startSession,
+        endSession,
+        updateCurrentCard,
+        recordAnswer,
+        updateCardProgress,
+        incrementScore,
+        updateStreak,
+    } = useStudySessionStore();
 
-    const [currentCardIndex, setCurrentCardIndex] = useState(0);
+    const [flipped, setFlipped] = useState(false);
+    const [showRating, setShowRating] = useState(false);
+    const [hasRated, setHasRated] = useState(false);
+    const [showResults, setShowResults] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
+    const [sessionResult, setSessionResult] = useState(null);
 
-    const [currentCardSide, setCurrentCardSide] = useState(false);
-
-    // TODO: Intended to keep track of the number of cards the user has clicked on and actually flipped/viewed
-    const [cardsStudied, setCardsStudied] = useState(0);
+    // Initialize session
+    useEffect(() => {
+        if (studyset?.cards?.length > 0 && !activeSession) {
+            startSession({
+                studysetUUID: studysetId,
+                mode: STUDY_MODES.FLASHCARDS,
+                cards: studyset.cards,
+                settings: {
+                    shuffleCards: false,
+                    timedMode: false,
+                    audioEnabled: false,
+                    autoAdvance: true,
+                    difficulty: 'medium',
+                },
+            });
+        }
+    }, [studyset?.cards, studysetId, activeSession]);
 
     useEffect(() => {
-        console.log("currentCard = ", currentCard)
-    }, [currentCard])
-
-    const [showWarningModal, setShowWarningModal] = useState(false);
-
-    console.log("showWarningModal is = ", showWarningModal);
-
-    const cardStyling = {
-        display: 'flex',
-        minHeight: "30rem",
-        minWidth: "60rem",
-        justifyContent: "center",
-        "&.MuiCard-root": {
-            transition: "0.2s ease",
+        if (activeSession?.settings?.audioEnabled && flipped && !hasRated) {
+            const currentCard = activeSession?.cards?.[activeSession.currentCardIndex];
+            if (currentCard?.definition) {
+                playAudio(currentCard.definition);
+            }
         }
+    }, [flipped, activeSession?.settings?.audioEnabled, activeSession?.cards, activeSession?.currentCardIndex, hasRated]);
+
+    if (isLoading || !activeSession || !activeSession.cards || activeSession.cards.length === 0) {
+        return (
+            <BasePage>
+                <Typography>Loading...</Typography>
+            </BasePage>
+        );
     }
 
-    const typographyStyling = {
-        "&.MuiTypography-root": {
-            color: theme.foreground
+    const currentCard = activeSession.cards[activeSession.currentCardIndex];
+    const isLastCard = activeSession.currentCardIndex === activeSession.cards.length - 1;
+    const isFirstCard = activeSession.currentCardIndex === 0;
+
+    const playAudio = (text: string) => {
+        if (window.speechSynthesis && text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(utterance);
         }
-    }
+    };
 
-    const handleArrowClick = (direction) => {
-        // const length = selectedFlashSet.cards.length;
-        // let newCardIndex = currentCardIndex;
-        // newCardIndex = direction === "FORWARD" ? newCardIndex + 1 : newCardIndex - 1;
+    const handleCardClick = () => {
+        if (!hasRated) {
+            setFlipped(!flipped);
+            if (!flipped) {
+                setShowRating(true);
+            }
+        }
+    };
 
-        // if (newCardIndex < 0 || newCardIndex >= length) {
-        //     return;
-        //     // TODO: Display page with "Study Again" button and return to home button
-        // }
+    const handleRating = (quality: number) => {
+        if (quality === 0 || hasRated) return;
 
-        // setCurrentCardIndex(newCardIndex);
-        // const { cards } = selectedFlashSet;
-        // console.log("New card = ", cards[newCardIndex]);
-        // setCurrentCard(cards[newCardIndex]);
+        setHasRated(true);
 
-    }
+        // Map 1-5 star rating to SM-2 quality (1=Again, 2=Hard, 3=Good, 4=Easy, 5=Perfect)
+        updateCardProgress(currentCard.cardUUID, quality);
 
-    const handleMainBackArrow = () => {
-        setShowWarningModal(true)
-    }
+        // Record answer
+        const isCorrect = quality >= 3;
+        const timeSpent = Math.floor((Date.now() - activeSession.startTime) / 1000);
+        recordAnswer({
+            cardUUID: currentCard.cardUUID,
+            correct: isCorrect,
+            timeSpent,
+            hintsUsed: 0,
+        });
 
-    const handleCloseWarning = () => {
-        setShowWarningModal(false);
-    }
+        // Update score and streak
+        if (isCorrect) {
+            incrementScore(100);
+            updateStreak(true);
+        } else {
+            updateStreak(false);
+        }
 
-    const handleConfirm = () => {
-        handleCloseWarning();
-        // setSelectedStudyMode("")
-    }
+        // Auto-advance after delay
+        if (activeSession.settings.autoAdvance) {
+            setTimeout(() => {
+                handleNext();
+            }, 500);
+        }
+    };
 
-    const handleAudioPlayback = () => {
-        // if (timeoutRef.current) {
-        //     clearTimeout(timeoutRef.current)
-        // }
-        const audio = new SpeechSynthesisUtterance();
-        audio.text = currentCard.term;
-        window.speechSynthesis.speak(audio);
-        // Wait half a second before speaking of definition
-        timeoutRef.current = setTimeout(() => {
-            audio.text = currentCard.definition;
-            window.speechSynthesis.speak(audio);
-        }, 500)
-        // timeoutRef.current = "";
-    }
+    const handleNext = () => {
+        if (isLastCard) {
+            // End session and show results
+            const result = endSession();
+            setSessionResult(result);
+            setShowResults(true);
+        } else {
+            updateCurrentCard(activeSession.currentCardIndex + 1);
+            setFlipped(false);
+            setShowRating(false);
+            setHasRated(false);
+        }
+    };
+
+    const handlePrevious = () => {
+        if (!isFirstCard) {
+            updateCurrentCard(activeSession.currentCardIndex - 1);
+            setFlipped(false);
+            setShowRating(false);
+            setHasRated(false);
+        }
+    };
+
+    const handleFlip = () => {
+        setFlipped(!flipped);
+        if (!flipped) {
+            setShowRating(true);
+        }
+    };
+
+    const handleAudioToggle = () => {
+        if (!activeSession) return;
+        const newSettings = {
+            ...activeSession.settings,
+            audioEnabled: !activeSession.settings.audioEnabled,
+        };
+        startSession({
+            studysetUUID: studysetId,
+            mode: STUDY_MODES.FLASHCARDS,
+            cards: studyset.cards,
+            settings: newSettings,
+        });
+    };
+
+    const handleSettingsSave = (newSettings) => {
+        startSession({
+            studysetUUID: studysetId,
+            mode: STUDY_MODES.FLASHCARDS,
+            cards: studyset.cards,
+            settings: newSettings,
+        });
+    };
+
+    const handleStudyAgain = () => {
+        setShowResults(false);
+        setSessionResult(null);
+        startSession({
+            studysetUUID: studysetId,
+            mode: STUDY_MODES.FLASHCARDS,
+            cards: studyset.cards,
+            settings: {
+                shuffleCards: false,
+                timedMode: false,
+                audioEnabled: false,
+                autoAdvance: true,
+                difficulty: 'medium',
+            },
+        });
+        setFlipped(false);
+        setShowRating(false);
+        setHasRated(false);
+    };
 
     return (
-        <div>
-            {/* TODO: In global App stylings: define back arrow */}
-            <IconButton 
-                color="primary"
-                aria-label="arrow backward" 
-                component="span"
-                onClick={() => handleMainBackArrow()}
-            >
-                <ArrowBack fontSize="large" />
-            </IconButton>
-            <ConfirmDialog
-                open={showWarningModal}
-                onClose={handleCloseWarning}
-                title="Stop studying this set?"
-                dialogMessage="You haven't finished studying all the cards in this set, are you sure you want to exit?"
-                onConfirm={handleConfirm}
-                cancelButtonText="No"
-                confirmButtonText="Yes"
+        <BasePage
+            sx={{
+                mt: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100vh',
+                overflow: 'hidden',
+                backgroundColor: 'background.default',
+            }}
+        >
+            <StudyHeader
+                studysetTitle={studyset.title || ''}
+                studysetUUID={studysetId}
+                currentCard={activeSession.currentCardIndex + 1}
+                totalCards={activeSession.cards.length}
+                score={activeSession.score}
+                streak={activeSession.streak}
+                audioEnabled={activeSession.settings.audioEnabled}
+                onToggleAudio={handleAudioToggle}
+                onSettings={() => setShowSettings(true)}
             />
-            <Typography
-                variant="h6"
-                component="span"
-                sx={typographyStyling}
-            >
-                Exit Study
-            </Typography>
 
-            {/* Progress Bar / Info here */}
-            <Typography
-                variant="h5"
-                sx={{ ...typographyStyling, marginBottom: "1rem" }}
+            {/* Stepper - at top */}
+            <Box sx={{ width: '100%', maxWidth: '50rem', mx: 'auto', pt: '4rem', px: '2rem' }}>
+                <Stepper activeStep={activeSession.currentCardIndex} alternativeLabel>
+                    {activeSession.cards.map((card) => (
+                        <Step key={card.cardUUID}>
+                            <StepLabel />
+                        </Step>
+                    ))}
+                </Stepper>
+            </Box>
+
+            {/* Main Card Area */}
+            <Box
+                sx={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'center',
+                    px: '2rem',
+                }}
             >
-                Progress
-            </Typography>
-            <LinearProgress variant="determinate" value={0} />
-            <StudyElements>
-                {/* TODO: Figure out how to adjust the font size of the Tooltip */}
-                <Tooltip
-                    title={<Typography fontSize="1rem">Go to previous card</Typography>}
+                {/* Card Container */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '2rem',
+                        width: '100%',
+                    }}
                 >
-                    <IconButton 
-                    color="primary"
-                        aria-label="arrow backward" 
-                        component="span"
-                        onClick={() => handleArrowClick("BACKWARD")}
-                    >
-                        <ArrowBack fontSize="large" />
-                    </IconButton>
+                {/* Previous Button */}
+                <Tooltip title="Previous Card">
+                    <span>
+                        <IconButton
+                            onClick={handlePrevious}
+                            disabled={isFirstCard}
+                            color="primary"
+                            sx={{ fontSize: '3rem' }}
+                        >
+                            <ArrowBack fontSize="inherit" />
+                        </IconButton>
+                    </span>
                 </Tooltip>
-                <Card
-                    sx={cardStyling}
-                    raised
-                    onClick={() => setCurrentCardSide(!currentCardSide)}
-                >
-                    {/* Action Buttons in top right corner of current card */}
-                    <Typography
-                        variant="h4"
+
+                {/* Flashcard */}
+                <AnimatePresence mode="wait">
+                    <Box
+                        key={currentCard.cardUUID}
                         sx={{
-                            alignSelf: "center",
+                            perspective: '1000px',
+                            width: '50rem',
+                            height: '30rem',
                         }}
                     >
-                        {currentCard.term}
-                    </Typography>
-                    {/* <div className={viewFlashStyles.cardActions}>
-                        <Tooltip
-                            title="Play TTS"
-                            placement="top"
+                        <motion.div
+                            initial={{ rotateY: 0 }}
+                            animate={{ rotateY: flipped ? 180 : 0 }}
+                            transition={{ duration: 0.6, type: 'spring' }}
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                position: 'relative',
+                                transformStyle: 'preserve-3d',
+                                cursor: hasRated ? 'default' : 'pointer',
+                            }}
+                            onClick={handleCardClick}
                         >
-                            <IconButton
-                                onClick={handleAudioPlayback}
+                            {/* Front of card (Term) */}
+                            <Card
+                                elevation={8}
+                                sx={{
+                                    position: 'absolute',
+                                    width: '100%',
+                                    height: '100%',
+                                    backfaceVisibility: 'hidden',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderRadius: '1rem',
+                                }}
                             >
-                                <VolumeUp />
-                            </IconButton>
-                        </Tooltip>
-                    </div> */}
-                </Card>
-                <Tooltip
-                    title={<Typography fontSize="1rem">Go to next card</Typography>}
-                >
-                    <IconButton
-                        color="primary"
-                        aria-label="arrow forward"
-                        component="span"
-                        onClick={() => handleArrowClick("FORWARD")}
-                    >
-                        <ArrowForward fontSize="large" />
+                                <CardContent>
+                                    <Typography
+                                        variant="h4"
+                                        sx={{
+                                            textAlign: 'center',
+                                            fontWeight: 600,
+                                            wordBreak: 'break-word',
+                                        }}
+                                    >
+                                        {currentCard.term}
+                                    </Typography>
+                                    <Typography
+                                        variant="body2"
+                                        color="text.secondary"
+                                        sx={{ textAlign: 'center', mt: '2rem' }}
+                                    >
+                                        Click to flip
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+
+                            {/* Back of card (Definition) */}
+                            <Card
+                                elevation={8}
+                                sx={{
+                                    position: 'absolute',
+                                    width: '100%',
+                                    height: '100%',
+                                    backfaceVisibility: 'hidden',
+                                    transform: 'rotateY(180deg)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderRadius: '1rem',
+                                    backgroundColor: 'primary.main',
+                                    color: 'primary.contrastText',
+                                }}
+                            >
+                                <CardContent sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                                    <Typography
+                                        variant="h4"
+                                        sx={{
+                                            textAlign: 'center',
+                                            fontWeight: 600,
+                                            wordBreak: 'break-word',
+                                        }}
+                                    >
+                                        {currentCard.definition}
+                                    </Typography>
+                                </CardContent>
+
+                                {/* Rating Section */}
+                                <Fade in={showRating && !hasRated}>
+                                    <Box
+                                        sx={{
+                                            p: '1.5rem',
+                                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                                            width: '100%',
+                                            borderBottomLeftRadius: '1rem',
+                                            borderBottomRightRadius: '1rem',
+                                        }}
+                                    >
+                                        <Typography variant="body2" sx={{ mb: '0.5rem', textAlign: 'center' }}>
+                                            How well did you know this?
+                                        </Typography>
+                                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                            <Rating
+                                                size="large"
+                                                value={0}
+                                                onChange={(_, value) => handleRating(value || 0)}
+                                                sx={{
+                                                    '& .MuiRating-iconFilled': {
+                                                        color: '#FFD93D',
+                                                    },
+                                                    '& .MuiRating-iconHover': {
+                                                        color: '#FFD93D',
+                                                    },
+                                                }}
+                                            />
+                                        </Box>
+                                    </Box>
+                                </Fade>
+                            </Card>
+                        </motion.div>
+                    </Box>
+                </AnimatePresence>
+
+                {/* Next Button */}
+                <Tooltip title={isLastCard ? 'Finish' : 'Next Card'}>
+                    <span>
+                        <IconButton
+                            onClick={handleNext}
+                            disabled={!hasRated}
+                            color="primary"
+                            sx={{ fontSize: '3rem' }}
+                        >
+                            <ArrowForward fontSize="inherit" />
+                        </IconButton>
+                    </span>
+                </Tooltip>
+                </Box>
+            </Box>
+
+            {/* Bottom Controls */}
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: '1rem',
+                }}
+            >
+                <Tooltip title="Flip Card">
+                    <IconButton onClick={handleFlip} color="primary" size="large">
+                        <Replay fontSize="inherit" />
                     </IconButton>
                 </Tooltip>
-            </StudyElements>
-        </div >
+                <Tooltip title={activeSession.settings.audioEnabled ? 'Audio On' : 'Audio Off'}>
+                    <IconButton onClick={handleAudioToggle} color="primary" size="large">
+                        {activeSession.settings.audioEnabled ? (
+                            <VolumeUp fontSize="inherit" />
+                        ) : (
+                            <VolumeOff fontSize="inherit" />
+                        )}
+                    </IconButton>
+                </Tooltip>
+            </Box>
+
+            {/* Dialogs */}
+            <StudyResults
+                open={showResults}
+                result={sessionResult}
+                onClose={() => setShowResults(false)}
+                onStudyAgain={handleStudyAgain}
+            />
+
+            <SettingsDialog
+                open={showSettings}
+                settings={activeSession.settings}
+                onClose={() => setShowSettings(false)}
+                onSave={handleSettingsSave}
+            />
+        </BasePage>
     );
-}
+};
 
 export default FlashcardsStudy;
