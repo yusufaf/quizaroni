@@ -86,6 +86,7 @@ export type User = {
     labels: string[];
     metadata: {
         defaultTheme: AppTheme;
+        fontSizeScale?: number;
         homeView: HomeView;
         namedColors: NamedColor[];
         preferredDateFormat: PreferredDateFormat;

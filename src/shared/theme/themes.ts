@@ -5,7 +5,25 @@ const primaryColor = '#ffa000';
 const primaryHoverColor = '#c67100';
 const primaryLightColor = '#ffd149';
 
-export const light = createTheme({
+// MUI Typography base configuration with scale multiplier
+const getBaseTypography = (scale: number = 1) => ({
+    fontSize: 14 * scale,
+    h1: { fontSize: `${2.5 * scale}rem`, fontWeight: 600 },
+    h2: { fontSize: `${2 * scale}rem`, fontWeight: 600 },
+    h3: { fontSize: `${1.75 * scale}rem`, fontWeight: 600 },
+    h4: { fontSize: `${1.5 * scale}rem`, fontWeight: 600 },
+    h5: { fontSize: `${1.25 * scale}rem`, fontWeight: 600 },
+    h6: { fontSize: `${1.125 * scale}rem`, fontWeight: 600 },
+    body1: { fontSize: `${1 * scale}rem` },
+    body2: { fontSize: `${0.875 * scale}rem` },
+    subtitle1: { fontSize: `${1 * scale}rem`, fontWeight: 500 },
+    subtitle2: { fontSize: `${0.875 * scale}rem`, fontWeight: 500 },
+    button: { fontSize: `${0.875 * scale}rem`, fontWeight: 600 },
+    caption: { fontSize: `${0.75 * scale}rem` },
+    overline: { fontSize: `${0.75 * scale}rem`, textTransform: 'uppercase' as const },
+});
+
+export const createLightTheme = (fontScale: number = 1) => createTheme({
     palette: {
         mode: 'light',
         primary: {
@@ -25,15 +43,16 @@ export const light = createTheme({
             disabled: 'rgba(0, 0, 0, 0.38)',
         },
     },
+    typography: getBaseTypography(fontScale),
     components: {
         MuiButton: {
             styleOverrides: {
                 text: {
-                    color: primaryColor, // Original text color
-                    transition: 'all 0.3s ease', // Smooth transition
+                    color: primaryColor,
+                    transition: 'all 0.3s ease',
                     '&:hover': {
-                        color: primaryHoverColor, // Darker text color for contrast
-                        backgroundColor: 'rgba(255, 160, 0, 0.2)', // Slightly darker background on hover
+                        color: primaryHoverColor,
+                        backgroundColor: 'rgba(255, 160, 0, 0.2)',
                     },
                     fontWeight: 600,
                 },
@@ -47,12 +66,6 @@ export const light = createTheme({
                     fontWeight: 600,
                 },
                 outlined: {
-                    // color: primaryColor,
-                    // borderColor: primaryColor,
-                    // '&:hover': {
-                    //     color: primaryHoverColor,
-                    //     backgroundColor: 'rgba(255, 160, 0, 0.1)',
-                    // },
                     fontWeight: 600,
                 },
             },
@@ -60,8 +73,7 @@ export const light = createTheme({
     },
 });
 
-// Dark theme follows the same pattern
-export const dark = createTheme({
+export const createDarkTheme = (fontScale: number = 1) => createTheme({
     palette: {
         mode: 'dark',
         primary: {
@@ -81,15 +93,16 @@ export const dark = createTheme({
             disabled: 'rgba(255, 255, 255, 0.5)',
         },
     },
+    typography: getBaseTypography(fontScale),
     components: {
         MuiButton: {
             styleOverrides: {
                 text: {
-                    color: primaryColor, // Original text color
-                    transition: 'all 0.3s ease', // Smooth transition
+                    color: primaryColor,
+                    transition: 'all 0.3s ease',
                     '&:hover': {
-                        color: '#ffffff', // Brighten text color for contrast
-                        backgroundColor: 'rgba(255, 160, 0, 0.2)', // Add a light background on hover
+                        color: '#ffffff',
+                        backgroundColor: 'rgba(255, 160, 0, 0.2)',
                     },
                     fontWeight: 600,
                 },
@@ -103,12 +116,6 @@ export const dark = createTheme({
                     fontWeight: 600,
                 },
                 outlined: {
-                    // color: primaryColor,
-                    // borderColor: primaryColor,
-                    // '&:hover': {
-                    // color: primaryHoverColor,
-                    // backgroundColor: 'rgba(255, 160, 0, 0.1)',
-                    // },
                     fontWeight: 600,
                 },
             },
@@ -116,6 +123,9 @@ export const dark = createTheme({
     },
 });
 
+// Backward compatibility - default exports
+export const light = createLightTheme();
+export const dark = createDarkTheme();
 export const themes = {
     light,
     dark,

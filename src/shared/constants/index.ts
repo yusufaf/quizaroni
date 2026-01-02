@@ -349,6 +349,7 @@ export const DEFAULT_USER_DATA: User = {
     labels: [],
     metadata: {
         defaultTheme: 'dark',
+        fontSizeScale: 1,
         homeView: 'table',
         namedColors: [],
         preferredDateFormat: DATE_FORMATS.MDY,
@@ -427,3 +428,13 @@ export const PRINT_IMPORTANT_ONLY_OPTIONS = [
     { value: false, ariaLabel: 'all cards', label: 'All Cards' },
     { value: true, ariaLabel: 'important only', label: 'Important Only' },
 ];
+
+// Font Size Scaling (for slider presets)
+export const FONT_SIZE_PRESETS = {
+    SMALL: 0.875,
+    MEDIUM: 1,
+    LARGE: 1.125,
+    EXTRA_LARGE: 1.25,
+} as const;
+
+export type FontSizeScale = typeof FONT_SIZE_PRESETS[keyof typeof FONT_SIZE_PRESETS];
