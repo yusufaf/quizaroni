@@ -16,22 +16,19 @@ export const ProfilePage = styled(BasePage)({
     display: 'grid',
     gridTemplateColumns: 'auto 2fr',
     gridTemplateRows: '1fr',
-    padding: '0 2rem 2rem 2rem',
-    gap: '4rem',
+    padding: '1.5rem 3rem 7rem 3rem',
+    gap: '3rem',
     minHeight: 'calc(100vh - 10rem)',
-    marginBottom: '2rem',
 });
 
 export const ProfileContainer = styled(FlexColumn)({
     alignItems: 'flex-start',
     gap: '1.25rem',
     borderRadius: '0.75rem',
-    padding: '1.25rem',
+    padding: '2rem',
 });
 
-export const ProfilePaper = styled(Paper)({
-    height: '100%',
-});
+export const ProfilePaper = styled(Paper)({});
 
 export const InfoChangeContainer = styled('div')({
     display: 'flex',
@@ -65,6 +62,7 @@ export const ActionHeader = styled('div')({
 
 export const ActionSubmitButton = styled(Button)({
     width: '50%',
+    whiteSpace: 'nowrap',
 });
 
 //#region ProfileCard
@@ -76,7 +74,7 @@ export const StyledProfileCard = styled(Card)({
     flexDirection: 'column',
     gap: '1.25rem',
     borderRadius: '0.75rem',
-    padding: '1.25rem',
+    padding: '2rem',
 });
 
 export const ProfilePicture = styled('div')({

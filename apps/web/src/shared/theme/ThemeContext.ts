@@ -20,7 +20,9 @@ export interface ThemeContextType {
     theme: ThemeName;
     isDarkMode: boolean;
     muiTheme: Theme;
+    fontSizeScale: number;
     setTheme: (name: ThemeName) => void;
+    setFontSizeScale: (scale: number) => void;
     toggleDarkMode: () => void;
 }
 

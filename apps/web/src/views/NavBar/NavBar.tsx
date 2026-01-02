@@ -102,7 +102,7 @@ const NavBar = (props: Props) => {
                         src={QuizaroniLogo}
                         alt="Quizaroni logo"
                     /> */}
-                <Typography color="primary" variant="h4">
+                <Typography color="primary" variant="h4" sx={{ fontSize: '2.125rem' }}>
                     Quizaroni
                 </Typography>
                 {isMobile && <NavDrawer />}
