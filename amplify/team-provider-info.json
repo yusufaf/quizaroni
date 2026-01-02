@@ -10,16 +10,6 @@
       "StackName": "amplify-quizaroni-dev-a9a7f",
       "StackId": "arn:aws:cloudformation:us-west-2:774905128304:stack/amplify-quizaroni-dev-a9a7f/b5dd3d30-3b37-11ef-9bc2-0a55a0a2f98f",
       "AmplifyAppId": "d2iay6a8ctvc6h"
-    },
-    "categories": {
-      "auth": {
-        "quizaroni87682cb9": {
-          "userPoolId": "us-west-2_lVho1De7z",
-          "userPoolName": "quizaroni-users",
-          "webClientId": "2s66bb95ckdolhcbvi7b4112av",
-          "nativeClientId": "2s66bb95ckdolhcbvi7b4112av"
-        }
-      }
     }
   }
 }

@@ -1,6 +1,7 @@
 import { Tabs } from '@mui/material/';
 import { SyntheticEvent, useState } from 'react';
 import AccountTab from './AccountTab';
+import AccessibilityTab from './AccessibilityTab';
 import CustomizationTab from './CustomizationTab';
 import ProfileCard from './ProfileCard';
 import {
@@ -14,8 +15,9 @@ import { DEFAULT_USER_RESPONSE, PAGE_TITLES } from 'shared/constants';
 import useBrowserTitle from 'hooks/useBrowserTitle';
 
 const TABS = {
-    ACCOUNT: 'Account',
     CUSTOMIZATION: 'Customization',
+    ACCESSIBILITY: 'Accessibility',
+    ACCOUNT: 'Account',
 };
 
 type Props = {};
@@ -52,12 +54,19 @@ const Profile = (props: Props) => {
                                 value={TABS.CUSTOMIZATION}
                             />
                             <ProfileTab
+                                label={TABS.ACCESSIBILITY}
+                                value={TABS.ACCESSIBILITY}
+                            />
+                            <ProfileTab
                                 label={TABS.ACCOUNT}
                                 value={TABS.ACCOUNT}
                             />
                         </Tabs>
                         {selectedProfileTab === TABS.CUSTOMIZATION && (
                             <CustomizationTab userData={userData} />
+                        )}
+                        {selectedProfileTab === TABS.ACCESSIBILITY && (
+                            <AccessibilityTab userData={userData} />
                         )}
                         {selectedProfileTab === TABS.ACCOUNT && (
                             <AccountTab userData={userData} />
