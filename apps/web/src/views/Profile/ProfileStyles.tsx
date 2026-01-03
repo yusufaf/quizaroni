@@ -77,14 +77,34 @@ export const StyledProfileCard = styled(Card)({
     padding: '2rem',
 });
 
-export const ProfilePicture = styled('div')({
+export const ProfilePictureContainer = styled('div')({
     position: 'relative',
     display: 'flex',
     alignSelf: 'center',
     height: '10rem',
     width: '10rem',
+});
+
+export const ProfilePicture = styled('div')({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    width: '100%',
     background: 'grey',
     borderRadius: '50%',
+    cursor: 'pointer',
+    overflow: 'hidden',
+    transition: 'opacity 0.2s ease',
+    '&:hover': {
+        opacity: 0.9,
+    },
+});
+
+export const ProfilePictureImage = styled('img')({
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
 });
 
 export const UserInfoContainer = styled('div')({
@@ -98,11 +118,18 @@ export const UserInfoHeading = styled(Typography)({
     fontWeight: 'bold',
 });
 
-export const UploadImageButton = styled(IconButton)({
+export const UploadImageButton = styled(IconButton)(({ theme }) => ({
     position: 'absolute',
-    left: '9rem',
-    cursor: 'pointer',
-});
+    bottom: '0rem',
+    right: '0rem',
+    background: theme.palette.primary.main,
+    color: '#fff',
+    padding: '0.5rem',
+    boxShadow: '0 0.125rem 0.25rem rgba(0,0,0,0.2)',
+    '&:hover': {
+        background: theme.palette.primary.dark,
+    },
+}));
 
 export const ProfileTab = styled(Tab)(({ theme }) => ({
     color: theme.palette.text.primary,
