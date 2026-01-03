@@ -284,6 +284,10 @@ export class QuizaroniAPI extends Construct {
                 route: `${usersPrefix}/download-user-data`,
                 lambdaName: 'downloadUserData',
             },
+            {
+                route: `${usersPrefix}/upload-profile-picture`,
+                lambdaName: 'uploadProfilePicture',
+            },
         ];
 
         const API_ROUTES = [
