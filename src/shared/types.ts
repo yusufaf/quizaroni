@@ -85,6 +85,7 @@ export type User = {
     email: string;
     labels: string[];
     metadata: {
+        avatar?: AvatarMetadata;
         defaultTheme: AppTheme;
         fontSizeScale?: number;
         homeView: HomeView;
@@ -106,6 +107,11 @@ export type PreferredDateFormat =
 
 export type DownloadSetFormat =
     (typeof DOWNLOAD_FILE_TYPES)[keyof typeof DOWNLOAD_FILE_TYPES];
+
+export type AvatarMetadata = {
+    type: 'dicebear' | 'upload';
+    value: string;
+};
 
 // Study Mode Types
 export type StudyMode = 'flashcards' | 'multiple-choice' | 'matching' | 'type-write';
@@ -389,6 +395,17 @@ export type DeleteFileRequest = {
 
 export type SendFeedbackRequest = {
     key: string;
+};
+
+export type UploadProfilePictureRequest = {
+    imageData: string;
+    fileName: string;
+    contentType: string;
+};
+
+export type UploadProfilePictureResponse = {
+    message: string;
+    url: string;
 };
 // #endregion
 

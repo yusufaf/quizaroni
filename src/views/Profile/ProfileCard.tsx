@@ -1,32 +1,55 @@
 import { AddPhotoAlternate as AddPhotoIcon } from '@mui/icons-material';
 import { Typography } from '@mui/material/';
-import { useEffect, useRef } from 'react';
+import { useState } from 'react';
 import {
     ProfilePicture,
+    ProfilePictureImage,
+    ProfilePictureContainer,
     StyledProfileCard,
     UploadImageButton,
     UserInfoContainer,
     UserInfoHeading,
 } from './ProfileStyles';
+import ProfilePictureDialog from './ProfilePictureDialog';
 import { useGetAllStudysets } from 'state/api/studysetsAPI';
 import { User } from 'shared/types';
 
 type Props = {
     userData: User;
 };
+
 const ProfileCard = ({ userData }: Props) => {
+    const [dialogOpen, setDialogOpen] = useState(false);
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
         useGetAllStudysets();
     const studysets = studysetsResponse?.studysets ?? [];
 
-    useEffect(() => {}, []);
+    const handleOpenDialog = () => setDialogOpen(true);
+    const handleCloseDialog = () => setDialogOpen(false);
 
-    const handleProfilePicture = () => {};
+    const avatarSrc = userData.metadata.avatar?.value;
+    const hasAvatar = !!avatarSrc;
 
     return (
         <>
             <StyledProfileCard elevation={6}>
-                <ProfilePicture></ProfilePicture>
+                <ProfilePictureContainer>
+                    <ProfilePicture onClick={handleOpenDialog}>
+                        {hasAvatar ? (
+                            <ProfilePictureImage
+                                src={avatarSrc}
+                                alt="Profile"
+                            />
+                        ) : (
+                            <Typography variant="h3" sx={{ color: '#fff' }}>
+                                {userData.username.charAt(0).toUpperCase()}
+                            </Typography>
+                        )}
+                    </ProfilePicture>
+                    <UploadImageButton onClick={handleOpenDialog}>
+                        <AddPhotoIcon />
+                    </UploadImageButton>
+                </ProfilePictureContainer>
                 <UserInfoContainer>
                     <UserInfoHeading>Username</UserInfoHeading>
                     <Typography>{userData?.username ?? 'N/A'}</Typography>
@@ -43,6 +66,11 @@ const ProfileCard = ({ userData }: Props) => {
                     </Typography>
                 </UserInfoContainer>
             </StyledProfileCard>
+            <ProfilePictureDialog
+                open={dialogOpen}
+                onClose={handleCloseDialog}
+                userData={userData}
+            />
         </>
     );
 };
