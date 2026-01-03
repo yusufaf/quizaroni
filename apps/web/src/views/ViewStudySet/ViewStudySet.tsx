@@ -281,31 +281,37 @@ const ViewStudySet = (props: Props) => {
                                         mb: '1rem',
                                     }}
                                 >
-                                    <LocalOffer
-                                        sx={{
-                                            fontSize: '1.25rem',
-                                            color: 'primary.main',
-                                        }}
-                                    />
                                     <Tooltip
                                         title="Manage Labels"
                                         placement="right"
                                     >
-                                        <Chip
-                                            label={
-                                                selectedStudyset?.label
-                                                    ? selectedStudyset?.label
-                                                    : 'No label selected'
-                                            }
-                                            color={
-                                                !selectedStudyset?.label
-                                                    ? 'error'
-                                                    : undefined
-                                            }
-                                            variant="outlined"
+                                        <LocalOffer
+                                            sx={{
+                                                fontSize: '1.25rem',
+                                                color: 'primary.main',
+                                                cursor: 'pointer',
+                                                '&:hover': {
+                                                    opacity: 0.7,
+                                                },
+                                            }}
                                             onClick={showManageLabelsDialog}
                                         />
                                     </Tooltip>
+                                    {selectedStudyset?.labels?.length > 0 ? (
+                                        selectedStudyset.labels.map((label, index) => (
+                                            <Chip
+                                                key={index}
+                                                label={label}
+                                                variant="outlined"
+                                            />
+                                        ))
+                                    ) : (
+                                        <Chip
+                                            label="No labels selected"
+                                            color="error"
+                                            variant="outlined"
+                                        />
+                                    )}
                                 </Box>
                                 <StudysetActions
                                     updateMetadataField={updateMetadataField}

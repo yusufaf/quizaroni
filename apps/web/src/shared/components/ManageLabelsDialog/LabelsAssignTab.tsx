@@ -5,6 +5,7 @@ import { Studyset } from 'shared/types';
 type Props = {
     labels: string[];
     studysets: Studyset[];
+    currentStudysetUUID?: string;
     selectedStudysetUUIDs: string[];
     assignLabels: string[];
     onStudysetsChange: (uuids: string[]) => void;
@@ -16,6 +17,7 @@ type Props = {
 export const LabelsAssignTab = ({
     labels,
     studysets,
+    currentStudysetUUID,
     selectedStudysetUUIDs,
     assignLabels,
     onStudysetsChange,
@@ -23,6 +25,17 @@ export const LabelsAssignTab = ({
     onAssign,
     isLoading,
 }: Props) => {
+    const formatDate = (timestamp: string) => {
+        try {
+            return new Date(timestamp).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+            });
+        } catch {
+            return '';
+        }
+    };
     const handleStudysetsChange = (event: SelectChangeEvent<string[]>) => {
         const value = event.target.value;
         onStudysetsChange(typeof value === 'string' ? value.split(',') : value);
@@ -45,6 +58,14 @@ export const LabelsAssignTab = ({
                     multiple
                     value={selectedStudysetUUIDs}
                     onChange={handleStudysetsChange}
+                    MenuProps={{
+                        PaperProps: {
+                            sx: {
+                                maxHeight: '25rem',
+                                maxWidth: '35rem',
+                            },
+                        },
+                    }}
                     renderValue={(selectedUUIDs) => (
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                             {selectedUUIDs.map((uuid) => {
@@ -54,13 +75,34 @@ export const LabelsAssignTab = ({
                         </Box>
                     )}
                 >
-                    {studysets.map((studyset) => (
-                        <MenuItem key={studyset.studysetUUID} value={studyset.studysetUUID}>
-                            <Typography variant="inherit" noWrap>
-                                {studyset.title}
-                            </Typography>
-                        </MenuItem>
-                    ))}
+                    {studysets.map((studyset) => {
+                        const isCurrent = studyset.studysetUUID === currentStudysetUUID;
+                        const dateStr = formatDate(studyset.createdAt);
+                        return (
+                            <MenuItem key={studyset.studysetUUID} value={studyset.studysetUUID}>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <Typography variant="inherit" noWrap sx={{ flex: 1 }}>
+                                            {studyset.title}
+                                        </Typography>
+                                        {isCurrent && (
+                                            <Chip
+                                                label="Current"
+                                                size="small"
+                                                color="primary"
+                                                sx={{ height: '1.25rem', fontSize: '0.625rem' }}
+                                            />
+                                        )}
+                                    </Box>
+                                    {dateStr && (
+                                        <Typography variant="caption" color="text.secondary">
+                                            Created: {dateStr}
+                                        </Typography>
+                                    )}
+                                </Box>
+                            </MenuItem>
+                        );
+                    })}
                 </Select>
             </FormControl>
 

@@ -117,7 +117,7 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
                     <Tooltip title="Mark as important" placement="top">
                         <IconButton onClick={markCardAsImportant} size="small">
                             {card.important ? (
-                                <Star fontSize="small" sx={{ color: muiTheme.palette.other.gold }} />
+                                <Star fontSize="small" sx={{ color: muiTheme.palette.primary.main }} />
                             ) : (
                                 <StarBorder fontSize="small" />
                             )}

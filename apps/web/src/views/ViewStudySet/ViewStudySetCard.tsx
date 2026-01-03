@@ -132,10 +132,12 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
         >
             {!contentOnly && (
                 <SimpleFlexContainer>
-                    <BoldTypography variant="h5">
-                        {currentLabelTerminology} {index + 1}
-                    </BoldTypography>
-                    <CategoryChips>
+                    {selectedStudyset?.metadata?.cardIndexVisible !== false && (
+                        <BoldTypography variant="h5">
+                            {currentLabelTerminology} {index + 1}
+                        </BoldTypography>
+                    )}
+                    <CategoryChips hasIndex={selectedStudyset?.metadata?.cardIndexVisible !== false}>
                         {categories.length > 3 ? (
                             <CategoriesPopover categories={categories} />
                         ) : (
@@ -175,7 +177,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                                 {card.important ? (
                                     <Star
                                         sx={{
-                                            color: muiTheme.palette.other.gold,
+                                            color: muiTheme.palette.primary.main,
                                         }}
                                     />
                                 ) : (

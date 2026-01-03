@@ -81,6 +81,9 @@ export const useLabelsDialog = () => {
         if (labelsDialogProps.open) {
             if (labelsDialogProps.selectedStudysetUUIDs) {
                 setSelectedStudysetUUIDs([...labelsDialogProps.selectedStudysetUUIDs]);
+            } else if (labelsDialogProps.studysetUUID) {
+                // Auto-select current studyset if opened from ViewStudySet
+                setSelectedStudysetUUIDs([labelsDialogProps.studysetUUID]);
             }
             if (labelsDialogProps.tab) {
                 setSelectedTab(labelsDialogProps.tab);

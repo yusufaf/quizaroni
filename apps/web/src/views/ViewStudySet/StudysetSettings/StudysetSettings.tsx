@@ -5,6 +5,7 @@ import FormatTerminologies from './FormatTerminologies';
 import LabelTerminologies from './LabelTerminologies';
 import {
     CARD_COUNT_VISIBILITY_OPTIONS,
+    CARD_INDEX_VISIBILITY_OPTIONS,
     NOTES_DRAWER_INITIAL_APPEARANCE_OPTIONS,
     NOTES_DRAWER_POSITIONS_OPTIONS,
 } from 'shared/constants';
@@ -52,6 +53,13 @@ const StudysetSettings = ({ open, onClose, studyset }: Props) => {
                             options={CARD_COUNT_VISIBILITY_OPTIONS}
                             selectedValue={studyset?.metadata?.cardCountVisible}
                             property="cardCountVisible"
+                            onChange={handleSettingToggleChange}
+                        />
+                        <SettingsToggle
+                            label="Show Card Index"
+                            options={CARD_INDEX_VISIBILITY_OPTIONS}
+                            selectedValue={studyset?.metadata?.cardIndexVisible}
+                            property="cardIndexVisible"
                             onChange={handleSettingToggleChange}
                         />
                     </FlexColumn>

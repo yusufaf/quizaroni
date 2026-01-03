@@ -117,6 +117,7 @@ const ManageLabelsDialog = () => {
                             <LabelsAssignTab
                                 labels={labels}
                                 studysets={studysets}
+                                currentStudysetUUID={studysetUUID}
                                 selectedStudysetUUIDs={selectedStudysetUUIDs}
                                 assignLabels={assignLabels}
                                 onStudysetsChange={setSelectedStudysetUUIDs}
