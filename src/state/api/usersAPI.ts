@@ -1,7 +1,11 @@
 import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
 import { BASE_API_URL, getCommonPostRequestProps } from './awsAPI';
 import { validate } from 'shared/validation';
-import { BaseResponseSchema, GetUserResponseSchema } from 'shared/schemas';
+import {
+    BaseResponseSchema,
+    GetUserResponseSchema,
+    UploadProfilePictureResponseSchema,
+} from 'shared/schemas';
 import {
     CreateUserRequest,
     DownloadUserDataRequest,
@@ -10,6 +14,7 @@ import {
     UpdateDefaultThemeRequest,
     UpdateEmailRequest,
     UpdateUserMetadataRequest,
+    UploadProfilePictureRequest,
     User,
 } from 'shared/types';
 
@@ -138,6 +143,35 @@ export const useDownloadUserData = () => {
                 type: 'response',
                 context: 'DownloadUserData'
             });
+        },
+    });
+};
+
+export const useUploadProfilePicture = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({
+            imageData,
+            fileName,
+            contentType,
+        }: UploadProfilePictureRequest) => {
+            const response = await fetch(
+                `${BASE_API_URL}/users/upload-profile-picture`,
+                {
+                    ...getCommonPostRequestProps(),
+                    body: JSON.stringify({ imageData, fileName, contentType }),
+                }
+            );
+            const data = await response.json();
+            return validate({
+                schema: UploadProfilePictureResponseSchema,
+                data,
+                type: 'response',
+                context: 'UploadProfilePicture',
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['user'] });
         },
     });
 };

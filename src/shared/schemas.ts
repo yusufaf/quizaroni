@@ -73,7 +73,13 @@ export const NamedColorSchema = z.object({
     name: z.string(),
 });
 
+export const AvatarMetadataSchema = z.object({
+    type: z.enum(['dicebear', 'upload']),
+    value: z.string().url(),
+});
+
 export const UserMetadataSchema = z.object({
+    avatar: AvatarMetadataSchema.optional(),
     defaultDownloadFormat: z.string(),
     defaultTheme: z.enum(['light', 'dark']),
     homeView: z.enum(['table', 'grid', 'html']),
@@ -285,6 +291,17 @@ export const DeleteFileRequestSchema = z.object({
 
 export const SendFeedbackRequestSchema = z.object({
     key: z.string(),
+});
+
+export const UploadProfilePictureRequestSchema = z.object({
+    imageData: z.string(),
+    fileName: z.string(),
+    contentType: z.enum(['image/png', 'image/jpeg', 'image/webp']),
+});
+
+export const UploadProfilePictureResponseSchema = z.object({
+    message: z.string(),
+    url: z.string().url(),
 });
 
 // #endregion

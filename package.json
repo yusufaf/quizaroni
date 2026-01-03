@@ -13,6 +13,8 @@
   "dependencies": {
     "@aws-amplify/auth": "^6.0.5",
     "@aws-amplify/ui-react": "^6.5.4",
+    "@dicebear/collection": "^9.2.2",
+    "@dicebear/core": "^9.2.2",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -31,6 +33,7 @@
     "amazon-cognito-identity-js": "^6.3.7",
     "aws-amplify": "^6.0.5",
     "babel-preset-react": "^6.24.1",
+    "browser-image-compression": "^2.0.2",
     "canvas-confetti": "^1.9.4",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
@@ -48,7 +51,6 @@
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.91.2",
-    "@types/jspdf": "^2.0.0",
     "@vitejs/plugin-react": "^4.1.1",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "3.3.2",
