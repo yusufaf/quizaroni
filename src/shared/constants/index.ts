@@ -337,6 +337,24 @@ export const CARD_COUNT_VISIBILITY_OPTIONS = [
     },
 ];
 
+export const CARD_INDEX_VISIBILITY = {
+    HIDDEN: false,
+    VISIBLE: true,
+};
+
+export const CARD_INDEX_VISIBILITY_OPTIONS = [
+    {
+        value: CARD_INDEX_VISIBILITY.HIDDEN,
+        ariaLabel: 'hidden',
+        label: 'Hidden',
+    },
+    {
+        value: CARD_INDEX_VISIBILITY.VISIBLE,
+        ariaLabel: 'visible',
+        label: 'Visible',
+    },
+];
+
 export const DATE_FORMATS = {
     ISO_8601: 'YYYY-MM-DD',
     DMY: 'DD/MM/YYYY',

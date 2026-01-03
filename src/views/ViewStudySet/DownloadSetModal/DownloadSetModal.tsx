@@ -63,6 +63,7 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
         defaultDownloadFormat ?? DOWNLOAD_FILE_TYPES.JSON
     );
     const [includeMetadata, setIncludeMetadata] = useState<boolean>(false);
+    const [includeNotes, setIncludeNotes] = useState<boolean>(false);
 
     const downloadFile = ({ data, fileName, fileType }: DownloadFileParams) => {
         const blob = new Blob([data], { type: MIME_TYPES[fileType] });
@@ -91,12 +92,12 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
         switch (downloadFileType) {
             case DOWNLOAD_FILE_TYPES.CSV: {
                 const headers: string = includeMetadata
-                    ? `${METADATA_CSV_HEADERS}, ${DEFAULT_CSV_HEADERS}`
-                    : DEFAULT_CSV_HEADERS;
+                    ? `${METADATA_CSV_HEADERS}, ${DEFAULT_CSV_HEADERS}${includeNotes ? ', Notes' : ''}`
+                    : `${DEFAULT_CSV_HEADERS}${includeNotes ? ', Notes' : ''}`;
 
                 const studysetCSV: string[] = cards.reduce(
                     (acc: string[], card: Card, index) => {
-                        const { term, definition } = card;
+                        const { term, definition, notes } = card;
 
                         let startString = '';
                         if (includeMetadata && index === 0) {
@@ -109,6 +110,14 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
                                 .join(',');
                         }
                         const csvStrings = [term, definition];
+
+                        if (includeNotes) {
+                            const notesText = notes.length > 0
+                                ? notes.map(n => n.text).join('; ')
+                                : '';
+                            csvStrings.push(notesText);
+                        }
+
                         if (startString) {
                             csvStrings.unshift(startString);
                         }
@@ -123,12 +132,20 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
             }
             case DOWNLOAD_FILE_TYPES.TXT: {
                 const cardText = cards.map((card: Card, index: number) => {
-                    const { definition, term } = card;
+                    const { definition, term, notes } = card;
                     const termString = `Term: ${term}`;
                     const definitionString = `Definition: ${definition}`;
-                    return `Card ${
+
+                    let cardContent = `Card ${
                         index + 1
-                    }:\n\t ${termString} \n\t ${definitionString} \n`;
+                    }:\n\t ${termString} \n\t ${definitionString}`;
+
+                    if (includeNotes && notes.length > 0) {
+                        const notesString = notes.map(n => `\t\t- ${n.text}`).join('\n');
+                        cardContent += `\n\t Notes:\n${notesString}`;
+                    }
+
+                    return cardContent + ' \n';
                 });
 
                 const newLineSeparatedCardText = `${cardText.join('\n')}`;
@@ -142,12 +159,18 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
             }
             case DOWNLOAD_FILE_TYPES.JSON: {
                 const mappedCards = cards.map((card: Card, index: number) => {
-                    const { definition, term } = card;
+                    const { definition, term, notes } = card;
+                    const cardData: any = {
+                        term,
+                        definition,
+                    };
+
+                    if (includeNotes) {
+                        cardData.notes = notes;
+                    }
+
                     return {
-                        [`Card ${index + 1}`]: {
-                            term,
-                            definition,
-                        },
+                        [`Card ${index + 1}`]: cardData,
                     };
                 });
                 const cleanedCards = Object.assign({}, ...mappedCards);
@@ -163,10 +186,18 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
             }
             case DOWNLOAD_FILE_TYPES.MD: {
                 const cardText = cards.map((card: Card, index: number) => {
-                    const { definition, term } = card;
-                    return `## Card ${
+                    const { definition, term, notes } = card;
+
+                    let cardMarkdown = `## Card ${
                         index + 1
-                    }\n\n**Term:** ${term}\n\n**Definition:** ${definition}\n\n`;
+                    }\n\n**Term:** ${term}\n\n**Definition:** ${definition}`;
+
+                    if (includeNotes && notes.length > 0) {
+                        const notesMarkdown = notes.map(n => `- ${n.text}`).join('\n');
+                        cardMarkdown += `\n\n**Notes:**\n${notesMarkdown}`;
+                    }
+
+                    return cardMarkdown + '\n\n';
                 });
                 const cardsMarkdownText = `${cardText.join('\n')}`;
                 let mdData = cardsMarkdownText;
@@ -213,6 +244,15 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
                             onChange={(e) =>
                                 setIncludeMetadata(e.target.checked)
                             }
+                        />
+                    }
+                />
+                <FormControlLabel
+                    label="Include notes?"
+                    control={
+                        <Checkbox
+                            checked={includeNotes}
+                            onChange={(e) => setIncludeNotes(e.target.checked)}
                         />
                     }
                 />

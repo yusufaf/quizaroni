@@ -143,10 +143,12 @@ export const ViewFlashsetCard = styled(Card)({
     },
 });
 
-export const CategoryChips = styled(SimpleFlexContainer)({
-    marginLeft: '1rem',
-    gap: '0.5rem',
-});
+export const CategoryChips = styled(SimpleFlexContainer)<{ hasIndex?: boolean }>(
+    ({ hasIndex = true }) => ({
+        marginLeft: hasIndex ? '1rem' : '0',
+        gap: '0.5rem',
+    })
+);
 
 export const CategoryChip = styled(Chip)({
     maxWidth: '10rem',
