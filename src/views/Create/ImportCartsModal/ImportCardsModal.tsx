@@ -18,6 +18,7 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { Card } from 'shared/types';
 import { processImportedCards } from 'utilities/importUtils';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     setShowImportModal: Dispatch<SetStateAction<boolean>>;
@@ -25,13 +26,14 @@ type Props = {
 };
 
 const IMPORT_METHODS = {
-    JSON_INPUT: 'JSON Input',
-    FILE: 'File Upload',
+    JSON_INPUT: 'jsonInput',
+    FILE: 'fileUpload',
 } as const;
 
 type ImportMethod = (typeof IMPORT_METHODS)[keyof typeof IMPORT_METHODS];
 
 const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
+    const { t } = useTranslation();
     const [importMethod, setImportMethod] = useState<ImportMethod>(
         IMPORT_METHODS.JSON_INPUT
     );
@@ -51,7 +53,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
 
     const handleFileUpload = (file: File) => {
         if (!file.name.endsWith('.json')) {
-            setError('Please upload a .json file');
+            setError(t('create.pleaseUploadJson'));
             setSelectedFile(null);
             return;
         }
@@ -67,7 +69,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
         };
 
         reader.onerror = () => {
-            setError('Failed to read file. Please try again.');
+            setError(t('create.failedToReadFile'));
             setSelectedFile(null);
         };
 
@@ -81,7 +83,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
         const sourceText = jsonInputText.trim();
 
         if (!sourceText) {
-            setError('Please provide JSON content');
+            setError(t('create.provideJsonContent'));
             setIsProcessing(false);
             return;
         }
@@ -95,14 +97,14 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
         }
 
         if (cards.length === 0) {
-            setError('No valid cards found to import');
+            setError(t('create.noValidCardsFound'));
             setIsProcessing(false);
             return;
         }
 
         // Success - send to parent
         onImportCards(cards);
-        toast.success(`Successfully imported ${cards.length} card(s)`);
+        toast.success(t('create.successfullyImported', { count: cards.length }));
         setShowImportModal(false);
         setIsProcessing(false);
     };
@@ -113,11 +115,11 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
 
     return (
         <Dialog open={true} onClose={onClose} fullWidth maxWidth="md">
-            <StandardDialogTitle title="Import Cards" onClose={onClose} />
+            <StandardDialogTitle title={t('create.importCards')} onClose={onClose} />
             <DialogContent>
                 <FormControl sx={{ mb: 2 }}>
                     <FormLabel id="import-method-radio-group-label">
-                        Import Method
+                        {t('create.importMethod')}
                     </FormLabel>
                     <RadioGroup
                         row
@@ -129,12 +131,12 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                         <FormControlLabel
                             value={IMPORT_METHODS.JSON_INPUT}
                             control={<Radio />}
-                            label={IMPORT_METHODS.JSON_INPUT}
+                            label={t('create.jsonInput')}
                         />
                         <FormControlLabel
                             value={IMPORT_METHODS.FILE}
                             control={<Radio />}
-                            label={IMPORT_METHODS.FILE}
+                            label={t('create.fileUpload')}
                         />
                     </RadioGroup>
                 </FormControl>
@@ -145,9 +147,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                         variant="outlined"
                         multiline
                         minRows={8}
-                        placeholder='Paste JSON here. Examples:
-Single card: {"term": "Photosynthesis", "definition": "Process by which plants make food"}
-Multiple cards: [{"term": "DNA", "definition": "Genetic material"}, {"term": "RNA", "definition": "Messenger molecule"}]'
+                        placeholder={t('create.pasteJsonPlaceholder')}
                         value={jsonInputText}
                         onChange={(e) => setJsonInputText(e.target.value)}
                         disabled={isProcessing}
@@ -165,8 +165,8 @@ Multiple cards: [{"term": "DNA", "definition": "Genetic material"}, {"term": "RN
                             sx={{ mb: 1 }}
                         >
                             {selectedFile
-                                ? `Selected: ${selectedFile.name}`
-                                : 'Choose JSON File'}
+                                ? t('create.selectedFile', { filename: selectedFile.name })
+                                : t('create.chooseJsonFile')}
                             <input
                                 type="file"
                                 accept=".json"
@@ -188,7 +188,7 @@ Multiple cards: [{"term": "DNA", "definition": "Genetic material"}, {"term": "RN
                                     setJsonInputText(e.target.value)
                                 }
                                 disabled={isProcessing}
-                                label="File Contents (editable)"
+                                label={t('create.fileContentsEditable')}
                             />
                         )}
                     </>
@@ -211,7 +211,7 @@ Multiple cards: [{"term": "DNA", "definition": "Genetic material"}, {"term": "RN
                         ) : undefined
                     }
                 >
-                    {isProcessing ? 'Importing...' : 'Import'}
+                    {isProcessing ? t('create.importing') : t('categories.import')}
                 </Button>
             </StyledDialogActions>
         </Dialog>

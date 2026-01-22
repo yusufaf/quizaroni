@@ -1,5 +1,6 @@
 import { Box, TextField } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+import { useTranslation } from 'react-i18next';
 import { ErrorInfo } from 'shared/components/MetadataDialogs';
 import { ChangeEvent } from 'react';
 
@@ -18,6 +19,8 @@ export const CategoriesCreateTab = ({
     onSubmit,
     isLoading,
 }: Props) => {
+    const { t } = useTranslation();
+
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !errorInfo && categoryName.trim()) {
             onSubmit();
@@ -27,7 +30,7 @@ export const CategoriesCreateTab = ({
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <TextField
-                label="Category Name"
+                label={t('categories.categoryName')}
                 value={categoryName}
                 onChange={onCategoryChange}
                 onKeyDown={handleKeyPress}
@@ -45,7 +48,7 @@ export const CategoriesCreateTab = ({
                     loading={isLoading}
                     sx={{ fontWeight: 600 }}
                 >
-                    Create
+                    {t('categories.create')}
                 </LoadingButton>
             </Box>
         </Box>

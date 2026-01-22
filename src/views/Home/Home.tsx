@@ -22,7 +22,8 @@ import useBrowserTitle from 'hooks/useBrowserTitle';
 import useFilterStudysets from 'hooks/useFilterStudysets';
 import useSortStudysets from 'hooks/useSortStudysets';
 import { HomeView, SortDirection, Studyset } from 'shared/types';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useGetAllStudysets, useUpdateStudyset } from 'state/api/studysetsAPI';
 import { useGetUser, useUpdateUserMetadata } from 'state/api/usersAPI';
@@ -56,6 +57,7 @@ declare module '@mui/x-data-grid' {
     interface ToolbarPropsOverrides {
         columnVisibilityModel: GridColumnVisibilityModel;
         density: GridDensity;
+        t: (key: string) => string;
     }
 }
 
@@ -64,6 +66,7 @@ type Props = {};
 const CustomToolbar = ({
     columnVisibilityModel,
     density,
+    t,
 }: NonNullable<GridSlotsComponentsProps['toolbar']>) => {
     const {
         mutate: updateUserMetadata,
@@ -87,13 +90,13 @@ const CustomToolbar = ({
             <GridToolbarFilterButton />
             <GridToolbarDensitySelector />
             <GridToolbarExport />
-            <Tooltip title="Save visible columns and density">
+            <Tooltip title={t?.('home.saveColumnsAndDensity') ?? 'Save visible columns and density'}>
                 <Button
                     variant="text"
                     startIcon={<Save />}
                     onClick={handleSavePreferences}
                 >
-                    Save Table Preferences
+                    {t?.('home.saveTablePreferences') ?? 'Save Table Preferences'}
                 </Button>
             </Tooltip>
         </GridToolbarContainer>
@@ -102,6 +105,7 @@ const CustomToolbar = ({
 
 const Home = (props: Props) => {
     /* Hooks / Redux */
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const { selectedStudySet, setSelectedStudySet } = useStudySetsStore();
@@ -156,11 +160,11 @@ const Home = (props: Props) => {
         )
         .filter(Boolean) as Studyset[];
 
-    const columns: GridColDef[] = [
+    const columns: GridColDef[] = useMemo(() => [
         {
             display: 'flex',
             field: 'favorited',
-            headerName: 'Favorited',
+            headerName: t('home.columns.favorited'),
             width: 75,
             cellClassName: `favorited-cell`,
             renderCell: (params: GridRenderCellParams<any, boolean>) => {
@@ -188,7 +192,7 @@ const Home = (props: Props) => {
         },
         {
             field: 'title',
-            headerName: 'Title',
+            headerName: t('home.columns.title'),
             width: 300,
             renderCell: (params: GridRenderCellParams<any, any>) => (
                 <GhostLink to={`/view/${params.id}`}>{params.value}</GhostLink>
@@ -196,12 +200,12 @@ const Home = (props: Props) => {
         },
         {
             field: 'description',
-            headerName: 'Description',
+            headerName: t('home.columns.description'),
             width: 300,
         },
         {
             field: 'createdAt',
-            headerName: 'Created',
+            headerName: t('home.columns.created'),
             width: 150,
             valueFormatter: (value) => {
                 return formatDateUsingPreferred(value, preferredDateFormat);
@@ -209,7 +213,7 @@ const Home = (props: Props) => {
         },
         {
             field: 'lastViewed',
-            headerName: 'Last Viewed',
+            headerName: t('home.columns.lastViewed'),
             width: 150,
             valueFormatter: (value) => {
                 return formatDateUsingPreferred(value, preferredDateFormat);
@@ -217,7 +221,7 @@ const Home = (props: Props) => {
         },
         {
             field: 'updatedAt',
-            headerName: 'Last Updated',
+            headerName: t('home.columns.lastUpdated'),
             width: 150,
             valueFormatter: (value) => {
                 return formatDateUsingPreferred(value, preferredDateFormat);
@@ -225,7 +229,7 @@ const Home = (props: Props) => {
         },
         {
             field: 'numberOfCards',
-            headerName: '# of Cards',
+            headerName: t('home.columns.numberOfCards'),
             width: 100,
             valueGetter: (_value, row) => {
                 return row.cards.length;
@@ -239,12 +243,12 @@ const Home = (props: Props) => {
         },
         {
             field: 'labels',
-            headerName: 'Labels',
+            headerName: t('home.columns.labels'),
             width: 300,
             renderCell: (params: any) => {
                 const labels = params.value as string[];
                 if (!labels || labels.length === 0) {
-                    return <Typography variant="body2" color="text.secondary">None</Typography>;
+                    return <Typography variant="body2" color="text.secondary">{t('home.noLabels')}</Typography>;
                 }
                 return (
                     <Box sx={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -258,7 +262,7 @@ const Home = (props: Props) => {
                 );
             },
         },
-    ];
+    ], [t, preferredDateFormat, updateStudyset]);
 
     // Create default visibility model where all columns are visible by default
     const defaultVisibilityModel: GridColumnVisibilityModel = columns.reduce(
@@ -362,7 +366,7 @@ const Home = (props: Props) => {
             <HomePaper elevation={6}>
                 <HomeContainer>
                     <HomeSetsHeading variant="h5">
-                        Your Study Sets
+                        {t('home.yourStudySets')}
                     </HomeSetsHeading>
                     <HomeToolbar
                         handleViewChange={handleViewChange}
@@ -411,6 +415,7 @@ const Home = (props: Props) => {
                                             showQuickFilter: true,
                                             columnVisibilityModel,
                                             density,
+                                            t,
                                         },
                                         row: {
                                             onContextMenu: handleContextMenu,

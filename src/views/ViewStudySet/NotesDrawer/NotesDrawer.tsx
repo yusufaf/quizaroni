@@ -38,6 +38,7 @@ import {
 import { NOTES_DRAWER_INITIAL_APPEARANCE } from 'shared/constants';
 import NotesList from './NotesList';
 import { StyledDrawer, CardPreviewText, EmptyStateBox } from './styles';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     selectedStudyset: Studyset;
@@ -49,6 +50,7 @@ const transitionDuration = 1000; //can also use theme.transitions.duration
 
 const NotesDrawer = (props: Props) => {
     const { selectedStudyset, isHidden: externalHidden, onToggle } = props;
+    const { t } = useTranslation();
 
     const {
         studysetUUID = '',
@@ -221,8 +223,8 @@ const NotesDrawer = (props: Props) => {
                 onClick={() => setHidden(false)}
                 color="primary"
                 size="small"
-                aria-label="Open notes drawer"
-                title="Open notes drawer"
+                aria-label={t('notesDrawer.openNotesDrawer')}
+                title={t('notesDrawer.openNotesDrawer')}
                 sx={{
                     position: 'fixed',
                     ...fabPosition,
@@ -252,7 +254,7 @@ const NotesDrawer = (props: Props) => {
                     }}
                 >
                     <NoteIcon sx={{ color: 'primary.main' }} />
-                    <BoldTypography variant="h5">Notes</BoldTypography>
+                    <BoldTypography variant="h5">{t('notesDrawer.title')}</BoldTypography>
                 </Box>
                 <Box
                     sx={{
@@ -261,7 +263,7 @@ const NotesDrawer = (props: Props) => {
                         gap: '0.5rem',
                     }}
                 >
-                    <Tooltip title="Sort notes">
+                    <Tooltip title={t('notesDrawer.sortNotes')}>
                         <IconButton
                             onClick={handleSortMenuOpen}
                             size="small"
@@ -288,24 +290,24 @@ const NotesDrawer = (props: Props) => {
                 <MenuItem
                     onClick={() => handleSortChange('alphabetical', 'asc')}
                 >
-                    A → Z
+                    {t('notesDrawer.aToZ')}
                 </MenuItem>
                 <MenuItem
                     onClick={() => handleSortChange('alphabetical', 'desc')}
                 >
-                    Z → A
+                    {t('notesDrawer.zToA')}
                 </MenuItem>
                 <MenuItem onClick={() => handleSortChange('date', 'desc')}>
-                    Newest First
+                    {t('notesDrawer.newestFirst')}
                 </MenuItem>
                 <MenuItem onClick={() => handleSortChange('date', 'asc')}>
-                    Oldest First
+                    {t('notesDrawer.oldestFirst')}
                 </MenuItem>
                 <MenuItem onClick={() => handleSortChange('cardOrder', 'asc')}>
-                    Card Order ↑
+                    {t('notesDrawer.cardOrderAsc')}
                 </MenuItem>
                 <MenuItem onClick={() => handleSortChange('cardOrder', 'desc')}>
-                    Card Order ↓
+                    {t('notesDrawer.cardOrderDesc')}
                 </MenuItem>
             </Menu>
 
@@ -370,11 +372,11 @@ const NotesDrawer = (props: Props) => {
                                                 whiteSpace: 'nowrap',
                                             }}
                                         >
-                                            Card {index + 1}
+                                            {t('notesDrawer.card', { index: index + 1 })}
                                         </BoldTypography>
                                         {noteCount > 0 && (
                                             <Chip
-                                                label={`${noteCount} ${noteCount === 1 ? 'note' : 'notes'}`}
+                                                label={t('notesDrawer.noteCount', { count: noteCount })}
                                                 size="small"
                                                 sx={{
                                                     height: '1.25rem',
@@ -388,7 +390,7 @@ const NotesDrawer = (props: Props) => {
                                         )}
                                     </Box>
                                     <CardPreviewText variant="body2">
-                                        {term || 'No term'}
+                                        {term || t('notesDrawer.noTerm')}
                                     </CardPreviewText>
                                     <CardPreviewText
                                         variant="caption"
@@ -397,7 +399,7 @@ const NotesDrawer = (props: Props) => {
                                             opacity: 0.7,
                                         }}
                                     >
-                                        {definition || 'No definition'}
+                                        {definition || t('notesDrawer.noDefinition')}
                                     </CardPreviewText>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ pt: 0 }}>
@@ -414,7 +416,7 @@ const NotesDrawer = (props: Props) => {
                                                 variant="body2"
                                                 color="text.secondary"
                                             >
-                                                No notes yet
+                                                {t('notesDrawer.noNotesYet')}
                                             </Typography>
                                         </EmptyStateBox>
                                     ) : (
@@ -452,7 +454,7 @@ const NotesDrawer = (props: Props) => {
                                             width: '100%',
                                         }}
                                     >
-                                        Add Note
+                                        {t('notesDrawer.addNote')}
                                     </LoadingButton>
                                 </AccordionDetails>
                             </Accordion>
@@ -465,7 +467,7 @@ const NotesDrawer = (props: Props) => {
                         sx={{ fontSize: '3rem', opacity: 0.2, mb: '1rem' }}
                     />
                     <Typography variant="h6" color="text.secondary">
-                        No cards in this study set
+                        {t('notesDrawer.noCardsInSet')}
                     </Typography>
                 </EmptyStateBox>
             )}

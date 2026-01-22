@@ -13,6 +13,7 @@ import { useUpdateStudyset } from 'state/api/studysetsAPI';
 import SettingsToggle from 'components/SettingsToggle/SettingsToggle';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import { FormControl, FormLabel } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     open: boolean;
@@ -20,6 +21,7 @@ type Props = {
     studyset: Studyset | undefined;
 };
 const StudysetSettings = ({ open, onClose, studyset }: Props) => {
+    const { t } = useTranslation();
     const { mutate: updateStudySet } = useUpdateStudyset();
 
     const handleSettingToggleChange = (
@@ -41,22 +43,22 @@ const StudysetSettings = ({ open, onClose, studyset }: Props) => {
 
     return (
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
-            <StandardDialogTitle title="Studyset Settings" onClose={onClose} />
+            <StandardDialogTitle title={t('studysetSettings.title')} onClose={onClose} />
             <StyledDialogContent>
                 <FormatTerminologies studyset={studyset} />
                 <LabelTerminologies studyset={studyset} />
                 <FormControl>
-                    <FormLabel sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}>Cards</FormLabel>
+                    <FormLabel sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}>{t('studysetSettings.cards')}</FormLabel>
                     <FlexColumn style={{ gap: '1rem', marginTop: '0.5rem' }}>
                         <SettingsToggle
-                            label="Show Card Count"
+                            label={t('studysetSettings.showCardCount')}
                             options={CARD_COUNT_VISIBILITY_OPTIONS}
                             selectedValue={studyset?.metadata?.cardCountVisible}
                             property="cardCountVisible"
                             onChange={handleSettingToggleChange}
                         />
                         <SettingsToggle
-                            label="Show Card Index"
+                            label={t('studysetSettings.showCardIndex')}
                             options={CARD_INDEX_VISIBILITY_OPTIONS}
                             selectedValue={studyset?.metadata?.cardIndexVisible}
                             property="cardIndexVisible"
@@ -65,17 +67,17 @@ const StudysetSettings = ({ open, onClose, studyset }: Props) => {
                     </FlexColumn>
                 </FormControl>
                 <FormControl>
-                    <FormLabel sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}>Notes</FormLabel>
+                    <FormLabel sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}>{t('studysetSettings.notes')}</FormLabel>
                     <FlexColumn style={{ gap: '1rem', marginTop: '0.5rem' }}>
                         <SettingsToggle
-                            label={`Notes Drawer Alignment`}
+                            label={t('studysetSettings.notesDrawerAlignment')}
                             options={NOTES_DRAWER_POSITIONS_OPTIONS}
                             selectedValue={studyset?.metadata?.notesDrawerPosition}
                             property="notesDrawerPosition"
                             onChange={handleSettingToggleChange}
                         />
                         <SettingsToggle
-                            label={`Notes Drawer Initial Appearance`}
+                            label={t('studysetSettings.notesDrawerInitialAppearance')}
                             options={NOTES_DRAWER_INITIAL_APPEARANCE_OPTIONS}
                             selectedValue={studyset?.metadata?.notesDrawerInitial}
                             property="notesDrawerInitial"

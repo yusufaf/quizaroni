@@ -23,6 +23,7 @@ import {
 import { DownloadDialogContent } from '../styles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import { useGetUser } from 'state/api/usersAPI';
+import { useTranslation } from 'react-i18next';
 
 export const downloadTypeItems = Object.values(DOWNLOAD_FILE_TYPES).map(
     (value, index) => {
@@ -51,6 +52,7 @@ type Props = {
 };
 
 const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
+    const { t } = useTranslation();
     const {
         data: {
             user: {
@@ -219,10 +221,10 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
 
     return (
         <Dialog open={open} onClose={onClose}>
-            <StandardDialogTitle title="Download Study Set" onClose={onClose} />
+            <StandardDialogTitle title={t('dialogs.download.title')} onClose={onClose} />
             <DownloadDialogContent>
                 <DialogContentText>
-                    Choose what format you'd like to download the study set as:
+                    {t('dialogs.download.chooseFormat')}
                 </DialogContentText>
                 <FormControl
                     sx={{
@@ -237,7 +239,7 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
                     </Select>
                 </FormControl>
                 <FormControlLabel
-                    label="Include metadata?"
+                    label={t('dialogs.download.includeMetadata')}
                     control={
                         <Checkbox
                             checked={includeMetadata}
@@ -248,7 +250,7 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
                     }
                 />
                 <FormControlLabel
-                    label="Include notes?"
+                    label={t('dialogs.download.includeNotes')}
                     control={
                         <Checkbox
                             checked={includeNotes}
@@ -259,10 +261,10 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
             </DownloadDialogContent>
             <DialogActions>
                 <Button onClick={onClose} variant="outlined">
-                    Cancel
+                    {t('buttons.cancel')}
                 </Button>
                 <Button onClick={handleDownloadSet} variant="contained">
-                    Download
+                    {t('buttons.download')}
                 </Button>
             </DialogActions>
         </Dialog>

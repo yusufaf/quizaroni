@@ -1,5 +1,5 @@
 import { AddPhotoAlternate as AddPhotoIcon } from '@mui/icons-material';
-import { Typography } from '@mui/material/';
+import { Tooltip, Typography } from '@mui/material/';
 import { useState } from 'react';
 import {
     ProfilePicture,
@@ -13,12 +13,16 @@ import {
 import ProfilePictureDialog from './ProfilePictureDialog';
 import { useGetAllStudysets } from 'state/api/studysetsAPI';
 import { User } from 'shared/types';
+import { formatDateUsingPreferred } from 'utilities/general';
+import { DATE_FORMATS, TIME_FORMATS } from 'constants';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     userData: User;
 };
 
 const ProfileCard = ({ userData }: Props) => {
+    const { t } = useTranslation();
     const [dialogOpen, setDialogOpen] = useState(false);
     const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
         useGetAllStudysets();
@@ -34,35 +38,43 @@ const ProfileCard = ({ userData }: Props) => {
         <>
             <StyledProfileCard elevation={6}>
                 <ProfilePictureContainer>
-                    <ProfilePicture onClick={handleOpenDialog}>
-                        {hasAvatar ? (
-                            <ProfilePictureImage
-                                src={avatarSrc}
-                                alt="Profile"
-                            />
-                        ) : (
-                            <Typography variant="h3" sx={{ color: '#fff' }}>
-                                {userData.username.charAt(0).toUpperCase()}
-                            </Typography>
-                        )}
-                    </ProfilePicture>
-                    <UploadImageButton onClick={handleOpenDialog}>
-                        <AddPhotoIcon />
-                    </UploadImageButton>
+                    <Tooltip title="Change profile picture">
+                        <ProfilePicture onClick={handleOpenDialog}>
+                            {hasAvatar ? (
+                                <ProfilePictureImage
+                                    src={avatarSrc}
+                                    alt="Profile"
+                                />
+                            ) : (
+                                <Typography variant="h3" sx={{ color: '#fff' }}>
+                                    {userData.username.charAt(0).toUpperCase()}
+                                </Typography>
+                            )}
+                        </ProfilePicture>
+                    </Tooltip>
+                    <Tooltip title="Change profile picture">
+                        <UploadImageButton onClick={handleOpenDialog}>
+                            <AddPhotoIcon />
+                        </UploadImageButton>
+                    </Tooltip>
                 </ProfilePictureContainer>
                 <UserInfoContainer>
-                    <UserInfoHeading>Username</UserInfoHeading>
+                    <UserInfoHeading>{t('profile.username')}</UserInfoHeading>
                     <Typography>{userData?.username ?? 'N/A'}</Typography>
                 </UserInfoContainer>
                 <UserInfoContainer>
-                    <UserInfoHeading># of Study Sets Created</UserInfoHeading>
+                    <UserInfoHeading>{t('profile.studySetsCreated')}</UserInfoHeading>
                     <Typography>{studysets.length ?? 0}</Typography>
                 </UserInfoContainer>
                 <UserInfoContainer>
-                    <UserInfoHeading>Account Created</UserInfoHeading>
+                    <UserInfoHeading>{t('profile.accountCreated')}</UserInfoHeading>
                     <Typography>
-                        {new Date(userData.createdAt).toLocaleDateString() ??
-                            'N/A'}
+                        {formatDateUsingPreferred(
+                            userData.createdAt,
+                            userData.metadata.preferredDateFormat ?? DATE_FORMATS.MDY,
+                            userData.metadata.preferredTimeFormat ?? TIME_FORMATS.TWELVE_HOUR,
+                            userData.metadata.showSeconds ?? false
+                        )}
                     </Typography>
                 </UserInfoContainer>
             </StyledProfileCard>

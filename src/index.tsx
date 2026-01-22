@@ -3,6 +3,9 @@ import { BrowserRouter } from 'react-router-dom';
 import { CustomThemeProvider } from './shared/theme/ThemeProvider';
 import { CssBaseline } from '@mui/material';
 
+// Initialize i18n before rendering
+import './i18n';
+
 import './index.css';
 import '@aws-amplify/ui-react/styles.css';
 import App from './App';

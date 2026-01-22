@@ -48,12 +48,14 @@ import {
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { useTranslation } from 'react-i18next';
 
 type Props = {};
 const CreateSet = (props: Props) => {
     /* Hooks / Redux */
     const { id: studysetUUID } = useParams();
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const { namedColorsDialogProps } = useGlobalStore();
     const { advancedSectionProps, setAdvancedSectionProps } =
@@ -190,14 +192,14 @@ const CreateSet = (props: Props) => {
             {
                 onSuccess: (response: any) => {
                     console.log({ response });
-                    toast.success('Successfully updated study set', {
+                    toast.success(t('create.successUpdate'), {
                         position: toast.POSITION.BOTTOM_LEFT,
                     });
                     navigate(`/view/${studysetUUID}`);
                 },
                 onError: (error) => {
                     console.log({ error });
-                    toast.error('Error updating study set', {
+                    toast.error(t('create.errorUpdate'), {
                         position: toast.POSITION.BOTTOM_LEFT,
                     });
                 },
@@ -309,7 +311,7 @@ const CreateSet = (props: Props) => {
                 <SpacedFlexContainer>
                     <SimpleFlexContainer style={{ gap: '0.5rem' }}>
                         <Typography variant="h6">
-                            {`${createdSetCards.length ?? 'N/A'} ${createdSetCards.length === 1 ? 'Card' : 'Cards'}`}
+                            {t('create.cardCount', { count: createdSetCards.length ?? 0 })}
                         </Typography>
                         {!createdSetCards.length && <NoCardsWarningsIcon />}
                     </SimpleFlexContainer>
@@ -334,7 +336,7 @@ const CreateSet = (props: Props) => {
                 </DndContext>
                 <AddCardButton variant="contained" onClick={handleAddCard}>
                     <AddCardIcon />
-                    Add Card
+                    {t('create.addCard')}
                 </AddCardButton>
                 <Button
                     variant="contained"
@@ -348,7 +350,7 @@ const CreateSet = (props: Props) => {
                         alignSelf: 'flex-end',
                     }}
                 >
-                    Save Changes
+                    {t('create.saveChanges')}
                 </Button>
             </CreateSetPage>
             {showImportModal && (
