@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Grow, Tooltip, Typography, Box } from '@mui/material';
 import { ViewCarousel, Quiz, Extension, Keyboard } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { STUDY_MODES, STUDY_MODE_CONFIG } from 'shared/constants';
@@ -18,7 +19,16 @@ type Props = {
     cardCount: number;
 };
 
+// Map mode IDs to translation keys
+const MODE_TRANSLATION_KEYS: Record<string, string> = {
+    'flashcards': 'flashcards',
+    'multiple-choice': 'multipleChoice',
+    'matching': 'matching',
+    'type-write': 'typeWrite',
+};
+
 const StudyModesGrid = ({ studysetUUID, cardCount }: Props) => {
+    const { t } = useTranslation('study');
     const navigate = useNavigate();
     const [hoveredMode, setHoveredMode] = useState<string | null>(null);
 
@@ -35,11 +45,12 @@ const StudyModesGrid = ({ studysetUUID, cardCount }: Props) => {
                 const IconComponent = ICON_MAP[mode.icon as keyof typeof ICON_MAP];
                 const isDisabled = cardCount === 0;
                 const isHovered = hoveredMode === mode.id;
+                const translationKey = MODE_TRANSLATION_KEYS[mode.id] || mode.id;
 
                 return (
                     <Grow in key={mode.id} timeout={300 + index * 100}>
                         <Tooltip
-                            title={isDisabled ? 'Add cards to unlock this mode' : mode.description}
+                            title={isDisabled ? t('addCardsToUnlock') : t(`modes.${translationKey}.description`)}
                             placement="top"
                         >
                             <StudyModePaper
@@ -68,7 +79,7 @@ const StudyModesGrid = ({ studysetUUID, cardCount }: Props) => {
                                         transition: 'color 0.3s ease',
                                     }}
                                 />
-                                <StudyModeTitle variant="subtitle1">{mode.title}</StudyModeTitle>
+                                <StudyModeTitle variant="subtitle1">{t(`modes.${translationKey}.title`)}</StudyModeTitle>
                             </StudyModePaper>
                         </Tooltip>
                     </Grow>

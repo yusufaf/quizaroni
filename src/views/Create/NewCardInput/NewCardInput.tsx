@@ -1,7 +1,8 @@
-import { Add, DragIndicator } from '@mui/icons-material';
+import { Add, DragIndicator, AddPhotoAlternate } from '@mui/icons-material';
 import FileUpload from 'components/FileUpload/FileUpload';
 import type { Card, TODO } from 'shared/types';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useMemo, useState, useRef } from 'react';
+import ImagePreview from './ImagePreview';
 import {
     AddCardBelowButton,
     BottomActions,
@@ -21,6 +22,15 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { IconButton, Tooltip } from '@mui/material';
 import { SimpleFlexContainer } from 'shared/styles/AppStyles';
+import { styled } from '@mui/system';
+import { useTranslation } from 'react-i18next';
+
+const ImagePreviewGrid = styled('div')({
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '0.75rem',
+    marginTop: '0.75rem',
+});
 
 type Props = {
     actionsStack: TODO[];
@@ -42,6 +52,7 @@ const NewCardInput = ({
     setCreatedSetCards,
     updateCardValue,
 }: Props) => {
+    const { t } = useTranslation();
     const {
         cardUUID,
         term,
@@ -59,6 +70,31 @@ const NewCardInput = ({
         studysetUUID,
     });
 
+    const termFileInputRef = useRef<HTMLInputElement>(null);
+    const definitionFileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleTermFileClick = () => {
+        termFileInputRef.current?.click();
+    };
+
+    const handleDefinitionFileClick = () => {
+        definitionFileInputRef.current?.click();
+    };
+
+    const handleTermFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            uploadFile([...e.target.files], 'term');
+            e.target.value = '';
+        }
+    };
+
+    const handleDefinitionFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            uploadFile([...e.target.files], 'definition');
+            e.target.value = '';
+        }
+    };
+
     const [localTextColor, setLocalTextColor] = useState(textColor);
     const [localBackgroundColor, setLocalBackgroundColor] =
         useState(backgroundColor);
@@ -68,6 +104,22 @@ const NewCardInput = ({
         useState<boolean>(false);
     const displayBackgroundColor = applyBackgroundColor && localBackgroundColor;
     const displayTextColor = applyTextColor && localTextColor;
+
+    // Filter files by association
+    const termFiles = useMemo(
+        () => (card.files || []).filter(f => f.association === 'term'),
+        [card.files]
+    );
+    const definitionFiles = useMemo(
+        () => (card.files || []).filter(f => f.association === 'definition'),
+        [card.files]
+    );
+
+    // Delete handler - removes file from local state
+    const handleDeleteFile = (fileKey: string) => {
+        const updatedFiles = (card.files || []).filter(f => f.key !== fileKey);
+        updateCardValue(index, 'files', updatedFiles);
+    };
 
     const {
         attributes,
@@ -99,9 +151,10 @@ const NewCardInput = ({
             <SimpleFlexContainer
                 style={{
                     gap: '0.5rem',
+                    padding: '0 3rem',
                 }}
             >
-                <Tooltip title="Drag to reorder" placement="left">
+                <Tooltip title={t('create.dragToReorder')} placement="left">
                     <IconButton
                         {...attributes}
                         {...listeners}
@@ -136,10 +189,35 @@ const NewCardInput = ({
             <NewCardInputs>
                 <NewCardRow>
                     <NewCardTerm>
-                        <NewCardLabel variant="subtitle1">Term</NewCardLabel>
+                        <SimpleFlexContainer style={{ gap: '0.5rem', alignItems: 'center', marginBottom: '0.25rem' }}>
+                            <NewCardLabel variant="subtitle1">{t('create.term')}</NewCardLabel>
+                            <Tooltip title={t('create.uploadImage')} placement="top">
+                                <IconButton
+                                    onClick={handleTermFileClick}
+                                    size="small"
+                                    sx={{
+                                        opacity: 0.6,
+                                        transition: 'all 0.2s ease',
+                                        '&:hover': {
+                                            opacity: 1,
+                                            backgroundColor: 'action.hover',
+                                        },
+                                    }}
+                                >
+                                    <AddPhotoAlternate fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                            <input
+                                type="file"
+                                ref={termFileInputRef}
+                                onChange={handleTermFileChange}
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                            />
+                        </SimpleFlexContainer>
                         <NewCardInputField
                             variant="standard"
-                            placeholder={'Enter a term'}
+                            placeholder={t('create.enterTerm')}
                             onChange={(e) =>
                                 updateCardValue(index, 'term', e.target.value)
                             }
@@ -154,22 +232,50 @@ const NewCardInput = ({
                                 },
                             }}
                         />
+                        {termFiles.length > 0 && (
+                            <ImagePreviewGrid>
+                                {termFiles.map(file => (
+                                    <ImagePreview
+                                        key={file.key}
+                                        file={file}
+                                        onDelete={handleDeleteFile}
+                                    />
+                                ))}
+                            </ImagePreviewGrid>
+                        )}
                     </NewCardTerm>
-                    <FileUpload
-                        handleFiles={(files) => uploadFile(files, 'term')}
-                    />
-                </NewCardRow>
-                <NewCardRow>
-                    <FileUpload
-                        handleFiles={(files) => uploadFile(files, 'definition')}
-                    />
                     <NewCardDefinition>
-                        <NewCardLabel variant="subtitle1">
-                            Definition
-                        </NewCardLabel>
+                        <SimpleFlexContainer style={{ gap: '0.5rem', alignItems: 'center', marginBottom: '0.25rem' }}>
+                            <NewCardLabel variant="subtitle1">
+                                {t('create.definition')}
+                            </NewCardLabel>
+                            <Tooltip title={t('create.uploadImage')} placement="top">
+                                <IconButton
+                                    onClick={handleDefinitionFileClick}
+                                    size="small"
+                                    sx={{
+                                        opacity: 0.6,
+                                        transition: 'all 0.2s ease',
+                                        '&:hover': {
+                                            opacity: 1,
+                                            backgroundColor: 'action.hover',
+                                        },
+                                    }}
+                                >
+                                    <AddPhotoAlternate fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                            <input
+                                type="file"
+                                ref={definitionFileInputRef}
+                                onChange={handleDefinitionFileChange}
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                            />
+                        </SimpleFlexContainer>
                         <NewCardInputField
                             variant="standard"
-                            placeholder={'Enter a definition'}
+                            placeholder={t('create.enterDefinition')}
                             onChange={(e) =>
                                 updateCardValue(
                                     index,
@@ -188,6 +294,17 @@ const NewCardInput = ({
                                 },
                             }}
                         />
+                        {definitionFiles.length > 0 && (
+                            <ImagePreviewGrid>
+                                {definitionFiles.map(file => (
+                                    <ImagePreview
+                                        key={file.key}
+                                        file={file}
+                                        onDelete={handleDeleteFile}
+                                    />
+                                ))}
+                            </ImagePreviewGrid>
+                        )}
                     </NewCardDefinition>
                 </NewCardRow>
                 <BottomActions>
@@ -202,7 +319,7 @@ const NewCardInput = ({
                                     setActionsStack,
                                 })
                             }
-                            title="Add card below"
+                            title={t('create.addCardBelow')}
                         >
                             <Add fontSize="medium" />
                         </AddCardBelowButton>

@@ -1,5 +1,6 @@
 import { Box, Typography, ListItemText, Button, Collapse, Stack } from '@mui/material';
 import { Delete as DeleteIcon, Download as DownloadIcon, CleaningServices as CleanIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { MetadataList, ErrorInfo } from 'shared/components/MetadataDialogs';
 import { downloadObjectAsJSON } from 'shared/utilities/general';
 
@@ -32,6 +33,7 @@ export const CategoriesManageTab = ({
     onDeleteUnused,
     isLoading,
 }: Props) => {
+    const { t } = useTranslation();
     const categoryItems = categories.map((name) => ({ name }));
 
     const renderItem = (item: { name: string }) => <ListItemText primary={item.name} />;
@@ -45,7 +47,7 @@ export const CategoriesManageTab = ({
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', mb: '1rem' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="h6">
-                        Categories ({categories.length})
+                        {t('categories.categoriesCount', { count: categories.length })}
                     </Typography>
                     <Stack direction="row" spacing="0.5rem">
                         <Button
@@ -54,7 +56,7 @@ export const CategoriesManageTab = ({
                             size="small"
                             disabled={categories.length === 0}
                         >
-                            Download
+                            {t('categories.download')}
                         </Button>
                         <Button
                             variant="outlined"
@@ -62,7 +64,7 @@ export const CategoriesManageTab = ({
                             startIcon={<CleanIcon />}
                             onClick={onDeleteUnused}
                         >
-                            Delete Unused
+                            {t('categories.deleteUnused')}
                         </Button>
                     </Stack>
                 </Box>
@@ -84,7 +86,7 @@ export const CategoriesManageTab = ({
                     }}
                 >
                     <Typography variant="body2" fontWeight={500}>
-                        {deleteIndices.length} item{deleteIndices.length > 1 ? 's' : ''} selected
+                        {t('categories.itemSelected', { count: deleteIndices.length })}
                     </Typography>
                     <Button
                         color="inherit"
@@ -103,7 +105,7 @@ export const CategoriesManageTab = ({
                             },
                         }}
                     >
-                        Delete
+                        {t('categories.delete')}
                     </Button>
                 </Box>
             </Collapse>
@@ -119,7 +121,7 @@ export const CategoriesManageTab = ({
                 validateFn={validateFn}
                 renderItem={renderItem}
                 isLoading={isLoading}
-                emptyMessage="No categories yet"
+                emptyMessage={t('categories.noCategoriesYet')}
             />
         </Box>
     );

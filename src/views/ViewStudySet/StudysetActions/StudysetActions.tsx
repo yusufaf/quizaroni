@@ -13,6 +13,7 @@ import { IconButton, Tooltip } from '@mui/material/';
 import CustomIconButton from 'components/CustomIconButton/CustomIconButton';
 import { Studyset } from 'shared/types';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGlobalStore } from 'state/stores/global';
 import { useViewSetsStore } from 'state/stores/viewSets';
@@ -28,6 +29,7 @@ type Props = {
 const StudysetActions = (props: Props) => {
     const { updateMetadataField, selectedStudyset } = props;
 
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { id: studySetUUID } = useParams();
 
@@ -103,7 +105,7 @@ const StudysetActions = (props: Props) => {
                         onClick: handleEditClick,
                     }}
                     tooltipProps={{
-                        title: 'Edit Study Set',
+                        title: t('actions.editStudySet'),
                     }}
                 />
                 <CustomIconButton
@@ -114,7 +116,7 @@ const StudysetActions = (props: Props) => {
                             handleShowDialog(VIEW_SET_DIALOGS.DOWNLOAD),
                     }}
                     tooltipProps={{
-                        title: 'Download',
+                        title: t('actions.download'),
                     }}
                 />
                 <CustomIconButton
@@ -125,7 +127,7 @@ const StudysetActions = (props: Props) => {
                             handleShowDialog(VIEW_SET_DIALOGS.NOTIFICATIONS),
                     }}
                     tooltipProps={{
-                        title: 'Manage Notifications',
+                        title: t('actions.manageNotifications'),
                     }}
                 />
                 <CustomIconButton
@@ -135,7 +137,7 @@ const StudysetActions = (props: Props) => {
                         onClick: handleOpenControlMenu,
                     }}
                     tooltipProps={{
-                        title: 'Control Menu',
+                        title: t('actions.controlMenu'),
                     }}
                     ref={controlAnchorRef}
                 />
@@ -146,7 +148,7 @@ const StudysetActions = (props: Props) => {
                         onClick: () => handleShowDialog(VIEW_SET_DIALOGS.PRINT),
                     }}
                     tooltipProps={{
-                        title: 'Print',
+                        title: t('actions.print'),
                     }}
                 />
                 <CustomIconButton
@@ -159,7 +161,7 @@ const StudysetActions = (props: Props) => {
                             ),
                     }}
                     tooltipProps={{
-                        title: 'Delete Study Set',
+                        title: t('actions.deleteStudySet'),
                     }}
                 />
                 <CustomIconButton
@@ -172,7 +174,7 @@ const StudysetActions = (props: Props) => {
                             ),
                     }}
                     tooltipProps={{
-                        title: 'Duplicate Study Set',
+                        title: t('actions.duplicateStudySet'),
                     }}
                 />
                 <CustomIconButton
@@ -183,7 +185,7 @@ const StudysetActions = (props: Props) => {
                             handleShowDialog(VIEW_SET_DIALOGS.SETTINGS),
                     }}
                     tooltipProps={{
-                        title: 'Study Set Settings',
+                        title: t('actions.studySetSettings'),
                     }}
                 />
                 <CustomIconButton
@@ -193,7 +195,7 @@ const StudysetActions = (props: Props) => {
                         onClick: () => handleShowDialog(VIEW_SET_DIALOGS.SHARE),
                     }}
                     tooltipProps={{
-                        title: 'Share',
+                        title: t('actions.share'),
                     }}
                 />
             </ActionButtonsRow>

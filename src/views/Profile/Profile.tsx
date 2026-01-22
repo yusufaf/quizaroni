@@ -13,6 +13,7 @@ import {
 import { useGetUser } from 'state/api/usersAPI';
 import { DEFAULT_USER_RESPONSE, PAGE_TITLES } from 'shared/constants';
 import useBrowserTitle from 'hooks/useBrowserTitle';
+import { useTranslation } from 'react-i18next';
 
 const TABS = {
     CUSTOMIZATION: 'Customization',
@@ -23,6 +24,7 @@ const TABS = {
 type Props = {};
 
 const Profile = (props: Props) => {
+    const { t } = useTranslation();
     const { data: { user: userData } = DEFAULT_USER_RESPONSE } =
         useGetUser();
 
@@ -50,15 +52,15 @@ const Profile = (props: Props) => {
                     <ProfileContainer>
                         <Tabs value={selectedProfileTab} onChange={onTabChange}>
                             <ProfileTab
-                                label={TABS.CUSTOMIZATION}
+                                label={t('profile.customization')}
                                 value={TABS.CUSTOMIZATION}
                             />
                             <ProfileTab
-                                label={TABS.ACCESSIBILITY}
+                                label={t('profile.accessibility')}
                                 value={TABS.ACCESSIBILITY}
                             />
                             <ProfileTab
-                                label={TABS.ACCOUNT}
+                                label={t('profile.account')}
                                 value={TABS.ACCOUNT}
                             />
                         </Tabs>

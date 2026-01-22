@@ -28,6 +28,7 @@ import {
 } from '../../shared/utilities/createUtils';
 import { Dispatch, MouseEvent, SetStateAction, useState } from 'react';
 import { Card } from 'shared/types';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     studysetCards: Card[];
@@ -40,6 +41,7 @@ const SetModificationButtons = ({
     setCardsCallback = () => {},
     setShowImportModal = () => {},
 }: Props) => {
+    const { t } = useTranslation();
     const hideButtonTextQuery = useMediaQuery(
         'only screen and (max-width:1280px)'
     );
@@ -47,7 +49,7 @@ const SetModificationButtons = ({
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const keyboardShortcutsOpen = Boolean(anchorEl);
 
-    const expandButtonTitle = expanded ? 'Hide Buttons' : 'Expand Buttons';
+    const expandButtonTitle = expanded ? t('create.hideButtons') : t('create.expandButtons');
 
     const onImportClick = (_e: MouseEvent<HTMLButtonElement>) => {
         setShowImportModal(true);
@@ -85,7 +87,7 @@ const SetModificationButtons = ({
         <SetModificationsContainer
             sx={{ gap: hideButtonTextQuery ? '0.5rem' : undefined }}
         >
-            <Tooltip title="Keyboard Shortcuts">
+            <Tooltip title={t('create.keyboardShortcuts')}>
                 <IconButton onClick={handleOpenShortcutsMenu}>
                     <KeyboardRounded color="primary" fontSize="medium" />
                 </IconButton>
@@ -104,7 +106,7 @@ const SetModificationButtons = ({
                     <ListItemIcon>
                         <UndoRounded />
                     </ListItemIcon>
-                    <ListItemText>Undo</ListItemText>
+                    <ListItemText>{t('create.undo')}</ListItemText>
                     <KeysToPressContainer>
                         <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Z</kbd>
                     </KeysToPressContainer>
@@ -122,7 +124,7 @@ const SetModificationButtons = ({
             </IconButton>
             {expanded && (
                 <>
-                    <Tooltip title="Import Cards">
+                    <Tooltip title={t('create.importCards')}>
                         {hideButtonTextQuery ? (
                             <IconButton onClick={onImportClick}>
                                 <UploadFile color="primary" fontSize="medium" />
@@ -133,11 +135,11 @@ const SetModificationButtons = ({
                                 startIcon={<UploadFile fontSize="medium" />}
                                 onClick={onImportClick}
                             >
-                                Import Cards
+                                {t('create.importCards')}
                             </Button>
                         )}
                     </Tooltip>
-                    <Tooltip title="Swap All">
+                    <Tooltip title={t('create.swapAll')}>
                         {hideButtonTextQuery ? (
                             <IconButton onClick={onSwapAllClick}>
                                 <SwapHoriz color="primary" fontSize="medium" />
@@ -148,11 +150,11 @@ const SetModificationButtons = ({
                                 startIcon={<SwapHoriz fontSize="medium" />}
                                 onClick={onSwapAllClick}
                             >
-                                Swap All
+                                {t('create.swapAll')}
                             </Button>
                         )}
                     </Tooltip>
-                    <Tooltip title="Reverse Cards">
+                    <Tooltip title={t('create.reverseCards')}>
                         {hideButtonTextQuery ? (
                             <IconButton onClick={onReverseClick}>
                                 <Sync color="primary" fontSize="medium" />
@@ -163,7 +165,7 @@ const SetModificationButtons = ({
                                 startIcon={<Sync fontSize="medium" />}
                                 onClick={onReverseClick}
                             >
-                                Reverse Cards
+                                {t('create.reverseCards')}
                             </Button>
                         )}
                     </Tooltip>

@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, SyntheticEvent, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     CardFiltersContainer,
     CategoryTab,
@@ -50,7 +51,15 @@ const ViewStudysetFilters = ({
     viewMode,
     setViewMode,
 }: Props) => {
+    const { t } = useTranslation();
     const { setSelectedDialog } = useViewSetsStore();
+
+    // Map default category values to translation keys
+    const getCategoryLabel = (category: string) => {
+        if (category === DEFAULT_CATEGORIES.ALL) return t('viewStudySet.all');
+        if (category === DEFAULT_CATEGORIES.IMPORTANT) return t('viewStudySet.important');
+        return category; // User-defined categories stay as-is
+    };
 
     const categoryTabs = useMemo(() => {
         const jointCategories = [
@@ -58,9 +67,9 @@ const ViewStudysetFilters = ({
             ...(selectedStudyset?.categories ?? []),
         ];
         return jointCategories.map((tab, index) => {
-            return <CategoryTab key={index} label={tab} value={tab} />;
+            return <CategoryTab key={index} label={getCategoryLabel(tab)} value={tab} />;
         });
-    }, [selectedStudyset]);
+    }, [selectedStudyset, t]);
 
     const onTabChange = (_e: SyntheticEvent, newTab: string) => {
         setSelectedTab(newTab);
@@ -97,11 +106,11 @@ const ViewStudysetFilters = ({
                 >
                     {categoryTabs}
                 </CategoryTabs>
-                <Tooltip title="Manage Categories">
+                <Tooltip title={t('viewStudySet.manageCategories')}>
                     <IconButton
                         color="primary"
                         onClick={handleShowCategoriesDialog}
-                        aria-label="Manage Categories"
+                        aria-label={t('viewStudySet.manageCategories')}
                     >
                         <Category />
                     </IconButton>
@@ -111,7 +120,7 @@ const ViewStudysetFilters = ({
                 <IconButton
                     color="primary"
                     onClick={toggleSortDirection}
-                    title="Sort Direction"
+                    title={t('viewStudySet.sortDirection')}
                 >
                     {sortDirection === SORT_DIRECTIONS.ASC ? (
                         <ArrowUpward />
@@ -120,24 +129,24 @@ const ViewStudysetFilters = ({
                     )}
                 </IconButton>
                 <SortCardsDropdown>
-                    <InputLabel id="sort-label" size="small">Sort</InputLabel>
+                    <InputLabel id="sort-label" size="small">{t('viewStudySet.sort')}</InputLabel>
                     <Select
                         labelId="sort-label"
-                        label="Sort"
+                        label={t('viewStudySet.sort')}
                         value={selectedSort}
                         onChange={onSortChange}
                         autoWidth
                         size="small"
                     >
                         <MenuItem value="">
-                            <em>None</em>
+                            <em>{t('viewStudySet.none')}</em>
                         </MenuItem>
-                        <MenuItem value={'term'}>Alphabetical - Term</MenuItem>
+                        <MenuItem value={'term'}>{t('viewStudySet.alphabeticalTerm')}</MenuItem>
                         <MenuItem value={'definition'}>
-                            Alphabetical - Definition
+                            {t('viewStudySet.alphabeticalDefinition')}
                         </MenuItem>
                         <MenuItem value={'label'}>
-                            Alphabetical - Label
+                            {t('viewStudySet.alphabeticalLabel')}
                         </MenuItem>
                     </Select>
                 </SortCardsDropdown>
@@ -149,10 +158,10 @@ const ViewStudysetFilters = ({
                     size="small"
                     sx={{ marginLeft: '1rem' }}
                 >
-                    <ToggleButton value={VIEWSET_LAYOUTS.LIST} title="List View">
+                    <ToggleButton value={VIEWSET_LAYOUTS.LIST} title={t('viewStudySet.listView')}>
                         <ViewList />
                     </ToggleButton>
-                    <ToggleButton value={VIEWSET_LAYOUTS.GRID} title="Grid View">
+                    <ToggleButton value={VIEWSET_LAYOUTS.GRID} title={t('viewStudySet.gridView')}>
                         <ViewModule />
                     </ToggleButton>
                 </ToggleButtonGroup>

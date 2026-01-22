@@ -8,6 +8,7 @@ import {
 import { Email } from '@mui/icons-material';
 import { StyledDialog } from './styles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     onClose: () => void;
@@ -16,11 +17,12 @@ type Props = {
 
 const NotificationsDialog = (props: Props) => {
     const { open, onClose } = props;
+    const { t } = useTranslation();
 
     return (
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
             <StandardDialogTitle
-                title="Manage Notifications"
+                title={t('dialogs.notifications.title')}
                 onClose={onClose}
             />
 

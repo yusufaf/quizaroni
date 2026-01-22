@@ -3,6 +3,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Studyset } from 'shared/types';
 import { Box, FormControl, InputLabel, Typography, MenuItem, List, ListItem, ListItemText, Button, Chip } from '@mui/material';
 import { Inbox as InboxIcon } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     selectedStudyset: Studyset;
@@ -20,6 +21,8 @@ const ImportTabView = (props: Props) => {
         studysets,
         handleImport,
     } = props;
+
+    const { t } = useTranslation();
 
     const handleChange = (event: SelectChangeEvent) => {
         setSelectedStudysetUUID(event.target.value as string);
@@ -44,10 +47,10 @@ const ImportTabView = (props: Props) => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <FormControl fullWidth>
-                <InputLabel id="study-set-select-label">Select Study Set</InputLabel>
+                <InputLabel id="study-set-select-label">{t('categories.selectStudyset')}</InputLabel>
                 <Select
                     labelId="study-set-select-label"
-                    label="Select Study Set"
+                    label={t('categories.selectStudyset')}
                     value={selectedStudysetUUID}
                     onChange={handleChange}
                 >
@@ -68,12 +71,12 @@ const ImportTabView = (props: Props) => {
                 <>
                     <Box>
                         <Typography variant="body2" color="text.secondary" sx={{ mb: '0.75rem' }}>
-                            Preview: {importSetCategories.length} categor{importSetCategories.length === 1 ? 'y' : 'ies'} found
+                            {t('categories.previewFound', { count: importSetCategories.length })}
                             {newCategories.length > 0 && (
-                                <> • {newCategories.length} new</>
+                                <> • {t('categories.newCount', { count: newCategories.length })}</>
                             )}
                             {duplicateCategories.length > 0 && (
-                                <> • {duplicateCategories.length} duplicate{duplicateCategories.length > 1 ? 's' : ''} (will be skipped)</>
+                                <> • {t('categories.duplicateCount', { count: duplicateCategories.length })}</>
                             )}
                         </Typography>
 
@@ -81,7 +84,7 @@ const ImportTabView = (props: Props) => {
                             <Box sx={{ textAlign: 'center', py: '2rem' }}>
                                 <InboxIcon fontSize="large" color="disabled" />
                                 <Typography variant="body2" color="text.secondary" sx={{ mt: '0.5rem' }}>
-                                    No categories in selected study set
+                                    {t('categories.noCategoriesInSet')}
                                 </Typography>
                             </Box>
                         ) : (
@@ -108,7 +111,7 @@ const ImportTabView = (props: Props) => {
                                                 <ListItemText primary={category} />
                                                 {isDuplicate && (
                                                     <Chip
-                                                        label="Duplicate"
+                                                        label={t('categories.duplicate')}
                                                         size="small"
                                                         variant="outlined"
                                                         sx={{ ml: '0.5rem' }}
@@ -129,7 +132,9 @@ const ImportTabView = (props: Props) => {
                             disabled={newCategories.length === 0}
                             sx={{ fontWeight: 600 }}
                         >
-                            Import {newCategories.length > 0 && `(${newCategories.length})`}
+                            {newCategories.length > 0
+                                ? t('categories.importCount', { count: newCategories.length })
+                                : t('categories.import')}
                         </Button>
                     </Box>
                 </>
