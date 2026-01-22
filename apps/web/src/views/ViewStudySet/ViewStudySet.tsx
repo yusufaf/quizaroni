@@ -7,6 +7,7 @@ import useFilterViewCards from 'hooks/useFilterViewCards';
 import useSortViewCards from 'hooks/useSortViewCards';
 import { OpenCardNotes, SortDirection, Studyset, UUID } from 'shared/types';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     useGetAllStudysets,
@@ -73,6 +74,7 @@ type Props = {};
 
 const ViewStudySet = (props: Props) => {
     /* Hooks / Redux */
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { id: studysetUUID = '' } = useParams();
 
@@ -248,7 +250,7 @@ const ViewStudySet = (props: Props) => {
                                     onClick={handleBackClick}
                                     startIcon={<ArrowBack color="primary" />}
                                 >
-                                    Back to Your Study Sets
+                                    {t('viewStudySet.backToStudySets')}
                                 </Button>
                                 <BoldTypography variant="h5">
                                     {isStudySetLoading ? (
@@ -261,7 +263,7 @@ const ViewStudySet = (props: Props) => {
                                     {isStudySetLoading ? (
                                         <Skeleton />
                                     ) : (
-                                        <>{`Created by ${selectedStudyset?.username}`}</>
+                                        <>{t('viewStudySet.createdBy', { username: selectedStudyset?.username })}</>
                                     )}
                                 </Typography>
                                 <StudysetDescription variant="body1">
@@ -282,7 +284,7 @@ const ViewStudySet = (props: Props) => {
                                     }}
                                 >
                                     <Tooltip
-                                        title="Manage Labels"
+                                        title={t('viewStudySet.manageLabels')}
                                         placement="right"
                                     >
                                         <LocalOffer
@@ -307,7 +309,7 @@ const ViewStudySet = (props: Props) => {
                                         ))
                                     ) : (
                                         <Chip
-                                            label="No labels selected"
+                                            label={t('viewStudySet.noLabelsSelected')}
                                             color="error"
                                             variant="outlined"
                                         />
@@ -348,7 +350,7 @@ const ViewStudySet = (props: Props) => {
                                 color: 'text.primary',
                             }}
                         >
-                            {`${selectedStudyset?.cards?.length ?? 'N/A'} ${selectedStudyset?.cards?.length === 1 ? 'Card' : 'Cards'}`}
+                            {`${selectedStudyset?.cards?.length ?? 'N/A'} ${t('viewStudySet.card', { count: selectedStudyset?.cards?.length ?? 0 })}`}
                         </Typography>
                         {!selectedStudyset?.cards?.length && (
                             <NoCardsWarningsIcon />
@@ -377,10 +379,10 @@ const ViewStudySet = (props: Props) => {
                 {filteredViewFlashCards.length === 0 &&
                 selectedTab !== DEFAULT_CATEGORIES.ALL ? (
                     <NoCardsMessage>
-                        No cards matched the selected category.
+                        {t('viewStudySet.noCardsCategory')}
                     </NoCardsMessage>
                 ) : filteredViewFlashCards.length === 0 ? (
-                    <NoCardsMessage>No cards in this study set.</NoCardsMessage>
+                    <NoCardsMessage>{t('viewStudySet.noCardsInSet')}</NoCardsMessage>
                 ) : viewMode === VIEWSET_LAYOUTS.GRID ? (
                     <ViewCardsGridContainer>
                         {filteredViewFlashCards.map((card, index) => (
@@ -422,7 +424,7 @@ const ViewStudySet = (props: Props) => {
                     variant="contained"
                     onClick={handleUpdateCards}
                 >
-                    Update Cards
+                    {t('viewStudySet.updateCards')}
                 </UpdateCardsButton>
                 <NotesDrawer
                     selectedStudyset={selectedStudyset}

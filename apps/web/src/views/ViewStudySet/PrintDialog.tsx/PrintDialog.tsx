@@ -23,6 +23,7 @@ import {
 } from './styles';
 import PrintPreview from './PrintPreview';
 import { getPdfGenerator } from './pdfGenerators';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     open: boolean;
@@ -31,6 +32,7 @@ type Props = {
 };
 
 const PrintDialog = ({ open, onClose, studyset }: Props) => {
+    const { t } = useTranslation();
     const { mutate: updateStudySet } = useUpdateStudyset();
     const printRef = useRef<HTMLDivElement>(null);
 
@@ -85,7 +87,7 @@ const PrintDialog = ({ open, onClose, studyset }: Props) => {
             doc.save(filename);
         } catch (error) {
             console.error('PDF generation failed:', error);
-            alert('Failed to generate PDF. Please try again.');
+            alert(t('dialogs.print.failedToGenerate'));
         } finally {
             setIsGenerating(false);
         }
@@ -93,7 +95,7 @@ const PrintDialog = ({ open, onClose, studyset }: Props) => {
 
     return (
         <Dialog open={open} onClose={onClose} fullScreen>
-            <StandardDialogTitle title="Download PDF" onClose={onClose} />
+            <StandardDialogTitle title={t('dialogs.print.title')} onClose={onClose} />
             <StyledDialogContent>
                 <PreviewPanel>
                     <PrintPreviewContainer ref={printRef}>
@@ -106,42 +108,42 @@ const PrintDialog = ({ open, onClose, studyset }: Props) => {
 
                 <SettingsPanel>
                     <SettingsToggle
-                        label="Layout Style"
+                        label={t('dialogs.print.layoutStyle')}
                         options={PRINT_LAYOUT_OPTIONS}
                         selectedValue={printSettings.layout}
                         property="layout"
                         onChange={handleSettingChange}
                     />
                     <SettingsToggle
-                        label="Include Notes"
+                        label={t('dialogs.print.includeNotes')}
                         options={PRINT_INCLUDE_NOTES_OPTIONS}
                         selectedValue={printSettings.includeNotes}
                         property="includeNotes"
                         onChange={handleSettingChange}
                     />
                     <SettingsToggle
-                        label="Include File Attachments"
+                        label={t('dialogs.print.includeFileAttachments')}
                         options={PRINT_INCLUDE_FILES_OPTIONS}
                         selectedValue={printSettings.includeFiles}
                         property="includeFiles"
                         onChange={handleSettingChange}
                     />
                     <SettingsToggle
-                        label="Include Categories"
+                        label={t('dialogs.print.includeCategories')}
                         options={PRINT_INCLUDE_CATEGORIES_OPTIONS}
                         selectedValue={printSettings.includeCategories}
                         property="includeCategories"
                         onChange={handleSettingChange}
                     />
                     <SettingsToggle
-                        label="Show Card Colors"
+                        label={t('dialogs.print.showCardColors')}
                         options={PRINT_SHOW_COLORS_OPTIONS}
                         selectedValue={printSettings.showColors}
                         property="showColors"
                         onChange={handleSettingChange}
                     />
                     <SettingsToggle
-                        label="Cards to Print"
+                        label={t('dialogs.print.cardsToPrint')}
                         options={PRINT_IMPORTANT_ONLY_OPTIONS}
                         selectedValue={printSettings.importantOnly}
                         property="importantOnly"
@@ -160,7 +162,7 @@ const PrintDialog = ({ open, onClose, studyset }: Props) => {
                         onClick={handleDownloadPdf}
                         disabled={isGenerating || !studyset}
                     >
-                        {isGenerating ? 'Generating PDF...' : 'Download PDF'}
+                        {isGenerating ? t('dialogs.print.generatingPdf') : t('dialogs.print.downloadPdf')}
                     </PrintButton>
                 </SettingsPanel>
             </StyledDialogContent>

@@ -1,0 +1,73 @@
+{
+    "modes": {
+        "flashcards": {
+            "title": "Flashcards",
+            "description": "Classic flip cards - learn at your own pace",
+            "features": {
+                "selfPaced": "Self-paced",
+                "audioSupport": "Audio support",
+                "progressTracking": "Progress tracking"
+            }
+        },
+        "multipleChoice": {
+            "title": "Multiple Choice",
+            "description": "Test knowledge with quiz-style questions",
+            "features": {
+                "timedMode": "Timed mode",
+                "instantFeedback": "Instant feedback",
+                "scoreTracking": "Score tracking"
+            }
+        },
+        "matching": {
+            "title": "Matching Game",
+            "description": "Match terms with definitions",
+            "features": {
+                "interactive": "Interactive",
+                "timeChallenge": "Time challenge",
+                "visualFeedback": "Visual feedback"
+            }
+        },
+        "typeWrite": {
+            "title": "Type & Write",
+            "description": "Practice by typing answers",
+            "features": {
+                "activeRecall": "Active recall",
+                "hintSystem": "Hint system",
+                "smartMatching": "Smart matching"
+            }
+        }
+    },
+    "actions": {
+        "startStudying": "Start Studying",
+        "continueStudying": "Continue Studying",
+        "restartSession": "Restart Session",
+        "viewResults": "View Results",
+        "flipCard": "Flip Card",
+        "nextCard": "Next Card",
+        "previousCard": "Previous Card",
+        "shuffle": "Shuffle",
+        "showHint": "Show Hint"
+    },
+    "progress": {
+        "cardsStudied": "Cards Studied",
+        "accuracy": "Accuracy",
+        "timeSpent": "Time Spent",
+        "streak": "Streak",
+        "score": "Score"
+    },
+    "feedback": {
+        "correct": "Correct!",
+        "incorrect": "Incorrect",
+        "tryAgain": "Try Again",
+        "wellDone": "Well Done!",
+        "keepGoing": "Keep Going!",
+        "perfectScore": "Perfect Score!"
+    },
+    "ratings": {
+        "again": "Again",
+        "hard": "Hard",
+        "good": "Good",
+        "easy": "Easy"
+    },
+    "addCardsToUnlock": "Add cards to unlock this mode"
+}

@@ -13,15 +13,17 @@ import { CustomInputsContainer, CustomInputRow, StyledTextField } from './styles
 import { LABEL_TERMINOLOGIES } from 'shared/constants';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
 import { Check } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     studyset: Studyset | undefined;
 };
 
 const LabelTerminologies = ({ studyset }: Props) => {
+    const { t } = useTranslation();
     const { mutate: updateStudySet } = useUpdateStudyset();
     const [customTerminology, setCustomTerminology] = useState<string>('');
-    const [isSaved, setIsSaved] = useState<boolean>(true);
+    const [isSaved, setIsSaved] = useState<boolean>(false);
     const saveTimeoutRef = useRef<NodeJS.Timeout>();
 
     const isCustomTerminology =
@@ -93,7 +95,7 @@ const LabelTerminologies = ({ studyset }: Props) => {
         <div>
             <FormControl>
                 <FormLabel id="label-terminology-radio-group-label" sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}>
-                    Label Terminology
+                    {t('studysetSettings.labelTerminology')}
                 </FormLabel>
                 <RadioGroup
                     aria-labelledby="label-terminology-radio-group-label"
@@ -111,7 +113,7 @@ const LabelTerminologies = ({ studyset }: Props) => {
                             <FormControlLabel
                                 value={value}
                                 control={<Radio />}
-                                label={value}
+                                label={t(`terminology.label.${value.toLowerCase()}`)}
                             />
                             {value === LABEL_TERMINOLOGIES.CUSTOM &&
                                 isCustomTerminology && (
@@ -121,12 +123,12 @@ const LabelTerminologies = ({ studyset }: Props) => {
                                             color="text.secondary"
                                             sx={{ marginBottom: '0.25rem' }}
                                         >
-                                            Define your custom label terminology:
+                                            {t('studysetSettings.defineCustomLabelTerminology')}
                                         </Typography>
                                         <CustomInputRow>
                                             <StyledTextField
                                                 placeholder="e.g., Card, Item, Entry"
-                                                label="Custom terminology"
+                                                label={t('studysetSettings.customTerminology')}
                                                 size="small"
                                                 onChange={onCustomTerminologyChange}
                                                 value={customTerminology}
@@ -135,7 +137,7 @@ const LabelTerminologies = ({ studyset }: Props) => {
                                         {customTerminology && isSaved && (
                                             <Chip
                                                 icon={<Check />}
-                                                label="Saved"
+                                                label={t('studysetSettings.saved')}
                                                 color="success"
                                                 size="small"
                                                 sx={{ width: 'fit-content' }}

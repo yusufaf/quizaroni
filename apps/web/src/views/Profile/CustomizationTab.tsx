@@ -1,6 +1,8 @@
 import {
+    AccessTime as AccessTimeIcon,
     DarkMode,
     Label,
+    Language as LanguageIcon,
     Launch,
     LightMode,
     Palette,
@@ -13,17 +15,20 @@ import {
     MenuItem,
     Select,
     SelectChangeEvent,
+    Switch,
     ToggleButton,
     ToggleButtonGroup,
     Typography,
 } from '@mui/material';
 import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     DARK,
     DATE_FORMATS,
     DOWNLOAD_FILE_TYPES,
     LIGHT,
+    TIME_FORMATS,
 } from 'shared/constants';
 import { SimpleFlexContainer } from 'shared/styles/AppStyles';
 import { PreferredDateFormat, User } from 'shared/types';
@@ -34,6 +39,8 @@ import { useGlobalStore } from 'state/stores/global';
 
 const LOADING_IDS = {
     DATE_FORMAT: 'preferredDateFormat',
+    TIME_FORMAT: 'preferredTimeFormat',
+    SHOW_SECONDS: 'showSeconds',
     DOWNLOAD_FORMAT: 'defaultDownloadFormat',
     DEFAULT_THEME: 'defaultTheme',
 };
@@ -43,6 +50,8 @@ type Props = {
 };
 
 const CustomizationTab = ({ userData }: Props) => {
+    const { t, i18n } = useTranslation();
+
     const {
         setNamedColorsDialogProps,
         setLabelsDialogProps,
@@ -55,6 +64,8 @@ const CustomizationTab = ({ userData }: Props) => {
         metadata: {
             defaultTheme = 'dark',
             preferredDateFormat,
+            preferredTimeFormat = TIME_FORMATS.TWELVE_HOUR,
+            showSeconds = false,
             defaultDownloadFormat = DOWNLOAD_FILE_TYPES.JSON,
         },
     } = userData;
@@ -69,12 +80,20 @@ const CustomizationTab = ({ userData }: Props) => {
         return loadingID === LOADING_IDS.DATE_FORMAT;
     }, [loadingID]);
 
+    const timeFormatLoading = useMemo(() => {
+        return loadingID === LOADING_IDS.TIME_FORMAT;
+    }, [loadingID]);
+
+    const secondsLoading = useMemo(() => {
+        return loadingID === LOADING_IDS.SHOW_SECONDS;
+    }, [loadingID]);
+
     const downloadFormatLoading = useMemo(() => {
         return loadingID === LOADING_IDS.DOWNLOAD_FORMAT;
     }, [loadingID]);
 
     const {
-        mutate: updateUserMetadata,
+        mutateAsync: updateUserMetadata,
         isPending: isUpdateMetadataLoading,
         isSuccess: isUpdateMetadataSuccess,
         isError: isUpdateMetadataError,
@@ -98,7 +117,6 @@ const CustomizationTab = ({ userData }: Props) => {
                     defaultTheme: newTheme,
                 },
             })
-                .unwrap()
                 .then(() => {
                     console.log(`Default theme updated successfully`);
                 })
@@ -129,7 +147,7 @@ const CustomizationTab = ({ userData }: Props) => {
     };
     // #endregion
 
-    // #region Date Format, Default Download Format
+    // #region Date Format, Time Format, Default Download Format
     const handleSelectChange = (event: SelectChangeEvent<string>) => {
         setLoadingID(event.target.name);
         updateUserMetadata({
@@ -137,7 +155,6 @@ const CustomizationTab = ({ userData }: Props) => {
                 [event.target.name]: event.target.value,
             },
         })
-            .unwrap()
             .then(() => {
                 console.log(`${event.target.name} updated successfully`);
             })
@@ -149,6 +166,30 @@ const CustomizationTab = ({ userData }: Props) => {
             });
     };
 
+    const handleShowSecondsToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setLoadingID(LOADING_IDS.SHOW_SECONDS);
+        updateUserMetadata({
+            updates: {
+                showSeconds: event.target.checked,
+            },
+        })
+            .then(() => {
+                console.log('Show seconds preference updated successfully');
+            })
+            .catch((error) => {
+                console.error('Failed to update show seconds preference:', error);
+            })
+            .finally(() => {
+                setLoadingID('');
+            });
+    };
+
+    // #endregion
+
+    // #region Language
+    const handleLanguageChange = (event: SelectChangeEvent<string>) => {
+        i18n.changeLanguage(event.target.value);
+    };
     // #endregion
 
     return (
@@ -156,7 +197,7 @@ const CustomizationTab = ({ userData }: Props) => {
             <ActionColumn>
                 <ActionHeader>
                     <DarkMode />
-                    <Typography variant="h6">Default Theme</Typography>
+                    <Typography variant="h6">{t('profile.defaultTheme')}</Typography>
                 </ActionHeader>
                 <SimpleFlexContainer style={{ gap: '1rem' }}>
                     <ToggleButtonGroup
@@ -168,13 +209,13 @@ const CustomizationTab = ({ userData }: Props) => {
                     >
                         <ToggleButton
                             value={LIGHT}
-                            title="Switch default to Light mode"
+                            title={t('profile.switchToLight')}
                         >
                             <LightMode />
                         </ToggleButton>
                         <ToggleButton
                             value={DARK}
-                            title="Switch default to Dark mode"
+                            title={t('profile.switchToDark')}
                         >
                             <DarkMode />
                         </ToggleButton>
@@ -184,35 +225,54 @@ const CustomizationTab = ({ userData }: Props) => {
             </ActionColumn>
             <ActionColumn>
                 <ActionHeader>
+                    <LanguageIcon />
+                    <Typography variant="h6">{t('profile.interfaceLanguage')}</Typography>
+                </ActionHeader>
+                <SimpleFlexContainer style={{ gap: '1rem' }}>
+                    <SimpleSelect
+                        value={i18n.language?.split('-')[0] || 'en'}
+                        onChange={handleLanguageChange}
+                        sx={{
+                            height: '2.5rem',
+                            width: '10rem',
+                        }}
+                    >
+                        <MenuItem value="en">English</MenuItem>
+                        <MenuItem value="es">Español</MenuItem>
+                    </SimpleSelect>
+                </SimpleFlexContainer>
+            </ActionColumn>
+            <ActionColumn>
+                <ActionHeader>
                     <Label />
-                    <Typography variant="h6">Labels</Typography>
+                    <Typography variant="h6">{t('profile.labels')}</Typography>
                 </ActionHeader>
                 <Button
                     variant="outlined"
                     startIcon={<Launch />}
                     onClick={showManageLabelsDialog}
                 >
-                    Manage Labels
+                    {t('profile.manageLabels')}
                 </Button>
             </ActionColumn>
             <ActionColumn>
                 <ActionHeader>
                     <Palette />
-                    <Typography variant="h6">Named Colors</Typography>
+                    <Typography variant="h6">{t('profile.namedColors')}</Typography>
                 </ActionHeader>
                 <Button
                     variant="outlined"
                     startIcon={<Launch />}
                     onClick={openNamedColorsDialog}
                 >
-                    Manage Named Colors
+                    {t('profile.manageNamedColors')}
                 </Button>
                 {namedColorsDialogProps.open && <NamedColorsDialog />}
             </ActionColumn>
             <ActionColumn>
                 <ActionHeader>
                     <DateRangeIcon />
-                    <Typography variant="h6">Date Format</Typography>
+                    <Typography variant="h6">{t('profile.dateFormat')}</Typography>
                 </ActionHeader>
                 <SimpleFlexContainer style={{ gap: '1rem' }}>
                     <SimpleSelect
@@ -236,9 +296,49 @@ const CustomizationTab = ({ userData }: Props) => {
             </ActionColumn>
             <ActionColumn>
                 <ActionHeader>
+                    <AccessTimeIcon />
+                    <Typography variant="h6">{t('profile.timeFormat')}</Typography>
+                </ActionHeader>
+                <SimpleFlexContainer style={{ gap: '1rem' }}>
+                    <SimpleSelect
+                        value={preferredTimeFormat}
+                        onChange={handleSelectChange}
+                        disabled={timeFormatLoading}
+                        name={LOADING_IDS.TIME_FORMAT}
+                        sx={{
+                            height: '2.5rem',
+                            width: '10rem',
+                        }}
+                    >
+                        <MenuItem value={TIME_FORMATS.TWELVE_HOUR}>
+                            {t('profile.twelveHour')}
+                        </MenuItem>
+                        <MenuItem value={TIME_FORMATS.TWENTY_FOUR_HOUR}>
+                            {t('profile.twentyFourHour')}
+                        </MenuItem>
+                    </SimpleSelect>
+                    {timeFormatLoading && <CircularProgress size={24} />}{' '}
+                </SimpleFlexContainer>
+            </ActionColumn>
+            <ActionColumn>
+                <ActionHeader>
+                    <AccessTimeIcon />
+                    <Typography variant="h6">{t('profile.showSecondsInTimestamps')}</Typography>
+                </ActionHeader>
+                <SimpleFlexContainer style={{ gap: '1rem', alignItems: 'center' }}>
+                    <Switch
+                        checked={showSeconds}
+                        onChange={handleShowSecondsToggle}
+                        disabled={secondsLoading}
+                    />
+                    {secondsLoading && <CircularProgress size={24} />}{' '}
+                </SimpleFlexContainer>
+            </ActionColumn>
+            <ActionColumn>
+                <ActionHeader>
                     <DownloadIcon />
                     <Typography variant="h6">
-                        Default Download Format
+                        {t('profile.defaultDownloadFormat')}
                     </Typography>
                 </ActionHeader>
                 <SimpleFlexContainer style={{ gap: '1rem' }}>

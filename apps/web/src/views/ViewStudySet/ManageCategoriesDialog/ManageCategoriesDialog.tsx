@@ -1,6 +1,7 @@
 import { Box, SelectChangeEvent } from '@mui/material';
 import { Studyset } from 'shared/types';
-import { ChangeEvent, useState, useCallback } from 'react';
+import { ChangeEvent, useState, useCallback, SyntheticEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
 import AssignTabView from './AssignTabView';
 import { CategoriesCreateTab } from './CategoriesCreateTab';
@@ -19,6 +20,8 @@ type Props = {
 
 const ManageCategoriesDialog = (props: Props) => {
     const { open, onClose, selectedStudyset, studysets } = props;
+
+    const { t } = useTranslation();
 
     const {
         cards,
@@ -39,9 +42,9 @@ const ManageCategoriesDialog = (props: Props) => {
     const [isUpdating, setIsUpdating] = useState(false);
 
     const tabs: TabConfig[] = [
-        { value: TABS.MANAGE, label: 'Manage', icon: <EditIcon /> },
-        { value: TABS.IMPORT, label: 'Import', icon: <ImportIcon /> },
-        { value: TABS.ASSIGN, label: 'Assign', icon: <AssignIcon /> },
+        { value: TABS.MANAGE, label: t('categories.manage'), icon: <EditIcon /> },
+        { value: TABS.IMPORT, label: t('categories.import'), icon: <ImportIcon /> },
+        { value: TABS.ASSIGN, label: t('categories.assign'), icon: <AssignIcon /> },
     ];
 
     const isManageTab = selectedTab === TABS.MANAGE;
@@ -56,17 +59,17 @@ const ManageCategoriesDialog = (props: Props) => {
     const validateCategory = useCallback(
         (value: string, excludeIndex?: number): ErrorInfo => {
             if (!value.trim()) {
-                return { helperText: 'Name cannot be empty' };
+                return { helperText: t('categories.nameCannotBeEmpty') };
             }
             const isDuplicate = categories.some(
                 (cat, i) => cat === value && i !== excludeIndex
             );
             if (isDuplicate) {
-                return { helperText: 'Category already exists' };
+                return { helperText: t('categories.categoryAlreadyExists') };
             }
             return null;
         },
-        [categories]
+        [categories, t]
     );
 
     // Create Category
@@ -246,7 +249,7 @@ const ManageCategoriesDialog = (props: Props) => {
         const unusedCategories = categories.filter((cat) => !usedCategories.has(cat));
 
         if (unusedCategories.length === 0) {
-            alert('No unused categories to delete');
+            alert(t('categories.noUnusedCategories'));
             return;
         }
 
@@ -276,7 +279,7 @@ const ManageCategoriesDialog = (props: Props) => {
         <MetadataDialogShell
             open={open}
             onClose={onClose}
-            title="Manage Categories"
+            title={t('categories.manageCategories')}
             tabs={tabs}
             selectedTab={selectedTab}
             onTabChange={setSelectedTab}

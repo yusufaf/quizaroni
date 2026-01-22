@@ -86,6 +86,8 @@
       "state/*": ["./state/*"],
       "lib/*": ["./lib/*"],
       "shared/*": ["./shared/*"],
+      "i18n": ["./i18n/index.ts"],
+      "i18n/*": ["./i18n/*"],
       // "api/*": ["./api/*"],
       // Shared subfolders
       "components/*": ["./shared/components/*"],

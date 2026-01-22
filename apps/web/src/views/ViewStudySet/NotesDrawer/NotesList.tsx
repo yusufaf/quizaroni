@@ -7,6 +7,7 @@ import { useDeleteNote } from 'state/api/studysetsAPI';
 import { EMPTY_NOTE_PLACEHOLDER } from 'shared/constants';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface NoteListProps {
     card: Card;
@@ -23,6 +24,7 @@ const NoteList = ({
     handleEditingNoteToggle,
     studysetUUID = '',
 }: NoteListProps) => {
+    const { t } = useTranslation();
     const [noteBeingDeleted, setNoteBeingDeleted] = useState<string>('');
     const { cardUUID } = useMemo(() => card, [card]);
 
@@ -104,7 +106,7 @@ const NoteList = ({
                                 gap: '0.25rem',
                             }}
                         >
-                            <Tooltip title={isEditing ? "Save note" : "Edit note"} placement="top">
+                            <Tooltip title={isEditing ? t('notesDrawer.saveNote') : t('notesDrawer.editNote')} placement="top">
                                 <IconButton
                                     onClick={() =>
                                         handleEditingNoteToggle(noteUUID)
@@ -121,7 +123,7 @@ const NoteList = ({
                                     <EditIcon fontSize="small" />
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip title="Delete note" placement="top">
+                            <Tooltip title={t('notesDrawer.deleteNote')} placement="top">
                                 <IconButton
                                     disabled={isDeleting}
                                     onClick={() => handleDeleteNote(noteUUID)}

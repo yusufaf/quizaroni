@@ -25,6 +25,7 @@ export default defineConfig(({ mode }) => {
                 state: path.resolve('src/state/'),
                 shared: path.resolve('src/shared/'),
                 resources: path.resolve('src/resources/'),
+                i18n: path.resolve('src/i18n/'),
                 // Shared subfolders
                 // api: path.resolve("src/shared/api/"),
                 components: path.resolve('src/shared/components/'),

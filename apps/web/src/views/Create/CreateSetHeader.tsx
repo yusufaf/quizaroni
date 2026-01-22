@@ -15,6 +15,7 @@ import {
 } from './CreateSetStyles';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetUser } from 'state/api/usersAPI';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     advancedSectionProps: any;
@@ -41,6 +42,7 @@ const CreateSetHeader = ({
 }: Props) => {
     const navigate = useNavigate();
     const { id: studySetUUID } = useParams();
+    const { t } = useTranslation();
 
     const { data: { user: { labels: userLabels = [] } } = DEFAULT_USER_RESPONSE } =
         useGetUser();
@@ -57,19 +59,19 @@ const CreateSetHeader = ({
                         onClick={handleBackToViewing}
                         startIcon={<ArrowBack color="primary" />}
                     >
-                        Back to Viewing Study Set
+                        {t('create.backToViewing')}
                     </BackToViewButton>
                     <BoldTypography variant="h5">
-                        Edit your study set
+                        {t('create.editYourStudySet')}
                     </BoldTypography>
                     <CreateSetInputsContainer>
                         <div>
                             <BoldTypography variant="subtitle1">
-                                Title *
+                                {t('create.titleRequired')}
                             </BoldTypography>
                             <TitleInput
                                 variant="standard"
-                                placeholder={'Enter a title for your study set'}
+                                placeholder={t('create.enterTitle')}
                                 value={title}
                                 onChange={onTitleChange}
                                 size="small"
@@ -77,13 +79,11 @@ const CreateSetHeader = ({
                         </div>
                         <div>
                             <BoldTypography variant="subtitle1">
-                                Description
+                                {t('create.description')}
                             </BoldTypography>
                             <DescriptionInput
                                 variant="outlined"
-                                placeholder={
-                                    'Enter a description for your study set'
-                                }
+                                placeholder={t('create.enterDescription')}
                                 value={description}
                                 onChange={onDescriptionChange}
                                 multiline
@@ -92,7 +92,7 @@ const CreateSetHeader = ({
                         </div>
                         <div>
                             <BoldTypography variant="subtitle1">
-                                Labels
+                                {t('create.labels')}
                             </BoldTypography>
                             <Autocomplete
                                 multiple
@@ -120,7 +120,7 @@ const CreateSetHeader = ({
                                     <TextField
                                         {...params}
                                         variant="outlined"
-                                        placeholder={selectedLabels.length === 0 ? "Add labels..." : ""}
+                                        placeholder={selectedLabels.length === 0 ? t('create.addLabels') : ""}
                                         size="small"
                                     />
                                 )}
@@ -137,7 +137,7 @@ const CreateSetHeader = ({
                         disabled={mainButtonDisabled}
                         startIcon={<Create />}
                     >
-                        Save Changes
+                        {t('create.saveChanges')}
                     </Button>
                     <HeaderAdvancedSection {...advancedSectionProps} />
                 </HeaderRight>

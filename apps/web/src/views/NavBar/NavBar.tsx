@@ -2,13 +2,12 @@ import { Create, Logout as LogoutIcon } from '@mui/icons-material';
 import {
     AppBar,
     Button,
-    IconButton,
     Toolbar,
-    Tooltip,
     Typography,
     useMediaQuery,
 } from '@mui/material/';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import ProfileDropdown from 'views/Profile/ProfileDropdown';
 import { useTheme } from 'theme/useTheme';
@@ -33,6 +32,7 @@ import { useGlobalStore } from 'state/stores/global';
 type Props = {};
 
 const NavBar = (props: Props) => {
+    const { t } = useTranslation();
     const { isDarkMode, toggleDarkMode, muiTheme } = useTheme();
 
     // TODO: Verify that a medium breakpoint works to handle mobile cases, can always add more breakpoints
@@ -110,13 +110,13 @@ const NavBar = (props: Props) => {
                     <NavItemsContainer>
                         <NavLinksContainer>
                             <StyledNavLink to="/" style={activeLinkStyle}>
-                                Home
+                                {t('nav.home')}
                             </StyledNavLink>
                             <StyledNavLink
                                 to="/explore"
                                 style={activeLinkStyle}
                             >
-                                Explore
+                                {t('nav.explore')}
                             </StyledNavLink>
                             <Button
                                 variant="contained"
@@ -124,7 +124,7 @@ const NavBar = (props: Props) => {
                                 size="large"
                                 startIcon={<Create />}
                             >
-                                Create Study Set
+                                {t('nav.createStudySet')}
                             </Button>
                         </NavLinksContainer>
                         <NavRightActions>
@@ -135,7 +135,7 @@ const NavBar = (props: Props) => {
                                         onClick={() => handleLogout()}
                                         startIcon={<LogoutIcon />}
                                     >
-                                        Logout
+                                        {t('nav.logout')}
                                     </AuthenticationButton>
                                 </>
                             ) : (
@@ -144,13 +144,13 @@ const NavBar = (props: Props) => {
                                         variant="outlined"
                                         onClick={() => navigate(ROUTES.LOGIN)}
                                     >
-                                        Log in
+                                        {t('nav.login')}
                                     </AuthenticationButton>
                                     <AuthenticationButton
                                         variant="contained"
                                         onClick={() => navigate(ROUTES.SIGNUP)}
                                     >
-                                        Sign up
+                                        {t('nav.signup')}
                                     </AuthenticationButton>
                                 </LoginButtonsContainer>
                             )}

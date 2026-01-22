@@ -1,0 +1,73 @@
+{
+    "modes": {
+        "flashcards": {
+            "title": "Flashcards",
+            "description": "Tarjetas clásicas - aprende a tu propio ritmo",
+            "features": {
+                "selfPaced": "A tu ritmo",
+                "audioSupport": "Soporte de audio",
+                "progressTracking": "Seguimiento de progreso"
+            }
+        },
+        "multipleChoice": {
+            "title": "Opción Múltiple",
+            "description": "Prueba tu conocimiento con preguntas tipo quiz",
+            "features": {
+                "timedMode": "Modo cronometrado",
+                "instantFeedback": "Retroalimentación instantánea",
+                "scoreTracking": "Seguimiento de puntuación"
+            }
+        },
+        "matching": {
+            "title": "Juego de Emparejamiento",
+            "description": "Empareja términos con definiciones",
+            "features": {
+                "interactive": "Interactivo",
+                "timeChallenge": "Desafío de tiempo",
+                "visualFeedback": "Retroalimentación visual"
+            }
+        },
+        "typeWrite": {
+            "title": "Escribe y Practica",
+            "description": "Practica escribiendo las respuestas",
+            "features": {
+                "activeRecall": "Recuerdo activo",
+                "hintSystem": "Sistema de pistas",
+                "smartMatching": "Emparejamiento inteligente"
+            }
+        }
+    },
+    "actions": {
+        "startStudying": "Comenzar a Estudiar",
+        "continueStudying": "Continuar Estudiando",
+        "restartSession": "Reiniciar Sesión",
+        "viewResults": "Ver Resultados",
+        "flipCard": "Voltear Tarjeta",
+        "nextCard": "Siguiente Tarjeta",
+        "previousCard": "Tarjeta Anterior",
+        "shuffle": "Mezclar",
+        "showHint": "Mostrar Pista"
+    },
+    "progress": {
+        "cardsStudied": "Tarjetas Estudiadas",
+        "accuracy": "Precisión",
+        "timeSpent": "Tiempo Invertido",
+        "streak": "Racha",
+        "score": "Puntuación"
+    },
+    "feedback": {
+        "correct": "¡Correcto!",
+        "incorrect": "Incorrecto",
+        "tryAgain": "Intenta de Nuevo",
+        "wellDone": "¡Bien Hecho!",
+        "keepGoing": "¡Sigue Así!",
+        "perfectScore": "¡Puntuación Perfecta!"
+    },
+    "ratings": {
+        "again": "Otra vez",
+        "hard": "Difícil",
+        "good": "Bien",
+        "easy": "Fácil"
+    },
+    "addCardsToUnlock": "Agrega tarjetas para desbloquear este modo"
+}

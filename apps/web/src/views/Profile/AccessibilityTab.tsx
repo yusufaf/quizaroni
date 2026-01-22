@@ -15,6 +15,7 @@ import {
     ActionHeader,
     AccountViewContainer,
 } from './ProfileStyles';
+import { useTranslation } from 'react-i18next';
 
 const LOADING_IDS = {
     FONT_SIZE: 'fontSizeScale',
@@ -33,6 +34,7 @@ type Props = {
 };
 
 const AccessibilityTab = ({ userData }: Props) => {
+    const { t } = useTranslation();
     const { setFontSizeScale, fontSizeScale: currentScale } = useTheme();
     const { metadata: { fontSizeScale = 1 } } = userData;
 
@@ -123,16 +125,15 @@ const AccessibilityTab = ({ userData }: Props) => {
             <ActionColumn>
                 <ActionHeader>
                     <Accessibility />
-                    <Typography variant="h6">Font Size</Typography>
+                    <Typography variant="h6">{t('profile.fontSize')}</Typography>
                 </ActionHeader>
                 <Typography variant="body2" color="text.secondary">
-                    Adjust text size across the entire application for better
-                    readability
+                    {t('profile.fontSizeDescription')}
                 </Typography>
                 <Box sx={{ width: '100%', maxWidth: '25rem', mt: 2 }}>
                     <SimpleFlexContainer style={{ gap: '1rem', marginBottom: '0.5rem' }}>
                         <Typography variant="body2" color="text.primary">
-                            Current scale: <strong>{localScale.toFixed(3)}x</strong>
+                            {t('profile.currentScale', { scale: localScale.toFixed(3) })}
                         </Typography>
                         {fontSizeLoading && <CircularProgress size={20} />}
                     </SimpleFlexContainer>

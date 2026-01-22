@@ -1,0 +1,65 @@
+{
+    "tabs": {
+        "overview": "Resumen",
+        "studySets": "Sets de Estudio",
+        "statistics": "Estadísticas",
+        "customization": "Personalización",
+        "settings": "Configuración"
+    },
+    "customization": {
+        "title": "Personalización",
+        "theme": {
+            "title": "Tema",
+            "light": "Claro",
+            "dark": "Oscuro"
+        },
+        "language": {
+            "title": "Idioma de la Interfaz",
+            "description": "Selecciona tu idioma preferido"
+        },
+        "fontSize": {
+            "title": "Tamaño de Fuente",
+            "small": "Pequeño",
+            "medium": "Mediano",
+            "large": "Grande",
+            "extraLarge": "Extra Grande"
+        },
+        "dateFormat": {
+            "title": "Formato de Fecha"
+        },
+        "timeFormat": {
+            "title": "Formato de Hora",
+            "twelveHour": "12 horas",
+            "twentyFourHour": "24 horas"
+        },
+        "showSeconds": {
+            "title": "Mostrar Segundos"
+        },
+        "homeView": {
+            "title": "Vista de Inicio Predeterminada",
+            "table": "Tabla",
+            "grid": "Cuadrícula"
+        },
+        "downloadFormat": {
+            "title": "Formato de Descarga Predeterminado"
+        }
+    },
+    "settings": {
+        "title": "Configuración",
+        "account": "Configuración de Cuenta",
+        "changePassword": "Cambiar Contraseña",
+        "deleteAccount": "Eliminar Cuenta",
+        "notifications": "Notificaciones",
+        "emailNotifications": "Notificaciones por Correo",
+        "studyReminders": "Recordatorios de Estudio"
+    },
+    "statistics": {
+        "title": "Estadísticas",
+        "totalSets": "Total de Sets de Estudio",
+        "totalCards": "Total de Tarjetas",
+        "studyTime": "Tiempo de Estudio",
+        "averageAccuracy": "Precisión Promedio",
+        "currentStreak": "Racha Actual",
+        "longestStreak": "Racha Más Larga"
+    }
+}
