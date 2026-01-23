@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
     Box,
     Card,
@@ -28,6 +28,7 @@ import StudyHeader from './shared/StudyHeader';
 import StudyResults from './shared/StudyResults';
 import SettingsDialog from './shared/SettingsDialog';
 import { BasePage } from 'styles/AppStyles';
+import ImageGallery from 'components/ImageGallery/ImageGallery';
 
 type Props = {
     studysetId: string;
@@ -54,6 +55,8 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
     const [showResults, setShowResults] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [sessionResult, setSessionResult] = useState(null);
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const lightboxCooldownRef = useRef(false);
 
     // Initialize session
     useEffect(() => {
@@ -103,11 +106,22 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
     };
 
     const handleCardClick = () => {
-        if (!hasRated) {
+        if (!hasRated && !lightboxOpen && !lightboxCooldownRef.current) {
             setFlipped(!flipped);
             if (!flipped) {
                 setShowRating(true);
             }
+        }
+    };
+
+    const handleLightboxChange = (isOpen: boolean) => {
+        setLightboxOpen(isOpen);
+        if (!isOpen) {
+            // Set cooldown to prevent accidental flip when closing lightbox
+            lightboxCooldownRef.current = true;
+            setTimeout(() => {
+                lightboxCooldownRef.current = false;
+            }, 100);
         }
     };
 
@@ -242,7 +256,7 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
             />
 
             {/* Stepper - at top */}
-            <Box sx={{ width: '100%', maxWidth: '50rem', mx: 'auto', pt: '4rem', px: '2rem' }}>
+            <Box sx={{ width: '100%', maxWidth: '50rem', mx: 'auto', pt: '4rem', pb: '1.5rem', px: '2rem' }}>
                 <Stepper activeStep={activeSession.currentCardIndex} alternativeLabel>
                     {activeSession.cards.map((card) => (
                         <Step key={card.cardUUID}>
@@ -318,12 +332,13 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
                                     height: '100%',
                                     backfaceVisibility: 'hidden',
                                     display: 'flex',
+                                    flexDirection: 'column',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     borderRadius: '1rem',
                                 }}
                             >
-                                <CardContent>
+                                <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                     <Typography
                                         variant="h4"
                                         sx={{
@@ -334,14 +349,23 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
                                     >
                                         {currentCard.term}
                                     </Typography>
-                                    <Typography
-                                        variant="body2"
-                                        color="text.secondary"
-                                        sx={{ textAlign: 'center', mt: '2rem' }}
-                                    >
-                                        Click to flip
-                                    </Typography>
+                                    <ImageGallery
+                                        files={currentCard.files?.filter(f => f.association === 'term') || []}
+                                        maxHeight="20vh"
+                                        onLightboxChange={handleLightboxChange}
+                                    />
                                 </CardContent>
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{
+                                        textAlign: 'center',
+                                        position: 'absolute',
+                                        bottom: '1.5rem',
+                                    }}
+                                >
+                                    Click to flip
+                                </Typography>
                             </Card>
 
                             {/* Back of card (Definition) */}
@@ -362,7 +386,7 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
                                     color: 'primary.contrastText',
                                 }}
                             >
-                                <CardContent sx={{ flex: 1, display: 'flex', alignItems: 'center' }}>
+                                <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                     <Typography
                                         variant="h4"
                                         sx={{
@@ -373,6 +397,11 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
                                     >
                                         {currentCard.definition}
                                     </Typography>
+                                    <ImageGallery
+                                        files={currentCard.files?.filter(f => f.association === 'definition') || []}
+                                        maxHeight="20vh"
+                                        onLightboxChange={handleLightboxChange}
+                                    />
                                 </CardContent>
 
                                 {/* Rating Section */}

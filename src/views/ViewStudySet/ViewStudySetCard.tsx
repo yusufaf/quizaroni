@@ -22,6 +22,7 @@ import {
 } from './styles';
 import CategoriesPopover from './CategoriesPopover';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
+import ImageGallery from 'components/ImageGallery/ImageGallery';
 
 type Props = {
     card: Card;
@@ -207,7 +208,10 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                     >
                         {card.term}
                     </Typography>
-                    {/* TODO: Term image */}
+                    <ImageGallery
+                        files={card.files?.filter(f => f.association === 'term') || []}
+                        maxHeight="7rem"
+                    />
                 </ViewCardInfo>
                 <ViewCardInfo>
                     {!contentOnly && (
@@ -227,7 +231,10 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                     >
                         {card.definition}
                     </Typography>
-                    {/* TODO: Definition image */}
+                    <ImageGallery
+                        files={card.files?.filter(f => f.association === 'definition') || []}
+                        maxHeight="7rem"
+                    />
                 </ViewCardInfo>
             </ViewCardContainer>
         </ViewFlashsetCard>
