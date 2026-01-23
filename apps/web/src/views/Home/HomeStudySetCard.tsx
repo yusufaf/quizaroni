@@ -18,7 +18,7 @@ import SetActionsMenu from './SetActionsMenu';
 import { useNavigate } from 'react-router-dom';
 import { Studyset } from 'shared/types';
 import { GhostLink } from 'styles/AppStyles';
-import { DEFAULT_USER_RESPONSE } from 'shared/constants';
+import { DEFAULT_USER_RESPONSE, TIME_FORMATS } from 'shared/constants';
 import { useGetUser } from 'state/api/usersAPI';
 import { formatDateUsingPreferred } from 'shared/utilities/general';
 import { useStudySetsStore } from 'state/stores/studysets';
@@ -50,7 +50,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
         data: {
             user: {
                 userUUID = '',
-                metadata: { preferredDateFormat },
+                metadata: { preferredDateFormat, preferredTimeFormat, showSeconds },
             },
         } = DEFAULT_USER_RESPONSE,
     } = useGetUser();
@@ -141,7 +141,9 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                             <Typography>
                                 {formatDateUsingPreferred(
                                     createdAt,
-                                    preferredDateFormat
+                                    preferredDateFormat,
+                                    preferredTimeFormat ?? TIME_FORMATS.TWELVE_HOUR,
+                                    showSeconds ?? false
                                 )}
                             </Typography>
                         </SpacedContainer>
@@ -150,7 +152,9 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                             <Typography>
                                 {formatDateUsingPreferred(
                                     lastViewed,
-                                    preferredDateFormat
+                                    preferredDateFormat,
+                                    preferredTimeFormat ?? TIME_FORMATS.TWELVE_HOUR,
+                                    showSeconds ?? false
                                 )}
                             </Typography>
                         </SpacedContainer>

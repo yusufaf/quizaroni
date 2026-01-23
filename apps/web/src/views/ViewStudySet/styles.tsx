@@ -46,12 +46,29 @@ export const ViewStudysetHeader = styled('div')({
 
 export const StudysetInfo = styled('div')(({ theme }) => ({
     height: '100%',
-    paddingRight: '0.5rem',
-    borderRight: `0.1rem solid ${theme.palette.text.primary}`,
+    paddingRight: '1.25rem',
     overflowY: 'auto',
+    overflowX: 'hidden',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
+    position: 'relative',
+    '&::after': {
+        content: '""',
+        position: 'absolute',
+        right: 0,
+        top: '10%',
+        height: '80%',
+        width: '0.125rem',
+        background: `linear-gradient(
+            to bottom,
+            transparent 0%,
+            ${theme.palette.divider} 20%,
+            ${theme.palette.divider} 80%,
+            transparent 100%
+        )`,
+        borderRadius: '0.125rem',
+    },
 }));
 
 export const StudysetDescription = styled(Typography)(({ theme }) => ({
@@ -70,7 +87,7 @@ export const StudysetDescription = styled(Typography)(({ theme }) => ({
 }));
 
 export const StudyModesSection = styled('section')({
-    padding: '0 1rem',
+    paddingLeft: '1.25rem',
 });
 
 export const StudyModeGrid = styled('div')({
@@ -94,9 +111,16 @@ export const StudyModePaper = styled(Paper)(({ theme }) => ({
     position: 'relative',
     overflow: 'hidden',
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    boxShadow: theme.palette.mode === 'dark'
+        ? 'none'
+        : '0 0.125rem 0.5rem rgba(0, 0, 0, 0.06)',
+    border: theme.palette.mode === 'light' ? '1px solid rgba(0, 0, 0, 0.08)' : 'none',
     '&:hover': {
         background: theme.palette.action.hover,
         transform: 'translateY(-0.25rem)',
+        boxShadow: theme.palette.mode === 'dark'
+            ? 'none'
+            : '0 0.375rem 1rem rgba(255, 160, 0, 0.12), 0 0.125rem 0.5rem rgba(0, 0, 0, 0.06)',
     },
 }));
 
@@ -123,25 +147,33 @@ export const SortCardsDropdown = styled(FormControl)({
 });
 
 /* Actions Section */
-export const ActionButtonsRow = styled(Paper)({
+export const ActionButtonsRow = styled(Paper)(({ theme }) => ({
     display: 'flex',
     gap: '0.5rem',
     borderRadius: '0.75rem',
     paddingLeft: '0.5rem',
-});
+    boxShadow: theme.palette.mode === 'dark'
+        ? 'none'
+        : '0 0.125rem 0.5rem rgba(0, 0, 0, 0.06)',
+    border: theme.palette.mode === 'light' ? '1px solid rgba(0, 0, 0, 0.08)' : 'none',
+}));
 
 /* Cards */
 
-export const ViewFlashsetCard = styled(Card)({
-    // width: "70rem",
+export const ViewFlashsetCard = styled(Card)(({ theme }) => ({
     padding: '1rem 1.25rem 1.25rem 1.25rem',
     borderRadius: '0.75rem',
     transition: 'all 0.2s ease',
-    boxShadow: '0 0.25rem 0.75rem rgba(255,160,0,0.15)',
+    boxShadow: theme.palette.mode === 'dark'
+        ? '0 0.25rem 0.75rem rgba(255,160,0,0.15)'
+        : '0 0.25rem 1rem rgba(0, 0, 0, 0.08), 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04)',
+    border: theme.palette.mode === 'light' ? '1px solid rgba(0, 0, 0, 0.06)' : 'none',
     '&:hover': {
-        boxShadow: '0 0.375rem 1rem rgba(255,160,0,0.25)',
+        boxShadow: theme.palette.mode === 'dark'
+            ? '0 0.375rem 1rem rgba(255,160,0,0.25)'
+            : '0 0.5rem 1.5rem rgba(255, 160, 0, 0.12), 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08)',
     },
-});
+}));
 
 export const CategoryChips = styled(SimpleFlexContainer)<{ hasIndex?: boolean }>(
     ({ hasIndex = true }) => ({
@@ -160,7 +192,7 @@ export const ViewFlashCardActions = styled('div')({
 
 export const ViewCardContainer = styled('div')({
     display: 'flex',
-    gap: '25rem',
+    gap: '3rem',
     marginTop: '0.5rem',
 });
 
@@ -169,8 +201,8 @@ export const ViewCardInfo = styled('div')({
     flexDirection: 'column',
     alignItems: 'flex-start',
     flexWrap: 'wrap',
-    flexGrow: '1',
-    width: '10rem',
+    flex: '1',
+    minWidth: '0',
     wordWrap: 'break-word',
 });
 
@@ -198,15 +230,20 @@ export const ViewCardsGridContainer = styled('div')({
     gap: '1.5rem',
 });
 
-export const ViewGridCard = styled(Card)({
+export const ViewGridCard = styled(Card)(({ theme }) => ({
     padding: '1rem',
     borderRadius: '0.75rem',
     transition: 'all 0.2s ease',
-    boxShadow: '0 0.25rem 0.75rem rgba(255,160,0,0.15)',
+    boxShadow: theme.palette.mode === 'dark'
+        ? '0 0.25rem 0.75rem rgba(255,160,0,0.15)'
+        : '0 0.25rem 1rem rgba(0, 0, 0, 0.08), 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04)',
+    border: theme.palette.mode === 'light' ? '1px solid rgba(0, 0, 0, 0.06)' : 'none',
     '&:hover': {
-        boxShadow: '0 0.375rem 1rem rgba(255,160,0,0.25)',
+        boxShadow: theme.palette.mode === 'dark'
+            ? '0 0.375rem 1rem rgba(255,160,0,0.25)'
+            : '0 0.5rem 1.5rem rgba(255, 160, 0, 0.12), 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08)',
     },
-});
+}));
 
 export const GridCardContent = styled('div')({
     display: 'flex',
