@@ -174,10 +174,16 @@ const AccountTab = ({ userData }: Props) => {
                     <Typography variant="h6">Delete Account</Typography>
                 </ActionHeader>
                 <ActionSubmitButton
-                    variant="outlined"
-                    color="error"
+                    variant="text"
                     onClick={toggleDeleteDialog}
                     fullWidth
+                    sx={{
+                        color: '#d32f2f',
+                        backgroundColor: 'rgba(211, 47, 47, 0.08)',
+                        '&:hover': {
+                            backgroundColor: 'rgba(211, 47, 47, 0.16)',
+                        },
+                    }}
                 >
                     Delete Account
                 </ActionSubmitButton>

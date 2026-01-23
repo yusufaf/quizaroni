@@ -1,5 +1,5 @@
-import { PreferredDateFormat } from 'shared/types';
-import { DATE_FORMATS, MIME_TYPES } from '../constants';
+import { PreferredDateFormat, PreferredTimeFormat } from 'shared/types';
+import { DATE_FORMATS, MIME_TYPES, TIME_FORMATS } from '../constants';
 
 export const getFormattedTimestamp = (): string => {
     const isoString = new Date().toISOString();
@@ -43,11 +43,13 @@ export const downloadObjectAsJSON = (data: Object, fileName: string) => {
 
 export const formatDateUsingPreferred = (
     value: string,
-    format: PreferredDateFormat
+    dateFormat: PreferredDateFormat,
+    timeFormat: PreferredTimeFormat = TIME_FORMATS.TWELVE_HOUR,
+    showSeconds: boolean = false
 ): string => {
     const dateValue = new Date(value);
     let formattedDate: string = value;
-    switch (format) {
+    switch (dateFormat) {
         case DATE_FORMATS.ISO_8601:
             formattedDate = dateValue.toISOString().split('T')[0] ?? value;
             break;
@@ -58,15 +60,17 @@ export const formatDateUsingPreferred = (
             formattedDate = dateValue.toLocaleDateString('en-GB');
             break;
         default:
-            console.error(`Unsupported format: ${format}`);
+            console.error(`Unsupported format: ${dateFormat}`);
     }
 
-    const formattedTime = dateValue.toLocaleTimeString('en-US', {
+    const is12Hour = timeFormat === TIME_FORMATS.TWELVE_HOUR;
+    const timeOptions: Intl.DateTimeFormatOptions = {
         hour: '2-digit',
         minute: '2-digit',
-        second: '2-digit',
-        hour12: true,
-    });
+        ...(showSeconds && { second: '2-digit' }),
+        hour12: is12Hour,
+    };
+    const formattedTime = dateValue.toLocaleTimeString('en-US', timeOptions);
 
     return `${formattedDate} ${formattedTime}`;
 };

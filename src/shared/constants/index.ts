@@ -361,6 +361,11 @@ export const DATE_FORMATS = {
     MDY: 'MM/DD/YYYY',
 } as const;
 
+export const TIME_FORMATS = {
+    TWELVE_HOUR: '12h',
+    TWENTY_FOUR_HOUR: '24h',
+} as const;
+
 export const DEFAULT_USER_DATA: User = {
     createdAt: new Date().toISOString(),
     email: '',
@@ -371,6 +376,8 @@ export const DEFAULT_USER_DATA: User = {
         homeView: 'table',
         namedColors: [],
         preferredDateFormat: DATE_FORMATS.MDY,
+        preferredTimeFormat: TIME_FORMATS.TWELVE_HOUR,
+        showSeconds: false,
         defaultDownloadFormat: DOWNLOAD_FILE_TYPES.JSON,
     },
     username: '',

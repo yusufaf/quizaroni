@@ -7,6 +7,7 @@ import { useTheme } from 'theme/useTheme';
 import { DEFAULT_TERMINOLOGY, FORMAT_TERMINOLOGIES } from 'shared/constants';
 import { ViewGridCard, GridCardContent, GridCardSection } from './styles';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
+import ImageGallery from 'components/ImageGallery/ImageGallery';
 
 type Props = {
     card: Card;
@@ -87,6 +88,10 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
                     >
                         {card.term}
                     </Typography>
+                    <ImageGallery
+                        files={card.files?.filter(f => f.association === 'term') || []}
+                        maxHeight="5rem"
+                    />
                 </GridCardSection>
                 <GridCardSection>
                     {!contentOnly && (
@@ -107,6 +112,10 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
                     >
                         {card.definition}
                     </Typography>
+                    <ImageGallery
+                        files={card.files?.filter(f => f.association === 'definition') || []}
+                        maxHeight="5rem"
+                    />
                 </GridCardSection>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto', justifyContent: 'flex-end' }}>
                     <Tooltip title="Play TTS" placement="top">

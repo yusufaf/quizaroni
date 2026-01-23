@@ -107,12 +107,12 @@ export const KeysToPressContainer = styled('div')({
 
 /* ==== New Card Styled Components ====  */
 export const NewCard = styled(Card)({
-    padding: '1rem 1.25rem 1.25rem 1.25rem',
+    padding: '1.25rem 0 2rem 0',
     borderRadius: '0.75rem',
     overflow: 'unset',
     display: 'flex',
     flexDirection: 'column',
-    gap: '0.5rem',
+    gap: '0.75rem',
     width: '100%',
     transition: 'all 0.2s ease',
     boxShadow: '0 0.25rem 0.75rem rgba(255,160,0,0.15)',
@@ -134,6 +134,7 @@ export const AddCardIcon = styled(AddCircleOutline)({
 
 export const NewCardInputs = styled(SpacedFlexContainer)({
     position: 'relative',
+    marginTop: '1rem',
 });
 
 export const NewCardInputField = styled(TextField)(({ theme }) => ({
@@ -176,15 +177,35 @@ export const NewCardLabel = styled(Typography)(({ theme }) => ({
     color: theme.palette.primary.main,
 }));
 
-export const NewCardTerm = styled(FlexColumn)({});
-
-export const NewCardDefinition = styled(FlexColumn)({});
-
-export const NewCardRow = styled('div')({
-    display: 'flex',
-    alignItems: 'flex-end',
-    gap: '1rem',
+export const NewCardTerm = styled(FlexColumn)({
+    flex: '1',
+    gap: '0.5rem',
+    minWidth: '0',
 });
+
+export const NewCardDefinition = styled(FlexColumn)({
+    flex: '1',
+    gap: '0.5rem',
+    minWidth: '0',
+});
+
+export const NewCardRow = styled('div')(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'flex-start',
+    gap: '3rem',
+    padding: '0 3rem',
+    position: 'relative',
+    '&::after': {
+        content: '""',
+        position: 'absolute',
+        left: '50%',
+        top: '0',
+        bottom: '0',
+        width: '1px',
+        backgroundColor: theme.palette.divider,
+        transform: 'translateX(-50%)',
+    },
+}));
 
 export const ExtraPickerContainer = styled(FlexColumn)(({ theme }) => ({
     background: theme.palette.background.paper,

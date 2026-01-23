@@ -1,4 +1,4 @@
-import { DATE_FORMATS, DOWNLOAD_FILE_TYPES } from './constants/';
+import { DATE_FORMATS, DOWNLOAD_FILE_TYPES, TIME_FORMATS } from './constants/';
 import { LabelsDialogTab } from 'components/ManageLabelsDialog/constants';
 
 // #region Utility Types
@@ -92,6 +92,8 @@ export type User = {
         homeView: HomeView;
         namedColors: NamedColor[];
         preferredDateFormat: PreferredDateFormat;
+        preferredTimeFormat?: PreferredTimeFormat;
+        showSeconds?: boolean;
         defaultDownloadFormat: DownloadSetFormat;
     };
     username: string;
@@ -105,6 +107,9 @@ export type NamedColor = { color: string; name: string };
 
 export type PreferredDateFormat =
     (typeof DATE_FORMATS)[keyof typeof DATE_FORMATS];
+
+export type PreferredTimeFormat =
+    (typeof TIME_FORMATS)[keyof typeof TIME_FORMATS];
 
 export type DownloadSetFormat =
     (typeof DOWNLOAD_FILE_TYPES)[keyof typeof DOWNLOAD_FILE_TYPES];

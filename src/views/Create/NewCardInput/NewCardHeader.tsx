@@ -116,7 +116,7 @@ const NewCardHeader = ({
 
     return (
         <SpacedFlexContainer>
-            <BoldTypography variant="h6">Card {index + 1}</BoldTypography>
+            <BoldTypography variant="h6" color="primary">Card {index + 1}</BoldTypography>
             <CenterActions>
                 <Tooltip title="Change card text color" placement="top">
                     <IconButton
