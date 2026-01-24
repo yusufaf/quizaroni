@@ -28,6 +28,12 @@ const ProfileCard = ({ userData }: Props) => {
         useGetAllStudysets();
     const studysets = studysetsResponse?.studysets ?? [];
 
+    const totalCards = studysets.reduce(
+        (sum, set) => sum + (set.cards?.length ?? 0),
+        0
+    );
+    const labelsCount = userData.labels?.length ?? 0;
+
     const handleOpenDialog = () => setDialogOpen(true);
     const handleCloseDialog = () => setDialogOpen(false);
 
@@ -64,7 +70,15 @@ const ProfileCard = ({ userData }: Props) => {
                 </UserInfoContainer>
                 <UserInfoContainer>
                     <UserInfoHeading>{t('profile.studySetsCreated')}</UserInfoHeading>
-                    <Typography>{studysets.length ?? 0}</Typography>
+                    <Typography>{studysets.length}</Typography>
+                </UserInfoContainer>
+                <UserInfoContainer>
+                    <UserInfoHeading>{t('profile.totalCards')}</UserInfoHeading>
+                    <Typography>{totalCards}</Typography>
+                </UserInfoContainer>
+                <UserInfoContainer>
+                    <UserInfoHeading>{t('profile.labelsCreated')}</UserInfoHeading>
+                    <Typography>{labelsCount}</Typography>
                 </UserInfoContainer>
                 <UserInfoContainer>
                     <UserInfoHeading>{t('profile.accountCreated')}</UserInfoHeading>
