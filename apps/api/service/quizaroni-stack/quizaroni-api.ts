@@ -281,6 +281,10 @@ export class QuizaroniAPI extends Construct {
                 lambdaName: 'updateUserMetadata',
             },
             {
+                route: `${usersPrefix}/update-notification-preferences`,
+                lambdaName: 'updateNotificationPreferences',
+            },
+            {
                 route: `${usersPrefix}/download-user-data`,
                 lambdaName: 'downloadUserData',
             },
@@ -366,6 +370,15 @@ export class QuizaroniAPI extends Construct {
             resources: s3BucketResources,
         });
         mainLambdaRole.addToPolicy(s3PolicyStatement);
+
+        // Add SES permissions for sending notification emails
+        const sesPolicyStatement = new PolicyStatement({
+            effect: Effect.ALLOW,
+            actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+            resources: ['*'],
+        });
+        mainLambdaRole.addToPolicy(sesPolicyStatement);
+
         addRole(mainLambdaRoleNameAndID, mainLambdaRole);
     };
 
