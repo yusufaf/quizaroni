@@ -1,8 +1,8 @@
-import { Create, Logout as LogoutIcon } from '@mui/icons-material';
+import { Add, Logout as LogoutIcon } from '@mui/icons-material';
 import {
     AppBar,
-    Button,
     Toolbar,
+    Tooltip,
     Typography,
     useMediaQuery,
 } from '@mui/material/';
@@ -15,7 +15,9 @@ import { ROUTES, LOADING_ACTIONS } from 'shared/constants';
 import NavDrawer from './NavDrawer';
 import {
     AuthenticationButton,
+    CreateStudySetButton,
     LoginButtonsContainer,
+    LogoutIconButton,
     NavItemsContainer,
     NavLinksContainer,
     NavRightActions,
@@ -49,11 +51,6 @@ const NavBar = (props: Props) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
     const { mutateAsync: createStudyset } = useCreateStudyset();
-
-    const activeLinkStyle = ({ isActive }) => ({
-        borderBottom: isActive ? '0.2rem solid orange' : 'none',
-        color: `${muiTheme.palette.text.primary}`,
-    });
 
     const handleLogout = async () => {
         try {
@@ -91,53 +88,47 @@ const NavBar = (props: Props) => {
         <AppBar
             position="static"
             color="inherit"
+            elevation={0}
             sx={{
                 zIndex: muiTheme.zIndex.drawer + 1,
+                borderBottom: `1px solid ${muiTheme.palette.divider}`,
             }}
         >
             <Toolbar>
-                {/*
-                    TODO: Revisit what to do with logo 
-                    <AppLogo
-                        src={QuizaroniLogo}
-                        alt="Quizaroni logo"
-                    /> */}
-                <Typography color="primary" variant="h4" sx={{ fontSize: '2.125rem' }}>
+                <Typography
+                    color="primary"
+                    sx={{
+                        fontSize: '2rem',
+                        fontWeight: 700,
+                    }}
+                >
                     Quizaroni
                 </Typography>
                 {isMobile && <NavDrawer />}
                 {!isMobile && (
                     <NavItemsContainer>
                         <NavLinksContainer>
-                            <StyledNavLink to="/" style={activeLinkStyle}>
+                            <StyledNavLink to="/">
                                 {t('nav.home')}
                             </StyledNavLink>
-                            <StyledNavLink
-                                to="/explore"
-                                style={activeLinkStyle}
-                            >
+                            <StyledNavLink to="/explore">
                                 {t('nav.explore')}
                             </StyledNavLink>
-                            <Button
+                            <CreateStudySetButton
                                 variant="contained"
                                 onClick={handleCreateStudyset}
-                                size="large"
-                                startIcon={<Create />}
+                                startIcon={<Add />}
                             >
                                 {t('nav.createStudySet')}
-                            </Button>
+                            </CreateStudySetButton>
                         </NavLinksContainer>
                         <NavRightActions>
                             {authenticated ? (
-                                <>
-                                    <AuthenticationButton
-                                        variant="text"
-                                        onClick={() => handleLogout()}
-                                        startIcon={<LogoutIcon />}
-                                    >
-                                        {t('nav.logout')}
-                                    </AuthenticationButton>
-                                </>
+                                <Tooltip title={t('nav.logout')}>
+                                    <LogoutIconButton onClick={() => handleLogout()}>
+                                        <LogoutIcon />
+                                    </LogoutIconButton>
+                                </Tooltip>
                             ) : (
                                 <LoginButtonsContainer>
                                     <AuthenticationButton

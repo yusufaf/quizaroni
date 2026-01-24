@@ -15,6 +15,7 @@ import { useGlobalStore } from 'state/stores/global';
 import LoadingIndicator from 'shared/components/LoadingIndicator/LoadingIndicator';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from 'state/queryClient';
+import { AppWrapper, MainContent } from 'styles/AppStyles';
 
 const App = () => {
     const { setTheme, theme } = useTheme();
@@ -28,10 +29,14 @@ const App = () => {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <NavBar />
-            {loadingActions.length > 0 && <LoadingIndicator />}
-            <AppRoutes />
-            <Footer />
+            <AppWrapper>
+                <NavBar />
+                {loadingActions.length > 0 && <LoadingIndicator />}
+                <MainContent>
+                    <AppRoutes />
+                </MainContent>
+                <Footer />
+            </AppWrapper>
             <FeedbackDialog />
             <ToastContainer theme={theme} />
             <GlobalConfirmDialog />

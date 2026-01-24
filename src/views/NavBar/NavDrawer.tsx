@@ -1,21 +1,23 @@
 import { useState } from 'react';
 import {
-    Button,
+    Box,
     Drawer,
     IconButton,
     List,
     ListItem,
-    ListItemText,
+    ListItemButton,
 } from '@mui/material/';
-import { Create, Menu } from '@mui/icons-material';
-import { StyledNavLink } from './NavStyles';
+import { Add, Menu } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { CreateStudySetButton, StyledNavLink } from './NavStyles';
 import DarkModeToggleButton from './DarkModeToggleButton';
 import { useNavigate } from 'react-router-dom';
 import { useCreateStudyset } from 'state/api/studysetsAPI';
 import { useGlobalStore } from 'state/stores/global';
 import { LOADING_ACTIONS } from 'shared/constants';
 
-const NavDrawer = (props) => {
+const NavDrawer = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const { setLoadingAdd, setLoadingRemove } = useGlobalStore();
@@ -33,6 +35,7 @@ const NavDrawer = (props) => {
     };
 
     const handleCreateStudyset = async () => {
+        handleCloseDrawer();
         setLoadingAdd(LOADING_ACTIONS.CREATE_STUDYSET);
         try {
             const response = await createStudyset();
@@ -48,33 +51,50 @@ const NavDrawer = (props) => {
     return (
         <>
             <Drawer
-                //anchor="bottom"
                 open={openDrawer}
                 onClose={handleCloseDrawer}
+                PaperProps={{
+                    sx: { minWidth: '16rem', p: 1 }
+                }}
             >
                 <List>
-                    <ListItem onClick={handleCloseDrawer}>
-                        <ListItemText>
-                            <StyledNavLink to="/">Home</StyledNavLink>
-                        </ListItemText>
+                    <ListItem disablePadding>
+                        <ListItemButton
+                            onClick={handleCloseDrawer}
+                            sx={{ borderRadius: '0.5rem' }}
+                        >
+                            <StyledNavLink to="/">{t('nav.home')}</StyledNavLink>
+                        </ListItemButton>
                     </ListItem>
-                    <ListItem onClick={handleCloseDrawer}>
-                        <ListItemText>
-                            <StyledNavLink to="/explore">Explore</StyledNavLink>
-                        </ListItemText>
+                    <ListItem disablePadding>
+                        <ListItemButton
+                            onClick={handleCloseDrawer}
+                            sx={{ borderRadius: '0.5rem' }}
+                        >
+                            <StyledNavLink to="/explore">{t('nav.explore')}</StyledNavLink>
+                        </ListItemButton>
                     </ListItem>
-                    <Button
-                        variant="contained"
-                        onClick={handleCreateStudyset}
-                        size="large"
-                        startIcon={<Create />}
-                    >
-                        Create Study Set
-                    </Button>
-                    <DarkModeToggleButton />
+                    <ListItem sx={{ mt: 1 }}>
+                        <CreateStudySetButton
+                            variant="contained"
+                            onClick={handleCreateStudyset}
+                            fullWidth
+                            startIcon={<Add />}
+                        >
+                            {t('nav.createStudySet')}
+                        </CreateStudySetButton>
+                    </ListItem>
+                    <ListItem>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <DarkModeToggleButton />
+                        </Box>
+                    </ListItem>
                 </List>
             </Drawer>
-            <IconButton onClick={handleToggleDrawer}>
+            <IconButton
+                onClick={handleToggleDrawer}
+                sx={{ ml: 'auto' }}
+            >
                 <Menu />
             </IconButton>
         </>
