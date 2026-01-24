@@ -68,7 +68,55 @@
             "title": "Share"
         },
         "notifications": {
-            "title": "Manage Notifications"
+            "title": "Manage Notifications",
+            "masterToggle": "Enable Notifications",
+            "masterToggleDescription": "Receive email notifications about your study progress",
+            "tabs": {
+                "email": "Email",
+                "schedule": "Schedule",
+                "thisStudyset": "This Study Set"
+            },
+            "modes": {
+                "title": "Notification Mode",
+                "calm": "Calm",
+                "calmDescription": "Weekly digest only",
+                "regular": "Regular",
+                "regularDescription": "Reminders & streaks",
+                "power-user": "Power User",
+                "power-userDescription": "All notifications",
+                "custom": "Custom",
+                "customDescription": "Configure individually"
+            },
+            "email": {
+                "studyReminders": "Study Reminders",
+                "studyRemindersDescription": "Get reminded to study your flashcards",
+                "streakAlerts": "Streak Alerts",
+                "streakAlertsDescription": "Stay notified about your study streaks",
+                "weeklyDigest": "Weekly Digest",
+                "weeklyDigestDescription": "Receive a weekly summary of your progress",
+                "inactivityNudges": "Inactivity Nudges",
+                "inactivityNudgesDescription": "Get a gentle reminder when you haven't studied"
+            },
+            "schedule": {
+                "quietHours": "Quiet Hours",
+                "quietHoursDescription": "No notifications during these hours",
+                "startTime": "Start",
+                "endTime": "End",
+                "to": "to"
+            },
+            "snooze": {
+                "title": "Snooze Notifications",
+                "description": "Temporarily pause all notifications",
+                "activeUntil": "Notifications snoozed until {{time}}",
+                "clear": "Resume"
+            },
+            "studyset": {
+                "thisStudyset": "This Study Set",
+                "enableReminders": "Enable Reminders",
+                "enableRemindersDescription": "Get study reminders for this specific set",
+                "reminderTime": "Reminder Time",
+                "reminderDays": "Reminder Days"
+            }
         },
         "print": {
             "title": "Download PDF",
@@ -254,6 +302,8 @@
         "manageLabels": "Manage Labels",
         "namedColors": "Named Colors",
         "manageNamedColors": "Manage Named Colors",
+        "notifications": "Notifications",
+        "manageNotifications": "Manage Notifications",
         "dateFormat": "Date Format",
         "timeFormat": "Time Format",
         "twelveHour": "12-hour (2:30 PM)",
@@ -265,6 +315,8 @@
         "currentScale": "Current scale: {{scale}}x",
         "username": "Username",
         "studySetsCreated": "# of Study Sets Created",
+        "totalCards": "Total Cards",
+        "labelsCreated": "Labels Created",
         "accountCreated": "Account Created"
     },
     "actions": {
@@ -342,5 +394,9 @@
         "provideJsonContent": "Please provide JSON content",
         "noValidCardsFound": "No valid cards found to import",
         "successfullyImported": "Successfully imported {{count}} card(s)"
+    },
+    "footer": {
+        "socials": "Socials",
+        "copyright": "© 2026 Quizaroni"
     }
 }

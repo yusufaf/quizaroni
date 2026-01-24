@@ -463,3 +463,78 @@ export const FONT_SIZE_PRESETS = {
 } as const;
 
 export type FontSizeScale = typeof FONT_SIZE_PRESETS[keyof typeof FONT_SIZE_PRESETS];
+
+// Notification Constants
+export const NOTIFICATION_MODES = {
+    CALM: 'calm',
+    REGULAR: 'regular',
+    POWER_USER: 'power-user',
+    CUSTOM: 'custom',
+} as const;
+
+export const NOTIFICATION_MODE_CONFIG = {
+    [NOTIFICATION_MODES.CALM]: {
+        email: {
+            enabled: true,
+            studyReminders: false,
+            streakAlerts: false,
+            weeklyDigest: true,
+            inactivityNudges: false,
+        },
+    },
+    [NOTIFICATION_MODES.REGULAR]: {
+        email: {
+            enabled: true,
+            studyReminders: true,
+            streakAlerts: true,
+            weeklyDigest: true,
+            inactivityNudges: false,
+        },
+    },
+    [NOTIFICATION_MODES.POWER_USER]: {
+        email: {
+            enabled: true,
+            studyReminders: true,
+            streakAlerts: true,
+            weeklyDigest: true,
+            inactivityNudges: true,
+        },
+    },
+} as const;
+
+export const SNOOZE_OPTIONS = [
+    { value: 1, label: '1 hour' },
+    { value: 4, label: '4 hours' },
+    { value: 24, label: '24 hours' },
+    { value: 168, label: '1 week' },
+] as const;
+
+export const DAYS_OF_WEEK = [
+    { value: 0, label: 'Sunday', short: 'Sun' },
+    { value: 1, label: 'Monday', short: 'Mon' },
+    { value: 2, label: 'Tuesday', short: 'Tue' },
+    { value: 3, label: 'Wednesday', short: 'Wed' },
+    { value: 4, label: 'Thursday', short: 'Thu' },
+    { value: 5, label: 'Friday', short: 'Fri' },
+    { value: 6, label: 'Saturday', short: 'Sat' },
+] as const;
+
+export const DEFAULT_NOTIFICATION_PREFERENCES = {
+    enabled: false,
+    mode: NOTIFICATION_MODES.REGULAR,
+    email: {
+        enabled: true,
+        studyReminders: true,
+        streakAlerts: true,
+        weeklyDigest: true,
+        inactivityNudges: false,
+        digestDay: 0, // Sunday
+    },
+    quietHours: {
+        enabled: false,
+        start: '22:00',
+        end: '08:00',
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    },
+    studysetPrefs: [],
+} as const;
