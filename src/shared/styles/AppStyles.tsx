@@ -3,6 +3,16 @@ import { DialogActions, DialogTitle, IconButton, Typography } from '@mui/materia
 import { Link } from "react-router-dom";
 import { ChromePicker } from 'react-color';
 
+export const AppWrapper = styled("div")({
+    display: "flex",
+    flexDirection: "column",
+    minHeight: "100vh",
+});
+
+export const MainContent = styled("div")({
+    flex: 1,
+});
+
 export const FlexRow = styled("div")({
     display: "flex",
 })
