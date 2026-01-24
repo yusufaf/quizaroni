@@ -8,14 +8,23 @@ import {
     DynamoDBDocumentClient,
     GetCommand,
     PutCommand,
+    QueryCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthorizerContext } from 'models/auth';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { S3Client } from '@aws-sdk/client-s3';
-import * as zlib from 'zlib';
+import {
+    GetObjectCommand,
+    PutObjectCommand,
+    S3Client,
+} from '@aws-sdk/client-s3';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { writeFile, readFile } from 'fs/promises';
 
-const { mainTable = '', usersTable = '' } = process.env;
+const { mainTable = '', usersTable = '', mainBucket = '' } = process.env;
+
+const execPromise = promisify(exec);
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -50,18 +59,61 @@ export const handler: Handler = async (
         const result = await docClient.send(getCommand);
         const user = result.Item;
 
-        const userDataJSON = JSON.stringify(user, null, 4);
+        // const userDataJSON = JSON.stringify(user, null, 4);
+        // const userDataKey = `${userUUID}/data-${new Date().toISOString()}.json`;
+        // const putObjectCommand = new PutObjectCommand({
+        //     Bucket: mainBucket,
+        //     Key: userDataKey,
+        //     Body: userDataJSON,
+        //     ContentType: 'application/json',
+        // });
+        // await s3Client.send(putObjectCommand);
 
+        const timestamp = Date.now();
+        const jsonKey = `${userUUID}/data-${timestamp}.json`;
+        const zipKey = `${userUUID}/data-${timestamp}.zip`;
+        const localJsonPath = `/tmp/userData.json`;
+        const localZipPath = `/tmp/userData.zip`;
+
+        // Write user data to /tmp/
         if (!includeStudysets) {
-            // Return the user data as JSON with a timestamp
-            return {
-                statusCode: 200,
-                headers: {
-                    'Content-Disposition': `attachment; filename="user_data.json"`,
-                    'Content-Type': 'application/json',
-                },
-                body: userDataJSON,
-            };
+            await s3Client.send(
+                new PutObjectCommand({
+                    Bucket: mainBucket,
+                    Key: jsonKey,
+                    Body: JSON.stringify(user, null, 4),
+                    ContentType: 'application/json',
+                })
+            );
+
+            const signedURL = await getSignedUrl(
+                s3Client,
+                new GetObjectCommand({
+                    Bucket: mainBucket,
+                    Key: jsonKey,
+                })
+            );
+
+            return { statusCode: 200, body: JSON.stringify({ signedURL }) };
+        }
+        await writeFile(localJsonPath, JSON.stringify(user, null, 4));
+
+        // Fetch study sets
+        const getStudysetsCommand = new QueryCommand({
+            TableName: mainTable,
+            KeyConditionExpression: 'PK = :pk',
+            ExpressionAttributeValues: { ':pk': `user#${userUUID}` },
+        });
+        const studysetResult = await docClient.send(getStudysetsCommand);
+        const studysets = studysetResult.Items || [];
+
+        // Write each studyset as a JSON file
+        const studysetFiles: string[] = [];
+        for (const studyset of studysets) {
+            const studysetFileName = `studyset-${studyset.SK}.json`;
+            const studysetPath = `/tmp/${studysetFileName}`;
+            await writeFile(studysetPath, JSON.stringify(studyset, null, 4));
+            studysetFiles.push(studysetPath);
         }
 
         return {
@@ -80,63 +132,4 @@ export const handler: Handler = async (
             }),
         };
     }
-};
-
-type DuplicateIndividualStudysetParams = {
-    studysetUUID: string;
-    username: string;
-    userUUID: string;
-};
-const duplicateIndividualStudyset = async ({
-    studysetUUID,
-    username,
-    userUUID,
-}: DuplicateIndividualStudysetParams) => {
-    const getCommand = new GetCommand({
-        Key: {
-            PK: `userUUID#${userUUID}`,
-            SK: `studyset#${studysetUUID}`,
-        },
-        TableName: mainTable,
-    });
-    const { Item } = await docClient.send(getCommand);
-
-    if (!Item) {
-        throw new Error(
-            `Studyset with UUID ${studysetUUID} for user ${username} not found`
-        );
-    }
-
-    const studyset = Item as Studyset;
-
-    const newStudysetUUID = uuidv4();
-    const timestamp = new Date().toISOString();
-
-    const duplicatedStudyset = structuredClone(studyset);
-    duplicatedStudyset.SK = `studyset#${newStudysetUUID}`;
-    duplicatedStudyset.title = `${duplicatedStudyset.title} Copy`;
-    duplicatedStudyset.createdAt = timestamp;
-    duplicatedStudyset.updatedAt = timestamp;
-    duplicatedStudyset.lastViewed = timestamp;
-    duplicatedStudyset.studysetUUID = newStudysetUUID;
-    duplicatedStudyset.cards = duplicatedStudyset.cards.map((card) => {
-        const newCardUUID = uuidv4();
-        const newNotes = card.notes.map((note) => ({
-            ...note,
-            noteUUID: uuidv4(),
-        }));
-
-        return {
-            ...card,
-            cardUUID: newCardUUID,
-            notes: newNotes,
-        };
-    });
-
-    const putCommand = new PutCommand({
-        TableName: mainTable,
-        Item: duplicatedStudyset,
-    });
-
-    await docClient.send(putCommand);
 };

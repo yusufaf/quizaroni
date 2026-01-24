@@ -5,13 +5,17 @@ import {
 } from "aws-lambda";
 import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, QueryCommand  } from "@aws-sdk/lib-dynamodb";
+import { S3Client } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import { AuthorizerContext } from "models/auth";
+import { Studyset } from "models/studysets";
+import { regenerateSignedUrlsForStudysets } from "utilities/studysets";
 
-const { mainTable = "" } = process.env;
+const { mainTable = "", mainBucket = "" } = process.env;
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
+const s3Client = new S3Client({});
 
 export const handler: Handler = async (
     event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>,
@@ -31,10 +35,17 @@ export const handler: Handler = async (
         });
         const { Items: studysets } = await docClient.send(queryCommand);
 
+        // Regenerate signed URLs for all files in all studysets
+        const studysetsWithFreshUrls = await regenerateSignedUrlsForStudysets({
+            s3Client,
+            bucket: mainBucket,
+            studysets: (studysets ?? []) as Studyset[],
+        });
+
         return {
             statusCode: 200,
             body: JSON.stringify({
-                studysets: studysets ?? []
+                studysets: studysetsWithFreshUrls
             }),
         };
     } catch (err) {

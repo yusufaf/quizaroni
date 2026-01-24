@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/quizaroni-cdk.ts",
+  "app": "pnpm exec npx ts-node --prefer-ts-exts bin/quizaroni-cdk.ts",
   "watch": {
     "include": [
       "**"
@@ -13,7 +13,8 @@
       "package*.json",
       "yarn.lock",
       "node_modules",
-      "test"
+      "test",
+      "pnpm-lock.yaml"
     ]
   },
   "context": {

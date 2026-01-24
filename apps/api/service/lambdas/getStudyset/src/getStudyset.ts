@@ -5,13 +5,17 @@ import {
 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import { S3Client } from "@aws-sdk/client-s3";
 import { AuthorizerContext } from "models/auth";
+import { Studyset } from "models/studysets";
 import { removeKeys } from "resources/dynamo/utilities";
+import { regenerateSignedUrls } from "utilities/studysets";
 
-const { mainTable = "" } = process.env;
+const { mainTable = "", mainBucket = "" } = process.env;
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
+const s3Client = new S3Client({});
 
 type RequestBody = {
     studysetUUID: string;
@@ -48,11 +52,18 @@ export const handler: Handler = async (
 
         removeKeys(studyset);
 
+        // Regenerate signed URLs for all files in the studyset
+        const studysetWithFreshUrls = await regenerateSignedUrls({
+            s3Client,
+            bucket: mainBucket,
+            studyset: studyset as Studyset,
+        });
+
         return {
             statusCode: 200,
             body: JSON.stringify({
                 message: "Successfully retrieved study set data",
-                studyset,
+                studyset: studysetWithFreshUrls,
             }),
         };
     } catch (error) {
@@ -60,7 +71,7 @@ export const handler: Handler = async (
         return {
             statusCode: 500,
             body: JSON.stringify({
-                message: error.message,
+                message: (error as Error).message,
             }),
         };
     }

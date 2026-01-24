@@ -53,7 +53,7 @@ export const handler: Handler = async (
         return {
             statusCode: 500,
             body: JSON.stringify({
-                message: error.message,
+                message: (error as Error).message,
             }),
         };
     }

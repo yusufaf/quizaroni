@@ -4,7 +4,7 @@ import {
     Handler,
 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, BatchWriteCommand, WriteRequest } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, BatchWriteCommand } from "@aws-sdk/lib-dynamodb";
 import { AuthorizerContext } from "models/auth";
 
 const { mainTable = "" } = process.env;
@@ -40,7 +40,7 @@ export const handler: Handler = async (
 
         // Process each chunk
         for (const chunk of chunks) {
-            const writeRequests: WriteRequest[] = chunk.map(([studysetUUID, labels]) => ({
+            const writeRequests = chunk.map(([studysetUUID, labels]) => ({
                 PutRequest: {
                     Item: {
                         PK: `userUUID#${userUUID}`,
