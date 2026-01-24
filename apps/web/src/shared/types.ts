@@ -91,6 +91,7 @@ export type User = {
         fontSizeScale?: number;
         homeView: HomeView;
         namedColors: NamedColor[];
+        notifications?: NotificationPreferences;
         preferredDateFormat: PreferredDateFormat;
         preferredTimeFormat?: PreferredTimeFormat;
         showSeconds?: boolean;
@@ -118,6 +119,42 @@ export type AvatarMetadata = {
     type: 'dicebear' | 'upload';
     value: string;
 };
+
+// #region Notification Types
+export type NotificationMode = 'calm' | 'regular' | 'power-user' | 'custom';
+
+export type EmailNotificationSettings = {
+    enabled: boolean;
+    studyReminders: boolean;
+    streakAlerts: boolean;
+    weeklyDigest: boolean;
+    inactivityNudges: boolean;
+    digestDay?: number; // 0-6 (Sunday-Saturday)
+};
+
+export type QuietHoursSettings = {
+    enabled: boolean;
+    start: string; // HH:mm
+    end: string; // HH:mm
+    timezone: string;
+};
+
+export type StudysetNotificationPrefs = {
+    studysetUUID: UUID;
+    enabled: boolean;
+    reminderTime?: string; // HH:mm
+    reminderDays?: number[]; // 0-6 (Sunday-Saturday)
+};
+
+export type NotificationPreferences = {
+    enabled: boolean;
+    mode: NotificationMode;
+    email: EmailNotificationSettings;
+    quietHours: QuietHoursSettings;
+    snoozeUntil?: Timestamp;
+    studysetPrefs: StudysetNotificationPrefs[];
+};
+// #endregion
 
 // Study Mode Types
 export type StudyMode = 'flashcards' | 'multiple-choice' | 'matching' | 'type-write';
@@ -281,6 +318,10 @@ export type CreateUserRequest = {
 
 export type UpdateUserMetadataRequest = {
     updates: Updates;
+};
+
+export type UpdateNotificationPreferencesRequest = {
+    updates: Partial<NotificationPreferences>;
 };
 
 export type UpdateDefaultThemeRequest = {

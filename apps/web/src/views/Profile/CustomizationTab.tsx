@@ -5,6 +5,7 @@ import {
     Language as LanguageIcon,
     Launch,
     LightMode,
+    Notifications as NotificationsIcon,
     Palette,
     DateRange as DateRangeIcon,
     Download as DownloadIcon,
@@ -36,6 +37,7 @@ import { useUpdateUserMetadata } from 'state/api/usersAPI';
 import { ActionColumn, ActionHeader, SimpleSelect, AccountViewContainer } from './ProfileStyles';
 import { downloadTypeItems } from 'views/ViewStudySet/DownloadSetModal/DownloadSetModal';
 import { useGlobalStore } from 'state/stores/global';
+import NotificationsDialog from 'views/ViewStudySet/NotificationsDialog/NotificationsDialog';
 
 const LOADING_IDS = {
     DATE_FORMAT: 'preferredDateFormat',
@@ -71,6 +73,7 @@ const CustomizationTab = ({ userData }: Props) => {
     } = userData;
 
     const [loadingID, setLoadingID] = useState<string>('');
+    const [notificationsDialogOpen, setNotificationsDialogOpen] = useState(false);
 
     const defaultThemeLoading = useMemo(() => {
         return loadingID === LOADING_IDS.DEFAULT_THEME;
@@ -268,6 +271,23 @@ const CustomizationTab = ({ userData }: Props) => {
                     {t('profile.manageNamedColors')}
                 </Button>
                 {namedColorsDialogProps.open && <NamedColorsDialog />}
+            </ActionColumn>
+            <ActionColumn>
+                <ActionHeader>
+                    <NotificationsIcon />
+                    <Typography variant="h6">{t('profile.notifications')}</Typography>
+                </ActionHeader>
+                <Button
+                    variant="outlined"
+                    startIcon={<Launch />}
+                    onClick={() => setNotificationsDialogOpen(true)}
+                >
+                    {t('profile.manageNotifications')}
+                </Button>
+                <NotificationsDialog
+                    open={notificationsDialogOpen}
+                    onClose={() => setNotificationsDialogOpen(false)}
+                />
             </ActionColumn>
             <ActionColumn>
                 <ActionHeader>

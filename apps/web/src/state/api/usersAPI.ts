@@ -13,6 +13,7 @@ import {
     GetUserResponse,
     UpdateDefaultThemeRequest,
     UpdateEmailRequest,
+    UpdateNotificationPreferencesRequest,
     UpdateUserMetadataRequest,
     UploadProfilePictureRequest,
     User,
@@ -168,6 +169,31 @@ export const useUploadProfilePicture = () => {
                 data,
                 type: 'response',
                 context: 'UploadProfilePicture',
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['user'] });
+        },
+    });
+};
+
+export const useUpdateNotificationPreferences = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ updates }: UpdateNotificationPreferencesRequest) => {
+            const response = await fetch(
+                `${BASE_API_URL}/users/update-notification-preferences`,
+                {
+                    ...getCommonPostRequestProps(),
+                    body: JSON.stringify({ updates }),
+                }
+            );
+            const data = await response.json();
+            return validate({
+                schema: BaseResponseSchema,
+                data,
+                type: 'response',
+                context: 'UpdateNotificationPreferences',
             });
         },
         onSuccess: () => {

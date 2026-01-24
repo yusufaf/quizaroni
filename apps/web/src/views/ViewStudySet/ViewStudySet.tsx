@@ -435,6 +435,8 @@ const ViewStudySet = (props: Props) => {
             <NotificationsDialog
                 open={selectedDialog === VIEW_SET_DIALOGS.NOTIFICATIONS}
                 onClose={onDialogClose}
+                studysetUUID={studysetUUID}
+                studysetTitle={selectedStudyset?.title}
             />
             <DownloadSetModal
                 open={selectedDialog === VIEW_SET_DIALOGS.DOWNLOAD}
