@@ -9,6 +9,7 @@ import {
     Palette,
     DateRange as DateRangeIcon,
     Download as DownloadIcon,
+    WarningAmber as WarningIcon,
 } from '@mui/icons-material';
 import {
     Button,
@@ -43,6 +44,7 @@ const LOADING_IDS = {
     DATE_FORMAT: 'preferredDateFormat',
     TIME_FORMAT: 'preferredTimeFormat',
     SHOW_SECONDS: 'showSeconds',
+    CONFIRM_DESTRUCTIVE: 'confirmDestructiveActions',
     DOWNLOAD_FORMAT: 'defaultDownloadFormat',
     DEFAULT_THEME: 'defaultTheme',
 };
@@ -68,6 +70,7 @@ const CustomizationTab = ({ userData }: Props) => {
             preferredDateFormat,
             preferredTimeFormat = TIME_FORMATS.TWELVE_HOUR,
             showSeconds = false,
+            confirmDestructiveActions = true,
             defaultDownloadFormat = DOWNLOAD_FILE_TYPES.JSON,
         },
     } = userData;
@@ -89,6 +92,10 @@ const CustomizationTab = ({ userData }: Props) => {
 
     const secondsLoading = useMemo(() => {
         return loadingID === LOADING_IDS.SHOW_SECONDS;
+    }, [loadingID]);
+
+    const confirmDestructiveLoading = useMemo(() => {
+        return loadingID === LOADING_IDS.CONFIRM_DESTRUCTIVE;
     }, [loadingID]);
 
     const downloadFormatLoading = useMemo(() => {
@@ -181,6 +188,24 @@ const CustomizationTab = ({ userData }: Props) => {
             })
             .catch((error) => {
                 console.error('Failed to update show seconds preference:', error);
+            })
+            .finally(() => {
+                setLoadingID('');
+            });
+    };
+
+    const handleConfirmDestructiveToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setLoadingID(LOADING_IDS.CONFIRM_DESTRUCTIVE);
+        updateUserMetadata({
+            updates: {
+                confirmDestructiveActions: event.target.checked,
+            },
+        })
+            .then(() => {
+                console.log('Confirm destructive actions preference updated successfully');
+            })
+            .catch((error) => {
+                console.error('Failed to update confirm destructive actions preference:', error);
             })
             .finally(() => {
                 setLoadingID('');
@@ -352,6 +377,23 @@ const CustomizationTab = ({ userData }: Props) => {
                         disabled={secondsLoading}
                     />
                     {secondsLoading && <CircularProgress size={24} />}{' '}
+                </SimpleFlexContainer>
+            </ActionColumn>
+            <ActionColumn>
+                <ActionHeader>
+                    <WarningIcon />
+                    <Typography variant="h6">{t('profile.confirmDestructiveActions')}</Typography>
+                </ActionHeader>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: '0.5rem' }}>
+                    {t('profile.confirmDestructiveActionsDescription')}
+                </Typography>
+                <SimpleFlexContainer style={{ gap: '1rem', alignItems: 'center' }}>
+                    <Switch
+                        checked={confirmDestructiveActions}
+                        onChange={handleConfirmDestructiveToggle}
+                        disabled={confirmDestructiveLoading}
+                    />
+                    {confirmDestructiveLoading && <CircularProgress size={24} />}
                 </SimpleFlexContainer>
             </ActionColumn>
             <ActionColumn>

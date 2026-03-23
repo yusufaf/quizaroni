@@ -1,8 +1,21 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useRef, useState } from 'react';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Studyset } from 'shared/types';
-import { Box, FormControl, InputLabel, Typography, MenuItem, List, ListItem, ListItemText, Button, Chip } from '@mui/material';
-import { Inbox as InboxIcon } from '@mui/icons-material';
+import {
+    Alert,
+    Box,
+    Button,
+    Chip,
+    Divider,
+    FormControl,
+    InputLabel,
+    List,
+    ListItem,
+    ListItemText,
+    MenuItem,
+    Typography,
+} from '@mui/material';
+import { Inbox as InboxIcon, UploadFile as UploadFileIcon } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -11,6 +24,35 @@ type Props = {
     selectedStudysetUUID: string;
     studysets: Studyset[];
     handleImport: () => void;
+    onFileImport: (categories: string[]) => void;
+};
+
+const ACCEPTED_EXTENSIONS = ['.json', '.txt', '.csv'];
+
+const parseFileCategories = (content: string, fileName: string): string[] => {
+    const ext = fileName.slice(fileName.lastIndexOf('.')).toLowerCase();
+
+    switch (ext) {
+        case '.json': {
+            const parsed = JSON.parse(content);
+            if (Array.isArray(parsed)) {
+                return parsed.map(String).filter(Boolean);
+            }
+            return [];
+        }
+        case '.csv':
+            return content
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean);
+        case '.txt':
+            return content
+                .split('\n')
+                .map((s) => s.trim())
+                .filter(Boolean);
+        default:
+            return [];
+    }
 };
 
 const ImportTabView = (props: Props) => {
@@ -20,9 +62,14 @@ const ImportTabView = (props: Props) => {
         selectedStudysetUUID,
         studysets,
         handleImport,
+        onFileImport,
     } = props;
 
     const { t } = useTranslation();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [fileError, setFileError] = useState<string | null>(null);
+    const [fileCategories, setFileCategories] = useState<string[]>([]);
+    const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
     const handleChange = (event: SelectChangeEvent) => {
         setSelectedStudysetUUID(event.target.value as string);
@@ -44,8 +91,72 @@ const ImportTabView = (props: Props) => {
         (cat) => existingCategories.includes(cat)
     );
 
+    // File import
+    const newFileCategories = fileCategories.filter(
+        (cat) => !existingCategories.includes(cat)
+    );
+    const duplicateFileCategories = fileCategories.filter(
+        (cat) => existingCategories.includes(cat)
+    );
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+        if (!ACCEPTED_EXTENSIONS.includes(ext)) {
+            setFileError(t('categories.unsupportedFileType'));
+            setFileCategories([]);
+            setSelectedFileName(null);
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const content = event.target?.result as string;
+                const parsed = parseFileCategories(content, file.name);
+                if (parsed.length === 0) {
+                    setFileError(t('categories.noCategoriesInFile'));
+                    setFileCategories([]);
+                    setSelectedFileName(null);
+                    return;
+                }
+                setFileCategories(parsed);
+                setSelectedFileName(file.name);
+                setFileError(null);
+            } catch {
+                setFileError(t('categories.failedToParseFile'));
+                setFileCategories([]);
+                setSelectedFileName(null);
+            }
+        };
+        reader.onerror = () => {
+            setFileError(t('categories.failedToReadFile'));
+            setFileCategories([]);
+            setSelectedFileName(null);
+        };
+        reader.readAsText(file);
+
+        // Reset input so the same file can be re-selected
+        e.target.value = '';
+    };
+
+    const handleFileImport = () => {
+        if (newFileCategories.length > 0) {
+            onFileImport(newFileCategories);
+            setFileCategories([]);
+            setSelectedFileName(null);
+        }
+    };
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {/* From Study Set */}
+            <Typography variant="subtitle2" color="text.secondary">
+                {t('categories.fromStudyset')}
+            </Typography>
+
             <FormControl fullWidth>
                 <InputLabel id="study-set-select-label">{t('categories.selectStudyset')}</InputLabel>
                 <Select
@@ -53,15 +164,31 @@ const ImportTabView = (props: Props) => {
                     label={t('categories.selectStudyset')}
                     value={selectedStudysetUUID}
                     onChange={handleChange}
+                    MenuProps={{
+                        PaperProps: {
+                            sx: {
+                                maxHeight: '20rem',
+                            },
+                        },
+                    }}
                 >
                     {filteredStudySets.map((studySet) => (
                         <MenuItem
                             key={studySet.studysetUUID}
                             value={studySet.studysetUUID}
                         >
-                            <Typography variant="inherit" noWrap title={studySet.title}>
-                                {studySet.title}
-                            </Typography>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: '1rem' }}>
+                                <Typography variant="inherit" noWrap title={studySet.title}>
+                                    {studySet.title}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
+                                    {new Date(studySet.createdAt).toLocaleDateString(undefined, {
+                                        month: 'short',
+                                        day: 'numeric',
+                                        year: 'numeric',
+                                    })}
+                                </Typography>
+                            </Box>
                         </MenuItem>
                     ))}
                 </Select>
@@ -134,6 +261,103 @@ const ImportTabView = (props: Props) => {
                         >
                             {newCategories.length > 0
                                 ? t('categories.importCount', { count: newCategories.length })
+                                : t('categories.import')}
+                        </Button>
+                    </Box>
+                </>
+            )}
+
+            <Divider />
+
+            {/* From File */}
+            <Typography variant="subtitle2" color="text.secondary">
+                {t('categories.fromFile')}
+            </Typography>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".json,.txt,.csv"
+                    onChange={handleFileSelect}
+                    hidden
+                />
+                <Button
+                    variant="outlined"
+                    startIcon={<UploadFileIcon />}
+                    onClick={() => fileInputRef.current?.click()}
+                >
+                    {t('categories.chooseFile')}
+                </Button>
+                {selectedFileName && (
+                    <Typography variant="body2" color="text.secondary" noWrap>
+                        {selectedFileName}
+                    </Typography>
+                )}
+            </Box>
+
+            <Typography variant="caption" color="text.secondary">
+                {t('categories.supportedFormats')}
+            </Typography>
+
+            {fileError && <Alert severity="error">{fileError}</Alert>}
+
+            {fileCategories.length > 0 && (
+                <>
+                    <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: '0.75rem' }}>
+                            {t('categories.previewFound', { count: fileCategories.length })}
+                            {newFileCategories.length > 0 && (
+                                <> • {t('categories.newCount', { count: newFileCategories.length })}</>
+                            )}
+                            {duplicateFileCategories.length > 0 && (
+                                <> • {t('categories.duplicateCount', { count: duplicateFileCategories.length })}</>
+                            )}
+                        </Typography>
+
+                        <Box
+                            sx={{
+                                maxHeight: '15rem',
+                                overflowY: 'auto',
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                borderRadius: '0.25rem',
+                            }}
+                        >
+                            <List dense>
+                                {fileCategories.map((category, index) => {
+                                    const isDuplicate = existingCategories.includes(category);
+                                    return (
+                                        <ListItem
+                                            key={index}
+                                            divider={index < fileCategories.length - 1}
+                                            sx={{ opacity: isDuplicate ? 0.5 : 1 }}
+                                        >
+                                            <ListItemText primary={category} />
+                                            {isDuplicate && (
+                                                <Chip
+                                                    label={t('categories.duplicate')}
+                                                    size="small"
+                                                    variant="outlined"
+                                                    sx={{ ml: '0.5rem' }}
+                                                />
+                                            )}
+                                        </ListItem>
+                                    );
+                                })}
+                            </List>
+                        </Box>
+                    </Box>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button
+                            variant="contained"
+                            onClick={handleFileImport}
+                            disabled={newFileCategories.length === 0}
+                            sx={{ fontWeight: 600 }}
+                        >
+                            {newFileCategories.length > 0
+                                ? t('categories.importCount', { count: newFileCategories.length })
                                 : t('categories.import')}
                         </Button>
                     </Box>

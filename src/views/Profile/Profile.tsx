@@ -3,6 +3,7 @@ import { SyntheticEvent, useState } from 'react';
 import AccountTab from './AccountTab';
 import AccessibilityTab from './AccessibilityTab';
 import CustomizationTab from './CustomizationTab';
+import JsonSettingsTab from './JsonSettingsTab';
 import ProfileCard from './ProfileCard';
 import {
     ProfileContainer,
@@ -19,6 +20,7 @@ const TABS = {
     CUSTOMIZATION: 'Customization',
     ACCESSIBILITY: 'Accessibility',
     ACCOUNT: 'Account',
+    JSON: 'JSON',
 };
 
 type Props = {};
@@ -63,6 +65,10 @@ const Profile = (props: Props) => {
                                 label={t('profile.account')}
                                 value={TABS.ACCOUNT}
                             />
+                            <ProfileTab
+                                label={t('profile.json')}
+                                value={TABS.JSON}
+                            />
                         </Tabs>
                         {selectedProfileTab === TABS.CUSTOMIZATION && (
                             <CustomizationTab userData={userData} />
@@ -72,6 +78,9 @@ const Profile = (props: Props) => {
                         )}
                         {selectedProfileTab === TABS.ACCOUNT && (
                             <AccountTab userData={userData} />
+                        )}
+                        {selectedProfileTab === TABS.JSON && (
+                            <JsonSettingsTab userData={userData} />
                         )}
                     </ProfileContainer>
                 </ProfilePaper>
