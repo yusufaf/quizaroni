@@ -1,6 +1,7 @@
 import { Delete as DeleteIcon, SwapHoriz as SwapIcon, BrokenImage } from '@mui/icons-material';
 import { CircularProgress, IconButton, Typography } from '@mui/material';
 import { CardFileMetadata } from 'shared/types';
+import { formatBytes } from 'utilities/general';
 import { useState } from 'react';
 import { styled } from '@mui/system';
 
@@ -89,14 +90,6 @@ interface ImagePreviewProps {
     onReplace?: (fileKey: string) => void;
     isDeleting?: boolean;
 }
-
-const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
-};
 
 const ImagePreview = ({ file, onDelete, onReplace, isDeleting = false }: ImagePreviewProps) => {
     const [imageError, setImageError] = useState(false);

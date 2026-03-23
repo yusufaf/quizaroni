@@ -138,7 +138,7 @@ export const NewCardInputs = styled(SpacedFlexContainer)({
 });
 
 export const NewCardInputField = styled(TextField)(({ theme }) => ({
-    width: '25rem',
+    width: '100%',
     '& .MuiInputBase-input::-webkit-scrollbar': {
         width: '0.5rem',
     },
@@ -171,6 +171,9 @@ export const BottomActions = styled(SimpleFlexContainer)({
 export const AddCardBelowButton = styled(IconButton)(({ theme }) => ({
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.background.paper,
+    '&:hover': {
+        backgroundColor: theme.palette.primary.dark,
+    },
 }));
 
 export const NewCardLabel = styled(Typography)(({ theme }) => ({
@@ -178,15 +181,17 @@ export const NewCardLabel = styled(Typography)(({ theme }) => ({
 }));
 
 export const NewCardTerm = styled(FlexColumn)({
-    flex: '1',
+    flex: '1 1 0',
     gap: '0.5rem',
     minWidth: '0',
+    overflow: 'hidden',
 });
 
 export const NewCardDefinition = styled(FlexColumn)({
-    flex: '1',
+    flex: '1 1 0',
     gap: '0.5rem',
     minWidth: '0',
+    overflow: 'hidden',
 });
 
 export const NewCardRow = styled('div')(({ theme }) => ({

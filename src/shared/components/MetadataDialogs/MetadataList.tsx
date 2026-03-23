@@ -16,6 +16,7 @@ export const MetadataList = <T extends { name: string }>({
     getItemKey,
     isLoading = false,
     emptyMessage = 'No items yet',
+    emptySubMessage,
 }: MetadataListProps<T>) => {
     if (isLoading) {
         return (
@@ -39,9 +40,11 @@ export const MetadataList = <T extends { name: string }>({
                 <Typography variant="h6" color="text.secondary" sx={{ mt: '1rem' }}>
                     {emptyMessage}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    Create your first item in the CREATE tab
-                </Typography>
+                {emptySubMessage && (
+                    <Typography variant="body2" color="text.secondary">
+                        {emptySubMessage}
+                    </Typography>
+                )}
             </Box>
         );
     }

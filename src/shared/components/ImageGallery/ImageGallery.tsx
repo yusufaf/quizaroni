@@ -1,6 +1,8 @@
 import { BrokenImage, Close as CloseIcon } from '@mui/icons-material';
 import { Dialog, IconButton, Typography } from '@mui/material';
 import { CardFileMetadata } from 'shared/types';
+import { formatBytes } from 'utilities/general';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { styled } from '@mui/system';
 
@@ -78,18 +80,27 @@ const CloseButton = styled(IconButton)({
     },
 });
 
-const ImageCaption = styled(Typography)(({ theme }) => ({
+const CaptionBar = styled('div')({
     position: 'absolute',
     bottom: '1rem',
     left: '50%',
     transform: 'translateX(-50%)',
-    color: 'white',
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     padding: '0.5rem 1rem',
     borderRadius: '0.25rem',
-    maxWidth: '80%',
-    textAlign: 'center',
-}));
+    maxWidth: '90%',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1.5rem',
+});
+
+const CaptionMetadata = styled('div')({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '1rem',
+    color: 'rgba(255, 255, 255, 0.7)',
+    flexShrink: 0,
+});
 
 interface ImageGalleryProps {
     files: CardFileMetadata[];
@@ -98,12 +109,22 @@ interface ImageGalleryProps {
     onLightboxChange?: (isOpen: boolean) => void;
 }
 
+const formatUploadDate = (isoDate: string, locale: string): string => {
+    const date = new Date(isoDate);
+    return date.toLocaleDateString(locale === 'es' ? 'es-ES' : 'en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+    });
+};
+
 const ImageGallery = ({
     files,
     maxHeight = '18.75rem',
     onImageClick,
     onLightboxChange,
 }: ImageGalleryProps) => {
+    const { t, i18n } = useTranslation();
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [selectedImage, setSelectedImage] = useState<CardFileMetadata | null>(null);
     const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
@@ -203,9 +224,28 @@ const ImageGallery = ({
                             alt={selectedImage.name}
                             onClick={(e) => e.stopPropagation()}
                         />
-                        <ImageCaption variant="body2" onClick={(e) => e.stopPropagation()}>
-                            {selectedImage.name}
-                        </ImageCaption>
+                        <CaptionBar onClick={(e) => e.stopPropagation()}>
+                            <Typography variant="body2" sx={{ color: 'white' }} noWrap>
+                                {selectedImage.name}
+                            </Typography>
+                            <CaptionMetadata>
+                                {selectedImage.size > 0 && (
+                                    <Typography variant="caption">
+                                        {formatBytes(selectedImage.size)}
+                                    </Typography>
+                                )}
+                                {selectedImage.uploadedAt && (
+                                    <Typography variant="caption">
+                                        {t('imageGallery.uploaded', {
+                                            date: formatUploadDate(
+                                                selectedImage.uploadedAt,
+                                                i18n.language
+                                            ),
+                                        })}
+                                    </Typography>
+                                )}
+                            </CaptionMetadata>
+                        </CaptionBar>
                     </LightboxContent>
                 )}
             </Dialog>

@@ -44,6 +44,7 @@ export interface MetadataListProps<T = any> {
     getItemKey?: (item: T) => string;
     isLoading?: boolean;
     emptyMessage?: string;
+    emptySubMessage?: string;
 }
 
 export interface CreateTabLayoutProps {

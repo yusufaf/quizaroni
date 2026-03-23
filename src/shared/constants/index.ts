@@ -378,6 +378,7 @@ export const DEFAULT_USER_DATA: User = {
         preferredDateFormat: DATE_FORMATS.MDY,
         preferredTimeFormat: TIME_FORMATS.TWELVE_HOUR,
         showSeconds: false,
+        confirmDestructiveActions: true,
         defaultDownloadFormat: DOWNLOAD_FILE_TYPES.JSON,
     },
     username: '',
