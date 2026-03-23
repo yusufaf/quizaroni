@@ -4,4 +4,5 @@ export type FileMetadata = {
     name: string;
     signedURL: string;
     size: number;
+    uploadedAt: string;
 };

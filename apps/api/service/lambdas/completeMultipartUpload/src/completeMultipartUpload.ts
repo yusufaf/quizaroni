@@ -79,6 +79,7 @@ export const handler: Handler = async (
             key,
             size: fileSize,
             signedURL,
+            uploadedAt: new Date().toISOString(),
         };
 
         if (studysetUUID) {
