@@ -95,6 +95,7 @@ export type User = {
         preferredDateFormat: PreferredDateFormat;
         preferredTimeFormat?: PreferredTimeFormat;
         showSeconds?: boolean;
+        confirmDestructiveActions?: boolean;
         defaultDownloadFormat: DownloadSetFormat;
     };
     username: string;
@@ -398,6 +399,7 @@ export type FileMetadata = {
     name: string;
     signedURL: string;
     size: number;
+    uploadedAt?: string;
 };
 
 export type Part = {

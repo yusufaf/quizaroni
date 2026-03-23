@@ -1,8 +1,16 @@
-import { Box, Typography, ListItemText, Button, Collapse, Stack } from '@mui/material';
-import { Delete as DeleteIcon, Download as DownloadIcon, CleaningServices as CleanIcon } from '@mui/icons-material';
+import { Box, Typography, ListItemText, Button, Collapse, Stack, Menu, MenuItem, ListItemIcon } from '@mui/material';
+import {
+    Delete as DeleteIcon,
+    Download as DownloadIcon,
+    CleaningServices as CleanIcon,
+    DataObject as JsonIcon,
+    Description as TxtIcon,
+    TableChart as CsvIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { MetadataList, ErrorInfo } from 'shared/components/MetadataDialogs';
-import { downloadObjectAsJSON } from 'shared/utilities/general';
+import { downloadFile } from 'shared/utilities/general';
+import { useState, MouseEvent } from 'react';
 
 type Props = {
     categories: string[];
@@ -34,12 +42,26 @@ export const CategoriesManageTab = ({
     isLoading,
 }: Props) => {
     const { t } = useTranslation();
+    const [downloadMenuAnchor, setDownloadMenuAnchor] = useState<null | HTMLElement>(null);
     const categoryItems = categories.map((name) => ({ name }));
 
     const renderItem = (item: { name: string }) => <ListItemText primary={item.name} />;
 
-    const downloadCategoriesList = () => {
-        downloadObjectAsJSON(categories, `Quizaroni_${studysetTitle}_Categories.json`);
+    const fileBase = `Quizaroni_${studysetTitle}_Categories`;
+
+    const handleDownload = (format: 'json' | 'txt' | 'csv') => {
+        setDownloadMenuAnchor(null);
+        switch (format) {
+            case 'json':
+                downloadFile(JSON.stringify(categories, null, 4), `${fileBase}.json`, 'application/json');
+                break;
+            case 'txt':
+                downloadFile(categories.join('\n'), `${fileBase}.txt`, 'text/plain');
+                break;
+            case 'csv':
+                downloadFile(categories.join(','), `${fileBase}.csv`, 'text/csv');
+                break;
+        }
     };
 
     return (
@@ -52,17 +74,36 @@ export const CategoriesManageTab = ({
                     <Stack direction="row" spacing="0.5rem">
                         <Button
                             startIcon={<DownloadIcon />}
-                            onClick={downloadCategoriesList}
+                            onClick={(e: MouseEvent<HTMLButtonElement>) => setDownloadMenuAnchor(e.currentTarget)}
                             size="small"
                             disabled={categories.length === 0}
                         >
                             {t('categories.download')}
                         </Button>
+                        <Menu
+                            anchorEl={downloadMenuAnchor}
+                            open={Boolean(downloadMenuAnchor)}
+                            onClose={() => setDownloadMenuAnchor(null)}
+                        >
+                            <MenuItem onClick={() => handleDownload('json')}>
+                                <ListItemIcon><JsonIcon fontSize="small" /></ListItemIcon>
+                                JSON
+                            </MenuItem>
+                            <MenuItem onClick={() => handleDownload('txt')}>
+                                <ListItemIcon><TxtIcon fontSize="small" /></ListItemIcon>
+                                TXT
+                            </MenuItem>
+                            <MenuItem onClick={() => handleDownload('csv')}>
+                                <ListItemIcon><CsvIcon fontSize="small" /></ListItemIcon>
+                                CSV
+                            </MenuItem>
+                        </Menu>
                         <Button
                             variant="outlined"
                             size="small"
                             startIcon={<CleanIcon />}
                             onClick={onDeleteUnused}
+                            disabled={categories.length === 0}
                         >
                             {t('categories.deleteUnused')}
                         </Button>
@@ -122,6 +163,7 @@ export const CategoriesManageTab = ({
                 renderItem={renderItem}
                 isLoading={isLoading}
                 emptyMessage={t('categories.noCategoriesYet')}
+                emptySubMessage={t('categories.createFirstCategory')}
             />
         </Box>
     );

@@ -78,13 +78,50 @@ export const AvatarMetadataSchema = z.object({
     value: z.string().url(),
 });
 
+export const EmailNotificationSettingsSchema = z.object({
+    enabled: z.boolean(),
+    studyReminders: z.boolean(),
+    streakAlerts: z.boolean(),
+    weeklyDigest: z.boolean(),
+    inactivityNudges: z.boolean(),
+    digestDay: z.number().min(0).max(6).optional(),
+});
+
+export const QuietHoursSettingsSchema = z.object({
+    enabled: z.boolean(),
+    start: z.string(),
+    end: z.string(),
+    timezone: z.string(),
+});
+
+export const StudysetNotificationPrefsSchema = z.object({
+    studysetUUID: UUIDSchema,
+    enabled: z.boolean(),
+    reminderTime: z.string().optional(),
+    reminderDays: z.array(z.number().min(0).max(6)).optional(),
+});
+
+export const NotificationPreferencesSchema = z.object({
+    enabled: z.boolean(),
+    mode: z.enum(['calm', 'regular', 'power-user', 'custom']),
+    email: EmailNotificationSettingsSchema,
+    quietHours: QuietHoursSettingsSchema,
+    snoozeUntil: z.string().optional(),
+    studysetPrefs: z.array(StudysetNotificationPrefsSchema),
+});
+
 export const UserMetadataSchema = z.object({
     avatar: AvatarMetadataSchema.optional(),
-    defaultDownloadFormat: z.string(),
+    confirmDestructiveActions: z.boolean().optional(),
+    defaultDownloadFormat: z.enum(['TXT', 'JSON', 'CSV', 'MD']),
     defaultTheme: z.enum(['light', 'dark']),
+    fontSizeScale: z.number().min(0.75).max(1.5).optional(),
     homeView: z.enum(['table', 'grid', 'html']),
     namedColors: z.array(NamedColorSchema),
-    preferredDateFormat: z.string(),
+    notifications: NotificationPreferencesSchema.optional(),
+    preferredDateFormat: z.enum(['YYYY-MM-DD', 'DD/MM/YYYY', 'MM/DD/YYYY']),
+    preferredTimeFormat: z.enum(['12h', '24h']).optional(),
+    showSeconds: z.boolean().optional(),
 });
 
 export const UserSchema = z.object({

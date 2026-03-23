@@ -243,6 +243,19 @@ const ManageCategoriesDialog = (props: Props) => {
         });
     };
 
+    const handleFileImport = useCallback(
+        (newCategories: string[]) => {
+            const combinedCategories = categories.concat(newCategories);
+            updateStudySet({
+                studysetUUID,
+                updates: {
+                    categories: combinedCategories,
+                },
+            });
+        },
+        [studysetUUID, categories, updateStudySet]
+    );
+
     // Delete Unused Categories
     const handleDeleteUnused = useCallback(() => {
         const usedCategories = new Set(cards.flatMap((card) => card.categories));
@@ -337,6 +350,7 @@ const ManageCategoriesDialog = (props: Props) => {
                         selectedStudyset={selectedStudyset}
                         setSelectedStudysetUUID={setSelectedStudysetUUID}
                         handleImport={handleImport}
+                        onFileImport={handleFileImport}
                     />
                 )}
 
