@@ -54,7 +54,7 @@ const NavDrawer = () => {
                 open={openDrawer}
                 onClose={handleCloseDrawer}
                 PaperProps={{
-                    sx: { minWidth: '16rem', p: 1 }
+                    sx: { minWidth: '16rem', p: 1 },
                 }}
             >
                 <List>
@@ -63,7 +63,9 @@ const NavDrawer = () => {
                             onClick={handleCloseDrawer}
                             sx={{ borderRadius: '0.5rem' }}
                         >
-                            <StyledNavLink to="/">{t('nav.home')}</StyledNavLink>
+                            <StyledNavLink to="/">
+                                {t('nav.home')}
+                            </StyledNavLink>
                         </ListItemButton>
                     </ListItem>
                     <ListItem disablePadding>
@@ -71,7 +73,9 @@ const NavDrawer = () => {
                             onClick={handleCloseDrawer}
                             sx={{ borderRadius: '0.5rem' }}
                         >
-                            <StyledNavLink to="/explore">{t('nav.explore')}</StyledNavLink>
+                            <StyledNavLink to="/explore">
+                                {t('nav.explore')}
+                            </StyledNavLink>
                         </ListItemButton>
                     </ListItem>
                     <ListItem sx={{ mt: 1 }}>
@@ -85,16 +89,19 @@ const NavDrawer = () => {
                         </CreateStudySetButton>
                     </ListItem>
                     <ListItem>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                            }}
+                        >
                             <DarkModeToggleButton />
                         </Box>
                     </ListItem>
                 </List>
             </Drawer>
-            <IconButton
-                onClick={handleToggleDrawer}
-                sx={{ ml: 'auto' }}
-            >
+            <IconButton onClick={handleToggleDrawer} sx={{ ml: 'auto' }}>
                 <Menu />
             </IconButton>
         </>

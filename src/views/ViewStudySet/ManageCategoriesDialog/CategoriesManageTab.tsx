@@ -1,4 +1,14 @@
-import { Box, Typography, ListItemText, Button, Collapse, Stack, Menu, MenuItem, ListItemIcon } from '@mui/material';
+import {
+    Box,
+    Typography,
+    ListItemText,
+    Button,
+    Collapse,
+    Stack,
+    Menu,
+    MenuItem,
+    ListItemIcon,
+} from '@mui/material';
 import {
     Delete as DeleteIcon,
     Download as DownloadIcon,
@@ -42,10 +52,13 @@ export const CategoriesManageTab = ({
     isLoading,
 }: Props) => {
     const { t } = useTranslation();
-    const [downloadMenuAnchor, setDownloadMenuAnchor] = useState<null | HTMLElement>(null);
+    const [downloadMenuAnchor, setDownloadMenuAnchor] =
+        useState<null | HTMLElement>(null);
     const categoryItems = categories.map((name) => ({ name }));
 
-    const renderItem = (item: { name: string }) => <ListItemText primary={item.name} />;
+    const renderItem = (item: { name: string }) => (
+        <ListItemText primary={item.name} />
+    );
 
     const fileBase = `Quizaroni_${studysetTitle}_Categories`;
 
@@ -53,28 +66,57 @@ export const CategoriesManageTab = ({
         setDownloadMenuAnchor(null);
         switch (format) {
             case 'json':
-                downloadFile(JSON.stringify(categories, null, 4), `${fileBase}.json`, 'application/json');
+                downloadFile(
+                    JSON.stringify(categories, null, 4),
+                    `${fileBase}.json`,
+                    'application/json'
+                );
                 break;
             case 'txt':
-                downloadFile(categories.join('\n'), `${fileBase}.txt`, 'text/plain');
+                downloadFile(
+                    categories.join('\n'),
+                    `${fileBase}.txt`,
+                    'text/plain'
+                );
                 break;
             case 'csv':
-                downloadFile(categories.join(','), `${fileBase}.csv`, 'text/csv');
+                downloadFile(
+                    categories.join(','),
+                    `${fileBase}.csv`,
+                    'text/csv'
+                );
                 break;
         }
     };
 
     return (
         <Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', mb: '1rem' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.75rem',
+                    mb: '1rem',
+                }}
+            >
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                    }}
+                >
                     <Typography variant="h6">
-                        {t('categories.categoriesCount', { count: categories.length })}
+                        {t('categories.categoriesCount', {
+                            count: categories.length,
+                        })}
                     </Typography>
                     <Stack direction="row" spacing="0.5rem">
                         <Button
                             startIcon={<DownloadIcon />}
-                            onClick={(e: MouseEvent<HTMLButtonElement>) => setDownloadMenuAnchor(e.currentTarget)}
+                            onClick={(e: MouseEvent<HTMLButtonElement>) =>
+                                setDownloadMenuAnchor(e.currentTarget)
+                            }
                             size="small"
                             disabled={categories.length === 0}
                         >
@@ -86,15 +128,21 @@ export const CategoriesManageTab = ({
                             onClose={() => setDownloadMenuAnchor(null)}
                         >
                             <MenuItem onClick={() => handleDownload('json')}>
-                                <ListItemIcon><JsonIcon fontSize="small" /></ListItemIcon>
+                                <ListItemIcon>
+                                    <JsonIcon fontSize="small" />
+                                </ListItemIcon>
                                 JSON
                             </MenuItem>
                             <MenuItem onClick={() => handleDownload('txt')}>
-                                <ListItemIcon><TxtIcon fontSize="small" /></ListItemIcon>
+                                <ListItemIcon>
+                                    <TxtIcon fontSize="small" />
+                                </ListItemIcon>
                                 TXT
                             </MenuItem>
                             <MenuItem onClick={() => handleDownload('csv')}>
-                                <ListItemIcon><CsvIcon fontSize="small" /></ListItemIcon>
+                                <ListItemIcon>
+                                    <CsvIcon fontSize="small" />
+                                </ListItemIcon>
                                 CSV
                             </MenuItem>
                         </Menu>
@@ -127,7 +175,9 @@ export const CategoriesManageTab = ({
                     }}
                 >
                     <Typography variant="body2" fontWeight={500}>
-                        {t('categories.itemSelected', { count: deleteIndices.length })}
+                        {t('categories.itemSelected', {
+                            count: deleteIndices.length,
+                        })}
                     </Typography>
                     <Button
                         color="inherit"

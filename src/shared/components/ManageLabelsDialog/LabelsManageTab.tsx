@@ -29,7 +29,9 @@ export const LabelsManageTab = ({
 }: Props) => {
     const labelItems = labels.map((name) => ({ name }));
 
-    const renderItem = (item: { name: string }) => <ListItemText primary={item.name} />;
+    const renderItem = (item: { name: string }) => (
+        <ListItemText primary={item.name} />
+    );
 
     return (
         <Box>
@@ -49,7 +51,8 @@ export const LabelsManageTab = ({
                     }}
                 >
                     <Typography variant="body2" fontWeight={500}>
-                        {deleteIndices.length} item{deleteIndices.length > 1 ? 's' : ''} selected
+                        {deleteIndices.length} item
+                        {deleteIndices.length > 1 ? 's' : ''} selected
                     </Typography>
                     <Button
                         color="inherit"

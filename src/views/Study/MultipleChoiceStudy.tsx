@@ -32,7 +32,9 @@ type QuizOption = {
 };
 
 const MultipleChoiceStudy = ({ studysetId }: Props) => {
-    const { data: studysetResponse, isLoading } = useGetStudyset({ studysetUUID: studysetId });
+    const { data: studysetResponse, isLoading } = useGetStudyset({
+        studysetUUID: studysetId,
+    });
     const studyset = studysetResponse?.studyset ?? ({} as Studyset);
 
     const {
@@ -90,12 +92,13 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
 
     // Timer
     useEffect(() => {
-        if (!activeSession?.settings?.timedMode || showFeedback || !currentCard) return;
+        if (!activeSession?.settings?.timedMode || showFeedback || !currentCard)
+            return;
 
         const timePerCard = activeSession.settings.timePerCard || 30;
         const interval = setInterval(() => {
             setTimeRemaining((prev) => {
-                const newTime = prev - (100 / (timePerCard * 10));
+                const newTime = prev - 100 / (timePerCard * 10);
                 if (newTime <= 0) {
                     handleSubmit(true);
                     return 0;
@@ -107,12 +110,17 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
         return () => clearInterval(interval);
     }, [activeSession?.settings, showFeedback, currentCard]);
 
-    const generateOptions = (correctCard: CardType, allCards: CardType[]): QuizOption[] => {
+    const generateOptions = (
+        correctCard: CardType,
+        allCards: CardType[]
+    ): QuizOption[] => {
         const options: QuizOption[] = [
             { text: correctCard.definition, isCorrect: true },
         ];
 
-        const otherCards = allCards.filter((card) => card.cardUUID !== correctCard.cardUUID);
+        const otherCards = allCards.filter(
+            (card) => card.cardUUID !== correctCard.cardUUID
+        );
         const shuffledOthers = [...otherCards].sort(() => Math.random() - 0.5);
 
         for (let i = 0; i < Math.min(3, shuffledOthers.length); i++) {
@@ -133,58 +141,75 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
         return options.sort(() => Math.random() - 0.5);
     };
 
-    const handleSubmit = useCallback((isTimeout = false) => {
-        if (showFeedback) return;
+    const handleSubmit = useCallback(
+        (isTimeout = false) => {
+            if (showFeedback) return;
 
-        const correctIndex = quizOptions.findIndex((opt) => opt.isCorrect);
-        const answeredCorrectly = selectedOption === correctIndex || (isTimeout && selectedOption === null);
-        const actuallyCorrect = !isTimeout && selectedOption === correctIndex;
+            const correctIndex = quizOptions.findIndex((opt) => opt.isCorrect);
+            const answeredCorrectly =
+                selectedOption === correctIndex ||
+                (isTimeout && selectedOption === null);
+            const actuallyCorrect =
+                !isTimeout && selectedOption === correctIndex;
 
-        setIsCorrect(actuallyCorrect);
-        setShowFeedback(true);
+            setIsCorrect(actuallyCorrect);
+            setShowFeedback(true);
 
-        // Calculate time bonus
-        const timeSpent = Math.floor((Date.now() - answerStartTime) / 1000);
-        let scoreToAdd = 0;
-        let quality = 1;
+            // Calculate time bonus
+            const timeSpent = Math.floor((Date.now() - answerStartTime) / 1000);
+            let scoreToAdd = 0;
+            let quality = 1;
 
-        if (actuallyCorrect) {
-            scoreToAdd = SCORING.CORRECT_ANSWER;
-            quality = 4;
+            if (actuallyCorrect) {
+                scoreToAdd = SCORING.CORRECT_ANSWER;
+                quality = 4;
 
-            // Time bonus
-            if (activeSession?.settings?.timedMode && timeRemaining > 50) {
-                const bonus = Math.floor(SCORING.TIME_BONUS_MAX * (timeRemaining / 100));
-                scoreToAdd += bonus;
+                // Time bonus
+                if (activeSession?.settings?.timedMode && timeRemaining > 50) {
+                    const bonus = Math.floor(
+                        SCORING.TIME_BONUS_MAX * (timeRemaining / 100)
+                    );
+                    scoreToAdd += bonus;
+                }
+
+                incrementScore(scoreToAdd);
+                updateStreak(true);
+            } else {
+                quality = 1;
+                updateStreak(false);
             }
 
-            incrementScore(scoreToAdd);
-            updateStreak(true);
-        } else {
-            quality = 1;
-            updateStreak(false);
-        }
+            // Update card progress and record answer
+            updateCardProgress(currentCard.cardUUID, quality);
+            recordAnswer({
+                cardUUID: currentCard.cardUUID,
+                correct: actuallyCorrect,
+                timeSpent,
+                hintsUsed: 0,
+                selectedOption,
+            });
 
-        // Update card progress and record answer
-        updateCardProgress(currentCard.cardUUID, quality);
-        recordAnswer({
-            cardUUID: currentCard.cardUUID,
-            correct: actuallyCorrect,
-            timeSpent,
-            hintsUsed: 0,
+            // Auto-advance after delay
+            setTimeout(() => {
+                handleNext();
+            }, 2000);
+        },
+        [
             selectedOption,
-        });
-
-        // Auto-advance after delay
-        setTimeout(() => {
-            handleNext();
-        }, 2000);
-    }, [selectedOption, quizOptions, showFeedback, timeRemaining, currentCard, answerStartTime, activeSession]);
+            quizOptions,
+            showFeedback,
+            timeRemaining,
+            currentCard,
+            answerStartTime,
+            activeSession,
+        ]
+    );
 
     const handleNext = () => {
         if (!activeSession) return;
 
-        const isLastCard = activeSession.currentCardIndex === activeSession.cards.length - 1;
+        const isLastCard =
+            activeSession.currentCardIndex === activeSession.cards.length - 1;
 
         if (isLastCard) {
             const result = endSession();
@@ -241,7 +266,12 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
         return 'error';
     };
 
-    if (isLoading || !activeSession || !activeSession.cards || activeSession.cards.length === 0) {
+    if (
+        isLoading ||
+        !activeSession ||
+        !activeSession.cards ||
+        activeSession.cards.length === 0
+    ) {
         return (
             <BasePage>
                 <Typography>Loading...</Typography>
@@ -333,8 +363,16 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
                                     exit={{ opacity: 0, y: -20 }}
                                 >
                                     <Alert
-                                        severity={isCorrect ? 'success' : 'error'}
-                                        icon={isCorrect ? <CheckCircle /> : <Cancel />}
+                                        severity={
+                                            isCorrect ? 'success' : 'error'
+                                        }
+                                        icon={
+                                            isCorrect ? (
+                                                <CheckCircle />
+                                            ) : (
+                                                <Cancel />
+                                            )
+                                        }
                                         sx={{ mb: '2rem' }}
                                     >
                                         {isCorrect
@@ -347,16 +385,32 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
 
                         {/* Options */}
                         <RadioGroup
-                            value={selectedOption !== null ? selectedOption : ''}
-                            onChange={(e) => !showFeedback && setSelectedOption(Number(e.target.value))}
+                            value={
+                                selectedOption !== null ? selectedOption : ''
+                            }
+                            onChange={(e) =>
+                                !showFeedback &&
+                                setSelectedOption(Number(e.target.value))
+                            }
                         >
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '1rem',
+                                }}
+                            >
                                 {quizOptions.map((option, index) => {
-                                    const isThisCorrect = index === correctIndex;
-                                    const isThisSelected = selectedOption === index;
-                                    const showCorrectHighlight = showFeedback && isThisCorrect;
+                                    const isThisCorrect =
+                                        index === correctIndex;
+                                    const isThisSelected =
+                                        selectedOption === index;
+                                    const showCorrectHighlight =
+                                        showFeedback && isThisCorrect;
                                     const showWrongHighlight =
-                                        showFeedback && isThisSelected && !isCorrect;
+                                        showFeedback &&
+                                        isThisSelected &&
+                                        !isCorrect;
 
                                     return (
                                         <Card
@@ -364,26 +418,38 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
                                             variant="outlined"
                                             sx={{
                                                 p: '1rem',
-                                                cursor: showFeedback ? 'default' : 'pointer',
+                                                cursor: showFeedback
+                                                    ? 'default'
+                                                    : 'pointer',
                                                 transition: 'all 0.2s ease',
-                                                backgroundColor: showCorrectHighlight
-                                                    ? 'rgba(76, 175, 80, 0.1)'
-                                                    : showWrongHighlight
-                                                    ? 'rgba(244, 67, 54, 0.1)'
-                                                    : 'background.paper',
-                                                borderColor: showCorrectHighlight
-                                                    ? 'success.main'
-                                                    : showWrongHighlight
-                                                    ? 'error.main'
-                                                    : 'divider',
-                                                borderWidth: showCorrectHighlight || showWrongHighlight ? 2 : 1,
+                                                backgroundColor:
+                                                    showCorrectHighlight
+                                                        ? 'rgba(76, 175, 80, 0.1)'
+                                                        : showWrongHighlight
+                                                          ? 'rgba(244, 67, 54, 0.1)'
+                                                          : 'background.paper',
+                                                borderColor:
+                                                    showCorrectHighlight
+                                                        ? 'success.main'
+                                                        : showWrongHighlight
+                                                          ? 'error.main'
+                                                          : 'divider',
+                                                borderWidth:
+                                                    showCorrectHighlight ||
+                                                    showWrongHighlight
+                                                        ? 2
+                                                        : 1,
                                                 '&:hover': {
-                                                    backgroundColor: showFeedback
-                                                        ? undefined
-                                                        : 'action.hover',
+                                                    backgroundColor:
+                                                        showFeedback
+                                                            ? undefined
+                                                            : 'action.hover',
                                                 },
                                             }}
-                                            onClick={() => !showFeedback && setSelectedOption(index)}
+                                            onClick={() =>
+                                                !showFeedback &&
+                                                setSelectedOption(index)
+                                            }
                                         >
                                             <FormControlLabel
                                                 value={index}
@@ -407,8 +473,12 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
                                                 label={
                                                     <Typography
                                                         sx={{
-                                                            wordBreak: 'break-word',
-                                                            fontWeight: isThisSelected ? 600 : 400,
+                                                            wordBreak:
+                                                                'break-word',
+                                                            fontWeight:
+                                                                isThisSelected
+                                                                    ? 600
+                                                                    : 400,
                                                         }}
                                                     >
                                                         {option.text}
@@ -424,7 +494,13 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
 
                         {/* Submit Button */}
                         {!showFeedback && (
-                            <Box sx={{ mt: '2rem', display: 'flex', justifyContent: 'center' }}>
+                            <Box
+                                sx={{
+                                    mt: '2rem',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                }}
+                            >
                                 <Button
                                     variant="contained"
                                     size="large"

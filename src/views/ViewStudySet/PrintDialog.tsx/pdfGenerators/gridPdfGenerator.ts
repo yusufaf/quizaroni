@@ -90,9 +90,7 @@ export class GridPdfGenerator extends BasePdfGenerator {
 
         // Set text color
         const textColor =
-            settings.showColors && card.textColor
-                ? card.textColor
-                : '#000000';
+            settings.showColors && card.textColor ? card.textColor : '#000000';
         this.setTextColor(doc, textColor);
 
         let currentY = y + 20;

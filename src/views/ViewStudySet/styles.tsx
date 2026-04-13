@@ -17,16 +17,16 @@ import {
     SpacedFlexContainer,
 } from 'styles/AppStyles';
 
-export const ViewStudysetPage = styled(BasePage)<{ viewMode?: 'list' | 'grid' }>(
-    ({ viewMode = 'list' }) => ({
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: viewMode === 'grid' ? '1.5rem' : '2rem',
-        padding: '0rem 22rem 2rem 22rem',
-        position: 'relative', // Allows the sticky positioning
-    })
-);
+export const ViewStudysetPage = styled(BasePage)<{
+    viewMode?: 'list' | 'grid';
+}>(({ viewMode = 'list' }) => ({
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: viewMode === 'grid' ? '1.5rem' : '2rem',
+    padding: '0rem 22rem 2rem 22rem',
+    position: 'relative', // Allows the sticky positioning
+}));
 
 export const ViewFlashsetPaper = styled(Paper)({});
 
@@ -111,16 +111,21 @@ export const StudyModePaper = styled(Paper)(({ theme }) => ({
     position: 'relative',
     overflow: 'hidden',
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-    boxShadow: theme.palette.mode === 'dark'
-        ? 'none'
-        : '0 0.125rem 0.5rem rgba(0, 0, 0, 0.06)',
-    border: theme.palette.mode === 'light' ? '1px solid rgba(0, 0, 0, 0.08)' : 'none',
+    boxShadow:
+        theme.palette.mode === 'dark'
+            ? 'none'
+            : '0 0.125rem 0.5rem rgba(0, 0, 0, 0.06)',
+    border:
+        theme.palette.mode === 'light'
+            ? '1px solid rgba(0, 0, 0, 0.08)'
+            : 'none',
     '&:hover': {
         background: theme.palette.action.hover,
         transform: 'translateY(-0.25rem)',
-        boxShadow: theme.palette.mode === 'dark'
-            ? 'none'
-            : '0 0.375rem 1rem rgba(255, 160, 0, 0.12), 0 0.125rem 0.5rem rgba(0, 0, 0, 0.06)',
+        boxShadow:
+            theme.palette.mode === 'dark'
+                ? 'none'
+                : '0 0.375rem 1rem rgba(255, 160, 0, 0.12), 0 0.125rem 0.5rem rgba(0, 0, 0, 0.06)',
     },
 }));
 
@@ -152,10 +157,14 @@ export const ActionButtonsRow = styled(Paper)(({ theme }) => ({
     gap: '0.5rem',
     borderRadius: '0.75rem',
     paddingLeft: '0.5rem',
-    boxShadow: theme.palette.mode === 'dark'
-        ? 'none'
-        : '0 0.125rem 0.5rem rgba(0, 0, 0, 0.06)',
-    border: theme.palette.mode === 'light' ? '1px solid rgba(0, 0, 0, 0.08)' : 'none',
+    boxShadow:
+        theme.palette.mode === 'dark'
+            ? 'none'
+            : '0 0.125rem 0.5rem rgba(0, 0, 0, 0.06)',
+    border:
+        theme.palette.mode === 'light'
+            ? '1px solid rgba(0, 0, 0, 0.08)'
+            : 'none',
 }));
 
 /* Cards */
@@ -164,23 +173,28 @@ export const ViewFlashsetCard = styled(Card)(({ theme }) => ({
     padding: '1rem 1.25rem 1.25rem 1.25rem',
     borderRadius: '0.75rem',
     transition: 'all 0.2s ease',
-    boxShadow: theme.palette.mode === 'dark'
-        ? '0 0.25rem 0.75rem rgba(255,160,0,0.15)'
-        : '0 0.25rem 1rem rgba(0, 0, 0, 0.08), 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04)',
-    border: theme.palette.mode === 'light' ? '1px solid rgba(0, 0, 0, 0.06)' : 'none',
+    boxShadow:
+        theme.palette.mode === 'dark'
+            ? '0 0.25rem 0.75rem rgba(255,160,0,0.15)'
+            : '0 0.25rem 1rem rgba(0, 0, 0, 0.08), 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04)',
+    border:
+        theme.palette.mode === 'light'
+            ? '1px solid rgba(0, 0, 0, 0.06)'
+            : 'none',
     '&:hover': {
-        boxShadow: theme.palette.mode === 'dark'
-            ? '0 0.375rem 1rem rgba(255,160,0,0.25)'
-            : '0 0.5rem 1.5rem rgba(255, 160, 0, 0.12), 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08)',
+        boxShadow:
+            theme.palette.mode === 'dark'
+                ? '0 0.375rem 1rem rgba(255,160,0,0.25)'
+                : '0 0.5rem 1.5rem rgba(255, 160, 0, 0.12), 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08)',
     },
 }));
 
-export const CategoryChips = styled(SimpleFlexContainer)<{ hasIndex?: boolean }>(
-    ({ hasIndex = true }) => ({
-        marginLeft: hasIndex ? '1rem' : '0',
-        gap: '0.5rem',
-    })
-);
+export const CategoryChips = styled(SimpleFlexContainer)<{
+    hasIndex?: boolean;
+}>(({ hasIndex = true }) => ({
+    marginLeft: hasIndex ? '1rem' : '0',
+    gap: '0.5rem',
+}));
 
 export const CategoryChip = styled(Chip)({
     maxWidth: '10rem',
@@ -234,14 +248,19 @@ export const ViewGridCard = styled(Card)(({ theme }) => ({
     padding: '1rem',
     borderRadius: '0.75rem',
     transition: 'all 0.2s ease',
-    boxShadow: theme.palette.mode === 'dark'
-        ? '0 0.25rem 0.75rem rgba(255,160,0,0.15)'
-        : '0 0.25rem 1rem rgba(0, 0, 0, 0.08), 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04)',
-    border: theme.palette.mode === 'light' ? '1px solid rgba(0, 0, 0, 0.06)' : 'none',
+    boxShadow:
+        theme.palette.mode === 'dark'
+            ? '0 0.25rem 0.75rem rgba(255,160,0,0.15)'
+            : '0 0.25rem 1rem rgba(0, 0, 0, 0.08), 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04)',
+    border:
+        theme.palette.mode === 'light'
+            ? '1px solid rgba(0, 0, 0, 0.06)'
+            : 'none',
     '&:hover': {
-        boxShadow: theme.palette.mode === 'dark'
-            ? '0 0.375rem 1rem rgba(255,160,0,0.25)'
-            : '0 0.5rem 1.5rem rgba(255, 160, 0, 0.12), 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08)',
+        boxShadow:
+            theme.palette.mode === 'dark'
+                ? '0 0.375rem 1rem rgba(255,160,0,0.25)'
+                : '0 0.5rem 1.5rem rgba(255, 160, 0, 0.12), 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08)',
     },
 }));
 

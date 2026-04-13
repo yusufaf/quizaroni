@@ -9,7 +9,11 @@ import {
 } from '@mui/material';
 import { Studyset } from 'shared/types';
 import { ChangeEvent, useState, useEffect, useCallback, useRef } from 'react';
-import { CustomInputsContainer, CustomInputRow, StyledTextField } from './styles';
+import {
+    CustomInputsContainer,
+    CustomInputRow,
+    StyledTextField,
+} from './styles';
 import { LABEL_TERMINOLOGIES } from 'shared/constants';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
 import { Check } from '@mui/icons-material';
@@ -31,7 +35,9 @@ const LabelTerminologies = ({ studyset }: Props) => {
 
     useEffect(() => {
         if (isCustomTerminology) {
-            setCustomTerminology(studyset?.metadata?.customLabelTerminology || '');
+            setCustomTerminology(
+                studyset?.metadata?.customLabelTerminology || ''
+            );
         }
     }, [studyset, isCustomTerminology]);
 
@@ -94,7 +100,10 @@ const LabelTerminologies = ({ studyset }: Props) => {
     return (
         <div>
             <FormControl>
-                <FormLabel id="label-terminology-radio-group-label" sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}>
+                <FormLabel
+                    id="label-terminology-radio-group-label"
+                    sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}
+                >
                     {t('studysetSettings.labelTerminology')}
                 </FormLabel>
                 <RadioGroup
@@ -113,7 +122,9 @@ const LabelTerminologies = ({ studyset }: Props) => {
                             <FormControlLabel
                                 value={value}
                                 control={<Radio />}
-                                label={t(`terminology.label.${value.toLowerCase()}`)}
+                                label={t(
+                                    `terminology.label.${value.toLowerCase()}`
+                                )}
                             />
                             {value === LABEL_TERMINOLOGIES.CUSTOM &&
                                 isCustomTerminology && (
@@ -123,21 +134,29 @@ const LabelTerminologies = ({ studyset }: Props) => {
                                             color="text.secondary"
                                             sx={{ marginBottom: '0.25rem' }}
                                         >
-                                            {t('studysetSettings.defineCustomLabelTerminology')}
+                                            {t(
+                                                'studysetSettings.defineCustomLabelTerminology'
+                                            )}
                                         </Typography>
                                         <CustomInputRow>
                                             <StyledTextField
                                                 placeholder="e.g., Card, Item, Entry"
-                                                label={t('studysetSettings.customTerminology')}
+                                                label={t(
+                                                    'studysetSettings.customTerminology'
+                                                )}
                                                 size="small"
-                                                onChange={onCustomTerminologyChange}
+                                                onChange={
+                                                    onCustomTerminologyChange
+                                                }
                                                 value={customTerminology}
                                             />
                                         </CustomInputRow>
                                         {customTerminology && isSaved && (
                                             <Chip
                                                 icon={<Check />}
-                                                label={t('studysetSettings.saved')}
+                                                label={t(
+                                                    'studysetSettings.saved'
+                                                )}
                                                 color="success"
                                                 size="small"
                                                 sx={{ width: 'fit-content' }}

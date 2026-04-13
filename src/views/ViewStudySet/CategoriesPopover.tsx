@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Popover, Typography } from "@mui/material/";
-import { CategoryChip } from "./styles";
+import { useState } from 'react';
+import { Popover, Typography } from '@mui/material/';
+import { CategoryChip } from './styles';
 
 type Props = {
     categories: string[];
@@ -18,12 +18,10 @@ const CategoriesPopover = ({ categories = [] }: Props) => {
 
     const open = Boolean(anchorEl);
 
-    console.log("Re-rendering popover");
-
     return (
         <>
             <CategoryChip
-                aria-owns={open ? "mouse-over-popover" : undefined}
+                aria-owns={open ? 'mouse-over-popover' : undefined}
                 aria-haspopup="true"
                 onMouseEnter={handlePopoverOpen}
                 onMouseLeave={handlePopoverClose}
@@ -33,24 +31,24 @@ const CategoriesPopover = ({ categories = [] }: Props) => {
             <Popover
                 id="mouse-over-popover"
                 sx={{
-                    pointerEvents: "none",
-                    maxWidth: "70rem",
+                    pointerEvents: 'none',
+                    maxWidth: '70rem',
                 }}
                 open={open}
                 anchorEl={anchorEl}
                 anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
+                    vertical: 'top',
+                    horizontal: 'right',
                 }}
                 transformOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
+                    vertical: 'top',
+                    horizontal: 'left',
                 }}
                 onClose={handlePopoverClose}
                 disableRestoreFocus
             >
-                <Typography sx={{ p: 2, borderRadius: "0.25rem" }}>
-                    {categories.map((category) => category).join(", ")}
+                <Typography sx={{ p: 2, borderRadius: '0.25rem' }}>
+                    {categories.map((category) => category).join(', ')}
                 </Typography>
             </Popover>
         </>

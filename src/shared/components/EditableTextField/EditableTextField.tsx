@@ -1,9 +1,9 @@
-import { TextField, Typography } from "@mui/material/";
-import { useState } from "react";
+import { TextField, Typography } from '@mui/material/';
+import { useState } from 'react';
 
 type Props = {
     isEditing: boolean;
-    style?: Object;
+    style?: object;
     value: string;
     placeholder?: string;
     onBlur: (editedValue: string) => void;
@@ -13,7 +13,7 @@ const EditableTextField = ({
     isEditing,
     style = {},
     value,
-    placeholder = "No value",
+    placeholder = 'No value',
     onBlur,
 }: Props) => {
     const [editedValue, setEditedValue] = useState(value);
@@ -31,8 +31,8 @@ const EditableTextField = ({
             {!isEditing ? (
                 <Typography
                     sx={{
-                        wordBreak: "break-word",
-                        width: "100%",
+                        wordBreak: 'break-word',
+                        width: '100%',
                         opacity: value ? 1 : 0.5, // Adjust opacity
                     }}
                 >

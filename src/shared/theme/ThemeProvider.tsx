@@ -12,16 +12,21 @@ type Props = {
 };
 
 export const CustomThemeProvider = ({ children }: Props) => {
-    const initialThemeName = (localStorage.getItem('appTheme') ?? LIGHT) as ThemeName;
-    const initialFontScale = Number(localStorage.getItem('fontSizeScale') ?? '1');
+    const initialThemeName = (localStorage.getItem('appTheme') ??
+        LIGHT) as ThemeName;
+    const initialFontScale = Number(
+        localStorage.getItem('fontSizeScale') ?? '1'
+    );
 
     const [theme, setTheme] = useState<ThemeName>(initialThemeName);
-    const [fontSizeScale, setFontSizeScaleState] = useState<number>(initialFontScale);
+    const [fontSizeScale, setFontSizeScaleState] =
+        useState<number>(initialFontScale);
     const [isDarkMode, setIsDarkMode] = useState<boolean>(theme === DARK);
 
     // Recreate theme when theme name OR font scale changes
     const muiTheme = useMemo(() => {
-        const themeFactory = theme === DARK ? createDarkTheme : createLightTheme;
+        const themeFactory =
+            theme === DARK ? createDarkTheme : createLightTheme;
         return themeFactory(fontSizeScale);
     }, [theme, fontSizeScale]);
 

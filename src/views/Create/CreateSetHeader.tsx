@@ -1,5 +1,11 @@
 import { ArrowBack, Create } from '@mui/icons-material';
-import { Button, Typography, Autocomplete, TextField, Chip } from '@mui/material';
+import {
+    Button,
+    Typography,
+    Autocomplete,
+    TextField,
+    Chip,
+} from '@mui/material';
 import { BoldTypography } from 'styles/AppStyles';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import HeaderAdvancedSection from './HeaderAdvancedSection';
@@ -16,6 +22,7 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGetUser } from 'state/api/usersAPI';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
 type Props = {
     advancedSectionProps: any;
@@ -44,8 +51,9 @@ const CreateSetHeader = ({
     const { id: studySetUUID } = useParams();
     const { t } = useTranslation();
 
-    const { data: { user: { labels: userLabels = [] } } = DEFAULT_USER_RESPONSE } =
-        useGetUser();
+    const {
+        data: { user: { labels: userLabels = [] } } = DEFAULT_USER_RESPONSE,
+    } = useGetUser();
 
     const handleBackToViewing = () => {
         navigate(`/view/${studySetUUID}`);
@@ -100,9 +108,14 @@ const CreateSetHeader = ({
                                 options={userLabels}
                                 value={selectedLabels}
                                 onChange={(_event, newValue) => {
-                                    // Soft limit warning at 10 labels
                                     if (newValue.length > 10) {
-                                        console.warn('Consider using fewer than 10 labels for better organization');
+                                        toast.warning(
+                                            t('create.labelsSoftLimitWarning'),
+                                            {
+                                                toastId:
+                                                    'create-labels-soft-limit',
+                                            }
+                                        );
                                     }
                                     onLabelsChange(newValue);
                                 }}
@@ -120,7 +133,11 @@ const CreateSetHeader = ({
                                     <TextField
                                         {...params}
                                         variant="outlined"
-                                        placeholder={selectedLabels.length === 0 ? t('create.addLabels') : ""}
+                                        placeholder={
+                                            selectedLabels.length === 0
+                                                ? t('create.addLabels')
+                                                : ''
+                                        }
                                         size="small"
                                     />
                                 )}

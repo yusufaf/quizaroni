@@ -6,7 +6,10 @@ import MatchingStudy from './MatchingStudy';
 import TypeWriteStudy from './TypeWriteStudy';
 
 const StudyMode = () => {
-    const { studysetId, mode } = useParams<{ studysetId: string; mode: string }>();
+    const { studysetId, mode } = useParams<{
+        studysetId: string;
+        mode: string;
+    }>();
 
     if (!studysetId) {
         return <Navigate to="/" replace />;

@@ -20,7 +20,10 @@ const NotificationsDialog = (props: Props) => {
 
     return (
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
-            <StandardDialogTitle title={t('dialogs.share.title')} onClose={onClose} />
+            <StandardDialogTitle
+                title={t('dialogs.share.title')}
+                onClose={onClose}
+            />
             <DialogContent></DialogContent>
         </StyledDialog>
     );

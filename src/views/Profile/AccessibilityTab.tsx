@@ -1,10 +1,5 @@
 import { Accessibility } from '@mui/icons-material';
-import {
-    CircularProgress,
-    Slider,
-    Typography,
-    Box,
-} from '@mui/material';
+import { CircularProgress, Slider, Typography, Box } from '@mui/material';
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { SimpleFlexContainer } from 'shared/styles/AppStyles';
 import { User } from 'shared/types';
@@ -36,7 +31,9 @@ type Props = {
 const AccessibilityTab = ({ userData }: Props) => {
     const { t } = useTranslation();
     const { setFontSizeScale, fontSizeScale: currentScale } = useTheme();
-    const { metadata: { fontSizeScale = 1 } } = userData;
+    const {
+        metadata: { fontSizeScale = 1 },
+    } = userData;
 
     const [loadingID, setLoadingID] = useState<string>('');
     const [localScale, setLocalScale] = useState<number>(fontSizeScale);
@@ -57,14 +54,17 @@ const AccessibilityTab = ({ userData }: Props) => {
     const { mutate: updateUserMetadata } = useUpdateUserMetadata();
 
     // Debounced theme update - only update theme after user stops dragging for 100ms
-    const debouncedThemeUpdate = useCallback((scale: number) => {
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
-        debounceTimerRef.current = setTimeout(() => {
-            setFontSizeScale(scale);
-        }, 100);
-    }, [setFontSizeScale]);
+    const debouncedThemeUpdate = useCallback(
+        (scale: number) => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+            debounceTimerRef.current = setTimeout(() => {
+                setFontSizeScale(scale);
+            }, 100);
+        },
+        [setFontSizeScale]
+    );
 
     const handleSliderChange = (_event: Event, newValue: number | number[]) => {
         const scale = Array.isArray(newValue) ? newValue[0] : newValue;
@@ -75,7 +75,10 @@ const AccessibilityTab = ({ userData }: Props) => {
         }
     };
 
-    const handleSliderChangeCommitted = (_event: Event | React.SyntheticEvent, newValue: number | number[]) => {
+    const handleSliderChangeCommitted = (
+        _event: Event | React.SyntheticEvent,
+        newValue: number | number[]
+    ) => {
         const scale = Array.isArray(newValue) ? newValue[0] : newValue;
 
         if (scale === undefined) return;
@@ -97,7 +100,6 @@ const AccessibilityTab = ({ userData }: Props) => {
             },
             {
                 onSuccess: () => {
-                    console.log('Font size scale updated successfully');
                     setLoadingID('');
                 },
                 onError: (error) => {
@@ -125,15 +127,21 @@ const AccessibilityTab = ({ userData }: Props) => {
             <ActionColumn>
                 <ActionHeader>
                     <Accessibility />
-                    <Typography variant="h6">{t('profile.fontSize')}</Typography>
+                    <Typography variant="h6">
+                        {t('profile.fontSize')}
+                    </Typography>
                 </ActionHeader>
                 <Typography variant="body2" color="text.secondary">
                     {t('profile.fontSizeDescription')}
                 </Typography>
                 <Box sx={{ width: '100%', maxWidth: '25rem', mt: 2 }}>
-                    <SimpleFlexContainer style={{ gap: '1rem', marginBottom: '0.5rem' }}>
+                    <SimpleFlexContainer
+                        style={{ gap: '1rem', marginBottom: '0.5rem' }}
+                    >
                         <Typography variant="body2" color="text.primary">
-                            {t('profile.currentScale', { scale: localScale.toFixed(3) })}
+                            {t('profile.currentScale', {
+                                scale: localScale.toFixed(3),
+                            })}
                         </Typography>
                         {fontSizeLoading && <CircularProgress size={20} />}
                     </SimpleFlexContainer>

@@ -50,7 +50,11 @@ const HomeStudySetCard = ({ studyset }: Props) => {
         data: {
             user: {
                 userUUID = '',
-                metadata: { preferredDateFormat, preferredTimeFormat, showSeconds },
+                metadata: {
+                    preferredDateFormat,
+                    preferredTimeFormat,
+                    showSeconds,
+                },
             },
         } = DEFAULT_USER_RESPONSE,
     } = useGetUser();
@@ -142,7 +146,8 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                                 {formatDateUsingPreferred(
                                     createdAt,
                                     preferredDateFormat,
-                                    preferredTimeFormat ?? TIME_FORMATS.TWELVE_HOUR,
+                                    preferredTimeFormat ??
+                                        TIME_FORMATS.TWELVE_HOUR,
                                     showSeconds ?? false
                                 )}
                             </Typography>
@@ -153,7 +158,8 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                                 {formatDateUsingPreferred(
                                     lastViewed,
                                     preferredDateFormat,
-                                    preferredTimeFormat ?? TIME_FORMATS.TWELVE_HOUR,
+                                    preferredTimeFormat ??
+                                        TIME_FORMATS.TWELVE_HOUR,
                                     showSeconds ?? false
                                 )}
                             </Typography>

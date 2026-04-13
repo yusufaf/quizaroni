@@ -1,4 +1,8 @@
-import { Delete as DeleteIcon, SwapHoriz as SwapIcon, BrokenImage } from '@mui/icons-material';
+import {
+    Delete as DeleteIcon,
+    SwapHoriz as SwapIcon,
+    BrokenImage,
+} from '@mui/icons-material';
 import { CircularProgress, IconButton, Typography } from '@mui/material';
 import { CardFileMetadata } from 'shared/types';
 import { formatBytes } from 'utilities/general';
@@ -91,7 +95,12 @@ interface ImagePreviewProps {
     isDeleting?: boolean;
 }
 
-const ImagePreview = ({ file, onDelete, onReplace, isDeleting = false }: ImagePreviewProps) => {
+const ImagePreview = ({
+    file,
+    onDelete,
+    onReplace,
+    isDeleting = false,
+}: ImagePreviewProps) => {
     const [imageError, setImageError] = useState(false);
     const [showActions, setShowActions] = useState(false);
 
@@ -155,7 +164,11 @@ const ImagePreview = ({ file, onDelete, onReplace, isDeleting = false }: ImagePr
                 </LoadingContainer>
             )}
             <FileInfo>
-                <Typography variant="caption" noWrap sx={{ fontSize: '0.625rem' }}>
+                <Typography
+                    variant="caption"
+                    noWrap
+                    sx={{ fontSize: '0.625rem' }}
+                >
                     {file.name}
                 </Typography>
                 <Typography variant="caption" sx={{ fontSize: '0.625rem' }}>

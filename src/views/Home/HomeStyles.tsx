@@ -17,9 +17,10 @@ export const HomePage = styled(BasePage)(({ theme }) => ({
 }));
 
 export const HomePaper = styled(Paper)(({ theme }) => ({
-    boxShadow: theme.palette.mode === 'dark'
-        ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-        : '0 8px 32px rgba(0, 0, 0, 0.08)',
+    boxShadow:
+        theme.palette.mode === 'dark'
+            ? '0 8px 32px rgba(0, 0, 0, 0.4)'
+            : '0 8px 32px rgba(0, 0, 0, 0.08)',
 }));
 
 export const HomeContainer = styled(Box)({
@@ -77,17 +78,19 @@ export const HomeSetCard = styled(Card)(({ theme }) => ({
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     cursor: 'pointer',
     border: `1px solid transparent`,
-    boxShadow: theme.palette.mode === 'dark'
-        ? '0 2px 8px rgba(0, 0, 0, 0.3)'
-        : '0 2px 8px rgba(0, 0, 0, 0.06)',
+    boxShadow:
+        theme.palette.mode === 'dark'
+            ? '0 2px 8px rgba(0, 0, 0, 0.3)'
+            : '0 2px 8px rgba(0, 0, 0, 0.06)',
     '&&': {
         borderRadius: '0.75rem',
     },
     '&:hover': {
         background: theme.palette.action.hover,
-        boxShadow: theme.palette.mode === 'dark'
-            ? '0 8px 24px rgba(0, 0, 0, 0.5)'
-            : '0 8px 24px rgba(0, 0, 0, 0.12)',
+        boxShadow:
+            theme.palette.mode === 'dark'
+                ? '0 8px 24px rgba(0, 0, 0, 0.5)'
+                : '0 8px 24px rgba(0, 0, 0, 0.12)',
         transform: 'translateY(-4px)',
         borderColor: theme.palette.primary.main,
     },

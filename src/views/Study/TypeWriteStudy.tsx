@@ -21,13 +21,17 @@ import StudyHeader from './shared/StudyHeader';
 import StudyResults from './shared/StudyResults';
 import SettingsDialog from './shared/SettingsDialog';
 import { BasePage } from 'styles/AppStyles';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     studysetId: string;
 };
 
 const TypeWriteStudy = ({ studysetId }: Props) => {
-    const { data: studysetResponse, isLoading } = useGetStudyset({ studysetUUID: studysetId });
+    const { t } = useTranslation('study');
+    const { data: studysetResponse, isLoading } = useGetStudyset({
+        studysetUUID: studysetId,
+    });
     const studyset = studysetResponse?.studyset ?? ({} as Studyset);
 
     const {
@@ -106,14 +110,24 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
         return track[str2.length][str1.length];
     };
 
-    const checkAnswer = (answer: string, correctAnswer: string, difficulty: string): boolean => {
+    const checkAnswer = (
+        answer: string,
+        correctAnswer: string,
+        difficulty: string
+    ): boolean => {
         const normalizedAnswer = answer.toLowerCase().trim();
         const normalizedCorrect = correctAnswer.toLowerCase().trim();
 
         if (normalizedAnswer === normalizedCorrect) return true;
 
-        const distance = levenshteinDistance(normalizedAnswer, normalizedCorrect);
-        const maxLength = Math.max(normalizedAnswer.length, normalizedCorrect.length);
+        const distance = levenshteinDistance(
+            normalizedAnswer,
+            normalizedCorrect
+        );
+        const maxLength = Math.max(
+            normalizedAnswer.length,
+            normalizedCorrect.length
+        );
         const similarity = 1 - distance / maxLength;
 
         // Difficulty-based thresholds
@@ -130,7 +144,11 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
         if (!currentCard || !activeSession) return;
 
         const difficulty = activeSession.settings.difficulty || 'medium';
-        const correct = checkAnswer(userAnswer, currentCard.definition, difficulty);
+        const correct = checkAnswer(
+            userAnswer,
+            currentCard.definition,
+            difficulty
+        );
 
         setIsCorrect(correct);
         setShowFeedback(true);
@@ -147,12 +165,16 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
             scoreToAdd += hintsUsed * SCORING.HINT_PENALTY;
             scoreToAdd = Math.max(0, scoreToAdd);
 
-            setFeedbackMessage('✓ Correct!');
+            setFeedbackMessage(t('typeWriteStudy.feedbackCorrect'));
             incrementScore(scoreToAdd);
             updateStreak(true);
         } else {
             quality = 1;
-            setFeedbackMessage(`✗ Incorrect. The correct answer is: "${currentCard.definition}"`);
+            setFeedbackMessage(
+                t('typeWriteStudy.feedbackIncorrect', {
+                    answer: currentCard.definition,
+                })
+            );
             updateStreak(false);
         }
 
@@ -175,7 +197,8 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
     const handleNext = () => {
         if (!activeSession) return;
 
-        const isLastCard = activeSession.currentCardIndex === activeSession.cards.length - 1;
+        const isLastCard =
+            activeSession.currentCardIndex === activeSession.cards.length - 1;
 
         if (isLastCard) {
             const result = endSession();
@@ -237,10 +260,15 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
         });
     };
 
-    if (isLoading || !activeSession || !activeSession.cards || activeSession.cards.length === 0) {
+    if (
+        isLoading ||
+        !activeSession ||
+        !activeSession.cards ||
+        activeSession.cards.length === 0
+    ) {
         return (
             <BasePage>
-                <Typography>Loading...</Typography>
+                <Typography>{t('typeWriteStudy.loading')}</Typography>
             </BasePage>
         );
     }
@@ -285,127 +313,181 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
             >
                 <Card
                     elevation={6}
-                    component={motion.div}
-                    // @ts-ignore
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
                     sx={{
                         maxWidth: '50rem',
                         width: '100%',
                         borderRadius: '1rem',
                     }}
                 >
-                    <CardContent sx={{ p: '2.5rem' }}>
-                        {/* Term Display */}
-                        <Typography
-                            variant="h5"
-                            sx={{
-                                fontWeight: 600,
-                                mb: '2rem',
-                                textAlign: 'center',
-                            }}
-                        >
-                            {currentCard.term}
-                        </Typography>
-
-                        <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            sx={{ mb: '1rem', textAlign: 'center' }}
-                        >
-                            Type the definition below:
-                        </Typography>
-
-                        {/* Answer Input */}
-                        <TextField
-                            fullWidth
-                            multiline
-                            rows={4}
-                            value={userAnswer}
-                            onChange={(e) => setUserAnswer(e.target.value)}
-                            onKeyPress={handleKeyPress}
-                            disabled={showFeedback}
-                            placeholder="Enter your answer..."
-                            variant="outlined"
-                            sx={{ mb: '1.5rem' }}
-                        />
-
-                        {/* Hints Section */}
-                        <Box sx={{ mb: '1.5rem' }}>
-                            <Button
-                                startIcon={<Lightbulb />}
-                                onClick={handleUseHint}
-                                disabled={showFeedback || hintsUsed >= 3}
-                                size="small"
-                                sx={{ mb: '1rem' }}
+                    <Box
+                        component={motion.div}
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        sx={{ borderRadius: 'inherit' }}
+                    >
+                        <CardContent sx={{ p: '2.5rem' }}>
+                            {/* Term Display */}
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    fontWeight: 600,
+                                    mb: '2rem',
+                                    textAlign: 'center',
+                                }}
                             >
-                                Use Hint ({3 - hintsUsed} remaining) {hintsUsed > 0 && `(${SCORING.HINT_PENALTY} pts)`}
-                            </Button>
+                                {currentCard.term}
+                            </Typography>
 
-                            <Collapse in={showHints}>
+                            <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={{ mb: '1rem', textAlign: 'center' }}
+                            >
+                                {t('typeWriteStudy.typeDefinitionBelow')}
+                            </Typography>
+
+                            {/* Answer Input */}
+                            <TextField
+                                fullWidth
+                                multiline
+                                rows={4}
+                                value={userAnswer}
+                                onChange={(e) => setUserAnswer(e.target.value)}
+                                onKeyPress={handleKeyPress}
+                                disabled={showFeedback}
+                                placeholder={t(
+                                    'typeWriteStudy.answerPlaceholder'
+                                )}
+                                variant="outlined"
+                                sx={{ mb: '1.5rem' }}
+                            />
+
+                            {/* Hints Section */}
+                            <Box sx={{ mb: '1.5rem' }}>
+                                <Button
+                                    startIcon={<Lightbulb />}
+                                    onClick={handleUseHint}
+                                    disabled={showFeedback || hintsUsed >= 3}
+                                    size="small"
+                                    sx={{ mb: '1rem' }}
+                                >
+                                    {t('typeWriteStudy.useHint', {
+                                        remaining: 3 - hintsUsed,
+                                    })}
+                                    {hintsUsed > 0
+                                        ? ` ${t('typeWriteStudy.hintPenaltySuffix', { points: SCORING.HINT_PENALTY })}`
+                                        : ''}
+                                </Button>
+
+                                <Collapse in={showHints}>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '0.5rem',
+                                            p: '1rem',
+                                            backgroundColor:
+                                                'rgba(255, 160, 0, 0.1)',
+                                            borderRadius: '0.5rem',
+                                            border: '1px solid rgba(255, 160, 0, 0.3)',
+                                        }}
+                                    >
+                                        {hintsUsed >= 1 && (
+                                            <Chip
+                                                label={t(
+                                                    'typeWriteStudy.hint1FirstLetter',
+                                                    {
+                                                        letter: correctAnswer.charAt(
+                                                            0
+                                                        ),
+                                                    }
+                                                )}
+                                                size="small"
+                                                color="primary"
+                                                variant="outlined"
+                                            />
+                                        )}
+                                        {hintsUsed >= 2 && (
+                                            <Chip
+                                                label={t(
+                                                    'typeWriteStudy.hint2FirstThree',
+                                                    {
+                                                        letters:
+                                                            correctAnswer.substring(
+                                                                0,
+                                                                3
+                                                            ),
+                                                    }
+                                                )}
+                                                size="small"
+                                                color="primary"
+                                                variant="outlined"
+                                            />
+                                        )}
+                                        {hintsUsed >= 3 && (
+                                            <Chip
+                                                label={t(
+                                                    'typeWriteStudy.hint3Length',
+                                                    {
+                                                        count: correctAnswer.length,
+                                                    }
+                                                )}
+                                                size="small"
+                                                color="primary"
+                                                variant="outlined"
+                                            />
+                                        )}
+                                    </Box>
+                                </Collapse>
+                            </Box>
+
+                            {/* Submit Button */}
+                            {!showFeedback && (
                                 <Box
                                     sx={{
                                         display: 'flex',
-                                        flexDirection: 'column',
-                                        gap: '0.5rem',
-                                        p: '1rem',
-                                        backgroundColor: 'rgba(255, 160, 0, 0.1)',
-                                        borderRadius: '0.5rem',
-                                        border: '1px solid rgba(255, 160, 0, 0.3)',
+                                        justifyContent: 'center',
                                     }}
                                 >
-                                    {hintsUsed >= 1 && (
-                                        <Chip
-                                            label={`Hint 1: First letter is "${correctAnswer.charAt(0)}"`}
-                                            size="small"
-                                            color="primary"
-                                            variant="outlined"
-                                        />
-                                    )}
-                                    {hintsUsed >= 2 && (
-                                        <Chip
-                                            label={`Hint 2: First 3 letters are "${correctAnswer.substring(0, 3)}"`}
-                                            size="small"
-                                            color="primary"
-                                            variant="outlined"
-                                        />
-                                    )}
-                                    {hintsUsed >= 3 && (
-                                        <Chip
-                                            label={`Hint 3: Length is ${correctAnswer.length} characters`}
-                                            size="small"
-                                            color="primary"
-                                            variant="outlined"
-                                        />
-                                    )}
+                                    <Button
+                                        variant="contained"
+                                        size="large"
+                                        onClick={handleSubmit}
+                                        disabled={!userAnswer.trim()}
+                                        sx={{ minWidth: '10rem' }}
+                                    >
+                                        {t('typeWriteStudy.submitAnswer')}
+                                    </Button>
                                 </Box>
-                            </Collapse>
-                        </Box>
+                            )}
 
-                        {/* Submit Button */}
-                        {!showFeedback && (
-                            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <Button
-                                    variant="contained"
-                                    size="large"
-                                    onClick={handleSubmit}
-                                    disabled={!userAnswer.trim()}
-                                    sx={{ minWidth: '10rem' }}
-                                >
-                                    Submit Answer
-                                </Button>
-                            </Box>
-                        )}
-
-                        {/* Difficulty Info */}
-                        <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ display: 'block', mt: '1.5rem', textAlign: 'center' }}
-                        >
-                            Difficulty: {activeSession.settings.difficulty || 'medium'} | Press Enter to submit
-                        </Typography>
-                    </CardContent>
+                            {/* Difficulty Info */}
+                            <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{
+                                    display: 'block',
+                                    mt: '1.5rem',
+                                    textAlign: 'center',
+                                }}
+                            >
+                                {(() => {
+                                    const d =
+                                        activeSession.settings.difficulty ||
+                                        'medium';
+                                    const levelKey =
+                                        d === 'easy'
+                                            ? 'typeWriteStudy.difficultyEasy'
+                                            : d === 'hard'
+                                              ? 'typeWriteStudy.difficultyHard'
+                                              : 'typeWriteStudy.difficultyMedium';
+                                    return t('typeWriteStudy.difficultyLine', {
+                                        level: t(levelKey),
+                                    });
+                                })()}
+                            </Typography>
+                        </CardContent>
+                    </Box>
                 </Card>
             </Box>
 

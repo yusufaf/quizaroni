@@ -67,13 +67,15 @@ export class ListPdfGenerator extends BasePdfGenerator {
         const startX = (doc.internal.pageSize.getWidth() - tableWidth) / 2;
 
         // Determine colors
-        const headerFillColor = settings.showColors && card.backgroundColor
-            ? this.hexToRgb(card.backgroundColor)
-            : { r: 245, g: 245, b: 245 };
+        const headerFillColor =
+            settings.showColors && card.backgroundColor
+                ? this.hexToRgb(card.backgroundColor)
+                : { r: 245, g: 245, b: 245 };
 
-        const headerTextColor = settings.showColors && card.textColor
-            ? this.hexToRgb(card.textColor)
-            : { r: 0, g: 0, b: 0 };
+        const headerTextColor =
+            settings.showColors && card.textColor
+                ? this.hexToRgb(card.textColor)
+                : { r: 0, g: 0, b: 0 };
 
         // Prepare table data
         const tableData = [[card.term, card.definition]];
@@ -89,10 +91,18 @@ export class ListPdfGenerator extends BasePdfGenerator {
                     '',
                 ],
             ],
-            body: [[
-                { content: `${term1Label}:\n${card.term}`, styles: { cellPadding: 8 } },
-                { content: `${term2Label}:\n${card.definition}`, styles: { cellPadding: 8 } },
-            ]],
+            body: [
+                [
+                    {
+                        content: `${term1Label}:\n${card.term}`,
+                        styles: { cellPadding: 8 },
+                    },
+                    {
+                        content: `${term2Label}:\n${card.definition}`,
+                        styles: { cellPadding: 8 },
+                    },
+                ],
+            ],
             theme: 'grid',
             columnStyles: {
                 0: { cellWidth: columnWidth },
@@ -132,8 +142,7 @@ export class ListPdfGenerator extends BasePdfGenerator {
             doc.setFontSize(10);
             doc.setTextColor(100, 100, 100);
             doc.setFont('helvetica', 'normal');
-            const categoriesText =
-                'Categories: ' + card.categories.join(', ');
+            const categoriesText = 'Categories: ' + card.categories.join(', ');
             const categoryLines = this.wrapText(
                 doc,
                 categoriesText,

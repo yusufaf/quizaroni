@@ -54,12 +54,10 @@ const NavBar = (props: Props) => {
 
     const handleLogout = async () => {
         try {
-            const result = await signOut();
-            console.log('Sign-In Result = ', result);
-
+            await signOut();
             setAuthenticated(false);
         } catch (error) {
-            console.log('error signing out: ', error);
+            console.error('Error signing out:', error);
         }
     };
 
@@ -125,7 +123,9 @@ const NavBar = (props: Props) => {
                         <NavRightActions>
                             {authenticated ? (
                                 <Tooltip title={t('nav.logout')}>
-                                    <LogoutIconButton onClick={() => handleLogout()}>
+                                    <LogoutIconButton
+                                        onClick={() => handleLogout()}
+                                    >
                                         <LogoutIcon />
                                     </LogoutIconButton>
                                 </Tooltip>

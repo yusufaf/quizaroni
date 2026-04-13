@@ -32,7 +32,10 @@ export class ImageLoader {
                         const dataURL = canvas.toDataURL('image/jpeg', 0.9);
                         resolve(dataURL);
                     } catch (error) {
-                        console.error('Error converting image to data URL:', error);
+                        console.error(
+                            'Error converting image to data URL:',
+                            error
+                        );
                         resolve(null);
                     }
                 };

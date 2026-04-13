@@ -27,7 +27,10 @@ export const ColorPickerPanel = ({ color, onChange }: Props) => {
 
     return (
         <Box>
-            <Paper variant="outlined" sx={{ p: '1rem', display: 'inline-block' }}>
+            <Paper
+                variant="outlined"
+                sx={{ p: '1rem', display: 'inline-block' }}
+            >
                 <StyledChromePicker color={color} onChange={onChange} />
             </Paper>
         </Box>

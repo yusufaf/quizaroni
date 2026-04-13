@@ -1,17 +1,10 @@
-import {
-    Button,
-    Tooltip,
-    Dialog,
-    DialogContentText,
-    Typography,
-    TextField,
-} from '@mui/material/';
+import { Button, Dialog, DialogContentText, TextField } from '@mui/material/';
 import * as C from 'shared/constants';
-import { StyledDialogTitle, StyledDialogActions } from 'styles/AppStyles';
-import CloseDialogButton from 'components/StandardDialogTitle/StandardDialogTitle';
+import { StyledDialogActions } from 'styles/AppStyles';
 import { Dispatch, SetStateAction } from 'react';
 import { DeleteDialogContent } from './ProfileStyles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     open: boolean;
@@ -21,6 +14,7 @@ type Props = {
 };
 
 const DeleteAccountDialog = (props: Props) => {
+    const { t } = useTranslation('profile');
     const { open, handleClose, deletePassword, setDeletePassword } = props;
 
     // deleteUser(user).then(() => {
@@ -34,17 +28,18 @@ const DeleteAccountDialog = (props: Props) => {
         // TODO
     };
 
-    console.log({ deletePassword });
-
     return (
         <Dialog open={open} onClose={handleClose}>
-            <StandardDialogTitle title="Delete Account" onClose={handleClose} />
+            <StandardDialogTitle
+                title={t('deleteAccountDialog.title')}
+                onClose={handleClose}
+            />
             <DeleteDialogContent>
                 <DialogContentText>{C.DELETE_ACCOUNT_MSG}</DialogContentText>
                 <TextField
                     fullWidth={true}
-                    label="Password"
-                    placeholder="Enter your password"
+                    label={t('deleteAccountDialog.passwordLabel')}
+                    placeholder={t('deleteAccountDialog.passwordPlaceholder')}
                     value={deletePassword}
                     name="passwordInput"
                     onChange={(e) => setDeletePassword(e.target.value)}
@@ -61,7 +56,7 @@ const DeleteAccountDialog = (props: Props) => {
                     onClick={() => handleDeleteAccount()}
                     disabled={deletePassword === ''}
                 >
-                    Delete Account
+                    {t('deleteAccountDialog.confirmButton')}
                 </Button>
             </StyledDialogActions>
         </Dialog>

@@ -1,15 +1,15 @@
 {
-  "dev": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-quizaroni-dev-a9a7f-authRole",
-      "UnauthRoleArn": "arn:aws:iam::774905128304:role/amplify-quizaroni-dev-a9a7f-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::774905128304:role/amplify-quizaroni-dev-a9a7f-authRole",
-      "Region": "us-west-2",
-      "DeploymentBucketName": "amplify-quizaroni-dev-a9a7f-deployment",
-      "UnauthRoleName": "amplify-quizaroni-dev-a9a7f-unauthRole",
-      "StackName": "amplify-quizaroni-dev-a9a7f",
-      "StackId": "arn:aws:cloudformation:us-west-2:774905128304:stack/amplify-quizaroni-dev-a9a7f/b5dd3d30-3b37-11ef-9bc2-0a55a0a2f98f",
-      "AmplifyAppId": "d2iay6a8ctvc6h"
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-quizaroni-dev-a9a7f-authRole",
+            "UnauthRoleArn": "arn:aws:iam::774905128304:role/amplify-quizaroni-dev-a9a7f-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::774905128304:role/amplify-quizaroni-dev-a9a7f-authRole",
+            "Region": "us-west-2",
+            "DeploymentBucketName": "amplify-quizaroni-dev-a9a7f-deployment",
+            "UnauthRoleName": "amplify-quizaroni-dev-a9a7f-unauthRole",
+            "StackName": "amplify-quizaroni-dev-a9a7f",
+            "StackId": "arn:aws:cloudformation:us-west-2:774905128304:stack/amplify-quizaroni-dev-a9a7f/b5dd3d30-3b37-11ef-9bc2-0a55a0a2f98f",
+            "AmplifyAppId": "d2iay6a8ctvc6h"
+        }
     }
-  }
 }

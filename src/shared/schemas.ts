@@ -115,6 +115,7 @@ export const UserMetadataSchema = z.object({
     confirmDestructiveActions: z.boolean().optional(),
     defaultDownloadFormat: z.enum(['TXT', 'JSON', 'CSV', 'MD']),
     defaultTheme: z.enum(['light', 'dark']),
+    density: z.enum(['compact', 'standard', 'comfortable']).optional(),
     fontSizeScale: z.number().min(0.75).max(1.5).optional(),
     homeView: z.enum(['table', 'grid', 'html']),
     namedColors: z.array(NamedColorSchema),
@@ -122,7 +123,22 @@ export const UserMetadataSchema = z.object({
     preferredDateFormat: z.enum(['YYYY-MM-DD', 'DD/MM/YYYY', 'MM/DD/YYYY']),
     preferredTimeFormat: z.enum(['12h', '24h']).optional(),
     showSeconds: z.boolean().optional(),
+    visibleColumns: z.record(z.string(), z.boolean()).optional(),
 });
+
+// Strict schema for the JSON settings editor — rejects unknown keys
+const EDITOR_EXCLUDED_FIELDS = [
+    'avatar',
+    'namedColors',
+    'notifications',
+] as const;
+export const EditableUserMetadataSchema = UserMetadataSchema.omit({
+    avatar: true,
+    namedColors: true,
+    notifications: true,
+})
+    .partial()
+    .strict();
 
 export const UserSchema = z.object({
     createdAt: TimestampSchema,

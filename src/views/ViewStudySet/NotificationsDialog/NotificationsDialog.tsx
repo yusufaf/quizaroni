@@ -164,7 +164,10 @@ const NotificationsDialog = (props: Props) => {
                     // Clear optimistic state on error - reverts to server state
                     setOptimisticPrefs(null);
                     setError('Failed to save notification preferences.');
-                    console.error('Notification preferences update failed:', err);
+                    console.error(
+                        'Notification preferences update failed:',
+                        err
+                    );
                 },
             }
         );
@@ -360,7 +363,10 @@ const NotificationsDialog = (props: Props) => {
                             }}
                         >
                             <Box>
-                                <Typography variant="subtitle1" fontWeight={600}>
+                                <Typography
+                                    variant="subtitle1"
+                                    fontWeight={600}
+                                >
                                     {t('dialogs.notifications.masterToggle')}
                                 </Typography>
                                 <Typography
@@ -591,7 +597,9 @@ const NotificationsDialog = (props: Props) => {
                                                     ?.weeklyDigest ?? false
                                             }
                                             onChange={() =>
-                                                handleEmailToggle('weeklyDigest')
+                                                handleEmailToggle(
+                                                    'weeklyDigest'
+                                                )
                                             }
                                         />
                                     </Box>
@@ -619,7 +627,9 @@ const NotificationsDialog = (props: Props) => {
                                                 ?.inactivityNudges ?? false
                                         }
                                         onChange={() =>
-                                            handleEmailToggle('inactivityNudges')
+                                            handleEmailToggle(
+                                                'inactivityNudges'
+                                            )
                                         }
                                     />
                                 </NotificationRow>
@@ -710,11 +720,19 @@ const NotificationsDialog = (props: Props) => {
                                 <Divider sx={{ my: 2 }} />
 
                                 <Box>
-                                    <Typography variant="subtitle2" gutterBottom>
+                                    <Typography
+                                        variant="subtitle2"
+                                        gutterBottom
+                                    >
                                         <SnoozeIcon
-                                            sx={{ verticalAlign: 'middle', mr: 1 }}
+                                            sx={{
+                                                verticalAlign: 'middle',
+                                                mr: 1,
+                                            }}
                                         />
-                                        {t('dialogs.notifications.snooze.title')}
+                                        {t(
+                                            'dialogs.notifications.snooze.title'
+                                        )}
                                     </Typography>
                                     <Typography
                                         variant="caption"

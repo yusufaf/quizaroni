@@ -49,7 +49,16 @@ import {
     formatDateUsingPreferred,
     getFormattedTimestamp,
 } from 'shared/utilities/general';
-import { Box, Button, Chip, IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
+import {
+    Box,
+    Button,
+    Chip,
+    IconButton,
+    Menu,
+    MenuItem,
+    Tooltip,
+    Typography,
+} from '@mui/material';
 import { useStudySetsStore } from 'state/stores/studysets';
 
 // augment the props for the toolbar slot
@@ -90,13 +99,19 @@ const CustomToolbar = ({
             <GridToolbarFilterButton />
             <GridToolbarDensitySelector />
             <GridToolbarExport />
-            <Tooltip title={t?.('home.saveColumnsAndDensity') ?? 'Save visible columns and density'}>
+            <Tooltip
+                title={
+                    t?.('home.saveColumnsAndDensity') ??
+                    'Save visible columns and density'
+                }
+            >
                 <Button
                     variant="text"
                     startIcon={<Save />}
                     onClick={handleSavePreferences}
                 >
-                    {t?.('home.saveTablePreferences') ?? 'Save Table Preferences'}
+                    {t?.('home.saveTablePreferences') ??
+                        'Save Table Preferences'}
                 </Button>
             </Tooltip>
         </GridToolbarContainer>
@@ -160,109 +175,135 @@ const Home = (props: Props) => {
         )
         .filter(Boolean) as Studyset[];
 
-    const columns: GridColDef[] = useMemo(() => [
-        {
-            display: 'flex',
-            field: 'favorited',
-            headerName: t('home.columns.favorited'),
-            width: 75,
-            cellClassName: `favorited-cell`,
-            renderCell: (params: GridRenderCellParams<any, boolean>) => {
-                const currentFavorited = params.value;
-                return (
-                    <IconButton
-                        onClick={(event) => {
-                            event.stopPropagation();
-                            updateStudyset({
-                                studysetUUID: params.id as string,
-                                updates: {
-                                    favorited: !currentFavorited,
-                                },
-                            });
-                        }}
-                    >
-                        {currentFavorited ? (
-                            <Favorite color="primary" />
-                        ) : (
-                            <FavoriteBorder />
+    const columns: GridColDef[] = useMemo(
+        () => [
+            {
+                display: 'flex',
+                field: 'favorited',
+                headerName: t('home.columns.favorited'),
+                width: 75,
+                cellClassName: `favorited-cell`,
+                renderCell: (params: GridRenderCellParams<any, boolean>) => {
+                    const currentFavorited = params.value;
+                    return (
+                        <IconButton
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                updateStudyset({
+                                    studysetUUID: params.id as string,
+                                    updates: {
+                                        favorited: !currentFavorited,
+                                    },
+                                });
+                            }}
+                        >
+                            {currentFavorited ? (
+                                <Favorite color="primary" />
+                            ) : (
+                                <FavoriteBorder />
+                            )}
+                        </IconButton>
+                    );
+                },
+            },
+            {
+                field: 'title',
+                headerName: t('home.columns.title'),
+                width: 300,
+                renderCell: (params: GridRenderCellParams<any, any>) => (
+                    <GhostLink to={`/view/${params.id}`}>
+                        {params.value}
+                    </GhostLink>
+                ),
+            },
+            {
+                field: 'description',
+                headerName: t('home.columns.description'),
+                width: 300,
+            },
+            {
+                field: 'createdAt',
+                headerName: t('home.columns.created'),
+                width: 150,
+                valueFormatter: (value) => {
+                    return formatDateUsingPreferred(value, preferredDateFormat);
+                },
+            },
+            {
+                field: 'lastViewed',
+                headerName: t('home.columns.lastViewed'),
+                width: 150,
+                valueFormatter: (value) => {
+                    return formatDateUsingPreferred(value, preferredDateFormat);
+                },
+            },
+            {
+                field: 'updatedAt',
+                headerName: t('home.columns.lastUpdated'),
+                width: 150,
+                valueFormatter: (value) => {
+                    return formatDateUsingPreferred(value, preferredDateFormat);
+                },
+            },
+            {
+                field: 'numberOfCards',
+                headerName: t('home.columns.numberOfCards'),
+                width: 100,
+                valueGetter: (_value, row) => {
+                    return row.cards.length;
+                },
+                renderCell: (params: GridRenderCellParams<any, any>) => (
+                    <SimpleFlexContainer style={{ gap: '0.5rem' }}>
+                        <span>{params.row?.cards?.length}</span>
+                        {params.row?.cards?.length === 0 && (
+                            <NoCardsWarningsIcon />
                         )}
-                    </IconButton>
-                );
+                    </SimpleFlexContainer>
+                ),
             },
-        },
-        {
-            field: 'title',
-            headerName: t('home.columns.title'),
-            width: 300,
-            renderCell: (params: GridRenderCellParams<any, any>) => (
-                <GhostLink to={`/view/${params.id}`}>{params.value}</GhostLink>
-            ),
-        },
-        {
-            field: 'description',
-            headerName: t('home.columns.description'),
-            width: 300,
-        },
-        {
-            field: 'createdAt',
-            headerName: t('home.columns.created'),
-            width: 150,
-            valueFormatter: (value) => {
-                return formatDateUsingPreferred(value, preferredDateFormat);
+            {
+                field: 'labels',
+                headerName: t('home.columns.labels'),
+                width: 300,
+                renderCell: (params: any) => {
+                    const labels = params.value as string[];
+                    if (!labels || labels.length === 0) {
+                        return (
+                            <Typography variant="body2" color="text.secondary">
+                                {t('home.noLabels')}
+                            </Typography>
+                        );
+                    }
+                    return (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                gap: '0.5rem',
+                                flexWrap: 'wrap',
+                            }}
+                        >
+                            {labels
+                                .slice(0, 3)
+                                .map((label: string, idx: number) => (
+                                    <Chip
+                                        key={idx}
+                                        label={label}
+                                        size="small"
+                                    />
+                                ))}
+                            {labels.length > 3 && (
+                                <Chip
+                                    label={`+${labels.length - 3}`}
+                                    size="small"
+                                />
+                            )}
+                        </Box>
+                    );
+                },
             },
-        },
-        {
-            field: 'lastViewed',
-            headerName: t('home.columns.lastViewed'),
-            width: 150,
-            valueFormatter: (value) => {
-                return formatDateUsingPreferred(value, preferredDateFormat);
-            },
-        },
-        {
-            field: 'updatedAt',
-            headerName: t('home.columns.lastUpdated'),
-            width: 150,
-            valueFormatter: (value) => {
-                return formatDateUsingPreferred(value, preferredDateFormat);
-            },
-        },
-        {
-            field: 'numberOfCards',
-            headerName: t('home.columns.numberOfCards'),
-            width: 100,
-            valueGetter: (_value, row) => {
-                return row.cards.length;
-            },
-            renderCell: (params: GridRenderCellParams<any, any>) => (
-                <SimpleFlexContainer style={{ gap: '0.5rem' }}>
-                    <span>{params.row?.cards?.length}</span>
-                    {params.row?.cards?.length === 0 && <NoCardsWarningsIcon />}
-                </SimpleFlexContainer>
-            ),
-        },
-        {
-            field: 'labels',
-            headerName: t('home.columns.labels'),
-            width: 300,
-            renderCell: (params: any) => {
-                const labels = params.value as string[];
-                if (!labels || labels.length === 0) {
-                    return <Typography variant="body2" color="text.secondary">{t('home.noLabels')}</Typography>;
-                }
-                return (
-                    <Box sx={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                        {labels.slice(0, 3).map((label: string, idx: number) => (
-                            <Chip key={idx} label={label} size="small" />
-                        ))}
-                        {labels.length > 3 && (
-                            <Chip label={`+${labels.length - 3}`} size="small" />
-                        )}
-                    </Box>
-                );
-            },
-        },
-    ], [t, preferredDateFormat, updateStudyset]);
+        ],
+        [t, preferredDateFormat, updateStudyset]
+    );
 
     // Create default visibility model where all columns are visible by default
     const defaultVisibilityModel: GridColumnVisibilityModel = columns.reduce(
@@ -295,7 +336,6 @@ const Home = (props: Props) => {
         event, // MuiEvent<React.MouseEvent<HTMLElement>>
         details // GridCallbackDetails
     ) => {
-        console.log({ params, event, details });
         const { row } = params;
         setSelectedStudySet(row);
         navigate(`/view/${row.studysetUUID}`);

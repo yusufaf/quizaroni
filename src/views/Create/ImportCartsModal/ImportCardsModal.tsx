@@ -104,7 +104,9 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
 
         // Success - send to parent
         onImportCards(cards);
-        toast.success(t('create.successfullyImported', { count: cards.length }));
+        toast.success(
+            t('create.successfullyImported', { count: cards.length })
+        );
         setShowImportModal(false);
         setIsProcessing(false);
     };
@@ -115,7 +117,10 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
 
     return (
         <Dialog open={true} onClose={onClose} fullWidth maxWidth="md">
-            <StandardDialogTitle title={t('create.importCards')} onClose={onClose} />
+            <StandardDialogTitle
+                title={t('create.importCards')}
+                onClose={onClose}
+            />
             <DialogContent>
                 <FormControl sx={{ mb: 2 }}>
                     <FormLabel id="import-method-radio-group-label">
@@ -165,7 +170,9 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                             sx={{ mb: 1 }}
                         >
                             {selectedFile
-                                ? t('create.selectedFile', { filename: selectedFile.name })
+                                ? t('create.selectedFile', {
+                                      filename: selectedFile.name,
+                                  })
                                 : t('create.chooseJsonFile')}
                             <input
                                 type="file"
@@ -211,7 +218,9 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                         ) : undefined
                     }
                 >
-                    {isProcessing ? t('create.importing') : t('categories.import')}
+                    {isProcessing
+                        ? t('create.importing')
+                        : t('categories.import')}
                 </Button>
             </StyledDialogActions>
         </Dialog>

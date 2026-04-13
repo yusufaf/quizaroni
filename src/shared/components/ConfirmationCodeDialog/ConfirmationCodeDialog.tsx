@@ -13,6 +13,7 @@ import {
     confirmUserAttribute,
 } from 'aws-amplify/auth';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useUpdateEmail } from 'state/api/usersAPI';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import { useGlobalStore } from 'state/stores/global';
@@ -21,6 +22,7 @@ import useCustomMutation from 'shared/hooks/useCustomMutation';
 type Props = {};
 const ConfirmationCodeDialog = (props: Props) => {
     /* Redux / Hooks */
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const { confirmationCodeDialogProps, setConfirmationCodeDialogProps } =
@@ -30,19 +32,18 @@ const ConfirmationCodeDialog = (props: Props) => {
     // const { username } = cognitoUser;
     const username = '';
 
-    // TODO: Toast notification?
     const {
         mutate: updateEmail,
         isLoading: isUpdatingEmail,
         isSuccess: isUpdateEmailSuccess,
-        isError: isUpdateEmailError
+        isError: isUpdateEmailError,
     } = useCustomMutation({
         mutation: useUpdateEmail,
         successMessage: 'Email updated successfully',
         errorMessage: 'Error updating email',
         onSuccess: () => {
             closeDialog();
-        }
+        },
     });
 
     const [confirmationCode, setConfirmationCode] = useState<string>('');
@@ -65,12 +66,11 @@ const ConfirmationCodeDialog = (props: Props) => {
 
     const handleResendCode = async () => {
         try {
-            const result = await resendSignUpCode({ username: '' });
-            console.log('Code resent successfully', result);
-            toast.success('Confirmation code resent');
+            await resendSignUpCode({ username: '' });
+            toast.success(t('dialogs.confirmationCode.codeResent'));
         } catch (err) {
             console.error('error resending code: ', err);
-            toast.error('Error resending confirmation code');
+            toast.error(t('dialogs.confirmationCode.resendError'));
         }
     };
 
@@ -84,17 +84,16 @@ const ConfirmationCodeDialog = (props: Props) => {
                     });
 
                     closeDialog();
-                    toast.success('Email confirmed successfully');
+                    toast.success(t('dialogs.confirmationCode.emailConfirmed'));
 
                     /* Send user to login page if successfully confirmed email */
                     navigate('/login');
                     break;
                 case 'changeEmail':
-                    const changeEmailResult = await confirmUserAttribute({
+                    await confirmUserAttribute({
                         userAttributeKey: 'email',
                         confirmationCode,
                     });
-                    console.log({ changeEmailResult });
 
                     updateEmail({ username, newEmail });
             }

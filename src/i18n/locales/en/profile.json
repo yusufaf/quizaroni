@@ -44,6 +44,12 @@
             "title": "Default Download Format"
         }
     },
+    "deleteAccountDialog": {
+        "title": "Delete Account",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter your password",
+        "confirmButton": "Delete Account"
+    },
     "settings": {
         "title": "Settings",
         "account": "Account Settings",

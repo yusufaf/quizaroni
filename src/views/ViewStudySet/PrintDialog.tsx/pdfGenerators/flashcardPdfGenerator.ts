@@ -68,9 +68,7 @@ export class FlashcardPdfGenerator extends BasePdfGenerator {
 
         // Text color
         const textColor =
-            settings.showColors && card.textColor
-                ? card.textColor
-                : '#000000';
+            settings.showColors && card.textColor ? card.textColor : '#000000';
         this.setTextColor(doc, textColor);
 
         // Title (Term label)
@@ -135,9 +133,7 @@ export class FlashcardPdfGenerator extends BasePdfGenerator {
 
         // Text color
         const textColor =
-            settings.showColors && card.textColor
-                ? card.textColor
-                : '#000000';
+            settings.showColors && card.textColor ? card.textColor : '#000000';
         this.setTextColor(doc, textColor);
 
         // Title (Definition label)
@@ -177,9 +173,7 @@ export class FlashcardPdfGenerator extends BasePdfGenerator {
             doc.setFontSize(14);
             doc.setFont('helvetica', 'italic');
 
-            const notesText = card.notes
-                .map((note) => note.text)
-                .join(' • ');
+            const notesText = card.notes.map((note) => note.text).join(' • ');
             const noteLines = this.wrapText(doc, notesText, pageWidth - 80);
             this.centerMultilineText(doc, noteLines, y, 20);
         }

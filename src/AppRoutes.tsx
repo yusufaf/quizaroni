@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Home from 'views/Home/Home';
+import Landing from 'views/Landing/Landing';
 // import Login from 'views/Login/Login';
 // import Signup from 'views/Signup/Signup';
 import CreateSet from 'views/Create/CreateSet';
@@ -65,7 +66,7 @@ const AppRoutes = () => {
     return (
         <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={authenticated ? <Home /> : <Landing />} />
             <Route path="/login" element={<AuthenticatorRoute />} />
             <Route path="/signUp" element={<AuthenticatorRoute />} />
 

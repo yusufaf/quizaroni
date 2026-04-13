@@ -4,11 +4,21 @@ type Props = {
     label: string;
     selectedValue: any;
     options: { value: any; ariaLabel: string; label: string }[];
-    onChange: (event: React.MouseEvent<HTMLElement, MouseEvent>, value: any, property?: string) => void;
+    onChange: (
+        event: React.MouseEvent<HTMLElement, MouseEvent>,
+        value: any,
+        property?: string
+    ) => void;
     property?: string;
 };
 
-const SettingsToggle = ({ label, selectedValue, options, onChange, property }: Props) => {
+const SettingsToggle = ({
+    label,
+    selectedValue,
+    options,
+    onChange,
+    property,
+}: Props) => {
     return (
         <div>
             <Typography variant="subtitle1">{label}</Typography>

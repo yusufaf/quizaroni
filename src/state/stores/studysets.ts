@@ -17,4 +17,5 @@ export const useStudySetsStore = create<StudySetsState>((set) => ({
 
 // Selector functions (optional, for convenience)
 export const selectStudySets = (state: StudySetsState) => state.studySets;
-export const selectSelectedStudySet = (state: StudySetsState) => state.selectedStudySet;
+export const selectSelectedStudySet = (state: StudySetsState) =>
+    state.selectedStudySet;
