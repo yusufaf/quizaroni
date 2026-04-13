@@ -1,7 +1,7 @@
-import { useCallback } from "react";
-import { Box, Zoom, Fab } from "@mui/material";
-import { ArrowUpward } from "@mui/icons-material";
-import useScrollTrigger from "@mui/material/useScrollTrigger";
+import { useCallback } from 'react';
+import { Box, Zoom, Fab } from '@mui/material';
+import { ArrowUpward } from '@mui/icons-material';
+import useScrollTrigger from '@mui/material/useScrollTrigger';
 
 const ScrollToTopFab = () => {
     // Use `window` instead of `body` as `document` will be `undefined` when the
@@ -11,7 +11,7 @@ const ScrollToTopFab = () => {
         threshold: 100,
     });
     const scrollToTop = useCallback(() => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }, []);
     return (
         <Zoom in={trigger}>
@@ -19,7 +19,7 @@ const ScrollToTopFab = () => {
                 role="presentation"
                 // Place the button in the bottom right corner.
                 sx={{
-                    position: "fixed",
+                    position: 'fixed',
                     bottom: 32,
                     right: 32,
                     zIndex: 1,

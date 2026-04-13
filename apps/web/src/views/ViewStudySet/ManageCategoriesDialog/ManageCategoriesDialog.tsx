@@ -1,6 +1,13 @@
 import { Box, SelectChangeEvent } from '@mui/material';
 import { Studyset } from 'shared/types';
-import { ChangeEvent, useState, useCallback, SyntheticEvent } from 'react';
+import {
+    ChangeEvent,
+    useState,
+    useCallback,
+    SyntheticEvent,
+    useRef,
+    useEffect,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
 import AssignTabView from './AssignTabView';
@@ -8,8 +15,16 @@ import { CategoriesCreateTab } from './CategoriesCreateTab';
 import { CategoriesManageTab } from './CategoriesManageTab';
 import ImportTabView from './ImportTabView';
 import { TABS } from './constants';
-import { MetadataDialogShell, TabConfig, ErrorInfo } from 'shared/components/MetadataDialogs';
-import { Edit as EditIcon, SwapHoriz as ImportIcon, Label as AssignIcon } from '@mui/icons-material';
+import {
+    MetadataDialogShell,
+    TabConfig,
+    ErrorInfo,
+} from 'shared/components/MetadataDialogs';
+import {
+    Edit as EditIcon,
+    SwapHoriz as ImportIcon,
+    Label as AssignIcon,
+} from '@mui/icons-material';
 
 type Props = {
     open: boolean;
@@ -37,14 +52,53 @@ const ManageCategoriesDialog = (props: Props) => {
     const [categoryName, setCategoryName] = useState<string>('');
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [deleteIndices, setDeleteIndices] = useState<number[]>([]);
-    const [selectedStudysetUUID, setSelectedStudysetUUID] = useState<string>('');
+    const [selectedStudysetUUID, setSelectedStudysetUUID] =
+        useState<string>('');
     const [selectedCardUUID, setSelectedCardUUID] = useState<string>('');
+    const [assignedCategoriesSelection, setAssignedCategoriesSelection] =
+        useState<string[]>([]);
     const [isUpdating, setIsUpdating] = useState(false);
 
+    const assignDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
+        null
+    );
+    const cardsRef = useRef(cards);
+    cardsRef.current = cards;
+    const studysetUUIDRef = useRef(studysetUUID);
+    studysetUUIDRef.current = studysetUUID;
+    const selectedCardUUIDRef = useRef(selectedCardUUID);
+    selectedCardUUIDRef.current = selectedCardUUID;
+
+    useEffect(() => {
+        const card = cards.find((c) => c.cardUUID === selectedCardUUID);
+        setAssignedCategoriesSelection(card?.categories ?? []);
+    }, [selectedCardUUID, cards, open]);
+
+    useEffect(
+        () => () => {
+            if (assignDebounceRef.current) {
+                clearTimeout(assignDebounceRef.current);
+            }
+        },
+        []
+    );
+
     const tabs: TabConfig[] = [
-        { value: TABS.MANAGE, label: t('categories.manage'), icon: <EditIcon /> },
-        { value: TABS.IMPORT, label: t('categories.import'), icon: <ImportIcon /> },
-        { value: TABS.ASSIGN, label: t('categories.assign'), icon: <AssignIcon /> },
+        {
+            value: TABS.MANAGE,
+            label: t('categories.manage'),
+            icon: <EditIcon />,
+        },
+        {
+            value: TABS.IMPORT,
+            label: t('categories.import'),
+            icon: <ImportIcon />,
+        },
+        {
+            value: TABS.ASSIGN,
+            label: t('categories.assign'),
+            icon: <AssignIcon />,
+        },
     ];
 
     const isManageTab = selectedTab === TABS.MANAGE;
@@ -73,12 +127,15 @@ const ManageCategoriesDialog = (props: Props) => {
     );
 
     // Create Category
-    const onCreateCategoryChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        const category = e.target.value;
-        setCategoryName(category);
-        const error = validateCategory(category);
-        setErrorInfo(error);
-    }, [validateCategory]);
+    const onCreateCategoryChange = useCallback(
+        (e: ChangeEvent<HTMLInputElement>) => {
+            const category = e.target.value;
+            setCategoryName(category);
+            const error = validateCategory(category);
+            setErrorInfo(error);
+        },
+        [validateCategory]
+    );
 
     const createCategory = useCallback(() => {
         if (!studysetUUID || !categoryName.trim() || errorInfo) {
@@ -104,7 +161,14 @@ const ManageCategoriesDialog = (props: Props) => {
                 },
             }
         );
-    }, [studysetUUID, categoryName, errorInfo, categories, updateStudySet, validateCategory]);
+    }, [
+        studysetUUID,
+        categoryName,
+        errorInfo,
+        categories,
+        updateStudySet,
+        validateCategory,
+    ]);
 
     // Edit Category (inline)
     const handleEditStart = useCallback((index: number) => {
@@ -161,7 +225,9 @@ const ManageCategoriesDialog = (props: Props) => {
     // Delete Categories
     const handleDeleteToggle = useCallback((index: number) => {
         setDeleteIndices((prev) =>
-            prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+            prev.includes(index)
+                ? prev.filter((i) => i !== index)
+                : [...prev, index]
         );
         setEditIndex(null);
     }, []);
@@ -170,12 +236,16 @@ const ManageCategoriesDialog = (props: Props) => {
         if (deleteIndices.length === 0) return;
 
         const categoriesToDelete = deleteIndices.map((i) => categories[i]);
-        const filteredCategories = categories.filter((_, i) => !deleteIndices.includes(i));
+        const filteredCategories = categories.filter(
+            (_, i) => !deleteIndices.includes(i)
+        );
 
         // Remove categories from all cards
         const modifiedCards = cards.map((card) => ({
             ...card,
-            categories: card.categories.filter((cat) => !categoriesToDelete.includes(cat)),
+            categories: card.categories.filter(
+                (cat) => !categoriesToDelete.includes(cat)
+            ),
         }));
 
         setIsUpdating(true);
@@ -199,25 +269,33 @@ const ManageCategoriesDialog = (props: Props) => {
         );
     }, [studysetUUID, deleteIndices, categories, cards, updateStudySet]);
 
-    // TODO: Debouncing?
-    const onAssignedCategoriesChange = (e: SelectChangeEvent) => {
-        const newCategories = e.target.value;
-        const modifiedCards = [...cards].map((card) => {
-            if (card.cardUUID === selectedCardUUID) {
-                return {
-                    ...card,
-                    categories: newCategories,
-                };
-            }
-            return card;
-        });
+    const onAssignedCategoriesChange = (e: SelectChangeEvent<string[]>) => {
+        const raw = e.target.value;
+        const newCategories =
+            typeof raw === 'string'
+                ? (raw as string).split(',')
+                : (raw as string[]);
+        setAssignedCategoriesSelection(newCategories);
 
-        updateStudySet({
-            studysetUUID,
-            updates: {
-                cards: modifiedCards,
-            },
-        });
+        if (assignDebounceRef.current) {
+            clearTimeout(assignDebounceRef.current);
+        }
+        assignDebounceRef.current = setTimeout(() => {
+            const snapshotCards = cardsRef.current;
+            const targetCardUUID = selectedCardUUIDRef.current;
+            const modifiedCards = snapshotCards.map((card) =>
+                card.cardUUID === targetCardUUID
+                    ? { ...card, categories: newCategories }
+                    : card
+            );
+            updateStudySet({
+                studysetUUID: studysetUUIDRef.current,
+                updates: {
+                    cards: modifiedCards,
+                },
+            });
+            assignDebounceRef.current = null;
+        }, 400);
     };
 
     const handleImport = () => {
@@ -258,15 +336,21 @@ const ManageCategoriesDialog = (props: Props) => {
 
     // Delete Unused Categories
     const handleDeleteUnused = useCallback(() => {
-        const usedCategories = new Set(cards.flatMap((card) => card.categories));
-        const unusedCategories = categories.filter((cat) => !usedCategories.has(cat));
+        const usedCategories = new Set(
+            cards.flatMap((card) => card.categories)
+        );
+        const unusedCategories = categories.filter(
+            (cat) => !usedCategories.has(cat)
+        );
 
         if (unusedCategories.length === 0) {
             alert(t('categories.noUnusedCategories'));
             return;
         }
 
-        const filteredCategories = categories.filter((cat) => usedCategories.has(cat));
+        const filteredCategories = categories.filter((cat) =>
+            usedCategories.has(cat)
+        );
 
         setIsUpdating(true);
         updateStudySet(
@@ -287,7 +371,6 @@ const ManageCategoriesDialog = (props: Props) => {
         );
     }, [studysetUUID, categories, cards, updateStudySet]);
 
-
     return (
         <MetadataDialogShell
             open={open}
@@ -301,7 +384,8 @@ const ManageCategoriesDialog = (props: Props) => {
             <Box
                 sx={{
                     display: 'grid',
-                    gridTemplateColumns: selectedTab === TABS.MANAGE ? '1fr 1fr' : '1fr',
+                    gridTemplateColumns:
+                        selectedTab === TABS.MANAGE ? '1fr 1fr' : '1fr',
                     gap: '1.25rem',
                     '@media (max-width: 900px)': {
                         gridTemplateColumns: '1fr',
@@ -360,6 +444,7 @@ const ManageCategoriesDialog = (props: Props) => {
                         selectedCardUUID={selectedCardUUID}
                         setSelectedCardUUID={setSelectedCardUUID}
                         selectedStudyset={selectedStudyset}
+                        assignedCategories={assignedCategoriesSelection}
                         onAssignedCategoriesChange={onAssignedCategoriesChange}
                     />
                 )}

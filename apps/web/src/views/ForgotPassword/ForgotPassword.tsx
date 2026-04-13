@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { confirmResetPassword, resetPassword } from "aws-amplify/auth";
-import { Paper } from "@mui/material";
+import { useState, type KeyboardEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { confirmResetPassword, resetPassword } from 'aws-amplify/auth';
+import { Paper } from '@mui/material';
 import {
     ForgotPassBtn,
     ForgotPassField,
@@ -9,54 +9,58 @@ import {
     ForgotPasswordDesc,
     ForgotPasswordPage,
     ForgotPasswordTitle,
-} from "./styles";
-import PasswordValidator from "components/PasswordValidator/PasswordValidator";
+} from './styles';
+import PasswordValidator from 'components/PasswordValidator/PasswordValidator';
 
 type Props = {};
 
 const ForgotPassword = (props: Props) => {
     const navigate = useNavigate();
 
-    const [username, setUsername] = useState<string>("");
-    const [confirmationCode, setConfirmationCode] = useState<string>("");
+    const [username, setUsername] = useState<string>('');
+    const [confirmationCode, setConfirmationCode] = useState<string>('');
     const [codeSent, setCodeSent] = useState<boolean>(false);
-    const [newPassword, setNewPassword] = useState<string>("");
+    const [newPassword, setNewPassword] = useState<string>('');
     const [passwordValid, setPasswordValid] = useState<boolean>(false);
+
+    const isValidCode = /^\d{6}$/.test(confirmationCode);
 
     const handleForgotPassword = async () => {
         try {
-            const result = await resetPassword({username});
-            console.log("Result of sending forgot pass code = ", result);
+            await resetPassword({ username });
 
             /* Trigger change in the "form" */
             setCodeSent(true);
         } catch (error) {
-            console.error("Error sending code ", error);
+            console.error('Error sending code ', error);
         }
     };
 
     const handleResetPassword = async () => {
         try {
-            const result = await confirmResetPassword({
+            await confirmResetPassword({
                 username,
                 confirmationCode,
-                newPassword
+                newPassword,
             });
-            console.log("Result of submitting reset password", result);
 
             /* Send user to login page if successfully changed */
-            navigate("/login");
+            navigate('/login');
         } catch (error) {}
     };
 
-    const enterKeyHandler = (e: any) => {
-        const key = e.key.trim();
-        if (key === "Enter") {
-            // TODO:
+    const enterKeyHandler = (e: KeyboardEvent) => {
+        if (e.key !== 'Enter') {
+            return;
+        }
+        if (codeSent) {
+            if (username && isValidCode && passwordValid) {
+                void handleResetPassword();
+            }
+        } else if (username.trim()) {
+            void handleForgotPassword();
         }
     };
-
-    const isValidCode = /^\d{6}$/.test(confirmationCode);
 
     return (
         <>
@@ -72,7 +76,7 @@ const ForgotPassword = (props: Props) => {
                         <ForgotPasswordDesc
                             variant="body1"
                             sx={{
-                                fontWeight: "600",
+                                fontWeight: '600',
                             }}
                         >
                             Be sure to check your spam folder.
@@ -108,7 +112,11 @@ const ForgotPassword = (props: Props) => {
                                 />
                                 <ForgotPassBtn
                                     variant="contained"
-                                    disabled={!isValidCode || !username || !passwordValid}
+                                    disabled={
+                                        !isValidCode ||
+                                        !username ||
+                                        !passwordValid
+                                    }
                                     onClick={handleResetPassword}
                                 >
                                     Reset Password

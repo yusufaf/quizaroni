@@ -13,15 +13,19 @@ import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import { ErrorInfo, AffectedItem } from 'shared/components/MetadataDialogs';
 import useCustomMutation from 'hooks/useCustomMutation';
 import { Studyset } from 'shared/types';
+import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 export const useLabelsDialog = () => {
+    const { t } = useTranslation();
     const { labelsDialogProps, setLabelsDialogProps } = useGlobalStore();
     const { studysetUUID = '' } = labelsDialogProps || {};
 
     const { data = DEFAULT_USER_RESPONSE } = useGetUser({
         enabled: labelsDialogProps.open,
     });
-    const { labels = [], userUUID = '' } = data?.user ?? DEFAULT_USER_RESPONSE.user;
+    const { labels = [], userUUID = '' } =
+        data?.user ?? DEFAULT_USER_RESPONSE.user;
 
     const { data: studysetsResponse } = useGetAllStudysets({
         enabled: labelsDialogProps.open,
@@ -30,7 +34,11 @@ export const useLabelsDialog = () => {
 
     const { data: studysetResponse } = useGetStudyset(
         { studysetUUID: labelsDialogProps.studysetUUID ?? '' },
-        { enabled: labelsDialogProps.open && Boolean(labelsDialogProps.studysetUUID) }
+        {
+            enabled:
+                labelsDialogProps.open &&
+                Boolean(labelsDialogProps.studysetUUID),
+        }
     );
     const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
 
@@ -38,18 +46,23 @@ export const useLabelsDialog = () => {
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [deleteIndices, setDeleteIndices] = useState<number[]>([]);
     const [showCascadePreview, setShowCascadePreview] = useState(false);
-    const [cascadeAction, setCascadeAction] = useState<'edit' | 'delete' | null>(null);
-    const [selectedStudysetUUIDs, setSelectedStudysetUUIDs] = useState<string[]>([]);
+    const [cascadeAction, setCascadeAction] = useState<
+        'edit' | 'delete' | null
+    >(null);
+    const [selectedStudysetUUIDs, setSelectedStudysetUUIDs] = useState<
+        string[]
+    >([]);
     const [assignLabels, setAssignLabels] = useState<string[]>([]);
 
-    const { mutate: createLabel, isPending: isCreatingLabel } = useCustomMutation({
-        mutation: useCreateLabel,
-        successMessage: 'Successfully created label',
-        errorMessage: 'Error creating label',
-        onSuccess: () => {
-            // Reset will be handled in the tab component
-        },
-    });
+    const { mutate: createLabel, isPending: isCreatingLabel } =
+        useCustomMutation({
+            mutation: useCreateLabel,
+            successMessage: 'Successfully created label',
+            errorMessage: 'Error creating label',
+            onSuccess: () => {
+                // Reset will be handled in the tab component
+            },
+        });
 
     const { mutate: editLabel, isPending: isEditingLabel } = useCustomMutation({
         mutation: useEditLabel,
@@ -61,26 +74,30 @@ export const useLabelsDialog = () => {
         },
     });
 
-    const { mutate: deleteLabel, isPending: isDeletingLabel } = useCustomMutation({
-        mutation: useDeleteLabel,
-        successMessage: 'Successfully deleted label(s)',
-        errorMessage: 'Error deleting label(s)',
-        onSuccess: () => {
-            setDeleteIndices([]);
-            setShowCascadePreview(false);
-        },
-    });
+    const { mutate: deleteLabel, isPending: isDeletingLabel } =
+        useCustomMutation({
+            mutation: useDeleteLabel,
+            successMessage: 'Successfully deleted label(s)',
+            errorMessage: 'Error deleting label(s)',
+            onSuccess: () => {
+                setDeleteIndices([]);
+                setShowCascadePreview(false);
+            },
+        });
 
-    const { mutate: batchUpdateLabels, isPending: isAssigningLabels } = useCustomMutation({
-        mutation: useBatchUpdateStudysetLabels,
-        successMessage: 'Successfully assigned labels',
-        errorMessage: 'Error assigning labels',
-    });
+    const { mutate: batchUpdateLabels, isPending: isAssigningLabels } =
+        useCustomMutation({
+            mutation: useBatchUpdateStudysetLabels,
+            successMessage: 'Successfully assigned labels',
+            errorMessage: 'Error assigning labels',
+        });
 
     useEffect(() => {
         if (labelsDialogProps.open) {
             if (labelsDialogProps.selectedStudysetUUIDs) {
-                setSelectedStudysetUUIDs([...labelsDialogProps.selectedStudysetUUIDs]);
+                setSelectedStudysetUUIDs([
+                    ...labelsDialogProps.selectedStudysetUUIDs,
+                ]);
             } else if (labelsDialogProps.studysetUUID) {
                 // Auto-select current studyset if opened from ViewStudySet
                 setSelectedStudysetUUIDs([labelsDialogProps.studysetUUID]);
@@ -122,7 +139,9 @@ export const useLabelsDialog = () => {
     const getAffectedStudysetsForDelete = useCallback((): AffectedItem[] => {
         const labelsToDelete = deleteIndices.map((i) => labels[i]);
         return studysets
-            .filter((ss) => ss.labels?.some((l: string) => labelsToDelete.includes(l)))
+            .filter((ss) =>
+                ss.labels?.some((l: string) => labelsToDelete.includes(l))
+            )
             .map((ss) => ({
                 name: ss.title,
                 detail: `Labels: ${ss.labels?.join(', ') || 'None'}`,
@@ -181,7 +200,9 @@ export const useLabelsDialog = () => {
 
     const handleDeleteToggle = useCallback((index: number) => {
         setDeleteIndices((prev) =>
-            prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+            prev.includes(index)
+                ? prev.filter((i) => i !== index)
+                : [...prev, index]
         );
         setEditIndex(null);
     }, []);
@@ -212,12 +233,17 @@ export const useLabelsDialog = () => {
             return;
         }
         if (assignLabels.length > 10) {
-            console.warn('Consider using fewer than 10 labels for better organization');
+            toast.warning(t('create.labelsSoftLimitWarning'), {
+                toastId: 'assign-labels-soft-limit',
+            });
         }
         batchUpdateLabels({
-            studysetUpdates: selectedStudysetUUIDs.map((uuid) => [uuid, assignLabels]),
+            studysetUpdates: selectedStudysetUUIDs.map((uuid) => [
+                uuid,
+                assignLabels,
+            ]),
         });
-    }, [assignLabels, selectedStudysetUUIDs, batchUpdateLabels]);
+    }, [assignLabels, selectedStudysetUUIDs, batchUpdateLabels, t]);
 
     const onClose = useCallback(() => {
         setLabelsDialogProps({
@@ -247,7 +273,13 @@ export const useLabelsDialog = () => {
             return getAffectedStudysetsForDelete();
         }
         return [];
-    }, [cascadeAction, editIndex, labels, getAffectedStudysetsForLabel, getAffectedStudysetsForDelete]);
+    }, [
+        cascadeAction,
+        editIndex,
+        labels,
+        getAffectedStudysetsForLabel,
+        getAffectedStudysetsForDelete,
+    ]);
 
     return {
         open: labelsDialogProps.open,
@@ -277,7 +309,11 @@ export const useLabelsDialog = () => {
         isEditingLabel,
         isDeletingLabel,
         isAssigningLabels,
-        isPending: isCreatingLabel || isEditingLabel || isDeletingLabel || isAssigningLabels,
+        isPending:
+            isCreatingLabel ||
+            isEditingLabel ||
+            isDeletingLabel ||
+            isAssigningLabels,
         showCascadePreview,
         cascadeAction,
         affectedItems,

@@ -1,5 +1,5 @@
-import { ErrorOutlineRounded } from "@mui/icons-material";
-import { Tooltip } from "@mui/material";
+import { ErrorOutlineRounded } from '@mui/icons-material';
+import { Tooltip } from '@mui/material';
 
 const NoCardsWarningsIcon = () => {
     return (

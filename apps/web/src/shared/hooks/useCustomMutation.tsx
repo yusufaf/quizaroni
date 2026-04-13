@@ -2,7 +2,12 @@ import { useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { UseMutationResult } from '@tanstack/react-query';
 
-type UseCustomMutationProps<TData = unknown, TError = unknown, TVariables = void, TContext = unknown> = {
+type UseCustomMutationProps<
+    TData = unknown,
+    TError = unknown,
+    TVariables = void,
+    TContext = unknown,
+> = {
     mutation: () => UseMutationResult<TData, TError, TVariables, TContext>;
     successMessage: string;
     errorMessage: string;
@@ -10,9 +15,12 @@ type UseCustomMutationProps<TData = unknown, TError = unknown, TVariables = void
     onError?: () => void;
 };
 
-export default function useCustomMutation<TData = unknown, TError = unknown, TVariables = void, TContext = unknown>(
-    props: UseCustomMutationProps<TData, TError, TVariables, TContext>
-) {
+export default function useCustomMutation<
+    TData = unknown,
+    TError = unknown,
+    TVariables = void,
+    TContext = unknown,
+>(props: UseCustomMutationProps<TData, TError, TVariables, TContext>) {
     const {
         mutation,
         successMessage = 'Success!',

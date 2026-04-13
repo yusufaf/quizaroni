@@ -15,7 +15,10 @@ import {
     MenuItem,
     Typography,
 } from '@mui/material';
-import { Inbox as InboxIcon, UploadFile as UploadFileIcon } from '@mui/icons-material';
+import {
+    Inbox as InboxIcon,
+    UploadFile as UploadFileIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -69,7 +72,9 @@ const ImportTabView = (props: Props) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [fileError, setFileError] = useState<string | null>(null);
     const [fileCategories, setFileCategories] = useState<string[]>([]);
-    const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+    const [selectedFileName, setSelectedFileName] = useState<string | null>(
+        null
+    );
 
     const handleChange = (event: SelectChangeEvent) => {
         setSelectedStudysetUUID(event.target.value as string);
@@ -87,16 +92,16 @@ const ImportTabView = (props: Props) => {
     const newCategories = importSetCategories.filter(
         (cat) => !existingCategories.includes(cat)
     );
-    const duplicateCategories = importSetCategories.filter(
-        (cat) => existingCategories.includes(cat)
+    const duplicateCategories = importSetCategories.filter((cat) =>
+        existingCategories.includes(cat)
     );
 
     // File import
     const newFileCategories = fileCategories.filter(
         (cat) => !existingCategories.includes(cat)
     );
-    const duplicateFileCategories = fileCategories.filter(
-        (cat) => existingCategories.includes(cat)
+    const duplicateFileCategories = fileCategories.filter((cat) =>
+        existingCategories.includes(cat)
     );
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,7 +163,9 @@ const ImportTabView = (props: Props) => {
             </Typography>
 
             <FormControl fullWidth>
-                <InputLabel id="study-set-select-label">{t('categories.selectStudyset')}</InputLabel>
+                <InputLabel id="study-set-select-label">
+                    {t('categories.selectStudyset')}
+                </InputLabel>
                 <Select
                     labelId="study-set-select-label"
                     label={t('categories.selectStudyset')}
@@ -177,12 +184,30 @@ const ImportTabView = (props: Props) => {
                             key={studySet.studysetUUID}
                             value={studySet.studysetUUID}
                         >
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', gap: '1rem' }}>
-                                <Typography variant="inherit" noWrap title={studySet.title}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    width: '100%',
+                                    gap: '1rem',
+                                }}
+                            >
+                                <Typography
+                                    variant="inherit"
+                                    noWrap
+                                    title={studySet.title}
+                                >
                                     {studySet.title}
                                 </Typography>
-                                <Typography variant="caption" color="text.secondary" sx={{ flexShrink: 0 }}>
-                                    {new Date(studySet.createdAt).toLocaleDateString(undefined, {
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                    sx={{ flexShrink: 0 }}
+                                >
+                                    {new Date(
+                                        studySet.createdAt
+                                    ).toLocaleDateString(undefined, {
                                         month: 'short',
                                         day: 'numeric',
                                         year: 'numeric',
@@ -197,20 +222,42 @@ const ImportTabView = (props: Props) => {
             {selectedStudysetUUID && (
                 <>
                     <Box>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: '0.75rem' }}>
-                            {t('categories.previewFound', { count: importSetCategories.length })}
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mb: '0.75rem' }}
+                        >
+                            {t('categories.previewFound', {
+                                count: importSetCategories.length,
+                            })}
                             {newCategories.length > 0 && (
-                                <> • {t('categories.newCount', { count: newCategories.length })}</>
+                                <>
+                                    {' '}
+                                    •{' '}
+                                    {t('categories.newCount', {
+                                        count: newCategories.length,
+                                    })}
+                                </>
                             )}
                             {duplicateCategories.length > 0 && (
-                                <> • {t('categories.duplicateCount', { count: duplicateCategories.length })}</>
+                                <>
+                                    {' '}
+                                    •{' '}
+                                    {t('categories.duplicateCount', {
+                                        count: duplicateCategories.length,
+                                    })}
+                                </>
                             )}
                         </Typography>
 
                         {importSetCategories.length === 0 ? (
                             <Box sx={{ textAlign: 'center', py: '2rem' }}>
                                 <InboxIcon fontSize="large" color="disabled" />
-                                <Typography variant="body2" color="text.secondary" sx={{ mt: '0.5rem' }}>
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mt: '0.5rem' }}
+                                >
                                     {t('categories.noCategoriesInSet')}
                                 </Typography>
                             </Box>
@@ -225,28 +272,45 @@ const ImportTabView = (props: Props) => {
                                 }}
                             >
                                 <List dense>
-                                    {importSetCategories.map((category, index) => {
-                                        const isDuplicate = existingCategories.includes(category);
-                                        return (
-                                            <ListItem
-                                                key={index}
-                                                divider={index < importSetCategories.length - 1}
-                                                sx={{
-                                                    opacity: isDuplicate ? 0.5 : 1,
-                                                }}
-                                            >
-                                                <ListItemText primary={category} />
-                                                {isDuplicate && (
-                                                    <Chip
-                                                        label={t('categories.duplicate')}
-                                                        size="small"
-                                                        variant="outlined"
-                                                        sx={{ ml: '0.5rem' }}
+                                    {importSetCategories.map(
+                                        (category, index) => {
+                                            const isDuplicate =
+                                                existingCategories.includes(
+                                                    category
+                                                );
+                                            return (
+                                                <ListItem
+                                                    key={index}
+                                                    divider={
+                                                        index <
+                                                        importSetCategories.length -
+                                                            1
+                                                    }
+                                                    sx={{
+                                                        opacity: isDuplicate
+                                                            ? 0.5
+                                                            : 1,
+                                                    }}
+                                                >
+                                                    <ListItemText
+                                                        primary={category}
                                                     />
-                                                )}
-                                            </ListItem>
-                                        );
-                                    })}
+                                                    {isDuplicate && (
+                                                        <Chip
+                                                            label={t(
+                                                                'categories.duplicate'
+                                                            )}
+                                                            size="small"
+                                                            variant="outlined"
+                                                            sx={{
+                                                                ml: '0.5rem',
+                                                            }}
+                                                        />
+                                                    )}
+                                                </ListItem>
+                                            );
+                                        }
+                                    )}
                                 </List>
                             </Box>
                         )}
@@ -260,7 +324,9 @@ const ImportTabView = (props: Props) => {
                             sx={{ fontWeight: 600 }}
                         >
                             {newCategories.length > 0
-                                ? t('categories.importCount', { count: newCategories.length })
+                                ? t('categories.importCount', {
+                                      count: newCategories.length,
+                                  })
                                 : t('categories.import')}
                         </Button>
                     </Box>
@@ -305,13 +371,31 @@ const ImportTabView = (props: Props) => {
             {fileCategories.length > 0 && (
                 <>
                     <Box>
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: '0.75rem' }}>
-                            {t('categories.previewFound', { count: fileCategories.length })}
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mb: '0.75rem' }}
+                        >
+                            {t('categories.previewFound', {
+                                count: fileCategories.length,
+                            })}
                             {newFileCategories.length > 0 && (
-                                <> • {t('categories.newCount', { count: newFileCategories.length })}</>
+                                <>
+                                    {' '}
+                                    •{' '}
+                                    {t('categories.newCount', {
+                                        count: newFileCategories.length,
+                                    })}
+                                </>
                             )}
                             {duplicateFileCategories.length > 0 && (
-                                <> • {t('categories.duplicateCount', { count: duplicateFileCategories.length })}</>
+                                <>
+                                    {' '}
+                                    •{' '}
+                                    {t('categories.duplicateCount', {
+                                        count: duplicateFileCategories.length,
+                                    })}
+                                </>
                             )}
                         </Typography>
 
@@ -326,17 +410,25 @@ const ImportTabView = (props: Props) => {
                         >
                             <List dense>
                                 {fileCategories.map((category, index) => {
-                                    const isDuplicate = existingCategories.includes(category);
+                                    const isDuplicate =
+                                        existingCategories.includes(category);
                                     return (
                                         <ListItem
                                             key={index}
-                                            divider={index < fileCategories.length - 1}
-                                            sx={{ opacity: isDuplicate ? 0.5 : 1 }}
+                                            divider={
+                                                index <
+                                                fileCategories.length - 1
+                                            }
+                                            sx={{
+                                                opacity: isDuplicate ? 0.5 : 1,
+                                            }}
                                         >
                                             <ListItemText primary={category} />
                                             {isDuplicate && (
                                                 <Chip
-                                                    label={t('categories.duplicate')}
+                                                    label={t(
+                                                        'categories.duplicate'
+                                                    )}
                                                     size="small"
                                                     variant="outlined"
                                                     sx={{ ml: '0.5rem' }}
@@ -357,7 +449,9 @@ const ImportTabView = (props: Props) => {
                             sx={{ fontWeight: 600 }}
                         >
                             {newFileCategories.length > 0
-                                ? t('categories.importCount', { count: newFileCategories.length })
+                                ? t('categories.importCount', {
+                                      count: newFileCategories.length,
+                                  })
                                 : t('categories.import')}
                         </Button>
                     </Box>

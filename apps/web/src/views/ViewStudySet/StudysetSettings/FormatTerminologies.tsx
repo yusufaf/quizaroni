@@ -10,7 +10,11 @@ import {
 import { Studyset } from 'shared/types';
 import { ChangeEvent, useState, useEffect, useCallback, useRef } from 'react';
 import { FORMAT_TERMINOLOGIES } from 'shared/constants';
-import { CustomInputsContainer, CustomInputRow, StyledTextField } from './styles';
+import {
+    CustomInputsContainer,
+    CustomInputRow,
+    StyledTextField,
+} from './styles';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
 import { Check } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -129,7 +133,10 @@ const FormatTerminologies = ({ studyset }: Props) => {
     return (
         <div>
             <FormControl>
-                <FormLabel id="terminology-radio-group-label" sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}>
+                <FormLabel
+                    id="terminology-radio-group-label"
+                    sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}
+                >
                     {t('studysetSettings.terminology')}
                 </FormLabel>
                 <RadioGroup
@@ -148,7 +155,9 @@ const FormatTerminologies = ({ studyset }: Props) => {
                             <FormControlLabel
                                 value={value}
                                 control={<Radio />}
-                                label={t(`terminology.format.${value === 'Term/Definition' ? 'termDefinition' : value === 'Question/Answer' ? 'questionAnswer' : value === 'Prompt/Response' ? 'promptResponse' : value === 'Word/Meaning' ? 'wordMeaning' : value === 'Fact/Explanation' ? 'factExplanation' : 'custom'}`)}
+                                label={t(
+                                    `terminology.format.${value === 'Term/Definition' ? 'termDefinition' : value === 'Question/Answer' ? 'questionAnswer' : value === 'Prompt/Response' ? 'promptResponse' : value === 'Word/Meaning' ? 'wordMeaning' : value === 'Fact/Explanation' ? 'factExplanation' : 'custom'}`
+                                )}
                             />
                             {value === FORMAT_TERMINOLOGIES.CUSTOM &&
                                 isCustomTerminology && (
@@ -158,12 +167,16 @@ const FormatTerminologies = ({ studyset }: Props) => {
                                             color="text.secondary"
                                             sx={{ marginBottom: '0.25rem' }}
                                         >
-                                            {t('studysetSettings.defineCustomTerminology')}
+                                            {t(
+                                                'studysetSettings.defineCustomTerminology'
+                                            )}
                                         </Typography>
                                         <CustomInputRow>
                                             <StyledTextField
                                                 placeholder="e.g., Front"
-                                                label={t('studysetSettings.firstTerm')}
+                                                label={t(
+                                                    'studysetSettings.firstTerm'
+                                                )}
                                                 size="small"
                                                 onChange={(e) =>
                                                     onCustomTerminologyChange(
@@ -173,7 +186,9 @@ const FormatTerminologies = ({ studyset }: Props) => {
                                                 }
                                                 value={customTerminology1}
                                                 error={Boolean(
-                                                    customTerminologyErrors.get(1)
+                                                    customTerminologyErrors.get(
+                                                        1
+                                                    )
                                                 )}
                                                 helperText={customTerminologyErrors.get(
                                                     1
@@ -187,7 +202,9 @@ const FormatTerminologies = ({ studyset }: Props) => {
                                             </Typography>
                                             <StyledTextField
                                                 placeholder="e.g., Back"
-                                                label={t('studysetSettings.secondTerm')}
+                                                label={t(
+                                                    'studysetSettings.secondTerm'
+                                                )}
                                                 size="small"
                                                 onChange={(e) =>
                                                     onCustomTerminologyChange(
@@ -197,7 +214,9 @@ const FormatTerminologies = ({ studyset }: Props) => {
                                                 }
                                                 value={customTerminology2}
                                                 error={Boolean(
-                                                    customTerminologyErrors.get(2)
+                                                    customTerminologyErrors.get(
+                                                        2
+                                                    )
                                                 )}
                                                 helperText={customTerminologyErrors.get(
                                                     2
@@ -209,10 +228,14 @@ const FormatTerminologies = ({ studyset }: Props) => {
                                             isSaved && (
                                                 <Chip
                                                     icon={<Check />}
-                                                    label={t('studysetSettings.saved')}
+                                                    label={t(
+                                                        'studysetSettings.saved'
+                                                    )}
                                                     color="success"
                                                     size="small"
-                                                    sx={{ width: 'fit-content' }}
+                                                    sx={{
+                                                        width: 'fit-content',
+                                                    }}
                                                 />
                                             )}
                                     </CustomInputsContainer>

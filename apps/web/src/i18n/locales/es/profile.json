@@ -44,6 +44,12 @@
             "title": "Formato de Descarga Predeterminado"
         }
     },
+    "deleteAccountDialog": {
+        "title": "Eliminar cuenta",
+        "passwordLabel": "Contraseña",
+        "passwordPlaceholder": "Introduce tu contraseña",
+        "confirmButton": "Eliminar cuenta"
+    },
     "settings": {
         "title": "Configuración",
         "account": "Configuración de Cuenta",

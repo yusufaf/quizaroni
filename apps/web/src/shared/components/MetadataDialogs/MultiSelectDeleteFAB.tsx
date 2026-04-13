@@ -2,7 +2,11 @@ import { Fab, Zoom } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { MultiSelectDeleteFABProps } from './types';
 
-export const MultiSelectDeleteFAB = ({ count, onClick, visible }: MultiSelectDeleteFABProps) => {
+export const MultiSelectDeleteFAB = ({
+    count,
+    onClick,
+    visible,
+}: MultiSelectDeleteFABProps) => {
     return (
         <Zoom in={visible && count > 0}>
             <Fab

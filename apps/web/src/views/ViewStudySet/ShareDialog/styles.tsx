@@ -1,9 +1,9 @@
-import styled from "@emotion/styled";
-import { Dialog } from "@mui/material";
+import styled from '@emotion/styled';
+import { Dialog } from '@mui/material';
 
 export const StyledDialog = styled(Dialog)({
-    "& .MuiDialog-paper": {
+    '& .MuiDialog-paper': {
         // width: "60rem",
-        height: "32rem",
+        height: '32rem',
     },
 });

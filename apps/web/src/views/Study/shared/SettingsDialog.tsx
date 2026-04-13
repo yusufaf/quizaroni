@@ -23,7 +23,8 @@ type Props = {
 };
 
 const SettingsDialog = ({ open, settings, onClose, onSave }: Props) => {
-    const [localSettings, setLocalSettings] = useState<StudySessionSettings>(settings);
+    const [localSettings, setLocalSettings] =
+        useState<StudySessionSettings>(settings);
 
     useEffect(() => {
         if (open) {
@@ -101,15 +102,27 @@ const SettingsDialog = ({ open, settings, onClose, onSave }: Props) => {
                 >
                     {/* Card Settings */}
                     <Box>
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: '1rem' }}>
+                        <Typography
+                            variant="subtitle2"
+                            color="text.secondary"
+                            sx={{ mb: '1rem' }}
+                        >
                             Card Settings
                         </Typography>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '0.5rem',
+                            }}
+                        >
                             <FormControlLabel
                                 control={
                                     <Switch
                                         checked={localSettings.shuffleCards}
-                                        onChange={() => handleSwitchChange('shuffleCards')}
+                                        onChange={() =>
+                                            handleSwitchChange('shuffleCards')
+                                        }
                                         color="primary"
                                     />
                                 }
@@ -119,7 +132,9 @@ const SettingsDialog = ({ open, settings, onClose, onSave }: Props) => {
                                 control={
                                     <Switch
                                         checked={localSettings.autoAdvance}
-                                        onChange={() => handleSwitchChange('autoAdvance')}
+                                        onChange={() =>
+                                            handleSwitchChange('autoAdvance')
+                                        }
                                         color="primary"
                                     />
                                 }
@@ -132,14 +147,20 @@ const SettingsDialog = ({ open, settings, onClose, onSave }: Props) => {
 
                     {/* Audio Settings */}
                     <Box>
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: '1rem' }}>
+                        <Typography
+                            variant="subtitle2"
+                            color="text.secondary"
+                            sx={{ mb: '1rem' }}
+                        >
                             Audio Settings
                         </Typography>
                         <FormControlLabel
                             control={
                                 <Switch
                                     checked={localSettings.audioEnabled}
-                                    onChange={() => handleSwitchChange('audioEnabled')}
+                                    onChange={() =>
+                                        handleSwitchChange('audioEnabled')
+                                    }
                                     color="primary"
                                 />
                             }
@@ -151,14 +172,20 @@ const SettingsDialog = ({ open, settings, onClose, onSave }: Props) => {
 
                     {/* Timer Settings */}
                     <Box>
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: '1rem' }}>
+                        <Typography
+                            variant="subtitle2"
+                            color="text.secondary"
+                            sx={{ mb: '1rem' }}
+                        >
                             Timer Settings
                         </Typography>
                         <FormControlLabel
                             control={
                                 <Switch
                                     checked={localSettings.timedMode}
-                                    onChange={() => handleSwitchChange('timedMode')}
+                                    onChange={() =>
+                                        handleSwitchChange('timedMode')
+                                    }
                                     color="primary"
                                 />
                             }
@@ -168,7 +195,8 @@ const SettingsDialog = ({ open, settings, onClose, onSave }: Props) => {
                         {localSettings.timedMode && (
                             <Box sx={{ mt: '1.5rem', px: '0.5rem' }}>
                                 <Typography variant="body2" gutterBottom>
-                                    Time per Card: {localSettings.timePerCard || 30} seconds
+                                    Time per Card:{' '}
+                                    {localSettings.timePerCard || 30} seconds
                                 </Typography>
                                 <Slider
                                     value={localSettings.timePerCard || 30}
@@ -197,7 +225,11 @@ const SettingsDialog = ({ open, settings, onClose, onSave }: Props) => {
 
                     {/* Difficulty Settings */}
                     <Box>
-                        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: '1rem' }}>
+                        <Typography
+                            variant="subtitle2"
+                            color="text.secondary"
+                            sx={{ mb: '1rem' }}
+                        >
                             Difficulty Level
                         </Typography>
                         <Box
@@ -206,23 +238,28 @@ const SettingsDialog = ({ open, settings, onClose, onSave }: Props) => {
                                 gap: '0.5rem',
                             }}
                         >
-                            {(['easy', 'medium', 'hard'] as const).map((difficulty) => (
-                                <Button
-                                    key={difficulty}
-                                    variant={
-                                        localSettings.difficulty === difficulty
-                                            ? 'contained'
-                                            : 'outlined'
-                                    }
-                                    onClick={() => handleDifficultyChange(difficulty)}
-                                    sx={{
-                                        flex: 1,
-                                        textTransform: 'capitalize',
-                                    }}
-                                >
-                                    {difficulty}
-                                </Button>
-                            ))}
+                            {(['easy', 'medium', 'hard'] as const).map(
+                                (difficulty) => (
+                                    <Button
+                                        key={difficulty}
+                                        variant={
+                                            localSettings.difficulty ===
+                                            difficulty
+                                                ? 'contained'
+                                                : 'outlined'
+                                        }
+                                        onClick={() =>
+                                            handleDifficultyChange(difficulty)
+                                        }
+                                        sx={{
+                                            flex: 1,
+                                            textTransform: 'capitalize',
+                                        }}
+                                    >
+                                        {difficulty}
+                                    </Button>
+                                )
+                            )}
                         </Box>
                         <Typography
                             variant="caption"

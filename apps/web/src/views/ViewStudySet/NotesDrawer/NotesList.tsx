@@ -60,7 +60,8 @@ const NoteList = ({
             {card.notes.map((note: Note, index: number) => {
                 const { noteUUID } = note;
                 const isEditing = currentEditKey === noteUUID;
-                const isDeleting = isDeleteNoteLoading && noteUUID === noteBeingDeleted;
+                const isDeleting =
+                    isDeleteNoteLoading && noteUUID === noteBeingDeleted;
 
                 return (
                     <SimpleFlexContainer
@@ -75,7 +76,8 @@ const NoteList = ({
                             transition: 'all 0.2s ease',
                             '&:hover': {
                                 borderColor: 'primary.light',
-                                boxShadow: '0 0.125rem 0.375rem rgba(0,0,0,0.05)',
+                                boxShadow:
+                                    '0 0.125rem 0.375rem rgba(0,0,0,0.05)',
                             },
                         }}
                     >
@@ -95,9 +97,10 @@ const NoteList = ({
                                 '& .MuiInput-underline:after': {
                                     borderBottomColor: '#ffa000',
                                 },
-                                '& .MuiInput-underline:hover:not(.Mui-disabled):before': {
-                                    borderBottomColor: '#ffa000',
-                                },
+                                '& .MuiInput-underline:hover:not(.Mui-disabled):before':
+                                    {
+                                        borderBottomColor: '#ffa000',
+                                    },
                             }}
                         />
                         <SimpleFlexContainer
@@ -106,14 +109,23 @@ const NoteList = ({
                                 gap: '0.25rem',
                             }}
                         >
-                            <Tooltip title={isEditing ? t('notesDrawer.saveNote') : t('notesDrawer.editNote')} placement="top">
+                            <Tooltip
+                                title={
+                                    isEditing
+                                        ? t('notesDrawer.saveNote')
+                                        : t('notesDrawer.editNote')
+                                }
+                                placement="top"
+                            >
                                 <IconButton
                                     onClick={() =>
                                         handleEditingNoteToggle(noteUUID)
                                     }
                                     size="small"
                                     sx={{
-                                        color: isEditing ? 'primary.main' : 'text.secondary',
+                                        color: isEditing
+                                            ? 'primary.main'
+                                            : 'text.secondary',
                                         '&:hover': {
                                             color: 'primary.main',
                                             bgcolor: 'rgba(255,160,0,0.08)',
@@ -123,7 +135,10 @@ const NoteList = ({
                                     <EditIcon fontSize="small" />
                                 </IconButton>
                             </Tooltip>
-                            <Tooltip title={t('notesDrawer.deleteNote')} placement="top">
+                            <Tooltip
+                                title={t('notesDrawer.deleteNote')}
+                                placement="top"
+                            >
                                 <IconButton
                                     disabled={isDeleting}
                                     onClick={() => handleDeleteNote(noteUUID)}

@@ -52,7 +52,7 @@ export const useInitiateMultipartUpload = () => {
                 schema: InitiateMultipartUploadResponseSchema,
                 data,
                 type: 'response',
-                context: 'InitiateMultipartUpload'
+                context: 'InitiateMultipartUpload',
             });
         },
     });
@@ -77,7 +77,7 @@ export const useGetMultipartSignedUploadUrls = () => {
                 schema: GetMultipartSignedUploadUrlsResponseSchema,
                 data,
                 type: 'response',
-                context: 'GetMultipartSignedUploadUrls'
+                context: 'GetMultipartSignedUploadUrls',
             });
         },
     });
@@ -112,7 +112,7 @@ export const useCompleteMultipartUpload = () => {
                 schema: FileMetadataSchema,
                 data,
                 type: 'response',
-                context: 'CompleteMultipartUpload'
+                context: 'CompleteMultipartUpload',
             });
         },
     });
@@ -130,7 +130,7 @@ export const useDeleteFile = () => {
                 schema: BaseResponseSchema,
                 data,
                 type: 'response',
-                context: 'DeleteFile'
+                context: 'DeleteFile',
             });
         },
     });
@@ -148,7 +148,7 @@ export const useSendFeedback = () => {
                 schema: BaseResponseSchema,
                 data,
                 type: 'response',
-                context: 'SendFeedback'
+                context: 'SendFeedback',
             });
         },
     });

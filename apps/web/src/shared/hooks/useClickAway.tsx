@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
 export function useClickAway(callback, additionalRefs: any[] = []) {
     const ref = useRef(null);
@@ -20,12 +20,12 @@ export function useClickAway(callback, additionalRefs: any[] = []) {
             }
         };
 
-        document.addEventListener("mousedown", handler);
-        document.addEventListener("touchstart", handler);
+        document.addEventListener('mousedown', handler);
+        document.addEventListener('touchstart', handler);
 
         return () => {
-            document.removeEventListener("mousedown", handler);
-            document.removeEventListener("touchstart", handler);
+            document.removeEventListener('mousedown', handler);
+            document.removeEventListener('touchstart', handler);
         };
     }, []);
 

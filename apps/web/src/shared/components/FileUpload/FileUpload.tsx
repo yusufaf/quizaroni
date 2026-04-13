@@ -12,7 +12,7 @@ const FILE_UPLOAD_ICONS = new Map([
 ]);
 
 type Props = {
-    style?: Object;
+    style?: object;
     type?: string;
     handleFiles: (files: File[]) => any;
 };

@@ -1,5 +1,17 @@
-import { ArrowBack, ViewCarouselRounded, CreditCard, LocalOffer } from '@mui/icons-material/';
-import { Button, Chip, Skeleton, Tooltip, Typography, Box } from '@mui/material/';
+import {
+    ArrowBack,
+    ViewCarouselRounded,
+    CreditCard,
+    LocalOffer,
+} from '@mui/icons-material/';
+import {
+    Button,
+    Chip,
+    Skeleton,
+    Tooltip,
+    Typography,
+    Box,
+} from '@mui/material/';
 import { BoldTypography, SimpleFlexContainer } from 'styles/AppStyles';
 import ScrollToTopFab from 'components/ScrollToTopFab/ScrollToTopFab';
 import useBrowserTitle from 'hooks/useBrowserTitle';
@@ -92,7 +104,6 @@ const ViewStudySet = (props: Props) => {
     const { data: studysetResponse, isLoading: isStudySetLoading } =
         useGetStudyset({ studysetUUID });
     const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
-    console.log({ selectedStudyset, studysetResponse, studysetUUID });
 
     const { mutate: updateStudySet } = useUpdateStudyset();
 
@@ -110,7 +121,8 @@ const ViewStudySet = (props: Props) => {
     const [sortDirection, setSortDirection] = useState<SortDirection>(
         SORT_DIRECTIONS.ASC
     );
-    const [isNotesDrawerHidden, setIsNotesDrawerHidden] = useState<boolean>(true);
+    const [isNotesDrawerHidden, setIsNotesDrawerHidden] =
+        useState<boolean>(true);
     const [viewMode, setViewMode] = useState<string>(
         selectedStudyset?.metadata?.viewSetLayout ?? VIEWSET_LAYOUTS.LIST
     );
@@ -147,7 +159,11 @@ const ViewStudySet = (props: Props) => {
 
     // Persist view mode to metadata
     useEffect(() => {
-        if (viewMode && selectedStudyset?.studysetUUID && selectedStudyset?.metadata?.viewSetLayout !== viewMode) {
+        if (
+            viewMode &&
+            selectedStudyset?.studysetUUID &&
+            selectedStudyset?.metadata?.viewSetLayout !== viewMode
+        ) {
             updateMetadataField('viewSetLayout', viewMode);
         }
     }, [viewMode]);
@@ -228,7 +244,8 @@ const ViewStudySet = (props: Props) => {
         navigate(`/edit/${studysetUUID}`);
     };
 
-    const notesDrawerPosition = selectedStudyset?.metadata?.notesDrawerPosition || 'right';
+    const notesDrawerPosition =
+        selectedStudyset?.metadata?.notesDrawerPosition || 'right';
     const drawerPadding = isNotesDrawerHidden ? '22rem' : '27.5rem';
 
     return (
@@ -263,7 +280,12 @@ const ViewStudySet = (props: Props) => {
                                     {isStudySetLoading ? (
                                         <Skeleton />
                                     ) : (
-                                        <>{t('viewStudySet.createdBy', { username: selectedStudyset?.username })}</>
+                                        <>
+                                            {t('viewStudySet.createdBy', {
+                                                username:
+                                                    selectedStudyset?.username,
+                                            })}
+                                        </>
                                     )}
                                 </Typography>
                                 <StudysetDescription variant="body1">
@@ -300,16 +322,20 @@ const ViewStudySet = (props: Props) => {
                                         />
                                     </Tooltip>
                                     {selectedStudyset?.labels?.length > 0 ? (
-                                        selectedStudyset.labels.map((label, index) => (
-                                            <Chip
-                                                key={index}
-                                                label={label}
-                                                variant="outlined"
-                                            />
-                                        ))
+                                        selectedStudyset.labels.map(
+                                            (label, index) => (
+                                                <Chip
+                                                    key={index}
+                                                    label={label}
+                                                    variant="outlined"
+                                                />
+                                            )
+                                        )
                                     ) : (
                                         <Chip
-                                            label={t('viewStudySet.noLabelsSelected')}
+                                            label={t(
+                                                'viewStudySet.noLabelsSelected'
+                                            )}
                                             color="error"
                                             variant="outlined"
                                         />
@@ -323,7 +349,9 @@ const ViewStudySet = (props: Props) => {
                             <StudyModesSection>
                                 <StudyModesGrid
                                     studysetUUID={studysetUUID}
-                                    cardCount={selectedStudyset?.cards?.length ?? 0}
+                                    cardCount={
+                                        selectedStudyset?.cards?.length ?? 0
+                                    }
                                 />
                             </StudyModesSection>
                         </ViewStudysetHeader>
@@ -342,7 +370,9 @@ const ViewStudySet = (props: Props) => {
                             width: 'fit-content',
                         }}
                     >
-                        <CreditCard sx={{ color: 'primary.main', fontSize: '1.25rem' }} />
+                        <CreditCard
+                            sx={{ color: 'primary.main', fontSize: '1.25rem' }}
+                        />
                         <Typography
                             variant="subtitle1"
                             sx={{
@@ -382,7 +412,9 @@ const ViewStudySet = (props: Props) => {
                         {t('viewStudySet.noCardsCategory')}
                     </NoCardsMessage>
                 ) : filteredViewFlashCards.length === 0 ? (
-                    <NoCardsMessage>{t('viewStudySet.noCardsInSet')}</NoCardsMessage>
+                    <NoCardsMessage>
+                        {t('viewStudySet.noCardsInSet')}
+                    </NoCardsMessage>
                 ) : viewMode === VIEWSET_LAYOUTS.GRID ? (
                     <ViewCardsGridContainer>
                         {filteredViewFlashCards.map((card, index) => (

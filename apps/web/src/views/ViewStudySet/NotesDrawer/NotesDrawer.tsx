@@ -185,8 +185,7 @@ const NotesDrawer = (props: Props) => {
 
     const handleAccordionChange =
         (cardUUID: UUID) =>
-        (event: React.SyntheticEvent, isExpanded: boolean) => {
-            console.log({ cardUUID, event, isExpanded });
+        (_event: React.SyntheticEvent, isExpanded: boolean) => {
             toggleNotesOpen(cardUUID, isExpanded);
         };
 
@@ -254,7 +253,9 @@ const NotesDrawer = (props: Props) => {
                     }}
                 >
                     <NoteIcon sx={{ color: 'primary.main' }} />
-                    <BoldTypography variant="h5">{t('notesDrawer.title')}</BoldTypography>
+                    <BoldTypography variant="h5">
+                        {t('notesDrawer.title')}
+                    </BoldTypography>
                 </Box>
                 <Box
                     sx={{
@@ -372,11 +373,16 @@ const NotesDrawer = (props: Props) => {
                                                 whiteSpace: 'nowrap',
                                             }}
                                         >
-                                            {t('notesDrawer.card', { index: index + 1 })}
+                                            {t('notesDrawer.card', {
+                                                index: index + 1,
+                                            })}
                                         </BoldTypography>
                                         {noteCount > 0 && (
                                             <Chip
-                                                label={t('notesDrawer.noteCount', { count: noteCount })}
+                                                label={t(
+                                                    'notesDrawer.noteCount',
+                                                    { count: noteCount }
+                                                )}
                                                 size="small"
                                                 sx={{
                                                     height: '1.25rem',
@@ -399,7 +405,8 @@ const NotesDrawer = (props: Props) => {
                                             opacity: 0.7,
                                         }}
                                     >
-                                        {definition || t('notesDrawer.noDefinition')}
+                                        {definition ||
+                                            t('notesDrawer.noDefinition')}
                                     </CardPreviewText>
                                 </AccordionSummary>
                                 <AccordionDetails sx={{ pt: 0 }}>

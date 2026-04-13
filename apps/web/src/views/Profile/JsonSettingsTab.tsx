@@ -1,20 +1,25 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
     Alert,
     Box,
     Chip,
+    IconButton,
+    Tooltip,
     Typography,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import {
     Save as SaveIcon,
     Restore as RestoreIcon,
+    FileDownload as DownloadIcon,
+    FileUpload as UploadIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/system';
 import { useTranslation } from 'react-i18next';
 import { User } from 'shared/types';
 import { useUpdateUserMetadata } from 'state/api/usersAPI';
-import { UserMetadataSchema } from 'shared/schemas';
+import { EditableUserMetadataSchema } from 'shared/schemas';
+import { downloadFile } from 'utilities/general';
 import { AccountViewContainer } from './ProfileStyles';
 import { toast } from 'react-toastify';
 
@@ -31,29 +36,34 @@ const EditorHeader = styled(Box)({
     alignItems: 'center',
 });
 
-const StyledTextarea = styled('textarea')<{ hasError: boolean }>(({ theme, hasError }) => ({
-    width: '100%',
-    minHeight: '30rem',
-    padding: '1rem',
-    fontFamily: '"Fira Code", "Cascadia Code", "JetBrains Mono", "Consolas", monospace',
-    fontSize: '0.875rem',
-    lineHeight: '1.5',
-    tabSize: 4,
-    backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
-    color: theme.palette.mode === 'dark' ? '#d4d4d4' : '#1e1e1e',
-    border: `1px solid ${hasError ? theme.palette.error.main : theme.palette.divider}`,
-    borderRadius: '0.5rem',
-    outline: 'none',
-    resize: 'vertical',
-    transition: 'border-color 0.2s ease',
-    '&:focus': {
-        borderColor: hasError ? theme.palette.error.main : theme.palette.primary.main,
-        boxShadow: `0 0 0 2px ${hasError ? theme.palette.error.main + '33' : theme.palette.primary.main + '33'}`,
-    },
-    '&::selection': {
-        backgroundColor: theme.palette.primary.main + '44',
-    },
-}));
+const StyledTextarea = styled('textarea')<{ hasError: boolean }>(
+    ({ theme, hasError }) => ({
+        width: '100%',
+        minHeight: '30rem',
+        padding: '1rem',
+        fontFamily:
+            '"Fira Code", "Cascadia Code", "JetBrains Mono", "Consolas", monospace',
+        fontSize: '0.875rem',
+        lineHeight: '1.5',
+        tabSize: 4,
+        backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
+        color: theme.palette.mode === 'dark' ? '#d4d4d4' : '#1e1e1e',
+        border: `1px solid ${hasError ? theme.palette.error.main : theme.palette.divider}`,
+        borderRadius: '0.5rem',
+        outline: 'none',
+        resize: 'vertical',
+        transition: 'border-color 0.2s ease',
+        '&:focus': {
+            borderColor: hasError
+                ? theme.palette.error.main
+                : theme.palette.primary.main,
+            boxShadow: `0 0 0 2px ${hasError ? theme.palette.error.main + '33' : theme.palette.primary.main + '33'}`,
+        },
+        '&::selection': {
+            backgroundColor: theme.palette.primary.main + '44',
+        },
+    })
+);
 
 const ErrorList = styled(Box)(({ theme }) => ({
     maxHeight: '8rem',
@@ -70,7 +80,7 @@ const ErrorList = styled(Box)(({ theme }) => ({
 const ButtonRow = styled(Box)({
     display: 'flex',
     gap: '0.75rem',
-    justifyContent: 'flex-end',
+    alignItems: 'center',
 });
 
 // Fields that shouldn't be edited via JSON (managed by other UI flows)
@@ -79,7 +89,10 @@ const EXCLUDED_FIELDS = ['avatar', 'namedColors', 'notifications'] as const;
 const formatMetadataForEditor = (metadata: User['metadata']): string => {
     const filtered = Object.fromEntries(
         Object.entries(metadata).filter(
-            ([key]) => !EXCLUDED_FIELDS.includes(key as (typeof EXCLUDED_FIELDS)[number])
+            ([key]) =>
+                !EXCLUDED_FIELDS.includes(
+                    key as (typeof EXCLUDED_FIELDS)[number]
+                )
         )
     );
     return JSON.stringify(filtered, null, 4);
@@ -90,7 +103,9 @@ type ValidationError = {
     message: string;
 };
 
-const validateJson = (jsonString: string): { data: Record<string, any> | null; errors: ValidationError[] } => {
+const validateJson = (
+    jsonString: string
+): { data: Record<string, any> | null; errors: ValidationError[] } => {
     let parsed: any;
     try {
         parsed = JSON.parse(jsonString);
@@ -101,16 +116,18 @@ const validateJson = (jsonString: string): { data: Record<string, any> | null; e
         };
     }
 
-    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    if (
+        typeof parsed !== 'object' ||
+        parsed === null ||
+        Array.isArray(parsed)
+    ) {
         return {
             data: null,
             errors: [{ path: '', message: 'Root value must be an object' }],
         };
     }
 
-    // Validate only the editable fields against the schema
-    const partialSchema = UserMetadataSchema.partial();
-    const result = partialSchema.safeParse(parsed);
+    const result = EditableUserMetadataSchema.safeParse(parsed);
 
     if (result.success) {
         return { data: parsed, errors: [] };
@@ -131,6 +148,7 @@ type Props = {
 const JsonSettingsTab = ({ userData }: Props) => {
     const { t } = useTranslation();
     const { mutateAsync: updateUserMetadata } = useUpdateUserMetadata();
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const originalJson = useMemo(
         () => formatMetadataForEditor(userData.metadata),
@@ -149,14 +167,17 @@ const JsonSettingsTab = ({ userData }: Props) => {
 
     const isDirty = editorValue !== originalJson;
 
-    const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const value = e.target.value;
-        setEditorValue(value);
+    const handleChange = useCallback(
+        (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const value = e.target.value;
+            setEditorValue(value);
 
-        // Live validation
-        const { errors: newErrors } = validateJson(value);
-        setErrors(newErrors);
-    }, []);
+            // Live validation
+            const { errors: newErrors } = validateJson(value);
+            setErrors(newErrors);
+        },
+        []
+    );
 
     const handleReset = useCallback(() => {
         setEditorValue(originalJson);
@@ -181,38 +202,86 @@ const JsonSettingsTab = ({ userData }: Props) => {
         }
     }, [editorValue, updateUserMetadata, t]);
 
-    const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        // Ctrl/Cmd+S to save
-        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-            e.preventDefault();
-            if (isDirty && errors.length === 0) {
-                handleSave();
-            }
-        }
+    const handleDownload = useCallback(() => {
+        downloadFile(
+            editorValue,
+            `quizaroni-settings.json`,
+            'application/json'
+        );
+    }, [editorValue]);
 
-        // Tab key inserts spaces instead of changing focus
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            const target = e.target as HTMLTextAreaElement;
-            const start = target.selectionStart;
-            const end = target.selectionEnd;
-            const newValue =
-                editorValue.substring(0, start) +
-                '    ' +
-                editorValue.substring(end);
-            setEditorValue(newValue);
-            // Restore cursor position after React re-render
-            requestAnimationFrame(() => {
-                target.selectionStart = target.selectionEnd = start + 4;
-            });
-        }
-    }, [isDirty, errors, handleSave, editorValue]);
+    const handleImport = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const content = event.target?.result as string;
+
+                // Try to pretty-print if valid JSON
+                try {
+                    const parsed = JSON.parse(content);
+                    const formatted = JSON.stringify(parsed, null, 4);
+                    setEditorValue(formatted);
+                    const { errors: newErrors } = validateJson(formatted);
+                    setErrors(newErrors);
+                } catch {
+                    // Still load the raw content so the user sees the parse error
+                    setEditorValue(content);
+                    const { errors: newErrors } = validateJson(content);
+                    setErrors(newErrors);
+                }
+            };
+            reader.readAsText(file);
+
+            // Reset so the same file can be re-imported
+            e.target.value = '';
+        },
+        []
+    );
+
+    const handleKeyDown = useCallback(
+        (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+            // Ctrl/Cmd+S to save
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                if (isDirty && errors.length === 0) {
+                    handleSave();
+                }
+            }
+
+            // Tab key inserts spaces instead of changing focus
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const target = e.target as HTMLTextAreaElement;
+                const start = target.selectionStart;
+                const end = target.selectionEnd;
+                const newValue =
+                    editorValue.substring(0, start) +
+                    '    ' +
+                    editorValue.substring(end);
+                setEditorValue(newValue);
+                // Restore cursor position after React re-render
+                requestAnimationFrame(() => {
+                    target.selectionStart = target.selectionEnd = start + 4;
+                });
+            }
+        },
+        [isDirty, errors, handleSave, editorValue]
+    );
 
     return (
         <AccountViewContainer>
             <EditorContainer>
                 <EditorHeader>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                        }}
+                    >
                         <Typography variant="h6">
                             {t('profile.jsonSettingsTitle')}
                         </Typography>
@@ -226,6 +295,26 @@ const JsonSettingsTab = ({ userData }: Props) => {
                         )}
                     </Box>
                     <ButtonRow>
+                        <Tooltip title={t('profile.importSettings')}>
+                            <IconButton
+                                size="small"
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                <UploadIcon />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('profile.downloadSettings')}>
+                            <IconButton size="small" onClick={handleDownload}>
+                                <DownloadIcon />
+                            </IconButton>
+                        </Tooltip>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept=".json"
+                            hidden
+                            onChange={handleImport}
+                        />
                         <LoadingButton
                             variant="outlined"
                             startIcon={<RestoreIcon />}
@@ -255,8 +344,14 @@ const JsonSettingsTab = ({ userData }: Props) => {
                 {errors.length > 0 && (
                     <ErrorList>
                         {errors.map((error, i) => (
-                            <Typography key={i} variant="caption" color="error" sx={{ fontFamily: 'monospace' }}>
-                                {error.path ? `${error.path}: ` : ''}{error.message}
+                            <Typography
+                                key={i}
+                                variant="caption"
+                                color="error"
+                                sx={{ fontFamily: 'monospace' }}
+                            >
+                                {error.path ? `${error.path}: ` : ''}
+                                {error.message}
                             </Typography>
                         ))}
                     </ErrorList>

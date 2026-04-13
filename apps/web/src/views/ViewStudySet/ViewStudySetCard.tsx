@@ -3,7 +3,7 @@ import { IconButton, Popover, Tooltip, Typography } from '@mui/material/';
 import { BoldTypography, SimpleFlexContainer } from 'styles/AppStyles';
 import useSpeechSynthesis from 'hooks/useSpeechSynthesis';
 import { Card, Studyset } from 'shared/types';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTheme } from 'theme/useTheme';
 import {
     DEFAULT_TERMINOLOGY,
@@ -32,11 +32,11 @@ type Props = {
 
 const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
     const { muiTheme } = useTheme();
-    const { speak, cancel } = useSpeechSynthesis();
+    const { cancel } = useSpeechSynthesis();
 
     const { mutate: updateStudySet } = useUpdateStudyset();
 
-    const timeoutRef = useRef(null);
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const { categories = [] } = card;
     const { cards, studysetUUID } = selectedStudyset;
@@ -51,29 +51,43 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
     const selectedTerminology = terminology ?? DEFAULT_TERMINOLOGY;
     const [terminology1, terminology2] =
         selectedTerminology === FORMAT_TERMINOLOGIES.CUSTOM
-            ? customTerminology?.split('/') ?? []
+            ? (customTerminology?.split('/') ?? [])
             : selectedTerminology.split('/');
     const selectedLabelTerminology =
         labelTerminology ?? LABEL_TERMINOLOGIES.CARD;
     const currentLabelTerminology =
         selectedLabelTerminology === LABEL_TERMINOLOGIES.CUSTOM
-            ? customLabelTerminology ?? ''
+            ? (customLabelTerminology ?? '')
             : selectedLabelTerminology;
 
-    // TODO: Adjust to clear timeout / reset if clicked multiple times
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current !== null) {
+                clearTimeout(timeoutRef.current);
+            }
+            cancel();
+            window.speechSynthesis.cancel();
+        };
+    }, [cancel]);
+
     const handleAudioPlayback = () => {
-        // if (timeoutRef.current) {
-        //     clearTimeout(timeoutRef.current)
-        // }
-        const audio = new SpeechSynthesisUtterance();
-        audio.text = card.term;
-        window.speechSynthesis.speak(audio);
-        // Wait half a second before speaking of definition
-        timeoutRef.current = setTimeout(() => {
-            audio.text = card.definition;
-            window.speechSynthesis.speak(audio);
+        if (timeoutRef.current !== null) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+        }
+        cancel();
+        window.speechSynthesis.cancel();
+
+        const termUtterance = new SpeechSynthesisUtterance();
+        termUtterance.text = card.term;
+        window.speechSynthesis.speak(termUtterance);
+
+        timeoutRef.current = window.setTimeout(() => {
+            const definitionUtterance = new SpeechSynthesisUtterance();
+            definitionUtterance.text = card.definition;
+            window.speechSynthesis.speak(definitionUtterance);
+            timeoutRef.current = null;
         }, 500);
-        // timeoutRef.current = "";
     };
 
     /**
@@ -138,7 +152,12 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                             {currentLabelTerminology} {index + 1}
                         </BoldTypography>
                     )}
-                    <CategoryChips hasIndex={selectedStudyset?.metadata?.cardIndexVisible !== false}>
+                    <CategoryChips
+                        hasIndex={
+                            selectedStudyset?.metadata?.cardIndexVisible !==
+                            false
+                        }
+                    >
                         {categories.length > 3 ? (
                             <CategoriesPopover categories={categories} />
                         ) : (
@@ -178,7 +197,8 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                                 {card.important ? (
                                     <Star
                                         sx={{
-                                            color: muiTheme.palette.primary.main,
+                                            color: muiTheme.palette.primary
+                                                .main,
                                         }}
                                     />
                                 ) : (
@@ -209,7 +229,11 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                         {card.term}
                     </Typography>
                     <ImageGallery
-                        files={card.files?.filter(f => f.association === 'term') || []}
+                        files={
+                            card.files?.filter(
+                                (f) => f.association === 'term'
+                            ) || []
+                        }
                         maxHeight="7rem"
                     />
                 </ViewCardInfo>
@@ -232,7 +256,11 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                         {card.definition}
                     </Typography>
                     <ImageGallery
-                        files={card.files?.filter(f => f.association === 'definition') || []}
+                        files={
+                            card.files?.filter(
+                                (f) => f.association === 'definition'
+                            ) || []
+                        }
                         maxHeight="7rem"
                     />
                 </ViewCardInfo>

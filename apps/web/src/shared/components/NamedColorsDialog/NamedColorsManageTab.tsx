@@ -1,4 +1,11 @@
-import { Box, Stack, Typography, ListItemText, Button, Collapse } from '@mui/material';
+import {
+    Box,
+    Stack,
+    Typography,
+    ListItemText,
+    Button,
+    Collapse,
+} from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { MetadataList, ErrorInfo } from 'shared/components/MetadataDialogs';
 
@@ -67,7 +74,8 @@ export const NamedColorsManageTab = ({
                     }}
                 >
                     <Typography variant="body2" fontWeight={500}>
-                        {deleteIndices.length} item{deleteIndices.length > 1 ? 's' : ''} selected
+                        {deleteIndices.length} item
+                        {deleteIndices.length > 1 ? 's' : ''} selected
                     </Typography>
                     <Button
                         color="inherit"

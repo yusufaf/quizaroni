@@ -69,5 +69,22 @@
         "good": "Bien",
         "easy": "Fácil"
     },
-    "addCardsToUnlock": "Agrega tarjetas para desbloquear este modo"
+    "addCardsToUnlock": "Agrega tarjetas para desbloquear este modo",
+    "typeWriteStudy": {
+        "loading": "Cargando...",
+        "typeDefinitionBelow": "Escribe la definición abajo:",
+        "answerPlaceholder": "Escribe tu respuesta...",
+        "useHint": "Usar pista ({{remaining}} restantes)",
+        "hintPenaltySuffix": "({{points}} pts)",
+        "hint1FirstLetter": "Pista 1: La primera letra es \"{{letter}}\"",
+        "hint2FirstThree": "Pista 2: Las primeras 3 letras son \"{{letters}}\"",
+        "hint3Length": "Pista 3: La longitud es de {{count}} caracteres",
+        "submitAnswer": "Enviar respuesta",
+        "difficultyLine": "Dificultad: {{level}} | Pulsa Enter para enviar",
+        "difficultyEasy": "fácil",
+        "difficultyMedium": "media",
+        "difficultyHard": "difícil",
+        "feedbackCorrect": "✓ ¡Correcto!",
+        "feedbackIncorrect": "✗ Incorrecto. La respuesta correcta es: \"{{answer}}\""
+    }
 }

@@ -1,6 +1,10 @@
 import {
     Button,
     ButtonGroup,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
     FormControl,
     IconButton,
     InputAdornment,
@@ -12,6 +16,8 @@ import {
     TextField,
     ToggleButton,
     ToggleButtonGroup,
+    useMediaQuery,
+    useTheme,
 } from '@mui/material';
 import {
     GridView as GridViewIcon,
@@ -27,6 +33,7 @@ import {
     FavoriteBorderRounded,
     ContentCopyRounded,
     LabelRounded,
+    Tune,
 } from '@mui/icons-material';
 import {
     HOME_LAYOUTS,
@@ -34,7 +41,8 @@ import {
     STUDYSET_CONFIRM_DIALOGS,
 } from 'shared/constants';
 import { SimpleFlexContainer, SpacedFlexContainer } from 'styles/AppStyles';
-import { ChangeEvent, Dispatch, SetStateAction } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SortDirection, Studyset } from 'shared/types';
 import { useNavigate } from 'react-router-dom';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
@@ -65,6 +73,10 @@ const HomeToolbar = ({
     selectedStudysetRows,
     selectedStudysetUUIDs,
 }: Props) => {
+    const { t } = useTranslation();
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+    const [filtersOpen, setFiltersOpen] = useState(false);
     const navigate = useNavigate();
 
     const { setLabelsDialogProps, showConfirmDialog } = useGlobalStore();
@@ -136,83 +148,127 @@ const HomeToolbar = ({
         });
     };
 
+    const searchField = (
+        <TextField
+            placeholder={t('home.toolbar.searchPlaceholder')}
+            fullWidth={isSmallScreen}
+            InputProps={{
+                startAdornment: (
+                    <InputAdornment position="start">
+                        <SearchIcon />
+                    </InputAdornment>
+                ),
+                endAdornment: searchText ? (
+                    <InputAdornment position="end">
+                        <IconButton onClick={clearSearchText} size="small">
+                            <CloseRounded />
+                        </IconButton>
+                    </InputAdornment>
+                ) : null,
+            }}
+            variant="outlined"
+            onChange={onSearchChange}
+            value={searchText}
+            size="small"
+            sx={{
+                '& .MuiOutlinedInput-root': {
+                    borderRadius: '1.5rem',
+                    paddingRight: searchText ? '0.25rem' : '0.875rem',
+                },
+            }}
+        />
+    );
+
+    const sortControls = (
+        <SimpleFlexContainer>
+            <IconButton
+                color="primary"
+                onClick={toggleSortDirection}
+                title={t('home.toolbar.sortDirection')}
+            >
+                {sortDirection === SORT_DIRECTIONS.ASC ? (
+                    <ArrowUpward />
+                ) : (
+                    <ArrowDownward />
+                )}
+            </IconButton>
+            <FormControl sx={{ minWidth: '8.75rem' }} size="small">
+                <InputLabel id="sort-label">
+                    {t('home.toolbar.sortBy')}
+                </InputLabel>
+                <Select
+                    labelId="sort-label"
+                    label={t('home.toolbar.sortBy')}
+                    onChange={onSortChange}
+                    value={selectedSort}
+                    sx={{
+                        borderRadius: '0.5rem',
+                    }}
+                >
+                    <MenuItem value="">
+                        <em>{t('viewStudySet.none')}</em>
+                    </MenuItem>
+                    <MenuItem value={'title'}>
+                        {t('home.columns.title')}
+                    </MenuItem>
+                    <MenuItem value={'lastViewed'}>
+                        {t('home.columns.lastViewed')}
+                    </MenuItem>
+                    <MenuItem value={'createdAt'}>
+                        {t('home.columns.created')}
+                    </MenuItem>
+                    <MenuItem value={'numCards'}>
+                        {t('home.columns.numberOfCards')}
+                    </MenuItem>
+                </Select>
+            </FormControl>
+        </SimpleFlexContainer>
+    );
+
     return (
         <SpacedFlexContainer style={{ alignItems: 'baseline' }}>
-            {!isTableView && (
-                <SimpleFlexContainer style={{ gap: '1rem' }}>
-                    <TextField
-                        placeholder="Search study sets..."
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon />
-                                </InputAdornment>
-                            ),
-                            endAdornment: searchText ? (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={clearSearchText}
-                                        size="small"
-                                    >
-                                        <CloseRounded />
-                                    </IconButton>
-                                </InputAdornment>
-                            ) : null,
-                        }}
-                        variant="outlined"
-                        onChange={onSearchChange}
-                        value={searchText}
-                        size="small"
-                        sx={{
-                            '& .MuiOutlinedInput-root': {
-                                borderRadius: '1.5rem',
-                                paddingRight: searchText
-                                    ? '0.25rem'
-                                    : '0.875rem',
-                            },
-                        }}
-                    />
-                    {/* TODO: Display a modal on mobile? */}
-
-                    <SimpleFlexContainer>
+            {!isTableView &&
+                (isSmallScreen ? (
+                    <>
                         <IconButton
                             color="primary"
-                            onClick={toggleSortDirection}
-                            title="Sort Direction"
+                            onClick={() => setFiltersOpen(true)}
+                            aria-label={t('home.toolbar.filtersDialogTitle')}
                         >
-                            {sortDirection === SORT_DIRECTIONS.ASC ? (
-                                <ArrowUpward />
-                            ) : (
-                                <ArrowDownward />
-                            )}
+                            <Tune />
                         </IconButton>
-                        <FormControl sx={{ minWidth: 140 }} size="small">
-                            <InputLabel id="sort-label">Sort by</InputLabel>
-                            <Select
-                                labelId="sort-label"
-                                label="Sort by"
-                                onChange={onSortChange}
-                                value={selectedSort}
+                        <Dialog
+                            open={filtersOpen}
+                            onClose={() => setFiltersOpen(false)}
+                            fullWidth
+                        >
+                            <DialogTitle>
+                                {t('home.toolbar.filtersDialogTitle')}
+                            </DialogTitle>
+                            <DialogContent
                                 sx={{
-                                    borderRadius: '0.5rem',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '1rem',
+                                    pt: '1rem',
                                 }}
                             >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
-                                <MenuItem value={'title'}>Title</MenuItem>
-                                <MenuItem value={'lastViewed'}>
-                                    Last Viewed
-                                </MenuItem>
-                                <MenuItem value={'createdAt'}>Created</MenuItem>
-                                <MenuItem value={'numCards'}>
-                                    # of Cards
-                                </MenuItem>
-                            </Select>
-                        </FormControl>
+                                {searchField}
+                                {sortControls}
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={() => setFiltersOpen(false)}>
+                                    {t('home.toolbar.done')}
+                                </Button>
+                            </DialogActions>
+                        </Dialog>
+                    </>
+                ) : (
+                    <SimpleFlexContainer style={{ gap: '1rem' }}>
+                        {searchField}
+                        {sortControls}
                     </SimpleFlexContainer>
-                </SimpleFlexContainer>
-            )}
+                ))}
             {isTableView && selectedStudysetRows.length > 0 && (
                 <SimpleFlexContainer style={{ gap: '1rem' }}>
                     {!(selectedStudysetRows.length > 1) && (

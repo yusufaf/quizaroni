@@ -69,7 +69,9 @@ const ProfileCard = ({ userData }: Props) => {
                     <Typography>{userData?.username ?? 'N/A'}</Typography>
                 </UserInfoContainer>
                 <UserInfoContainer>
-                    <UserInfoHeading>{t('profile.studySetsCreated')}</UserInfoHeading>
+                    <UserInfoHeading>
+                        {t('profile.studySetsCreated')}
+                    </UserInfoHeading>
                     <Typography>{studysets.length}</Typography>
                 </UserInfoContainer>
                 <UserInfoContainer>
@@ -77,16 +79,22 @@ const ProfileCard = ({ userData }: Props) => {
                     <Typography>{totalCards}</Typography>
                 </UserInfoContainer>
                 <UserInfoContainer>
-                    <UserInfoHeading>{t('profile.labelsCreated')}</UserInfoHeading>
+                    <UserInfoHeading>
+                        {t('profile.labelsCreated')}
+                    </UserInfoHeading>
                     <Typography>{labelsCount}</Typography>
                 </UserInfoContainer>
                 <UserInfoContainer>
-                    <UserInfoHeading>{t('profile.accountCreated')}</UserInfoHeading>
+                    <UserInfoHeading>
+                        {t('profile.accountCreated')}
+                    </UserInfoHeading>
                     <Typography>
                         {formatDateUsingPreferred(
                             userData.createdAt,
-                            userData.metadata.preferredDateFormat ?? DATE_FORMATS.MDY,
-                            userData.metadata.preferredTimeFormat ?? TIME_FORMATS.TWELVE_HOUR,
+                            userData.metadata.preferredDateFormat ??
+                                DATE_FORMATS.MDY,
+                            userData.metadata.preferredTimeFormat ??
+                                TIME_FORMATS.TWELVE_HOUR,
                             userData.metadata.showSeconds ?? false
                         )}
                     </Typography>

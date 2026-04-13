@@ -5,7 +5,8 @@ import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import { ErrorInfo } from 'shared/components/MetadataDialogs';
 
 export const useNamedColorsDialog = () => {
-    const { namedColorsDialogProps, setNamedColorsDialogProps } = useGlobalStore();
+    const { namedColorsDialogProps, setNamedColorsDialogProps } =
+        useGlobalStore();
 
     const { data: userData = DEFAULT_USER_RESPONSE } = useGetUser({
         enabled: namedColorsDialogProps.open,
@@ -100,7 +101,10 @@ export const useNamedColorsDialog = () => {
                 return;
             }
             // Don't make network call if nothing changed
-            if (newName === selectedColor.name && color === selectedColor.color) {
+            if (
+                newName === selectedColor.name &&
+                color === selectedColor.color
+            ) {
                 setEditIndex(null);
                 return;
             }
@@ -150,7 +154,9 @@ export const useNamedColorsDialog = () => {
 
     const handleDeleteToggle = useCallback((index: number) => {
         setDeleteIndices((prev) =>
-            prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
+            prev.includes(index)
+                ? prev.filter((i) => i !== index)
+                : [...prev, index]
         );
         setEditIndex(null);
     }, []);

@@ -17,7 +17,7 @@ type Props = {
     onResetColor: () => void;
     onApplyColor: () => void;
     onChange: (e: any) => void;
-    style?: Object;
+    style?: object;
     onClose: () => void;
     additionalRefs?: any[];
 };

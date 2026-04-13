@@ -1,16 +1,13 @@
-import {Dispatch, SetStateAction} from "react"
-import { IconButton, InputAdornment } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Dispatch, SetStateAction } from 'react';
+import { IconButton, InputAdornment } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 type Props = {
     passwordVisibility: boolean;
     setPasswordVisibility: Dispatch<SetStateAction<boolean>>;
-}
+};
 const PasswordToggle = (props: Props) => {
-    const {
-        passwordVisibility,
-        setPasswordVisibility
-    } = props;
+    const { passwordVisibility, setPasswordVisibility } = props;
 
     return (
         <InputAdornment position="end">
@@ -23,7 +20,7 @@ const PasswordToggle = (props: Props) => {
                 {passwordVisibility ? <VisibilityOff /> : <Visibility />}
             </IconButton>
         </InputAdornment>
-    )
-}
+    );
+};
 
 export default PasswordToggle;

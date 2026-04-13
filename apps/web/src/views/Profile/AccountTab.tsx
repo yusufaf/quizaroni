@@ -74,7 +74,7 @@ const AccountTab = ({ userData }: Props) => {
             });
             handleUpdateUserAttributeNextSteps(output);
         } catch (error) {
-            console.log(error);
+            console.error('Failed to update user attribute:', error);
         }
     };
 
@@ -96,7 +96,6 @@ const AccountTab = ({ userData }: Props) => {
 
                 break;
             case 'DONE':
-                console.log(`attribute was successfully updated.`);
                 break;
         }
     };

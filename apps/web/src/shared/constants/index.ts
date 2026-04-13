@@ -463,7 +463,8 @@ export const FONT_SIZE_PRESETS = {
     EXTRA_LARGE: 1.25,
 } as const;
 
-export type FontSizeScale = typeof FONT_SIZE_PRESETS[keyof typeof FONT_SIZE_PRESETS];
+export type FontSizeScale =
+    (typeof FONT_SIZE_PRESETS)[keyof typeof FONT_SIZE_PRESETS];
 
 // Notification Constants
 export const NOTIFICATION_MODES = {

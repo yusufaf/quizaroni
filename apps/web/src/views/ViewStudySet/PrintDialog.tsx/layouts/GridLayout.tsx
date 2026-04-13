@@ -15,11 +15,10 @@ type Props = {
 
 const GridLayout = ({ studyset, cards, settings }: Props) => {
     const { terminology, customTerminology } = studyset.metadata;
-    const [term1, term2] =
-        (terminology === FORMAT_TERMINOLOGIES.CUSTOM
-            ? customTerminology
-            : terminology
-        )?.split('/') ?? ['Term', 'Definition'];
+    const [term1, term2] = (terminology === FORMAT_TERMINOLOGIES.CUSTOM
+        ? customTerminology
+        : terminology
+    )?.split('/') ?? ['Term', 'Definition'];
 
     return (
         <div className="print-content">
@@ -68,7 +67,8 @@ const GridLayout = ({ studyset, cards, settings }: Props) => {
                                         fontStyle: 'italic',
                                     }}
                                 >
-                                    Notes: {card.notes.map((n) => n.text).join('; ')}
+                                    Notes:{' '}
+                                    {card.notes.map((n) => n.text).join('; ')}
                                 </div>
                             )}
                         </GridCardContent>

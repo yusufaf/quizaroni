@@ -49,7 +49,9 @@ const SetModificationButtons = ({
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const keyboardShortcutsOpen = Boolean(anchorEl);
 
-    const expandButtonTitle = expanded ? t('create.hideButtons') : t('create.expandButtons');
+    const expandButtonTitle = expanded
+        ? t('create.hideButtons')
+        : t('create.expandButtons');
 
     const onImportClick = (_e: MouseEvent<HTMLButtonElement>) => {
         setShowImportModal(true);

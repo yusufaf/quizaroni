@@ -45,11 +45,10 @@ const ConfirmEmail = (props: Props) => {
                     navigate('/login');
                     break;
                 case 'changeEmail':
-                    const changeEmailResult = await confirmUserAttribute({
+                    await confirmUserAttribute({
                         userAttributeKey: 'email',
                         confirmationCode,
                     });
-                    console.log({ changeEmailResult });
 
                     updateEmail({
                         username,
@@ -64,8 +63,7 @@ const ConfirmEmail = (props: Props) => {
 
     const handleResendCode = async () => {
         try {
-            const result = await resendSignUpCode({ username });
-            console.log('Code resent succesfully', result);
+            await resendSignUpCode({ username });
         } catch (err) {
             console.error('error resending code: ', err);
         }

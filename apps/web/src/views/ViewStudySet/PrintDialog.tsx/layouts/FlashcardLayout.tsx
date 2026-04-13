@@ -18,11 +18,10 @@ type Props = {
 
 const FlashcardLayout = ({ studyset, cards, settings }: Props) => {
     const { terminology, customTerminology } = studyset.metadata;
-    const [term1, term2] =
-        (terminology === FORMAT_TERMINOLOGIES.CUSTOM
-            ? customTerminology
-            : terminology
-        )?.split('/') ?? ['Term', 'Definition'];
+    const [term1, term2] = (terminology === FORMAT_TERMINOLOGIES.CUSTOM
+        ? customTerminology
+        : terminology
+    )?.split('/') ?? ['Term', 'Definition'];
 
     return (
         <div className="print-content">

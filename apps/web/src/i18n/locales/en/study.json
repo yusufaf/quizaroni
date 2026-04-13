@@ -69,5 +69,22 @@
         "good": "Good",
         "easy": "Easy"
     },
-    "addCardsToUnlock": "Add cards to unlock this mode"
+    "addCardsToUnlock": "Add cards to unlock this mode",
+    "typeWriteStudy": {
+        "loading": "Loading...",
+        "typeDefinitionBelow": "Type the definition below:",
+        "answerPlaceholder": "Enter your answer...",
+        "useHint": "Use Hint ({{remaining}} remaining)",
+        "hintPenaltySuffix": "({{points}} pts)",
+        "hint1FirstLetter": "Hint 1: First letter is \"{{letter}}\"",
+        "hint2FirstThree": "Hint 2: First 3 letters are \"{{letters}}\"",
+        "hint3Length": "Hint 3: Length is {{count}} characters",
+        "submitAnswer": "Submit Answer",
+        "difficultyLine": "Difficulty: {{level}} | Press Enter to submit",
+        "difficultyEasy": "easy",
+        "difficultyMedium": "medium",
+        "difficultyHard": "hard",
+        "feedbackCorrect": "✓ Correct!",
+        "feedbackIncorrect": "✗ Incorrect. The correct answer is: \"{{answer}}\""
+    }
 }

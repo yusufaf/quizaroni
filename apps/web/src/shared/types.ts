@@ -87,7 +87,10 @@ export type User = {
     labels: string[];
     metadata: {
         avatar?: AvatarMetadata;
+        confirmDestructiveActions?: boolean;
+        defaultDownloadFormat: DownloadSetFormat;
         defaultTheme: AppTheme;
+        density?: 'compact' | 'standard' | 'comfortable';
         fontSizeScale?: number;
         homeView: HomeView;
         namedColors: NamedColor[];
@@ -95,8 +98,7 @@ export type User = {
         preferredDateFormat: PreferredDateFormat;
         preferredTimeFormat?: PreferredTimeFormat;
         showSeconds?: boolean;
-        confirmDestructiveActions?: boolean;
-        defaultDownloadFormat: DownloadSetFormat;
+        visibleColumns?: Record<string, boolean>;
     };
     username: string;
     userUUID: UUID;
@@ -158,7 +160,11 @@ export type NotificationPreferences = {
 // #endregion
 
 // Study Mode Types
-export type StudyMode = 'flashcards' | 'multiple-choice' | 'matching' | 'type-write';
+export type StudyMode =
+    | 'flashcards'
+    | 'multiple-choice'
+    | 'matching'
+    | 'type-write';
 
 export type StudySessionState = {
     studysetUUID: UUID;

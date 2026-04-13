@@ -74,9 +74,7 @@ export const validateAndNormalizeCard = (rawCard: any): Card | null => {
         definition: rawCard.definition.trim(),
         cardUUID: rawCard.cardUUID || crypto.randomUUID(),
         categories: Array.isArray(rawCard.categories)
-            ? rawCard.categories.filter(
-                  (cat: any) => typeof cat === 'string'
-              )
+            ? rawCard.categories.filter((cat: any) => typeof cat === 'string')
             : [],
         files: Array.isArray(rawCard.files) ? rawCard.files : [],
         notes: Array.isArray(rawCard.notes) ? rawCard.notes : [],

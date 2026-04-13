@@ -57,8 +57,7 @@ const Login = (props: Props) => {
 
     const handleLogin = async () => {
         try {
-            const user = await signIn({ username, password });
-            console.log('Result of cognito sign in = ', user);
+            await signIn({ username, password });
 
             /* Store cognito user and authenticated in state */
             // setCognitoUser({ username });
