@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
+import {
+    useQuery,
+    useMutation,
+    useQueryClient,
+    UseQueryOptions,
+} from '@tanstack/react-query';
 import { BASE_API_URL, getCommonPostRequestProps } from './awsAPI';
 import { validate } from 'shared/validation';
 import {
@@ -27,7 +32,9 @@ import {
     router.post("/api/users/updateEmail", updateUserEmail);
 */
 
-export const useGetUser = (options?: Omit<UseQueryOptions<GetUserResponse>, 'queryKey' | 'queryFn'>) => {
+export const useGetUser = (
+    options?: Omit<UseQueryOptions<GetUserResponse>, 'queryKey' | 'queryFn'>
+) => {
     return useQuery({
         queryKey: ['user'],
         queryFn: async () => {
@@ -39,7 +46,7 @@ export const useGetUser = (options?: Omit<UseQueryOptions<GetUserResponse>, 'que
                 schema: GetUserResponseSchema,
                 data,
                 type: 'response',
-                context: 'GetUser'
+                context: 'GetUser',
             });
         },
         ...options,
@@ -58,7 +65,7 @@ export const useCreateUser = () => {
                 schema: BaseResponseSchema,
                 data,
                 type: 'response',
-                context: 'CreateUser'
+                context: 'CreateUser',
             });
         },
     });
@@ -68,16 +75,19 @@ export const useUpdateUserMetadata = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ updates }: UpdateUserMetadataRequest) => {
-            const response = await fetch(`${BASE_API_URL}/users/update-metadata`, {
-                ...getCommonPostRequestProps(),
-                body: JSON.stringify({ updates }),
-            });
+            const response = await fetch(
+                `${BASE_API_URL}/users/update-metadata`,
+                {
+                    ...getCommonPostRequestProps(),
+                    body: JSON.stringify({ updates }),
+                }
+            );
             const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
                 type: 'response',
-                context: 'UpdateUserMetadata'
+                context: 'UpdateUserMetadata',
             });
         },
         onSuccess: () => {
@@ -90,16 +100,19 @@ export const useUpdateDefaultTheme = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ newTheme, uuid }: UpdateDefaultThemeRequest) => {
-            const response = await fetch(`${BASE_API_URL}/users/updateDefaultTheme`, {
-                ...getCommonPostRequestProps(),
-                body: JSON.stringify({ uuid, newTheme }),
-            });
+            const response = await fetch(
+                `${BASE_API_URL}/users/updateDefaultTheme`,
+                {
+                    ...getCommonPostRequestProps(),
+                    body: JSON.stringify({ uuid, newTheme }),
+                }
+            );
             const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
                 type: 'response',
-                context: 'UpdateDefaultTheme'
+                context: 'UpdateDefaultTheme',
             });
         },
         onSuccess: () => {
@@ -121,7 +134,7 @@ export const useUpdateEmail = () => {
                 schema: BaseResponseSchema,
                 data,
                 type: 'response',
-                context: 'UpdateEmail'
+                context: 'UpdateEmail',
             });
         },
         onSuccess: () => {
@@ -133,16 +146,19 @@ export const useUpdateEmail = () => {
 export const useDownloadUserData = () => {
     return useMutation({
         mutationFn: async (params: DownloadUserDataRequest) => {
-            const response = await fetch(`${BASE_API_URL}/users/download-user-data`, {
-                ...getCommonPostRequestProps(),
-                body: JSON.stringify(params),
-            });
+            const response = await fetch(
+                `${BASE_API_URL}/users/download-user-data`,
+                {
+                    ...getCommonPostRequestProps(),
+                    body: JSON.stringify(params),
+                }
+            );
             const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
                 type: 'response',
-                context: 'DownloadUserData'
+                context: 'DownloadUserData',
             });
         },
     });
@@ -180,7 +196,9 @@ export const useUploadProfilePicture = () => {
 export const useUpdateNotificationPreferences = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ updates }: UpdateNotificationPreferencesRequest) => {
+        mutationFn: async ({
+            updates,
+        }: UpdateNotificationPreferencesRequest) => {
             const response = await fetch(
                 `${BASE_API_URL}/users/update-notification-preferences`,
                 {

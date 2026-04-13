@@ -31,7 +31,12 @@ export const MetadataDialogShell = ({
     maxWidth = 'lg',
 }: MetadataDialogShellProps) => {
     return (
-        <StyledDialog open={open} onClose={onClose} fullWidth maxWidth={maxWidth}>
+        <StyledDialog
+            open={open}
+            onClose={onClose}
+            fullWidth
+            maxWidth={maxWidth}
+        >
             <StandardDialogTitle title={title} onClose={onClose} />
 
             <StyledTabs

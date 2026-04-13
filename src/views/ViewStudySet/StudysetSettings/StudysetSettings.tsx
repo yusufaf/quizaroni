@@ -43,12 +43,19 @@ const StudysetSettings = ({ open, onClose, studyset }: Props) => {
 
     return (
         <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
-            <StandardDialogTitle title={t('studysetSettings.title')} onClose={onClose} />
+            <StandardDialogTitle
+                title={t('studysetSettings.title')}
+                onClose={onClose}
+            />
             <StyledDialogContent>
                 <FormatTerminologies studyset={studyset} />
                 <LabelTerminologies studyset={studyset} />
                 <FormControl>
-                    <FormLabel sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}>{t('studysetSettings.cards')}</FormLabel>
+                    <FormLabel
+                        sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}
+                    >
+                        {t('studysetSettings.cards')}
+                    </FormLabel>
                     <FlexColumn style={{ gap: '1rem', marginTop: '0.5rem' }}>
                         <SettingsToggle
                             label={t('studysetSettings.showCardCount')}
@@ -67,19 +74,29 @@ const StudysetSettings = ({ open, onClose, studyset }: Props) => {
                     </FlexColumn>
                 </FormControl>
                 <FormControl>
-                    <FormLabel sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}>{t('studysetSettings.notes')}</FormLabel>
+                    <FormLabel
+                        sx={{ fontWeight: 'bold', fontSize: '1.125rem' }}
+                    >
+                        {t('studysetSettings.notes')}
+                    </FormLabel>
                     <FlexColumn style={{ gap: '1rem', marginTop: '0.5rem' }}>
                         <SettingsToggle
                             label={t('studysetSettings.notesDrawerAlignment')}
                             options={NOTES_DRAWER_POSITIONS_OPTIONS}
-                            selectedValue={studyset?.metadata?.notesDrawerPosition}
+                            selectedValue={
+                                studyset?.metadata?.notesDrawerPosition
+                            }
                             property="notesDrawerPosition"
                             onChange={handleSettingToggleChange}
                         />
                         <SettingsToggle
-                            label={t('studysetSettings.notesDrawerInitialAppearance')}
+                            label={t(
+                                'studysetSettings.notesDrawerInitialAppearance'
+                            )}
                             options={NOTES_DRAWER_INITIAL_APPEARANCE_OPTIONS}
-                            selectedValue={studyset?.metadata?.notesDrawerInitial}
+                            selectedValue={
+                                studyset?.metadata?.notesDrawerInitial
+                            }
                             property="notesDrawerInitial"
                             onChange={handleSettingToggleChange}
                         />

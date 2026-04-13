@@ -1,6 +1,12 @@
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { Studyset } from 'shared/types';
-import { Box, FormControl, InputLabel, Typography, MenuItem } from '@mui/material';
+import {
+    Box,
+    FormControl,
+    InputLabel,
+    Typography,
+    MenuItem,
+} from '@mui/material';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,7 +14,8 @@ type Props = {
     selectedStudyset: Studyset;
     selectedCardUUID: string;
     setSelectedCardUUID: Dispatch<SetStateAction<string>>;
-    onAssignedCategoriesChange: (e: SelectChangeEvent) => void;
+    assignedCategories: string[];
+    onAssignedCategoriesChange: (e: SelectChangeEvent<string[]>) => void;
     isAssigningCategories?: boolean;
 };
 
@@ -17,6 +24,7 @@ const AssignTabView = (props: Props) => {
         selectedStudyset,
         selectedCardUUID,
         setSelectedCardUUID,
+        assignedCategories,
         onAssignedCategoriesChange,
         isAssigningCategories = false,
     } = props;
@@ -24,14 +32,13 @@ const AssignTabView = (props: Props) => {
     const { t } = useTranslation();
 
     const { cards, categories } = selectedStudyset;
-    const selectedCardCategories: string[] =
-        cards?.find((card) => card.cardUUID === selectedCardUUID)?.categories ??
-        [];
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <FormControl fullWidth>
-                <InputLabel id="card-select-label">{t('categories.selectCard')}</InputLabel>
+                <InputLabel id="card-select-label">
+                    {t('categories.selectCard')}
+                </InputLabel>
                 <Select
                     labelId="card-select-label"
                     label={t('categories.selectCard')}
@@ -44,11 +51,12 @@ const AssignTabView = (props: Props) => {
                             definition: card.definition,
                         });
                         return (
-                            <MenuItem
-                                key={card.cardUUID}
-                                value={card.cardUUID}
-                            >
-                                <Typography variant="inherit" noWrap title={text}>
+                            <MenuItem key={card.cardUUID} value={card.cardUUID}>
+                                <Typography
+                                    variant="inherit"
+                                    noWrap
+                                    title={text}
+                                >
                                     {text}
                                 </Typography>
                             </MenuItem>
@@ -66,7 +74,7 @@ const AssignTabView = (props: Props) => {
                         labelId="category-select-label"
                         label={t('categories.assignCategories')}
                         multiple
-                        value={selectedCardCategories}
+                        value={assignedCategories}
                         onChange={onAssignedCategoriesChange}
                         disabled={isAssigningCategories}
                     >
@@ -83,9 +91,11 @@ const AssignTabView = (props: Props) => {
 
             {selectedCardUUID && (
                 <Typography variant="body2" color="text.secondary">
-                    {selectedCardCategories.length === 0
+                    {assignedCategories.length === 0
                         ? t('categories.noCategoriesAssigned')
-                        : t('categories.categoriesAssigned', { count: selectedCardCategories.length })}
+                        : t('categories.categoriesAssigned', {
+                              count: assignedCategories.length,
+                          })}
                 </Typography>
             )}
         </Box>

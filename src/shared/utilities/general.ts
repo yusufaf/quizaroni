@@ -31,7 +31,7 @@ export const getRandomNumber = (min: number, max: number): number => {
     return Math.random() * (max - min) + min;
 };
 
-export const downloadObjectAsJSON = (data: Object, fileName: string) => {
+export const downloadObjectAsJSON = (data: object, fileName: string) => {
     const jsonData = JSON.stringify(data, null, 4);
     const blob = new Blob([jsonData], { type: MIME_TYPES.JSON });
     const anchor = document.createElement('a');
@@ -41,7 +41,11 @@ export const downloadObjectAsJSON = (data: Object, fileName: string) => {
     anchor.remove();
 };
 
-export const downloadFile = (content: string, fileName: string, mimeType: string) => {
+export const downloadFile = (
+    content: string,
+    fileName: string,
+    mimeType: string
+) => {
     const blob = new Blob([content], { type: mimeType });
     const anchor = document.createElement('a');
     anchor.download = fileName;

@@ -67,7 +67,6 @@ const Signup = (props: Props) => {
                     },
                 },
             });
-            console.log({ signUpResult });
 
             /* Store newly created cognito user in Redux */
             // dispatch(
@@ -87,7 +86,7 @@ const Signup = (props: Props) => {
                 title: 'Confirm Sign Up',
             });
         } catch (error) {
-            console.log('error signing up:', error);
+            console.error('Error signing up:', error);
         }
     };
 

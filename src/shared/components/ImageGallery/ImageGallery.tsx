@@ -14,25 +14,27 @@ const GalleryGrid = styled('div')<{ columns: number }>(({ columns }) => ({
     marginBottom: '0.75rem',
 }));
 
-const GalleryImage = styled('div')<{ maxHeight: string }>(({ theme, maxHeight }) => ({
-    position: 'relative',
-    width: '10rem',
-    height: '7rem',
-    borderRadius: '0.5rem',
-    overflow: 'hidden',
-    cursor: 'pointer',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-    backgroundColor: theme.palette.grey[100],
-    border: `1px solid ${theme.palette.divider}`,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-    '&:hover': {
-        transform: 'scale(1.02)',
-        boxShadow: theme.shadows[4],
-    },
-}));
+const GalleryImage = styled('div')<{ maxHeight: string }>(
+    ({ theme, maxHeight }) => ({
+        position: 'relative',
+        width: '10rem',
+        height: '7rem',
+        borderRadius: '0.5rem',
+        overflow: 'hidden',
+        cursor: 'pointer',
+        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+        backgroundColor: theme.palette.grey[100],
+        border: `1px solid ${theme.palette.divider}`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+        '&:hover': {
+            transform: 'scale(1.02)',
+            boxShadow: theme.shadows[4],
+        },
+    })
+);
 
 const StyledImage = styled('img')({
     width: '100%',
@@ -126,7 +128,9 @@ const ImageGallery = ({
 }: ImageGalleryProps) => {
     const { t, i18n } = useTranslation();
     const [lightboxOpen, setLightboxOpen] = useState(false);
-    const [selectedImage, setSelectedImage] = useState<CardFileMetadata | null>(null);
+    const [selectedImage, setSelectedImage] = useState<CardFileMetadata | null>(
+        null
+    );
     const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
     const handleImageClick = (file: CardFileMetadata) => {
@@ -136,7 +140,9 @@ const ImageGallery = ({
         onImageClick?.(file);
     };
 
-    const handleCloseLightbox = (e?: React.MouseEvent | React.SyntheticEvent) => {
+    const handleCloseLightbox = (
+        e?: React.MouseEvent | React.SyntheticEvent
+    ) => {
         e?.stopPropagation();
         setLightboxOpen(false);
         setSelectedImage(null);
@@ -144,7 +150,7 @@ const ImageGallery = ({
     };
 
     const handleImageError = (fileKey: string) => {
-        setImageErrors(prev => new Set(prev).add(fileKey));
+        setImageErrors((prev) => new Set(prev).add(fileKey));
     };
 
     if (!files || files.length === 0) {
@@ -158,7 +164,7 @@ const ImageGallery = ({
             onMouseUp={(e) => e.stopPropagation()}
         >
             <GalleryGrid columns={files.length === 1 ? 1 : 2}>
-                {files.map(file => (
+                {files.map((file) => (
                     <GalleryImage
                         key={file.key}
                         maxHeight={maxHeight}
@@ -170,7 +176,10 @@ const ImageGallery = ({
                                 <Typography variant="caption">
                                     Failed to load image
                                 </Typography>
-                                <Typography variant="caption" sx={{ fontSize: '0.625rem' }}>
+                                <Typography
+                                    variant="caption"
+                                    sx={{ fontSize: '0.625rem' }}
+                                >
                                     {file.name}
                                 </Typography>
                             </BrokenImageContainer>
@@ -225,7 +234,11 @@ const ImageGallery = ({
                             onClick={(e) => e.stopPropagation()}
                         />
                         <CaptionBar onClick={(e) => e.stopPropagation()}>
-                            <Typography variant="body2" sx={{ color: 'white' }} noWrap>
+                            <Typography
+                                variant="body2"
+                                sx={{ color: 'white' }}
+                                noWrap
+                            >
                                 {selectedImage.name}
                             </Typography>
                             <CaptionMetadata>

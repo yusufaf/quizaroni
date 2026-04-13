@@ -19,7 +19,12 @@ export const NamedColorsCreateTab = ({
     color,
 }: Props) => {
     const previewComponent = (
-        <Stack direction="row" spacing="1rem" alignItems="center" sx={{ mt: '0.5rem' }}>
+        <Stack
+            direction="row"
+            spacing="1rem"
+            alignItems="center"
+            sx={{ mt: '0.5rem' }}
+        >
             <Box
                 sx={{
                     width: '2rem',

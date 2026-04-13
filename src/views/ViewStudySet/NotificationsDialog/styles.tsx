@@ -1,5 +1,11 @@
 import styled from '@emotion/styled';
-import { Box, Dialog, Paper, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import {
+    Box,
+    Dialog,
+    Paper,
+    ToggleButton,
+    ToggleButtonGroup,
+} from '@mui/material';
 
 export const StyledDialog = styled(Dialog)({
     '& .MuiDialog-paper': {

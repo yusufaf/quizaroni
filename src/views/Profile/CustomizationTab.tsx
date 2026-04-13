@@ -35,7 +35,12 @@ import {
 import { SimpleFlexContainer } from 'shared/styles/AppStyles';
 import { PreferredDateFormat, User } from 'shared/types';
 import { useUpdateUserMetadata } from 'state/api/usersAPI';
-import { ActionColumn, ActionHeader, SimpleSelect, AccountViewContainer } from './ProfileStyles';
+import {
+    ActionColumn,
+    ActionHeader,
+    SimpleSelect,
+    AccountViewContainer,
+} from './ProfileStyles';
 import { downloadTypeItems } from 'views/ViewStudySet/DownloadSetModal/DownloadSetModal';
 import { useGlobalStore } from 'state/stores/global';
 import NotificationsDialog from 'views/ViewStudySet/NotificationsDialog/NotificationsDialog';
@@ -76,7 +81,8 @@ const CustomizationTab = ({ userData }: Props) => {
     } = userData;
 
     const [loadingID, setLoadingID] = useState<string>('');
-    const [notificationsDialogOpen, setNotificationsDialogOpen] = useState(false);
+    const [notificationsDialogOpen, setNotificationsDialogOpen] =
+        useState(false);
 
     const defaultThemeLoading = useMemo(() => {
         return loadingID === LOADING_IDS.DEFAULT_THEME;
@@ -114,7 +120,6 @@ const CustomizationTab = ({ userData }: Props) => {
      */
     const handleDefaultTheme = async (event, newTheme) => {
         try {
-            console.log({ newTheme });
             /* Don't take any action if selected theme is the same */
             if (!userUUID || newTheme === null || newTheme === defaultTheme) {
                 return;
@@ -127,9 +132,6 @@ const CustomizationTab = ({ userData }: Props) => {
                     defaultTheme: newTheme,
                 },
             })
-                .then(() => {
-                    console.log(`Default theme updated successfully`);
-                })
                 .catch((error) => {
                     console.error(`Failed to update default theme:`, error);
                 })
@@ -165,9 +167,6 @@ const CustomizationTab = ({ userData }: Props) => {
                 [event.target.name]: event.target.value,
             },
         })
-            .then(() => {
-                console.log(`${event.target.name} updated successfully`);
-            })
             .catch((error) => {
                 console.error(`Failed to update ${event.target.name}:`, error);
             })
@@ -176,36 +175,40 @@ const CustomizationTab = ({ userData }: Props) => {
             });
     };
 
-    const handleShowSecondsToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleShowSecondsToggle = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
         setLoadingID(LOADING_IDS.SHOW_SECONDS);
         updateUserMetadata({
             updates: {
                 showSeconds: event.target.checked,
             },
         })
-            .then(() => {
-                console.log('Show seconds preference updated successfully');
-            })
             .catch((error) => {
-                console.error('Failed to update show seconds preference:', error);
+                console.error(
+                    'Failed to update show seconds preference:',
+                    error
+                );
             })
             .finally(() => {
                 setLoadingID('');
             });
     };
 
-    const handleConfirmDestructiveToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleConfirmDestructiveToggle = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
         setLoadingID(LOADING_IDS.CONFIRM_DESTRUCTIVE);
         updateUserMetadata({
             updates: {
                 confirmDestructiveActions: event.target.checked,
             },
         })
-            .then(() => {
-                console.log('Confirm destructive actions preference updated successfully');
-            })
             .catch((error) => {
-                console.error('Failed to update confirm destructive actions preference:', error);
+                console.error(
+                    'Failed to update confirm destructive actions preference:',
+                    error
+                );
             })
             .finally(() => {
                 setLoadingID('');
@@ -225,7 +228,9 @@ const CustomizationTab = ({ userData }: Props) => {
             <ActionColumn>
                 <ActionHeader>
                     <DarkMode />
-                    <Typography variant="h6">{t('profile.defaultTheme')}</Typography>
+                    <Typography variant="h6">
+                        {t('profile.defaultTheme')}
+                    </Typography>
                 </ActionHeader>
                 <SimpleFlexContainer style={{ gap: '1rem' }}>
                     <ToggleButtonGroup
@@ -254,7 +259,9 @@ const CustomizationTab = ({ userData }: Props) => {
             <ActionColumn>
                 <ActionHeader>
                     <LanguageIcon />
-                    <Typography variant="h6">{t('profile.interfaceLanguage')}</Typography>
+                    <Typography variant="h6">
+                        {t('profile.interfaceLanguage')}
+                    </Typography>
                 </ActionHeader>
                 <SimpleFlexContainer style={{ gap: '1rem' }}>
                     <SimpleSelect
@@ -265,8 +272,8 @@ const CustomizationTab = ({ userData }: Props) => {
                             width: '10rem',
                         }}
                     >
-                        <MenuItem value="en">English</MenuItem>
-                        <MenuItem value="es">Español</MenuItem>
+                        <MenuItem value="en">{t('languages.en')}</MenuItem>
+                        <MenuItem value="es">{t('languages.es')}</MenuItem>
                     </SimpleSelect>
                 </SimpleFlexContainer>
             </ActionColumn>
@@ -286,7 +293,9 @@ const CustomizationTab = ({ userData }: Props) => {
             <ActionColumn>
                 <ActionHeader>
                     <Palette />
-                    <Typography variant="h6">{t('profile.namedColors')}</Typography>
+                    <Typography variant="h6">
+                        {t('profile.namedColors')}
+                    </Typography>
                 </ActionHeader>
                 <Button
                     variant="outlined"
@@ -300,7 +309,9 @@ const CustomizationTab = ({ userData }: Props) => {
             <ActionColumn>
                 <ActionHeader>
                     <NotificationsIcon />
-                    <Typography variant="h6">{t('profile.notifications')}</Typography>
+                    <Typography variant="h6">
+                        {t('profile.notifications')}
+                    </Typography>
                 </ActionHeader>
                 <Button
                     variant="outlined"
@@ -317,7 +328,9 @@ const CustomizationTab = ({ userData }: Props) => {
             <ActionColumn>
                 <ActionHeader>
                     <DateRangeIcon />
-                    <Typography variant="h6">{t('profile.dateFormat')}</Typography>
+                    <Typography variant="h6">
+                        {t('profile.dateFormat')}
+                    </Typography>
                 </ActionHeader>
                 <SimpleFlexContainer style={{ gap: '1rem' }}>
                     <SimpleSelect
@@ -342,7 +355,9 @@ const CustomizationTab = ({ userData }: Props) => {
             <ActionColumn>
                 <ActionHeader>
                     <AccessTimeIcon />
-                    <Typography variant="h6">{t('profile.timeFormat')}</Typography>
+                    <Typography variant="h6">
+                        {t('profile.timeFormat')}
+                    </Typography>
                 </ActionHeader>
                 <SimpleFlexContainer style={{ gap: '1rem' }}>
                     <SimpleSelect
@@ -368,9 +383,13 @@ const CustomizationTab = ({ userData }: Props) => {
             <ActionColumn>
                 <ActionHeader>
                     <AccessTimeIcon />
-                    <Typography variant="h6">{t('profile.showSecondsInTimestamps')}</Typography>
+                    <Typography variant="h6">
+                        {t('profile.showSecondsInTimestamps')}
+                    </Typography>
                 </ActionHeader>
-                <SimpleFlexContainer style={{ gap: '1rem', alignItems: 'center' }}>
+                <SimpleFlexContainer
+                    style={{ gap: '1rem', alignItems: 'center' }}
+                >
                     <Switch
                         checked={showSeconds}
                         onChange={handleShowSecondsToggle}
@@ -382,18 +401,28 @@ const CustomizationTab = ({ userData }: Props) => {
             <ActionColumn>
                 <ActionHeader>
                     <WarningIcon />
-                    <Typography variant="h6">{t('profile.confirmDestructiveActions')}</Typography>
+                    <Typography variant="h6">
+                        {t('profile.confirmDestructiveActions')}
+                    </Typography>
                 </ActionHeader>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: '0.5rem' }}>
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: '0.5rem' }}
+                >
                     {t('profile.confirmDestructiveActionsDescription')}
                 </Typography>
-                <SimpleFlexContainer style={{ gap: '1rem', alignItems: 'center' }}>
+                <SimpleFlexContainer
+                    style={{ gap: '1rem', alignItems: 'center' }}
+                >
                     <Switch
                         checked={confirmDestructiveActions}
                         onChange={handleConfirmDestructiveToggle}
                         disabled={confirmDestructiveLoading}
                     />
-                    {confirmDestructiveLoading && <CircularProgress size={24} />}
+                    {confirmDestructiveLoading && (
+                        <CircularProgress size={24} />
+                    )}
                 </SimpleFlexContainer>
             </ActionColumn>
             <ActionColumn>
@@ -416,7 +445,9 @@ const CustomizationTab = ({ userData }: Props) => {
                     >
                         {downloadTypeItems}
                     </SimpleSelect>
-                    {downloadFormatLoading && <CircularProgress size={24} />}{' '}
+                    {downloadFormatLoading && (
+                        <CircularProgress size={24} />
+                    )}{' '}
                 </SimpleFlexContainer>
             </ActionColumn>
         </AccountViewContainer>

@@ -85,16 +85,26 @@ export const CascadePreviewDialog = ({
                         {affectedItems.slice(0, 10).map((item, i) => (
                             <ListItem key={i}>
                                 <ListItemIcon>
-                                    <WarningIcon fontSize="small" color="warning" />
+                                    <WarningIcon
+                                        fontSize="small"
+                                        color="warning"
+                                    />
                                 </ListItemIcon>
-                                <ListItemText primary={item.name} secondary={item.detail} />
+                                <ListItemText
+                                    primary={item.name}
+                                    secondary={item.detail}
+                                />
                             </ListItem>
                         ))}
                         {affectedItems.length > 10 && (
                             <Typography
                                 variant="caption"
                                 color="text.secondary"
-                                sx={{ mt: '0.5rem', display: 'block', textAlign: 'center' }}
+                                sx={{
+                                    mt: '0.5rem',
+                                    display: 'block',
+                                    textAlign: 'center',
+                                }}
                             >
                                 ... and {affectedItems.length - 10} more
                             </Typography>

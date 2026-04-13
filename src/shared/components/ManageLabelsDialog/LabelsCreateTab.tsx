@@ -10,7 +10,12 @@ type Props = {
     isLoading: boolean;
 };
 
-export const LabelsCreateTab = ({ labels, studysetUUID, onSubmit, isLoading }: Props) => {
+export const LabelsCreateTab = ({
+    labels,
+    studysetUUID,
+    onSubmit,
+    isLoading,
+}: Props) => {
     const [labelName, setLabelName] = useState('');
     const [errorInfo, setErrorInfo] = useState<ErrorInfo>(null);
     const [shouldUpdateLabel, setShouldUpdateLabel] = useState(false);
@@ -62,7 +67,9 @@ export const LabelsCreateTab = ({ labels, studysetUUID, onSubmit, isLoading }: P
                     control={
                         <Checkbox
                             checked={shouldUpdateLabel}
-                            onChange={(e) => setShouldUpdateLabel(e.target.checked)}
+                            onChange={(e) =>
+                                setShouldUpdateLabel(e.target.checked)
+                            }
                         />
                     }
                     label="Apply to current study set"

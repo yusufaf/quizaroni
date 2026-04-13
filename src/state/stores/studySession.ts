@@ -71,10 +71,16 @@ export const useStudySessionStore = create<StudySessionStore>()(
 
                 const endTime = new Date();
                 const startTime = new Date(session.startTime);
-                const timeSpent = (endTime.getTime() - startTime.getTime()) / 1000;
+                const timeSpent =
+                    (endTime.getTime() - startTime.getTime()) / 1000;
 
-                const correctAnswers = session.answers.filter((a) => a.correct).length;
-                const accuracy = session.answers.length > 0 ? (correctAnswers / session.answers.length) * 100 : 0;
+                const correctAnswers = session.answers.filter(
+                    (a) => a.correct
+                ).length;
+                const accuracy =
+                    session.answers.length > 0
+                        ? (correctAnswers / session.answers.length) * 100
+                        : 0;
 
                 const result: StudySessionResult = {
                     sessionUUID: crypto.randomUUID(),
@@ -125,12 +131,17 @@ export const useStudySessionStore = create<StudySessionStore>()(
             updateStreak: (correct) =>
                 set((state) => {
                     if (!state.activeSession) return {};
-                    const newStreak = correct ? state.activeSession.streak + 1 : 0;
+                    const newStreak = correct
+                        ? state.activeSession.streak + 1
+                        : 0;
                     return {
                         activeSession: {
                             ...state.activeSession,
                             streak: newStreak,
-                            maxStreak: Math.max(state.activeSession.maxStreak, newStreak),
+                            maxStreak: Math.max(
+                                state.activeSession.maxStreak,
+                                newStreak
+                            ),
                         },
                     };
                 }),
@@ -170,7 +181,9 @@ export const useStudySessionStore = create<StudySessionStore>()(
                 }
 
                 // Update ease factor based on quality
-                easeFactor = easeFactor + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+                easeFactor =
+                    easeFactor +
+                    (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
                 easeFactor = Math.max(1.3, easeFactor); // Minimum ease factor of 1.3
 
                 // Calculate next review date
@@ -179,7 +192,13 @@ export const useStudySessionStore = create<StudySessionStore>()(
 
                 // Determine mastery level
                 const masteryLevel: CardProgress['masteryLevel'] =
-                    repetitions >= 5 ? 'mastered' : repetitions >= 2 ? 'review' : repetitions >= 1 ? 'learning' : 'new';
+                    repetitions >= 5
+                        ? 'mastered'
+                        : repetitions >= 2
+                          ? 'review'
+                          : repetitions >= 1
+                            ? 'learning'
+                            : 'new';
 
                 const updatedProgress: CardProgress = {
                     ...progress,
@@ -209,15 +228,21 @@ export const useStudySessionStore = create<StudySessionStore>()(
                 set((state) => {
                     const newTotalSessions = state.statistics.totalSessions + 1;
                     const newAverageAccuracy =
-                        (state.statistics.averageAccuracy * state.statistics.totalSessions + result.accuracy) /
+                        (state.statistics.averageAccuracy *
+                            state.statistics.totalSessions +
+                            result.accuracy) /
                         newTotalSessions;
 
                     return {
                         statistics: {
                             ...state.statistics,
                             totalSessions: newTotalSessions,
-                            totalCardsStudied: state.statistics.totalCardsStudied + result.totalCards,
-                            totalTimeSpent: state.statistics.totalTimeSpent + result.timeSpent,
+                            totalCardsStudied:
+                                state.statistics.totalCardsStudied +
+                                result.totalCards,
+                            totalTimeSpent:
+                                state.statistics.totalTimeSpent +
+                                result.timeSpent,
                             averageAccuracy: newAverageAccuracy,
                         },
                     };
@@ -225,7 +250,9 @@ export const useStudySessionStore = create<StudySessionStore>()(
             },
 
             unlockAchievement: (achievementId) => {
-                const existing = get().statistics.achievements.find((a) => a.id === achievementId);
+                const existing = get().statistics.achievements.find(
+                    (a) => a.id === achievementId
+                );
                 if (existing) return;
 
                 const newAchievement: Achievement = {
@@ -239,7 +266,10 @@ export const useStudySessionStore = create<StudySessionStore>()(
                 set((state) => ({
                     statistics: {
                         ...state.statistics,
-                        achievements: [...state.statistics.achievements, newAchievement],
+                        achievements: [
+                            ...state.statistics.achievements,
+                            newAchievement,
+                        ],
                     },
                 }));
             },
@@ -250,7 +280,9 @@ export const useStudySessionStore = create<StudySessionStore>()(
                 cardProgress: Array.from(state.cardProgress.entries()),
                 statistics: {
                     ...state.statistics,
-                    progressByStudyset: Array.from(state.statistics.progressByStudyset.entries()),
+                    progressByStudyset: Array.from(
+                        state.statistics.progressByStudyset.entries()
+                    ),
                 },
             }),
             merge: (persistedState, currentState) => {
@@ -261,7 +293,9 @@ export const useStudySessionStore = create<StudySessionStore>()(
                     statistics: {
                         ...currentState.statistics,
                         ...persisted.statistics,
-                        progressByStudyset: new Map(persisted.statistics?.progressByStudyset || []),
+                        progressByStudyset: new Map(
+                            persisted.statistics?.progressByStudyset || []
+                        ),
                     },
                 };
             },

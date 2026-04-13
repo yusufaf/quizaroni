@@ -25,7 +25,13 @@ import {
     ToggleButtonGroup,
     Tooltip,
 } from '@mui/material';
-import { ArrowUpward, ArrowDownward, Category, ViewList, ViewModule } from '@mui/icons-material';
+import {
+    ArrowUpward,
+    ArrowDownward,
+    Category,
+    ViewList,
+    ViewModule,
+} from '@mui/icons-material';
 import { useViewSetsStore } from 'state/stores/viewSets';
 
 type Props = {
@@ -57,7 +63,8 @@ const ViewStudysetFilters = ({
     // Map default category values to translation keys
     const getCategoryLabel = (category: string) => {
         if (category === DEFAULT_CATEGORIES.ALL) return t('viewStudySet.all');
-        if (category === DEFAULT_CATEGORIES.IMPORTANT) return t('viewStudySet.important');
+        if (category === DEFAULT_CATEGORIES.IMPORTANT)
+            return t('viewStudySet.important');
         return category; // User-defined categories stay as-is
     };
 
@@ -67,7 +74,13 @@ const ViewStudysetFilters = ({
             ...(selectedStudyset?.categories ?? []),
         ];
         return jointCategories.map((tab, index) => {
-            return <CategoryTab key={index} label={getCategoryLabel(tab)} value={tab} />;
+            return (
+                <CategoryTab
+                    key={index}
+                    label={getCategoryLabel(tab)}
+                    value={tab}
+                />
+            );
         });
     }, [selectedStudyset, t]);
 
@@ -89,7 +102,10 @@ const ViewStudysetFilters = ({
         setSelectedDialog(VIEW_SET_DIALOGS.CATEGORIES);
     };
 
-    const handleViewModeChange = (_event: React.MouseEvent<HTMLElement>, newView: string | null) => {
+    const handleViewModeChange = (
+        _event: React.MouseEvent<HTMLElement>,
+        newView: string | null
+    ) => {
         if (newView !== null) {
             setViewMode(newView);
         }
@@ -129,7 +145,9 @@ const ViewStudysetFilters = ({
                     )}
                 </IconButton>
                 <SortCardsDropdown>
-                    <InputLabel id="sort-label" size="small">{t('viewStudySet.sort')}</InputLabel>
+                    <InputLabel id="sort-label" size="small">
+                        {t('viewStudySet.sort')}
+                    </InputLabel>
                     <Select
                         labelId="sort-label"
                         label={t('viewStudySet.sort')}
@@ -141,7 +159,9 @@ const ViewStudysetFilters = ({
                         <MenuItem value="">
                             <em>{t('viewStudySet.none')}</em>
                         </MenuItem>
-                        <MenuItem value={'term'}>{t('viewStudySet.alphabeticalTerm')}</MenuItem>
+                        <MenuItem value={'term'}>
+                            {t('viewStudySet.alphabeticalTerm')}
+                        </MenuItem>
                         <MenuItem value={'definition'}>
                             {t('viewStudySet.alphabeticalDefinition')}
                         </MenuItem>
@@ -158,10 +178,16 @@ const ViewStudysetFilters = ({
                     size="small"
                     sx={{ marginLeft: '1rem' }}
                 >
-                    <ToggleButton value={VIEWSET_LAYOUTS.LIST} title={t('viewStudySet.listView')}>
+                    <ToggleButton
+                        value={VIEWSET_LAYOUTS.LIST}
+                        title={t('viewStudySet.listView')}
+                    >
                         <ViewList />
                     </ToggleButton>
-                    <ToggleButton value={VIEWSET_LAYOUTS.GRID} title={t('viewStudySet.gridView')}>
+                    <ToggleButton
+                        value={VIEWSET_LAYOUTS.GRID}
+                        title={t('viewStudySet.gridView')}
+                    >
                         <ViewModule />
                     </ToggleButton>
                 </ToggleButtonGroup>

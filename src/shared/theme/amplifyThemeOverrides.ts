@@ -2,7 +2,6 @@ import { Theme } from '@mui/material/styles';
 import { Theme as AmplifyTheme } from '@aws-amplify/ui-react';
 
 export const amplifyThemeOverrides = (muiTheme: Theme): AmplifyTheme => {
-    console.log({ muiTheme });
     return {
         name: 'custom-amplify-theme',
         tokens: {

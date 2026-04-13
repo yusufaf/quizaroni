@@ -127,11 +127,6 @@ const CreateSet = (props: Props) => {
     const handleUndoAction = useCallback(() => {
         const newActionsStack = [...actionsStack];
         const lastAction = newActionsStack.pop();
-        console.log('ENTERED HANDLEUNDO', {
-            newActionsStack,
-            lastAction,
-            createdSetCards,
-        });
         if (!lastAction) {
             return newActionsStack;
         }
@@ -172,11 +167,11 @@ const CreateSet = (props: Props) => {
      */
     const saveChanges = () => {
         if (!studysetUUID) {
-            // TODO: Some indication to the user that something is wrong if the query parameter isnt defined
+            toast.error(t('create.missingStudysetId'), {
+                position: toast.POSITION.BOTTOM_LEFT,
+            });
             return;
         }
-
-        console.log({ selectedStudyset, title, description });
 
         const updatedStudyset: Studyset = {
             ...selectedStudyset,
@@ -185,20 +180,17 @@ const CreateSet = (props: Props) => {
             description,
             labels: selectedLabels,
         };
-        console.log({ updatedStudyset });
 
         updateStudyset(
             { studysetUUID, updates: updatedStudyset },
             {
-                onSuccess: (response: any) => {
-                    console.log({ response });
+                onSuccess: () => {
                     toast.success(t('create.successUpdate'), {
                         position: toast.POSITION.BOTTOM_LEFT,
                     });
                     navigate(`/view/${studysetUUID}`);
                 },
-                onError: (error) => {
-                    console.log({ error });
+                onError: () => {
                     toast.error(t('create.errorUpdate'), {
                         position: toast.POSITION.BOTTOM_LEFT,
                     });
@@ -311,7 +303,9 @@ const CreateSet = (props: Props) => {
                 <SpacedFlexContainer>
                     <SimpleFlexContainer style={{ gap: '0.5rem' }}>
                         <Typography variant="h6">
-                            {t('create.cardCount', { count: createdSetCards.length ?? 0 })}
+                            {t('create.cardCount', {
+                                count: createdSetCards.length ?? 0,
+                            })}
                         </Typography>
                         {!createdSetCards.length && <NoCardsWarningsIcon />}
                     </SimpleFlexContainer>

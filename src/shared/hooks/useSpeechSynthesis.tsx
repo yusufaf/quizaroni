@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef } from 'react';
 
 const useSpeechSynthesis = () => {
     const audioRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -6,7 +6,7 @@ const useSpeechSynthesis = () => {
 
     const speak = (text: string, delay: number = 0) => {
         if (!window.speechSynthesis) {
-            console.error("Web Speech API is not supported in this browser.");
+            console.error('Web Speech API is not supported in this browser.');
             return;
         }
 

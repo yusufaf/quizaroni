@@ -18,6 +18,10 @@
         "retry": "Reintentar",
         "skip": "Saltar"
     },
+    "languages": {
+        "en": "English",
+        "es": "Español"
+    },
     "nav": {
         "home": "Inicio",
         "explore": "Explorar",
@@ -66,6 +70,11 @@
         },
         "share": {
             "title": "Compartir"
+        },
+        "confirmationCode": {
+            "codeResent": "Código de confirmación reenviado",
+            "resendError": "Error al reenviar el código de confirmación",
+            "emailConfirmed": "Correo confirmado correctamente"
         },
         "notifications": {
             "title": "Administrar Notificaciones",
@@ -200,8 +209,78 @@
     "imageGallery": {
         "uploaded": "Subido el {{date}}"
     },
+    "landing": {
+        "hero": {
+            "headlineStart": "Aprende lo que sea.",
+            "headlineEnd": "Recuerda",
+            "headlineHighlight": "todo.",
+            "subheadline": "Quizaroni convierte cualquier tema en tarjetas de estudio que disfrutarás usar. Herramientas inteligentes para mentes curiosas.",
+            "signUpCta": "Comienza Gratis",
+            "exploreCta": "Explorar Sets",
+            "trustLine": "Gratis para siempre • Sin tarjeta de crédito"
+        },
+        "flashcards": {
+            "biologyLabel": "Biología",
+            "biologyTerm": "Mitocondria",
+            "biologyDefinition": "La central energética de la célula.",
+            "spanishLabel": "Inglés",
+            "spanishTerm": "Library",
+            "calculusLabel": "Cálculo",
+            "calculusTerm": "d/dx sin(x) = ?",
+            "calculusAnswer": "cos(x)",
+            "historyLabel": "Historia",
+            "historyTerm": "1776"
+        },
+        "features": {
+            "sectionTitle": "Todo lo que necesitas para estudiar mejor",
+            "sectionSubtitle": "Herramientas diseñadas para cómo aprende tu cerebro.",
+            "create": {
+                "title": "Crea en segundos",
+                "description": "Convierte tus notas, PDFs o cualquier tema en tarjetas profesionales con ayuda de IA."
+            },
+            "study": {
+                "title": "Modos de estudio que funcionan",
+                "description": "Voltea, responde, empareja y escribe. Cambia de modo para mantener fresco el aprendizaje."
+            },
+            "progress": {
+                "title": "Sigue tu progreso",
+                "description": "Visualiza tu avance con estadísticas detalladas y recomendaciones personalizadas."
+            },
+            "share": {
+                "title": "Comparte con tu grupo",
+                "description": "Colabora con compañeros, crea sets compartidos o mantén los tuyos privados. Tú decides."
+            }
+        },
+        "howItWorks": {
+            "sectionTitle": "Empieza en menos de un minuto",
+            "step1": {
+                "title": "Regístrate gratis",
+                "description": "Crea tu perfil en segundos. Sin tarjeta de crédito, sin trampas."
+            },
+            "step2": {
+                "title": "Crea tu primer set",
+                "description": "Agrega tarjetas como quieras: escribiéndolas, pegándolas o importando un archivo."
+            },
+            "step3": {
+                "title": "Comienza a estudiar",
+                "description": "Elige un modo y comienza. Tu progreso se guarda automáticamente."
+            }
+        },
+        "footerCta": {
+            "headline": "¿Listo para aprender algo nuevo?",
+            "subheadline": "Únete a Quizaroni gratis y comienza a estudiar hoy.",
+            "button": "Comienza Gratis"
+        }
+    },
     "home": {
         "yourStudySets": "Tus Sets de Estudio",
+        "toolbar": {
+            "searchPlaceholder": "Buscar sets de estudio...",
+            "filtersDialogTitle": "Buscar y ordenar",
+            "done": "Listo",
+            "sortBy": "Ordenar por",
+            "sortDirection": "Dirección del orden"
+        },
         "saveTablePreferences": "Guardar Preferencias de Tabla",
         "saveColumnsAndDensity": "Guardar columnas visibles y densidad",
         "columns": {
@@ -335,6 +414,8 @@
         "unsavedChanges": "Cambios sin guardar",
         "resetChanges": "Restablecer",
         "saveSettings": "Guardar",
+        "downloadSettings": "Descargar configuración como JSON",
+        "importSettings": "Importar configuración desde archivo JSON",
         "fontSize": "Tamaño de Fuente",
         "fontSizeDescription": "Ajusta el tamaño del texto en toda la aplicación para mejor legibilidad",
         "currentScale": "Escala actual: {{scale}}x",
@@ -406,6 +487,8 @@
         "reverseCards": "Invertir Tarjetas",
         "successUpdate": "Set de estudio actualizado exitosamente",
         "errorUpdate": "Error al actualizar set de estudio",
+        "missingStudysetId": "No se pudo guardar: falta el enlace del set de estudio. Abre el set desde tu inicio e inténtalo de nuevo.",
+        "labelsSoftLimitWarning": "Usar más de 10 etiquetas puede dificultar la organización. Considera quitar algunas.",
         "importMethod": "Método de Importación",
         "jsonInput": "Entrada JSON",
         "fileUpload": "Subir Archivo",

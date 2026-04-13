@@ -35,7 +35,9 @@ type Props = {
 };
 
 const FlashcardsStudy = ({ studysetId }: Props) => {
-    const { data: studysetResponse, isLoading } = useGetStudyset({ studysetUUID: studysetId });
+    const { data: studysetResponse, isLoading } = useGetStudyset({
+        studysetUUID: studysetId,
+    });
     const studyset = studysetResponse?.studyset ?? ({} as Studyset);
 
     const {
@@ -78,14 +80,26 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
 
     useEffect(() => {
         if (activeSession?.settings?.audioEnabled && flipped && !hasRated) {
-            const currentCard = activeSession?.cards?.[activeSession.currentCardIndex];
+            const currentCard =
+                activeSession?.cards?.[activeSession.currentCardIndex];
             if (currentCard?.definition) {
                 playAudio(currentCard.definition);
             }
         }
-    }, [flipped, activeSession?.settings?.audioEnabled, activeSession?.cards, activeSession?.currentCardIndex, hasRated]);
+    }, [
+        flipped,
+        activeSession?.settings?.audioEnabled,
+        activeSession?.cards,
+        activeSession?.currentCardIndex,
+        hasRated,
+    ]);
 
-    if (isLoading || !activeSession || !activeSession.cards || activeSession.cards.length === 0) {
+    if (
+        isLoading ||
+        !activeSession ||
+        !activeSession.cards ||
+        activeSession.cards.length === 0
+    ) {
         return (
             <BasePage>
                 <Typography>Loading...</Typography>
@@ -94,7 +108,8 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
     }
 
     const currentCard = activeSession.cards[activeSession.currentCardIndex];
-    const isLastCard = activeSession.currentCardIndex === activeSession.cards.length - 1;
+    const isLastCard =
+        activeSession.currentCardIndex === activeSession.cards.length - 1;
     const isFirstCard = activeSession.currentCardIndex === 0;
 
     const playAudio = (text: string) => {
@@ -135,7 +150,9 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
 
         // Record answer
         const isCorrect = quality >= 3;
-        const timeSpent = Math.floor((Date.now() - activeSession.startTime) / 1000);
+        const timeSpent = Math.floor(
+            (Date.now() - activeSession.startTime) / 1000
+        );
         recordAnswer({
             cardUUID: currentCard.cardUUID,
             correct: isCorrect,
@@ -256,8 +273,20 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
             />
 
             {/* Stepper - at top */}
-            <Box sx={{ width: '100%', maxWidth: '50rem', mx: 'auto', pt: '4rem', pb: '1.5rem', px: '2rem' }}>
-                <Stepper activeStep={activeSession.currentCardIndex} alternativeLabel>
+            <Box
+                sx={{
+                    width: '100%',
+                    maxWidth: '50rem',
+                    mx: 'auto',
+                    pt: '4rem',
+                    pb: '1.5rem',
+                    px: '2rem',
+                }}
+            >
+                <Stepper
+                    activeStep={activeSession.currentCardIndex}
+                    alternativeLabel
+                >
                     {activeSession.cards.map((card) => (
                         <Step key={card.cardUUID}>
                             <StepLabel />
@@ -286,173 +315,218 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
                         width: '100%',
                     }}
                 >
-                {/* Previous Button */}
-                <Tooltip title="Previous Card">
-                    <span>
-                        <IconButton
-                            onClick={handlePrevious}
-                            disabled={isFirstCard}
-                            color="primary"
-                            sx={{ fontSize: '3rem' }}
-                        >
-                            <ArrowBack fontSize="inherit" />
-                        </IconButton>
-                    </span>
-                </Tooltip>
+                    {/* Previous Button */}
+                    <Tooltip title="Previous Card">
+                        <span>
+                            <IconButton
+                                onClick={handlePrevious}
+                                disabled={isFirstCard}
+                                color="primary"
+                                sx={{ fontSize: '3rem' }}
+                            >
+                                <ArrowBack fontSize="inherit" />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
 
-                {/* Flashcard */}
-                <AnimatePresence mode="wait">
-                    <Box
-                        key={currentCard.cardUUID}
-                        sx={{
-                            perspective: '1000px',
-                            width: '50rem',
-                            height: '30rem',
-                        }}
-                    >
-                        <motion.div
-                            initial={{ rotateY: 0 }}
-                            animate={{ rotateY: flipped ? 180 : 0 }}
-                            transition={{ duration: 0.6, type: 'spring' }}
-                            style={{
-                                width: '100%',
-                                height: '100%',
-                                position: 'relative',
-                                transformStyle: 'preserve-3d',
-                                cursor: hasRated ? 'default' : 'pointer',
+                    {/* Flashcard */}
+                    <AnimatePresence mode="wait">
+                        <Box
+                            key={currentCard.cardUUID}
+                            sx={{
+                                perspective: '1000px',
+                                width: '50rem',
+                                height: '30rem',
                             }}
-                            onClick={handleCardClick}
                         >
-                            {/* Front of card (Term) */}
-                            <Card
-                                elevation={8}
-                                sx={{
-                                    position: 'absolute',
+                            <motion.div
+                                initial={{ rotateY: 0 }}
+                                animate={{ rotateY: flipped ? 180 : 0 }}
+                                transition={{ duration: 0.6, type: 'spring' }}
+                                style={{
                                     width: '100%',
                                     height: '100%',
-                                    backfaceVisibility: 'hidden',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    borderRadius: '1rem',
+                                    position: 'relative',
+                                    transformStyle: 'preserve-3d',
+                                    cursor: hasRated ? 'default' : 'pointer',
                                 }}
+                                onClick={handleCardClick}
                             >
-                                <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                    <Typography
-                                        variant="h4"
-                                        sx={{
-                                            textAlign: 'center',
-                                            fontWeight: 600,
-                                            wordBreak: 'break-word',
-                                        }}
-                                    >
-                                        {currentCard.term}
-                                    </Typography>
-                                    <ImageGallery
-                                        files={currentCard.files?.filter(f => f.association === 'term') || []}
-                                        maxHeight="20vh"
-                                        onLightboxChange={handleLightboxChange}
-                                    />
-                                </CardContent>
-                                <Typography
-                                    variant="body2"
-                                    color="text.secondary"
+                                {/* Front of card (Term) */}
+                                <Card
+                                    elevation={8}
                                     sx={{
-                                        textAlign: 'center',
                                         position: 'absolute',
-                                        bottom: '1.5rem',
+                                        width: '100%',
+                                        height: '100%',
+                                        backfaceVisibility: 'hidden',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        borderRadius: '1rem',
                                     }}
                                 >
-                                    Click to flip
-                                </Typography>
-                            </Card>
-
-                            {/* Back of card (Definition) */}
-                            <Card
-                                elevation={8}
-                                sx={{
-                                    position: 'absolute',
-                                    width: '100%',
-                                    height: '100%',
-                                    backfaceVisibility: 'hidden',
-                                    transform: 'rotateY(180deg)',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    borderRadius: '1rem',
-                                    backgroundColor: 'primary.main',
-                                    color: 'primary.contrastText',
-                                }}
-                            >
-                                <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                                    <CardContent
+                                        sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        <Typography
+                                            variant="h4"
+                                            sx={{
+                                                textAlign: 'center',
+                                                fontWeight: 600,
+                                                wordBreak: 'break-word',
+                                            }}
+                                        >
+                                            {currentCard.term}
+                                        </Typography>
+                                        <ImageGallery
+                                            files={
+                                                currentCard.files?.filter(
+                                                    (f) =>
+                                                        f.association === 'term'
+                                                ) || []
+                                            }
+                                            maxHeight="20vh"
+                                            onLightboxChange={
+                                                handleLightboxChange
+                                            }
+                                        />
+                                    </CardContent>
                                     <Typography
-                                        variant="h4"
+                                        variant="body2"
+                                        color="text.secondary"
                                         sx={{
                                             textAlign: 'center',
-                                            fontWeight: 600,
-                                            wordBreak: 'break-word',
+                                            position: 'absolute',
+                                            bottom: '1.5rem',
                                         }}
                                     >
-                                        {currentCard.definition}
+                                        Click to flip
                                     </Typography>
-                                    <ImageGallery
-                                        files={currentCard.files?.filter(f => f.association === 'definition') || []}
-                                        maxHeight="20vh"
-                                        onLightboxChange={handleLightboxChange}
-                                    />
-                                </CardContent>
+                                </Card>
 
-                                {/* Rating Section */}
-                                <Fade in={showRating && !hasRated}>
-                                    <Box
+                                {/* Back of card (Definition) */}
+                                <Card
+                                    elevation={8}
+                                    sx={{
+                                        position: 'absolute',
+                                        width: '100%',
+                                        height: '100%',
+                                        backfaceVisibility: 'hidden',
+                                        transform: 'rotateY(180deg)',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        borderRadius: '1rem',
+                                        backgroundColor: 'primary.main',
+                                        color: 'primary.contrastText',
+                                    }}
+                                >
+                                    <CardContent
                                         sx={{
-                                            p: '1.5rem',
-                                            backgroundColor: 'rgba(0, 0, 0, 0.2)',
-                                            width: '100%',
-                                            borderBottomLeftRadius: '1rem',
-                                            borderBottomRightRadius: '1rem',
+                                            flex: 1,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
                                         }}
                                     >
-                                        <Typography variant="body2" sx={{ mb: '0.5rem', textAlign: 'center' }}>
-                                            How well did you know this?
+                                        <Typography
+                                            variant="h4"
+                                            sx={{
+                                                textAlign: 'center',
+                                                fontWeight: 600,
+                                                wordBreak: 'break-word',
+                                            }}
+                                        >
+                                            {currentCard.definition}
                                         </Typography>
-                                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                                            <Rating
-                                                size="large"
-                                                value={0}
-                                                onChange={(_, value) => handleRating(value || 0)}
-                                                sx={{
-                                                    '& .MuiRating-iconFilled': {
-                                                        color: '#FFD93D',
-                                                    },
-                                                    '& .MuiRating-iconHover': {
-                                                        color: '#FFD93D',
-                                                    },
-                                                }}
-                                            />
-                                        </Box>
-                                    </Box>
-                                </Fade>
-                            </Card>
-                        </motion.div>
-                    </Box>
-                </AnimatePresence>
+                                        <ImageGallery
+                                            files={
+                                                currentCard.files?.filter(
+                                                    (f) =>
+                                                        f.association ===
+                                                        'definition'
+                                                ) || []
+                                            }
+                                            maxHeight="20vh"
+                                            onLightboxChange={
+                                                handleLightboxChange
+                                            }
+                                        />
+                                    </CardContent>
 
-                {/* Next Button */}
-                <Tooltip title={isLastCard ? 'Finish' : 'Next Card'}>
-                    <span>
-                        <IconButton
-                            onClick={handleNext}
-                            disabled={!hasRated}
-                            color="primary"
-                            sx={{ fontSize: '3rem' }}
-                        >
-                            <ArrowForward fontSize="inherit" />
-                        </IconButton>
-                    </span>
-                </Tooltip>
+                                    {/* Rating Section */}
+                                    <Fade in={showRating && !hasRated}>
+                                        <Box
+                                            sx={{
+                                                p: '1.5rem',
+                                                backgroundColor:
+                                                    'rgba(0, 0, 0, 0.2)',
+                                                width: '100%',
+                                                borderBottomLeftRadius: '1rem',
+                                                borderBottomRightRadius: '1rem',
+                                            }}
+                                        >
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    mb: '0.5rem',
+                                                    textAlign: 'center',
+                                                }}
+                                            >
+                                                How well did you know this?
+                                            </Typography>
+                                            <Box
+                                                sx={{
+                                                    display: 'flex',
+                                                    justifyContent: 'center',
+                                                }}
+                                            >
+                                                <Rating
+                                                    size="large"
+                                                    value={0}
+                                                    onChange={(_, value) =>
+                                                        handleRating(value || 0)
+                                                    }
+                                                    sx={{
+                                                        '& .MuiRating-iconFilled':
+                                                            {
+                                                                color: '#FFD93D',
+                                                            },
+                                                        '& .MuiRating-iconHover':
+                                                            {
+                                                                color: '#FFD93D',
+                                                            },
+                                                    }}
+                                                />
+                                            </Box>
+                                        </Box>
+                                    </Fade>
+                                </Card>
+                            </motion.div>
+                        </Box>
+                    </AnimatePresence>
+
+                    {/* Next Button */}
+                    <Tooltip title={isLastCard ? 'Finish' : 'Next Card'}>
+                        <span>
+                            <IconButton
+                                onClick={handleNext}
+                                disabled={!hasRated}
+                                color="primary"
+                                sx={{ fontSize: '3rem' }}
+                            >
+                                <ArrowForward fontSize="inherit" />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
                 </Box>
             </Box>
 
@@ -465,12 +539,26 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
                 }}
             >
                 <Tooltip title="Flip Card">
-                    <IconButton onClick={handleFlip} color="primary" size="large">
+                    <IconButton
+                        onClick={handleFlip}
+                        color="primary"
+                        size="large"
+                    >
                         <Replay fontSize="inherit" />
                     </IconButton>
                 </Tooltip>
-                <Tooltip title={activeSession.settings.audioEnabled ? 'Audio On' : 'Audio Off'}>
-                    <IconButton onClick={handleAudioToggle} color="primary" size="large">
+                <Tooltip
+                    title={
+                        activeSession.settings.audioEnabled
+                            ? 'Audio On'
+                            : 'Audio Off'
+                    }
+                >
+                    <IconButton
+                        onClick={handleAudioToggle}
+                        color="primary"
+                        size="large"
+                    >
                         {activeSession.settings.audioEnabled ? (
                             <VolumeUp fontSize="inherit" />
                         ) : (

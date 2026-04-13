@@ -18,6 +18,10 @@
         "retry": "Retry",
         "skip": "Skip"
     },
+    "languages": {
+        "en": "English",
+        "es": "Español"
+    },
     "nav": {
         "home": "Home",
         "explore": "Explore",
@@ -66,6 +70,11 @@
         },
         "share": {
             "title": "Share"
+        },
+        "confirmationCode": {
+            "codeResent": "Confirmation code resent",
+            "resendError": "Error resending confirmation code",
+            "emailConfirmed": "Email confirmed successfully"
         },
         "notifications": {
             "title": "Manage Notifications",
@@ -200,8 +209,78 @@
     "imageGallery": {
         "uploaded": "Uploaded {{date}}"
     },
+    "landing": {
+        "hero": {
+            "headlineStart": "Learn anything.",
+            "headlineEnd": "Remember",
+            "headlineHighlight": "everything.",
+            "subheadline": "Quizaroni turns any topic into flashcards you'll actually enjoy studying. Smarter tools for curious minds.",
+            "signUpCta": "Get Started Free",
+            "exploreCta": "Explore Sets",
+            "trustLine": "Free forever • No credit card required"
+        },
+        "flashcards": {
+            "biologyLabel": "Biology",
+            "biologyTerm": "Mitochondria",
+            "biologyDefinition": "The powerhouse of the cell.",
+            "spanishLabel": "Spanish",
+            "spanishTerm": "Biblioteca",
+            "calculusLabel": "Calculus",
+            "calculusTerm": "d/dx sin(x) = ?",
+            "calculusAnswer": "cos(x)",
+            "historyLabel": "History",
+            "historyTerm": "1776"
+        },
+        "features": {
+            "sectionTitle": "Everything you need to study smarter",
+            "sectionSubtitle": "Tools built for how your brain actually learns.",
+            "create": {
+                "title": "Create in seconds",
+                "description": "Turn your notes, PDFs, or any topic into professional flashcards with AI-assisted creation."
+            },
+            "study": {
+                "title": "Study modes that stick",
+                "description": "Flip, quiz, match, and write. Switch modes to keep things fresh and memory strong."
+            },
+            "progress": {
+                "title": "Track your progress",
+                "description": "Visualize your growth with detailed mastery stats and personalized learning insights."
+            },
+            "share": {
+                "title": "Share with your crew",
+                "description": "Collaborate with classmates, build shared decks, or keep your sets private. Your call."
+            }
+        },
+        "howItWorks": {
+            "sectionTitle": "Get started in under a minute",
+            "step1": {
+                "title": "Sign up free",
+                "description": "Create your profile in seconds. No credit card, no catch."
+            },
+            "step2": {
+                "title": "Build your first deck",
+                "description": "Add cards any way you like. Type them, paste them, or import a file."
+            },
+            "step3": {
+                "title": "Start studying",
+                "description": "Pick a mode and go. Your progress saves automatically."
+            }
+        },
+        "footerCta": {
+            "headline": "Ready to learn something new?",
+            "subheadline": "Join Quizaroni free and start studying today.",
+            "button": "Get Started Free"
+        }
+    },
     "home": {
         "yourStudySets": "Your Study Sets",
+        "toolbar": {
+            "searchPlaceholder": "Search study sets...",
+            "filtersDialogTitle": "Search and sort",
+            "done": "Done",
+            "sortBy": "Sort by",
+            "sortDirection": "Sort direction"
+        },
         "saveTablePreferences": "Save Table Preferences",
         "saveColumnsAndDensity": "Save visible columns and density",
         "columns": {
@@ -335,6 +414,8 @@
         "unsavedChanges": "Unsaved changes",
         "resetChanges": "Reset",
         "saveSettings": "Save",
+        "downloadSettings": "Download settings as JSON",
+        "importSettings": "Import settings from JSON file",
         "fontSize": "Font Size",
         "fontSizeDescription": "Adjust text size across the entire application for better readability",
         "currentScale": "Current scale: {{scale}}x",
@@ -406,6 +487,8 @@
         "reverseCards": "Reverse Cards",
         "successUpdate": "Successfully updated study set",
         "errorUpdate": "Error updating study set",
+        "missingStudysetId": "Could not save: this page is missing the study set link. Open the set from your home page and try again.",
+        "labelsSoftLimitWarning": "Using more than 10 labels can make organization harder. Consider removing a few.",
         "importMethod": "Import Method",
         "jsonInput": "JSON Input",
         "fileUpload": "File Upload",

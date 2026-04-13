@@ -2,7 +2,11 @@ import { Box, Typography, Button } from '@mui/material';
 import { Download as DownloadIcon } from '@mui/icons-material';
 import { ItemListHeaderProps } from './types';
 
-export const ItemListHeader = ({ title, onDownload, itemCount }: ItemListHeaderProps) => {
+export const ItemListHeader = ({
+    title,
+    onDownload,
+    itemCount,
+}: ItemListHeaderProps) => {
     return (
         <Box
             sx={{

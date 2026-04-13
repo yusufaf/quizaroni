@@ -43,8 +43,7 @@ const PrintDialog = ({ open, onClose, studyset }: Props) => {
         includeCategories:
             studyset?.metadata?.printConfig?.includeCategories ?? true,
         showColors: studyset?.metadata?.printConfig?.showColors ?? false,
-        importantOnly:
-            studyset?.metadata?.printConfig?.importantOnly ?? false,
+        importantOnly: studyset?.metadata?.printConfig?.importantOnly ?? false,
     };
 
     const [printSettings, setPrintSettings] =
@@ -81,7 +80,11 @@ const PrintDialog = ({ open, onClose, studyset }: Props) => {
                 ? studyset.cards.filter((c) => c.important)
                 : studyset.cards;
 
-            const doc = await generator.generate(studyset, cards, printSettings);
+            const doc = await generator.generate(
+                studyset,
+                cards,
+                printSettings
+            );
 
             const filename = `${studyset.title.replace(/[^a-z0-9]/gi, '_')}.pdf`;
             doc.save(filename);
@@ -95,7 +98,10 @@ const PrintDialog = ({ open, onClose, studyset }: Props) => {
 
     return (
         <Dialog open={open} onClose={onClose} fullScreen>
-            <StandardDialogTitle title={t('dialogs.print.title')} onClose={onClose} />
+            <StandardDialogTitle
+                title={t('dialogs.print.title')}
+                onClose={onClose}
+            />
             <StyledDialogContent>
                 <PreviewPanel>
                     <PrintPreviewContainer ref={printRef}>
@@ -162,7 +168,9 @@ const PrintDialog = ({ open, onClose, studyset }: Props) => {
                         onClick={handleDownloadPdf}
                         disabled={isGenerating || !studyset}
                     >
-                        {isGenerating ? t('dialogs.print.generatingPdf') : t('dialogs.print.downloadPdf')}
+                        {isGenerating
+                            ? t('dialogs.print.generatingPdf')
+                            : t('dialogs.print.downloadPdf')}
                     </PrintButton>
                 </SettingsPanel>
             </StyledDialogContent>

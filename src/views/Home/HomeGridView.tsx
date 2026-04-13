@@ -38,7 +38,11 @@ const HomeGridView = ({ studysets, isLoading = false }: Props) => {
             <HomeSetGrid>
                 {Array.from({ length: 6 }).map((_, index) => (
                     <Box key={index} sx={{ padding: '1.25rem' }}>
-                        <Skeleton variant="rectangular" height="15rem" sx={{ borderRadius: '0.75rem' }} />
+                        <Skeleton
+                            variant="rectangular"
+                            height="15rem"
+                            sx={{ borderRadius: '0.75rem' }}
+                        />
                     </Box>
                 ))}
             </HomeSetGrid>
@@ -61,8 +65,13 @@ const HomeGridView = ({ studysets, isLoading = false }: Props) => {
                 <Typography variant="h6" color="text.secondary">
                     No study sets yet
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ maxWidth: '30rem', textAlign: 'center' }}>
-                    Get started by creating your first study set! Add flashcards, organize them, and start learning.
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ maxWidth: '30rem', textAlign: 'center' }}
+                >
+                    Get started by creating your first study set! Add
+                    flashcards, organize them, and start learning.
                 </Typography>
                 <Button
                     variant="contained"

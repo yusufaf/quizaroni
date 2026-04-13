@@ -45,7 +45,7 @@ const ChangePasswordSection = ({}: Props) => {
             setNewPassword('');
             setConfirmPassword('');
         } catch (err) {
-            console.log(err);
+            console.error('Failed to update password:', err);
         }
     };
 

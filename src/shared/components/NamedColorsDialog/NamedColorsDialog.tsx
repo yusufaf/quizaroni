@@ -35,7 +35,10 @@ const NamedColorsDialog = () => {
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg">
-            <StandardDialogTitle title="Manage Named Colors" onClose={onClose} />
+            <StandardDialogTitle
+                title="Manage Named Colors"
+                onClose={onClose}
+            />
             <DialogContent sx={{ p: '1.5rem' }}>
                 <Box
                     sx={{

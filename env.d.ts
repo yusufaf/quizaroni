@@ -1,10 +1,9 @@
-/// <reference types="vite/client" />
-
+/// <reference types="vite-plus/client" />
 
 interface ImportMetaEnv {
-    readonly VITE_AWS_API_KEY: string
-  }
-  
-  interface ImportMeta {
-    readonly env: ImportMetaEnv
-  }
+    readonly VITE_AWS_API_KEY: string;
+}
+
+interface ImportMeta {
+    readonly env: ImportMetaEnv;
+}

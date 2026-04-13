@@ -33,7 +33,6 @@ export const deleteCard = ({
 }: DeleteCardParams): void => {
     const newCreatedSetCards = [...createdSetCards];
     const cardBeingDeleted = newCreatedSetCards[index];
-    console.log({ cardBeingDeleted });
     newCreatedSetCards.splice(index, 1);
     setStateCallback(newCreatedSetCards);
 
@@ -41,10 +40,6 @@ export const deleteCard = ({
         actionType: 'deleteCard',
         undoCallback: (createdSetCards: TODO[], setStateCallback: TODO) => {
             const newCreatedSetCards = [...createdSetCards];
-            console.log({
-                newCreatedSetCards,
-                originalUUID: cardBeingDeleted.cardUUID,
-            });
             newCreatedSetCards.splice(index, 0, cardBeingDeleted);
             setStateCallback(newCreatedSetCards);
         },
@@ -159,10 +154,6 @@ export const addCard = ({
             const newCreatedSetCards = [...createdSetCards].filter(
                 (value) => value.cardUUID !== cardToAdd.cardUUID
             );
-            console.log({
-                newCreatedSetCards,
-                originalUUID: cardToAdd.cardUUID,
-            });
             setStateCallback(newCreatedSetCards);
         },
     });

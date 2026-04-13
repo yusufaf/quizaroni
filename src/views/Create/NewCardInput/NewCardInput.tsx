@@ -1,7 +1,15 @@
 import { Add, DragIndicator, AddPhotoAlternate } from '@mui/icons-material';
 import FileUpload from 'components/FileUpload/FileUpload';
 import type { Card, TODO } from 'shared/types';
-import { Dispatch, DragEvent, SetStateAction, useMemo, useState, useRef, useCallback } from 'react';
+import {
+    Dispatch,
+    DragEvent,
+    SetStateAction,
+    useMemo,
+    useState,
+    useRef,
+    useCallback,
+} from 'react';
 import ImagePreview from './ImagePreview';
 import {
     AddCardBelowButton,
@@ -65,7 +73,11 @@ const NewCardInput = ({
     updateCardValue,
 }: Props) => {
     const { t } = useTranslation();
-    const { data: { user: { metadata: { confirmDestructiveActions = true } = {} } = {} } = DEFAULT_USER_RESPONSE } = useGetUser();
+    const {
+        data: {
+            user: { metadata: { confirmDestructiveActions = true } = {} } = {},
+        } = DEFAULT_USER_RESPONSE,
+    } = useGetUser();
     const {
         cardUUID,
         term,
@@ -94,14 +106,19 @@ const NewCardInput = ({
         definitionFileInputRef.current?.click();
     };
 
-    const handleFileUpload = useCallback(async (files: File[], association: 'term' | 'definition') => {
-        try {
-            await uploadFile(files, association);
-            toast.success(t('create.imageUploaded', { count: files.length }));
-        } catch {
-            toast.error(t('create.imageUploadFailed'));
-        }
-    }, [uploadFile, t]);
+    const handleFileUpload = useCallback(
+        async (files: File[], association: 'term' | 'definition') => {
+            try {
+                await uploadFile(files, association);
+                toast.success(
+                    t('create.imageUploaded', { count: files.length })
+                );
+            } catch {
+                toast.error(t('create.imageUploadFailed'));
+            }
+        },
+        [uploadFile, t]
+    );
 
     const handleTermFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -110,7 +127,9 @@ const NewCardInput = ({
         }
     };
 
-    const handleDefinitionFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleDefinitionFileChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
         if (e.target.files && e.target.files.length > 0) {
             handleFileUpload([...e.target.files], 'definition');
             e.target.value = '';
@@ -121,29 +140,45 @@ const NewCardInput = ({
     const [termDragActive, setTermDragActive] = useState(false);
     const [definitionDragActive, setDefinitionDragActive] = useState(false);
 
-    const handleDrag = useCallback((association: 'term' | 'definition') => (e: DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const setter = association === 'term' ? setTermDragActive : setDefinitionDragActive;
-        if (e.type === 'dragenter' || e.type === 'dragover') {
-            setter(true);
-        } else if (e.type === 'dragleave') {
-            setter(false);
-        }
-    }, []);
+    const handleDrag = useCallback(
+        (association: 'term' | 'definition') =>
+            (e: DragEvent<HTMLDivElement>) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const setter =
+                    association === 'term'
+                        ? setTermDragActive
+                        : setDefinitionDragActive;
+                if (e.type === 'dragenter' || e.type === 'dragover') {
+                    setter(true);
+                } else if (e.type === 'dragleave') {
+                    setter(false);
+                }
+            },
+        []
+    );
 
-    const handleDrop = useCallback((association: 'term' | 'definition') => (e: DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const setter = association === 'term' ? setTermDragActive : setDefinitionDragActive;
-        setter(false);
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-            const imageFiles = [...e.dataTransfer.files].filter(f => f.type.startsWith('image/'));
-            if (imageFiles.length > 0) {
-                handleFileUpload(imageFiles, association);
-            }
-        }
-    }, [handleFileUpload]);
+    const handleDrop = useCallback(
+        (association: 'term' | 'definition') =>
+            (e: DragEvent<HTMLDivElement>) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const setter =
+                    association === 'term'
+                        ? setTermDragActive
+                        : setDefinitionDragActive;
+                setter(false);
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    const imageFiles = [...e.dataTransfer.files].filter((f) =>
+                        f.type.startsWith('image/')
+                    );
+                    if (imageFiles.length > 0) {
+                        handleFileUpload(imageFiles, association);
+                    }
+                }
+            },
+        [handleFileUpload]
+    );
 
     const [localTextColor, setLocalTextColor] = useState(textColor);
     const [localBackgroundColor, setLocalBackgroundColor] =
@@ -157,18 +192,20 @@ const NewCardInput = ({
 
     // Filter files by association
     const termFiles = useMemo(
-        () => (card.files || []).filter(f => f.association === 'term'),
+        () => (card.files || []).filter((f) => f.association === 'term'),
         [card.files]
     );
     const definitionFiles = useMemo(
-        () => (card.files || []).filter(f => f.association === 'definition'),
+        () => (card.files || []).filter((f) => f.association === 'definition'),
         [card.files]
     );
 
     // Delete handler with confirmation
-    const [deleteConfirmKey, setDeleteConfirmKey] = useState<string | null>(null);
+    const [deleteConfirmKey, setDeleteConfirmKey] = useState<string | null>(
+        null
+    );
     const fileToDelete = useMemo(
-        () => (card.files || []).find(f => f.key === deleteConfirmKey),
+        () => (card.files || []).find((f) => f.key === deleteConfirmKey),
         [card.files, deleteConfirmKey]
     );
 
@@ -176,14 +213,18 @@ const NewCardInput = ({
         if (confirmDestructiveActions) {
             setDeleteConfirmKey(fileKey);
         } else {
-            const updatedFiles = (card.files || []).filter(f => f.key !== fileKey);
+            const updatedFiles = (card.files || []).filter(
+                (f) => f.key !== fileKey
+            );
             updateCardValue(index, 'files', updatedFiles);
         }
     };
 
     const confirmDeleteFile = () => {
         if (deleteConfirmKey) {
-            const updatedFiles = (card.files || []).filter(f => f.key !== deleteConfirmKey);
+            const updatedFiles = (card.files || []).filter(
+                (f) => f.key !== deleteConfirmKey
+            );
             updateCardValue(index, 'files', updatedFiles);
             setDeleteConfirmKey(null);
         }
@@ -270,9 +311,20 @@ const NewCardInput = ({
                             }),
                         }}
                     >
-                        <SimpleFlexContainer style={{ gap: '0.5rem', alignItems: 'center', marginBottom: '0.25rem' }}>
-                            <NewCardLabel variant="subtitle1">{t('create.term')}</NewCardLabel>
-                            <Tooltip title={t('create.uploadImage')} placement="top">
+                        <SimpleFlexContainer
+                            style={{
+                                gap: '0.5rem',
+                                alignItems: 'center',
+                                marginBottom: '0.25rem',
+                            }}
+                        >
+                            <NewCardLabel variant="subtitle1">
+                                {t('create.term')}
+                            </NewCardLabel>
+                            <Tooltip
+                                title={t('create.uploadImage')}
+                                placement="top"
+                            >
                                 <IconButton
                                     onClick={handleTermFileClick}
                                     size="small"
@@ -315,7 +367,7 @@ const NewCardInput = ({
                         />
                         {termFiles.length > 0 && (
                             <ImagePreviewGrid>
-                                {termFiles.map(file => (
+                                {termFiles.map((file) => (
                                     <ImagePreview
                                         key={file.key}
                                         file={file}
@@ -339,11 +391,20 @@ const NewCardInput = ({
                             }),
                         }}
                     >
-                        <SimpleFlexContainer style={{ gap: '0.5rem', alignItems: 'center', marginBottom: '0.25rem' }}>
+                        <SimpleFlexContainer
+                            style={{
+                                gap: '0.5rem',
+                                alignItems: 'center',
+                                marginBottom: '0.25rem',
+                            }}
+                        >
                             <NewCardLabel variant="subtitle1">
                                 {t('create.definition')}
                             </NewCardLabel>
-                            <Tooltip title={t('create.uploadImage')} placement="top">
+                            <Tooltip
+                                title={t('create.uploadImage')}
+                                placement="top"
+                            >
                                 <IconButton
                                     onClick={handleDefinitionFileClick}
                                     size="small"
@@ -390,7 +451,7 @@ const NewCardInput = ({
                         />
                         {definitionFiles.length > 0 && (
                             <ImagePreviewGrid>
-                                {definitionFiles.map(file => (
+                                {definitionFiles.map((file) => (
                                     <ImagePreview
                                         key={file.key}
                                         file={file}
@@ -429,14 +490,20 @@ const NewCardInput = ({
                 <DialogTitle>{t('create.deleteImageTitle')}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        {t('create.deleteImageMessage', { name: fileToDelete?.name ?? '' })}
+                        {t('create.deleteImageMessage', {
+                            name: fileToDelete?.name ?? '',
+                        })}
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setDeleteConfirmKey(null)}>
                         {t('buttons.cancel')}
                     </Button>
-                    <Button onClick={confirmDeleteFile} color="error" variant="contained">
+                    <Button
+                        onClick={confirmDeleteFile}
+                        color="error"
+                        variant="contained"
+                    >
                         {t('buttons.delete')}
                     </Button>
                 </DialogActions>

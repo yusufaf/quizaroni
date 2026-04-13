@@ -124,7 +124,9 @@ export const InlineEditableListItem = <T extends { name: string }>({
                 <ListItemText
                     primary={item.name}
                     sx={{
-                        textDecoration: isDeleteSelected ? 'line-through' : 'none',
+                        textDecoration: isDeleteSelected
+                            ? 'line-through'
+                            : 'none',
                     }}
                 />
             )}
@@ -153,7 +155,11 @@ export const InlineEditableListItem = <T extends { name: string }>({
                     <IconButton
                         size="small"
                         onClick={() => onDelete(index)}
-                        title={isDeleteSelected ? 'Unmark for deletion' : 'Mark for deletion'}
+                        title={
+                            isDeleteSelected
+                                ? 'Unmark for deletion'
+                                : 'Mark for deletion'
+                        }
                         color={isDeleteSelected ? 'error' : undefined}
                     >
                         <Delete />

@@ -32,7 +32,9 @@ type MatchCard = {
 };
 
 const MatchingStudy = ({ studysetId }: Props) => {
-    const { data: studysetResponse, isLoading } = useGetStudyset({ studysetUUID: studysetId });
+    const { data: studysetResponse, isLoading } = useGetStudyset({
+        studysetUUID: studysetId,
+    });
     const studyset = studysetResponse?.studyset ?? ({} as Studyset);
 
     const {
@@ -124,8 +126,7 @@ const MatchingStudy = ({ studysetId }: Props) => {
 
     const checkMatch = (card1: MatchCard, card2: MatchCard) => {
         const isMatch =
-            card1.cardUUID === card2.cardUUID &&
-            card1.type !== card2.type;
+            card1.cardUUID === card2.cardUUID && card1.type !== card2.type;
 
         if (isMatch) {
             // Correct match
@@ -172,7 +173,13 @@ const MatchingStudy = ({ studysetId }: Props) => {
                     particleCount: 150,
                     spread: 100,
                     origin: { y: 0.6 },
-                    colors: ['#FFA000', '#FF6B6B', '#4ECDC4', '#FFD93D', '#95E1D3'],
+                    colors: [
+                        '#FFA000',
+                        '#FF6B6B',
+                        '#4ECDC4',
+                        '#FFD93D',
+                        '#95E1D3',
+                    ],
                 });
             }
 
@@ -239,15 +246,22 @@ const MatchingStudy = ({ studysetId }: Props) => {
     };
 
     const getTimerColor = () => {
-        const avgTimePerCard = timeElapsed / Math.max(1, matchedPairs.size || 1);
+        const avgTimePerCard =
+            timeElapsed / Math.max(1, matchedPairs.size || 1);
         if (avgTimePerCard < 5) return 'success';
         if (avgTimePerCard < 10) return 'warning';
         return 'error';
     };
 
-    const progress = termCards.length > 0 ? (matchedPairs.size / termCards.length) * 100 : 0;
+    const progress =
+        termCards.length > 0 ? (matchedPairs.size / termCards.length) * 100 : 0;
 
-    if (isLoading || !activeSession || !activeSession.cards || activeSession.cards.length === 0) {
+    if (
+        isLoading ||
+        !activeSession ||
+        !activeSession.cards ||
+        activeSession.cards.length === 0
+    ) {
         return (
             <BasePage>
                 <Typography>Loading...</Typography>
@@ -289,9 +303,16 @@ const MatchingStudy = ({ studysetId }: Props) => {
 
             {/* Timer and Progress */}
             <Box sx={{ px: '2rem', py: '1rem' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: '0.5rem' }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        mb: '0.5rem',
+                    }}
+                >
                     <Typography variant="body2" color="text.secondary">
-                        Time: {Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')}
+                        Time: {Math.floor(timeElapsed / 60)}:
+                        {(timeElapsed % 60).toString().padStart(2, '0')}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                         Matched: {matchedPairs.size}/{termCards.length}
@@ -324,8 +345,21 @@ const MatchingStudy = ({ studysetId }: Props) => {
                 }}
             >
                 {/* Terms Column */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, textAlign: 'center', mb: '0.5rem' }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '1rem',
+                    }}
+                >
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            fontWeight: 600,
+                            textAlign: 'center',
+                            mb: '0.5rem',
+                        }}
+                    >
                         Terms
                     </Typography>
                     {termCards.map((card, index) => (
@@ -333,25 +367,39 @@ const MatchingStudy = ({ studysetId }: Props) => {
                             <Card
                                 onClick={() => handleCardClick(card)}
                                 sx={{
-                                    cursor: card.matched ? 'default' : 'pointer',
+                                    cursor: card.matched
+                                        ? 'default'
+                                        : 'pointer',
                                     transition: 'all 0.3s ease',
                                     borderRadius: '0.75rem',
                                     backgroundColor: card.matched
                                         ? 'rgba(76, 175, 80, 0.1)'
-                                        : selectedCards.some((c) => c.id === card.id)
-                                        ? 'primary.main'
-                                        : 'background.paper',
-                                    color: selectedCards.some((c) => c.id === card.id)
+                                        : selectedCards.some(
+                                                (c) => c.id === card.id
+                                            )
+                                          ? 'primary.main'
+                                          : 'background.paper',
+                                    color: selectedCards.some(
+                                        (c) => c.id === card.id
+                                    )
                                         ? 'primary.contrastText'
                                         : 'text.primary',
                                     opacity: card.matched ? 0.6 : 1,
-                                    border: card.matched ? '2px solid' : '1px solid',
-                                    borderColor: card.matched ? 'success.main' : 'divider',
-                                    transform: selectedCards.some((c) => c.id === card.id)
+                                    border: card.matched
+                                        ? '2px solid'
+                                        : '1px solid',
+                                    borderColor: card.matched
+                                        ? 'success.main'
+                                        : 'divider',
+                                    transform: selectedCards.some(
+                                        (c) => c.id === card.id
+                                    )
                                         ? 'scale(1.05)'
                                         : 'scale(1)',
                                     '&:hover': {
-                                        transform: card.matched ? 'scale(1)' : 'scale(1.02)',
+                                        transform: card.matched
+                                            ? 'scale(1)'
+                                            : 'scale(1.02)',
                                         boxShadow: card.matched ? undefined : 4,
                                     },
                                 }}
@@ -389,8 +437,21 @@ const MatchingStudy = ({ studysetId }: Props) => {
                 </Box>
 
                 {/* Definitions Column */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, textAlign: 'center', mb: '0.5rem' }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '1rem',
+                    }}
+                >
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            fontWeight: 600,
+                            textAlign: 'center',
+                            mb: '0.5rem',
+                        }}
+                    >
                         Definitions
                     </Typography>
                     {definitionCards.map((card, index) => (
@@ -398,25 +459,39 @@ const MatchingStudy = ({ studysetId }: Props) => {
                             <Card
                                 onClick={() => handleCardClick(card)}
                                 sx={{
-                                    cursor: card.matched ? 'default' : 'pointer',
+                                    cursor: card.matched
+                                        ? 'default'
+                                        : 'pointer',
                                     transition: 'all 0.3s ease',
                                     borderRadius: '0.75rem',
                                     backgroundColor: card.matched
                                         ? 'rgba(76, 175, 80, 0.1)'
-                                        : selectedCards.some((c) => c.id === card.id)
-                                        ? 'primary.main'
-                                        : 'background.paper',
-                                    color: selectedCards.some((c) => c.id === card.id)
+                                        : selectedCards.some(
+                                                (c) => c.id === card.id
+                                            )
+                                          ? 'primary.main'
+                                          : 'background.paper',
+                                    color: selectedCards.some(
+                                        (c) => c.id === card.id
+                                    )
                                         ? 'primary.contrastText'
                                         : 'text.primary',
                                     opacity: card.matched ? 0.6 : 1,
-                                    border: card.matched ? '2px solid' : '1px solid',
-                                    borderColor: card.matched ? 'success.main' : 'divider',
-                                    transform: selectedCards.some((c) => c.id === card.id)
+                                    border: card.matched
+                                        ? '2px solid'
+                                        : '1px solid',
+                                    borderColor: card.matched
+                                        ? 'success.main'
+                                        : 'divider',
+                                    transform: selectedCards.some(
+                                        (c) => c.id === card.id
+                                    )
                                         ? 'scale(1.05)'
                                         : 'scale(1)',
                                     '&:hover': {
-                                        transform: card.matched ? 'scale(1)' : 'scale(1.02)',
+                                        transform: card.matched
+                                            ? 'scale(1)'
+                                            : 'scale(1.02)',
                                         boxShadow: card.matched ? undefined : 4,
                                     },
                                 }}

@@ -60,7 +60,9 @@ const StudyHeader = ({
                     gap: '1rem',
                 }}
             >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <Box
+                    sx={{ display: 'flex', alignItems: 'center', gap: '1rem' }}
+                >
                     <Tooltip title="Back to Study Set">
                         <IconButton onClick={handleBack} color="primary">
                             <ArrowBack />
@@ -102,8 +104,13 @@ const StudyHeader = ({
                                 border: '0.0625rem solid rgba(255, 107, 107, 0.3)',
                             }}
                         >
-                            <Typography sx={{ fontSize: '1.25rem' }}>🔥</Typography>
-                            <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            <Typography sx={{ fontSize: '1.25rem' }}>
+                                🔥
+                            </Typography>
+                            <Typography
+                                variant="body1"
+                                sx={{ fontWeight: 600 }}
+                            >
                                 {streak} Streak
                             </Typography>
                         </Box>
@@ -131,7 +138,13 @@ const StudyHeader = ({
                     </Typography>
                 </Box>
 
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                    }}
+                >
                     <Tooltip title={audioEnabled ? 'Audio On' : 'Audio Off'}>
                         <IconButton
                             onClick={onToggleAudio}

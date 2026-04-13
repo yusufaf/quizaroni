@@ -37,7 +37,15 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
 
     if (!result) return null;
 
-    const { totalCards, correctAnswers, score, timeSpent, accuracy, streak, achievements } = result;
+    const {
+        totalCards,
+        correctAnswers,
+        score,
+        timeSpent,
+        accuracy,
+        streak,
+        achievements,
+    } = result;
 
     const getPerformanceMessage = () => {
         if (accuracy >= 95) return 'Outstanding! 🌟';
@@ -74,7 +82,9 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
                         gap: '0.5rem',
                     }}
                 >
-                    <EmojiEvents sx={{ fontSize: '2rem', color: 'primary.main' }} />
+                    <EmojiEvents
+                        sx={{ fontSize: '2rem', color: 'primary.main' }}
+                    />
                     <Typography variant="h5" sx={{ fontWeight: 700 }}>
                         {getPerformanceMessage()}
                     </Typography>
@@ -133,7 +143,9 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
                                 backgroundColor: 'rgba(76, 175, 80, 0.1)',
                             }}
                         >
-                            <CheckCircle sx={{ fontSize: '2rem', color: 'success.main' }} />
+                            <CheckCircle
+                                sx={{ fontSize: '2rem', color: 'success.main' }}
+                            />
                             <Typography variant="h6" sx={{ fontWeight: 600 }}>
                                 {correctAnswers}/{totalCards}
                             </Typography>
@@ -183,7 +195,9 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
                                 backgroundColor: 'rgba(78, 205, 196, 0.1)',
                             }}
                         >
-                            <Timer sx={{ fontSize: '2rem', color: '#4ECDC4' }} />
+                            <Timer
+                                sx={{ fontSize: '2rem', color: '#4ECDC4' }}
+                            />
                             <Typography variant="h6" sx={{ fontWeight: 600 }}>
                                 {formatTime(timeSpent)}
                             </Typography>
@@ -204,7 +218,9 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
                                 backgroundColor: 'rgba(255, 107, 107, 0.1)',
                             }}
                         >
-                            <Whatshot sx={{ fontSize: '2rem', color: '#FF6B6B' }} />
+                            <Whatshot
+                                sx={{ fontSize: '2rem', color: '#FF6B6B' }}
+                            />
                             <Typography variant="h6" sx={{ fontWeight: 600 }}>
                                 {streak}
                             </Typography>
@@ -228,7 +244,10 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
                                     gap: '0.75rem',
                                 }}
                             >
-                                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                <Typography
+                                    variant="subtitle1"
+                                    sx={{ fontWeight: 600 }}
+                                >
                                     🎉 New Achievements Unlocked!
                                 </Typography>
                                 <Box
@@ -238,18 +257,24 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
                                         gap: '0.5rem',
                                     }}
                                 >
-                                    {achievements.map((achievementId, index) => (
-                                        <Chip
-                                            key={achievementId}
-                                            label={achievementId.replace(/-/g, ' ').toUpperCase()}
-                                            color="primary"
-                                            component={motion.div}
-                                            // @ts-ignore
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
-                                            transition={{ delay: index * 0.1 }}
-                                        />
-                                    ))}
+                                    {achievements.map(
+                                        (achievementId, index) => (
+                                            <Chip
+                                                key={achievementId}
+                                                label={achievementId
+                                                    .replace(/-/g, ' ')
+                                                    .toUpperCase()}
+                                                color="primary"
+                                                component={motion.div}
+                                                // @ts-ignore
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                                transition={{
+                                                    delay: index * 0.1,
+                                                }}
+                                            />
+                                        )
+                                    )}
                                 </Box>
                             </Box>
                         )}

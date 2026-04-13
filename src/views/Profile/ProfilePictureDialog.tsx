@@ -176,9 +176,17 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
                                 selectedAvatar?.value === avatarUrl;
 
                             return (
-                                <Grid item xs={4} sm={3} md={2.4} key={preset.id}>
+                                <Grid
+                                    item
+                                    xs={4}
+                                    sm={3}
+                                    md={2.4}
+                                    key={preset.id}
+                                >
                                     <Box
-                                        onClick={() => handlePresetSelect(preset)}
+                                        onClick={() =>
+                                            handlePresetSelect(preset)
+                                        }
                                         sx={{
                                             cursor: 'pointer',
                                             border: isSelected

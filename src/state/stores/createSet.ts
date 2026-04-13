@@ -20,4 +20,5 @@ export const useCreateSetStore = create<CreateSetState>((set) => ({
 }));
 
 // Selector functions (optional, for convenience)
-export const selectAdvancedSectionProps = (state: CreateSetState) => state.advancedSectionProps;
+export const selectAdvancedSectionProps = (state: CreateSetState) =>
+    state.advancedSectionProps;

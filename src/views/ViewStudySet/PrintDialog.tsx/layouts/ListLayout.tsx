@@ -17,13 +17,16 @@ type Props = {
 };
 
 const ListLayout = ({ studyset, cards, settings }: Props) => {
-    const { terminology, customTerminology, labelTerminology, customLabelTerminology } =
-        studyset.metadata;
-    const [term1, term2] =
-        (terminology === FORMAT_TERMINOLOGIES.CUSTOM
-            ? customTerminology
-            : terminology
-        )?.split('/') ?? ['Term', 'Definition'];
+    const {
+        terminology,
+        customTerminology,
+        labelTerminology,
+        customLabelTerminology,
+    } = studyset.metadata;
+    const [term1, term2] = (terminology === FORMAT_TERMINOLOGIES.CUSTOM
+        ? customTerminology
+        : terminology
+    )?.split('/') ?? ['Term', 'Definition'];
     const labelText =
         labelTerminology === LABEL_TERMINOLOGIES.CUSTOM
             ? customLabelTerminology
@@ -90,7 +93,11 @@ const ListLayout = ({ studyset, cards, settings }: Props) => {
                             </p>
                             {settings.includeFiles &&
                                 card.files
-                                    .filter((f) => f.association === 'term' && f.signedURL)
+                                    .filter(
+                                        (f) =>
+                                            f.association === 'term' &&
+                                            f.signedURL
+                                    )
                                     .map((file, i) => (
                                         <FileImage
                                             key={i}

@@ -22,12 +22,13 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
     const timeoutRef = useRef(null);
 
     const { cards, studysetUUID } = selectedStudyset;
-    const { customTerminology, terminology, contentOnly } = selectedStudyset.metadata;
+    const { customTerminology, terminology, contentOnly } =
+        selectedStudyset.metadata;
 
     const selectedTerminology = terminology ?? DEFAULT_TERMINOLOGY;
     const [terminology1, terminology2] =
         selectedTerminology === FORMAT_TERMINOLOGIES.CUSTOM
-            ? customTerminology?.split('/') ?? []
+            ? (customTerminology?.split('/') ?? [])
             : selectedTerminology.split('/');
 
     const handleAudioPlayback = () => {
@@ -62,7 +63,8 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
             elevation={6}
             sx={{
                 backgroundColor: `${
-                    card?.backgroundColor && selectedStudyset?.metadata?.backgroundColorVisible
+                    card?.backgroundColor &&
+                    selectedStudyset?.metadata?.backgroundColorVisible
                         ? card.backgroundColor
                         : ''
                 }`,
@@ -71,14 +73,19 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
             <GridCardContent>
                 <GridCardSection>
                     {!contentOnly && (
-                        <Typography variant="subtitle2" color="primary" fontWeight={600}>
+                        <Typography
+                            variant="subtitle2"
+                            color="primary"
+                            fontWeight={600}
+                        >
                             {terminology1 ?? 'Term'}
                         </Typography>
                     )}
                     <Typography
                         sx={{
                             color: `${
-                                card?.textColor && selectedStudyset?.metadata?.textColorVisible
+                                card?.textColor &&
+                                selectedStudyset?.metadata?.textColorVisible
                                     ? card.textColor
                                     : ''
                             }`,
@@ -89,20 +96,29 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
                         {card.term}
                     </Typography>
                     <ImageGallery
-                        files={card.files?.filter(f => f.association === 'term') || []}
+                        files={
+                            card.files?.filter(
+                                (f) => f.association === 'term'
+                            ) || []
+                        }
                         maxHeight="5rem"
                     />
                 </GridCardSection>
                 <GridCardSection>
                     {!contentOnly && (
-                        <Typography variant="subtitle2" color="primary" fontWeight={600}>
+                        <Typography
+                            variant="subtitle2"
+                            color="primary"
+                            fontWeight={600}
+                        >
                             {terminology2 ?? 'Definition'}
                         </Typography>
                     )}
                     <Typography
                         sx={{
                             color: `${
-                                card?.textColor && selectedStudyset?.metadata?.textColorVisible
+                                card?.textColor &&
+                                selectedStudyset?.metadata?.textColorVisible
                                     ? card.textColor
                                     : ''
                             }`,
@@ -113,11 +129,22 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
                         {card.definition}
                     </Typography>
                     <ImageGallery
-                        files={card.files?.filter(f => f.association === 'definition') || []}
+                        files={
+                            card.files?.filter(
+                                (f) => f.association === 'definition'
+                            ) || []
+                        }
                         maxHeight="5rem"
                     />
                 </GridCardSection>
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto', justifyContent: 'flex-end' }}>
+                <div
+                    style={{
+                        display: 'flex',
+                        gap: '0.5rem',
+                        marginTop: 'auto',
+                        justifyContent: 'flex-end',
+                    }}
+                >
                     <Tooltip title="Play TTS" placement="top">
                         <IconButton onClick={handleAudioPlayback} size="small">
                             <VolumeUp fontSize="small" />
@@ -126,7 +153,12 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
                     <Tooltip title="Mark as important" placement="top">
                         <IconButton onClick={markCardAsImportant} size="small">
                             {card.important ? (
-                                <Star fontSize="small" sx={{ color: muiTheme.palette.primary.main }} />
+                                <Star
+                                    fontSize="small"
+                                    sx={{
+                                        color: muiTheme.palette.primary.main,
+                                    }}
+                                />
                             ) : (
                                 <StarBorder fontSize="small" />
                             )}

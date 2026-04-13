@@ -37,7 +37,11 @@ export const MetadataList = <T extends { name: string }>({
                 }}
             >
                 <InboxIcon fontSize="large" color="disabled" />
-                <Typography variant="h6" color="text.secondary" sx={{ mt: '1rem' }}>
+                <Typography
+                    variant="h6"
+                    color="text.secondary"
+                    sx={{ mt: '1rem' }}
+                >
                     {emptyMessage}
                 </Typography>
                 {emptySubMessage && (

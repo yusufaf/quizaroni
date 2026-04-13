@@ -89,11 +89,7 @@ export abstract class BasePdfGenerator {
      * Wrap text to fit within max width
      * Returns array of lines
      */
-    protected wrapText(
-        doc: jsPDF,
-        text: string,
-        maxWidth: number
-    ): string[] {
+    protected wrapText(doc: jsPDF, text: string, maxWidth: number): string[] {
         return doc.splitTextToSize(text, maxWidth);
     }
 

@@ -114,9 +114,10 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
                         const csvStrings = [term, definition];
 
                         if (includeNotes) {
-                            const notesText = notes.length > 0
-                                ? notes.map(n => n.text).join('; ')
-                                : '';
+                            const notesText =
+                                notes.length > 0
+                                    ? notes.map((n) => n.text).join('; ')
+                                    : '';
                             csvStrings.push(notesText);
                         }
 
@@ -143,7 +144,9 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
                     }:\n\t ${termString} \n\t ${definitionString}`;
 
                     if (includeNotes && notes.length > 0) {
-                        const notesString = notes.map(n => `\t\t- ${n.text}`).join('\n');
+                        const notesString = notes
+                            .map((n) => `\t\t- ${n.text}`)
+                            .join('\n');
                         cardContent += `\n\t Notes:\n${notesString}`;
                     }
 
@@ -176,7 +179,7 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
                     };
                 });
                 const cleanedCards = Object.assign({}, ...mappedCards);
-                const studysetJSON: { cards: any; metadata?: Object } = {
+                const studysetJSON: { cards: any; metadata?: object } = {
                     cards: cleanedCards,
                 };
                 if (includeMetadata) {
@@ -195,7 +198,9 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
                     }\n\n**Term:** ${term}\n\n**Definition:** ${definition}`;
 
                     if (includeNotes && notes.length > 0) {
-                        const notesMarkdown = notes.map(n => `- ${n.text}`).join('\n');
+                        const notesMarkdown = notes
+                            .map((n) => `- ${n.text}`)
+                            .join('\n');
                         cardMarkdown += `\n\n**Notes:**\n${notesMarkdown}`;
                     }
 
@@ -221,7 +226,10 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
 
     return (
         <Dialog open={open} onClose={onClose}>
-            <StandardDialogTitle title={t('dialogs.download.title')} onClose={onClose} />
+            <StandardDialogTitle
+                title={t('dialogs.download.title')}
+                onClose={onClose}
+            />
             <DownloadDialogContent>
                 <DialogContentText>
                     {t('dialogs.download.chooseFormat')}
