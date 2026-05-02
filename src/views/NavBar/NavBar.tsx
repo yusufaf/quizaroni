@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import ProfileDropdown from 'views/Profile/ProfileDropdown';
 import { useTheme } from 'theme/useTheme';
 import { ROUTES, LOADING_ACTIONS } from 'shared/constants';
+import { SyncStatusIndicator } from 'state/local';
 import NavDrawer from './NavDrawer';
 import {
     AuthenticationButton,
@@ -121,6 +122,7 @@ const NavBar = (props: Props) => {
                             </CreateStudySetButton>
                         </NavLinksContainer>
                         <NavRightActions>
+                            <SyncStatusIndicator />
                             {authenticated ? (
                                 <Tooltip title={t('nav.logout')}>
                                     <LogoutIconButton

@@ -47,7 +47,11 @@ const ProfileCard = ({ userData }: Props) => {
                     <Tooltip title="Change profile picture">
                         <ProfilePicture onClick={handleOpenDialog}>
                             {isGetAllStudysetsLoading ? (
-                                <Skeleton variant="circular" width="100%" height="100%" />
+                                <Skeleton
+                                    variant="circular"
+                                    width="100%"
+                                    height="100%"
+                                />
                             ) : hasAvatar ? (
                                 <ProfilePictureImage
                                     src={avatarSrc}
@@ -78,8 +82,12 @@ const ProfileCard = ({ userData }: Props) => {
                 ) : (
                     <>
                         <UserInfoContainer>
-                            <UserInfoHeading>{t('profile.username')}</UserInfoHeading>
-                            <Typography>{userData?.username ?? 'N/A'}</Typography>
+                            <UserInfoHeading>
+                                {t('profile.username')}
+                            </UserInfoHeading>
+                            <Typography>
+                                {userData?.username ?? 'N/A'}
+                            </Typography>
                         </UserInfoContainer>
                         <UserInfoContainer>
                             <UserInfoHeading>
@@ -88,7 +96,9 @@ const ProfileCard = ({ userData }: Props) => {
                             <Typography>{studysets.length}</Typography>
                         </UserInfoContainer>
                         <UserInfoContainer>
-                            <UserInfoHeading>{t('profile.totalCards')}</UserInfoHeading>
+                            <UserInfoHeading>
+                                {t('profile.totalCards')}
+                            </UserInfoHeading>
                             <Typography>{totalCards}</Typography>
                         </UserInfoContainer>
                         <UserInfoContainer>
