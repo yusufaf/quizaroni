@@ -70,9 +70,14 @@ const ManageCategoriesDialog = (props: Props) => {
     selectedCardUUIDRef.current = selectedCardUUID;
 
     useEffect(() => {
-        const card = cards.find((c) => c.cardUUID === selectedCardUUID);
+        // Use cardsRef to avoid dependency on cards array reference
+        const card = cardsRef.current.find(
+            (c) => c.cardUUID === selectedCardUUID
+        );
         setAssignedCategoriesSelection(card?.categories ?? []);
-    }, [selectedCardUUID, cards, open]);
+        // Only run when selectedCardUUID or open changes
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedCardUUID, open]);
 
     useEffect(
         () => () => {

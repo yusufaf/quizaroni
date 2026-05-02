@@ -191,7 +191,9 @@ export const ViewFlashsetCard = styled(Card)(({ theme }) => ({
     },
 }));
 
-export const CategoryChips = styled(SimpleFlexContainer)<{
+export const CategoryChips = styled(SimpleFlexContainer, {
+    shouldForwardProp: (prop) => prop !== 'hasIndex',
+})<{
     hasIndex?: boolean;
 }>(({ hasIndex = true }) => ({
     marginLeft: hasIndex ? '1rem' : '0',
