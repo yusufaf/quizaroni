@@ -260,7 +260,7 @@ const NewCardInput = ({
             <SimpleFlexContainer
                 style={{
                     gap: '0.5rem',
-                    padding: '0 3rem',
+                    padding: '0 1.5rem',
                 }}
             >
                 <Tooltip title={t('create.dragToReorder')} placement="left">

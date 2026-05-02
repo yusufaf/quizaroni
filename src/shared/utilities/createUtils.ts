@@ -43,6 +43,12 @@ export const deleteCard = ({
             newCreatedSetCards.splice(index, 0, cardBeingDeleted);
             setStateCallback(newCreatedSetCards);
         },
+        redoCallback: (createdSetCards: TODO[], setStateCallback: TODO) => {
+            const newCreatedSetCards = [...createdSetCards].filter(
+                (c) => c.cardUUID !== cardBeingDeleted.cardUUID
+            );
+            setStateCallback(newCreatedSetCards);
+        },
     });
     setActionsStack(newActionsStack);
 };

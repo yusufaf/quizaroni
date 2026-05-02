@@ -456,7 +456,9 @@ const ViewStudySet = (props: Props) => {
                     variant="contained"
                     onClick={handleUpdateCards}
                 >
-                    {t('viewStudySet.updateCards')}
+                    {selectedStudyset?.cards?.length === 0
+                        ? t('viewStudySet.addCards')
+                        : t('viewStudySet.updateCards')}
                 </UpdateCardsButton>
                 <NotesDrawer
                     selectedStudyset={selectedStudyset}
