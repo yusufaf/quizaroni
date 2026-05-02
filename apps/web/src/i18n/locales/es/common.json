@@ -527,5 +527,27 @@
     "footer": {
         "socials": "Redes Sociales",
         "copyright": "© 2026 Quizaroni"
+    },
+    "sync": {
+        "allCaughtUp": "Todo sincronizado",
+        "offline": "Modo sin conexión",
+        "offlineMode": "Sin conexión",
+        "online": "En línea",
+        "syncing": "Sincronizando...",
+        "pending": "{{count}} cambio pendiente",
+        "pending_plural": "{{count}} cambios pendientes",
+        "pendingChanges": "{{count}} cambio esperando sincronización",
+        "pendingChanges_plural": "{{count}} cambios esperando sincronización",
+        "lastSync": "Última sincronización",
+        "never": "Nunca",
+        "justNow": "Ahora mismo",
+        "minutesAgo": "Hace {{count}} minuto",
+        "minutesAgo_plural": "Hace {{count}} minutos",
+        "hoursAgo": "Hace {{count}} hora",
+        "hoursAgo_plural": "Hace {{count}} horas",
+        "daysAgo": "Hace {{count}} día",
+        "daysAgo_plural": "Hace {{count}} días",
+        "syncNow": "Sincronizar ahora",
+        "willSyncWhenOnline": "Se sincronizará cuando haya conexión"
     }
 }
