@@ -17,7 +17,9 @@ import {
     SpacedFlexContainer,
 } from 'styles/AppStyles';
 
-export const ViewStudysetPage = styled(BasePage)<{
+export const ViewStudysetPage = styled(BasePage, {
+    shouldForwardProp: (prop) => prop !== 'viewMode',
+})<{
     viewMode?: 'list' | 'grid';
 }>(({ viewMode = 'list' }) => ({
     height: '100%',
@@ -25,7 +27,7 @@ export const ViewStudysetPage = styled(BasePage)<{
     flexDirection: 'column',
     gap: viewMode === 'grid' ? '1.5rem' : '2rem',
     padding: '0rem 22rem 2rem 22rem',
-    position: 'relative', // Allows the sticky positioning
+    position: 'relative',
 }));
 
 export const ViewFlashsetPaper = styled(Paper)({});

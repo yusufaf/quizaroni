@@ -197,8 +197,8 @@ export const NewCardDefinition = styled(FlexColumn)({
 export const NewCardRow = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'flex-start',
-    gap: '3rem',
-    padding: '0 3rem',
+    gap: '2rem',
+    padding: '0 1.5rem',
     position: 'relative',
     '&::after': {
         content: '""',

@@ -1,5 +1,5 @@
 import { AddPhotoAlternate as AddPhotoIcon } from '@mui/icons-material';
-import { Tooltip, Typography } from '@mui/material/';
+import { Skeleton, Tooltip, Typography } from '@mui/material/';
 import { useState } from 'react';
 import {
     ProfilePicture,
@@ -14,7 +14,7 @@ import ProfilePictureDialog from './ProfilePictureDialog';
 import { useGetAllStudysets } from 'state/api/studysetsAPI';
 import { User } from 'shared/types';
 import { formatDateUsingPreferred } from 'utilities/general';
-import { DATE_FORMATS, TIME_FORMATS } from 'constants';
+import { DATE_FORMATS, TIME_FORMATS } from 'shared/constants';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -46,7 +46,9 @@ const ProfileCard = ({ userData }: Props) => {
                 <ProfilePictureContainer>
                     <Tooltip title="Change profile picture">
                         <ProfilePicture onClick={handleOpenDialog}>
-                            {hasAvatar ? (
+                            {isGetAllStudysetsLoading ? (
+                                <Skeleton variant="circular" width="100%" height="100%" />
+                            ) : hasAvatar ? (
                                 <ProfilePictureImage
                                     src={avatarSrc}
                                     alt="Profile"
@@ -64,41 +66,54 @@ const ProfileCard = ({ userData }: Props) => {
                         </UploadImageButton>
                     </Tooltip>
                 </ProfilePictureContainer>
-                <UserInfoContainer>
-                    <UserInfoHeading>{t('profile.username')}</UserInfoHeading>
-                    <Typography>{userData?.username ?? 'N/A'}</Typography>
-                </UserInfoContainer>
-                <UserInfoContainer>
-                    <UserInfoHeading>
-                        {t('profile.studySetsCreated')}
-                    </UserInfoHeading>
-                    <Typography>{studysets.length}</Typography>
-                </UserInfoContainer>
-                <UserInfoContainer>
-                    <UserInfoHeading>{t('profile.totalCards')}</UserInfoHeading>
-                    <Typography>{totalCards}</Typography>
-                </UserInfoContainer>
-                <UserInfoContainer>
-                    <UserInfoHeading>
-                        {t('profile.labelsCreated')}
-                    </UserInfoHeading>
-                    <Typography>{labelsCount}</Typography>
-                </UserInfoContainer>
-                <UserInfoContainer>
-                    <UserInfoHeading>
-                        {t('profile.accountCreated')}
-                    </UserInfoHeading>
-                    <Typography>
-                        {formatDateUsingPreferred(
-                            userData.createdAt,
-                            userData.metadata.preferredDateFormat ??
-                                DATE_FORMATS.MDY,
-                            userData.metadata.preferredTimeFormat ??
-                                TIME_FORMATS.TWELVE_HOUR,
-                            userData.metadata.showSeconds ?? false
-                        )}
-                    </Typography>
-                </UserInfoContainer>
+                {isGetAllStudysetsLoading ? (
+                    <>
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <UserInfoContainer key={i}>
+                                <Skeleton width="60%" />
+                                <Skeleton width="40%" />
+                            </UserInfoContainer>
+                        ))}
+                    </>
+                ) : (
+                    <>
+                        <UserInfoContainer>
+                            <UserInfoHeading>{t('profile.username')}</UserInfoHeading>
+                            <Typography>{userData?.username ?? 'N/A'}</Typography>
+                        </UserInfoContainer>
+                        <UserInfoContainer>
+                            <UserInfoHeading>
+                                {t('profile.studySetsCreated')}
+                            </UserInfoHeading>
+                            <Typography>{studysets.length}</Typography>
+                        </UserInfoContainer>
+                        <UserInfoContainer>
+                            <UserInfoHeading>{t('profile.totalCards')}</UserInfoHeading>
+                            <Typography>{totalCards}</Typography>
+                        </UserInfoContainer>
+                        <UserInfoContainer>
+                            <UserInfoHeading>
+                                {t('profile.labelsCreated')}
+                            </UserInfoHeading>
+                            <Typography>{labelsCount}</Typography>
+                        </UserInfoContainer>
+                        <UserInfoContainer>
+                            <UserInfoHeading>
+                                {t('profile.accountCreated')}
+                            </UserInfoHeading>
+                            <Typography>
+                                {formatDateUsingPreferred(
+                                    userData.createdAt,
+                                    userData.metadata.preferredDateFormat ??
+                                        DATE_FORMATS.MDY,
+                                    userData.metadata.preferredTimeFormat ??
+                                        TIME_FORMATS.TWELVE_HOUR,
+                                    userData.metadata.showSeconds ?? false
+                                )}
+                            </Typography>
+                        </UserInfoContainer>
+                    </>
+                )}
             </StyledProfileCard>
             <ProfilePictureDialog
                 open={dialogOpen}
