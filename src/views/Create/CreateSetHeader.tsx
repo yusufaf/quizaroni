@@ -132,8 +132,7 @@ const CreateSetHeader = ({
                     variant="outlined"
                     placeholder={
                       selectedLabels.length === 0
-                        ? t("create.addLabelsPlaceholder") ||
-                          "Type and press Enter to add labels"
+                        ? t("create.addLabelsPlaceholder")
                         : ""
                     }
                     size="small"

@@ -9,15 +9,25 @@ import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
   Add as AddIcon,
+  DeleteSweep as DeleteSweepIcon,
+  SwapVert as SwapVertIcon,
 } from "@mui/icons-material";
 import { useCreateSetStore } from "state/stores/createSet";
 import { useTranslation } from "react-i18next";
 
 type Props = {
   onBlankInputsSubmit: any;
+  onClearEmptyCards?: () => void;
+  onReverseAllCards?: () => void;
+  cardsCount?: number;
 };
 
-const HeaderAdvancedSection = ({ onBlankInputsSubmit = null }: Props) => {
+const HeaderAdvancedSection = ({
+  onBlankInputsSubmit = null,
+  onClearEmptyCards,
+  onReverseAllCards,
+  cardsCount = 0,
+}: Props) => {
   const { t } = useTranslation();
   const { advancedSectionProps, setAdvancedSectionProps } = useCreateSetStore();
 
@@ -53,42 +63,127 @@ const HeaderAdvancedSection = ({ onBlankInputsSubmit = null }: Props) => {
         </IconButton>
       </SimpleFlexContainer>
       {expanded && (
-        <BlankInputsContainer>
-          <Box sx={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-            <Typography variant="body2" color="text.secondary">
+        <BlankInputsContainer
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+            alignItems: "flex-start",
+            mt: "0.5rem",
+          }}
+        >
+          {/* Add blank cards */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "0.75rem",
+              width: "100%",
+            }}
+          >
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ textAlign: "left" }}
+            >
               {t("create.addBlankCards", { defaultValue: "Add blank cards:" })}
             </Typography>
-            <TextField
-              type="number"
-              size="small"
-              value={blankCardsCount}
-              onChange={onBlankInputsChange}
-              inputProps={{
-                min: 0,
-                max: 100,
-                style: {
-                  width: "3rem",
-                  textAlign: "center",
-                  MozAppearance: "textfield",
-                },
-              }}
-              sx={{
-                "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
-                  {
-                    WebkitAppearance: "none",
-                    margin: 0,
+            <Box sx={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+              <TextField
+                type="number"
+                size="small"
+                value={blankCardsCount}
+                onChange={onBlankInputsChange}
+                inputProps={{
+                  min: 0,
+                  max: 100,
+                  style: {
+                    width: "3rem",
+                    textAlign: "center",
+                    MozAppearance: "textfield",
                   },
-              }}
-            />
+                }}
+                sx={{
+                  "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                    {
+                      WebkitAppearance: "none",
+                      margin: 0,
+                    },
+                }}
+              />
+              <Button
+                variant="contained"
+                size="small"
+                onClick={handleBlankInputsSubmit}
+                disabled={!blankCardsCount || blankCardsCount <= 0}
+                startIcon={<AddIcon />}
+                sx={{ minWidth: "auto" }}
+              >
+                {t("create.add", { defaultValue: "Add" })}
+              </Button>
+            </Box>
+          </Box>
+
+          {/* Clear empty cards */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "0.75rem",
+              width: "100%",
+            }}
+          >
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ textAlign: "left" }}
+            >
+              {t("create.clearEmptyCards", {
+                defaultValue: "Clear empty cards:",
+              })}
+            </Typography>
             <Button
-              variant="contained"
+              variant="outlined"
               size="small"
-              onClick={handleBlankInputsSubmit}
-              disabled={!blankCardsCount || blankCardsCount <= 0}
-              startIcon={<AddIcon />}
+              onClick={onClearEmptyCards}
+              disabled={!onClearEmptyCards || cardsCount === 0}
+              startIcon={<DeleteSweepIcon />}
               sx={{ minWidth: "auto" }}
             >
-              {t("create.add", { defaultValue: "Add" })}
+              {t("create.clear", { defaultValue: "Clear" })}
+            </Button>
+          </Box>
+
+          {/* Reverse all cards */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "0.75rem",
+              width: "100%",
+            }}
+          >
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ textAlign: "left" }}
+            >
+              {t("create.reverseAllCards", {
+                defaultValue: "Reverse all cards:",
+              })}
+            </Typography>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={onReverseAllCards}
+              disabled={!onReverseAllCards || cardsCount === 0}
+              startIcon={<SwapVertIcon />}
+              sx={{ minWidth: "auto" }}
+            >
+              {t("create.reverse", { defaultValue: "Reverse" })}
             </Button>
           </Box>
         </BlankInputsContainer>
