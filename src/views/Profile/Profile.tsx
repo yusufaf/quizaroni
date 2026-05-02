@@ -1,5 +1,6 @@
 import { Tabs } from '@mui/material/';
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import AccountTab from './AccountTab';
 import AccessibilityTab from './AccessibilityTab';
 import CustomizationTab from './CustomizationTab';
@@ -12,7 +13,11 @@ import {
     ProfileTab,
 } from './ProfileStyles';
 import { useGetUser } from 'state/api/usersAPI';
-import { DEFAULT_USER_RESPONSE, PAGE_TITLES } from 'shared/constants';
+import {
+    DEFAULT_USER_RESPONSE,
+    PAGE_TITLES,
+    QUERY_PARAMS,
+} from 'shared/constants';
 import useBrowserTitle from 'hooks/useBrowserTitle';
 import { useTranslation } from 'react-i18next';
 
@@ -23,6 +28,8 @@ const TABS = {
     JSON: 'JSON',
 };
 
+const VALID_TABS = new Set<string>(Object.values(TABS));
+
 type Props = {};
 
 const Profile = (props: Props) => {
@@ -31,18 +38,34 @@ const Profile = (props: Props) => {
 
     useBrowserTitle(PAGE_TITLES.PROFILE);
 
-    const [selectedProfileTab, setSelectedProfileTab] = useState<string>(
-        localStorage.getItem('profileTab') ?? TABS.CUSTOMIZATION
-    );
+    const [searchParams, setSearchParams] = useSearchParams();
+    const urlTab = searchParams.get(QUERY_PARAMS.PROFILE_TAB);
+    const selectedProfileTab =
+        urlTab && VALID_TABS.has(urlTab) ? urlTab : TABS.CUSTOMIZATION;
 
-    /* User Input Error Checking */
-    const [showErrorText, setShowErrorText] = useState({
-        confirmPassInput: false,
-    });
+    // Backfill URL param on first load so the tab is reflected in the URL.
+    useEffect(() => {
+        if (!urlTab || !VALID_TABS.has(urlTab)) {
+            setSearchParams(
+                (prev) => {
+                    const next = new URLSearchParams(prev);
+                    next.set(QUERY_PARAMS.PROFILE_TAB, TABS.CUSTOMIZATION);
+                    return next;
+                },
+                { replace: true }
+            );
+        }
+    }, []);
 
     const onTabChange = (_e: SyntheticEvent, newTab: string) => {
-        localStorage.setItem('profileTab', newTab);
-        setSelectedProfileTab(newTab);
+        setSearchParams(
+            (prev) => {
+                const next = new URLSearchParams(prev);
+                next.set(QUERY_PARAMS.PROFILE_TAB, newTab);
+                return next;
+            },
+            { replace: true }
+        );
     };
 
     return (

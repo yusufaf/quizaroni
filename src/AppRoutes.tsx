@@ -20,7 +20,13 @@ type RequireAuthProps = {
 };
 
 const RequireAuth = ({ children, authenticated }: RequireAuthProps) => {
-    return authenticated ? <>{children}</> : <Navigate to="/login" replace />;
+    const location = useLocation();
+    const from = location.pathname + location.search;
+    return authenticated ? (
+        <>{children}</>
+    ) : (
+        <Navigate to="/login" state={{ from }} replace />
+    );
 };
 
 const AppRoutes = () => {
@@ -39,7 +45,6 @@ const AppRoutes = () => {
         { path: '/study/:studysetId/:mode', element: <StudyMode /> },
     ];
 
-    // Determine initial state based on the current route
     const getInitialState = () => {
         const path = location.pathname.toLowerCase();
         switch (path) {
@@ -56,7 +61,8 @@ const AppRoutes = () => {
 
     const AuthenticatorRoute = () => {
         if (authenticated) {
-            return <Navigate to="/" replace />;
+            const from = location.state?.from ?? '/';
+            return <Navigate to={from} replace />;
         }
 
         const initialState = getInitialState();

@@ -1,6 +1,12 @@
 import { useState } from 'react';
-import { Grow, Tooltip, Typography, Box } from '@mui/material';
-import { ViewCarousel, Quiz, Extension, Keyboard } from '@mui/icons-material';
+import { Grow, Tooltip, Box } from '@mui/material';
+import {
+    ViewCarousel,
+    Quiz,
+    Extension,
+    Keyboard,
+    LockOutlined,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -67,19 +73,52 @@ const StudyModesGrid = ({ studysetUUID, cardCount }: Props) => {
                                 onMouseLeave={() => setHoveredMode(null)}
                                 elevation={isHovered && !isDisabled ? 8 : 2}
                                 sx={{
-                                    opacity: isDisabled ? 0.4 : 1,
                                     cursor: isDisabled
                                         ? 'not-allowed'
                                         : 'pointer',
                                     transition: 'all 0.3s ease',
-                                    borderLeft: `0.25rem solid ${mode.color}`,
+                                    borderLeft: isDisabled
+                                        ? '0.25rem dashed'
+                                        : `0.25rem solid ${mode.color}`,
+                                    borderLeftColor: isDisabled
+                                        ? 'divider'
+                                        : undefined,
+                                    filter: isDisabled
+                                        ? 'grayscale(1)'
+                                        : 'none',
+                                    opacity: isDisabled ? 0.55 : 1,
                                     '&:hover': {
                                         backgroundColor: isDisabled
                                             ? undefined
                                             : 'action.hover',
+                                        transform: isDisabled
+                                            ? 'none'
+                                            : undefined,
                                     },
                                 }}
                             >
+                                {isDisabled && (
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            top: '0.5rem',
+                                            right: '0.5rem',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            width: '1.5rem',
+                                            height: '1.5rem',
+                                            borderRadius: '50%',
+                                            backgroundColor:
+                                                'background.default',
+                                            color: 'text.secondary',
+                                        }}
+                                    >
+                                        <LockOutlined
+                                            sx={{ fontSize: '1rem' }}
+                                        />
+                                    </Box>
+                                )}
                                 <Box
                                     component={motion.div}
                                     whileHover={{

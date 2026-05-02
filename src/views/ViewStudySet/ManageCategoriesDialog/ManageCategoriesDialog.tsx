@@ -39,7 +39,7 @@ const ManageCategoriesDialog = (props: Props) => {
     const { t } = useTranslation();
 
     const {
-        cards,
+        cards = [],
         categories = [],
         title: studysetTitle = '',
         studysetUUID = '',
