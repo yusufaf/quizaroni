@@ -30,6 +30,7 @@ export default defineConfig({
         // VitePWA({ registerType: "autoUpdate" }),
     ],
     resolve: {
+        dedupe: ['react', 'react-dom'],
         alias: {
             src: path.resolve('src/'),
             views: path.resolve('src/views/'),
@@ -44,6 +45,9 @@ export default defineConfig({
             theme: path.resolve('src/shared/theme/'),
             utilities: path.resolve('src/shared/utilities/'),
         },
+    },
+    optimizeDeps: {
+        include: ['react', 'react-dom', 'react-dom/client'],
     },
     server: {
         proxy: {
