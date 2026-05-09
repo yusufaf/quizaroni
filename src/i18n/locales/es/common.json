@@ -462,6 +462,7 @@
     "create": {
         "backToViewing": "Volver a Ver Set de Estudio",
         "editYourStudySet": "Edita tu set de estudio",
+        "title": "Título",
         "titleRequired": "Título *",
         "enterTitle": "Ingresa un título para tu set de estudio",
         "description": "Descripción",
