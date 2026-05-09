@@ -462,6 +462,7 @@
     "create": {
         "backToViewing": "Back to Viewing Study Set",
         "editYourStudySet": "Edit your study set",
+        "title": "Title",
         "titleRequired": "Title *",
         "enterTitle": "Enter a title for your study set",
         "description": "Description",
