@@ -405,6 +405,8 @@
         "confirmDestructiveActions": "Confirm Destructive Actions",
         "confirmDestructiveActionsDescription": "Show a confirmation dialog before deleting images, categories, and other destructive actions",
         "defaultDownloadFormat": "Default Download Format",
+        "ttsVoice": "Text-to-Speech Voice",
+        "defaultTtsVoice": "Default System Voice",
         "json": "JSON",
         "jsonSettingsTitle": "Settings JSON",
         "jsonSettingsDescription": "Edit your preferences directly as JSON. Changes are validated before saving. Press Ctrl+S to save.",
