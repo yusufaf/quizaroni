@@ -21,9 +21,10 @@ import {
 } from "@mui/icons-material";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGetStudyset } from "state/api/studysetsAPI";
+import { useGetUser } from "state/api/usersAPI";
 import { useStudySessionStore } from "state/stores/studySession";
 import { Card as CardType, Studyset } from "shared/types";
-import { STUDY_MODES } from "shared/constants";
+import { STUDY_MODES, DEFAULT_USER_RESPONSE } from "shared/constants";
 import StudyHeader from "./shared/StudyHeader";
 import StudyResults from "./shared/StudyResults";
 import SettingsDialog from "./shared/SettingsDialog";
@@ -39,6 +40,8 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
     studysetUUID: studysetId,
   });
   const studyset = studysetResponse?.studyset ?? ({} as Studyset);
+  const { data: userData = DEFAULT_USER_RESPONSE } = useGetUser();
+  const ttsVoice = userData.user?.metadata?.ttsVoice;
 
   const {
     activeSession,
@@ -117,6 +120,12 @@ const FlashcardsStudy = ({ studysetId }: Props) => {
     if (window.speechSynthesis && text) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
+      if (ttsVoice) {
+        const voice = window.speechSynthesis
+          .getVoices()
+          .find((v) => v.voiceURI === ttsVoice);
+        if (voice) utterance.voice = voice;
+      }
       window.speechSynthesis.speak(utterance);
     }
   };
