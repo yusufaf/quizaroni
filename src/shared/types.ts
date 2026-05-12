@@ -98,6 +98,7 @@ export type User = {
     preferredDateFormat: PreferredDateFormat;
     preferredTimeFormat?: PreferredTimeFormat;
     showSeconds?: boolean;
+    ttsVoice?: string;
     visibleColumns?: Record<string, boolean>;
   };
   username: string;

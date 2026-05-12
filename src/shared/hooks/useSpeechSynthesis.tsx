@@ -1,49 +1,60 @@
-import { useRef } from 'react';
+import { useRef } from "react";
 
 const useSpeechSynthesis = () => {
-    const audioRef = useRef<SpeechSynthesisUtterance | null>(null);
-    const timeoutRef = useRef<any>(null);
+  const audioRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const timeoutRef = useRef<any>(null);
 
-    const speak = (text: string, delay: number = 0) => {
-        if (!window.speechSynthesis) {
-            console.error('Web Speech API is not supported in this browser.');
-            return;
-        }
+  const getVoice = (voiceURI?: string): SpeechSynthesisVoice | null => {
+    if (!voiceURI || !window.speechSynthesis) return null;
+    const voices = window.speechSynthesis.getVoices();
+    return voices.find((v) => v.voiceURI === voiceURI) || null;
+  };
 
-        // Cancel previous speech and timeout
-        if (audioRef.current) {
-            window.speechSynthesis.cancel();
-            clearTimeout(timeoutRef.current!);
-        }
+  const speak = (text: string, delay: number = 0, voiceURI?: string) => {
+    if (!window.speechSynthesis) {
+      console.error("Web Speech API is not supported in this browser.");
+      return;
+    }
 
-        const audio = new SpeechSynthesisUtterance();
-        audio.text = text;
+    // Cancel previous speech and timeout
+    if (audioRef.current) {
+      window.speechSynthesis.cancel();
+      clearTimeout(timeoutRef.current!);
+    }
 
-        // Store the audio reference to allow cancelation if needed
-        audioRef.current = audio;
+    const audio = new SpeechSynthesisUtterance();
+    audio.text = text;
 
-        // Delay speech if needed
-        if (delay > 0) {
-            timeoutRef.current = setTimeout(() => {
-                window.speechSynthesis.speak(audio);
-            }, delay);
-        } else {
-            window.speechSynthesis.speak(audio);
-        }
-    };
+    const voice = getVoice(voiceURI);
+    if (voice) {
+      audio.voice = voice;
+    }
 
-    const cancel = () => {
-        if (audioRef.current) {
-            window.speechSynthesis.cancel();
-            audioRef.current = null;
-        }
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = null;
-        }
-    };
+    // Store the audio reference to allow cancelation if needed
+    audioRef.current = audio;
 
-    return { speak, cancel };
+    // Delay speech if needed
+    if (delay > 0) {
+      timeoutRef.current = setTimeout(() => {
+        window.speechSynthesis.speak(audio);
+      }, delay);
+    } else {
+      window.speechSynthesis.speak(audio);
+    }
+  };
+
+  const cancel = () => {
+    if (audioRef.current) {
+      window.speechSynthesis.cancel();
+      audioRef.current = null;
+    }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  };
+
+  return { speak, cancel, getVoice };
 };
 
 export default useSpeechSynthesis;
