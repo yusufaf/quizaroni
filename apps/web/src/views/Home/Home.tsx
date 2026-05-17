@@ -269,9 +269,17 @@ const Home = (props: Props) => {
                     const labels = params.value as string[];
                     if (!labels || labels.length === 0) {
                         return (
-                            <Typography variant="body2" color="text.secondary">
-                                {t('home.noLabels')}
-                            </Typography>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    height: '100%',
+                                }}
+                            >
+                                <Typography variant="body2" color="text.secondary">
+                                    {t('home.noLabels')}
+                                </Typography>
+                            </Box>
                         );
                     }
                     return (

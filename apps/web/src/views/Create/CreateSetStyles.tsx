@@ -129,7 +129,7 @@ export const AddCardButton = styled(Button)({
 });
 
 export const AddCardIcon = styled(AddCircleOutline)({
-    fontSize: '3rem',
+    fontSize: '1.5rem',
 });
 
 export const NewCardInputs = styled(SpacedFlexContainer)({

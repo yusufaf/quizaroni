@@ -154,6 +154,9 @@ export const createLightTheme = (fontScale: number = 1) =>
         styleOverrides: {
           root: {
             color: "rgba(0, 0, 0, 0.7)",
+            "&.MuiIconButton-colorPrimary": {
+              color: primaryColor,
+            },
             "&:hover": {
               backgroundColor: "rgba(255, 160, 0, 0.08)",
               color: primaryHoverColor,
@@ -327,6 +330,9 @@ export const createDarkTheme = (fontScale: number = 1) =>
         styleOverrides: {
           root: {
             color: "rgba(255, 255, 255, 0.7)",
+            "&.MuiIconButton-colorPrimary": {
+              color: primaryColor,
+            },
             "&:hover": {
               backgroundColor: "rgba(255, 160, 0, 0.08)",
               color: primaryColor,
