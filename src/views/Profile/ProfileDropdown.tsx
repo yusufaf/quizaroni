@@ -25,8 +25,16 @@ const ProfileDropdown = (props) => {
             onClose={onClose}
             anchorEl={dropdownRef.current}
         >
-            <MenuItem onClick={onClose}>
-                <StyledProfileLink to="/profile">Profile</StyledProfileLink>
+            <MenuItem
+                component={Link}
+                to="/profile"
+                onClick={onClose}
+                sx={{
+                    color: 'text.primary',
+                    textDecoration: 'none',
+                }}
+            >
+                Profile
             </MenuItem>
             <MenuItem onClick={openFeedbackDialog}>Feedback</MenuItem>
         </Menu>

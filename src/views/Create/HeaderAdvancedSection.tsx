@@ -57,11 +57,14 @@ const HeaderAdvancedSection = ({
 
     return (
         <AdvancedSection>
-            <SimpleFlexContainer>
+            <SimpleFlexContainer
+                onClick={onToggleExpanded}
+                style={{ cursor: 'pointer', userSelect: 'none', gap: '0.25rem' }}
+            >
                 <BoldTypography>
                     {t('create.advanced', { defaultValue: 'Advanced' })}
                 </BoldTypography>
-                <IconButton onClick={onToggleExpanded} size="small">
+                <IconButton size="small">
                     {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </IconButton>
             </SimpleFlexContainer>

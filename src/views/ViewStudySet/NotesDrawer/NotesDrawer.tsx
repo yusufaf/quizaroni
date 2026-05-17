@@ -238,6 +238,11 @@ const NotesDrawer = (props: Props) => {
         sx={{
           position: "fixed",
           ...fabPosition,
+          backgroundColor: (theme) => theme.palette.primary.main,
+          color: "#000000",
+          "&:hover": {
+            backgroundColor: (theme) => theme.palette.primary.dark,
+          },
         }}
       >
         <MenuOpenIcon fontSize="medium" />
