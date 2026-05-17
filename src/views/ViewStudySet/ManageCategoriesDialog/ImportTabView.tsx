@@ -238,7 +238,7 @@ const ImportTabView = (props: Props) => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {/* From Study Set */}
-            <Typography variant="subtitle2" color="text.secondary">
+            <Typography variant="h6" color="text.primary" sx={{ fontWeight: 600 }}>
                 {t('categories.fromStudyset')}
             </Typography>
 
@@ -416,7 +416,7 @@ const ImportTabView = (props: Props) => {
             <Divider />
 
             {/* From File */}
-            <Typography variant="subtitle2" color="text.secondary">
+            <Typography variant="h6" color="text.primary" sx={{ fontWeight: 600, mt: '0.5rem' }}>
                 {t('categories.fromFile')}
             </Typography>
 

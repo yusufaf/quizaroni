@@ -1,4 +1,4 @@
-import { ArrowBack, LocalOffer } from "@mui/icons-material/";
+import { AddCircleOutline as AddIcon, ArrowBack, Edit as EditIcon, LocalOffer } from "@mui/icons-material/";
 import {
   Button,
   Chip,
@@ -409,7 +409,17 @@ const ViewStudySet = (props: Props) => {
             </SortableContext>
           </DndContext>
         )}
-        <UpdateCardsButton variant="contained" onClick={handleUpdateCards}>
+        <UpdateCardsButton
+          variant="contained"
+          onClick={handleUpdateCards}
+          startIcon={
+            selectedStudyset?.cards?.length === 0 ? (
+              <AddIcon sx={{ fontSize: "1.5rem" }} />
+            ) : (
+              <EditIcon sx={{ fontSize: "1.5rem" }} />
+            )
+          }
+        >
           {selectedStudyset?.cards?.length === 0
             ? t("viewStudySet.addCards")
             : t("viewStudySet.updateCards")}

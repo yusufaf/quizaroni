@@ -276,7 +276,7 @@ const HomeToolbar = ({
                 </SimpleFlexContainer>
             )}
             {isTableView && selectedStudysetRows.length > 0 && (
-                <SimpleFlexContainer style={{ gap: '1rem' }}>
+                <SimpleFlexContainer style={{ gap: '1rem', marginLeft: '2.5rem' }}>
                     {!(selectedStudysetRows.length > 1) && (
                         <>
                             <Button
