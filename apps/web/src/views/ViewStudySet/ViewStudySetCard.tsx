@@ -151,12 +151,9 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
       elevation={6}
       key={index}
       sx={{
-        backgroundColor: `${
-          card?.backgroundColor &&
-          selectedStudyset?.metadata?.backgroundColorVisible
+        backgroundColor: card?.backgroundColor && selectedStudyset?.metadata?.backgroundColorVisible
             ? card.backgroundColor
-            : ""
-        }`,
+            : undefined,
       }}
       tabIndex={index}
     >
@@ -227,11 +224,9 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
           )}
           <Typography
             sx={{
-              color: `${
-                card?.textColor && selectedStudyset?.metadata?.textColorVisible
+              color: card?.textColor && selectedStudyset?.metadata?.textColorVisible
                   ? card.textColor
-                  : ""
-              }`,
+                  : undefined,
             }}
           >
             {card.term}
@@ -249,11 +244,9 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
           )}
           <Typography
             sx={{
-              color: `${
-                card?.textColor && selectedStudyset?.metadata?.textColorVisible
+              color: card?.textColor && selectedStudyset?.metadata?.textColorVisible
                   ? card.textColor
-                  : ""
-              }`,
+                  : undefined,
             }}
           >
             {card.definition}

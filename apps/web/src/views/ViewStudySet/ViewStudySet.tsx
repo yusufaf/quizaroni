@@ -272,7 +272,16 @@ const ViewStudySet = (props: Props) => {
                 >
                   {t("viewStudySet.backToStudySets")}
                 </Button>
-                <BoldTypography variant="h5">
+                <BoldTypography 
+                  variant="h5" 
+                  sx={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
                   {isStudySetLoading ? (
                     <Skeleton />
                   ) : (
