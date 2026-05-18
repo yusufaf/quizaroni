@@ -9,6 +9,7 @@ import CreateSet from 'views/Create/CreateSet';
 import Profile from 'views/Profile/Profile';
 // import ConfirmEmail from 'views/ConfirmEmail/ConfirmEmail';
 import ViewStudySet from 'views/ViewStudySet/ViewStudySet';
+import CombineSets from 'views/CombineSets/CombineSets';
 import Explore from 'views/Explore/Explore';
 import NotFound from 'views/NotFound/NotFound';
 import StudyMode from 'views/Study/StudyMode';
@@ -41,6 +42,7 @@ const AppRoutes = () => {
         { path: '/profile', element: <Profile /> },
         { path: '/explore', element: <Explore /> },
         { path: '/view/:id', element: <ViewStudySet /> },
+        { path: '/combine/:id', element: <CombineSets /> },
         { path: '/edit/:id', element: <CreateSet /> },
         { path: '/study/:studysetId/:mode', element: <StudyMode /> },
     ];

@@ -5,6 +5,7 @@ import {
     Edit,
     EditNotifications,
     MenuOpen,
+    MergeType,
     Print,
     Settings,
     Share,
@@ -106,6 +107,16 @@ const StudysetActions = (props: Props) => {
                     }}
                     tooltipProps={{
                         title: t('actions.editStudySet'),
+                    }}
+                />
+                <CustomIconButton
+                    iconButtonProps={{
+                        color: 'primary',
+                        icon: <MergeType />,
+                        onClick: () => navigate(`/combine/${studySetUUID}`),
+                    }}
+                    tooltipProps={{
+                        title: 'Combine Study Sets',
                     }}
                 />
                 <CustomIconButton

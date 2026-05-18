@@ -77,12 +77,9 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
     <ViewGridCard
       elevation={6}
       sx={{
-        backgroundColor: `${
-          card?.backgroundColor &&
-          selectedStudyset?.metadata?.backgroundColorVisible
+        backgroundColor: card?.backgroundColor && selectedStudyset?.metadata?.backgroundColorVisible
             ? card.backgroundColor
-            : ""
-        }`,
+            : undefined,
       }}
     >
       <GridCardContent>
@@ -94,11 +91,9 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
           )}
           <Typography
             sx={{
-              color: `${
-                card?.textColor && selectedStudyset?.metadata?.textColorVisible
+              color: card?.textColor && selectedStudyset?.metadata?.textColorVisible
                   ? card.textColor
-                  : ""
-              }`,
+                  : undefined,
               wordBreak: "break-word",
               overflowWrap: "break-word",
             }}
@@ -118,11 +113,9 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
           )}
           <Typography
             sx={{
-              color: `${
-                card?.textColor && selectedStudyset?.metadata?.textColorVisible
+              color: card?.textColor && selectedStudyset?.metadata?.textColorVisible
                   ? card.textColor
-                  : ""
-              }`,
+                  : undefined,
               wordBreak: "break-word",
               overflowWrap: "break-word",
             }}

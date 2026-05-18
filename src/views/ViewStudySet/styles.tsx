@@ -34,7 +34,7 @@ export const ViewFlashsetPaper = styled(Paper)({});
 
 export const ViewStudysetContainer = styled('div')({
     gridRow: '1',
-    height: '20rem',
+    minHeight: '20rem',
     padding: '1rem 1.25rem',
     borderRadius: '0.75rem',
 });
