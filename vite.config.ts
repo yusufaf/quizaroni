@@ -10,7 +10,8 @@ const apiProxyURL =
 
 export default defineConfig({
     staged: {
-        '*': 'vp check --fix',
+        '*.{js,jsx,ts,tsx}': ['vp lint --fix', 'vp fmt --write'],
+        '*.{json,md,css,html,yml,yaml}': 'vp fmt --write',
     },
     lint: { options: { typeAware: true, typeCheck: true } },
     fmt: {
