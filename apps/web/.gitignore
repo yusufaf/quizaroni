@@ -30,6 +30,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# pnpm is the package manager; prevent stale lockfiles from other PMs
+package-lock.json
+yarn.lock
+
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend
 amplify/.config/local-*
