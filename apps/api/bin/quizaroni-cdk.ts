@@ -1,0 +1,23 @@
+#!/usr/bin/env node
+import "source-map-support/register";
+import * as dotenv from "dotenv";
+import { App } from "aws-cdk-lib";
+import { QuizaroniStack } from '../service/quizaroni-stack';
+
+dotenv.config();
+
+const app = new App();
+
+const env = {
+    account: process.env.account,
+    region: process.env.region,
+};
+
+const appName = process.env.appName;
+const deploymentType = process.env.deploymentType;
+
+new QuizaroniStack(app, `${appName}-${deploymentType}-stack`, {
+    env,
+    appName,
+    deploymentType,
+});
