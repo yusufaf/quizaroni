@@ -65,14 +65,5 @@
         "vite-plus": "^0.1.20",
         "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
     },
-    "packageManager": "pnpm@10.33.0",
-    "overrides": {
-        "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-        "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
-    },
-    "pnpm": {
-        "overrides": {
-            "js-cookie": "^3.0.7"
-        }
-    }
+    "packageManager": "pnpm@10.33.0"
 }

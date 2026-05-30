@@ -11,7 +11,7 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { AuthorizerContext } from 'models/auth';
 import { removeKeys } from 'resources/dynamo/utilities';
-import { NotificationPreferences } from 'models/User';
+import { NotificationPreferences } from 'models/user';
 
 const { usersTable = '' } = process.env;
 

@@ -12,7 +12,7 @@ import {
     UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { AuthorizerContext } from 'models/auth';
-import { User } from 'models/User';
+import { User } from 'models/user';
 
 const { mainTable = '', usersTable = '' } = process.env;
 
