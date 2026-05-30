@@ -1,0 +1,31 @@
+{
+    "name": "quizaroni",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Quizaroni — a flashcard / quiz study app. React frontend + serverless AWS backend.",
+    "license": "MIT",
+    "author": "Yusuf Afzal",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yusufaf/quizaroni.git"
+    },
+    "scripts": {
+        "dev:web": "pnpm --filter @quizaroni/web dev",
+        "build:web": "pnpm --filter @quizaroni/web build",
+        "build:api": "pnpm --filter @quizaroni/api build",
+        "build": "pnpm -r build",
+        "synth:api": "pnpm --filter @quizaroni/api exec cdk synth",
+        "deploy:api": "pnpm --filter @quizaroni/api exec cdk deploy",
+        "test": "pnpm -r test",
+        "prepare": "husky"
+    },
+    "devDependencies": {
+        "@commitlint/cli": "^20.5.3",
+        "@commitlint/config-conventional": "^20.5.3",
+        "husky": "^9.1.7"
+    },
+    "engines": {
+        "node": ">=20"
+    },
+    "packageManager": "pnpm@10.24.0"
+}

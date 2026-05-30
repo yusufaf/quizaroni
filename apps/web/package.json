@@ -1,5 +1,5 @@
 {
-    "name": "quizaroni",
+    "name": "@quizaroni/web",
     "private": true,
     "version": "0.2.0",
     "type": "module",
@@ -9,7 +9,7 @@
         "start": "npm run vite",
         "build": "vp build",
         "preview": "vp preview",
-        "prepare": "vp config && husky"
+        "prepare": "vp config"
     },
     "dependencies": {
         "@aws-amplify/auth": "^6.0.5",

@@ -151,7 +151,7 @@ export class QuizaroniAPI extends Construct {
             new ServicePrincipal('apigateway.amazonaws.com')
         );
 
-        const authorizerUri = `arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/${apiAuthorizerLambda.functionArn}/invocations`;
+        const authorizerUri = `arn:aws:apigateway:${this.region}:lambda:path/2015-03-31/functions/${apiAuthorizerLambda.functionArn}/invocations`;
         const httpAuthorizer = new HttpAuthorizer(this, authorizerNameAndID, {
             authorizerName: authorizerNameAndID,
             authorizerUri,

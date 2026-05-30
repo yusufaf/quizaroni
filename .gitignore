@@ -1,0 +1,30 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# env / secrets — never commit
+.env
+.env.*
+!.env.example
+*.env
+
+# build output
+dist/
+dist-ssr/
+build/
+/coverage
+
+# CDK
+apps/api/cdk.out/
+.cdk.staging
+
+# misc
+.DS_Store
+*.local
+*.cache
+*.iso
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*

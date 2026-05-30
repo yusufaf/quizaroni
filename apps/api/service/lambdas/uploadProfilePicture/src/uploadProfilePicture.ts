@@ -13,7 +13,8 @@ import { AuthorizerContext } from 'models/auth';
 
 const { mainBucket = '' } = process.env;
 
-const s3Client = new S3Client({ region: 'us-west-2' });
+// AWS_REGION is injected automatically into the Lambda runtime.
+const s3Client = new S3Client({ region: process.env.AWS_REGION });
 
 type RequestBody = {
     imageData: string; // base64 encoded
