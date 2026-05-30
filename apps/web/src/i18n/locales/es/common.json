@@ -1,0 +1,556 @@
+{
+    "buttons": {
+        "submit": "Enviar",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "create": "Crear",
+        "duplicate": "Duplicar",
+        "download": "Descargar",
+        "print": "Imprimir",
+        "share": "Compartir",
+        "close": "Cerrar",
+        "confirm": "Confirmar",
+        "back": "Atrás",
+        "next": "Siguiente",
+        "done": "Listo",
+        "retry": "Reintentar",
+        "skip": "Saltar"
+    },
+    "languages": {
+        "en": "English",
+        "es": "Español"
+    },
+    "nav": {
+        "home": "Inicio",
+        "explore": "Explorar",
+        "createStudySet": "Crear Set de Estudio",
+        "profile": "Perfil",
+        "logout": "Cerrar Sesión",
+        "login": "Iniciar Sesión",
+        "signup": "Registrarse"
+    },
+    "pageTitles": {
+        "create": "Crear",
+        "edit": "Editar",
+        "home": "Inicio",
+        "login": "Iniciar Sesión",
+        "signUp": "Registrarse",
+        "explore": "Explorar",
+        "profile": "Perfil"
+    },
+    "labels": {
+        "title": "Título",
+        "description": "Descripción",
+        "created": "Creado el",
+        "lastViewed": "Última Vista",
+        "label": "Etiqueta",
+        "cards": "Tarjetas",
+        "favorited": "Favorito",
+        "important": "Importante",
+        "all": "Todos"
+    },
+    "dialogs": {
+        "deleteSet": {
+            "title": "Eliminar el set de estudio",
+            "message": "¿Estás seguro de que quieres eliminar este set?"
+        },
+        "duplicateSet": {
+            "title": "Duplicar el set de estudio",
+            "message": "¿Estás seguro de que quieres duplicar este set?"
+        },
+        "deleteMultiple": {
+            "title": "¿Eliminar múltiples sets de estudio?",
+            "message": "Los siguientes sets serán eliminados:"
+        },
+        "duplicateMultiple": {
+            "title": "¿Duplicar múltiples sets de estudio?",
+            "message": "Los siguientes sets serán duplicados:"
+        },
+        "share": {
+            "title": "Compartir"
+        },
+        "confirmationCode": {
+            "codeResent": "Código de confirmación reenviado",
+            "resendError": "Error al reenviar el código de confirmación",
+            "emailConfirmed": "Correo confirmado correctamente"
+        },
+        "notifications": {
+            "title": "Administrar Notificaciones",
+            "masterToggle": "Activar Notificaciones",
+            "masterToggleDescription": "Recibe notificaciones por correo sobre tu progreso de estudio",
+            "tabs": {
+                "email": "Correo",
+                "schedule": "Horario",
+                "thisStudyset": "Este Set"
+            },
+            "modes": {
+                "title": "Modo de Notificaciones",
+                "calm": "Tranquilo",
+                "calmDescription": "Solo resumen semanal",
+                "regular": "Regular",
+                "regularDescription": "Recordatorios y rachas",
+                "power-user": "Usuario Avanzado",
+                "power-userDescription": "Todas las notificaciones",
+                "custom": "Personalizado",
+                "customDescription": "Configurar individualmente"
+            },
+            "email": {
+                "studyReminders": "Recordatorios de Estudio",
+                "studyRemindersDescription": "Recibe recordatorios para estudiar tus tarjetas",
+                "streakAlerts": "Alertas de Racha",
+                "streakAlertsDescription": "Mantente informado sobre tus rachas de estudio",
+                "weeklyDigest": "Resumen Semanal",
+                "weeklyDigestDescription": "Recibe un resumen semanal de tu progreso",
+                "inactivityNudges": "Recordatorios de Inactividad",
+                "inactivityNudgesDescription": "Recibe un recordatorio cuando no hayas estudiado"
+            },
+            "schedule": {
+                "quietHours": "Horas de Silencio",
+                "quietHoursDescription": "Sin notificaciones durante estas horas",
+                "startTime": "Inicio",
+                "endTime": "Fin",
+                "to": "a"
+            },
+            "snooze": {
+                "title": "Pausar Notificaciones",
+                "description": "Pausar temporalmente todas las notificaciones",
+                "activeUntil": "Notificaciones pausadas hasta {{time}}",
+                "clear": "Reanudar"
+            },
+            "studyset": {
+                "thisStudyset": "Este Set de Estudio",
+                "enableReminders": "Activar Recordatorios",
+                "enableRemindersDescription": "Recibe recordatorios de estudio para este set",
+                "reminderTime": "Hora del Recordatorio",
+                "reminderDays": "Dias del Recordatorio"
+            }
+        },
+        "print": {
+            "title": "Descargar PDF",
+            "layoutStyle": "Estilo de Diseño",
+            "includeNotes": "Incluir Notas",
+            "includeFileAttachments": "Incluir Archivos Adjuntos",
+            "includeCategories": "Incluir Categorías",
+            "showCardColors": "Mostrar Colores de Tarjetas",
+            "cardsToPrint": "Tarjetas a Imprimir",
+            "generatingPdf": "Generando PDF...",
+            "downloadPdf": "Descargar PDF",
+            "failedToGenerate": "Error al generar PDF. Por favor intenta de nuevo."
+        },
+        "download": {
+            "title": "Descargar Set de Estudio",
+            "chooseFormat": "Elige el formato en que quieres descargar el set de estudio:",
+            "includeMetadata": "¿Incluir metadatos?",
+            "includeNotes": "¿Incluir notas?"
+        }
+    },
+    "terminology": {
+        "format": {
+            "termDefinition": "Término/Definición",
+            "questionAnswer": "Pregunta/Respuesta",
+            "promptResponse": "Indicación/Respuesta",
+            "wordMeaning": "Palabra/Significado",
+            "factExplanation": "Hecho/Explicación",
+            "custom": "Personalizado"
+        },
+        "label": {
+            "card": "Tarjeta",
+            "item": "Elemento",
+            "flashcard": "Flashcard",
+            "entry": "Entrada",
+            "concept": "Concepto",
+            "idea": "Idea",
+            "note": "Nota",
+            "custom": "Personalizado"
+        }
+    },
+    "download": {
+        "textFile": "Archivo de Texto",
+        "json": "Notación de Objetos JavaScript",
+        "csv": "Valores Separados por Comas",
+        "markdown": "Archivo Markdown"
+    },
+    "options": {
+        "left": "Izquierda",
+        "right": "Derecha",
+        "open": "Abierto",
+        "closed": "Cerrado",
+        "hidden": "Oculto",
+        "visible": "Visible",
+        "include": "Incluir",
+        "exclude": "Excluir",
+        "show": "Mostrar",
+        "hide": "Ocultar",
+        "allCards": "Todas las Tarjetas",
+        "importantOnly": "Solo Importantes"
+    },
+    "layouts": {
+        "flashcard": "Flashcard",
+        "list": "Lista",
+        "grid": "Cuadrícula",
+        "table": "Tabla"
+    },
+    "status": {
+        "success": "Éxito",
+        "error": "Error",
+        "enabled": "Activado",
+        "disabled": "Desactivado"
+    },
+    "placeholders": {
+        "enterNote": "Ingresa texto para la nota"
+    },
+    "errors": {
+        "generic": "Algo salió mal",
+        "notFound": "No encontrado",
+        "unauthorized": "No autorizado"
+    },
+    "imageGallery": {
+        "uploaded": "Subido el {{date}}"
+    },
+    "landing": {
+        "hero": {
+            "headlineStart": "Aprende lo que sea.",
+            "headlineEnd": "Recuerda",
+            "headlineHighlight": "todo.",
+            "subheadline": "Quizaroni convierte cualquier tema en tarjetas de estudio que disfrutarás usar. Herramientas inteligentes para mentes curiosas.",
+            "signUpCta": "Comienza Gratis",
+            "exploreCta": "Explorar Sets",
+            "trustLine": "Gratis para siempre • Sin tarjeta de crédito"
+        },
+        "flashcards": {
+            "biologyLabel": "Biología",
+            "biologyTerm": "Mitocondria",
+            "biologyDefinition": "La central energética de la célula.",
+            "spanishLabel": "Inglés",
+            "spanishTerm": "Library",
+            "calculusLabel": "Cálculo",
+            "calculusTerm": "d/dx sin(x) = ?",
+            "calculusAnswer": "cos(x)",
+            "historyLabel": "Historia",
+            "historyTerm": "1776"
+        },
+        "features": {
+            "sectionTitle": "Todo lo que necesitas para estudiar mejor",
+            "sectionSubtitle": "Herramientas diseñadas para cómo aprende tu cerebro.",
+            "create": {
+                "title": "Crea en segundos",
+                "description": "Convierte tus notas, PDFs o cualquier tema en tarjetas profesionales con ayuda de IA."
+            },
+            "study": {
+                "title": "Modos de estudio que funcionan",
+                "description": "Voltea, responde, empareja y escribe. Cambia de modo para mantener fresco el aprendizaje."
+            },
+            "progress": {
+                "title": "Sigue tu progreso",
+                "description": "Visualiza tu avance con estadísticas detalladas y recomendaciones personalizadas."
+            },
+            "share": {
+                "title": "Comparte con tu grupo",
+                "description": "Colabora con compañeros, crea sets compartidos o mantén los tuyos privados. Tú decides."
+            }
+        },
+        "howItWorks": {
+            "sectionTitle": "Empieza en menos de un minuto",
+            "step1": {
+                "title": "Regístrate gratis",
+                "description": "Crea tu perfil en segundos. Sin tarjeta de crédito, sin trampas."
+            },
+            "step2": {
+                "title": "Crea tu primer set",
+                "description": "Agrega tarjetas como quieras: escribiéndolas, pegándolas o importando un archivo."
+            },
+            "step3": {
+                "title": "Comienza a estudiar",
+                "description": "Elige un modo y comienza. Tu progreso se guarda automáticamente."
+            }
+        },
+        "footerCta": {
+            "headline": "¿Listo para aprender algo nuevo?",
+            "subheadline": "Únete a Quizaroni gratis y comienza a estudiar hoy.",
+            "button": "Comienza Gratis"
+        }
+    },
+    "home": {
+        "yourStudySets": "Tus Sets de Estudio",
+        "toolbar": {
+            "searchPlaceholder": "Buscar sets de estudio...",
+            "filtersDialogTitle": "Buscar y ordenar",
+            "done": "Listo",
+            "sortBy": "Ordenar por",
+            "sortDirection": "Dirección del orden"
+        },
+        "saveTablePreferences": "Guardar Preferencias de Tabla",
+        "saveColumnsAndDensity": "Guardar columnas visibles y densidad",
+        "columns": {
+            "favorited": "Favorito",
+            "title": "Título",
+            "description": "Descripción",
+            "created": "Creado",
+            "lastViewed": "Última Vista",
+            "lastUpdated": "Última Actualización",
+            "numberOfCards": "# de Tarjetas",
+            "labels": "Etiquetas"
+        },
+        "noLabels": "Ninguna",
+        "rowsPerPage": "Filas por página"
+    },
+    "categories": {
+        "manageCategories": "Administrar Categorías",
+        "manage": "Administrar",
+        "import": "Importar",
+        "assign": "Asignar",
+        "categoryName": "Nombre de Categoría",
+        "categories": "Categorías",
+        "categoriesCount": "Categorías ({{count}})",
+        "create": "Crear",
+        "download": "Descargar",
+        "delete": "Eliminar",
+        "deleteUnused": "Eliminar No Usadas",
+        "deleteSelected": "Eliminar Seleccionadas",
+        "itemSelected": "{{count}} elemento seleccionado",
+        "itemSelected_plural": "{{count}} elementos seleccionados",
+        "nameCannotBeEmpty": "El nombre no puede estar vacío",
+        "categoryAlreadyExists": "La categoría ya existe",
+        "noUnusedCategories": "No hay categorías sin usar para eliminar",
+        "noCategoriesYet": "Sin categorías aún",
+        "createFirstCategory": "Usa el campo de arriba para crear tu primera categoría",
+        "cardCount_one": "{{count}} tarjeta",
+        "cardCount_other": "{{count}} tarjetas",
+        "selectStudyset": "Seleccionar un Set de Estudio",
+        "importCategories": "Importar Categorías",
+        "selectCard": "Seleccionar una Tarjeta",
+        "assignedCategories": "Categorías Asignadas",
+        "assignCategories": "Asignar Categorías",
+        "previewFound": "Vista previa: {{count}} categoría encontrada",
+        "previewFound_plural": "Vista previa: {{count}} categorías encontradas",
+        "newCount": "{{count}} nueva",
+        "duplicateCount": "{{count}} duplicada (se omitirá)",
+        "duplicateCount_plural": "{{count}} duplicadas (se omitirán)",
+        "fromStudyset": "Desde Set de Estudio",
+        "fromFile": "Desde Archivo",
+        "chooseFile": "Elegir Archivo",
+        "supportedFormats": "Formatos soportados: JSON, TXT (uno por línea), CSV",
+        "unsupportedFileType": "Tipo de archivo no soportado. Usa JSON, TXT o CSV",
+        "noCategoriesInFile": "No se encontraron categorías en el archivo",
+        "failedToParseFile": "Error al analizar el contenido del archivo",
+        "failedToReadFile": "Error al leer el archivo",
+        "noCategoriesInSet": "Sin categorías en el set seleccionado",
+        "duplicate": "Duplicada",
+        "importCount": "Importar ({{count}})",
+        "termDefinitionFormat": "Término: {{term}} | Definición: {{definition}}",
+        "noCategoriesAssigned": "Sin categorías asignadas a esta tarjeta",
+        "categoriesAssigned": "{{count}} categoría asignada",
+        "categoriesAssigned_plural": "{{count}} categorías asignadas"
+    },
+    "studysetSettings": {
+        "title": "Configuración del Set",
+        "terminology": "Terminología",
+        "labelTerminology": "Terminología de Etiqueta",
+        "defineCustomTerminology": "Define tu par de terminología personalizado:",
+        "defineCustomLabelTerminology": "Define tu terminología de etiqueta personalizada:",
+        "firstTerm": "Primer término",
+        "secondTerm": "Segundo término",
+        "customTerminology": "Terminología personalizada",
+        "saved": "Guardado",
+        "cards": "Tarjetas",
+        "showCardCount": "Mostrar Conteo de Tarjetas",
+        "showCardIndex": "Mostrar Índice de Tarjeta",
+        "notes": "Notas",
+        "notesDrawerAlignment": "Alineación del Panel de Notas",
+        "notesDrawerInitialAppearance": "Apariencia Inicial del Panel de Notas"
+    },
+    "notesDrawer": {
+        "title": "Notas",
+        "sortNotes": "Ordenar notas",
+        "openNotesDrawer": "Abrir panel de notas",
+        "aToZ": "A → Z",
+        "zToA": "Z → A",
+        "newestFirst": "Más Recientes Primero",
+        "oldestFirst": "Más Antiguas Primero",
+        "cardOrderAsc": "Orden de Tarjetas ↑",
+        "cardOrderDesc": "Orden de Tarjetas ↓",
+        "card": "Tarjeta {{index}}",
+        "noteCount_one": "{{count}} nota",
+        "noteCount_other": "{{count}} notas",
+        "noTerm": "Sin término",
+        "noDefinition": "Sin definición",
+        "noNotesYet": "Sin notas aún",
+        "addNote": "Agregar Nota",
+        "noCardsInSet": "No hay tarjetas en este set de estudio",
+        "editNote": "Editar nota",
+        "saveNote": "Guardar nota",
+        "deleteNote": "Eliminar nota"
+    },
+    "profile": {
+        "customization": "Personalización",
+        "accessibility": "Accesibilidad",
+        "account": "Cuenta",
+        "defaultTheme": "Tema Predeterminado",
+        "switchToLight": "Cambiar predeterminado a modo Claro",
+        "switchToDark": "Cambiar predeterminado a modo Oscuro",
+        "interfaceLanguage": "Idioma de Interfaz",
+        "labels": "Etiquetas",
+        "manageLabels": "Administrar Etiquetas",
+        "namedColors": "Colores Nombrados",
+        "manageNamedColors": "Administrar Colores Nombrados",
+        "notifications": "Notificaciones",
+        "manageNotifications": "Administrar Notificaciones",
+        "dateFormat": "Formato de Fecha",
+        "timeFormat": "Formato de Hora",
+        "twelveHour": "12 horas (2:30 PM)",
+        "twentyFourHour": "24 horas (14:30)",
+        "showSecondsInTimestamps": "Mostrar Segundos en Marcas de Tiempo",
+        "confirmDestructiveActions": "Confirmar Acciones Destructivas",
+        "confirmDestructiveActionsDescription": "Mostrar un diálogo de confirmación antes de eliminar imágenes, categorías y otras acciones destructivas",
+        "defaultDownloadFormat": "Formato de Descarga Predeterminado",
+        "ttsVoice": "Voz de Texto a Voz",
+        "defaultTtsVoice": "Voz del Sistema Predeterminada",
+        "json": "JSON",
+        "jsonSettingsTitle": "Configuración JSON",
+        "jsonSettingsDescription": "Edita tus preferencias directamente como JSON. Los cambios se validan antes de guardar. Presiona Ctrl+S para guardar.",
+        "jsonSettingsSaved": "Configuración guardada exitosamente",
+        "jsonSettingsSaveFailed": "Error al guardar la configuración",
+        "jsonSettingsExcludedNote": "Avatar, colores nombrados y preferencias de notificación se gestionan a través de sus propios diálogos y están excluidos de este editor.",
+        "unsavedChanges": "Cambios sin guardar",
+        "resetChanges": "Restablecer",
+        "saveSettings": "Guardar",
+        "downloadSettings": "Descargar configuración como JSON",
+        "importSettings": "Importar configuración desde archivo JSON",
+        "fontSize": "Tamaño de Fuente",
+        "fontSizeDescription": "Ajusta el tamaño del texto en toda la aplicación para mejor legibilidad",
+        "currentScale": "Escala actual: {{scale}}x",
+        "username": "Usuario",
+        "studySetsCreated": "# de Sets de Estudio Creados",
+        "totalCards": "Total de Tarjetas",
+        "labelsCreated": "Etiquetas Creadas",
+        "accountCreated": "Cuenta Creada"
+    },
+    "actions": {
+        "editStudySet": "Editar Set de Estudio",
+        "download": "Descargar",
+        "manageNotifications": "Administrar Notificaciones",
+        "controlMenu": "Menú de Control",
+        "print": "Imprimir",
+        "deleteStudySet": "Eliminar Set de Estudio",
+        "duplicateStudySet": "Duplicar Set de Estudio",
+        "studySetSettings": "Configuración del Set",
+        "share": "Compartir"
+    },
+    "viewStudySet": {
+        "backToStudySets": "Volver a Tus Sets de Estudio",
+        "createdBy": "Creado por {{username}}",
+        "noLabelsSelected": "Sin etiquetas seleccionadas",
+        "manageLabels": "Administrar Etiquetas",
+        "card_one": "Tarjeta",
+        "card_other": "Tarjetas",
+        "noCardsCategory": "No hay tarjetas que coincidan con la categoría seleccionada.",
+        "noCardsInSet": "No hay tarjetas en este set de estudio.",
+        "updateCards": "Actualizar Tarjetas",
+        "addCards": "Agregar Tarjetas",
+        "sort": "Ordenar",
+        "manageCategories": "Administrar Categorías",
+        "sortDirection": "Dirección de Orden",
+        "none": "Ninguno",
+        "alphabeticalTerm": "Alfabético - Término",
+        "alphabeticalDefinition": "Alfabético - Definición",
+        "alphabeticalLabel": "Alfabético - Etiqueta",
+        "listView": "Vista de Lista",
+        "gridView": "Vista de Cuadrícula",
+        "all": "Todos",
+        "important": "Importante"
+    },
+    "create": {
+        "backToViewing": "Volver a Ver Set de Estudio",
+        "editYourStudySet": "Edita tu set de estudio",
+        "title": "Título",
+        "titleRequired": "Título *",
+        "enterTitle": "Ingresa un título para tu set de estudio",
+        "description": "Descripción",
+        "enterDescription": "Ingresa una descripción para tu set de estudio",
+        "labels": "Etiquetas",
+        "addLabels": "Agregar etiquetas...",
+        "addLabelsPlaceholder": "Escribe y presiona Enter para agregar etiquetas",
+        "saveChanges": "Guardar Cambios",
+        "advanced": "Avanzado",
+        "addBlankCards": "Agregar tarjetas en blanco:",
+        "add": "Agregar",
+        "clearEmptyCards": "Eliminar tarjetas vacías:",
+        "clear": "Eliminar",
+        "reverseAllCards": "Invertir todas las tarjetas:",
+        "reverse": "Invertir",
+        "noEmptyCards": "No se encontraron tarjetas vacías",
+        "clearedEmptyCards": "Eliminada {{count}} tarjeta vacía",
+        "clearedEmptyCards_plural": "Eliminadas {{count}} tarjetas vacías",
+        "reversedAllCards": "Todas las tarjetas invertidas",
+        "addCard": "Agregar Tarjeta",
+        "cardCount_one": "{{count}} Tarjeta",
+        "cardCount_other": "{{count}} Tarjetas",
+        "term": "Término",
+        "definition": "Definición",
+        "enterTerm": "Ingresa un término",
+        "enterDefinition": "Ingresa una definición",
+        "dragToReorder": "Arrastra para reordenar",
+        "uploadImage": "Subir imagen",
+        "addCardBelow": "Agregar tarjeta abajo",
+        "keyboardShortcuts": "Atajos de Teclado",
+        "undo": "Deshacer",
+        "hideButtons": "Ocultar Botones",
+        "expandButtons": "Expandir Botones",
+        "importCards": "Importar Tarjetas",
+        "swapAll": "Intercambiar Todo",
+        "reverseCards": "Invertir Tarjetas",
+        "successUpdate": "Set de estudio actualizado exitosamente",
+        "errorUpdate": "Error al actualizar set de estudio",
+        "missingStudysetId": "No se pudo guardar: falta el enlace del set de estudio. Abre el set desde tu inicio e inténtalo de nuevo.",
+        "labelsSoftLimitWarning": "Usar más de 10 etiquetas puede dificultar la organización. Considera quitar algunas.",
+        "importMethod": "Método de Importación",
+        "jsonInput": "Entrada JSON",
+        "fileUpload": "Subir Archivo",
+        "pasteJsonPlaceholder": "Pega JSON aquí. Ejemplos:\nTarjeta única: {\"term\": \"Fotosíntesis\", \"definition\": \"Proceso por el cual las plantas producen alimento\"}\nMúltiples tarjetas: [{\"term\": \"ADN\", \"definition\": \"Material genético\"}, {\"term\": \"ARN\", \"definition\": \"Molécula mensajera\"}]",
+        "selectedFile": "Seleccionado: {{filename}}",
+        "chooseJsonFile": "Elegir Archivo JSON",
+        "fileContentsEditable": "Contenido del Archivo (editable)",
+        "importing": "Importando...",
+        "pleaseUploadJson": "Por favor sube un archivo .json",
+        "failedToReadFile": "Error al leer el archivo. Por favor intenta de nuevo.",
+        "provideJsonContent": "Por favor proporciona contenido JSON",
+        "noValidCardsFound": "No se encontraron tarjetas válidas para importar",
+        "successfullyImported": "{{count}} tarjeta(s) importada(s) exitosamente",
+        "pasteOrUploadJson": "Pega JSON abajo o sube un archivo .json",
+        "uploadJsonFile": "Subir archivo JSON",
+        "clearEditor": "Limpiar editor",
+        "imageUploaded": "{{count}} imagen subida exitosamente",
+        "imageUploaded_plural": "{{count}} imágenes subidas exitosamente",
+        "imageUploadFailed": "Error al subir la imagen",
+        "deleteImageTitle": "Eliminar Imagen",
+        "deleteImageMessage": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Esto no se puede deshacer."
+    },
+    "footer": {
+        "socials": "Redes Sociales",
+        "copyright": "© 2026 Quizaroni"
+    },
+    "sync": {
+        "allCaughtUp": "Todo sincronizado",
+        "offline": "Modo sin conexión",
+        "offlineMode": "Sin conexión",
+        "online": "En línea",
+        "syncing": "Sincronizando...",
+        "pending": "{{count}} cambio pendiente",
+        "pending_plural": "{{count}} cambios pendientes",
+        "pendingChanges": "{{count}} cambio esperando sincronización",
+        "pendingChanges_plural": "{{count}} cambios esperando sincronización",
+        "lastSync": "Última sincronización",
+        "never": "Nunca",
+        "justNow": "Ahora mismo",
+        "minutesAgo": "Hace {{count}} minuto",
+        "minutesAgo_plural": "Hace {{count}} minutos",
+        "hoursAgo": "Hace {{count}} hora",
+        "hoursAgo_plural": "Hace {{count}} horas",
+        "daysAgo": "Hace {{count}} día",
+        "daysAgo_plural": "Hace {{count}} días",
+        "syncNow": "Sincronizar ahora",
+        "willSyncWhenOnline": "Se sincronizará cuando haya conexión"
+    }
+}

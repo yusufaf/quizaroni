@@ -1,0 +1,71 @@
+{
+    "tabs": {
+        "overview": "Overview",
+        "studySets": "Study Sets",
+        "statistics": "Statistics",
+        "customization": "Customization",
+        "settings": "Settings"
+    },
+    "customization": {
+        "title": "Customization",
+        "theme": {
+            "title": "Theme",
+            "light": "Light",
+            "dark": "Dark"
+        },
+        "language": {
+            "title": "Interface Language",
+            "description": "Select your preferred language"
+        },
+        "fontSize": {
+            "title": "Font Size",
+            "small": "Small",
+            "medium": "Medium",
+            "large": "Large",
+            "extraLarge": "Extra Large"
+        },
+        "dateFormat": {
+            "title": "Date Format"
+        },
+        "timeFormat": {
+            "title": "Time Format",
+            "twelveHour": "12-hour",
+            "twentyFourHour": "24-hour"
+        },
+        "showSeconds": {
+            "title": "Show Seconds"
+        },
+        "homeView": {
+            "title": "Default Home View",
+            "table": "Table",
+            "grid": "Grid"
+        },
+        "downloadFormat": {
+            "title": "Default Download Format"
+        }
+    },
+    "deleteAccountDialog": {
+        "title": "Delete Account",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter your password",
+        "confirmButton": "Delete Account"
+    },
+    "settings": {
+        "title": "Settings",
+        "account": "Account Settings",
+        "changePassword": "Change Password",
+        "deleteAccount": "Delete Account",
+        "notifications": "Notifications",
+        "emailNotifications": "Email Notifications",
+        "studyReminders": "Study Reminders"
+    },
+    "statistics": {
+        "title": "Statistics",
+        "totalSets": "Total Study Sets",
+        "totalCards": "Total Cards",
+        "studyTime": "Study Time",
+        "averageAccuracy": "Average Accuracy",
+        "currentStreak": "Current Streak",
+        "longestStreak": "Longest Streak"
+    }
+}

@@ -1,0 +1,474 @@
+import { AddCircleOutline as AddIcon, ArrowBack, Edit as EditIcon, LocalOffer } from "@mui/icons-material/";
+import {
+  Button,
+  Chip,
+  Skeleton,
+  Tooltip,
+  Typography,
+  Box,
+} from "@mui/material/";
+import { BoldTypography } from "styles/AppStyles";
+import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
+import useBrowserTitle from "hooks/useBrowserTitle";
+import useFilterViewCards from "hooks/useFilterViewCards";
+import useSortViewCards from "hooks/useSortViewCards";
+import { SortDirection, Studyset } from "shared/types";
+import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  useGetAllStudysets,
+  useGetStudyset,
+  useUpdateStudyset,
+} from "state/api/studysetsAPI";
+import { useGetUser } from "state/api/usersAPI";
+import {
+  DEFAULT_CATEGORIES,
+  SORT_DIRECTIONS,
+  VIEW_SET_DIALOGS,
+  DEFAULT_USER_RESPONSE,
+  NOTES_DRAWER_INITIAL_APPEARANCE,
+  VIEWSET_LAYOUTS,
+} from "shared/constants";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
+import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
+import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
+import PrintDialog from "./PrintDialog.tsx/PrintDialog";
+import StudysetActions from "./StudysetActions/StudysetActions";
+import StudysetSettings from "./StudysetSettings/StudysetSettings";
+import ViewStudySetCard from "./ViewStudySetCard";
+import ViewStudySetCardGrid from "./ViewStudySetCardGrid";
+import ViewStudysetFilters from "./ViewStudysetFilters/ViewStudysetFilters";
+import StudyModesGrid from "./StudyModesGrid/StudyModesGrid";
+import {
+  NoCardsMessage,
+  ViewCardsGridContainer,
+  StudyModesSection,
+  StudysetDescription,
+  StudysetInfo,
+  UpdateCardsButton,
+  ViewFlashsetPaper,
+  ViewStudysetContainer,
+  ViewStudysetHeader,
+  ViewStudysetPage,
+} from "./styles";
+import NotesDrawer from "./NotesDrawer/NotesDrawer";
+import { useViewSetsStore } from "state/stores/viewSets";
+import { useGlobalStore } from "state/stores/global";
+
+type Props = {};
+
+const ViewStudySet = (props: Props) => {
+  /* Hooks / Redux */
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { id: studysetUUID = "" } = useParams();
+
+  const { setLabelsDialogProps } = useGlobalStore();
+  const { selectedDialog, setSelectedDialog } = useViewSetsStore();
+
+  const { data: userData = DEFAULT_USER_RESPONSE } = useGetUser();
+  const { labels = [], userUUID = "" } = userData.user ?? {};
+
+  /* Skip option prevents hook from running when userUUID is undefined */
+  const { data: studysetsResponse, isLoading: isGetAllStudysetsLoading } =
+    useGetAllStudysets();
+  const studysets = studysetsResponse?.studysets ?? [];
+
+  const { data: studysetResponse, isLoading: isStudySetLoading } =
+    useGetStudyset({ studysetUUID });
+  const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
+
+  const { mutate: updateStudySet } = useUpdateStudyset();
+
+  useBrowserTitle(selectedStudyset?.title ?? "");
+
+  const updatedViewTimestamp = useRef<boolean>(false);
+  const studyModeIconStyle = {
+    fontSize: "5rem",
+  };
+
+  const [selectedStudyMode, setSelectedStudyMode] = useState("");
+
+  const [selectedTab, setSelectedTab] = useState(DEFAULT_CATEGORIES.ALL);
+  const [selectedSort, setSelectedSort] = useState<string>("");
+  const [sortDirection, setSortDirection] = useState<SortDirection>(
+    SORT_DIRECTIONS.ASC,
+  );
+  const [isNotesDrawerHidden, setIsNotesDrawerHidden] = useState<boolean>(true);
+  const [viewMode, setViewMode] = useState<string>(
+    selectedStudyset?.metadata?.viewSetLayout ?? VIEWSET_LAYOUTS.LIST,
+  );
+
+  useEffect(() => {
+    if (!updatedViewTimestamp.current && studysetUUID) {
+      const updates = {
+        lastViewed: new Date().toISOString(),
+      };
+      updateStudySet({
+        studysetUUID,
+        updates,
+      });
+      updatedViewTimestamp.current = true;
+    }
+  }, [studysetUUID]);
+
+  // Sync drawer initial state from metadata
+  useEffect(() => {
+    if (selectedStudyset?.metadata?.notesDrawerInitial) {
+      const shouldBeHidden =
+        selectedStudyset.metadata.notesDrawerInitial ===
+        NOTES_DRAWER_INITIAL_APPEARANCE.CLOSED;
+      setIsNotesDrawerHidden(shouldBeHidden);
+    }
+  }, [selectedStudyset?.metadata?.notesDrawerInitial]);
+
+  // Sync view mode from metadata
+  useEffect(() => {
+    if (selectedStudyset?.metadata?.viewSetLayout) {
+      setViewMode(selectedStudyset.metadata.viewSetLayout);
+    }
+  }, [selectedStudyset?.metadata?.viewSetLayout]);
+
+  // Persist view mode to metadata
+  useEffect(() => {
+    if (
+      viewMode &&
+      selectedStudyset?.studysetUUID &&
+      selectedStudyset?.metadata?.viewSetLayout !== viewMode
+    ) {
+      updateMetadataField("viewSetLayout", viewMode);
+    }
+  }, [viewMode]);
+
+  const updateMetadataField = (property: string, newValue: any) => {
+    try {
+      updateStudySet({
+        studysetUUID,
+        updates: {
+          [property]: newValue,
+        },
+        isMetadataUpdate: true,
+      });
+    } catch (error) {
+      console.error("Error updating study set metadata");
+    }
+  };
+
+  const handleBackClick = () => {
+    navigate("/");
+  };
+
+  const sortedViewFlashCards = useSortViewCards({
+    selectedSort,
+    sortDirection,
+    studyset: selectedStudyset,
+  });
+
+  const filteredViewFlashCards = useFilterViewCards({
+    selectedTab,
+    sortedViewFlashCards,
+  });
+
+  /* #region Drag and Drop */
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const cards = selectedStudyset.cards ?? [];
+      const oldIndex = cards.findIndex((item) => item.cardUUID === active.id);
+      const newIndex = cards.findIndex((item) => item.cardUUID === over.id);
+
+      const reorderedCards = arrayMove(cards, oldIndex, newIndex);
+
+      updateStudySet({
+        studysetUUID,
+        updates: {
+          cards: reorderedCards,
+        },
+      });
+    }
+  };
+  // #endregion
+
+  const showManageLabelsDialog = () => {
+    setLabelsDialogProps({
+      open: true,
+      studysetUUID: selectedStudyset.studysetUUID ?? "",
+    });
+  };
+
+  const onDialogClose = () => {
+    setSelectedDialog("");
+  };
+
+  const handleUpdateCards = () => {
+    navigate(`/edit/${studysetUUID}`);
+  };
+
+  const notesDrawerPosition =
+    selectedStudyset?.metadata?.notesDrawerPosition || "right";
+  const drawerOpenPadding = "27.5rem";
+  const drawerClosedPadding = "4rem";
+  const basePadding = "2rem";
+
+  const getPadding = () => {
+    if (isNotesDrawerHidden) {
+      // When drawer is hidden, use moderate padding on both sides
+      return {
+        paddingLeft: drawerClosedPadding,
+        paddingRight: drawerClosedPadding,
+      };
+    }
+    // When drawer is open, large padding on drawer side, minimal on other
+    return {
+      paddingLeft:
+        notesDrawerPosition === "left" ? drawerOpenPadding : basePadding,
+      paddingRight:
+        notesDrawerPosition === "right" ? drawerOpenPadding : basePadding,
+    };
+  };
+
+  const padding = getPadding();
+
+  return (
+    <>
+      <ViewStudysetPage
+        className="view-set-page"
+        viewMode={viewMode}
+        sx={{
+          ...padding,
+        }}
+      >
+        <ViewFlashsetPaper elevation={6}>
+          <ViewStudysetContainer>
+            <ViewStudysetHeader id="viewStudysetHeader">
+              <StudysetInfo>
+                <Button
+                  onClick={handleBackClick}
+                  startIcon={<ArrowBack color="primary" />}
+                >
+                  {t("viewStudySet.backToStudySets")}
+                </Button>
+                <BoldTypography 
+                  variant="h5" 
+                  sx={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {isStudySetLoading ? (
+                    <Skeleton />
+                  ) : (
+                    <>{selectedStudyset?.title}</>
+                  )}
+                </BoldTypography>
+                <Typography variant="subtitle1">
+                  {isStudySetLoading ? (
+                    <Skeleton />
+                  ) : (
+                    <>
+                      {t("viewStudySet.createdBy", {
+                        username: selectedStudyset?.username,
+                      })}
+                    </>
+                  )}
+                </Typography>
+                <StudysetDescription variant="body1">
+                  {isStudySetLoading ? (
+                    <Skeleton />
+                  ) : (
+                    <>{selectedStudyset?.description}</>
+                  )}
+                </StudysetDescription>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    flexWrap: "wrap",
+                    mt: "1rem",
+                    mb: "1rem",
+                  }}
+                >
+                  <Tooltip
+                    title={t("viewStudySet.manageLabels")}
+                    placement="right"
+                  >
+                    <LocalOffer
+                      sx={{
+                        fontSize: "1.25rem",
+                        color: "primary.main",
+                        cursor: "pointer",
+                        "&:hover": {
+                          opacity: 0.7,
+                        },
+                      }}
+                      onClick={showManageLabelsDialog}
+                    />
+                  </Tooltip>
+                  {selectedStudyset?.labels?.length > 0 ? (
+                    selectedStudyset.labels.map((label, index) => (
+                      <Chip key={index} label={label} variant="outlined" />
+                    ))
+                  ) : (
+                    <Chip
+                      label={t("viewStudySet.noLabelsSelected")}
+                      color="error"
+                      variant="outlined"
+                    />
+                  )}
+                </Box>
+                <StudysetActions
+                  updateMetadataField={updateMetadataField}
+                  selectedStudyset={selectedStudyset}
+                />
+              </StudysetInfo>
+              <StudyModesSection>
+                <StudyModesGrid
+                  studysetUUID={studysetUUID}
+                  cardCount={selectedStudyset?.cards?.length ?? 0}
+                />
+              </StudyModesSection>
+            </ViewStudysetHeader>
+          </ViewStudysetContainer>
+        </ViewFlashsetPaper>
+        <ViewStudysetFilters
+          selectedTab={selectedTab}
+          setSelectedTab={setSelectedTab}
+          selectedSort={selectedSort}
+          setSelectedSort={setSelectedSort}
+          selectedStudyset={selectedStudyset}
+          setSortDirection={setSortDirection}
+          sortDirection={sortDirection}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          cardCount={selectedStudyset?.cards?.length ?? 0}
+          cardCountVisible={selectedStudyset?.metadata?.cardCountVisible}
+        />
+        {/* Testing out virtual scrolling */}
+        {/* <Virtuoso
+                style={{
+                    height: "20rem",
+                }}
+                totalCount={filteredViewFlashCards.length}
+            /> */}
+        {filteredViewFlashCards.length === 0 &&
+        selectedTab !== DEFAULT_CATEGORIES.ALL ? (
+          <NoCardsMessage>{t("viewStudySet.noCardsCategory")}</NoCardsMessage>
+        ) : filteredViewFlashCards.length === 0 ? (
+          <NoCardsMessage>{t("viewStudySet.noCardsInSet")}</NoCardsMessage>
+        ) : viewMode === VIEWSET_LAYOUTS.GRID ? (
+          <ViewCardsGridContainer>
+            {filteredViewFlashCards.map((card, index) => (
+              <ViewStudySetCardGrid
+                key={card.cardUUID}
+                card={card}
+                index={index}
+                selectedStudyset={selectedStudyset}
+              />
+            ))}
+          </ViewCardsGridContainer>
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={filteredViewFlashCards.map((card) => card.cardUUID)}
+              strategy={verticalListSortingStrategy}
+            >
+              {filteredViewFlashCards.map((card, index) => {
+                const { cardUUID } = card;
+                return (
+                  <ViewStudySetCard
+                    key={cardUUID}
+                    card={card}
+                    index={index}
+                    selectedStudyset={selectedStudyset}
+                  />
+                );
+              })}
+            </SortableContext>
+          </DndContext>
+        )}
+        <UpdateCardsButton
+          variant="contained"
+          onClick={handleUpdateCards}
+          startIcon={
+            selectedStudyset?.cards?.length === 0 ? (
+              <AddIcon sx={{ fontSize: "1.5rem" }} />
+            ) : (
+              <EditIcon sx={{ fontSize: "1.5rem" }} />
+            )
+          }
+        >
+          {selectedStudyset?.cards?.length === 0
+            ? t("viewStudySet.addCards")
+            : t("viewStudySet.updateCards")}
+        </UpdateCardsButton>
+        <NotesDrawer
+          selectedStudyset={selectedStudyset}
+          isHidden={isNotesDrawerHidden}
+          onToggle={setIsNotesDrawerHidden}
+        />
+      </ViewStudysetPage>
+      <NotificationsDialog
+        open={selectedDialog === VIEW_SET_DIALOGS.NOTIFICATIONS}
+        onClose={onDialogClose}
+        studysetUUID={studysetUUID}
+        studysetTitle={selectedStudyset?.title}
+      />
+      <DownloadSetModal
+        open={selectedDialog === VIEW_SET_DIALOGS.DOWNLOAD}
+        onClose={onDialogClose}
+        studyset={selectedStudyset}
+      />
+      <ManageCategoriesDialog
+        open={selectedDialog === VIEW_SET_DIALOGS.CATEGORIES}
+        onClose={onDialogClose}
+        selectedStudyset={selectedStudyset}
+        studysets={studysets}
+      />
+      <StudysetSettings
+        open={selectedDialog === VIEW_SET_DIALOGS.SETTINGS}
+        onClose={onDialogClose}
+        studyset={selectedStudyset}
+      />
+      <PrintDialog
+        open={selectedDialog === VIEW_SET_DIALOGS.PRINT}
+        onClose={onDialogClose}
+        studyset={selectedStudyset}
+      />
+      <ScrollToTopFab />
+    </>
+  );
+};
+
+export default ViewStudySet;
