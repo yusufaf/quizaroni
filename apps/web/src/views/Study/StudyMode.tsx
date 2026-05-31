@@ -24,6 +24,8 @@ const StudyMode = () => {
             return <MatchingStudy studysetId={studysetId} />;
         case STUDY_MODES.TYPE_WRITE:
             return <TypeWriteStudy studysetId={studysetId} />;
+        case STUDY_MODES.REVIEW:
+            return <FlashcardsStudy studysetId={studysetId} reviewMode />;
         default:
             return <Navigate to={`/view/${studysetId}`} replace />;
     }

@@ -5,12 +5,14 @@ import {
     Quiz,
     Extension,
     Keyboard,
+    Schedule,
     LockOutlined,
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { STUDY_MODES, STUDY_MODE_CONFIG } from 'shared/constants';
+import { useDueCount } from 'shared/hooks/useDueCount';
 import { StudyModeGrid, StudyModePaper, StudyModeTitle } from '../styles';
 
 const ICON_MAP = {
@@ -18,6 +20,7 @@ const ICON_MAP = {
     Quiz,
     Extension,
     Keyboard,
+    Schedule,
 };
 
 type Props = {
@@ -31,12 +34,14 @@ const MODE_TRANSLATION_KEYS: Record<string, string> = {
     'multiple-choice': 'multipleChoice',
     matching: 'matching',
     'type-write': 'typeWrite',
+    review: 'review',
 };
 
 const StudyModesGrid = ({ studysetUUID, cardCount }: Props) => {
     const { t } = useTranslation('study');
     const navigate = useNavigate();
     const [hoveredMode, setHoveredMode] = useState<string | null>(null);
+    const { count: dueCount } = useDueCount(studysetUUID);
 
     const handleModeClick = (modeId: string) => {
         if (cardCount === 0) return;
@@ -145,7 +150,13 @@ const StudyModesGrid = ({ studysetUUID, cardCount }: Props) => {
                                         }}
                                     />
                                     <StudyModeTitle variant="subtitle1">
-                                        {t(`modes.${translationKey}.title`)}
+                                        {mode.id === 'review'
+                                            ? t('review.dueCount', {
+                                                  count: dueCount,
+                                              })
+                                            : t(
+                                                  `modes.${translationKey}.title`
+                                              )}
                                     </StudyModeTitle>
                                 </Box>
                             </StudyModePaper>

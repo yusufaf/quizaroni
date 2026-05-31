@@ -16,8 +16,7 @@
         /* Modules */
         "module": "ESNext" /* Specify what module code is generated. */,
         // "rootDir": "./",                                  /* Specify the root folder within your source files. */
-        "moduleResolution": "node" /* Specify how TypeScript looks up a file from a given module specifier. */,
-        "baseUrl": "./src" /* Specify the base directory to resolve non-relative module names. */,
+        "moduleResolution": "bundler" /* Specify how TypeScript looks up a file from a given module specifier. */,
         // "paths": {},                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
         // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
         // "typeRoots": [],                                  /* Specify multiple folders that act like './node_modules/@types'. */
@@ -39,7 +38,7 @@
         // "outFile": "./",                                  /* Specify a file that bundles all outputs into one JavaScript file. If 'declaration' is true, also designates a file that bundles all .d.ts output. */
         // "outDir": "./",                                   /* Specify an output folder for all emitted files. */
         // "removeComments": true,                           /* Disable emitting comments. */
-        // "noEmit": true,                                   /* Disable emitting files from a compilation. */
+        "noEmit": true /* Disable emitting files from a compilation. */,
         // "importHelpers": true,                            /* Allow importing helper functions from tslib once per project, instead of including them per-file. */
         // "importsNotUsedAsValues": "remove",               /* Specify emit/checking behavior for imports that are only used for types. */
         // "downlevelIteration": true,                       /* Emit more compliant, but verbose and less performant JavaScript for iteration. */
@@ -81,21 +80,21 @@
 
         "skipLibCheck": true /* Skip type checking all .d.ts files. */,
         "paths": {
-            "views/*": ["./views/*"],
-            "resources/*": ["./resources/*"],
-            "state/*": ["./state/*"],
-            "lib/*": ["./lib/*"],
-            "shared/*": ["./shared/*"],
-            "i18n": ["./i18n/index.ts"],
-            "i18n/*": ["./i18n/*"],
-            // "api/*": ["./api/*"],
+            "views/*": ["./src/views/*"],
+            "resources/*": ["./src/resources/*"],
+            "state/*": ["./src/state/*"],
+            "lib/*": ["./src/lib/*"],
+            "shared/*": ["./src/shared/*"],
+            "i18n": ["./src/i18n/index.ts"],
+            "i18n/*": ["./src/i18n/*"],
+            // "api/*": ["./src/api/*"],
             // Shared subfolders
-            "components/*": ["./shared/components/*"],
-            "constants/*": ["./shared/constants/*"],
-            "hooks/*": ["./shared/hooks/*"],
-            "styles/*": ["./shared/styles/*"],
-            "theme/*": ["./shared/theme/*"],
-            "utilities/*": ["./shared/utilities/*"]
+            "components/*": ["./src/shared/components/*"],
+            "constants/*": ["./src/shared/constants/*"],
+            "hooks/*": ["./src/shared/hooks/*"],
+            "styles/*": ["./src/shared/styles/*"],
+            "theme/*": ["./src/shared/theme/*"],
+            "utilities/*": ["./src/shared/utilities/*"]
         }
     },
     "include": ["src", "env.d.ts"]

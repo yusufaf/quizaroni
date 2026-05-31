@@ -35,6 +35,15 @@
                 "hintSystem": "Sistema de pistas",
                 "smartMatching": "Emparejamiento inteligente"
             }
+        },
+        "review": {
+            "title": "Repaso pendiente",
+            "description": "Estudia solo las tarjetas pendientes de hoy",
+            "features": {
+                "spacedRepetition": "Repetición espaciada",
+                "dueCardsOnly": "Solo tarjetas pendientes",
+                "optimizedRetention": "Retención optimizada"
+            }
         }
     },
     "actions": {
@@ -68,6 +77,14 @@
         "hard": "Difícil",
         "good": "Bien",
         "easy": "Fácil"
+    },
+    "review": {
+        "due": "Repaso pendiente",
+        "dueCount": "{{count}} tarjeta pendiente",
+        "dueCount_plural": "{{count}} tarjetas pendientes",
+        "caughtUp": "¡Todo al día!",
+        "caughtUpSubtitle": "No hay tarjetas pendientes de repaso ahora mismo.",
+        "ratePrompt": "¿Qué tan bien lo recordaste?"
     },
     "addCardsToUnlock": "Agrega tarjetas para desbloquear este modo",
     "typeWriteStudy": {

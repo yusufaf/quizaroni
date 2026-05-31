@@ -1,0 +1,110 @@
+import { getDatabase, type LocalCardProgress } from '../db';
+import type { CardProgress, UUID } from 'shared/types';
+
+const LEGACY_KEY = 'study-session-storage';
+const MIGRATION_FLAG = 'srs-progress-migrated-v1';
+
+// Repository for SM-2 card progress - always hits local Dexie DB.
+// Local-only for now (no backend sync); rows are marked pending for a future sync layer.
+export class CardProgressRepository {
+    private db = getDatabase();
+    private migrated = false;
+
+    // ===== Read =====
+
+    async getByCard(cardUUID: UUID): Promise<LocalCardProgress | undefined> {
+        await this.ensureMigrated();
+        return await this.db.cardProgress.get(cardUUID);
+    }
+
+    async getAllForStudyset(studysetUUID: UUID): Promise<LocalCardProgress[]> {
+        await this.ensureMigrated();
+        return await this.db.cardProgress
+            .where('studysetUUID')
+            .equals(studysetUUID)
+            .toArray();
+    }
+
+    async getDueForStudyset(
+        studysetUUID: UUID,
+        now: Date = new Date()
+    ): Promise<LocalCardProgress[]> {
+        await this.ensureMigrated();
+        const nowIso = now.toISOString();
+        // Compound index [studysetUUID+nextReview]: bound the range to this set,
+        // upper-bounded by now (ISO strings sort chronologically).
+        return await this.db.cardProgress
+            .where('[studysetUUID+nextReview]')
+            .between([studysetUUID, ''], [studysetUUID, nowIso], true, true)
+            .toArray();
+    }
+
+    async getDueCount(
+        studysetUUID: UUID,
+        now: Date = new Date()
+    ): Promise<number> {
+        const due = await this.getDueForStudyset(studysetUUID, now);
+        return due.length;
+    }
+
+    // ===== Write =====
+
+    async upsert(
+        progress: CardProgress,
+        studysetUUID: UUID
+    ): Promise<LocalCardProgress> {
+        await this.ensureMigrated();
+        const local: LocalCardProgress = {
+            ...progress,
+            studysetUUID,
+            _syncStatus: 'pending',
+            _lastModified: Date.now(),
+        };
+        await this.db.cardProgress.put(local);
+        return local;
+    }
+
+    // ===== Migration (one-time, lazy, idempotent) =====
+
+    private async ensureMigrated(): Promise<void> {
+        if (this.migrated) return;
+        this.migrated = true;
+
+        if (
+            typeof localStorage === 'undefined' ||
+            localStorage.getItem(MIGRATION_FLAG)
+        ) {
+            return;
+        }
+
+        try {
+            const raw = localStorage.getItem(LEGACY_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                // zustand persist shape: { state: { cardProgress: [[uuid, progress], ...] } }
+                const entries: [string, CardProgress][] =
+                    parsed?.state?.cardProgress ?? [];
+                const rows: LocalCardProgress[] = entries
+                    .map(([, p]) => p)
+                    .filter((p) => p && p.cardUUID)
+                    .map((p) => ({
+                        ...p,
+                        // studysetUUID was not tracked in the legacy Map; mark unknown.
+                        studysetUUID: '',
+                        _syncStatus: 'pending' as const,
+                        _lastModified: Date.now(),
+                    }));
+                if (rows.length > 0) {
+                    await this.db.cardProgress.bulkPut(rows);
+                }
+            }
+        } catch {
+            // Corrupt legacy data is non-fatal; skip migration.
+        } finally {
+            localStorage.setItem(MIGRATION_FLAG, '1');
+        }
+    }
+}
+
+// Singleton instance
+export const cardProgressRepository = new CardProgressRepository();

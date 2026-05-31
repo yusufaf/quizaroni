@@ -51,7 +51,7 @@ interface QuizaroniDatabase extends Dexie {
 }
 
 const DB_NAME = 'quizaroni_v1';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbInstance: QuizaroniDatabase | null = null;
 
@@ -70,7 +70,8 @@ export function getDatabase(): QuizaroniDatabase {
 
         // Study session data - analytics/progress
         sessions: 'sessionUUID, studysetUUID, completedAt, _syncStatus',
-        cardProgress: 'cardUUID, studysetUUID, nextReview, _syncStatus',
+        cardProgress:
+            'cardUUID, studysetUUID, nextReview, _syncStatus, [studysetUUID+nextReview]',
 
         // Sync queue for offline operations
         syncQueue: '++id, entityType, entityId, createdAt',

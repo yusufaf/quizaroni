@@ -3,19 +3,16 @@ import { persist } from 'zustand/middleware';
 import type {
     StudySessionState,
     StudyAnswer,
-    CardProgress,
     StudySessionResult,
     StudyStatistics,
     Achievement,
-    StudysetProgress,
 } from 'shared/types';
+import { computeSm2, newProgress } from 'shared/utilities/srs';
+import { cardProgressRepository } from 'state/local/repositories';
 
 type StudySessionStore = {
     // Active session
     activeSession: StudySessionState | null;
-
-    // Progress tracking
-    cardProgress: Map<string, CardProgress>;
 
     // Statistics
     statistics: StudyStatistics;
@@ -31,7 +28,6 @@ type StudySessionStore = {
 
     // Progress management (SM-2 algorithm)
     updateCardProgress: (cardUUID: string, quality: number) => void;
-    getNextReviewCards: (studysetUUID: string) => string[];
 
     // Statistics
     recordSessionResult: (result: StudySessionResult) => void;
@@ -42,7 +38,6 @@ export const useStudySessionStore = create<StudySessionStore>()(
     persist(
         (set, get) => ({
             activeSession: null,
-            cardProgress: new Map(),
             statistics: {
                 totalSessions: 0,
                 totalCardsStudied: 0,
@@ -148,80 +143,19 @@ export const useStudySessionStore = create<StudySessionStore>()(
 
             resetSession: () => set({ activeSession: null }),
 
-            // SM-2 Spaced Repetition Algorithm
+            // SM-2 spaced repetition — pure math in shared/utilities/srs,
+            // persisted to Dexie via cardProgressRepository (local-first).
             updateCardProgress: (cardUUID, quality) => {
-                const existing = get().cardProgress.get(cardUUID);
-                const progress: CardProgress = existing || {
-                    cardUUID,
-                    lastStudied: new Date().toISOString(),
-                    nextReview: new Date().toISOString(),
-                    easeFactor: 2.5,
-                    interval: 0,
-                    repetitions: 0,
-                    masteryLevel: 'new' as const,
-                };
+                const studysetUUID = get().activeSession?.studysetUUID;
+                if (!studysetUUID) return;
 
-                let { easeFactor, interval, repetitions } = progress;
-
-                // SM-2 algorithm calculations
-                if (quality >= 3) {
-                    // Correct response
-                    if (repetitions === 0) {
-                        interval = 1;
-                    } else if (repetitions === 1) {
-                        interval = 6;
-                    } else {
-                        interval = Math.round(interval * easeFactor);
-                    }
-                    repetitions += 1;
-                } else {
-                    // Incorrect response - reset
-                    repetitions = 0;
-                    interval = 1;
-                }
-
-                // Update ease factor based on quality
-                easeFactor =
-                    easeFactor +
-                    (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
-                easeFactor = Math.max(1.3, easeFactor); // Minimum ease factor of 1.3
-
-                // Calculate next review date
-                const nextReview = new Date();
-                nextReview.setDate(nextReview.getDate() + interval);
-
-                // Determine mastery level
-                const masteryLevel: CardProgress['masteryLevel'] =
-                    repetitions >= 5
-                        ? 'mastered'
-                        : repetitions >= 2
-                          ? 'review'
-                          : repetitions >= 1
-                            ? 'learning'
-                            : 'new';
-
-                const updatedProgress: CardProgress = {
-                    ...progress,
-                    lastStudied: new Date().toISOString(),
-                    nextReview: nextReview.toISOString(),
-                    easeFactor,
-                    interval,
-                    repetitions,
-                    masteryLevel,
-                };
-
-                set((state) => {
-                    const newMap = new Map(state.cardProgress);
-                    newMap.set(cardUUID, updatedProgress);
-                    return { cardProgress: newMap };
-                });
-            },
-
-            getNextReviewCards: (studysetUUID) => {
-                const now = new Date();
-                return Array.from(get().cardProgress.values())
-                    .filter((p) => new Date(p.nextReview) <= now)
-                    .map((p) => p.cardUUID);
+                void (async () => {
+                    const existing =
+                        await cardProgressRepository.getByCard(cardUUID);
+                    const prev = existing ?? newProgress(cardUUID);
+                    const updated = computeSm2(prev, quality);
+                    await cardProgressRepository.upsert(updated, studysetUUID);
+                })();
             },
 
             recordSessionResult: (result) => {
@@ -277,7 +211,6 @@ export const useStudySessionStore = create<StudySessionStore>()(
         {
             name: 'study-session-storage',
             partialize: (state) => ({
-                cardProgress: Array.from(state.cardProgress.entries()),
                 statistics: {
                     ...state.statistics,
                     progressByStudyset: Array.from(
@@ -289,7 +222,6 @@ export const useStudySessionStore = create<StudySessionStore>()(
                 const persisted = persistedState as any;
                 return {
                     ...currentState,
-                    cardProgress: new Map(persisted.cardProgress || []),
                     statistics: {
                         ...currentState.statistics,
                         ...persisted.statistics,
