@@ -1,1 +1,3 @@
-vp staged
+# Git runs hooks from the repo root, but `vp staged` needs the package's
+# vite.config.ts (staged config lives in apps/web). cd there first.
+cd "$(dirname "$0")/.." && vp staged
