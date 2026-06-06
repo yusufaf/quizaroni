@@ -49,8 +49,26 @@ export default defineConfig({
     },
     optimizeDeps: {
         include: ['react', 'react-dom', 'react-dom/client'],
+        // Rolldown's dep optimizer auto-splits @emotion/react / @mui/styled-engine
+        // into a shared chunk but drops the cross-chunk init-guard import, causing
+        // `init_emotion_react_browser_development_esm is not defined`. Force emotion
+        // + mui into one chunk via rolldown's native advancedChunks so the init
+        // guards stay in-scope.
+        rolldownOptions: {
+            output: {
+                codeSplitting: {
+                    groups: [
+                        {
+                            name: 'mui-emotion',
+                            test: /[\\/]node_modules[\\/](\.pnpm[\\/])?(@emotion|@mui|hoist-non-react-statics)/,
+                        },
+                    ],
+                },
+            },
+        },
     },
     server: {
+        host: '127.0.0.1',
         proxy: {
             '/api': {
                 target: apiProxyURL,
