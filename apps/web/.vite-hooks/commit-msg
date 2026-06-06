@@ -1,0 +1,3 @@
+# Runs from the repo root (where git invokes hooks), so "$1"
+# (.git/COMMIT_EDITMSG) and the root commitlint.config.js both resolve.
+pnpm exec commitlint --edit "$1"
