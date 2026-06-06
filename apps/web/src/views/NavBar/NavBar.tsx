@@ -1,4 +1,5 @@
 import { Add, Logout as LogoutIcon } from '@mui/icons-material';
+import logoUrl from '../../resources/logo.png';
 import {
     AppBar,
     Toolbar,
@@ -96,15 +97,32 @@ const NavBar = (props: Props) => {
             }}
         >
             <Toolbar>
-                <Typography
-                    color="primary"
-                    sx={{
-                        fontSize: '2rem',
-                        fontWeight: 700,
+                <div
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
                     }}
                 >
-                    Quizaroni
-                </Typography>
+                    <img
+                        src={logoUrl}
+                        alt="Quizaroni Logo"
+                        style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '8px',
+                        }}
+                    />
+                    <Typography
+                        color="primary"
+                        sx={{
+                            fontSize: '2rem',
+                            fontWeight: 700,
+                        }}
+                    >
+                        Quizaroni
+                    </Typography>
+                </div>
                 {isMobile && <NavDrawer />}
                 {!isMobile && (
                     <NavItemsContainer>
