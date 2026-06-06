@@ -110,6 +110,35 @@ export const NotificationPreferencesSchema = z.object({
   studysetPrefs: z.array(StudysetNotificationPrefsSchema),
 });
 
+export const GamificationStateSchema = z.object({
+  currentStreak: z.number(),
+  longestStreak: z.number(),
+  lastStudyDate: z.string().nullable(),
+  unlockedAchievementIds: z.array(z.string()),
+  unlockedAtById: z.record(z.string(), z.string()),
+  studiedStudysetUUIDs: z.array(UUIDSchema),
+  studysetSessionCounts: z.record(z.string(), z.number()),
+});
+
+export const CustomAchievementSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  icon: z.string(),
+  metric: z.enum([
+    "daily_streak",
+    "total_sessions",
+    "total_cards",
+    "session_streak",
+    "perfect_session",
+    "studyset_sessions",
+  ]),
+  threshold: z.number(),
+  studysetUUID: UUIDSchema.optional(),
+  createdAt: TimestampSchema,
+  unlockedAt: TimestampSchema.optional(),
+});
+
 export const UserMetadataSchema = z.object({
   avatar: AvatarMetadataSchema.optional(),
   confirmDestructiveActions: z.boolean().optional(),
@@ -120,6 +149,8 @@ export const UserMetadataSchema = z.object({
   homeView: z.enum(["table", "grid", "html"]),
   namedColors: z.array(NamedColorSchema),
   notifications: NotificationPreferencesSchema.optional(),
+  gamification: GamificationStateSchema.optional(),
+  customAchievements: z.array(CustomAchievementSchema).optional(),
   preferredDateFormat: z.enum(["YYYY-MM-DD", "DD/MM/YYYY", "MM/DD/YYYY"]),
   preferredTimeFormat: z.enum(["12h", "24h"]).optional(),
   showSeconds: z.boolean().optional(),
@@ -294,6 +325,17 @@ export const UpdateEmailRequestSchema = z.object({
 
 export const DownloadUserDataRequestSchema = z.object({
   includeStudysets: z.boolean(),
+});
+
+export const UpdateGamificationRequestSchema = z.object({
+  gamification: GamificationStateSchema,
+  customAchievements: z.array(CustomAchievementSchema),
+});
+
+export const UpdateGamificationResponseSchema = z.object({
+  message: z.string(),
+  gamification: GamificationStateSchema,
+  customAchievements: z.array(CustomAchievementSchema),
 });
 
 // Files

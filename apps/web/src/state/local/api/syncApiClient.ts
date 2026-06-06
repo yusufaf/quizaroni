@@ -123,7 +123,7 @@ export const syncApiClient = {
    * Update user metadata on the server
    */
   async updateUserMetadata(updates: Record<string, unknown>): Promise<unknown> {
-    const response = await fetch(`${BASE_API_URL}/users/update-user-metadata`, {
+    const response = await fetch(`${BASE_API_URL}/users/update-metadata`, {
       ...getCommonPostRequestProps(),
       body: JSON.stringify({ updates }),
     });

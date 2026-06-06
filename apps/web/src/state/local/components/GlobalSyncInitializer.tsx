@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { getSyncEngine, type SyncOptions } from "../sync/SyncEngine";
 import { registerServiceWorker } from "../pwa/registerSW";
 import { syncApiClient } from "../api/syncApiClient";
+import { useGamificationStore } from "state/stores/gamification";
 
 // API client wrapper for the sync engine
 const defaultApiClient: SyncOptions["apiClient"] = {
@@ -35,6 +36,9 @@ export function GlobalSyncInitializer({
 
     // Register PWA service worker
     registerServiceWorker();
+
+    // Load gamification state from Dexie
+    void useGamificationStore.getState().hydrateFromDb();
 
     // Initialize sync engine
     const syncEngine = getSyncEngine({

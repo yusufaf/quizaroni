@@ -5,6 +5,7 @@ import AccountTab from './AccountTab';
 import AccessibilityTab from './AccessibilityTab';
 import CustomizationTab from './CustomizationTab';
 import JsonSettingsTab from './JsonSettingsTab';
+import AchievementsTab from './AchievementsTab';
 import ProfileCard from './ProfileCard';
 import {
     ProfileContainer,
@@ -23,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 
 const TABS = {
     CUSTOMIZATION: 'Customization',
+    ACHIEVEMENTS: 'Achievements',
     ACCESSIBILITY: 'Accessibility',
     ACCOUNT: 'Account',
     JSON: 'JSON',
@@ -80,6 +82,10 @@ const Profile = (props: Props) => {
                                 value={TABS.CUSTOMIZATION}
                             />
                             <ProfileTab
+                                label={t('profile.achievements')}
+                                value={TABS.ACHIEVEMENTS}
+                            />
+                            <ProfileTab
                                 label={t('profile.accessibility')}
                                 value={TABS.ACCESSIBILITY}
                             />
@@ -94,6 +100,9 @@ const Profile = (props: Props) => {
                         </Tabs>
                         {selectedProfileTab === TABS.CUSTOMIZATION && (
                             <CustomizationTab userData={userData} />
+                        )}
+                        {selectedProfileTab === TABS.ACHIEVEMENTS && (
+                            <AchievementsTab />
                         )}
                         {selectedProfileTab === TABS.ACCESSIBILITY && (
                             <AccessibilityTab userData={userData} />

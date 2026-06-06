@@ -289,6 +289,10 @@ export class QuizaroniAPI extends Construct {
                 lambdaName: 'downloadUserData',
             },
             {
+                route: `${usersPrefix}/update-gamification`,
+                lambdaName: 'updateGamification',
+            },
+            {
                 route: `${usersPrefix}/upload-profile-picture`,
                 lambdaName: 'uploadProfilePicture',
             },

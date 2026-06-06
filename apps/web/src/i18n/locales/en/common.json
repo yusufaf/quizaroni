@@ -425,7 +425,8 @@
         "studySetsCreated": "# of Study Sets Created",
         "totalCards": "Total Cards",
         "labelsCreated": "Labels Created",
-        "accountCreated": "Account Created"
+        "accountCreated": "Account Created",
+        "achievements": "Achievements"
     },
     "actions": {
         "editStudySet": "Edit Study Set",

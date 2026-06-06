@@ -95,6 +95,8 @@ export type User = {
         homeView: HomeView;
         namedColors: NamedColor[];
         notifications?: NotificationPreferences;
+        gamification?: GamificationState;
+        customAchievements?: CustomAchievement[];
         preferredDateFormat: PreferredDateFormat;
         preferredTimeFormat?: PreferredTimeFormat;
         showSeconds?: boolean;
@@ -231,6 +233,45 @@ export type Achievement = {
     title: string;
     description: string;
     icon: string;
+    isCustom?: boolean;
+};
+
+export type AchievementMetric =
+    | 'daily_streak'
+    | 'total_sessions'
+    | 'total_cards'
+    | 'session_streak'
+    | 'perfect_session'
+    | 'studyset_sessions';
+
+export type PresetAchievementDef = {
+    id: string;
+    metric: AchievementMetric;
+    threshold: number;
+    icon: string;
+    i18nKey: string;
+};
+
+export type CustomAchievement = {
+    id: string;
+    title: string;
+    description: string;
+    icon: string;
+    metric: AchievementMetric;
+    threshold: number;
+    studysetUUID?: UUID;
+    createdAt: Timestamp;
+    unlockedAt?: Timestamp;
+};
+
+export type GamificationState = {
+    currentStreak: number;
+    longestStreak: number;
+    lastStudyDate: string | null;
+    unlockedAchievementIds: string[];
+    unlockedAtById: Record<string, Timestamp>;
+    studiedStudysetUUIDs: UUID[];
+    studysetSessionCounts: Record<UUID, number>;
 };
 
 export type StudyStatistics = {
@@ -332,6 +373,17 @@ export type UpdateUserMetadataRequest = {
 
 export type UpdateNotificationPreferencesRequest = {
     updates: Partial<NotificationPreferences>;
+};
+
+export type UpdateGamificationRequest = {
+    gamification: GamificationState;
+    customAchievements: CustomAchievement[];
+};
+
+export type UpdateGamificationResponse = {
+    message: string;
+    gamification: GamificationState;
+    customAchievements: CustomAchievement[];
 };
 
 export type UpdateDefaultThemeRequest = {

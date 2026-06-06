@@ -425,7 +425,8 @@
         "studySetsCreated": "# de Sets de Estudio Creados",
         "totalCards": "Total de Tarjetas",
         "labelsCreated": "Etiquetas Creadas",
-        "accountCreated": "Cuenta Creada"
+        "accountCreated": "Cuenta Creada",
+        "achievements": "Logros"
     },
     "actions": {
         "editStudySet": "Editar Set de Estudio",

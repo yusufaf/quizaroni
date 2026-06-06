@@ -67,5 +67,76 @@
         "averageAccuracy": "Precisión Promedio",
         "currentStreak": "Racha Actual",
         "longestStreak": "Racha Más Larga"
+    },
+    "achievements": {
+        "streakTitle": "Racha de Estudio",
+        "currentStreak": "Racha Actual",
+        "longestStreak": "Racha Más Larga",
+        "streakTooltip": "Racha de {{count}} día de estudio",
+        "streakTooltip_plural": "Racha de {{count}} días de estudio",
+        "presetTitle": "Logros Predefinidos",
+        "customTitle": "Metas Personalizadas",
+        "createCustom": "Crear Meta",
+        "noCustom": "Aún no tienes metas personalizadas. ¡Crea una para seguir un hito personal!",
+        "unlocked": "Desbloqueado",
+        "deleteCustom": "Eliminar meta personalizada",
+        "customProgress": "Objetivo: {{target}}",
+        "form": {
+            "title": "Título de la Meta",
+            "description": "Descripción",
+            "icon": "Icono (emoji)",
+            "metric": "Seguimiento",
+            "threshold": "Objetivo",
+            "cancel": "Cancelar",
+            "save": "Guardar Meta"
+        },
+        "metrics": {
+            "total_sessions": "Sesiones de estudio completadas",
+            "total_cards": "Tarjetas estudiadas",
+            "daily_streak": "Racha diaria de estudio",
+            "studyset_sessions": "Sesiones en un set de estudio"
+        },
+        "presets": {
+            "firstStudy": {
+                "title": "Primeros Pasos",
+                "description": "Completa tu primera sesión de estudio"
+            },
+            "perfectScore": {
+                "title": "Puntuación Perfecta",
+                "description": "Obtén 100% de precisión en una sesión"
+            },
+            "streak3": {
+                "title": "En Racha",
+                "description": "Estudia 3 días seguidos"
+            },
+            "streak7": {
+                "title": "Guerrero Semanal",
+                "description": "Estudia 7 días seguidos"
+            },
+            "streak30": {
+                "title": "Maestro Mensual",
+                "description": "Estudia 30 días seguidos"
+            },
+            "sessionStreak10": {
+                "title": "Racha Caliente",
+                "description": "Responde 10 tarjetas correctamente seguidas"
+            },
+            "sessions10": {
+                "title": "Estudiante Dedicado",
+                "description": "Completa 10 sesiones de estudio"
+            },
+            "sessions50": {
+                "title": "Maratón de Estudio",
+                "description": "Completa 50 sesiones de estudio"
+            },
+            "cards100": {
+                "title": "Erudito del Siglo",
+                "description": "Estudia 100 tarjetas en total"
+            },
+            "cards500": {
+                "title": "Campeón del Conocimiento",
+                "description": "Estudia 500 tarjetas en total"
+            }
+        }
     }
 }

@@ -103,5 +103,19 @@
         "difficultyHard": "difícil",
         "feedbackCorrect": "✓ ¡Correcto!",
         "feedbackIncorrect": "✗ Incorrecto. La respuesta correcta es: \"{{answer}}\""
+    },
+    "results": {
+        "outstanding": "¡Excelente! 🌟",
+        "greatJob": "¡Buen trabajo! 🎉",
+        "goodWork": "¡Bien hecho! 👍",
+        "keepPracticing": "¡Sigue practicando! 💪",
+        "totalScore": "Puntuación Total",
+        "correct": "Correctas",
+        "accuracy": "Precisión",
+        "time": "Tiempo",
+        "bestStreak": "Mejor Racha",
+        "newAchievements": "🎉 ¡Nuevos Logros Desbloqueados!",
+        "backToSet": "Volver al Set",
+        "studyAgain": "Estudiar de Nuevo"
     }
 }

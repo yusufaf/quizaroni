@@ -14,6 +14,9 @@ import { EmojiEvents, CheckCircle, Timer, Whatshot } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { StudySessionResult } from 'shared/types';
+import { useTranslation } from 'react-i18next';
+import { PRESET_ACHIEVEMENTS } from 'shared/constants';
+import { useGamificationStore } from 'state/stores/gamification';
 
 type Props = {
     open: boolean;
@@ -23,6 +26,30 @@ type Props = {
 };
 
 const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
+    const { t } = useTranslation(['study', 'profile']);
+    const getAchievementById = useGamificationStore((s) => s.getAchievementById);
+
+    const getAchievementLabel = (achievementId: string) => {
+        const preset = Object.values(PRESET_ACHIEVEMENTS).find(
+            (p) => p.id === achievementId
+        );
+        if (preset) {
+            return t(`achievements.presets.${preset.i18nKey}.title`, {
+                ns: 'profile',
+            });
+        }
+        const achievement = getAchievementById(achievementId);
+        return achievement?.title ?? achievementId;
+    };
+
+    const getAchievementIcon = (achievementId: string) => {
+        const preset = Object.values(PRESET_ACHIEVEMENTS).find(
+            (p) => p.id === achievementId
+        );
+        if (preset) return preset.icon;
+        return getAchievementById(achievementId)?.icon ?? '🏅';
+    };
+
     useEffect(() => {
         if (open && result && result.accuracy >= 80) {
             // Trigger confetti for high scores
@@ -48,10 +75,10 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
     } = result;
 
     const getPerformanceMessage = () => {
-        if (accuracy >= 95) return 'Outstanding! 🌟';
-        if (accuracy >= 80) return 'Great Job! 🎉';
-        if (accuracy >= 60) return 'Good Work! 👍';
-        return 'Keep Practicing! 💪';
+        if (accuracy >= 95) return t('results.outstanding');
+        if (accuracy >= 80) return t('results.greatJob');
+        if (accuracy >= 60) return t('results.goodWork');
+        return t('results.keepPracticing');
     };
 
     const formatTime = (seconds: number) => {
@@ -110,7 +137,7 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
                         }}
                     >
                         <Typography variant="body2" color="text.secondary">
-                            Total Score
+                            {t('results.totalScore')}
                         </Typography>
                         <Typography
                             variant="h3"
@@ -150,7 +177,7 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
                                 {correctAnswers}/{totalCards}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Correct
+                                {t('results.correct')}
                             </Typography>
                         </Box>
 
@@ -179,7 +206,7 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
                                 }}
                             />
                             <Typography variant="body2" color="text.secondary">
-                                Accuracy
+                                {t('results.accuracy')}
                             </Typography>
                         </Box>
 
@@ -202,7 +229,7 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
                                 {formatTime(timeSpent)}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Time
+                                {t('results.time')}
                             </Typography>
                         </Box>
 
@@ -225,7 +252,7 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
                                 {streak}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                                Best Streak
+                                {t('results.bestStreak')}
                             </Typography>
                         </Box>
                     </Box>
@@ -248,7 +275,7 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
                                     variant="subtitle1"
                                     sx={{ fontWeight: 600 }}
                                 >
-                                    🎉 New Achievements Unlocked!
+                                    {t('results.newAchievements')}
                                 </Typography>
                                 <Box
                                     sx={{
@@ -261,9 +288,7 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
                                         (achievementId, index) => (
                                             <Chip
                                                 key={achievementId}
-                                                label={achievementId
-                                                    .replace(/-/g, ' ')
-                                                    .toUpperCase()}
+                                                label={`${getAchievementIcon(achievementId)} ${getAchievementLabel(achievementId)}`}
                                                 color="primary"
                                                 component={motion.div}
                                                 // @ts-ignore
@@ -284,10 +309,10 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
 
             <DialogActions sx={{ px: '1.5rem', pb: '1rem' }}>
                 <Button onClick={onClose} variant="outlined" size="large">
-                    Back to Set
+                    {t('results.backToSet')}
                 </Button>
                 <Button onClick={onStudyAgain} variant="contained" size="large">
-                    Study Again
+                    {t('results.studyAgain')}
                 </Button>
             </DialogActions>
         </Dialog>

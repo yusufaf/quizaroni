@@ -9,6 +9,7 @@ import type {
 } from 'shared/types';
 import { computeSm2, newProgress } from 'shared/utilities/srs';
 import { cardProgressRepository } from 'state/local/repositories';
+import { useGamificationStore } from './gamification';
 
 type StudySessionStore = {
     // Active session
@@ -31,7 +32,7 @@ type StudySessionStore = {
 
     // Statistics
     recordSessionResult: (result: StudySessionResult) => void;
-    unlockAchievement: (achievementId: string) => void;
+    unlockAchievement: (achievement: Achievement) => void;
 };
 
 export const useStudySessionStore = create<StudySessionStore>()(
@@ -77,7 +78,7 @@ export const useStudySessionStore = create<StudySessionStore>()(
                         ? (correctAnswers / session.answers.length) * 100
                         : 0;
 
-                const result: StudySessionResult = {
+                let result: StudySessionResult = {
                     sessionUUID: crypto.randomUUID(),
                     studysetUUID: session.studysetUUID,
                     mode: session.mode,
@@ -91,7 +92,23 @@ export const useStudySessionStore = create<StudySessionStore>()(
                     achievements: [],
                 };
 
+                const statistics = get().statistics;
+                result = useGamificationStore
+                    .getState()
+                    .processSessionEnd(result, statistics);
+
                 get().recordSessionResult(result);
+
+                for (const achievementId of result.achievements) {
+                    const achievement =
+                        useGamificationStore
+                            .getState()
+                            .getAchievementById(achievementId);
+                    if (achievement) {
+                        get().unlockAchievement(achievement);
+                    }
+                }
+
                 set({ activeSession: null });
                 return result;
             },
@@ -183,19 +200,13 @@ export const useStudySessionStore = create<StudySessionStore>()(
                 });
             },
 
-            unlockAchievement: (achievementId) => {
+            unlockAchievement: (achievement) => {
                 const existing = get().statistics.achievements.find(
-                    (a) => a.id === achievementId
+                    (a) => a.id === achievement.id
                 );
                 if (existing) return;
 
-                const newAchievement: Achievement = {
-                    id: achievementId,
-                    unlockedAt: new Date().toISOString(),
-                    title: achievementId,
-                    description: '',
-                    icon: '',
-                };
+                const newAchievement = achievement;
 
                 set((state) => ({
                     statistics: {

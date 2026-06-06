@@ -103,5 +103,19 @@
         "difficultyHard": "hard",
         "feedbackCorrect": "✓ Correct!",
         "feedbackIncorrect": "✗ Incorrect. The correct answer is: \"{{answer}}\""
+    },
+    "results": {
+        "outstanding": "Outstanding! 🌟",
+        "greatJob": "Great Job! 🎉",
+        "goodWork": "Good Work! 👍",
+        "keepPracticing": "Keep Practicing! 💪",
+        "totalScore": "Total Score",
+        "correct": "Correct",
+        "accuracy": "Accuracy",
+        "time": "Time",
+        "bestStreak": "Best Streak",
+        "newAchievements": "🎉 New Achievements Unlocked!",
+        "backToSet": "Back to Set",
+        "studyAgain": "Study Again"
     }
 }

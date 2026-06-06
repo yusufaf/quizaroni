@@ -7,6 +7,7 @@ import { useTheme } from "shared/theme/useTheme";
 import { DARK, LIGHT } from "shared/constants/index";
 import AppRoutes from "./AppRoutes";
 import { GlobalSyncInitializer } from "state/local";
+import { GamificationSyncInitializer } from "state/local/components/GamificationSyncInitializer";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GlobalConfirmDialog from "shared/components/GlobalConfirmDialog/GlobalConfirmDialog";
@@ -31,6 +32,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <GlobalSyncInitializer enableSync={true} />
+      <GamificationSyncInitializer />
       <AppWrapper>
         <NavBar />
         {loadingActions.length > 0 && <LoadingIndicator />}

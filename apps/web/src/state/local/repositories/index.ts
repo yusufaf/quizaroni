@@ -4,3 +4,7 @@ export {
     CardProgressRepository,
     cardProgressRepository,
 } from './CardProgressRepository';
+export {
+    GamificationRepository,
+    gamificationRepository,
+} from './GamificationRepository';

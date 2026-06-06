@@ -178,13 +178,84 @@ export const SCORING = {
     SKIP_PENALTY: -10,
 };
 
-export const ACHIEVEMENTS = {
-    FIRST_PERFECT: { id: 'first-perfect', threshold: 1, icon: '🌟' },
-    SPEED_DEMON: { id: 'speed-demon', threshold: 5, icon: '⚡' },
-    STREAK_MASTER: { id: 'streak-master', threshold: 10, icon: '🔥' },
-    MARATHON: { id: 'marathon', threshold: 50, icon: '🏃' },
-    SCHOLAR: { id: 'scholar', threshold: 100, icon: '🎓' },
-};
+export const PRESET_ACHIEVEMENTS = {
+    FIRST_STUDY: {
+        id: 'first-study',
+        metric: 'total_sessions' as const,
+        threshold: 1,
+        icon: '🎯',
+        i18nKey: 'firstStudy',
+    },
+    PERFECT_SCORE: {
+        id: 'perfect-score',
+        metric: 'perfect_session' as const,
+        threshold: 1,
+        icon: '🌟',
+        i18nKey: 'perfectScore',
+    },
+    STREAK_3: {
+        id: 'streak-3',
+        metric: 'daily_streak' as const,
+        threshold: 3,
+        icon: '🔥',
+        i18nKey: 'streak3',
+    },
+    STREAK_7: {
+        id: 'streak-7',
+        metric: 'daily_streak' as const,
+        threshold: 7,
+        icon: '🔥',
+        i18nKey: 'streak7',
+    },
+    STREAK_30: {
+        id: 'streak-30',
+        metric: 'daily_streak' as const,
+        threshold: 30,
+        icon: '💎',
+        i18nKey: 'streak30',
+    },
+    SESSION_STREAK_10: {
+        id: 'session-streak-10',
+        metric: 'session_streak' as const,
+        threshold: 10,
+        icon: '⚡',
+        i18nKey: 'sessionStreak10',
+    },
+    SESSIONS_10: {
+        id: 'sessions-10',
+        metric: 'total_sessions' as const,
+        threshold: 10,
+        icon: '📚',
+        i18nKey: 'sessions10',
+    },
+    SESSIONS_50: {
+        id: 'sessions-50',
+        metric: 'total_sessions' as const,
+        threshold: 50,
+        icon: '🏃',
+        i18nKey: 'sessions50',
+    },
+    CARDS_100: {
+        id: 'cards-100',
+        metric: 'total_cards' as const,
+        threshold: 100,
+        icon: '🎓',
+        i18nKey: 'cards100',
+    },
+    CARDS_500: {
+        id: 'cards-500',
+        metric: 'total_cards' as const,
+        threshold: 500,
+        icon: '🏆',
+        i18nKey: 'cards500',
+    },
+} as const;
+
+/** @deprecated Use PRESET_ACHIEVEMENTS */
+export const ACHIEVEMENTS = PRESET_ACHIEVEMENTS;
+
+export const GAMIFICATION_STORAGE_KEY = 'gamification-storage';
+export const GAMIFICATION_DB_ID = 'default';
 
 export const SM2_INTERVALS = {
     AGAIN: 0,

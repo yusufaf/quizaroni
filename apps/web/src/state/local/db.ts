@@ -4,6 +4,8 @@ import type {
     User,
     StudySessionResult,
     CardProgress,
+    CustomAchievement,
+    GamificationState,
 } from 'shared/types';
 
 // Local-first versions of types with sync metadata
@@ -30,12 +32,23 @@ export interface LocalCardProgress extends CardProgress {
     studysetUUID: string;
 }
 
+export interface LocalGamificationRecord extends GamificationState {
+    id: string;
+    _lastModified: number;
+}
+
+export interface LocalCustomAchievement extends CustomAchievement {
+    _lastModified: number;
+}
+
 // Database tables interface
 interface QuizaroniDatabase extends Dexie {
     studysets: EntityTable<LocalStudyset, 'studysetUUID'>;
     users: EntityTable<LocalUser, 'userUUID'>;
     sessions: EntityTable<LocalStudySession, 'sessionUUID'>;
     cardProgress: EntityTable<LocalCardProgress, 'cardUUID'>;
+    gamification: EntityTable<LocalGamificationRecord, 'id'>;
+    customAchievements: EntityTable<LocalCustomAchievement, 'id'>;
     syncQueue: EntityTable<
         {
             id: number;
@@ -51,7 +64,7 @@ interface QuizaroniDatabase extends Dexie {
 }
 
 const DB_NAME = 'quizaroni_v1';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 let dbInstance: QuizaroniDatabase | null = null;
 
@@ -62,18 +75,25 @@ export function getDatabase(): QuizaroniDatabase {
 
     const db = new Dexie(DB_NAME) as QuizaroniDatabase;
 
-    db.version(DB_VERSION).stores({
-        // Primary entities - indexed for common queries
+    db.version(2).stores({
         studysets:
             'studysetUUID, userUUID, _syncStatus, _lastModified, labels, lastViewed',
         users: 'userUUID, _syncStatus, _lastModified',
-
-        // Study session data - analytics/progress
         sessions: 'sessionUUID, studysetUUID, completedAt, _syncStatus',
         cardProgress:
             'cardUUID, studysetUUID, nextReview, _syncStatus, [studysetUUID+nextReview]',
+        syncQueue: '++id, entityType, entityId, createdAt',
+    });
 
-        // Sync queue for offline operations
+    db.version(DB_VERSION).stores({
+        studysets:
+            'studysetUUID, userUUID, _syncStatus, _lastModified, labels, lastViewed',
+        users: 'userUUID, _syncStatus, _lastModified',
+        sessions: 'sessionUUID, studysetUUID, completedAt, _syncStatus',
+        cardProgress:
+            'cardUUID, studysetUUID, nextReview, _syncStatus, [studysetUUID+nextReview]',
+        gamification: 'id',
+        customAchievements: 'id, unlockedAt',
         syncQueue: '++id, entityType, entityId, createdAt',
     });
 
@@ -94,14 +114,25 @@ export async function exportAllData(): Promise<{
     users: LocalUser[];
     sessions: LocalStudySession[];
     cardProgress: LocalCardProgress[];
+    gamification: LocalGamificationRecord[];
+    customAchievements: LocalCustomAchievement[];
 }> {
     const db = getDatabase();
 
-    const [studysets, users, sessions, cardProgress] = await Promise.all([
+    const [
+        studysets,
+        users,
+        sessions,
+        cardProgress,
+        gamification,
+        customAchievements,
+    ] = await Promise.all([
         db.studysets.toArray(),
         db.users.toArray(),
         db.sessions.toArray(),
         db.cardProgress.toArray(),
+        db.gamification.toArray(),
+        db.customAchievements.toArray(),
     ]);
 
     return {
@@ -109,6 +140,8 @@ export async function exportAllData(): Promise<{
         users,
         sessions,
         cardProgress,
+        gamification,
+        customAchievements,
     };
 }
 
@@ -118,12 +151,21 @@ export async function importAllData(data: {
     users?: LocalUser[];
     sessions?: LocalStudySession[];
     cardProgress?: LocalCardProgress[];
+    gamification?: LocalGamificationRecord[];
+    customAchievements?: LocalCustomAchievement[];
 }): Promise<void> {
     const db = getDatabase();
 
     await db.transaction(
         'rw',
-        [db.studysets, db.users, db.sessions, db.cardProgress],
+        [
+            db.studysets,
+            db.users,
+            db.sessions,
+            db.cardProgress,
+            db.gamification,
+            db.customAchievements,
+        ],
         async () => {
             if (data.studysets?.length) {
                 await db.studysets.bulkPut(data.studysets);
@@ -136,6 +178,12 @@ export async function importAllData(data: {
             }
             if (data.cardProgress?.length) {
                 await db.cardProgress.bulkPut(data.cardProgress);
+            }
+            if (data.gamification?.length) {
+                await db.gamification.bulkPut(data.gamification);
+            }
+            if (data.customAchievements?.length) {
+                await db.customAchievements.bulkPut(data.customAchievements);
             }
         }
     );

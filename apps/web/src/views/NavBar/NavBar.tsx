@@ -31,6 +31,8 @@ import DarkModeToggleButton from './DarkModeToggleButton';
 import { useCreateStudyset } from 'state/api/studysetsAPI';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { useGlobalStore } from 'state/stores/global';
+import StreakBadge from 'shared/components/StreakBadge/StreakBadge';
+import { QUERY_PARAMS } from 'shared/constants';
 
 type Props = {};
 
@@ -123,6 +125,15 @@ const NavBar = (props: Props) => {
                         </NavLinksContainer>
                         <NavRightActions>
                             <SyncStatusIndicator />
+                            {authenticated && (
+                                <StreakBadge
+                                    onClick={() =>
+                                        navigate(
+                                            `/profile?${QUERY_PARAMS.PROFILE_TAB}=Achievements`
+                                        )
+                                    }
+                                />
+                            )}
                             {authenticated ? (
                                 <Tooltip title={t('nav.logout')}>
                                     <LogoutIconButton

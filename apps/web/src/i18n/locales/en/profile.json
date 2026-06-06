@@ -67,5 +67,76 @@
         "averageAccuracy": "Average Accuracy",
         "currentStreak": "Current Streak",
         "longestStreak": "Longest Streak"
+    },
+    "achievements": {
+        "streakTitle": "Study Streak",
+        "currentStreak": "Current Streak",
+        "longestStreak": "Longest Streak",
+        "streakTooltip": "{{count}} day study streak",
+        "streakTooltip_plural": "{{count}} day study streak",
+        "presetTitle": "Preset Achievements",
+        "customTitle": "Custom Goals",
+        "createCustom": "Create Goal",
+        "noCustom": "No custom goals yet. Create one to track a personal milestone!",
+        "unlocked": "Unlocked",
+        "deleteCustom": "Delete custom goal",
+        "customProgress": "Target: {{target}}",
+        "form": {
+            "title": "Goal Title",
+            "description": "Description",
+            "icon": "Icon (emoji)",
+            "metric": "Track",
+            "threshold": "Target",
+            "cancel": "Cancel",
+            "save": "Save Goal"
+        },
+        "metrics": {
+            "total_sessions": "Study sessions completed",
+            "total_cards": "Cards studied",
+            "daily_streak": "Daily study streak",
+            "studyset_sessions": "Sessions on a study set"
+        },
+        "presets": {
+            "firstStudy": {
+                "title": "First Steps",
+                "description": "Complete your first study session"
+            },
+            "perfectScore": {
+                "title": "Perfect Score",
+                "description": "Get 100% accuracy in a session"
+            },
+            "streak3": {
+                "title": "On a Roll",
+                "description": "Study 3 days in a row"
+            },
+            "streak7": {
+                "title": "Week Warrior",
+                "description": "Study 7 days in a row"
+            },
+            "streak30": {
+                "title": "Monthly Master",
+                "description": "Study 30 days in a row"
+            },
+            "sessionStreak10": {
+                "title": "Hot Streak",
+                "description": "Answer 10 cards correctly in a row"
+            },
+            "sessions10": {
+                "title": "Dedicated Learner",
+                "description": "Complete 10 study sessions"
+            },
+            "sessions50": {
+                "title": "Study Marathon",
+                "description": "Complete 50 study sessions"
+            },
+            "cards100": {
+                "title": "Century Scholar",
+                "description": "Study 100 cards total"
+            },
+            "cards500": {
+                "title": "Knowledge Champion",
+                "description": "Study 500 cards total"
+            }
+        }
     }
 }
