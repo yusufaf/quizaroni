@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/yusufaf/quizaroni/compare/api-v0.2.0...api-v0.2.1) (2026-06-13)
+
+
+### Bug Fixes
+
+* **api:** load dotenv before stack import so CORS origins survive deploy ([11824d0](https://github.com/yusufaf/quizaroni/commit/11824d028de8558f2906ae39b60600a4a183a91a))
+* **deps:** resolve Dependabot alerts (esbuild, pnpm, uuid) ([#11](https://github.com/yusufaf/quizaroni/issues/11)) ([f16aa28](https://github.com/yusufaf/quizaroni/commit/f16aa285fc4f4574423a79fca4e749d76e3f1aec))
+
 ## [0.2.0](https://github.com/yusufaf/quizaroni/compare/api-v0.1.0...api-v0.2.0) (2026-06-07)
 
 
