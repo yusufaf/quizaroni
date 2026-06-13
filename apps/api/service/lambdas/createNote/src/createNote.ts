@@ -9,7 +9,7 @@ import {
     GetCommand,
     UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 import { AuthorizerContext } from "models/auth";
 import { Studyset } from "models/studysets";
 
@@ -58,7 +58,7 @@ export const handler: Handler = async (
 
         const { cards } = studyset;
 
-        const noteUUID = uuidv4();
+        const noteUUID = randomUUID();
 
         const newNote = {
             noteUUID,

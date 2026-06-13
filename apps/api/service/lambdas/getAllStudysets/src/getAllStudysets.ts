@@ -6,7 +6,6 @@ import {
 import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand, QueryCommand  } from "@aws-sdk/lib-dynamodb";
 import { S3Client } from "@aws-sdk/client-s3";
-import { v4 as uuidv4 } from "uuid";
 import { AuthorizerContext } from "models/auth";
 import { Studyset } from "models/studysets";
 import { regenerateSignedUrlsForStudysets } from "utilities/studysets";
