@@ -21,7 +21,10 @@ export const getYesterdayKey = (date: Date = new Date()): string => {
 export const updateDailyStreak = (
     state: GamificationState,
     today: Date = new Date()
-): Pick<GamificationState, 'currentStreak' | 'longestStreak' | 'lastStudyDate'> => {
+): Pick<
+    GamificationState,
+    'currentStreak' | 'longestStreak' | 'lastStudyDate'
+> => {
     const todayKey = getDateKey(today);
 
     if (state.lastStudyDate === todayKey) {
@@ -57,8 +60,7 @@ const getMetricValue = (
 ): number => {
     const { gamification, statistics, session } = context;
     const projectedSessions = statistics.totalSessions + 1;
-    const projectedCards =
-        statistics.totalCardsStudied + session.totalCards;
+    const projectedCards = statistics.totalCardsStudied + session.totalCards;
 
     switch (metric) {
         case 'daily_streak':
@@ -153,7 +155,7 @@ export const mergeGamificationState = (
 ): GamificationState => {
     const longestStreak = Math.max(local.longestStreak, remote.longestStreak);
 
-    const streak = mergeStreakFields(local, remote, longestStreak);
+    const streak = mergeStreakFields(local, remote);
 
     const unlockedAchievementIds = [
         ...new Set([
@@ -162,7 +164,10 @@ export const mergeGamificationState = (
         ]),
     ];
 
-    const unlockedAtById = { ...remote.unlockedAtById, ...local.unlockedAtById };
+    const unlockedAtById = {
+        ...remote.unlockedAtById,
+        ...local.unlockedAtById,
+    };
     for (const id of unlockedAchievementIds) {
         const localAt = local.unlockedAtById[id];
         const remoteAt = remote.unlockedAtById[id];
@@ -198,8 +203,7 @@ export const mergeGamificationState = (
 
 const mergeStreakFields = (
     local: GamificationState,
-    remote: GamificationState,
-    longestStreak: number
+    remote: GamificationState
 ): Pick<GamificationState, 'currentStreak' | 'lastStudyDate'> => {
     if (!local.lastStudyDate && !remote.lastStudyDate) {
         return { currentStreak: 0, lastStudyDate: null };
@@ -254,7 +258,7 @@ export const mergeCustomAchievements = (
                 ? existing.unlockedAt < achievement.unlockedAt
                     ? existing.unlockedAt
                     : achievement.unlockedAt
-                : existing.unlockedAt ?? achievement.unlockedAt;
+                : (existing.unlockedAt ?? achievement.unlockedAt);
 
         byId.set(achievement.id, {
             ...existing,
