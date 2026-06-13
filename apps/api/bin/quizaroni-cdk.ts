@@ -1,10 +1,12 @@
 #!/usr/bin/env node
+// Load .env BEFORE importing the stack: constants/index.ts reads
+// process.env.ALLOWED_ORIGINS at module-eval time, and ES imports are
+// evaluated before any statement runs. A plain dotenv.config() call below
+// the stack import would fire too late, dropping CORS origins on deploy.
+import "dotenv/config";
 import "source-map-support/register";
-import * as dotenv from "dotenv";
 import { App } from "aws-cdk-lib";
 import { QuizaroniStack } from '../service/quizaroni-stack';
-
-dotenv.config();
 
 const app = new App();
 
