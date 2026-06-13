@@ -10,7 +10,6 @@ import {
     PutCommand,
     QueryCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { v4 as uuidv4 } from 'uuid';
 import { AuthorizerContext } from 'models/auth';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import {

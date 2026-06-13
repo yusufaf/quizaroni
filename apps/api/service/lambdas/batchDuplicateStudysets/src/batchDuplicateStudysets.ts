@@ -9,7 +9,7 @@ import {
     GetCommand,
     PutCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { AuthorizerContext } from 'models/auth';
 import { removeKeys } from 'resources/dynamo/utilities';
 import { Studyset } from 'models/studysets';
@@ -87,7 +87,7 @@ const duplicateIndividualStudyset = async ({
 
     const studyset = Item as Studyset;
 
-    const newStudysetUUID = uuidv4();
+    const newStudysetUUID = randomUUID();
     const timestamp = new Date().toISOString();
 
     const duplicatedStudyset = structuredClone(studyset);
@@ -98,10 +98,10 @@ const duplicateIndividualStudyset = async ({
     duplicatedStudyset.lastViewed = timestamp;
     duplicatedStudyset.studysetUUID = newStudysetUUID;
     duplicatedStudyset.cards = duplicatedStudyset.cards.map((card) => {
-        const newCardUUID = uuidv4();
+        const newCardUUID = randomUUID();
         const newNotes = card.notes.map((note) => ({
             ...note,
-            noteUUID: uuidv4(),
+            noteUUID: randomUUID(),
         }));
 
         return {

@@ -5,7 +5,7 @@ import {
 } from "aws-lambda";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 import { AuthorizerContext } from "models/auth";
 import { removeKeys } from "resources/dynamo/utilities";
 
@@ -28,7 +28,7 @@ export const handler: Handler = async (
     // const body: RequestBody = JSON.parse(event.body ?? "{}");
 
     try {
-        const studysetUUID = uuidv4();
+        const studysetUUID = randomUUID();
         const timestamp = new Date().toISOString();
         const initialMetadata = {
             backgroundColorVisible: false,

@@ -10,7 +10,6 @@ import {
     UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
-import { v4 as uuidv4 } from 'uuid';
 import { AuthorizerContext } from 'models/auth';
 import { removeKeys } from 'resources/dynamo/utilities';
 
