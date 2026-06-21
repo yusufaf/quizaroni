@@ -8,7 +8,6 @@ export { default as GlobalConfirmDialog } from './GlobalConfirmDialog/GlobalConf
 export { default as LoadingIndicator } from './LoadingIndicator/LoadingIndicator';
 export { default as ManageLabelsDialog } from './ManageLabelsDialog/ManageLabelsDialog';
 export { default as NamedColorsDialog } from './NamedColorsDialog/NamedColorsDialog';
-export { default as NoCardsWarningsIcon } from './NoCardsWarningsIcon/NoCardsWarningsIcon';
 export { default as PasswordToggle } from './PasswordToggle/PasswordToggle';
 export { default as PasswordValidator } from './PasswordValidator/PasswordValidator';
 export { default as ScrollToTopFab } from './ScrollToTopFab/ScrollToTopFab';

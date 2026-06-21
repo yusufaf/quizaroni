@@ -30,7 +30,6 @@ import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
 import { Card, Studyset } from 'shared/types';
 import { SimpleFlexContainer, SpacedFlexContainer } from 'styles/AppStyles';
 import { Button, SelectChangeEvent, Tooltip, Typography } from '@mui/material';
-import NoCardsWarningsIcon from 'components/NoCardsWarningsIcon/NoCardsWarningsIcon';
 import { useGlobalStore } from 'state/stores/global';
 import { useCreateSetStore } from 'state/stores/createSet';
 import {
@@ -204,7 +203,9 @@ const CreateSet = (props: Props) => {
      */
     const updateCardValue = (index: number, property: string, value: any) => {
         const newCreatedSetCards = [...createdSetCards];
-        const newCard = { ...newCreatedSetCards[index] };
+        const existingCard = newCreatedSetCards[index];
+        if (!existingCard) return;
+        const newCard = { ...existingCard };
         newCard[property] = value;
         newCreatedSetCards[index] = newCard;
         setCreatedSetCards(newCreatedSetCards);
@@ -343,7 +344,6 @@ const CreateSet = (props: Props) => {
                                 count: createdSetCards.length ?? 0,
                             })}
                         </Typography>
-                        {!createdSetCards.length && <NoCardsWarningsIcon />}
                     </SimpleFlexContainer>
                     <SetModificationButtons
                         studysetCards={createdSetCards}

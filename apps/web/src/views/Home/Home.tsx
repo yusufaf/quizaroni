@@ -17,7 +17,6 @@ import {
     GridToolbarFilterButton,
 } from '@mui/x-data-grid';
 import { GhostLink, SimpleFlexContainer } from 'styles/AppStyles';
-import NoCardsWarningsIcon from 'components/NoCardsWarningsIcon/NoCardsWarningsIcon';
 import useBrowserTitle from 'hooks/useBrowserTitle';
 import useFilterStudysets from 'hooks/useFilterStudysets';
 import useSortStudysets from 'hooks/useSortStudysets';
@@ -255,9 +254,6 @@ const Home = (props: Props) => {
                 renderCell: (params: GridRenderCellParams<any, any>) => (
                     <SimpleFlexContainer style={{ gap: '0.5rem' }}>
                         <span>{params.row?.cards?.length}</span>
-                        {params.row?.cards?.length === 0 && (
-                            <NoCardsWarningsIcon />
-                        )}
                     </SimpleFlexContainer>
                 ),
             },
@@ -276,7 +272,10 @@ const Home = (props: Props) => {
                                     height: '100%',
                                 }}
                             >
-                                <Typography variant="body2" color="text.secondary">
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                >
                                     {t('home.noLabels')}
                                 </Typography>
                             </Box>
