@@ -22,6 +22,7 @@ import StudyResults from './shared/StudyResults';
 import SettingsDialog from './shared/SettingsDialog';
 import { BasePage } from 'styles/AppStyles';
 import { useTranslation } from 'react-i18next';
+import { useShortcuts } from 'shared/keyboard/useShortcuts';
 
 type Props = {
     studysetId: string;
@@ -214,6 +215,19 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
             handleSubmit();
         }
     };
+
+    useShortcuts([
+        {
+            id: 'typewrite.next',
+            keys: ['Enter'],
+            scope: 'study:typewrite',
+            descriptionKey: 'shortcuts.actions.confirm',
+            handler: () => handleNext(),
+            // Only after feedback is shown. While typing, focus is in the input
+            // so the global listener ignores Enter and handleKeyPress submits.
+            when: () => showFeedback,
+        },
+    ]);
 
     const handleUseHint = () => {
         setHintsUsed((prev) => prev + 1);

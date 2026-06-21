@@ -21,6 +21,7 @@ import StudyHeader from './shared/StudyHeader';
 import StudyResults from './shared/StudyResults';
 import SettingsDialog from './shared/SettingsDialog';
 import { BasePage } from 'styles/AppStyles';
+import { useShortcuts } from 'shared/keyboard/useShortcuts';
 
 type Props = {
     studysetId: string;
@@ -219,6 +220,30 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
             updateCurrentCard(activeSession.currentCardIndex + 1);
         }
     };
+
+    useShortcuts([
+        {
+            id: 'mc.select',
+            keys: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
+            scope: 'study:mc',
+            descriptionKey: 'shortcuts.actions.selectOption',
+            handler: (e) => {
+                const idx = Number(e.key) - 1;
+                if (idx >= 0 && idx < quizOptions.length) {
+                    setSelectedOption(idx);
+                }
+            },
+            when: () => !showFeedback,
+        },
+        {
+            id: 'mc.submit',
+            keys: ['Enter'],
+            scope: 'study:mc',
+            descriptionKey: 'shortcuts.actions.submit',
+            handler: () => handleSubmit(),
+            when: () => !showFeedback && selectedOption !== null,
+        },
+    ]);
 
     const handleAudioToggle = () => {
         if (!activeSession) return;

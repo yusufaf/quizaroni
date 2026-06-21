@@ -553,5 +553,37 @@
         "daysAgo_plural": "Hace {{count}} días",
         "syncNow": "Sincronizar ahora",
         "willSyncWhenOnline": "Se sincronizará cuando haya conexión"
+    },
+    "shortcuts": {
+        "title": "Atajos de teclado",
+        "close": "Cerrar",
+        "scopes": {
+            "global": "General",
+            "nav": "Navegación",
+            "study:flashcards": "Tarjetas",
+            "study:mc": "Opción múltiple",
+            "study:typewrite": "Escribe la respuesta",
+            "study:matching": "Emparejar"
+        },
+        "actions": {
+            "help": "Mostrar esta ayuda",
+            "escape": "Cerrar diálogo / ayuda",
+            "create": "Crear un conjunto nuevo",
+            "search": "Enfocar búsqueda",
+            "goHome": "Ir al inicio",
+            "goExplore": "Ir a explorar",
+            "flip": "Voltear tarjeta",
+            "gradeAgain": "Calificar: Otra vez",
+            "gradeHard": "Calificar: Difícil",
+            "gradeGood": "Calificar: Bien",
+            "gradeEasy": "Calificar: Fácil",
+            "prev": "Tarjeta anterior",
+            "next": "Tarjeta siguiente",
+            "selectOption": "Seleccionar opción 1-9",
+            "selectTile": "Seleccionar ficha 1-9",
+            "moveHighlight": "Mover resaltado",
+            "confirm": "Confirmar / siguiente",
+            "submit": "Enviar respuesta"
+        }
     }
 }

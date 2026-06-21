@@ -553,5 +553,37 @@
         "daysAgo_plural": "{{count}} days ago",
         "syncNow": "Sync now",
         "willSyncWhenOnline": "Will sync when connection returns"
+    },
+    "shortcuts": {
+        "title": "Keyboard shortcuts",
+        "close": "Close",
+        "scopes": {
+            "global": "General",
+            "nav": "Navigation",
+            "study:flashcards": "Flashcards",
+            "study:mc": "Multiple choice",
+            "study:typewrite": "Type the answer",
+            "study:matching": "Matching"
+        },
+        "actions": {
+            "help": "Show this help",
+            "escape": "Close dialog / help",
+            "create": "Create a new set",
+            "search": "Focus search",
+            "goHome": "Go to home",
+            "goExplore": "Go to explore",
+            "flip": "Flip card",
+            "gradeAgain": "Grade: Again",
+            "gradeHard": "Grade: Hard",
+            "gradeGood": "Grade: Good",
+            "gradeEasy": "Grade: Easy",
+            "prev": "Previous card",
+            "next": "Next card",
+            "selectOption": "Select option 1-9",
+            "selectTile": "Select tile 1-9",
+            "moveHighlight": "Move highlight",
+            "confirm": "Confirm / next",
+            "submit": "Submit answer"
+        }
     }
 }

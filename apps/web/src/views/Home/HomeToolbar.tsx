@@ -152,6 +152,7 @@ const HomeToolbar = ({
         <TextField
             placeholder={t('home.toolbar.searchPlaceholder')}
             fullWidth={isSmallScreen}
+            inputProps={{ 'data-shortcut-search': 'true' }}
             InputProps={{
                 startAdornment: (
                     <InputAdornment position="start">
@@ -276,7 +277,9 @@ const HomeToolbar = ({
                 </SimpleFlexContainer>
             )}
             {isTableView && selectedStudysetRows.length > 0 && (
-                <SimpleFlexContainer style={{ gap: '1rem', marginLeft: '2.5rem' }}>
+                <SimpleFlexContainer
+                    style={{ gap: '1rem', marginLeft: '2.5rem' }}
+                >
                     {!(selectedStudysetRows.length > 1) && (
                         <>
                             <Button
