@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.4.0](https://github.com/yusufaf/quizaroni/compare/web-v0.3.0...web-v0.4.0) (2026-06-21)
+
+
+### Features
+
+* **a11y:** flashcards study shortcuts ([adc8251](https://github.com/yusufaf/quizaroni/commit/adc8251bab3f1d131143b458697c884b302fbc95))
+* **a11y:** global key listener and dispatch ([6233d3c](https://github.com/yusufaf/quizaroni/commit/6233d3c5b287be1ec11500af0f393c261c2ffcf9))
+* **a11y:** keyboard shortcuts and help modal ([#5](https://github.com/yusufaf/quizaroni/issues/5)) ([2db6f87](https://github.com/yusufaf/quizaroni/commit/2db6f87cadb953ba9287805ddb50a2574138ad63))
+* **a11y:** matching study shortcuts ([9cd5d59](https://github.com/yusufaf/quizaroni/commit/9cd5d59999879c303d1a7944d29470da99bac4a2))
+* **a11y:** mount shortcut layer in app ([74f824e](https://github.com/yusufaf/quizaroni/commit/74f824e84220df9eecf82b66ab22f727ec54cd71))
+* **a11y:** multiple choice study shortcuts ([7eb75a0](https://github.com/yusufaf/quizaroni/commit/7eb75a0e8f6d22f92bdc88a959fff3f1c4918df5))
+* **a11y:** nav shortcuts and search tag ([2c1a256](https://github.com/yusufaf/quizaroni/commit/2c1a256ef8a959f71d565fb3204402562481a6b9))
+* **a11y:** shortcut help modal and strings ([8d88353](https://github.com/yusufaf/quizaroni/commit/8d8835331fd0452d4eb9df7cdd44fd143e4eaca4))
+* **a11y:** shortcut registry provider ([463846b](https://github.com/yusufaf/quizaroni/commit/463846bc39f46059ea411e6b3d3241b0e07ffcaf))
+* **a11y:** shortcut types and input guards ([d08218f](https://github.com/yusufaf/quizaroni/commit/d08218f93941266329eaa88ca87fdd1996046875))
+* **a11y:** type-write study shortcuts ([e2099e4](https://github.com/yusufaf/quizaroni/commit/e2099e46e8add2ea83b9a8417ff92ac271bc0719))
+* **a11y:** useShortcuts registration hook ([b67bf10](https://github.com/yusufaf/quizaroni/commit/b67bf101aead85ebea348d0f494dd45c62be8045))
+* **study:** add back-to-set button on caught-up screen ([1b5f811](https://github.com/yusufaf/quizaroni/commit/1b5f811595a40327e45f5575f8f625690d463965))
+
+
+### Bug Fixes
+
+* **deps:** patch dompurify, js-yaml, vite-plus alerts ([5aa323a](https://github.com/yusufaf/quizaroni/commit/5aa323a70fc61ffb490c9c0044953a65ab328088))
+* **deps:** resolve 7 Dependabot alerts ([5083d22](https://github.com/yusufaf/quizaroni/commit/5083d228c14ee8507dc0f24d5634cd59ea3930e9))
+* **i18n:** use _one/_other plural keys for categoriesAssigned ([2dedf58](https://github.com/yusufaf/quizaroni/commit/2dedf583f034ff9eac6330b4bc56c559c826a017))
+* **web:** no-cards removal, pnpm scripts, download refactor + a11y docs ([49bc8fd](https://github.com/yusufaf/quizaroni/commit/49bc8fdaca49cd47dabf55a212d3e59fb8398977))
+* **web:** remove no-cards warning icon ([b301e5e](https://github.com/yusufaf/quizaroni/commit/b301e5e62e2e999acf0c2c8cc4c339d131145ec3))
+
 ## [0.3.0](https://github.com/yusufaf/quizaroni/compare/web-v0.2.0...web-v0.3.0) (2026-06-07)
 
 
