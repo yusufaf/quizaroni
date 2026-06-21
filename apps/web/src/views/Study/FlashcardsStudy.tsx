@@ -32,6 +32,7 @@ import SettingsDialog from './shared/SettingsDialog';
 import { BasePage } from 'styles/AppStyles';
 import ImageGallery from 'components/ImageGallery/ImageGallery';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { cardProgressRepository } from 'state/local/repositories';
 import {
     newProgress,
@@ -48,6 +49,7 @@ type Props = {
 
 const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
     const { t } = useTranslation('study');
+    const navigate = useNavigate();
     const { data: studysetResponse, isLoading } = useGetStudyset({
         studysetUUID: studysetId,
     });
@@ -179,6 +181,13 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
                 <Typography variant="body1" color="text.secondary">
                     {t('review.caughtUpSubtitle')}
                 </Typography>
+                <Button
+                    variant="contained"
+                    onClick={() => navigate(`/view/${studysetId}`)}
+                    sx={{ mt: 2 }}
+                >
+                    {t('results.backToSet')}
+                </Button>
             </BasePage>
         );
     }
