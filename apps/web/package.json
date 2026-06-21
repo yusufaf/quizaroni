@@ -5,8 +5,8 @@
     "type": "module",
     "scripts": {
         "vite": "vp dev",
-        "dev": "npm run vite",
-        "start": "npm run vite",
+        "dev": "pnpm vite",
+        "start": "pnpm vite",
         "build": "vp build",
         "gen:icons": "node scripts/gen-icons.mjs",
         "preview": "vp preview",

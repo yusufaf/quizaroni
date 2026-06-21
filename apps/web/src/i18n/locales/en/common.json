@@ -341,8 +341,8 @@
         "importCount": "Import ({{count}})",
         "termDefinitionFormat": "Term: {{term}} | Definition: {{definition}}",
         "noCategoriesAssigned": "No categories assigned to this card",
-        "categoriesAssigned": "{{count}} category assigned",
-        "categoriesAssigned_plural": "{{count}} categories assigned"
+        "categoriesAssigned_one": "{{count}} category assigned",
+        "categoriesAssigned_other": "{{count}} categories assigned"
     },
     "studysetSettings": {
         "title": "Studyset Settings",

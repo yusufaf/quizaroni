@@ -7,15 +7,14 @@ import {
     DialogContentText,
     FormControl,
     FormControlLabel,
-    MenuItem,
     Select,
+    TextField,
 } from '@mui/material/';
 import { Card, Studyset } from 'shared/types';
 import { useState } from 'react';
 import {
     DOWNLOAD_FILE_TYPES,
     MIME_TYPES,
-    DOWNLOAD_FILE_TITLES,
     DEFAULT_CSV_HEADERS,
     METADATA_CSV_HEADERS,
     DEFAULT_USER_RESPONSE,
@@ -24,20 +23,7 @@ import { DownloadDialogContent } from '../styles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import { useGetUser } from 'state/api/usersAPI';
 import { useTranslation } from 'react-i18next';
-
-export const downloadTypeItems = Object.values(DOWNLOAD_FILE_TYPES).map(
-    (value, index) => {
-        return (
-            <MenuItem
-                key={index}
-                value={value}
-                title={DOWNLOAD_FILE_TITLES[value]}
-            >
-                {value}
-            </MenuItem>
-        );
-    }
-);
+import { downloadTypeItems } from 'shared/components/downloadTypeItems';
 
 type DownloadFileParams = {
     data: any;
@@ -66,6 +52,9 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
     );
     const [includeMetadata, setIncludeMetadata] = useState<boolean>(false);
     const [includeNotes, setIncludeNotes] = useState<boolean>(false);
+    const [customFileName, setCustomFileName] = useState<string>(
+        `${studyset.title}_Studyset`
+    );
 
     const downloadFile = ({ data, fileName, fileType }: DownloadFileParams) => {
         const blob = new Blob([data], { type: MIME_TYPES[fileType] });
@@ -77,9 +66,10 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
     };
 
     const handleDownloadSet = () => {
-        const { description, label, title, cards } = studyset;
+        const { description, labels, title, cards } = studyset;
+        const label = labels?.join(', ') ?? '';
         const fileExtension = downloadFileType.toLowerCase();
-        const fileName = `${title}_Studyset.${fileExtension}`;
+        const fileName = `${customFileName || title + '_Studyset'}.${fileExtension}`;
         const downloadTimestamp = new Date().toLocaleString().replace(',', '');
 
         let blobData: any = null;
@@ -271,6 +261,15 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
                         {downloadTypeItems}
                     </Select>
                 </FormControl>
+                <TextField
+                    label={t('dialogs.download.fileName', {
+                        defaultValue: 'File Name',
+                    })}
+                    value={customFileName}
+                    onChange={(e) => setCustomFileName(e.target.value)}
+                    fullWidth
+                    margin="normal"
+                />
                 <FormControlLabel
                     label={t('dialogs.download.includeMetadata')}
                     control={
