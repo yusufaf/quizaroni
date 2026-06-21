@@ -18,6 +18,7 @@ import StudyHeader from './shared/StudyHeader';
 import StudyResults from './shared/StudyResults';
 import SettingsDialog from './shared/SettingsDialog';
 import { BasePage } from 'styles/AppStyles';
+import { useShortcuts } from 'shared/keyboard/useShortcuts';
 
 type Props = {
     studysetId: string;
@@ -55,6 +56,7 @@ const MatchingStudy = ({ studysetId }: Props) => {
     const [showSettings, setShowSettings] = useState(false);
     const [sessionResult, setSessionResult] = useState(null);
     const [incorrectAttempts, setIncorrectAttempts] = useState(0);
+    const [highlightIndex, setHighlightIndex] = useState(0);
 
     // Initialize session
     useEffect(() => {
@@ -200,6 +202,50 @@ const MatchingStudy = ({ studysetId }: Props) => {
         setSessionResult(result);
         setShowResults(true);
     };
+
+    // Combined, linear view of both columns (terms first, then definitions)
+    // so number keys and arrow highlight can address every tile by index.
+    const matchTiles = [...termCards, ...definitionCards];
+
+    useShortcuts([
+        {
+            id: 'matching.select',
+            keys: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
+            scope: 'study:matching',
+            descriptionKey: 'shortcuts.actions.selectTile',
+            handler: (e) => {
+                const tile = matchTiles[Number(e.key) - 1];
+                if (tile) handleCardClick(tile);
+            },
+        },
+        {
+            id: 'matching.move',
+            keys: ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'],
+            scope: 'study:matching',
+            descriptionKey: 'shortcuts.actions.moveHighlight',
+            handler: (e) => {
+                setHighlightIndex((i) => {
+                    if (matchTiles.length === 0) return 0;
+                    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        return (
+                            (i - 1 + matchTiles.length) % matchTiles.length
+                        );
+                    }
+                    return (i + 1) % matchTiles.length;
+                });
+            },
+        },
+        {
+            id: 'matching.confirm',
+            keys: ['Enter'],
+            scope: 'study:matching',
+            descriptionKey: 'shortcuts.actions.confirm',
+            handler: () => {
+                const tile = matchTiles[highlightIndex];
+                if (tile) handleCardClick(tile);
+            },
+        },
+    ]);
 
     const handleAudioToggle = () => {
         if (!activeSession) return;
@@ -367,6 +413,12 @@ const MatchingStudy = ({ studysetId }: Props) => {
                             <Card
                                 onClick={() => handleCardClick(card)}
                                 sx={{
+                                    outline:
+                                        highlightIndex === index
+                                            ? '3px solid'
+                                            : undefined,
+                                    outlineColor: 'secondary.main',
+                                    outlineOffset: '2px',
                                     cursor: card.matched
                                         ? 'default'
                                         : 'pointer',
@@ -459,6 +511,13 @@ const MatchingStudy = ({ studysetId }: Props) => {
                             <Card
                                 onClick={() => handleCardClick(card)}
                                 sx={{
+                                    outline:
+                                        highlightIndex ===
+                                        termCards.length + index
+                                            ? '3px solid'
+                                            : undefined,
+                                    outlineColor: 'secondary.main',
+                                    outlineOffset: '2px',
                                     cursor: card.matched
                                         ? 'default'
                                         : 'pointer',
