@@ -32,7 +32,9 @@
         "overrides": {
             "js-cookie": "^3.0.7",
             "vite": "npm:@voidzero-dev/vite-plus-core@latest",
-            "vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+            "vitest": "npm:@voidzero-dev/vite-plus-test@latest",
+            "dompurify": "^3.4.11",
+            "js-yaml": "^4.2.0"
         }
     }
 }
