@@ -33,6 +33,7 @@ import { BasePage } from 'styles/AppStyles';
 import ImageGallery from 'components/ImageGallery/ImageGallery';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useShortcuts } from 'shared/keyboard/useShortcuts';
 import { cardProgressRepository } from 'state/local/repositories';
 import {
     newProgress,
@@ -322,6 +323,51 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
             setShowRating(true);
         }
     };
+
+    const gradeKeyMap: Record<string, Grade> = {
+        '1': 'again',
+        '2': 'hard',
+        '3': 'good',
+        '4': 'easy',
+    };
+
+    useShortcuts([
+        {
+            id: 'flashcards.flip',
+            keys: [' ', 'Enter'],
+            scope: 'study:flashcards',
+            descriptionKey: 'shortcuts.actions.flip',
+            handler: () => handleFlip(),
+            when: () => !showResults && !hasRated,
+        },
+        {
+            id: 'flashcards.grade',
+            keys: ['1', '2', '3', '4'],
+            scope: 'study:flashcards',
+            descriptionKey: 'shortcuts.actions.gradeGood',
+            handler: (e) => {
+                const grade = gradeKeyMap[e.key];
+                if (grade) handleGrade(grade);
+            },
+            when: () => flipped && !hasRated && !showResults,
+        },
+        {
+            id: 'flashcards.prev',
+            keys: ['ArrowLeft'],
+            scope: 'study:flashcards',
+            descriptionKey: 'shortcuts.actions.prev',
+            handler: () => handlePrevious(),
+            when: () => !showResults,
+        },
+        {
+            id: 'flashcards.next',
+            keys: ['ArrowRight'],
+            scope: 'study:flashcards',
+            descriptionKey: 'shortcuts.actions.next',
+            handler: () => handleNext(),
+            when: () => !showResults,
+        },
+    ]);
 
     const handleAudioToggle = () => {
         if (!activeSession) return;
