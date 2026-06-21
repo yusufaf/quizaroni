@@ -341,8 +341,8 @@
         "importCount": "Importar ({{count}})",
         "termDefinitionFormat": "Término: {{term}} | Definición: {{definition}}",
         "noCategoriesAssigned": "Sin categorías asignadas a esta tarjeta",
-        "categoriesAssigned": "{{count}} categoría asignada",
-        "categoriesAssigned_plural": "{{count}} categorías asignadas"
+        "categoriesAssigned_one": "{{count}} categoría asignada",
+        "categoriesAssigned_other": "{{count}} categorías asignadas"
     },
     "studysetSettings": {
         "title": "Configuración del Set",
