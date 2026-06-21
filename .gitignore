@@ -19,6 +19,10 @@ build/
 apps/api/cdk.out/
 .cdk.staging
 
+# agent / tooling scratch
+.agents/
+.playwright-mcp/
+
 # misc
 .DS_Store
 *.local
