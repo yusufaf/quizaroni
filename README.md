@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./logo.png" width="128" alt="Quizaroni Logo" style="border-radius: 20%" />
+</p>
+
 # Quizaroni
 
 A flashcard / quiz study application. Create study sets, attach notes and
