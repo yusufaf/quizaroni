@@ -57,6 +57,8 @@ import {
     MenuItem,
     Tooltip,
     Typography,
+    useMediaQuery,
+    useTheme,
 } from '@mui/material';
 import { useStudySetsStore } from 'state/stores/studysets';
 
@@ -121,6 +123,9 @@ const Home = (props: Props) => {
     /* Hooks / Redux */
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const theme = useTheme();
+    const isBelowSm = useMediaQuery(theme.breakpoints.down('sm'));
+    const isBelowMd = useMediaQuery(theme.breakpoints.down('md'));
 
     const { selectedStudySet, setSelectedStudySet } = useStudySetsStore();
 
@@ -321,8 +326,48 @@ const Home = (props: Props) => {
         {} as GridColumnVisibilityModel
     );
 
+    // Prioritized column visibility for narrow screens so the important columns
+    // fit without horizontal scrolling. Users can still re-toggle any column via
+    // the grid's Columns button; those choices persist until the next breakpoint
+    // crossing (or reload).
+    const responsiveVisibilityModel = useMemo<GridColumnVisibilityModel>(() => {
+        if (isBelowSm) {
+            return {
+                favorited: false,
+                title: true,
+                description: false,
+                createdAt: false,
+                lastViewed: true,
+                updatedAt: false,
+                numberOfCards: true,
+                labels: false,
+            };
+        }
+        if (isBelowMd) {
+            return {
+                favorited: true,
+                title: true,
+                description: true,
+                createdAt: false,
+                lastViewed: true,
+                updatedAt: false,
+                numberOfCards: true,
+                labels: false,
+            };
+        }
+        return defaultVisibilityModel;
+        // defaultVisibilityModel is derived from the (memoized) columns; the
+        // breakpoint booleans are what actually drive changes here.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isBelowSm, isBelowMd]);
+
     const [columnVisibilityModel, setColumnVisibilityModel] =
-        useState<GridColumnVisibilityModel>(defaultVisibilityModel);
+        useState<GridColumnVisibilityModel>(responsiveVisibilityModel);
+
+    // Re-apply the responsive defaults whenever the screen crosses a breakpoint.
+    useEffect(() => {
+        setColumnVisibilityModel(responsiveVisibilityModel);
+    }, [responsiveVisibilityModel]);
 
     const handleViewChange = (_event: any, newView: string | null) => {
         // Enforces one view always being selected

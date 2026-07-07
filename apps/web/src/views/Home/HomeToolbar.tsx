@@ -227,7 +227,13 @@ const HomeToolbar = ({
     );
 
     return (
-        <SpacedFlexContainer style={{ alignItems: 'baseline' }}>
+        <SpacedFlexContainer
+            style={{
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '0.75rem',
+            }}
+        >
             {isTableView ? (
                 // Table view: show only search field (sort is handled by DataGrid)
                 <SimpleFlexContainer style={{ gap: '1rem' }}>

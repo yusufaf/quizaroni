@@ -6,7 +6,9 @@ import {
   Tooltip,
   Typography,
   Box,
+  useMediaQuery,
 } from "@mui/material/";
+import { useTheme } from "theme/useTheme";
 import { BoldTypography } from "styles/AppStyles";
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "hooks/useBrowserTitle";
@@ -78,6 +80,10 @@ const ViewStudySet = (props: Props) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id: studysetUUID = "" } = useParams();
+  const { muiTheme } = useTheme();
+  // The notes panel only reserves layout space (rather than overlaying) once
+  // the screen is wide enough for the permanent side panel.
+  const isWideScreen = useMediaQuery(muiTheme.breakpoints.up("lg"));
 
   const { setLabelsDialogProps } = useGlobalStore();
   const { selectedDialog, setSelectedDialog } = useViewSetsStore();
@@ -128,15 +134,16 @@ const ViewStudySet = (props: Props) => {
     }
   }, [studysetUUID]);
 
-  // Sync drawer initial state from metadata
+  // Sync drawer initial state from metadata. On narrow screens the drawer is a
+  // temporary overlay, so keep it closed on load instead of covering the page.
   useEffect(() => {
     if (selectedStudyset?.metadata?.notesDrawerInitial) {
       const shouldBeHidden =
         selectedStudyset.metadata.notesDrawerInitial ===
         NOTES_DRAWER_INITIAL_APPEARANCE.CLOSED;
-      setIsNotesDrawerHidden(shouldBeHidden);
+      setIsNotesDrawerHidden(isWideScreen ? shouldBeHidden : true);
     }
-  }, [selectedStudyset?.metadata?.notesDrawerInitial]);
+  }, [selectedStudyset?.metadata?.notesDrawerInitial, isWideScreen]);
 
   // Sync view mode from metadata
   useEffect(() => {
@@ -230,9 +237,11 @@ const ViewStudySet = (props: Props) => {
 
   const notesDrawerPosition =
     selectedStudyset?.metadata?.notesDrawerPosition || "right";
-  const drawerOpenPadding = "27.5rem";
-  const drawerClosedPadding = "4rem";
-  const basePadding = "2rem";
+  // Below `lg` the drawer is a temporary overlay, so it reserves no space and
+  // we fall back to the page's own responsive padding (undefined = inherit).
+  const drawerOpenPadding = { xs: undefined, lg: "27.5rem" };
+  const drawerClosedPadding = { xs: undefined, sm: "3rem", lg: "4rem" };
+  const basePadding = { xs: undefined, lg: "2rem" };
 
   const getPadding = () => {
     if (isNotesDrawerHidden) {

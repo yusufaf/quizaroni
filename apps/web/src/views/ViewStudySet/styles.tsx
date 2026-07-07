@@ -21,12 +21,20 @@ export const ViewStudysetPage = styled(BasePage, {
     shouldForwardProp: (prop) => prop !== 'viewMode',
 })<{
     viewMode?: 'list' | 'grid';
-}>(({ viewMode = 'list' }) => ({
+}>(({ viewMode = 'list', theme }) => ({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
     gap: viewMode === 'grid' ? '1.5rem' : '2rem',
-    padding: '0rem 22rem 2rem 22rem',
+    // Fluid horizontal padding: comfortable on wide screens, tight on small
+    // ones. Overridden by the notes-drawer padding in ViewStudySet.tsx.
+    padding: '0 1rem 2rem 1rem',
+    [theme.breakpoints.up('sm')]: {
+        padding: '0 2rem 2rem 2rem',
+    },
+    [theme.breakpoints.up('lg')]: {
+        padding: '0 clamp(2rem, 8vw, 8rem) 2rem clamp(2rem, 8vw, 8rem)',
+    },
     position: 'relative',
 }));
 
@@ -39,37 +47,64 @@ export const ViewStudysetContainer = styled('div')({
     borderRadius: '0.75rem',
 });
 
-export const ViewStudysetHeader = styled('div')({
+export const ViewStudysetHeader = styled('div')(({ theme }) => ({
     display: 'grid',
-    gridTemplateColumns: '28rem auto',
+    // Stack the info and study-modes sections on narrow screens; place them
+    // side by side once there is room so neither gets squeezed.
+    gridTemplateColumns: '1fr',
     height: '100%',
-    gap: '1rem',
-});
+    gap: '1.5rem',
+    [theme.breakpoints.up('md')]: {
+        gridTemplateColumns: 'minmax(18rem, 26rem) 1fr',
+        gap: '1rem',
+    },
+}));
 
 export const StudysetInfo = styled('div')(({ theme }) => ({
     height: '100%',
-    paddingRight: '1.25rem',
     overflowY: 'auto',
     overflowX: 'hidden',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
     position: 'relative',
+    // Divider sits below the info section when stacked, and to its right
+    // once the layout goes side by side.
+    paddingBottom: '1.25rem',
     '&::after': {
         content: '""',
         position: 'absolute',
-        right: 0,
-        top: '10%',
-        height: '80%',
-        width: '0.125rem',
+        left: 0,
+        bottom: 0,
+        width: '100%',
+        height: '0.125rem',
         background: `linear-gradient(
-            to bottom,
+            to right,
             transparent 0%,
             ${theme.palette.divider} 20%,
             ${theme.palette.divider} 80%,
             transparent 100%
         )`,
         borderRadius: '0.125rem',
+    },
+    [theme.breakpoints.up('md')]: {
+        paddingRight: '1.25rem',
+        paddingBottom: 0,
+        '&::after': {
+            left: 'auto',
+            right: 0,
+            top: '10%',
+            bottom: 'auto',
+            height: '80%',
+            width: '0.125rem',
+            background: `linear-gradient(
+                to bottom,
+                transparent 0%,
+                ${theme.palette.divider} 20%,
+                ${theme.palette.divider} 80%,
+                transparent 100%
+            )`,
+        },
     },
 }));
 
@@ -88,17 +123,25 @@ export const StudysetDescription = styled(Typography)(({ theme }) => ({
     },
 }));
 
-export const StudyModesSection = styled('section')({
-    paddingLeft: '1.25rem',
-});
+export const StudyModesSection = styled('section')(({ theme }) => ({
+    paddingLeft: 0,
+    [theme.breakpoints.up('md')]: {
+        paddingLeft: '1.25rem',
+    },
+}));
 
-export const StudyModeGrid = styled('div')({
+export const StudyModeGrid = styled('div')(({ theme }) => ({
     height: '100%',
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gridTemplateRows: 'repeat(2, auto)',
-    gap: '0.5rem',
-});
+    // Two columns on phones, three from `sm` up. `minmax(0, 1fr)` lets tiles
+    // shrink so labels wrap instead of clipping against the tile edge.
+    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+    gridAutoRows: '1fr',
+    gap: '0.75rem',
+    [theme.breakpoints.up('sm')]: {
+        gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+    },
+}));
 
 export const StudyModePaper = styled(Paper)(({ theme }) => ({
     fontSize: '1rem',
@@ -133,6 +176,13 @@ export const StudyModePaper = styled(Paper)(({ theme }) => ({
 
 export const StudyModeTitle = styled(BoldTypography)({
     fontSize: '0.875rem',
+    width: '100%',
+    textAlign: 'center',
+    lineHeight: 1.2,
+    // Let long labels wrap and break instead of clipping against the tile edge.
+    overflowWrap: 'anywhere',
+    wordBreak: 'break-word',
+    hyphens: 'auto',
 });
 
 export const CategoryTab = styled(Tab)({
@@ -141,12 +191,16 @@ export const CategoryTab = styled(Tab)({
 
 export const CategoryTabs = styled(Tabs)({
     maxWidth: '25rem',
+    minWidth: 0,
 });
 
 export const CardFiltersContainer = styled(SpacedFlexContainer)({
     display: 'flex',
     alignItems: 'center',
-    // justifyContent: "flex-end",
+    // Wrap the filter groups onto a second row rather than overflowing when
+    // there isn't enough horizontal space (e.g. drawer open / small screens).
+    flexWrap: 'wrap',
+    gap: '0.75rem 1rem',
 });
 
 export const SortCardsDropdown = styled(FormControl)({
@@ -208,11 +262,17 @@ export const ViewFlashCardActions = styled('div')({
     marginLeft: 'auto',
 });
 
-export const ViewCardContainer = styled('div')({
+export const ViewCardContainer = styled('div')(({ theme }) => ({
     display: 'flex',
-    gap: '3rem',
+    // Stack term/definition on small screens so neither column gets crushed.
+    flexDirection: 'column',
+    gap: '1.5rem',
     marginTop: '0.5rem',
-});
+    [theme.breakpoints.up('sm')]: {
+        flexDirection: 'row',
+        gap: '3rem',
+    },
+}));
 
 export const ViewCardInfo = styled('div')({
     display: 'flex',
@@ -228,12 +288,17 @@ export const ViewCardText = styled(Typography)({});
 
 export const NoCardsMessage = styled(BoldTypography)({});
 
-export const UpdateCardsButton = styled(Button)({
+export const UpdateCardsButton = styled(Button)(({ theme }) => ({
     alignSelf: 'center',
-    width: '25%',
+    width: '100%',
+    maxWidth: '20rem',
+    minWidth: '12rem',
     textTransform: 'none',
     fontSize: '1rem',
-});
+    [theme.breakpoints.up('md')]: {
+        width: '25%',
+    },
+}));
 
 // Download Dialog
 export const DownloadDialogContent = styled(DialogContent)({
@@ -244,7 +309,8 @@ export const DownloadDialogContent = styled(DialogContent)({
 // Grid View Styles
 export const ViewCardsGridContainer = styled('div')({
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(18rem, 1fr))',
+    // min() keeps a single column from overflowing on very narrow screens.
+    gridTemplateColumns: 'repeat(auto-fill, minmax(min(18rem, 100%), 1fr))',
     gap: '1.5rem',
 });
 
