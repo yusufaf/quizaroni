@@ -17,35 +17,57 @@ import {
     SpacedFlexContainer,
 } from 'styles/AppStyles';
 
-export const CreateSetPage = styled(BasePage)({
+export const CreateSetPage = styled(BasePage)(({ theme }) => ({
     marginTop: '0',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     gap: '2rem',
-    padding: '2rem 20rem',
-});
+    // Fluid horizontal padding: tight on small screens, growing on wide ones to
+    // keep a readable content width (replaces the fixed 20rem gutter).
+    padding: '1rem',
+    [theme.breakpoints.up('sm')]: {
+        padding: '1.5rem 2rem',
+    },
+    [theme.breakpoints.up('md')]: {
+        padding: '2rem 3rem',
+    },
+    [theme.breakpoints.up('lg')]: {
+        padding: '2rem clamp(3rem, 10vw, 18rem)',
+    },
+}));
 
 export const CreateSetPaper = styled(Paper)({});
 
-export const HeaderContainer = styled('div')({
+export const HeaderContainer = styled('div')(({ theme }) => ({
     height: 'fit-content',
     padding: '1.25rem',
     borderRadius: '0.75rem',
     display: 'grid',
-    gridTemplateColumns: '2fr 1fr',
+    // Stack the form and the save/advanced controls on narrow screens; place
+    // them side by side once there is room.
+    gridTemplateColumns: '1fr',
+    gap: '1.5rem',
     overflow: 'hidden',
-});
+    [theme.breakpoints.up('md')]: {
+        gridTemplateColumns: '2fr 1fr',
+        gap: '1rem',
+    },
+}));
 
 export const HeaderLeft = styled(FlexColumn)({
     gap: '1.25rem',
+    minWidth: 0,
 });
 
 export const BackToViewButton = styled(Button)({
     width: 'fit-content',
 });
 
-export const HeaderRight = styled(FlexColumn)({});
+export const HeaderRight = styled(FlexColumn)({
+    gap: '1rem',
+    minWidth: 0,
+});
 
 export const CreateSetInputsContainer = styled('div')({
     display: 'flex',
@@ -55,11 +77,13 @@ export const CreateSetInputsContainer = styled('div')({
 });
 
 export const TitleInput = styled(TextField)({
-    width: '80%',
+    width: '100%',
+    maxWidth: '40rem',
 });
 
 export const DescriptionInput = styled(TextField)(({ theme }) => ({
-    width: '80%',
+    width: '100%',
+    maxWidth: '40rem',
     '& .MuiInputBase-input::-webkit-scrollbar': {
         width: '0.5rem',
     },
@@ -196,19 +220,36 @@ export const NewCardDefinition = styled(FlexColumn)({
 
 export const NewCardRow = styled('div')(({ theme }) => ({
     display: 'flex',
-    alignItems: 'flex-start',
-    gap: '2rem',
+    // Stack term and definition on narrow screens; side by side once there's
+    // room. The divider follows: horizontal when stacked, vertical when not.
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    gap: '1.25rem',
     padding: '0 1.5rem',
     position: 'relative',
     '&::after': {
         content: '""',
         position: 'absolute',
-        left: '50%',
-        top: '0',
-        bottom: '0',
-        width: '1px',
+        left: '1.5rem',
+        right: '1.5rem',
+        top: '50%',
+        height: '1px',
         backgroundColor: theme.palette.divider,
-        transform: 'translateX(-50%)',
+        transform: 'translateY(-50%)',
+    },
+    [theme.breakpoints.up('sm')]: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: '2rem',
+        '&::after': {
+            left: '50%',
+            right: 'auto',
+            top: '0',
+            bottom: '0',
+            width: '1px',
+            height: 'auto',
+            transform: 'translateX(-50%)',
+        },
     },
 }));
 

@@ -163,6 +163,49 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
         };
     }, [activeSession?.cards, activeSession?.currentCardIndex]);
 
+    // Keyboard shortcuts must be registered unconditionally (before any early
+    // return) so the hook order stays stable across loading/loaded renders. The
+    // handler/`when` closures below reference values defined later in render;
+    // they are only invoked on keypress, by which point those are initialized.
+    // useShortcuts keeps the latest bindings via a ref, so fresh state is used.
+    useShortcuts([
+        {
+            id: 'flashcards.flip',
+            keys: [' ', 'Enter'],
+            scope: 'study:flashcards',
+            descriptionKey: 'shortcuts.actions.flip',
+            handler: () => handleFlip(),
+            when: () => !showResults && !hasRated,
+        },
+        {
+            id: 'flashcards.grade',
+            keys: ['1', '2', '3', '4'],
+            scope: 'study:flashcards',
+            descriptionKey: 'shortcuts.actions.gradeGood',
+            handler: (e) => {
+                const grade = gradeKeyMap[e.key];
+                if (grade) handleGrade(grade);
+            },
+            when: () => flipped && !hasRated && !showResults,
+        },
+        {
+            id: 'flashcards.prev',
+            keys: ['ArrowLeft'],
+            scope: 'study:flashcards',
+            descriptionKey: 'shortcuts.actions.prev',
+            handler: () => handlePrevious(),
+            when: () => !showResults,
+        },
+        {
+            id: 'flashcards.next',
+            keys: ['ArrowRight'],
+            scope: 'study:flashcards',
+            descriptionKey: 'shortcuts.actions.next',
+            handler: () => handleNext(),
+            when: () => !showResults,
+        },
+    ]);
+
     // Review mode with nothing due: show a caught-up state instead of a session.
     if (reviewMode && dueCardUUIDs !== null && dueCardUUIDs.length === 0) {
         return (
@@ -330,44 +373,6 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
         '3': 'good',
         '4': 'easy',
     };
-
-    useShortcuts([
-        {
-            id: 'flashcards.flip',
-            keys: [' ', 'Enter'],
-            scope: 'study:flashcards',
-            descriptionKey: 'shortcuts.actions.flip',
-            handler: () => handleFlip(),
-            when: () => !showResults && !hasRated,
-        },
-        {
-            id: 'flashcards.grade',
-            keys: ['1', '2', '3', '4'],
-            scope: 'study:flashcards',
-            descriptionKey: 'shortcuts.actions.gradeGood',
-            handler: (e) => {
-                const grade = gradeKeyMap[e.key];
-                if (grade) handleGrade(grade);
-            },
-            when: () => flipped && !hasRated && !showResults,
-        },
-        {
-            id: 'flashcards.prev',
-            keys: ['ArrowLeft'],
-            scope: 'study:flashcards',
-            descriptionKey: 'shortcuts.actions.prev',
-            handler: () => handlePrevious(),
-            when: () => !showResults,
-        },
-        {
-            id: 'flashcards.next',
-            keys: ['ArrowRight'],
-            scope: 'study:flashcards',
-            descriptionKey: 'shortcuts.actions.next',
-            handler: () => handleNext(),
-            when: () => !showResults,
-        },
-    ]);
 
     const handleAudioToggle = () => {
         if (!activeSession) return;

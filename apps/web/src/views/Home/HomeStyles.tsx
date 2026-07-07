@@ -10,24 +10,40 @@ import { DataGrid } from '@mui/x-data-grid';
 export const HomePage = styled(BasePage)(({ theme }) => ({
     marginTop: '0',
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'center',
-    padding: '2rem 20rem',
+    // Modest, fluid padding — the centered, max-width paper handles wide
+    // screens, so we no longer reserve a huge fixed gutter.
+    padding: '1rem',
+    [theme.breakpoints.up('sm')]: {
+        padding: '1.5rem',
+    },
+    [theme.breakpoints.up('md')]: {
+        padding: '2rem',
+    },
     background: `linear-gradient(to bottom, ${theme.palette.background.default}, ${theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5'})`,
 }));
 
 export const HomePaper = styled(Paper)(({ theme }) => ({
+    width: '100%',
+    maxWidth: '70rem',
+    minWidth: 0,
     boxShadow:
         theme.palette.mode === 'dark'
             ? '0 8px 32px rgba(0, 0, 0, 0.4)'
             : '0 8px 32px rgba(0, 0, 0, 0.08)',
 }));
 
-export const HomeContainer = styled(Box)({
-    width: '70rem',
-    padding: '1.25rem',
+export const HomeContainer = styled(Box)(({ theme }) => ({
+    width: '100%',
+    minWidth: 0,
+    boxSizing: 'border-box',
+    padding: '0.75rem',
     borderRadius: '0.75rem',
-});
+    [theme.breakpoints.up('sm')]: {
+        padding: '1.25rem',
+    },
+}));
 
 export const HomeSetsHeading = styled(BoldTypography)({
     letterSpacing: '0.5px',
@@ -37,6 +53,10 @@ export const HomeSetsHeading = styled(BoldTypography)({
 export const HomeSetsContainer = styled('div')({
     display: 'flex',
     flexDirection: 'column',
+    // minWidth: 0 lets the DataGrid scroll its columns internally instead of
+    // forcing the whole page wider than the viewport.
+    minWidth: 0,
+    width: '100%',
     height: '40rem',
     marginTop: '1rem',
 });
@@ -63,17 +83,19 @@ export const StyledDataGrid = styled(DataGrid)(({ theme }) => ({
 
 export const HomeSetGrid = styled('div')({
     display: 'grid',
-    gridTemplateRows: 'repeat(2, 18rem)',
-    gridTemplateColumns: 'repeat(3, 20rem)',
+    // Fluid columns that reflow from 1 up to 3+ across as space allows;
+    // min() keeps a single card from overflowing on very narrow screens.
+    gridTemplateColumns: 'repeat(auto-fill, minmax(min(18rem, 100%), 1fr))',
+    gridAutoRows: '18rem',
     gap: '1.5rem',
-    height: 'calc(100vh - 20rem)',
     justifyContent: 'center',
 });
 
 /* Grid View - Card Styling */
 export const HomeSetCard = styled(Card)(({ theme }) => ({
     height: '18rem',
-    width: '20rem',
+    width: '100%',
+    maxWidth: '24rem',
     padding: '1.25rem',
     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
     cursor: 'pointer',

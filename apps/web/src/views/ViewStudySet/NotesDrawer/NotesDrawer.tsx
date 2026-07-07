@@ -25,7 +25,9 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from "@mui/material/";
+import { useTheme } from "theme/useTheme";
 import {
   BoldTypography,
   SimpleFlexContainer,
@@ -56,6 +58,10 @@ const transitionDuration = 1000; //can also use theme.transitions.duration
 const NotesDrawer = (props: Props) => {
   const { selectedStudyset, isHidden: externalHidden, onToggle } = props;
   const { t } = useTranslation();
+  const { muiTheme } = useTheme();
+  // Wide screens get the floating side panel; narrower ones get a temporary
+  // drawer that slides over the content instead of overlapping it.
+  const isWideScreen = useMediaQuery(muiTheme.breakpoints.up("lg"));
 
   const {
     studysetUUID = "",
@@ -250,9 +256,12 @@ const NotesDrawer = (props: Props) => {
     </>
   ) : (
     <StyledDrawer
-      variant="permanent"
+      variant={isWideScreen ? "permanent" : "temporary"}
       anchor={notesDrawerPosition}
       open={true}
+      onClose={onClose}
+      isFloating={isWideScreen}
+      ModalProps={{ keepMounted: true }}
       transitionDuration={{
         enter: transitionDuration,
         exit: transitionDuration,
