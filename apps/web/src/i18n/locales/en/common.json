@@ -214,10 +214,10 @@
             "headlineStart": "Learn anything.",
             "headlineEnd": "Remember",
             "headlineHighlight": "everything.",
-            "subheadline": "Quizaroni turns any topic into flashcards you'll actually enjoy studying. Smarter tools for curious minds.",
+            "subheadline": "Quizaroni turns any topic into flashcards you'll actually enjoy studying — with real spaced repetition, offline access, and your data always yours.",
             "signUpCta": "Get Started Free",
             "exploreCta": "Explore Sets",
-            "trustLine": "Free forever • No credit card required"
+            "trustLine": "Free forever • Open source • No credit card required"
         },
         "flashcards": {
             "biologyLabel": "Biology",
@@ -235,20 +235,20 @@
             "sectionTitle": "Everything you need to study smarter",
             "sectionSubtitle": "Tools built for how your brain actually learns.",
             "create": {
-                "title": "Create in seconds",
-                "description": "Turn your notes, PDFs, or any topic into professional flashcards with AI-assisted creation."
+                "title": "Create or import in seconds",
+                "description": "Type your cards, paste a list, or import an existing deck straight from Quizlet or Anki. Your notes become a study set in seconds."
             },
             "study": {
                 "title": "Study modes that stick",
                 "description": "Flip, quiz, match, and write. Switch modes to keep things fresh and memory strong."
             },
             "progress": {
-                "title": "Track your progress",
-                "description": "Visualize your growth with detailed mastery stats and personalized learning insights."
+                "title": "Remember it with spaced repetition",
+                "description": "A proven spaced-repetition system schedules each card right before you'd forget it — with mastery stats that show your growth."
             },
             "share": {
-                "title": "Share with your crew",
-                "description": "Collaborate with classmates, build shared decks, or keep your sets private. Your call."
+                "title": "Share it, or keep it yours",
+                "description": "Publish a set for anyone to study and browse the community in Explore, or keep it private. It all works offline, and your data exports anytime."
             }
         },
         "howItWorks": {
@@ -259,7 +259,7 @@
             },
             "step2": {
                 "title": "Build your first deck",
-                "description": "Add cards any way you like. Type them, paste them, or import a file."
+                "description": "Add cards any way you like — type them, paste a list, or import straight from Quizlet or Anki."
             },
             "step3": {
                 "title": "Start studying",
@@ -462,6 +462,19 @@
         "all": "All",
         "important": "Important"
     },
+    "publicView": {
+        "createdBy": "Created by {{username}}",
+        "term": "Term",
+        "definition": "Definition",
+        "cards_one": "{{count}} card",
+        "cards_other": "{{count}} cards",
+        "ctaTitle": "Want to study this set?",
+        "ctaSubtitle": "Save it, study with real spaced repetition, and track your progress — free and open source.",
+        "ctaButton": "Create a free account",
+        "unavailableTitle": "This set isn't available",
+        "unavailableBody": "It may be private, or the link may be incorrect.",
+        "goHome": "Go to Quizaroni"
+    },
     "create": {
         "backToViewing": "Back to Viewing Study Set",
         "editYourStudySet": "Edit your study set",
@@ -522,6 +535,25 @@
         "pasteOrUploadJson": "Paste JSON below or upload a .json file",
         "uploadJsonFile": "Upload JSON file",
         "clearEditor": "Clear editor",
+        "formatJson": "JSON",
+        "formatQuizlet": "Quizlet",
+        "formatAnki": "Anki",
+        "termDefSeparator": "Between term and definition",
+        "rowSeparatorLabel": "Between cards",
+        "sepTab": "Tab",
+        "sepComma": "Comma",
+        "sepSpace": "Space",
+        "sepDash": "Dash ( - )",
+        "sepNewline": "New line",
+        "sepSemicolon": "Semicolon",
+        "sepBlankLine": "Blank line",
+        "sepCustom": "Custom…",
+        "customSeparator": "Custom",
+        "dragDropHint": "Tip: You can also drag & drop a file here",
+        "quizletHint": "Paste your Quizlet export (Export → copy text).",
+        "ankiHint": "Paste your Anki export (Notes in Plain Text .txt).",
+        "pastePlaceholderQuizlet": "Paste your Quizlet export here.\nExample (Tab between term and definition, new line between cards):\nMitochondria\tThe powerhouse of the cell\nDNA\tGenetic material",
+        "pastePlaceholderAnki": "Paste your Anki plain-text export here.\nExample:\nHola\tHello\nAdios\tGoodbye",
         "imageUploaded": "{{count}} image uploaded successfully",
         "imageUploaded_plural": "{{count}} images uploaded successfully",
         "imageUploadFailed": "Failed to upload image",

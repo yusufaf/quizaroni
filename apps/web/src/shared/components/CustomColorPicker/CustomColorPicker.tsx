@@ -7,7 +7,7 @@ import {
 import { Tooltip } from '@mui/material';
 import { ExtraPickerButton } from 'views/Create/CreateSetStyles';
 import { ColorPickerContainer, ExtraPickerContainer } from './styles';
-import { StyledChromePicker } from 'styles/AppStyles';
+import { StyledChromePicker } from 'styles/StyledChromePicker';
 import { useClickAway } from 'hooks/useClickAway';
 import { useGlobalStore } from 'state/stores/global';
 

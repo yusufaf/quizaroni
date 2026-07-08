@@ -4,8 +4,25 @@ base = "apps/web"
 command = "pnpm install && pnpm build"
 publish = "dist"
 
-# Proxy API calls to the backend. Update the target to your deployed API
-# Gateway URL (see apps/api).
+# Inject per-set Open Graph / Twitter meta into public study-set pages so
+# shared links unfurl richly and search engines get real snippets. Runs before
+# redirects; falls back to the default shell for private/unknown sets.
+# (Source: apps/web/netlify/edge-functions/og-meta.ts — base dir is apps/web.)
+[[edge_functions]]
+path = "/view/*"
+function = "og-meta"
+
+# Dynamic XML sitemap of all public study sets (linked from robots.txt), so
+# public pages are discoverable/indexable. Source:
+# apps/web/netlify/edge-functions/sitemap.ts.
+[[edge_functions]]
+path = "/sitemap.xml"
+function = "sitemap"
+
+# Proxy API calls to the backend. NOTE: the running web app calls the AWS API
+# Gateway directly via BASE_API_URL (apps/web/src/state/api/awsAPI.ts), so this
+# onrender proxy is currently unused — update or remove it to match your
+# deployed backend (see apps/api).
 [[redirects]]
 from = "/api/*"
 to = "https://quizaroni-api.onrender.com/api/:splat"

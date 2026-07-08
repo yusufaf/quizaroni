@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { EmojiEvents, CheckCircle, Timer, Whatshot } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from 'shared/utilities/confetti';
 import { StudySessionResult } from 'shared/types';
 import { useTranslation } from 'react-i18next';
 import { PRESET_ACHIEVEMENTS } from 'shared/constants';
@@ -27,7 +27,9 @@ type Props = {
 
 const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
     const { t } = useTranslation(['study', 'profile']);
-    const getAchievementById = useGamificationStore((s) => s.getAchievementById);
+    const getAchievementById = useGamificationStore(
+        (s) => s.getAchievementById
+    );
 
     const getAchievementLabel = (achievementId: string) => {
         const preset = Object.values(PRESET_ACHIEVEMENTS).find(
@@ -53,7 +55,7 @@ const StudyResults = ({ open, result, onClose, onStudyAgain }: Props) => {
     useEffect(() => {
         if (open && result && result.accuracy >= 80) {
             // Trigger confetti for high scores
-            confetti({
+            fireConfetti({
                 particleCount: 100,
                 spread: 70,
                 origin: { y: 0.6 },

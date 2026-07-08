@@ -214,10 +214,10 @@
             "headlineStart": "Aprende lo que sea.",
             "headlineEnd": "Recuerda",
             "headlineHighlight": "todo.",
-            "subheadline": "Quizaroni convierte cualquier tema en tarjetas de estudio que disfrutarás usar. Herramientas inteligentes para mentes curiosas.",
+            "subheadline": "Quizaroni convierte cualquier tema en tarjetas que de verdad disfrutarás estudiar, con repetición espaciada real, acceso sin conexión y tus datos siempre en tus manos.",
             "signUpCta": "Comienza Gratis",
             "exploreCta": "Explorar Sets",
-            "trustLine": "Gratis para siempre • Sin tarjeta de crédito"
+            "trustLine": "Gratis para siempre • Código abierto • Sin tarjeta de crédito"
         },
         "flashcards": {
             "biologyLabel": "Biología",
@@ -235,20 +235,20 @@
             "sectionTitle": "Todo lo que necesitas para estudiar mejor",
             "sectionSubtitle": "Herramientas diseñadas para cómo aprende tu cerebro.",
             "create": {
-                "title": "Crea en segundos",
-                "description": "Convierte tus notas, PDFs o cualquier tema en tarjetas profesionales con ayuda de IA."
+                "title": "Crea o importa en segundos",
+                "description": "Escribe tus tarjetas, pega una lista o importa un mazo existente directamente desde Quizlet o Anki. Tus notas se convierten en un set de estudio en segundos."
             },
             "study": {
                 "title": "Modos de estudio que funcionan",
                 "description": "Voltea, responde, empareja y escribe. Cambia de modo para mantener fresco el aprendizaje."
             },
             "progress": {
-                "title": "Sigue tu progreso",
-                "description": "Visualiza tu avance con estadísticas detalladas y recomendaciones personalizadas."
+                "title": "Recuérdalo con repetición espaciada",
+                "description": "Un sistema de repetición espaciada probado programa cada tarjeta justo antes de que la olvides, con estadísticas de dominio que muestran tu avance."
             },
             "share": {
-                "title": "Comparte con tu grupo",
-                "description": "Colabora con compañeros, crea sets compartidos o mantén los tuyos privados. Tú decides."
+                "title": "Compártelo, o guárdalo para ti",
+                "description": "Publica un set para que cualquiera lo estudie y explora la comunidad en Explorar, o mantenlo privado. Todo funciona sin conexión y puedes exportar tus datos cuando quieras."
             }
         },
         "howItWorks": {
@@ -259,7 +259,7 @@
             },
             "step2": {
                 "title": "Crea tu primer set",
-                "description": "Agrega tarjetas como quieras: escribiéndolas, pegándolas o importando un archivo."
+                "description": "Agrega tarjetas como quieras: escríbelas, pega una lista o impórtalas directamente desde Quizlet o Anki."
             },
             "step3": {
                 "title": "Comienza a estudiar",
@@ -462,6 +462,19 @@
         "all": "Todos",
         "important": "Importante"
     },
+    "publicView": {
+        "createdBy": "Creado por {{username}}",
+        "term": "Término",
+        "definition": "Definición",
+        "cards_one": "{{count}} tarjeta",
+        "cards_other": "{{count}} tarjetas",
+        "ctaTitle": "¿Quieres estudiar este set?",
+        "ctaSubtitle": "Guárdalo, estudia con repetición espaciada real y sigue tu progreso — gratis y de código abierto.",
+        "ctaButton": "Crea una cuenta gratis",
+        "unavailableTitle": "Este set no está disponible",
+        "unavailableBody": "Puede ser privado o el enlace puede ser incorrecto.",
+        "goHome": "Ir a Quizaroni"
+    },
     "create": {
         "backToViewing": "Volver a Ver Set de Estudio",
         "editYourStudySet": "Edita tu set de estudio",
@@ -522,6 +535,25 @@
         "pasteOrUploadJson": "Pega JSON abajo o sube un archivo .json",
         "uploadJsonFile": "Subir archivo JSON",
         "clearEditor": "Limpiar editor",
+        "formatJson": "JSON",
+        "formatQuizlet": "Quizlet",
+        "formatAnki": "Anki",
+        "termDefSeparator": "Entre término y definición",
+        "rowSeparatorLabel": "Entre tarjetas",
+        "sepTab": "Tabulación",
+        "sepComma": "Coma",
+        "sepSpace": "Espacio",
+        "sepDash": "Guion ( - )",
+        "sepNewline": "Nueva línea",
+        "sepSemicolon": "Punto y coma",
+        "sepBlankLine": "Línea en blanco",
+        "sepCustom": "Personalizado…",
+        "customSeparator": "Personalizado",
+        "dragDropHint": "Consejo: también puedes arrastrar y soltar un archivo aquí",
+        "quizletHint": "Pega tu exportación de Quizlet (Exportar → copiar texto).",
+        "ankiHint": "Pega tu exportación de Anki (Notas en texto sin formato .txt).",
+        "pastePlaceholderQuizlet": "Pega aquí tu exportación de Quizlet.\nEjemplo (tabulación entre término y definición, nueva línea entre tarjetas):\nMitocondria\tLa central energética de la célula\nADN\tMaterial genético",
+        "pastePlaceholderAnki": "Pega aquí tu exportación de texto sin formato de Anki.\nEjemplo:\nHola\tHello\nAdiós\tGoodbye",
         "imageUploaded": "{{count}} imagen subida exitosamente",
         "imageUploaded_plural": "{{count}} imágenes subidas exitosamente",
         "imageUploadFailed": "Error al subir la imagen",

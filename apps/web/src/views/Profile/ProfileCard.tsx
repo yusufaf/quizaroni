@@ -1,6 +1,6 @@
 import { AddPhotoAlternate as AddPhotoIcon } from '@mui/icons-material';
 import { Skeleton, Tooltip, Typography } from '@mui/material/';
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import {
     ProfilePicture,
     ProfilePictureImage,
@@ -10,7 +10,9 @@ import {
     UserInfoContainer,
     UserInfoHeading,
 } from './ProfileStyles';
-import ProfilePictureDialog from './ProfilePictureDialog';
+// Lazy-loaded so DiceBear (avatar generation) only downloads when the user
+// opens the avatar dialog, not on every Profile page view.
+const ProfilePictureDialog = lazy(() => import('./ProfilePictureDialog'));
 import { useGetAllStudysets } from 'state/api/studysetsAPI';
 import { User } from 'shared/types';
 import { formatDateUsingPreferred } from 'utilities/general';
@@ -125,11 +127,15 @@ const ProfileCard = ({ userData }: Props) => {
                     </>
                 )}
             </StyledProfileCard>
-            <ProfilePictureDialog
-                open={dialogOpen}
-                onClose={handleCloseDialog}
-                userData={userData}
-            />
+            {dialogOpen && (
+                <Suspense fallback={null}>
+                    <ProfilePictureDialog
+                        open={dialogOpen}
+                        onClose={handleCloseDialog}
+                        userData={userData}
+                    />
+                </Suspense>
+            )}
         </>
     );
 };

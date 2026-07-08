@@ -9,7 +9,7 @@ import {
     Grow,
 } from '@mui/material';
 import { CheckCircle } from '@mui/icons-material';
-import confetti from 'canvas-confetti';
+import { fireConfetti } from 'shared/utilities/confetti';
 import { useGetStudyset } from 'state/api/studysetsAPI';
 import { useStudySessionStore } from 'state/stores/studySession';
 import { Card as CardType, Studyset } from 'shared/types';
@@ -171,7 +171,7 @@ const MatchingStudy = ({ studysetId }: Props) => {
                 }, 1000);
 
                 // Trigger confetti
-                confetti({
+                fireConfetti({
                     particleCount: 150,
                     spread: 100,
                     origin: { y: 0.6 },
@@ -227,9 +227,7 @@ const MatchingStudy = ({ studysetId }: Props) => {
                 setHighlightIndex((i) => {
                     if (matchTiles.length === 0) return 0;
                     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-                        return (
-                            (i - 1 + matchTiles.length) % matchTiles.length
-                        );
+                        return (i - 1 + matchTiles.length) % matchTiles.length;
                     }
                     return (i + 1) % matchTiles.length;
                 });
