@@ -6,7 +6,6 @@ import {
     Typography,
 } from '@mui/material/';
 import { Link } from 'react-router-dom';
-import { ChromePicker } from 'react-color';
 
 export const AppWrapper = styled('div')({
     display: 'flex',
@@ -83,12 +82,6 @@ export const GhostLink = styled(Link)(({ theme }) => ({
     transition: '0.2s ease',
     '&:hover': {
         color: theme.palette.primary.main,
-    },
-}));
-
-export const StyledChromePicker = styled(ChromePicker)(({ theme }) => ({
-    '&.chrome-picker': {
-        background: `${theme.palette.background.paper} !important`,
     },
 }));
 

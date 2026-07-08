@@ -5,7 +5,14 @@ import {
     CircularProgress,
     Dialog,
     DialogContent,
+    FormControl,
     IconButton,
+    InputLabel,
+    MenuItem,
+    Select,
+    TextField,
+    ToggleButton,
+    ToggleButtonGroup,
     Tooltip,
     Typography,
     Paper,
@@ -20,7 +27,7 @@ import { StyledDialogActions } from 'styles/AppStyles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import { Dispatch, SetStateAction, useCallback, useRef, useState } from 'react';
 import { Card } from 'shared/types';
-import { processImportedCards } from 'utilities/importUtils';
+import { processImport, ImportFormat } from 'utilities/importUtils';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 
@@ -120,6 +127,23 @@ const DropOverlay = styled(Paper)(({ theme }) => ({
     },
 }));
 
+// Separator presets offered for Quizlet imports. Values are descriptors the
+// importUtils parser understands (named tokens, a literal, or 'custom').
+const FIELD_SEPARATORS: { value: string; labelKey: string }[] = [
+    { value: 'tab', labelKey: 'create.sepTab' },
+    { value: 'comma', labelKey: 'create.sepComma' },
+    { value: 'space', labelKey: 'create.sepSpace' },
+    { value: ' - ', labelKey: 'create.sepDash' },
+    { value: 'custom', labelKey: 'create.sepCustom' },
+];
+
+const ROW_SEPARATORS: { value: string; labelKey: string }[] = [
+    { value: 'newline', labelKey: 'create.sepNewline' },
+    { value: 'semicolon', labelKey: 'create.sepSemicolon' },
+    { value: 'blankline', labelKey: 'create.sepBlankLine' },
+    { value: 'custom', labelKey: 'create.sepCustom' },
+];
+
 const validateLive = (value: string): string | null => {
     const trimmed = value.trim();
     if (!trimmed) return null;
@@ -144,14 +168,25 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const dragCounterRef = useRef<number>(0);
 
+    const [format, setFormat] = useState<ImportFormat>('json');
+    const [fieldSep, setFieldSep] = useState<string>('tab');
+    const [fieldSepCustom, setFieldSepCustom] = useState<string>('');
+    const [rowSep, setRowSep] = useState<string>('newline');
+    const [rowSepCustom, setRowSepCustom] = useState<string>('');
+
+    const resolvedFieldSep = fieldSep === 'custom' ? fieldSepCustom : fieldSep;
+    const resolvedRowSep = rowSep === 'custom' ? rowSepCustom : rowSep;
+
     const handleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
             const value = e.target.value;
             setJsonInputText(value);
-            setLiveError(validateLive(value));
+            // Live syntax validation only applies to JSON; delimited formats
+            // are validated on import.
+            setLiveError(format === 'json' ? validateLive(value) : null);
             setSubmitError(null);
         },
-        []
+        [format]
     );
 
     const handleDragEnter = useCallback((e: React.DragEvent) => {
@@ -180,7 +215,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
 
     const handleFileUpload = useCallback(
         (file: File) => {
-            if (!file.name.endsWith('.json')) {
+            if (format === 'json' && !file.name.endsWith('.json')) {
                 setSubmitError(t('create.pleaseUploadJson'));
                 return;
             }
@@ -190,14 +225,19 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const text = (e.target?.result as string) ?? '';
-                try {
-                    const parsed = JSON.parse(text);
-                    const formatted = JSON.stringify(parsed, null, 4);
-                    setJsonInputText(formatted);
-                    setLiveError(null);
-                } catch {
+                // Pretty-print JSON uploads; leave delimited text untouched.
+                if (format === 'json') {
+                    try {
+                        const parsed = JSON.parse(text);
+                        setJsonInputText(JSON.stringify(parsed, null, 4));
+                        setLiveError(null);
+                    } catch {
+                        setJsonInputText(text);
+                        setLiveError(validateLive(text));
+                    }
+                } else {
                     setJsonInputText(text);
-                    setLiveError(validateLive(text));
+                    setLiveError(null);
                 }
             };
             reader.onerror = () => {
@@ -206,7 +246,18 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             };
             reader.readAsText(file);
         },
-        [t]
+        [format, t]
+    );
+
+    const handleFormatChange = useCallback(
+        (_e: React.MouseEvent<HTMLElement>, next: ImportFormat | null) => {
+            if (!next) return;
+            setFormat(next);
+            setSubmitError(null);
+            // Re-run live validation under the new format's rules.
+            setLiveError(next === 'json' ? validateLive(jsonInputText) : null);
+        },
+        [jsonInputText]
     );
 
     const handleDrop = useCallback(
@@ -220,14 +271,11 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             if (files && files.length > 0) {
                 const file = files.item(0);
                 if (!file) return;
-                if (!file.name.endsWith('.json')) {
-                    setSubmitError(t('create.pleaseUploadJson'));
-                    return;
-                }
+                // handleFileUpload enforces the .json requirement for JSON imports.
                 handleFileUpload(file);
             }
         },
-        [handleFileUpload, t]
+        [handleFileUpload]
     );
 
     const handleReset = useCallback(() => {
@@ -248,7 +296,14 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             return;
         }
 
-        const { cards, error: importError } = processImportedCards(sourceText);
+        const { cards, error: importError } = processImport(
+            sourceText,
+            format,
+            {
+                fieldSeparator: resolvedFieldSep,
+                rowSeparator: resolvedRowSep,
+            }
+        );
         if (importError) {
             setSubmitError(importError);
             setIsProcessing(false);
@@ -266,7 +321,15 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
         );
         setShowImportModal(false);
         setIsProcessing(false);
-    }, [jsonInputText, onImportCards, setShowImportModal, t]);
+    }, [
+        jsonInputText,
+        format,
+        resolvedFieldSep,
+        resolvedRowSep,
+        onImportCards,
+        setShowImportModal,
+        t,
+    ]);
 
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -300,6 +363,15 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
     const importDisabled =
         isProcessing || !jsonInputText.trim() || Boolean(liveError);
 
+    const fileAccept = format === 'json' ? '.json' : '.txt,.csv,.tsv,.text';
+
+    const placeholder =
+        format === 'json'
+            ? `${t('create.pasteJsonPlaceholder') || 'Paste JSON here...'}\n\n💡 ${t('create.dragDropHint')}`
+            : format === 'quizlet'
+              ? t('create.pastePlaceholderQuizlet')
+              : t('create.pastePlaceholderAnki');
+
     return (
         <Dialog open={true} onClose={onClose} fullWidth maxWidth="md">
             <StandardDialogTitle
@@ -308,13 +380,118 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             />
             <DialogContent>
                 <EditorContainer>
+                    <ToggleButtonGroup
+                        value={format}
+                        exclusive
+                        onChange={handleFormatChange}
+                        size="small"
+                        color="primary"
+                        fullWidth
+                        disabled={isProcessing}
+                    >
+                        <ToggleButton value="json">
+                            {t('create.formatJson')}
+                        </ToggleButton>
+                        <ToggleButton value="quizlet">
+                            {t('create.formatQuizlet')}
+                        </ToggleButton>
+                        <ToggleButton value="anki">
+                            {t('create.formatAnki')}
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+
+                    {format === 'quizlet' && (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                gap: '1rem',
+                                flexWrap: 'wrap',
+                            }}
+                        >
+                            <FormControl
+                                size="small"
+                                sx={{ minWidth: 180, flex: 1 }}
+                            >
+                                <InputLabel>
+                                    {t('create.termDefSeparator')}
+                                </InputLabel>
+                                <Select
+                                    label={t('create.termDefSeparator')}
+                                    value={fieldSep}
+                                    onChange={(e) =>
+                                        setFieldSep(e.target.value as string)
+                                    }
+                                >
+                                    {FIELD_SEPARATORS.map((opt) => (
+                                        <MenuItem
+                                            key={opt.value}
+                                            value={opt.value}
+                                        >
+                                            {t(opt.labelKey)}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            {fieldSep === 'custom' && (
+                                <TextField
+                                    size="small"
+                                    label={t('create.customSeparator')}
+                                    value={fieldSepCustom}
+                                    onChange={(e) =>
+                                        setFieldSepCustom(e.target.value)
+                                    }
+                                    sx={{ width: 140 }}
+                                />
+                            )}
+                            <FormControl
+                                size="small"
+                                sx={{ minWidth: 180, flex: 1 }}
+                            >
+                                <InputLabel>
+                                    {t('create.rowSeparatorLabel')}
+                                </InputLabel>
+                                <Select
+                                    label={t('create.rowSeparatorLabel')}
+                                    value={rowSep}
+                                    onChange={(e) =>
+                                        setRowSep(e.target.value as string)
+                                    }
+                                >
+                                    {ROW_SEPARATORS.map((opt) => (
+                                        <MenuItem
+                                            key={opt.value}
+                                            value={opt.value}
+                                        >
+                                            {t(opt.labelKey)}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                            {rowSep === 'custom' && (
+                                <TextField
+                                    size="small"
+                                    label={t('create.customSeparator')}
+                                    value={rowSepCustom}
+                                    onChange={(e) =>
+                                        setRowSepCustom(e.target.value)
+                                    }
+                                    sx={{ width: 140 }}
+                                />
+                            )}
+                        </Box>
+                    )}
+
                     <EditorHeader>
                         <Typography variant="body2" color="text.secondary">
                             {selectedFileName
                                 ? t('create.selectedFile', {
                                       filename: selectedFileName,
                                   })
-                                : t('create.pasteOrUploadJson')}
+                                : format === 'json'
+                                  ? t('create.pasteOrUploadJson')
+                                  : format === 'quizlet'
+                                    ? t('create.quizletHint')
+                                    : t('create.ankiHint')}
                         </Typography>
                         <ActionsRow>
                             <Tooltip title={t('create.uploadJsonFile')}>
@@ -344,7 +521,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                             <input
                                 ref={fileInputRef}
                                 type="file"
-                                accept=".json"
+                                accept={fileAccept}
                                 hidden
                                 onChange={(e) => {
                                     const file = e.target.files?.[0];
@@ -366,7 +543,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                             autoComplete="off"
                             autoCorrect="off"
                             autoCapitalize="off"
-                            placeholder={`${t('create.pasteJsonPlaceholder') || 'Paste JSON here...'}\n\n💡 Tip: You can also drag & drop a .json file here`}
+                            placeholder={placeholder}
                             disabled={isProcessing}
                             onDragEnter={handleDragEnter}
                             onDragLeave={handleDragLeave}

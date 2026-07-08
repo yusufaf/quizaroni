@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Box, Typography, Paper } from '@mui/material';
 import { useTheme } from 'theme/useTheme';
-import { StyledChromePicker } from 'styles/AppStyles';
+import { StyledChromePicker } from 'styles/StyledChromePicker';
 
 type Props = {
     color: string;

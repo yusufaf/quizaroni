@@ -1,19 +1,27 @@
-import { ReactNode } from 'react';
+import { lazy, ReactNode, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import Home from 'views/Home/Home';
 import Landing from 'views/Landing/Landing';
+import LoadingIndicator from 'shared/components/LoadingIndicator/LoadingIndicator';
 // import Login from 'views/Login/Login';
 // import Signup from 'views/Signup/Signup';
-import CreateSet from 'views/Create/CreateSet';
 // import ForgotPassword from 'views/ForgotPassword/ForgotPassword';
-import Profile from 'views/Profile/Profile';
 // import ConfirmEmail from 'views/ConfirmEmail/ConfirmEmail';
-import ViewStudySet from 'views/ViewStudySet/ViewStudySet';
-import CombineSets from 'views/CombineSets/CombineSets';
-import Explore from 'views/Explore/Explore';
-import NotFound from 'views/NotFound/NotFound';
-import StudyMode from 'views/Study/StudyMode';
 import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react';
+
+// Route-level code splitting: keep Landing eager (first paint for logged-out
+// visitors); lazy-load everything else so heavy deps (jsPDF, data-grid,
+// amplify, framer-motion, react-color, dicebear) stay out of the entry chunk.
+const Home = lazy(() => import('views/Home/Home'));
+const CreateSet = lazy(() => import('views/Create/CreateSet'));
+const Profile = lazy(() => import('views/Profile/Profile'));
+const ViewStudySet = lazy(() => import('views/ViewStudySet/ViewStudySet'));
+const CombineSets = lazy(() => import('views/CombineSets/CombineSets'));
+const Explore = lazy(() => import('views/Explore/Explore'));
+const NotFound = lazy(() => import('views/NotFound/NotFound'));
+const StudyMode = lazy(() => import('views/Study/StudyMode'));
+const PublicStudySet = lazy(
+    () => import('views/PublicStudySet/PublicStudySet')
+);
 
 type RequireAuthProps = {
     children: ReactNode;
@@ -41,7 +49,6 @@ const AppRoutes = () => {
         { path: '/create/:id', element: <CreateSet /> },
         { path: '/profile', element: <Profile /> },
         { path: '/explore', element: <Explore /> },
-        { path: '/view/:id', element: <ViewStudySet /> },
         { path: '/combine/:id', element: <CombineSets /> },
         { path: '/edit/:id', element: <CreateSet /> },
         { path: '/study/:studysetId/:mode', element: <StudyMode /> },
@@ -72,31 +79,47 @@ const AppRoutes = () => {
     };
 
     return (
-        <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={authenticated ? <Home /> : <Landing />} />
-            <Route path="/login" element={<AuthenticatorRoute />} />
-            <Route path="/signUp" element={<AuthenticatorRoute />} />
-
-            {/* <Route path="/signup" element={<Signup />} /> */}
-            {/* <Route path="/forgotPassword" element={<ForgotPassword />} />
-            <Route path="/confirmEmail" element={<ConfirmEmail />} /> */}
-
-            {/* Protected Routes */}
-            {protectedRoutes.map(({ path, element }) => (
+        <Suspense fallback={<LoadingIndicator />}>
+            <Routes>
+                {/* Public Routes */}
                 <Route
-                    key={path}
-                    path={path}
+                    path="/"
+                    element={authenticated ? <Home /> : <Landing />}
+                />
+                <Route path="/login" element={<AuthenticatorRoute />} />
+                <Route path="/signUp" element={<AuthenticatorRoute />} />
+
+                {/* Study set view — full owner experience when authenticated,
+                    read-only public page (via the no-auth endpoint) otherwise.
+                    Keeping the same URL means existing share links keep working
+                    for logged-out visitors and crawlers. */}
+                <Route
+                    path="/view/:id"
                     element={
-                        <RequireAuth authenticated={authenticated}>
-                            {element}
-                        </RequireAuth>
+                        authenticated ? <ViewStudySet /> : <PublicStudySet />
                     }
                 />
-            ))}
 
-            <Route path="*" element={<NotFound />} />
-        </Routes>
+                {/* <Route path="/signup" element={<Signup />} /> */}
+                {/* <Route path="/forgotPassword" element={<ForgotPassword />} />
+            <Route path="/confirmEmail" element={<ConfirmEmail />} /> */}
+
+                {/* Protected Routes */}
+                {protectedRoutes.map(({ path, element }) => (
+                    <Route
+                        key={path}
+                        path={path}
+                        element={
+                            <RequireAuth authenticated={authenticated}>
+                                {element}
+                            </RequireAuth>
+                        }
+                    />
+                ))}
+
+                <Route path="*" element={<NotFound />} />
+            </Routes>
+        </Suspense>
     );
 };
 

@@ -10,12 +10,14 @@ import {
     BaseResponseSchema,
     GetAllStudysetsResponseSchema,
     GetStudysetResponseSchema,
+    GetPublicStudysetResponseSchema,
     CreateStudysetResponseSchema,
     UpdateStudysetResponseSchema,
     BatchDeleteStudysetsResponseSchema,
     BatchDuplicateStudysetsResponseSchema,
     CreateNoteResponseSchema,
 } from 'shared/schemas';
+import type { z } from 'zod';
 
 /* Endpoints
     Studyset Operations
@@ -120,6 +122,52 @@ export const useGetStudyset = (
                 context: 'GetStudyset',
             });
         },
+        ...options,
+    });
+};
+
+export type GetPublicStudysetResponse = z.infer<
+    typeof GetPublicStudysetResponseSchema
+>;
+
+/**
+ * Fetches a publicly-shared study set through the unauthenticated endpoint.
+ * Deliberately does NOT send Cognito headers, so it works for logged-out
+ * visitors. A 404 (private/nonexistent) is surfaced by throwing so callers can
+ * render a "not available" state.
+ */
+export const useGetPublicStudyset = (
+    studysetUUID: string,
+    options?: Omit<
+        UseQueryOptions<GetPublicStudysetResponse>,
+        'queryKey' | 'queryFn'
+    >
+) => {
+    return useQuery({
+        queryKey: ['public-studyset', studysetUUID],
+        queryFn: async () => {
+            const response = await fetch(
+                `${BASE_API_URL}/public/studyset/${encodeURIComponent(
+                    studysetUUID
+                )}`,
+                { method: 'GET' }
+            );
+            if (!response.ok) {
+                throw new Error(
+                    response.status === 404
+                        ? 'This study set is private or does not exist.'
+                        : 'Failed to load study set.'
+                );
+            }
+            const data = await response.json();
+            return validate({
+                schema: GetPublicStudysetResponseSchema,
+                data,
+                type: 'response',
+                context: 'GetPublicStudyset',
+            });
+        },
+        retry: false,
         ...options,
     });
 };

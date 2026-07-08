@@ -22,7 +22,6 @@ import {
     PrintPreviewContainer,
 } from './styles';
 import PrintPreview from './PrintPreview';
-import { getPdfGenerator } from './pdfGenerators';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -75,6 +74,9 @@ const PrintDialog = ({ open, onClose, studyset }: Props) => {
         setIsGenerating(true);
 
         try {
+            // Load the PDF generators (and jsPDF) on demand so the library only
+            // downloads when the user actually generates a PDF.
+            const { getPdfGenerator } = await import('./pdfGenerators');
             const generator = getPdfGenerator(printSettings.layout);
             const cards = printSettings.importantOnly
                 ? studyset.cards.filter((c) => c.important)
