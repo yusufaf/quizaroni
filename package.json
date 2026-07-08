@@ -27,7 +27,7 @@
     "engines": {
         "node": ">=20"
     },
-    "packageManager": "pnpm@10.33.0",
+    "packageManager": "pnpm@10.34.4",
     "pnpm": {
         "overrides": {
             "js-cookie": "^3.0.7",
