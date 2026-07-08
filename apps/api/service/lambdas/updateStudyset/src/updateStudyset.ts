@@ -12,6 +12,10 @@ import {
 import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { AuthorizerContext } from 'models/auth';
 import { removeKeys } from 'resources/dynamo/utilities';
+import {
+    PUBLIC_STUDYSET_PK,
+    publicStudysetSK,
+} from 'resources/dynamo/publicSharing';
 
 const { mainBucket = '', mainTable = '' } = process.env;
 
@@ -156,7 +160,31 @@ export const handler: Handler = async (
             ExpressionAttributeValues[attributeValue] = value;
         }
 
-        const UpdateExpression = `SET ${updateExpressions.join(', ')}`;
+        // Maintain the public-sharing GSI (PK2/SK2). A set is indexed there
+        // only while it is public, so toggling `publiclyViewable` adds or
+        // removes the index attributes. `publiclyViewable` always arrives as a
+        // metadata update, so we key off its presence in `updates`.
+        const removeExpressions: string[] = [];
+        if (
+            Object.prototype.hasOwnProperty.call(updates, 'publiclyViewable')
+        ) {
+            ExpressionAttributeNames['#PK2'] = 'PK2';
+            ExpressionAttributeNames['#SK2'] = 'SK2';
+
+            if (updates.publiclyViewable === true) {
+                ExpressionAttributeValues[':PK2'] = PUBLIC_STUDYSET_PK;
+                ExpressionAttributeValues[':SK2'] =
+                    publicStudysetSK(studysetUUID);
+                updateExpressions.push('#PK2 = :PK2', '#SK2 = :SK2');
+            } else {
+                removeExpressions.push('#PK2', '#SK2');
+            }
+        }
+
+        let UpdateExpression = `SET ${updateExpressions.join(', ')}`;
+        if (removeExpressions.length > 0) {
+            UpdateExpression += ` REMOVE ${removeExpressions.join(', ')}`;
+        }
 
         console.log({
             ExpressionAttributeNames,

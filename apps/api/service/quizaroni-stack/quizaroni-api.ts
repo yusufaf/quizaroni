@@ -314,6 +314,26 @@ export class QuizaroniAPI extends Construct {
             });
         }
 
+        // Public (unauthenticated) routes — deliberately registered WITHOUT the
+        // Cognito authorizer so crawlers, social scrapers, and logged-out
+        // visitors can read publicly-shared study sets. The lambdas enforce
+        // `metadata.publiclyViewable` server-side.
+        this.createLambdaHttpIntegration({
+            api,
+            lambdaProps,
+            path: `/api/public/studyset/{studysetUUID}`,
+            lambdaName: 'getPublicStudyset',
+            methods: [HttpMethod.GET],
+        });
+
+        this.createLambdaHttpIntegration({
+            api,
+            lambdaProps,
+            path: `/api/public/studysets`,
+            lambdaName: 'getPublicStudysets',
+            methods: [HttpMethod.GET],
+        });
+
         // this.createLambdaHttpIntegration({
         //     api,
         //     lambdaProps,
@@ -334,11 +354,13 @@ export class QuizaroniAPI extends Construct {
             ],
         });
 
-        // Add a policy statement for DynamoDB access
-        const dynamoTableResources = [`main`, `users`].map(
-            (tableName) =>
-                `arn:aws:dynamodb:${this.region}:${this.account}:table/${this.prefix}-${tableName}`
-        );
+        // Add a policy statement for DynamoDB access. Include the `/index/*`
+        // sub-resource so lambdas can Query global secondary indexes (e.g. the
+        // PK2 public-sharing index) — table-level ARNs alone don't grant that.
+        const dynamoTableResources = [`main`, `users`].flatMap((tableName) => {
+            const tableArn = `arn:aws:dynamodb:${this.region}:${this.account}:table/${this.prefix}-${tableName}`;
+            return [tableArn, `${tableArn}/index/*`];
+        });
         const dynamoDBPolicyStatement = new PolicyStatement({
             effect: Effect.ALLOW,
             actions: [

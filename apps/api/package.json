@@ -8,7 +8,8 @@
 		"build": "tsc",
 		"watch": "tsc -w",
 		"test": "jest",
-		"cdk": "cdk"
+		"cdk": "cdk",
+		"backfill:public-gsi": "ts-node scripts/backfillPublicGsi.ts"
 	},
 	"dependencies": {
 		"@aws-sdk/client-cognito-identity-provider": "^3.721.0",
