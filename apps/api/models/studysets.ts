@@ -1,60 +1,18 @@
-import { FileMetadata } from "./general";
+import type { StudysetBase, Timestamp } from "@quizaroni/shared-types";
 
-export type UUID = string;
-export type Timestamp = string;
+export type {
+    Card,
+    CardFileMetadata,
+    Note,
+    StudysetMetadata,
+    Timestamp,
+    UUID,
+} from "@quizaroni/shared-types";
 
-export type Studyset = {
+/** The persisted DynamoDB record. The web client's `Studyset` differs: it
+ * carries `uuid` instead of the PK/SK key pair. */
+export type Studyset = StudysetBase & {
     PK: string;
     SK: string;
-    cards: Card[];
-    categories: string[];
-    createdAt: Timestamp;
-    description: string;
-    favorited: boolean;
-    labels: string[];
-    lastViewed: Timestamp;
-    metadata: StudysetMetadata;
-    studysetUUID: UUID;
-    title: string;
     updatedAt: Timestamp;
-    userUUID: UUID;
-    username: string;
 };
-
-export type Note = {
-    text: string;
-    noteUUID: UUID;
-    createdAt: Timestamp;
-};
-
-export type Card = {
-    backgroundColor?: string;
-    categories: string[];
-    definition: string;
-    files: CardFileMetadata[];
-    important: boolean;
-    notes: Note[];
-    term: string;
-    textColor?: string;
-    cardUUID: UUID;
-};
-
-export type StudysetMetadata = {
-    backgroundColorVisible: boolean;
-    contentOnly: boolean;
-    customLabelTerminology: string;
-    customTerminology: string;
-    labelTerminology: string;
-    notesDrawerInitial: string;
-    notesDrawerPosition: string;
-    notesSortBy?: 'alphabetical' | 'date' | 'cardOrder';
-    notesSortDirection?: 'asc' | 'desc';
-    publiclyViewable: boolean;
-    terminology: string;
-    textColorVisible: boolean;
-    viewSetLayout?: string;
-};
-
-export type CardFileMetadata = FileMetadata & {
-    association: 'term' | 'definition';
-}

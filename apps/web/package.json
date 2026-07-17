@@ -13,6 +13,7 @@
         "prepare": "vp config"
     },
     "dependencies": {
+        "@quizaroni/shared-types": "workspace:*",
         "@aws-amplify/auth": "^6.0.5",
         "@aws-amplify/ui-react": "^6.5.4",
         "@dicebear/collection": "^9.2.2",

@@ -1,10 +1,15 @@
 import { DATE_FORMATS, DOWNLOAD_FILE_TYPES, TIME_FORMATS } from './constants/';
 import { LabelsDialogTab } from 'components/ManageLabelsDialog/constants';
+import type {
+    Card,
+    StudysetBase,
+    Timestamp,
+    UUID,
+} from '@quizaroni/shared-types';
 
 // #region Utility Types
 export type TODO = any;
-export type UUID = string;
-export type Timestamp = string;
+export type { UUID, Timestamp } from '@quizaroni/shared-types';
 // #endregion
 
 // #region Theme
@@ -12,70 +17,18 @@ export type ThemeName = 'light' | 'dark';
 // #endregion
 
 // #region Studysets
-export type Studyset = {
-    cards: Card[];
-    categories: string[];
-    createdAt: Timestamp;
-    description: string;
-    favorited?: boolean;
-    labels: string[];
-    lastViewed: Timestamp;
-    metadata: StudysetMetadata;
-    studysetUUID: UUID;
-    title: string;
-    userUUID: UUID;
-    username: string;
+export type {
+    Card,
+    CardFileMetadata,
+    Note,
+    PrintConfig,
+    StudysetMetadata,
+} from '@quizaroni/shared-types';
+
+/** The client-side shape. The API's persisted record differs: it carries a
+ * PK/SK key pair and `updatedAt` instead of `uuid`. */
+export type Studyset = StudysetBase & {
     uuid: UUID;
-};
-
-export type Card = {
-    backgroundColor?: string;
-    categories: string[];
-    definition: string;
-    files: CardFileMetadata[];
-    important: boolean;
-    notes: Note[];
-    term: string;
-    textColor?: string;
-    cardUUID: UUID;
-};
-
-export type Note = {
-    text: string;
-    noteUUID: UUID;
-    createdAt?: Timestamp;
-};
-
-export type PrintConfig = {
-    layout: 'flashcard' | 'list' | 'grid';
-    includeNotes: boolean;
-    includeFiles: boolean;
-    includeCategories: boolean;
-    showColors: boolean;
-    importantOnly: boolean;
-};
-
-export type StudysetMetadata = {
-    backgroundColorVisible: boolean;
-    contentOnly?: boolean;
-    cardCountVisible?: boolean;
-    cardIndexVisible?: boolean;
-    customLabelTerminology: string;
-    customTerminology: string;
-    labelTerminology: string;
-    notesDrawerInitial: string;
-    notesDrawerPosition: 'left' | 'right';
-    notesSortBy?: 'alphabetical' | 'date' | 'cardOrder';
-    notesSortDirection?: 'asc' | 'desc';
-    printConfig?: PrintConfig;
-    publiclyViewable: boolean;
-    terminology: string;
-    textColorVisible: boolean;
-    viewSetLayout?: ViewSetLayout;
-};
-
-export type CardFileMetadata = FileMetadata & {
-    association: 'term' | 'definition';
 };
 
 // #endregion
@@ -111,7 +64,7 @@ export type User = {
 
 export type AppTheme = 'light' | 'dark';
 export type HomeView = 'table' | 'grid' | 'html';
-export type ViewSetLayout = 'list' | 'grid';
+export type { ViewSetLayout } from '@quizaroni/shared-types';
 export type NamedColor = { color: string; name: string };
 
 export type PreferredDateFormat =
@@ -457,13 +410,7 @@ export type BatchUpdateStudysetLabelsRequest = {
     studysetUpdates: [UUID, string[]][]; // [studysetUUID, labels[]]
 };
 
-export type FileMetadata = {
-    key: string;
-    name: string;
-    signedURL: string;
-    size: number;
-    uploadedAt?: string;
-};
+export type { FileMetadata } from '@quizaroni/shared-types';
 
 export type Part = {
     ETag: string;
