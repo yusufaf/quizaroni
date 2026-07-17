@@ -70,7 +70,9 @@ import {
   ViewStudysetPage,
 } from "./styles";
 import NotesDrawer from "./NotesDrawer/NotesDrawer";
+import AIChatPanel from "./AIChatPanel/AIChatPanel";
 import { useViewSetsStore } from "state/stores/viewSets";
+import { useAIChatStore } from "state/stores/aiChat";
 import { useGlobalStore } from "state/stores/global";
 
 type Props = {};
@@ -237,6 +239,9 @@ const ViewStudySet = (props: Props) => {
 
   const notesDrawerPosition =
     selectedStudyset?.metadata?.notesDrawerPosition || "right";
+  // The AI panel docks on the opposite side from the notes drawer.
+  const aiPanelPosition = notesDrawerPosition === "right" ? "left" : "right";
+  const { isOpen: isAIPanelOpen } = useAIChatStore();
   // Below `lg` the drawer is a temporary overlay, so it reserves no space and
   // we fall back to the page's own responsive padding (undefined = inherit).
   const drawerOpenPadding = { xs: undefined, lg: "27.5rem" };
@@ -244,20 +249,24 @@ const ViewStudySet = (props: Props) => {
   const basePadding = { xs: undefined, lg: "2rem" };
 
   const getPadding = () => {
-    if (isNotesDrawerHidden) {
-      // When drawer is hidden, use moderate padding on both sides
-      return {
-        paddingLeft: drawerClosedPadding,
-        paddingRight: drawerClosedPadding,
-      };
+    let paddingLeft = isNotesDrawerHidden
+      ? drawerClosedPadding
+      : notesDrawerPosition === "left"
+        ? drawerOpenPadding
+        : basePadding;
+    let paddingRight = isNotesDrawerHidden
+      ? drawerClosedPadding
+      : notesDrawerPosition === "right"
+        ? drawerOpenPadding
+        : basePadding;
+
+    // Reserve space for the AI panel on its docked side when open.
+    if (isAIPanelOpen) {
+      if (aiPanelPosition === "left") paddingLeft = drawerOpenPadding;
+      else paddingRight = drawerOpenPadding;
     }
-    // When drawer is open, large padding on drawer side, minimal on other
-    return {
-      paddingLeft:
-        notesDrawerPosition === "left" ? drawerOpenPadding : basePadding,
-      paddingRight:
-        notesDrawerPosition === "right" ? drawerOpenPadding : basePadding,
-    };
+
+    return { paddingLeft, paddingRight };
   };
 
   const padding = getPadding();
@@ -266,7 +275,7 @@ const ViewStudySet = (props: Props) => {
     <>
       <ViewStudysetPage
         className="view-set-page"
-        viewMode={viewMode}
+        viewMode={viewMode as "list" | "grid"}
         sx={{
           ...padding,
         }}
@@ -446,6 +455,10 @@ const ViewStudySet = (props: Props) => {
           selectedStudyset={selectedStudyset}
           isHidden={isNotesDrawerHidden}
           onToggle={setIsNotesDrawerHidden}
+        />
+        <AIChatPanel
+          selectedStudyset={selectedStudyset}
+          notesDrawerPosition={notesDrawerPosition as "left" | "right"}
         />
       </ViewStudysetPage>
       <NotificationsDialog

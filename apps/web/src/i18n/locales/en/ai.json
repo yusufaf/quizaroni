@@ -1,0 +1,81 @@
+{
+    "aiChat": {
+        "title": "AI Study Assistant",
+        "openPanel": "Open AI Assistant",
+        "closePanel": "Close AI Assistant",
+        "modes": {
+            "chat": "Chat",
+            "quiz": "Quiz Me",
+            "explain": "Explain",
+            "keyConcepts": "Key Concepts",
+            "suggestCards": "Suggest Cards"
+        },
+        "modeDescriptions": {
+            "chat": "Ask questions about your study material",
+            "quiz": "Test your knowledge with AI-generated questions",
+            "explain": "Get detailed explanations of concepts",
+            "keyConcepts": "Discover the most important takeaways",
+            "suggestCards": "Generate new flashcards similar to these"
+        },
+        "actions": {
+            "explainCard": "Explain with AI",
+            "generateKeyConcepts": "Generate Key Concepts",
+            "generateCards": "Generate Cards",
+            "addToSet": "Add {{count}} to set",
+            "exportChat": "Export conversation"
+        },
+        "suggestedCards": {
+            "title": "Suggested flashcards",
+            "added": "Added {{count}} card(s) to your set",
+            "addedShort": "Added to set"
+        },
+        "input": {
+            "placeholder": "Ask a question...",
+            "send": "Send",
+            "stop": "Stop generating"
+        },
+        "messages": {
+            "welcome": "Hi! I'm your AI study assistant. I have access to all the cards in this study set. How can I help you study?",
+            "quizWelcome": "Let's test your knowledge! I'll ask you questions based on your flashcards. Ready?",
+            "explainWelcome": "I can explain any concept from your study set in detail. What would you like to understand better?",
+            "keyConceptsWelcome": "Let me analyze your study set and identify the key concepts...",
+            "suggestCardsWelcome": "I can generate new flashcards that fit this set. Tap Generate Cards to start.",
+            "emptyState": "Start a conversation to get help studying",
+            "error": "Something went wrong. Please try again.",
+            "clearChat": "Clear chat",
+            "clearChatConfirm": "Are you sure you want to clear this conversation?"
+        },
+        "setup": {
+            "title": "Set up AI Features",
+            "description": "Configure your AI provider and API key to start using AI-powered study features.",
+            "goToSettings": "Go to AI Settings",
+            "noApiKey": "No API key configured"
+        }
+    },
+    "aiSettings": {
+        "title": "AI Integration",
+        "description": "Configure your AI provider to enable AI-powered study features. Your API key is stored encrypted on your device and never saved on our servers.",
+        "provider": "AI Provider",
+        "providerDescription": "Select your preferred AI provider",
+        "model": "Model",
+        "modelDescription": "Choose which AI model to use",
+        "apiKey": "API Key",
+        "apiKeyDescription": "Enter your API key from your provider",
+        "apiKeyPlaceholder": "Paste your API key here",
+        "apiKeySaved": "API key saved securely",
+        "apiKeyMasked": "Key configured",
+        "saveKey": "Save Key",
+        "deleteKey": "Delete Key",
+        "testConnection": "Test Connection",
+        "testSuccess": "Connection successful!",
+        "testError": "Connection failed. Please check your API key.",
+        "getApiKey": "Get an API key",
+        "recommended": "Recommended",
+        "securityNote": "Your API key is encrypted and stored only on this device. It is transmitted securely per-request but never stored on our servers.",
+        "providerOptions": {
+            "openai": "OpenAI",
+            "anthropic": "Anthropic",
+            "google": "Google Gemini"
+        }
+    }
+}

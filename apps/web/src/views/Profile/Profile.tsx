@@ -7,6 +7,7 @@ import CustomizationTab from './CustomizationTab';
 import JsonSettingsTab from './JsonSettingsTab';
 import AchievementsTab from './AchievementsTab';
 import ProfileCard from './ProfileCard';
+import AISettingsTab from './AISettingsTab';
 import {
     ProfileContainer,
     ProfilePage,
@@ -28,6 +29,7 @@ const TABS = {
     ACCESSIBILITY: 'Accessibility',
     ACCOUNT: 'Account',
     JSON: 'JSON',
+    AI: 'AI',
 };
 
 const VALID_TABS = new Set<string>(Object.values(TABS));
@@ -93,6 +95,7 @@ const Profile = (props: Props) => {
                                 label={t('profile.account')}
                                 value={TABS.ACCOUNT}
                             />
+                            <ProfileTab label="AI Settings" value={TABS.AI} />
                             <ProfileTab
                                 label={t('profile.json')}
                                 value={TABS.JSON}
@@ -109,6 +112,9 @@ const Profile = (props: Props) => {
                         )}
                         {selectedProfileTab === TABS.ACCOUNT && (
                             <AccountTab userData={userData} />
+                        )}
+                        {selectedProfileTab === TABS.AI && (
+                            <AISettingsTab userData={userData} />
                         )}
                         {selectedProfileTab === TABS.JSON && (
                             <JsonSettingsTab userData={userData} />

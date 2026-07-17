@@ -101,6 +101,8 @@ export type User = {
         preferredTimeFormat?: PreferredTimeFormat;
         showSeconds?: boolean;
         ttsVoice?: string;
+        aiProvider?: 'openai' | 'anthropic' | 'google';
+        aiModel?: string;
         visibleColumns?: Record<string, boolean>;
     };
     username: string;
