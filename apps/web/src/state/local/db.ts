@@ -7,6 +7,7 @@ import type {
     CustomAchievement,
     GamificationState,
 } from 'shared/types';
+import type { AIMessage } from 'shared/ai/providers';
 
 // Local-first versions of types with sync metadata
 export interface LocalStudyset extends Studyset {
@@ -41,6 +42,13 @@ export interface LocalCustomAchievement extends CustomAchievement {
     _lastModified: number;
 }
 
+// One persisted AI conversation per study set
+export interface LocalAIChatHistory {
+    studysetUUID: string;
+    messages: AIMessage[];
+    updatedAt: number;
+}
+
 // Database tables interface
 interface QuizaroniDatabase extends Dexie {
     studysets: EntityTable<LocalStudyset, 'studysetUUID'>;
@@ -49,6 +57,7 @@ interface QuizaroniDatabase extends Dexie {
     cardProgress: EntityTable<LocalCardProgress, 'cardUUID'>;
     gamification: EntityTable<LocalGamificationRecord, 'id'>;
     customAchievements: EntityTable<LocalCustomAchievement, 'id'>;
+    aiChatHistory: EntityTable<LocalAIChatHistory, 'studysetUUID'>;
     syncQueue: EntityTable<
         {
             id: number;
@@ -64,7 +73,7 @@ interface QuizaroniDatabase extends Dexie {
 }
 
 const DB_NAME = 'quizaroni_v1';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 let dbInstance: QuizaroniDatabase | null = null;
 
@@ -85,6 +94,18 @@ export function getDatabase(): QuizaroniDatabase {
         syncQueue: '++id, entityType, entityId, createdAt',
     });
 
+    db.version(3).stores({
+        studysets:
+            'studysetUUID, userUUID, _syncStatus, _lastModified, labels, lastViewed',
+        users: 'userUUID, _syncStatus, _lastModified',
+        sessions: 'sessionUUID, studysetUUID, completedAt, _syncStatus',
+        cardProgress:
+            'cardUUID, studysetUUID, nextReview, _syncStatus, [studysetUUID+nextReview]',
+        gamification: 'id',
+        customAchievements: 'id, unlockedAt',
+        syncQueue: '++id, entityType, entityId, createdAt',
+    });
+
     db.version(DB_VERSION).stores({
         studysets:
             'studysetUUID, userUUID, _syncStatus, _lastModified, labels, lastViewed',
@@ -94,6 +115,7 @@ export function getDatabase(): QuizaroniDatabase {
             'cardUUID, studysetUUID, nextReview, _syncStatus, [studysetUUID+nextReview]',
         gamification: 'id',
         customAchievements: 'id, unlockedAt',
+        aiChatHistory: 'studysetUUID, updatedAt',
         syncQueue: '++id, entityType, entityId, createdAt',
     });
 

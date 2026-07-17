@@ -1,0 +1,81 @@
+{
+    "aiChat": {
+        "title": "Asistente de Estudio de IA",
+        "openPanel": "Abrir Asistente de IA",
+        "closePanel": "Cerrar Asistente de IA",
+        "modes": {
+            "chat": "Chat",
+            "quiz": "Examen",
+            "explain": "Explicar",
+            "keyConcepts": "Conceptos Clave",
+            "suggestCards": "Sugerir Tarjetas"
+        },
+        "modeDescriptions": {
+            "chat": "Haz preguntas sobre tu material de estudio",
+            "quiz": "Pon a prueba tus conocimientos con preguntas generadas por IA",
+            "explain": "Obtén explicaciones detalladas de los conceptos",
+            "keyConcepts": "Descubre las conclusiones más importantes",
+            "suggestCards": "Genera nuevas tarjetas similares a estas"
+        },
+        "actions": {
+            "explainCard": "Explicar con IA",
+            "generateKeyConcepts": "Generar Conceptos Clave",
+            "generateCards": "Generar Tarjetas",
+            "addToSet": "Añadir {{count}} a la unidad",
+            "exportChat": "Exportar conversación"
+        },
+        "suggestedCards": {
+            "title": "Tarjetas sugeridas",
+            "added": "Se añadieron {{count}} tarjeta(s) a tu unidad",
+            "addedShort": "Añadidas a la unidad"
+        },
+        "input": {
+            "placeholder": "Haz una pregunta...",
+            "send": "Enviar",
+            "stop": "Detener generación"
+        },
+        "messages": {
+            "welcome": "¡Hola! Soy tu asistente de estudio de IA. Tengo acceso a todas las tarjetas de esta unidad. ¿Cómo puedo ayudarte a estudiar?",
+            "quizWelcome": "¡Pongamos a prueba tus conocimientos! Te haré preguntas basadas en tus tarjetas. ¿Listo?",
+            "explainWelcome": "Puedo explicarte cualquier concepto de tu unidad en detalle. ¿Qué te gustaría entender mejor?",
+            "keyConceptsWelcome": "Déjame analizar tu unidad e identificar los conceptos clave...",
+            "suggestCardsWelcome": "Puedo generar nuevas tarjetas que encajen con esta unidad. Toca Generar Tarjetas para empezar.",
+            "emptyState": "Inicia una conversación para obtener ayuda para estudiar",
+            "error": "Algo salió mal. Por favor, inténtalo de nuevo.",
+            "clearChat": "Borrar chat",
+            "clearChatConfirm": "¿Estás seguro de que quieres borrar esta conversación?"
+        },
+        "setup": {
+            "title": "Configurar Funciones de IA",
+            "description": "Configura tu proveedor de IA y tu clave API para empezar a usar las funciones de estudio.",
+            "goToSettings": "Ir a Configuración de IA",
+            "noApiKey": "No hay clave API configurada"
+        }
+    },
+    "aiSettings": {
+        "title": "Integración de IA",
+        "description": "Configura tu proveedor de IA para habilitar las funciones de estudio. Tu clave API se guarda cifrada en tu dispositivo y nunca se guarda en nuestros servidores.",
+        "provider": "Proveedor de IA",
+        "providerDescription": "Selecciona tu proveedor de IA preferido",
+        "model": "Modelo",
+        "modelDescription": "Elige qué modelo de IA usar",
+        "apiKey": "Clave API",
+        "apiKeyDescription": "Ingresa tu clave API de tu proveedor",
+        "apiKeyPlaceholder": "Pega tu clave API aquí",
+        "apiKeySaved": "Clave API guardada de forma segura",
+        "apiKeyMasked": "Clave configurada",
+        "saveKey": "Guardar Clave",
+        "deleteKey": "Borrar Clave",
+        "testConnection": "Probar Conexión",
+        "testSuccess": "¡Conexión exitosa!",
+        "testError": "Error de conexión. Por favor revisa tu clave API.",
+        "getApiKey": "Obtener una clave API",
+        "recommended": "Recomendado",
+        "securityNote": "Tu clave API está cifrada y se almacena solo en este dispositivo. Se transmite de forma segura por cada solicitud pero nunca se almacena en nuestros servidores.",
+        "providerOptions": {
+            "openai": "OpenAI",
+            "anthropic": "Anthropic",
+            "google": "Google Gemini"
+        }
+    }
+}

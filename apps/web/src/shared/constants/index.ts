@@ -410,6 +410,13 @@ export const NOTES_DRAWER_INITIAL_APPEARANCE_OPTIONS = [
     },
 ];
 
+export const AI_PANEL_POSITIONS = {
+    LEFT: 'left',
+    RIGHT: 'right',
+} as const;
+
+export const MAX_AI_CONTEXT_CARDS = 50;
+
 export const CARD_COUNT_VISIBILITY = {
     HIDDEN: false,
     VISIBLE: true,
