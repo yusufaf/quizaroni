@@ -10,6 +10,9 @@
         "build": "vp build",
         "gen:icons": "node scripts/gen-icons.mjs",
         "preview": "vp preview",
+        "test": "vp test --run",
+        "test:watch": "vp test",
+        "typecheck": "tsc --noEmit",
         "prepare": "vp config"
     },
     "dependencies": {
