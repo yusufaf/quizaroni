@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.4.0](https://github.com/yusufaf/quizaroni/compare/web-v0.3.0...web-v0.4.0) (2026-07-18)
+
+
+### Features
+
+* **a11y:** flashcards study shortcuts ([adc8251](https://github.com/yusufaf/quizaroni/commit/adc8251bab3f1d131143b458697c884b302fbc95))
+* **a11y:** global key listener and dispatch ([6233d3c](https://github.com/yusufaf/quizaroni/commit/6233d3c5b287be1ec11500af0f393c261c2ffcf9))
+* **a11y:** keyboard shortcuts and help modal ([#5](https://github.com/yusufaf/quizaroni/issues/5)) ([2db6f87](https://github.com/yusufaf/quizaroni/commit/2db6f87cadb953ba9287805ddb50a2574138ad63))
+* **a11y:** matching study shortcuts ([9cd5d59](https://github.com/yusufaf/quizaroni/commit/9cd5d59999879c303d1a7944d29470da99bac4a2))
+* **a11y:** mount shortcut layer in app ([74f824e](https://github.com/yusufaf/quizaroni/commit/74f824e84220df9eecf82b66ab22f727ec54cd71))
+* **a11y:** multiple choice study shortcuts ([7eb75a0](https://github.com/yusufaf/quizaroni/commit/7eb75a0e8f6d22f92bdc88a959fff3f1c4918df5))
+* **a11y:** nav shortcuts and search tag ([2c1a256](https://github.com/yusufaf/quizaroni/commit/2c1a256ef8a959f71d565fb3204402562481a6b9))
+* **a11y:** shortcut help modal and strings ([8d88353](https://github.com/yusufaf/quizaroni/commit/8d8835331fd0452d4eb9df7cdd44fd143e4eaca4))
+* **a11y:** shortcut registry provider ([463846b](https://github.com/yusufaf/quizaroni/commit/463846bc39f46059ea411e6b3d3241b0e07ffcaf))
+* **a11y:** shortcut types and input guards ([d08218f](https://github.com/yusufaf/quizaroni/commit/d08218f93941266329eaa88ca87fdd1996046875))
+* **a11y:** type-write study shortcuts ([e2099e4](https://github.com/yusufaf/quizaroni/commit/e2099e46e8add2ea83b9a8417ff92ac271bc0719))
+* **a11y:** useShortcuts registration hook ([b67bf10](https://github.com/yusufaf/quizaroni/commit/b67bf101aead85ebea348d0f494dd45c62be8045))
+* public study-set sharing (public page, per-set meta, sitemap) + perf/import ([7f6b588](https://github.com/yusufaf/quizaroni/commit/7f6b5881f547e990670031524d1cc363c71e9cdd))
+* **study:** add back-to-set button on caught-up screen ([1b5f811](https://github.com/yusufaf/quizaroni/commit/1b5f811595a40327e45f5575f8f625690d463965))
+* **web:** add AI chat panel phase 2 (issue [#15](https://github.com/yusufaf/quizaroni/issues/15)) ([ec9739b](https://github.com/yusufaf/quizaroni/commit/ec9739be5c3edc1e8e9908a7e06074d9ac55e7b6))
+* **web:** AI chat panel phase 2 (issue [#15](https://github.com/yusufaf/quizaroni/issues/15)) ([01f81b3](https://github.com/yusufaf/quizaroni/commit/01f81b352e56d5e9fed3630302718402b59291bb))
+* **web:** public share page, per-set meta, perf splitting, Quizlet/Anki import ([89690cb](https://github.com/yusufaf/quizaroni/commit/89690cb254116e5289e50b477899ceddb93284c1))
+
+
+### Bug Fixes
+
+* **deps:** bump pnpm to 10.34.4 (resolves 3 high Dependabot alerts) ([2c3d7df](https://github.com/yusufaf/quizaroni/commit/2c3d7df53f64b5d9d4ca83e971f090582bf156f4))
+* **deps:** bump pnpm to 10.34.4 to resolve Dependabot high alerts ([6f0da9a](https://github.com/yusufaf/quizaroni/commit/6f0da9a82ad7cdd86bd580f01ca9f5b0610047d9))
+* **deps:** patch dompurify, js-yaml, vite-plus alerts ([5aa323a](https://github.com/yusufaf/quizaroni/commit/5aa323a70fc61ffb490c9c0044953a65ab328088))
+* **deps:** resolve 7 Dependabot alerts ([5083d22](https://github.com/yusufaf/quizaroni/commit/5083d228c14ee8507dc0f24d5634cd59ea3930e9))
+* **i18n:** use _one/_other plural keys for categoriesAssigned ([2dedf58](https://github.com/yusufaf/quizaroni/commit/2dedf583f034ff9eac6330b4bc56c559c826a017))
+* **web:** clear all 67 type errors and gate CI on typecheck ([36b2c0b](https://github.com/yusufaf/quizaroni/commit/36b2c0b0f04b4e5e0c558d8fd340e32aa455c65d))
+* **web:** clear all 67 type errors and gate CI on typecheck ([29c7099](https://github.com/yusufaf/quizaroni/commit/29c709951bc514f3623dfcc2a9c478d8a947ac33))
+* **web:** no-cards removal, pnpm scripts, download refactor + a11y docs ([49bc8fd](https://github.com/yusufaf/quizaroni/commit/49bc8fdaca49cd47dabf55a212d3e59fb8398977))
+* **web:** remove no-cards warning icon ([b301e5e](https://github.com/yusufaf/quizaroni/commit/b301e5e62e2e999acf0c2c8cc4c339d131145ec3))
+* **web:** responsive layouts for view/home/edit and flashcards crash ([76b60be](https://github.com/yusufaf/quizaroni/commit/76b60bedee4d1ab930512e9c83f21e11ac19523e))
+* **web:** UI responsiveness across studyset pages + flashcards crash ([46c6145](https://github.com/yusufaf/quizaroni/commit/46c6145a2616d9aa25ed97a6e1bf954e75752ea2))
+
 ## [0.3.0](https://github.com/yusufaf/quizaroni/compare/web-v0.2.0...web-v0.3.0) (2026-06-07)
 
 
