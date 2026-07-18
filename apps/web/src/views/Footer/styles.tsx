@@ -1,4 +1,4 @@
-import { IconButton, Paper } from '@mui/material';
+import { IconButton, Paper, type IconButtonProps } from '@mui/material';
 import { styled } from '@mui/system';
 
 export const StyledFooter = styled('footer')({
@@ -27,7 +27,14 @@ export const FooterRight = styled('div')({
     gap: '0.5rem',
 });
 
-export const SocialIconButton = styled(IconButton)(({ theme }) => ({
+// These render as external links. `styled()` erases IconButton's polymorphic
+// `component` overload, so the anchor form is pinned with a thin wrapper that
+// carries the right prop types (href/target/rel) through to the styled version.
+const AnchorIconButton = (props: Omit<IconButtonProps<'a'>, 'component'>) => (
+    <IconButton component="a" {...props} />
+);
+
+export const SocialIconButton = styled(AnchorIconButton)(({ theme }) => ({
     color: theme.palette.text.primary,
     '&:hover': {
         opacity: 0.6,

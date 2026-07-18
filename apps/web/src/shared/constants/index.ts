@@ -1,6 +1,7 @@
 import type {
     Card,
     ConfirmDialogProps,
+    NotificationPreferences,
     SortDirection,
     User,
 } from 'shared/types';
@@ -620,7 +621,9 @@ export const DAYS_OF_WEEK = [
     { value: 6, label: 'Saturday', short: 'Sat' },
 ] as const;
 
-export const DEFAULT_NOTIFICATION_PREFERENCES = {
+// Annotated rather than `as const`: the readonly arrays and literal types an
+// `as const` produces are not assignable to the mutable NotificationPreferences.
+export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
     enabled: false,
     mode: NOTIFICATION_MODES.REGULAR,
     email: {
@@ -638,4 +641,4 @@ export const DEFAULT_NOTIFICATION_PREFERENCES = {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     },
     studysetPrefs: [],
-} as const;
+};

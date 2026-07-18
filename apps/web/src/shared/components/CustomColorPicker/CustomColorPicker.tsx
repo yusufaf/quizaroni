@@ -36,7 +36,7 @@ const CustomColorPicker = (props: Props) => {
 
     const { setNamedColorsDialogProps } = useGlobalStore();
 
-    const ref = useClickAway(onClose, additionalRefs);
+    const ref = useClickAway<HTMLDivElement>(onClose, additionalRefs);
 
     const openNamedColorsDialog = () => {
         setNamedColorsDialogProps({

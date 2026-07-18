@@ -196,6 +196,6 @@ describe('mergeCustomAchievements', () => {
         const merged = mergeCustomAchievements(local, remote);
 
         expect(merged).toHaveLength(1);
-        expect(merged[0].unlockedAt).toBe('2026-06-02T00:00:00.000Z');
+        expect(merged[0]?.unlockedAt).toBe('2026-06-02T00:00:00.000Z');
     });
 });

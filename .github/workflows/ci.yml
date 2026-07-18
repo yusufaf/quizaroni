@@ -18,6 +18,8 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile=false
+      - name: Typecheck
+        run: pnpm typecheck
       - name: Test
         run: pnpm test
       - name: Build frontend

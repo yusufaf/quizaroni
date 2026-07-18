@@ -28,9 +28,7 @@ export class GridPdfGenerator extends BasePdfGenerator {
 
         let xPos = this.MARGIN;
 
-        for (let i = 0; i < cards.length; i++) {
-            const card = cards[i];
-
+        for (const [i, card] of cards.entries()) {
             // Check if we need to start a new row
             if (i > 0 && i % this.CARDS_PER_ROW === 0) {
                 xPos = this.MARGIN;

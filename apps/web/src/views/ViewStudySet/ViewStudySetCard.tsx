@@ -108,7 +108,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
         if (voice) termUtterance.voice = voice;
         window.speechSynthesis.speak(termUtterance);
 
-        timeoutRef.current = window.setTimeout(() => {
+        timeoutRef.current = setTimeout(() => {
             const definitionUtterance = new SpeechSynthesisUtterance();
             definitionUtterance.text = card.definition;
             if (voice) definitionUtterance.voice = voice;

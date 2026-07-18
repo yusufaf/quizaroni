@@ -28,6 +28,7 @@ const Footer = () => {
                         <SocialIconButton
                             href="https://github.com/yusufaf"
                             target="_blank"
+                            rel="noopener noreferrer"
                             aria-label="GitHub"
                         >
                             <GitHub />
@@ -37,6 +38,7 @@ const Footer = () => {
                         <SocialIconButton
                             href="https://www.linkedin.com/in/yusuf-afzal/"
                             target="_blank"
+                            rel="noopener noreferrer"
                             aria-label="LinkedIn"
                         >
                             <LinkedIn />

@@ -246,32 +246,37 @@ const NotificationsDialog = (props: Props) => {
         updatePreferences({ snoozeUntil: undefined });
     };
 
-    const handleStudysetToggle = (enabled: boolean) => {
-        if (!studysetUUID) return;
-
+    /**
+     * Apply a patch to this studyset's prefs entry, returning the full updated
+     * list — or null when the studyset has no entry yet.
+     */
+    const patchStudysetPrefs = (
+        patch: Partial<StudysetNotificationPrefs>
+    ): StudysetNotificationPrefs[] | null => {
         const existingPrefs = preferences.studysetPrefs || [];
         const existingIndex = existingPrefs.findIndex(
             (p) => p.studysetUUID === studysetUUID
         );
+        const existing = existingPrefs[existingIndex];
+        if (!existing) return null;
 
-        let updatedPrefs: StudysetNotificationPrefs[];
-        if (existingIndex >= 0) {
-            updatedPrefs = [...existingPrefs];
-            updatedPrefs[existingIndex] = {
-                ...updatedPrefs[existingIndex],
+        const updatedPrefs = [...existingPrefs];
+        updatedPrefs[existingIndex] = { ...existing, ...patch };
+        return updatedPrefs;
+    };
+
+    const handleStudysetToggle = (enabled: boolean) => {
+        if (!studysetUUID) return;
+
+        const updatedPrefs = patchStudysetPrefs({ enabled }) ?? [
+            ...(preferences.studysetPrefs || []),
+            {
+                studysetUUID,
                 enabled,
-            };
-        } else {
-            updatedPrefs = [
-                ...existingPrefs,
-                {
-                    studysetUUID,
-                    enabled,
-                    reminderTime: '09:00',
-                    reminderDays: [1, 2, 3, 4, 5],
-                },
-            ];
-        }
+                reminderTime: '09:00',
+                reminderDays: [1, 2, 3, 4, 5],
+            },
+        ];
 
         updatePreferences({ studysetPrefs: updatedPrefs });
     };
@@ -279,17 +284,8 @@ const NotificationsDialog = (props: Props) => {
     const handleStudysetReminderTime = (time: string) => {
         if (!studysetUUID) return;
 
-        const existingPrefs = preferences.studysetPrefs || [];
-        const existingIndex = existingPrefs.findIndex(
-            (p) => p.studysetUUID === studysetUUID
-        );
-
-        if (existingIndex >= 0) {
-            const updatedPrefs = [...existingPrefs];
-            updatedPrefs[existingIndex] = {
-                ...updatedPrefs[existingIndex],
-                reminderTime: time,
-            };
+        const updatedPrefs = patchStudysetPrefs({ reminderTime: time });
+        if (updatedPrefs) {
             updatePreferences({ studysetPrefs: updatedPrefs });
         }
     };
@@ -297,17 +293,8 @@ const NotificationsDialog = (props: Props) => {
     const handleStudysetReminderDays = (days: number[]) => {
         if (!studysetUUID) return;
 
-        const existingPrefs = preferences.studysetPrefs || [];
-        const existingIndex = existingPrefs.findIndex(
-            (p) => p.studysetUUID === studysetUUID
-        );
-
-        if (existingIndex >= 0) {
-            const updatedPrefs = [...existingPrefs];
-            updatedPrefs[existingIndex] = {
-                ...updatedPrefs[existingIndex],
-                reminderDays: days,
-            };
+        const updatedPrefs = patchStudysetPrefs({ reminderDays: days });
+        if (updatedPrefs) {
             updatePreferences({ studysetPrefs: updatedPrefs });
         }
     };

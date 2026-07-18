@@ -7,7 +7,9 @@ import { CircularProgress, IconButton, Typography } from '@mui/material';
 import { CardFileMetadata } from 'shared/types';
 import { formatBytes } from 'utilities/general';
 import { useState } from 'react';
-import { styled } from '@mui/system';
+// `@mui/material/styles` rather than `@mui/system`: only the former's Theme
+// carries `shadows`, which the hover style below reads.
+import { styled } from '@mui/material/styles';
 
 const ImagePreviewContainer = styled('div')(({ theme }) => ({
     position: 'relative',
