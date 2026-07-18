@@ -1,8 +1,1 @@
-
-export type FileMetadata = {
-    key: string;
-    name: string;
-    signedURL: string;
-    size: number;
-    uploadedAt: string;
-};
+export type { FileMetadata } from "@quizaroni/shared-types";

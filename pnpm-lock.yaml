@@ -48,6 +48,9 @@ importers:
       '@aws-sdk/s3-request-presigner':
         specifier: ^3.722.0
         version: 3.1057.0
+      '@quizaroni/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
       aws-cdk-lib:
         specifier: ^2.177.0
         version: 2.257.0(constructs@10.6.0)
@@ -136,6 +139,9 @@ importers:
       '@mui/x-data-grid':
         specifier: ^7.18.0
         version: 7.29.13(@emotion/react@11.14.0(@types/react@18.3.29)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.29)(react@18.3.1))(@types/react@18.3.29)(react@18.3.1))(@mui/material@5.18.0(@emotion/react@11.14.0(@types/react@18.3.29)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.29)(react@18.3.1))(@types/react@18.3.29)(react@18.3.1))(@types/react@18.3.29)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@mui/system@5.18.0(@emotion/react@11.14.0(@types/react@18.3.29)(react@18.3.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@18.3.29)(react@18.3.1))(@types/react@18.3.29)(react@18.3.1))(@types/react@18.3.29)(react@18.3.1))(@types/react@18.3.29)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@quizaroni/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
       '@reduxjs/toolkit':
         specifier: ^2.2.7
         version: 2.12.0(react@18.3.1)
@@ -260,6 +266,12 @@ importers:
       vitest:
         specifier: npm:@voidzero-dev/vite-plus-test@latest
         version: '@voidzero-dev/vite-plus-test@0.1.23(@types/node@20.19.41)(@voidzero-dev/vite-plus-core@0.1.23(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(esbuild@0.28.1)(jiti@2.6.1)(jsdom@29.1.1)(typescript@5.9.3)'
+
+  packages/shared-types:
+    devDependencies:
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
 
 packages:
 
