@@ -82,8 +82,8 @@ const HomeHTMLView = ({ studysets }: Props) => {
                                     </td>
                                     <td>{studyset.cards.length}</td>
                                     <td>
-                                        {studyset.label
-                                            ? studyset.label
+                                        {studyset.labels?.length
+                                            ? studyset.labels.join(', ')
                                             : 'No label'}
                                     </td>
                                     <td>{studyset.favorited ? '✅' : '❌'}</td>

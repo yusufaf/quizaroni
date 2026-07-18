@@ -21,9 +21,7 @@ export class ListPdfGenerator extends BasePdfGenerator {
         let yPos = this.renderHeader(doc, studyset, 40);
         yPos += 20;
 
-        for (let i = 0; i < cards.length; i++) {
-            const card = cards[i];
-
+        for (const [i, card] of cards.entries()) {
             // Check if we need a new page
             const estimatedHeight = await this.estimateCardHeight(
                 card,
@@ -229,7 +227,7 @@ export class ListPdfGenerator extends BasePdfGenerator {
             try {
                 const height = await this.embedImageAt(
                     doc,
-                    file.downloadURL,
+                    file.signedURL,
                     x,
                     y,
                     maxWidth,

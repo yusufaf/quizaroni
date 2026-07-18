@@ -54,7 +54,7 @@ export const useLabelsDialog = () => {
     >([]);
     const [assignLabels, setAssignLabels] = useState<string[]>([]);
 
-    const { mutate: createLabel, isPending: isCreatingLabel } =
+    const { mutate: createLabel, isLoading: isCreatingLabel } =
         useCustomMutation({
             mutation: useCreateLabel,
             successMessage: 'Successfully created label',
@@ -64,7 +64,7 @@ export const useLabelsDialog = () => {
             },
         });
 
-    const { mutate: editLabel, isPending: isEditingLabel } = useCustomMutation({
+    const { mutate: editLabel, isLoading: isEditingLabel } = useCustomMutation({
         mutation: useEditLabel,
         successMessage: 'Successfully edited label',
         errorMessage: 'Error editing label',
@@ -74,7 +74,7 @@ export const useLabelsDialog = () => {
         },
     });
 
-    const { mutate: deleteLabel, isPending: isDeletingLabel } =
+    const { mutate: deleteLabel, isLoading: isDeletingLabel } =
         useCustomMutation({
             mutation: useDeleteLabel,
             successMessage: 'Successfully deleted label(s)',
@@ -85,7 +85,7 @@ export const useLabelsDialog = () => {
             },
         });
 
-    const { mutate: batchUpdateLabels, isPending: isAssigningLabels } =
+    const { mutate: batchUpdateLabels, isLoading: isAssigningLabels } =
         useCustomMutation({
             mutation: useBatchUpdateStudysetLabels,
             successMessage: 'Successfully assigned labels',
@@ -174,6 +174,8 @@ export const useLabelsDialog = () => {
     const confirmEdit = useCallback(() => {
         if (editIndex === null) return;
         const oldLabel = labels[editIndex];
+        if (oldLabel === undefined) return;
+
         const newLabel = ''; // This will be passed from the form
         editLabel({
             index: editIndex,
@@ -188,13 +190,15 @@ export const useLabelsDialog = () => {
             setCascadeAction('delete');
             setShowCascadePreview(true);
         } else {
-            const labelsToDelete = deleteIndices.map((i) => labels[i]);
+            const labelsToDelete = deleteIndices.flatMap(
+                (i) => labels[i] ?? []
+            );
             deleteLabel({ labelsToDelete });
         }
     }, [deleteIndices, labels, getAffectedStudysetsForDelete, deleteLabel]);
 
     const confirmDelete = useCallback(() => {
-        const labelsToDelete = deleteIndices.map((i) => labels[i]);
+        const labelsToDelete = deleteIndices.flatMap((i) => labels[i] ?? []);
         deleteLabel({ labelsToDelete });
     }, [deleteIndices, labels, deleteLabel]);
 
@@ -268,7 +272,10 @@ export const useLabelsDialog = () => {
 
     const affectedItems = useMemo(() => {
         if (cascadeAction === 'edit' && editIndex !== null) {
-            return getAffectedStudysetsForLabel(labels[editIndex]);
+            const label = labels[editIndex];
+            return label === undefined
+                ? []
+                : getAffectedStudysetsForLabel(label);
         } else if (cascadeAction === 'delete') {
             return getAffectedStudysetsForDelete();
         }

@@ -1,7 +1,10 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 
-export function useClickAway(callback, additionalRefs: any[] = []) {
-    const ref = useRef(null);
+export function useClickAway<T extends HTMLElement = HTMLElement>(
+    callback,
+    additionalRefs: any[] = []
+) {
+    const ref = useRef<T>(null);
     const callbackRef = useRef(callback);
 
     useLayoutEffect(() => {

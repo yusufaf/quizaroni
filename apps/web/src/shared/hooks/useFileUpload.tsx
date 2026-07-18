@@ -30,6 +30,10 @@ const useFileUpload = ({ cardUUID, studysetUUID }: UseFileUploadProps) => {
                     ? file.slice(start, end)
                     : file.slice(start);
             const url = signedURLs[index];
+            if (!url) {
+                throw new Error(`Missing signed upload URL for part ${index}`);
+            }
+
             return fetch(url, {
                 method: 'PUT',
                 body: blob,

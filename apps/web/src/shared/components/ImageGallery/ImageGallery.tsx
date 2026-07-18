@@ -4,7 +4,9 @@ import { CardFileMetadata } from 'shared/types';
 import { formatBytes } from 'utilities/general';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import { styled } from '@mui/system';
+// `@mui/material/styles` rather than `@mui/system`: only the former's Theme
+// carries `shadows`, which the hover style below reads.
+import { styled } from '@mui/material/styles';
 
 const GalleryGrid = styled('div')<{ columns: number }>(({ columns }) => ({
     display: 'flex',
@@ -198,7 +200,7 @@ const ImageGallery = ({
             {/* Lightbox Modal */}
             <Dialog
                 open={lightboxOpen}
-                onClose={handleCloseLightbox}
+                onClose={() => handleCloseLightbox()}
                 maxWidth={false}
                 fullWidth
                 onClick={(e) => e.stopPropagation()}

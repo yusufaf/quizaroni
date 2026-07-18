@@ -18,7 +18,11 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGlobalStore } from 'state/stores/global';
 import { useViewSetsStore } from 'state/stores/viewSets';
-import { STUDYSET_CONFIRM_DIALOGS, VIEW_SET_DIALOGS } from 'shared/constants';
+import {
+    STUDYSET_CONFIRM_DIALOGS,
+    VIEW_SET_DIALOGS,
+    type ViewSetDialog,
+} from 'shared/constants';
 import { ActionButtonsRow } from '../styles';
 import ControlMenu from './ControlMenu';
 
@@ -49,6 +53,8 @@ const StudysetActions = (props: Props) => {
     };
 
     const updateMetadataState = (property: string) => {
+        if (!selectedStudyset) return;
+
         let newValue;
         switch (property) {
             default:
@@ -62,7 +68,7 @@ const StudysetActions = (props: Props) => {
         navigate(`/edit/${studySetUUID}`);
     };
 
-    const handleShowDialog = (dialog: string) => {
+    const handleShowDialog = (dialog: ViewSetDialog) => {
         setSelectedDialog(dialog);
     };
 

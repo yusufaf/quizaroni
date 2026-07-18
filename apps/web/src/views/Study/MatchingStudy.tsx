@@ -12,7 +12,7 @@ import { CheckCircle } from '@mui/icons-material';
 import { fireConfetti } from 'shared/utilities/confetti';
 import { useGetStudyset } from 'state/api/studysetsAPI';
 import { useStudySessionStore } from 'state/stores/studySession';
-import { Card as CardType, Studyset } from 'shared/types';
+import { Card as CardType, Studyset, StudySessionResult } from 'shared/types';
 import { STUDY_MODES, SCORING } from 'shared/constants';
 import StudyHeader from './shared/StudyHeader';
 import StudyResults from './shared/StudyResults';
@@ -54,7 +54,8 @@ const MatchingStudy = ({ studysetId }: Props) => {
     const [timeElapsed, setTimeElapsed] = useState(0);
     const [showResults, setShowResults] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
-    const [sessionResult, setSessionResult] = useState(null);
+    const [sessionResult, setSessionResult] =
+        useState<StudySessionResult | null>(null);
     const [incorrectAttempts, setIncorrectAttempts] = useState(0);
     const [highlightIndex, setHighlightIndex] = useState(0);
 
@@ -71,6 +72,7 @@ const MatchingStudy = ({ studysetId }: Props) => {
                     audioEnabled: false,
                     autoAdvance: true,
                     difficulty: 'medium',
+                    hideImages: false,
                 },
             });
         }
@@ -78,8 +80,9 @@ const MatchingStudy = ({ studysetId }: Props) => {
 
     // Initialize cards when session is ready
     useEffect(() => {
-        if (activeSession?.cards?.length > 0) {
-            initializeCards(activeSession.cards);
+        const cards = activeSession?.cards;
+        if (cards?.length) {
+            initializeCards(cards);
         }
     }, [activeSession?.cards?.length]);
 
@@ -122,7 +125,10 @@ const MatchingStudy = ({ studysetId }: Props) => {
         setSelectedCards(newSelected);
 
         if (newSelected.length === 2) {
-            checkMatch(newSelected[0], newSelected[1]);
+            const [first, second] = newSelected;
+            if (first && second) {
+                checkMatch(first, second);
+            }
         }
     };
 
@@ -285,6 +291,7 @@ const MatchingStudy = ({ studysetId }: Props) => {
                 audioEnabled: false,
                 autoAdvance: true,
                 difficulty: 'medium',
+                hideImages: false,
             },
         });
     };

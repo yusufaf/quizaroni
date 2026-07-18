@@ -36,10 +36,16 @@ export const generateAvatarDataUri = (
     style: AvatarStyle,
     seed: string
 ): string => {
-    const avatar = createAvatar(STYLE_MAP[style], {
-        seed,
-        size: 512,
-    });
+    const avatar = createAvatar(
+        // Each DiceBear style declares its own Options type, so the union of
+        // the five is not assignable to the single Style<Options> parameter.
+        // Only `seed` and `size` are passed, which every style supports.
+        STYLE_MAP[style] as Parameters<typeof createAvatar>[0],
+        {
+            seed,
+            size: 512,
+        }
+    );
     return avatar.toDataUri();
 };
 
@@ -104,6 +110,11 @@ export const prepareImageForUpload = async (
         const reader = new FileReader();
         reader.onload = () => {
             const base64 = (reader.result as string).split(',')[1]; // Remove data URL prefix
+            if (!base64) {
+                reject(new Error('Could not read compressed image as base64'));
+                return;
+            }
+
             resolve({
                 base64,
                 contentType: compressedFile.type,

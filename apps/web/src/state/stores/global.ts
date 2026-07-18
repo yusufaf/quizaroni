@@ -70,6 +70,9 @@ export const useGlobalStore = create<GlobalState>((set, get) => ({
             case STUDYSET_CONFIRM_DIALOGS.DELETE:
             case STUDYSET_CONFIRM_DIALOGS.DUPLICATE: {
                 const studyset = studysets[0];
+                // Single-studyset dialogs are meaningless with nothing selected.
+                if (!studyset) return;
+
                 dialogProps = {
                     ...dialogProps,
                     dialogMessage,

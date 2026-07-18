@@ -175,7 +175,7 @@ export abstract class BasePdfGenerator {
         for (const file of associatedFiles) {
             try {
                 const dataURL = await this.imageLoader.loadImageAsDataURL(
-                    file.downloadURL
+                    file.signedURL
                 );
 
                 if (!dataURL) continue;
@@ -262,7 +262,8 @@ export abstract class BasePdfGenerator {
         // Parse custom terminology (format: "Term1/Term2")
         const parts = terminology.split('/');
         if (parts.length === 2) {
-            return [parts[0].trim(), parts[1].trim()];
+            const [first = '', second = ''] = parts;
+            return [first.trim(), second.trim()];
         }
 
         return ['Term', 'Definition'];

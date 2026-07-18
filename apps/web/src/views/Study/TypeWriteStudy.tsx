@@ -15,7 +15,7 @@ import { Lightbulb } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useGetStudyset } from 'state/api/studysetsAPI';
 import { useStudySessionStore } from 'state/stores/studySession';
-import { Studyset } from 'shared/types';
+import { Studyset, StudySessionResult } from 'shared/types';
 import { STUDY_MODES, SCORING } from 'shared/constants';
 import StudyHeader from './shared/StudyHeader';
 import StudyResults from './shared/StudyResults';
@@ -23,6 +23,7 @@ import SettingsDialog from './shared/SettingsDialog';
 import { BasePage } from 'styles/AppStyles';
 import { useTranslation } from 'react-i18next';
 import { useShortcuts } from 'shared/keyboard/useShortcuts';
+import { stringSimilarity } from 'shared/utilities/stringSimilarity';
 
 type Props = {
     studysetId: string;
@@ -54,7 +55,8 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
     const [isCorrect, setIsCorrect] = useState(false);
     const [showResults, setShowResults] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
-    const [sessionResult, setSessionResult] = useState(null);
+    const [sessionResult, setSessionResult] =
+        useState<StudySessionResult | null>(null);
     const [answerStartTime, setAnswerStartTime] = useState(Date.now());
 
     // Initialize session
@@ -70,6 +72,7 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
                     audioEnabled: false,
                     autoAdvance: true,
                     difficulty: 'medium',
+                    hideImages: false,
                 },
             });
         }
@@ -88,29 +91,6 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
         }
     }, [currentCard]);
 
-    // Levenshtein distance algorithm for fuzzy matching
-    const levenshteinDistance = (str1: string, str2: string): number => {
-        const track = Array(str2.length + 1)
-            .fill(null)
-            .map(() => Array(str1.length + 1).fill(null));
-
-        for (let i = 0; i <= str1.length; i++) track[0][i] = i;
-        for (let j = 0; j <= str2.length; j++) track[j][0] = j;
-
-        for (let j = 1; j <= str2.length; j++) {
-            for (let i = 1; i <= str1.length; i++) {
-                const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
-                track[j][i] = Math.min(
-                    track[j][i - 1] + 1,
-                    track[j - 1][i] + 1,
-                    track[j - 1][i - 1] + indicator
-                );
-            }
-        }
-
-        return track[str2.length][str1.length];
-    };
-
     const checkAnswer = (
         answer: string,
         correctAnswer: string,
@@ -121,15 +101,10 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
 
         if (normalizedAnswer === normalizedCorrect) return true;
 
-        const distance = levenshteinDistance(
+        const similarity = stringSimilarity(
             normalizedAnswer,
             normalizedCorrect
         );
-        const maxLength = Math.max(
-            normalizedAnswer.length,
-            normalizedCorrect.length
-        );
-        const similarity = 1 - distance / maxLength;
 
         // Difficulty-based thresholds
         const thresholds = {
@@ -270,15 +245,19 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
                 audioEnabled: false,
                 autoAdvance: true,
                 difficulty: 'medium',
+                hideImages: false,
             },
         });
     };
 
+    // `currentCard` is included deliberately: the session is persisted, so a
+    // restored `currentCardIndex` can point past the end of a shortened deck.
     if (
         isLoading ||
         !activeSession ||
         !activeSession.cards ||
-        activeSession.cards.length === 0
+        activeSession.cards.length === 0 ||
+        !currentCard
     ) {
         return (
             <BasePage>

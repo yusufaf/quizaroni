@@ -15,7 +15,7 @@ import { CheckCircle, Cancel } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGetStudyset } from 'state/api/studysetsAPI';
 import { useStudySessionStore } from 'state/stores/studySession';
-import { Card as CardType, Studyset } from 'shared/types';
+import { Card as CardType, Studyset, StudySessionResult } from 'shared/types';
 import { STUDY_MODES, SCORING } from 'shared/constants';
 import StudyHeader from './shared/StudyHeader';
 import StudyResults from './shared/StudyResults';
@@ -56,7 +56,8 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
     const [quizOptions, setQuizOptions] = useState<QuizOption[]>([]);
     const [showResults, setShowResults] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
-    const [sessionResult, setSessionResult] = useState(null);
+    const [sessionResult, setSessionResult] =
+        useState<StudySessionResult | null>(null);
     const [answerStartTime, setAnswerStartTime] = useState(Date.now());
 
     // Initialize session
@@ -72,6 +73,7 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
                     audioEnabled: false,
                     autoAdvance: true,
                     difficulty: 'medium',
+                    hideImages: false,
                 },
             });
         }
@@ -124,9 +126,9 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
         );
         const shuffledOthers = [...otherCards].sort(() => Math.random() - 0.5);
 
-        for (let i = 0; i < Math.min(3, shuffledOthers.length); i++) {
+        for (const card of shuffledOthers.slice(0, 3)) {
             options.push({
-                text: shuffledOthers[i].definition,
+                text: card.definition,
                 isCorrect: false,
             });
         }
@@ -144,7 +146,7 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
 
     const handleSubmit = useCallback(
         (isTimeout = false) => {
-            if (showFeedback) return;
+            if (showFeedback || !currentCard) return;
 
             const correctIndex = quizOptions.findIndex((opt) => opt.isCorrect);
             const answeredCorrectly =
@@ -187,7 +189,7 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
                 correct: actuallyCorrect,
                 timeSpent,
                 hintsUsed: 0,
-                selectedOption,
+                selectedOption: selectedOption ?? undefined,
             });
 
             // Auto-advance after delay
@@ -281,6 +283,7 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
                 audioEnabled: false,
                 autoAdvance: true,
                 difficulty: 'medium',
+                hideImages: false,
             },
         });
     };
@@ -291,11 +294,14 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
         return 'error';
     };
 
+    // `currentCard` is included deliberately: the session is persisted, so a
+    // restored `currentCardIndex` can point past the end of a shortened deck.
     if (
         isLoading ||
         !activeSession ||
         !activeSession.cards ||
-        activeSession.cards.length === 0
+        activeSession.cards.length === 0 ||
+        !currentCard
     ) {
         return (
             <BasePage>
