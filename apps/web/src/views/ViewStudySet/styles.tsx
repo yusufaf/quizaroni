@@ -210,9 +210,11 @@ export const SortCardsDropdown = styled(FormControl)({
 /* Actions Section */
 export const ActionButtonsRow = styled(Paper)(({ theme }) => ({
     display: 'flex',
+    flexWrap: 'wrap',
+    maxWidth: '100%',
     gap: '0.5rem',
     borderRadius: '0.75rem',
-    paddingLeft: '0.5rem',
+    padding: '0.25rem 0.5rem',
     boxShadow:
         theme.palette.mode === 'dark'
             ? 'none'
