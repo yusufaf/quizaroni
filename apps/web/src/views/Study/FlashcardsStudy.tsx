@@ -345,7 +345,14 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
             offset: info.offset,
             velocity: info.velocity,
             canGrade: flipped && !hasRated && !showResults,
-            canFlip: !hasRated && !lightboxOpen && !lightboxCooldownRef.current,
+            // Vertical swipe only flips term -> definition. Once flipped, an
+            // up-leaning diagonal drag during a grading swipe must not flip
+            // the card back and hide the rating controls.
+            canFlip:
+                !flipped &&
+                !hasRated &&
+                !lightboxOpen &&
+                !lightboxCooldownRef.current,
         });
 
         if (action.type === 'grade') {
@@ -410,6 +417,8 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
             setFlipped(false);
             setShowRating(false);
             setHasRated(false);
+            dragX.set(0);
+            dragY.set(0);
         }
     };
 
@@ -419,6 +428,8 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
             setFlipped(false);
             setShowRating(false);
             setHasRated(false);
+            dragX.set(0);
+            dragY.set(0);
         }
     };
 
@@ -478,6 +489,8 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
         setFlipped(false);
         setShowRating(false);
         setHasRated(false);
+        dragX.set(0);
+        dragY.set(0);
     };
 
     return (

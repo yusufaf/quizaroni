@@ -81,6 +81,18 @@ describe('resolveSwipe', () => {
         expect(result).toEqual({ type: 'none' });
     });
 
+    it('grades a fast horizontal flick even with larger incidental vertical offset', () => {
+        // offset.y (50) exceeds offset.x (40) in raw distance, but only the
+        // horizontal axis clears its threshold (via velocity), so it must
+        // still win over the vertical (flip) branch.
+        const result = resolveSwipe({
+            ...base,
+            offset: { x: 40, y: 50 },
+            velocity: { x: SWIPE_VELOCITY_THRESHOLD + 100, y: 0 },
+        });
+        expect(result).toEqual({ type: 'grade', grade: 'good' });
+    });
+
     it('resolves a diagonal drag to the dominant axis', () => {
         // Horizontal dominant: grades despite some vertical movement.
         const result = resolveSwipe({
