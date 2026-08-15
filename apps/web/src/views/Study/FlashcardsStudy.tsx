@@ -12,6 +12,7 @@ import {
     StepLabel,
     Fade,
     Tooltip,
+    useTheme,
 } from '@mui/material';
 import {
     ArrowBack,
@@ -20,7 +21,14 @@ import {
     VolumeUp,
     VolumeOff,
 } from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
+import {
+    motion,
+    AnimatePresence,
+    useMotionValue,
+    useTransform,
+    useReducedMotion,
+    type PanInfo,
+} from 'framer-motion';
 import { useGetStudyset } from 'state/api/studysetsAPI';
 import { useGetUser } from 'state/api/usersAPI';
 import { useStudySessionStore } from 'state/stores/studySession';
@@ -42,6 +50,7 @@ import {
     type Grade,
 } from 'shared/utilities/srs';
 import type { CardProgress, StudySessionResult } from 'shared/types';
+import { resolveSwipe, SWIPE_DISTANCE_THRESHOLD } from './swipeGesture';
 
 type Props = {
     studysetId: string;
@@ -51,6 +60,7 @@ type Props = {
 const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
     const { t } = useTranslation('study');
     const navigate = useNavigate();
+    const theme = useTheme();
     const { data: studysetResponse, isLoading } = useGetStudyset({
         studysetUUID: studysetId,
     });
@@ -81,6 +91,25 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
 
     const [dueCardUUIDs, setDueCardUUIDs] = useState<string[] | null>(null);
     const [cardProgress, setCardProgress] = useState<CardProgress | null>(null);
+
+    // Swipe gesture state (Issue #26). dragX/dragY drive the card's position
+    // and derived tilt/overlay-opacity; didDragRef suppresses the synthetic
+    // click that follows a drag release so a swipe never also fires a flip.
+    const dragX = useMotionValue(0);
+    const dragY = useMotionValue(0);
+    const prefersReducedMotion = useReducedMotion();
+    const tilt = useTransform(dragX, [-300, 0, 300], [-12, 0, 12]);
+    const againOpacity = useTransform(
+        dragX,
+        [-SWIPE_DISTANCE_THRESHOLD, -20, 0],
+        [1, 0, 0]
+    );
+    const goodOpacity = useTransform(
+        dragX,
+        [0, 20, SWIPE_DISTANCE_THRESHOLD],
+        [0, 0, 1]
+    );
+    const didDragRef = useRef(false);
 
     // Initialize session
     useEffect(() => {
@@ -285,11 +314,51 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
     const GRADES: Grade[] = ['again', 'hard', 'good', 'easy'];
 
     const handleCardClick = () => {
-        if (!hasRated && !lightboxOpen && !lightboxCooldownRef.current) {
+        if (
+            !hasRated &&
+            !lightboxOpen &&
+            !lightboxCooldownRef.current &&
+            !didDragRef.current
+        ) {
             setFlipped(!flipped);
             if (!flipped) {
                 setShowRating(true);
             }
+        }
+    };
+
+    const handleDragStart = () => {
+        didDragRef.current = true;
+    };
+
+    const handleDragEnd = (
+        _event: MouseEvent | TouchEvent | PointerEvent,
+        info: PanInfo
+    ) => {
+        // Clear the drag flag on the next tick so the click that follows
+        // pointerup on some browsers still sees it as a drag.
+        setTimeout(() => {
+            didDragRef.current = false;
+        }, 0);
+
+        const action = resolveSwipe({
+            offset: info.offset,
+            velocity: info.velocity,
+            canGrade: flipped && !hasRated && !showResults,
+            // Vertical swipe only flips term -> definition. Once flipped, an
+            // up-leaning diagonal drag during a grading swipe must not flip
+            // the card back and hide the rating controls.
+            canFlip:
+                !flipped &&
+                !hasRated &&
+                !lightboxOpen &&
+                !lightboxCooldownRef.current,
+        });
+
+        if (action.type === 'grade') {
+            handleGrade(action.grade);
+        } else if (action.type === 'flip') {
+            handleFlip();
         }
     };
 
@@ -348,6 +417,8 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
             setFlipped(false);
             setShowRating(false);
             setHasRated(false);
+            dragX.set(0);
+            dragY.set(0);
         }
     };
 
@@ -357,6 +428,8 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
             setFlipped(false);
             setShowRating(false);
             setHasRated(false);
+            dragX.set(0);
+            dragY.set(0);
         }
     };
 
@@ -416,6 +489,8 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
         setFlipped(false);
         setShowRating(false);
         setHasRated(false);
+        dragX.set(0);
+        dragY.set(0);
     };
 
     return (
@@ -503,11 +578,53 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
                         <Box
                             key={currentCard.cardUUID}
                             sx={{
+                                position: 'relative',
                                 perspective: '1000px',
                                 width: '50rem',
                                 height: '30rem',
                             }}
                         >
+                            {/* Swipe overlay labels - siblings of the flipping
+                                card so back-face mirroring never flips their
+                                left/right placement. */}
+                            <motion.div
+                                style={{
+                                    opacity: againOpacity,
+                                    position: 'absolute',
+                                    top: '1.5rem',
+                                    left: '1.5rem',
+                                    zIndex: 2,
+                                    pointerEvents: 'none',
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '0.5rem',
+                                    border: '0.15rem solid',
+                                    borderColor: theme.palette.error.main,
+                                    color: theme.palette.error.main,
+                                    fontWeight: 700,
+                                    textTransform: 'uppercase',
+                                }}
+                            >
+                                {t('ratings.again')}
+                            </motion.div>
+                            <motion.div
+                                style={{
+                                    opacity: goodOpacity,
+                                    position: 'absolute',
+                                    top: '1.5rem',
+                                    right: '1.5rem',
+                                    zIndex: 2,
+                                    pointerEvents: 'none',
+                                    padding: '0.5rem 1rem',
+                                    borderRadius: '0.5rem',
+                                    border: '0.15rem solid',
+                                    borderColor: theme.palette.success.main,
+                                    color: theme.palette.success.main,
+                                    fontWeight: 700,
+                                    textTransform: 'uppercase',
+                                }}
+                            >
+                                {t('ratings.good')}
+                            </motion.div>
                             <motion.div
                                 initial={{ rotateY: 0 }}
                                 animate={{ rotateY: flipped ? 180 : 0 }}
@@ -518,7 +635,21 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
                                     position: 'relative',
                                     transformStyle: 'preserve-3d',
                                     cursor: hasRated ? 'default' : 'pointer',
+                                    x: dragX,
+                                    y: dragY,
+                                    rotate: prefersReducedMotion ? 0 : tilt,
                                 }}
+                                drag={!hasRated && !lightboxOpen}
+                                dragDirectionLock
+                                dragElastic={0.6}
+                                dragConstraints={{
+                                    left: 0,
+                                    right: 0,
+                                    top: 0,
+                                    bottom: 0,
+                                }}
+                                onDragStart={handleDragStart}
+                                onDragEnd={handleDragEnd}
                                 onClick={handleCardClick}
                             >
                                 {/* Front of card (Term) */}
