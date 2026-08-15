@@ -45,7 +45,7 @@ const StudyHeader = ({
             position="sticky"
             sx={{
                 top: 0,
-                zIndex: 1100,
+                zIndex: (theme) => theme.zIndex.appBar,
                 backgroundColor: 'background.paper',
                 color: 'text.primary',
                 boxShadow: 2,

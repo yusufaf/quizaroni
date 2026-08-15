@@ -25,11 +25,17 @@
     "nav": {
         "home": "Inicio",
         "explore": "Explorar",
+        "create": "Crear",
         "createStudySet": "Crear Set de Estudio",
         "profile": "Perfil",
         "logout": "Cerrar Sesión",
         "login": "Iniciar Sesión",
-        "signup": "Registrarse"
+        "signup": "Registrarse",
+        "primaryNavigation": "Navegación principal",
+        "openMenu": "Abrir menú",
+        "menu": "Menú",
+        "darkMode": "Modo oscuro",
+        "feedback": "Comentarios"
     },
     "pageTitles": {
         "create": "Crear",

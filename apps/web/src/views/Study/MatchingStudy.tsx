@@ -386,6 +386,7 @@ const MatchingStudy = ({ studysetId }: Props) => {
                     flex: 1,
                     px: '2rem',
                     pt: '4rem',
+                    pb: 'max(1rem, var(--safe-area-bottom))',
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
                     gap: '2rem',

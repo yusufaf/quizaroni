@@ -731,6 +731,7 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
                     display: 'flex',
                     justifyContent: 'center',
                     gap: '1rem',
+                    paddingBottom: 'max(0.5rem, var(--safe-area-bottom))',
                 }}
             >
                 <Tooltip title="Flip Card">

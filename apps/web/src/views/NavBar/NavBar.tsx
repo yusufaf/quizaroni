@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import ProfileDropdown from 'views/Profile/ProfileDropdown';
 import { useTheme } from 'theme/useTheme';
-import { ROUTES, LOADING_ACTIONS } from 'shared/constants';
+import { ROUTES } from 'shared/constants';
 import { SyncStatusIndicator } from 'state/local';
 import NavDrawer from './NavDrawer';
 import {
@@ -27,13 +27,12 @@ import {
     StyledAccountIcon,
     StyledNavLink,
 } from './NavStyles';
-import { signOut } from 'aws-amplify/auth';
 import DarkModeToggleButton from './DarkModeToggleButton';
-import { useCreateStudyset } from 'state/api/studysetsAPI';
 import { useAuthenticator } from '@aws-amplify/ui-react';
-import { useGlobalStore } from 'state/stores/global';
 import StreakBadge from 'shared/components/StreakBadge/StreakBadge';
 import { QUERY_PARAMS } from 'shared/constants';
+import { useCreateStudysetAction } from 'hooks/useCreateStudysetAction';
+import { useLogout } from 'hooks/useLogout';
 
 type Props = {};
 
@@ -44,9 +43,6 @@ const NavBar = (props: Props) => {
     // TODO: Verify that a medium breakpoint works to handle mobile cases, can always add more breakpoints
     const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
 
-    const { setAuthenticated, setLoadingAdd, setLoadingRemove } =
-        useGlobalStore();
-
     const { authStatus } = useAuthenticator((context) => [context.authStatus]);
     const authenticated = authStatus === 'authenticated';
 
@@ -54,16 +50,8 @@ const NavBar = (props: Props) => {
 
     const [showDropdown, setShowDropdown] = useState(false);
     const dropdownRef = useRef(null);
-    const { mutateAsync: createStudyset } = useCreateStudyset();
-
-    const handleLogout = async () => {
-        try {
-            await signOut();
-            setAuthenticated(false);
-        } catch (error) {
-            console.error('Error signing out:', error);
-        }
-    };
+    const { createAndOpen: handleCreateStudyset } = useCreateStudysetAction();
+    const handleLogout = useLogout();
 
     const displayDropdown = () => {
         setShowDropdown(true);
@@ -71,19 +59,6 @@ const NavBar = (props: Props) => {
 
     const closeDropdown = () => {
         setShowDropdown(false);
-    };
-
-    const handleCreateStudyset = async () => {
-        setLoadingAdd(LOADING_ACTIONS.CREATE_STUDYSET);
-        try {
-            const response = await createStudyset();
-            const { studyset } = response;
-            navigate(`/edit/${studyset.studysetUUID}`);
-            setLoadingRemove(LOADING_ACTIONS.CREATE_STUDYSET);
-        } catch (error) {
-            console.error('Error creating studyset:', error);
-            setLoadingRemove(LOADING_ACTIONS.CREATE_STUDYSET);
-        }
     };
 
     return (
@@ -94,6 +69,7 @@ const NavBar = (props: Props) => {
             sx={{
                 zIndex: muiTheme.zIndex.drawer + 1,
                 borderBottom: `1px solid ${muiTheme.palette.divider}`,
+                paddingTop: 'env(safe-area-inset-top, 0px)',
             }}
         >
             <Toolbar>

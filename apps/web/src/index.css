@@ -1,3 +1,28 @@
+:root {
+    /*
+     * Fixed mobile bottom-nav geometry. Single source of truth for every
+     * consumer (AppWrapper padding, both FABs, the bar itself). 0px above
+     * the md breakpoint, so consumers can reference it unconditionally with
+     * no media query of their own.
+     */
+    --bottom-nav-height: 0px;
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --bottom-nav-offset: calc(
+        var(--bottom-nav-height) + var(--safe-area-bottom)
+    );
+}
+
+/*
+ * Matches MUI theme.breakpoints.down('md') exactly (md = 900 emits
+ * max-width: 899.95px). Keep in sync with shared/theme/themes.ts if custom
+ * breakpoints are ever added there.
+ */
+@media (max-width: 899.95px) {
+    :root {
+        --bottom-nav-height: 3.5rem;
+    }
+}
+
 body {
     margin: 0;
     padding: 0;
