@@ -143,10 +143,33 @@ describe('parseApkg', () => {
     it('errors when the archive has no recognizable collection entry', async () => {
         const zipped = zipSync({ 'media.json': new Uint8Array([1, 2, 3]) });
 
-        const { cards, error } = await parseApkg(zipped);
+        const { cards, error, errorKey } = await parseApkg(zipped);
 
         expect(cards).toHaveLength(0);
         expect(error).toMatch(/not a valid Anki package|Anki package/i);
+        expect(errorKey).toBe('noCollection');
+    });
+
+    it('reports a stable errorKey (not just an English message) for each failure mode, so callers can localize', async () => {
+        const tooLarge = await parseApkg(new Uint8Array(101 * 1024 * 1024));
+        expect(tooLarge.errorKey).toBe('tooLarge');
+
+        const unreadable = await parseApkg(new Uint8Array([9, 9, 9]));
+        expect(unreadable.errorKey).toBe('archiveUnreadable');
+
+        const emptyCollection = zipSync({
+            'collection.anki2': new Uint8Array([1, 2, 3]),
+        });
+        const invalid = await parseApkg(emptyCollection);
+        expect(invalid.errorKey).toBe('invalidCollection');
+    });
+
+    it('reports no errorKey on success', async () => {
+        const dbBytes = await buildNotesDb([{ flds: 'Term\x1fDefinition' }]);
+        const zipped = zipSync({ 'collection.anki2': dbBytes });
+
+        const { errorKey } = await parseApkg(zipped);
+        expect(errorKey).toBeNull();
     });
 
     it('decompresses a modern collection.anki21b package via fzstd', async () => {

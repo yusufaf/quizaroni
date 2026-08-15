@@ -28,7 +28,7 @@ import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTi
 import { Dispatch, SetStateAction, useCallback, useRef, useState } from 'react';
 import { Card } from 'shared/types';
 import { processImport, ImportFormat } from 'utilities/importUtils';
-import { parseApkg } from 'utilities/ankiApkg';
+import { parseApkg, ApkgErrorKey, MAX_APKG_BYTES } from 'utilities/ankiApkg';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 
@@ -138,6 +138,18 @@ const FIELD_SEPARATORS: { value: string; labelKey: string }[] = [
     { value: 'custom', labelKey: 'create.sepCustom' },
 ];
 
+// Maps parseApkg's stable, locale-independent error identifiers to i18n
+// keys, so .apkg failures are localized like every other import format
+// instead of showing the developer-facing English message from ankiApkg.ts.
+const APKG_ERROR_KEY_TO_I18N: Record<ApkgErrorKey, string> = {
+    tooLarge: 'create.apkgTooLarge',
+    archiveUnreadable: 'create.apkgArchiveUnreadable',
+    noCollection: 'create.apkgNoCollection',
+    decompressFailed: 'create.apkgDecompressFailed',
+    invalidCollection: 'create.apkgInvalidCollection',
+    noCards: 'create.apkgNoCards',
+};
+
 const ROW_SEPARATORS: { value: string; labelKey: string }[] = [
     { value: 'newline', labelKey: 'create.sepNewline' },
     { value: 'semicolon', labelKey: 'create.sepSemicolon' },
@@ -225,6 +237,13 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                 setSubmitError(t('create.pleaseUploadApkg'));
                 return;
             }
+            // Reject oversized files before reading them fully into memory
+            // (parseApkg's own size guard runs after that read, too late to
+            // avoid it).
+            if (format === 'apkg' && file.size > MAX_APKG_BYTES) {
+                setSubmitError(t('create.apkgTooLarge'));
+                return;
+            }
             setSubmitError(null);
             setSelectedFileName(file.name);
 
@@ -290,6 +309,11 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             setIsDragging(false);
             dragCounterRef.current = 0;
 
+            // Ignore drops while an import is already in flight (mirrors the
+            // upload IconButton's disabled={isProcessing}), so a mid-parse
+            // drop can't clobber the bytes/file the current import is using.
+            if (isProcessing) return;
+
             const files = e.dataTransfer.files;
             if (files && files.length > 0) {
                 const file = files.item(0);
@@ -298,7 +322,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                 handleFileUpload(file);
             }
         },
-        [handleFileUpload]
+        [handleFileUpload, isProcessing]
     );
 
     const handleReset = useCallback(() => {
@@ -323,10 +347,17 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             const {
                 cards,
                 error: importError,
+                errorKey,
                 mediaSkippedCount,
             } = await parseApkg(apkgBytes);
             if (importError) {
-                setSubmitError(importError);
+                setSubmitError(
+                    t(
+                        errorKey
+                            ? APKG_ERROR_KEY_TO_I18N[errorKey]
+                            : 'create.apkgParseFailed'
+                    )
+                );
                 setIsProcessing(false);
                 return;
             }
@@ -612,7 +643,9 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
 
                     {format === 'apkg' ? (
                         <Box
-                            onClick={() => fileInputRef.current?.click()}
+                            onClick={() =>
+                                !isProcessing && fileInputRef.current?.click()
+                            }
                             onDragEnter={handleDragEnter}
                             onDragLeave={handleDragLeave}
                             onDragOver={handleDragOver}

@@ -238,23 +238,44 @@ const MD_LINE_SHAPE = /^[-*]?\s*(.+?)\s*::\s*(.+)$/;
  * outside of a `## Card N` block (e.g. the `# Title` / `## Description` /
  * `## Label` / `## Downloaded on` metadata header) are ignored.
  */
+// Which field is currently accumulating continuation lines (lines after a
+// **Term:**/**Definition:** marker up to the next recognized marker), so
+// multiline card content -- which DownloadSetModal writes verbatim, with no
+// per-line prefix -- round-trips instead of being silently dropped.
+type MdSection = 'none' | 'term' | 'definition' | 'notes';
+
+/**
+ * Joins accumulated lines for a field, trimming only the blank lines the
+ * exporter uses as separators between sections (leading/trailing), while
+ * preserving any blank lines genuinely embedded in the content.
+ */
+const joinSection = (lines: string[]): string => {
+    const start = lines.findIndex((line) => line.trim() !== '');
+    if (start === -1) return '';
+    let end = lines.length - 1;
+    while (end > start && lines[end]?.trim() === '') end -= 1;
+    return lines.slice(start, end + 1).join('\n');
+};
+
 const parseMarkdownCardBlocks = (
     lines: string[]
 ): { cards: Card[]; error: string | null } => {
     const cards: Card[] = [];
 
     let inCard = false;
-    let term: string | null = null;
-    let definition: string | null = null;
-    let inNotes = false;
-    let notes: string[] = [];
+    let section: MdSection = 'none';
+    let termLines: string[] = [];
+    let definitionLines: string[] = [];
+    let noteLines: string[] = [];
 
     const flush = () => {
+        const term = joinSection(termLines);
+        const definition = joinSection(definitionLines);
         if (term && definition) {
             const normalized = validateAndNormalizeCard({
                 term,
                 definition,
-                notes: notes.map((text) => ({
+                notes: noteLines.map((text) => ({
                     text,
                     noteUUID: crypto.randomUUID(),
                 })),
@@ -263,10 +284,10 @@ const parseMarkdownCardBlocks = (
                 cards.push(normalized);
             }
         }
-        term = null;
-        definition = null;
-        inNotes = false;
-        notes = [];
+        section = 'none';
+        termLines = [];
+        definitionLines = [];
+        noteLines = [];
     };
 
     lines.forEach((line) => {
@@ -279,28 +300,38 @@ const parseMarkdownCardBlocks = (
 
         const termMatch = line.match(MD_TERM_LINE);
         if (termMatch) {
-            term = (termMatch[1] ?? '').trim();
-            inNotes = false;
+            section = 'term';
+            termLines = [(termMatch[1] ?? '').trim()];
             return;
         }
 
         const definitionMatch = line.match(MD_DEFINITION_LINE);
         if (definitionMatch) {
-            definition = (definitionMatch[1] ?? '').trim();
-            inNotes = false;
+            section = 'definition';
+            definitionLines = [(definitionMatch[1] ?? '').trim()];
             return;
         }
 
         if (MD_NOTES_LINE.test(line)) {
-            inNotes = true;
+            section = 'notes';
             return;
         }
 
-        if (inNotes) {
+        if (section === 'term') {
+            termLines.push(line);
+            return;
+        }
+
+        if (section === 'definition') {
+            definitionLines.push(line);
+            return;
+        }
+
+        if (section === 'notes') {
             const bulletMatch = line.match(MD_BULLET_LINE);
             if (bulletMatch) {
                 const noteText = (bulletMatch[1] ?? '').trim();
-                if (noteText) notes.push(noteText);
+                if (noteText) noteLines.push(noteText);
             }
         }
     });

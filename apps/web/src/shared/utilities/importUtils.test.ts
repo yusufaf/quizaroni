@@ -153,6 +153,30 @@ describe('parseMarkdownCards', () => {
         });
     });
 
+    it('preserves embedded newlines in Term/Definition, matching what DownloadSetModal writes for multiline cards', () => {
+        // DownloadSetModal writes `**Definition:** ${definition}` verbatim,
+        // so a definition containing "\n" produces a continuation line with
+        // no "**Definition:**" prefix, e.g. multiline NewCardInput text.
+        const text = [
+            '## Card 1',
+            '',
+            '**Term:** Line one term',
+            'Line two term',
+            '',
+            '**Definition:** Line one def',
+            'Line two def',
+            '',
+        ].join('\n');
+        const { cards, error } = parseMarkdownCards(text);
+
+        expect(error).toBeNull();
+        expect(cards).toHaveLength(1);
+        expect(cards[0]).toMatchObject({
+            term: 'Line one term\nLine two term',
+            definition: 'Line one def\nLine two def',
+        });
+    });
+
     it('parses **Notes:** bullets under a Card block into card.notes', () => {
         const text = [
             '## Card 1',

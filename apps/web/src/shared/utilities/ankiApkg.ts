@@ -11,9 +11,21 @@ import { validateAndNormalizeCard } from './importUtils';
  * only loads when a user actually picks the .apkg import format.
  */
 
+// Stable, locale-independent identifiers for each failure mode, so callers
+// (ImportCardsModal) can map to a translated string instead of showing the
+// English `error` message directly.
+export type ApkgErrorKey =
+    | 'tooLarge'
+    | 'archiveUnreadable'
+    | 'noCollection'
+    | 'decompressFailed'
+    | 'invalidCollection'
+    | 'noCards';
+
 export type ApkgParseResult = {
     cards: Card[];
     error: string | null;
+    errorKey: ApkgErrorKey | null;
     mediaSkippedCount: number;
 };
 
@@ -26,7 +38,9 @@ const COLLECTION_ENTRY_PRIORITY = [
     'collection.anki2',
 ];
 
-const MAX_APKG_BYTES = 100 * 1024 * 1024;
+// Exported so the file-picker/drop-zone can reject an oversized file before
+// reading it into memory, rather than only after the fact inside parseApkg.
+export const MAX_APKG_BYTES = 100 * 1024 * 1024;
 
 /**
  * Picks the collection database entry to read from an .apkg's file list,
@@ -95,6 +109,7 @@ export const parseApkg = async (
         return {
             cards: [],
             error: 'This file is too large to be a valid Anki package.',
+            errorKey: 'tooLarge',
             mediaSkippedCount: 0,
         };
     }
@@ -107,6 +122,7 @@ export const parseApkg = async (
         return {
             cards: [],
             error: 'Could not read this file as an Anki package (.apkg) archive.',
+            errorKey: 'archiveUnreadable',
             mediaSkippedCount: 0,
         };
     }
@@ -116,6 +132,7 @@ export const parseApkg = async (
         return {
             cards: [],
             error: 'This does not look like a valid Anki package (no collection database found).',
+            errorKey: 'noCollection',
             mediaSkippedCount: 0,
         };
     }
@@ -130,6 +147,7 @@ export const parseApkg = async (
             return {
                 cards: [],
                 error: 'Could not decompress this Anki package.',
+                errorKey: 'decompressFailed',
                 mediaSkippedCount: 0,
             };
         }
@@ -181,12 +199,14 @@ export const parseApkg = async (
                 cards.length === 0
                     ? 'No valid cards found in this Anki package.'
                     : null,
+            errorKey: cards.length === 0 ? 'noCards' : null,
             mediaSkippedCount,
         };
     } catch {
         return {
             cards: [],
             error: 'This does not look like a valid Anki collection database.',
+            errorKey: 'invalidCollection',
             mediaSkippedCount: 0,
         };
     } finally {
