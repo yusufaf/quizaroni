@@ -28,6 +28,7 @@ import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTi
 import { Dispatch, SetStateAction, useCallback, useRef, useState } from 'react';
 import { Card } from 'shared/types';
 import { processImport, ImportFormat } from 'utilities/importUtils';
+import { parseApkg } from 'utilities/ankiApkg';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 
@@ -173,6 +174,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
     const [fieldSepCustom, setFieldSepCustom] = useState<string>('');
     const [rowSep, setRowSep] = useState<string>('newline');
     const [rowSepCustom, setRowSepCustom] = useState<string>('');
+    const [apkgBytes, setApkgBytes] = useState<Uint8Array | null>(null);
 
     const resolvedFieldSep = fieldSep === 'custom' ? fieldSepCustom : fieldSep;
     const resolvedRowSep = rowSep === 'custom' ? rowSepCustom : rowSep;
@@ -219,8 +221,27 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                 setSubmitError(t('create.pleaseUploadJson'));
                 return;
             }
+            if (format === 'apkg' && !file.name.endsWith('.apkg')) {
+                setSubmitError(t('create.pleaseUploadApkg'));
+                return;
+            }
             setSubmitError(null);
             setSelectedFileName(file.name);
+
+            if (format === 'apkg') {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const buffer = e.target?.result as ArrayBuffer;
+                    setApkgBytes(new Uint8Array(buffer));
+                };
+                reader.onerror = () => {
+                    setSubmitError(t('create.failedToReadFile'));
+                    setSelectedFileName(null);
+                    setApkgBytes(null);
+                };
+                reader.readAsArrayBuffer(file);
+                return;
+            }
 
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -254,6 +275,8 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             if (!next) return;
             setFormat(next);
             setSubmitError(null);
+            setApkgBytes(null);
+            setSelectedFileName(null);
             // Re-run live validation under the new format's rules.
             setLiveError(next === 'json' ? validateLive(jsonInputText) : null);
         },
@@ -283,11 +306,44 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
         setSelectedFileName(null);
         setLiveError(null);
         setSubmitError(null);
+        setApkgBytes(null);
     }, []);
 
-    const handleImport = useCallback(() => {
+    const handleImport = useCallback(async () => {
         setIsProcessing(true);
         setSubmitError(null);
+
+        if (format === 'apkg') {
+            if (!apkgBytes) {
+                setSubmitError(t('create.pleaseUploadApkg'));
+                setIsProcessing(false);
+                return;
+            }
+
+            const {
+                cards,
+                error: importError,
+                mediaSkippedCount,
+            } = await parseApkg(apkgBytes);
+            if (importError) {
+                setSubmitError(importError);
+                setIsProcessing(false);
+                return;
+            }
+
+            onImportCards(cards);
+            toast.success(
+                t('create.successfullyImported', { count: cards.length })
+            );
+            if (mediaSkippedCount > 0) {
+                toast.warning(
+                    t('create.apkgMediaSkipped', { count: mediaSkippedCount })
+                );
+            }
+            setShowImportModal(false);
+            setIsProcessing(false);
+            return;
+        }
 
         const sourceText = jsonInputText.trim();
         if (!sourceText) {
@@ -326,6 +382,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
         format,
         resolvedFieldSep,
         resolvedRowSep,
+        apkgBytes,
         onImportCards,
         setShowImportModal,
         t,
@@ -336,7 +393,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
                 if (jsonInputText.trim() && !liveError) {
-                    handleImport();
+                    void handleImport();
                 }
                 return;
             }
@@ -361,16 +418,27 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
     const onClose = () => setShowImportModal(false);
 
     const importDisabled =
-        isProcessing || !jsonInputText.trim() || Boolean(liveError);
+        isProcessing ||
+        Boolean(liveError) ||
+        (format === 'apkg' ? !apkgBytes : !jsonInputText.trim());
 
-    const fileAccept = format === 'json' ? '.json' : '.txt,.csv,.tsv,.text';
+    const fileAccept =
+        format === 'json'
+            ? '.json'
+            : format === 'apkg'
+              ? '.apkg'
+              : format === 'markdown'
+                ? '.md,.markdown,.txt,.text'
+                : '.txt,.csv,.tsv,.text';
 
     const placeholder =
         format === 'json'
             ? `${t('create.pasteJsonPlaceholder') || 'Paste JSON here...'}\n\n💡 ${t('create.dragDropHint')}`
             : format === 'quizlet'
               ? t('create.pastePlaceholderQuizlet')
-              : t('create.pastePlaceholderAnki');
+              : format === 'markdown'
+                ? t('create.pastePlaceholderMarkdown')
+                : t('create.pastePlaceholderAnki');
 
     return (
         <Dialog open={true} onClose={onClose} fullWidth maxWidth="md">
@@ -397,6 +465,12 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                         </ToggleButton>
                         <ToggleButton value="anki">
                             {t('create.formatAnki')}
+                        </ToggleButton>
+                        <ToggleButton value="markdown">
+                            {t('create.formatMarkdown')}
+                        </ToggleButton>
+                        <ToggleButton value="apkg">
+                            {t('create.formatApkg')}
                         </ToggleButton>
                     </ToggleButtonGroup>
 
@@ -491,7 +565,11 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                                   ? t('create.pasteOrUploadJson')
                                   : format === 'quizlet'
                                     ? t('create.quizletHint')
-                                    : t('create.ankiHint')}
+                                    : format === 'markdown'
+                                      ? t('create.markdownHint')
+                                      : format === 'apkg'
+                                        ? t('create.apkgHint')
+                                        : t('create.ankiHint')}
                         </Typography>
                         <ActionsRow>
                             <Tooltip title={t('create.uploadJsonFile')}>
@@ -532,44 +610,98 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                         </ActionsRow>
                     </EditorHeader>
 
-                    <Box sx={{ position: 'relative' }}>
-                        <StyledTextarea
-                            value={jsonInputText}
-                            onChange={handleChange}
-                            onKeyDown={handleKeyDown}
-                            hasError={Boolean(liveError)}
-                            isDragging={isDragging}
-                            spellCheck={false}
-                            autoComplete="off"
-                            autoCorrect="off"
-                            autoCapitalize="off"
-                            placeholder={placeholder}
-                            disabled={isProcessing}
+                    {format === 'apkg' ? (
+                        <Box
+                            onClick={() => fileInputRef.current?.click()}
                             onDragEnter={handleDragEnter}
                             onDragLeave={handleDragLeave}
                             onDragOver={handleDragOver}
                             onDrop={handleDrop}
-                        />
-                        {isDragging && (
-                            <DropOverlay elevation={0}>
-                                <CloudUploadIcon
-                                    sx={{
-                                        fontSize: 56,
-                                        color: 'primary.main',
-                                        mb: 1,
-                                    }}
-                                />
+                            sx={{
+                                position: 'relative',
+                                minHeight: '18rem',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.75rem',
+                                border: '2px dashed',
+                                borderColor: isDragging
+                                    ? 'primary.main'
+                                    : 'divider',
+                                borderRadius: '0.5rem',
+                                cursor: isProcessing ? 'default' : 'pointer',
+                                transition: 'border-color 0.2s ease',
+                            }}
+                        >
+                            <CloudUploadIcon
+                                sx={{
+                                    fontSize: 48,
+                                    color: isDragging
+                                        ? 'primary.main'
+                                        : 'text.secondary',
+                                }}
+                            />
+                            <Typography
+                                variant="body2"
+                                color={
+                                    isDragging
+                                        ? 'primary.main'
+                                        : 'text.secondary'
+                                }
+                                align="center"
+                            >
+                                {t('create.apkgDropPrompt')}
+                            </Typography>
+                            {isProcessing && (
                                 <Typography
-                                    variant="h6"
-                                    color="primary.main"
-                                    fontWeight="medium"
+                                    variant="caption"
+                                    color="text.secondary"
                                 >
-                                    {t('create.dropJsonFile') ||
-                                        'Drop JSON file here'}
+                                    {t('create.parsingApkg')}
                                 </Typography>
-                            </DropOverlay>
-                        )}
-                    </Box>
+                            )}
+                        </Box>
+                    ) : (
+                        <Box sx={{ position: 'relative' }}>
+                            <StyledTextarea
+                                value={jsonInputText}
+                                onChange={handleChange}
+                                onKeyDown={handleKeyDown}
+                                hasError={Boolean(liveError)}
+                                isDragging={isDragging}
+                                spellCheck={false}
+                                autoComplete="off"
+                                autoCorrect="off"
+                                autoCapitalize="off"
+                                placeholder={placeholder}
+                                disabled={isProcessing}
+                                onDragEnter={handleDragEnter}
+                                onDragLeave={handleDragLeave}
+                                onDragOver={handleDragOver}
+                                onDrop={handleDrop}
+                            />
+                            {isDragging && (
+                                <DropOverlay elevation={0}>
+                                    <CloudUploadIcon
+                                        sx={{
+                                            fontSize: 56,
+                                            color: 'primary.main',
+                                            mb: 1,
+                                        }}
+                                    />
+                                    <Typography
+                                        variant="h6"
+                                        color="primary.main"
+                                        fontWeight="medium"
+                                    >
+                                        {t('create.dropJsonFile') ||
+                                            'Drop JSON file here'}
+                                    </Typography>
+                                </DropOverlay>
+                            )}
+                        </Box>
+                    )}
 
                     {liveError && (
                         <Alert severity="warning" variant="outlined">
@@ -590,7 +722,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             <StyledDialogActions>
                 <Button
                     variant="contained"
-                    onClick={handleImport}
+                    onClick={() => void handleImport()}
                     disabled={importDisabled}
                     startIcon={
                         isProcessing ? (

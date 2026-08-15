@@ -3,6 +3,7 @@ import {
     resolveSeparator,
     parseDelimitedCards,
     parseAnkiExport,
+    parseMarkdownCards,
     processImport,
     processImportedCards,
 } from './importUtils';
@@ -122,6 +123,125 @@ describe('parseAnkiExport', () => {
     });
 });
 
+describe('parseMarkdownCards', () => {
+    it('round-trips the app\'s own "## Card N" export shape', () => {
+        const text = [
+            '## Card 1',
+            '',
+            '**Term:** Mitochondria',
+            '',
+            '**Definition:** The powerhouse of the cell',
+            '',
+            '## Card 2',
+            '',
+            '**Term:** DNA',
+            '',
+            '**Definition:** Genetic material',
+            '',
+        ].join('\n');
+        const { cards, error } = parseMarkdownCards(text);
+
+        expect(error).toBeNull();
+        expect(cards).toHaveLength(2);
+        expect(cards[0]).toMatchObject({
+            term: 'Mitochondria',
+            definition: 'The powerhouse of the cell',
+        });
+        expect(cards[1]).toMatchObject({
+            term: 'DNA',
+            definition: 'Genetic material',
+        });
+    });
+
+    it('parses **Notes:** bullets under a Card block into card.notes', () => {
+        const text = [
+            '## Card 1',
+            '',
+            '**Term:** Mitochondria',
+            '',
+            '**Definition:** The powerhouse of the cell',
+            '',
+            '**Notes:**',
+            '- Found in eukaryotic cells',
+            '- Has its own DNA',
+            '',
+        ].join('\n');
+        const { cards, error } = parseMarkdownCards(text);
+
+        expect(error).toBeNull();
+        expect(cards[0]?.notes.map((n) => n.text)).toEqual([
+            'Found in eukaryotic cells',
+            'Has its own DNA',
+        ]);
+    });
+
+    it('skips the metadata header block (title/description/label/downloaded on)', () => {
+        const text = [
+            '# My Set',
+            '',
+            '## Description',
+            'Some description',
+            '',
+            '## Label',
+            'biology',
+            '',
+            '## Downloaded on',
+            '1/1/2026',
+            '',
+            '## Card 1',
+            '',
+            '**Term:** A',
+            '',
+            '**Definition:** B',
+            '',
+        ].join('\n');
+        const { cards, error } = parseMarkdownCards(text);
+
+        expect(error).toBeNull();
+        expect(cards).toHaveLength(1);
+        expect(cards[0]).toMatchObject({ term: 'A', definition: 'B' });
+    });
+
+    it('parses "Term:: Definition" lines', () => {
+        const text =
+            'Mitochondria:: Powerhouse of the cell\nDNA:: Genetic material';
+        const { cards, error } = parseMarkdownCards(text);
+
+        expect(error).toBeNull();
+        expect(cards).toHaveLength(2);
+        expect(cards[0]).toMatchObject({
+            term: 'Mitochondria',
+            definition: 'Powerhouse of the cell',
+        });
+    });
+
+    it('parses "- Term:: Definition" bulleted lines', () => {
+        const text =
+            '- Mitochondria:: Powerhouse of the cell\n* DNA:: Genetic material';
+        const { cards, error } = parseMarkdownCards(text);
+
+        expect(error).toBeNull();
+        expect(cards.map((c) => c.term)).toEqual(['Mitochondria', 'DNA']);
+    });
+
+    it('ignores blank lines and heading lines in the line-shape convention', () => {
+        const text =
+            '# Heading\n\nMitochondria:: Powerhouse of the cell\n\n## Sub';
+        const { cards, error } = parseMarkdownCards(text);
+
+        expect(error).toBeNull();
+        expect(cards).toHaveLength(1);
+    });
+
+    it('errors with a helpful message when no cards are found', () => {
+        const { cards, error } = parseMarkdownCards(
+            'just some prose\nwith no markers'
+        );
+        expect(cards).toHaveLength(0);
+        expect(error).toMatch(/no.*cards/i);
+    });
+});
+
 describe('processImport (format dispatch)', () => {
     it('routes json to the JSON parser', () => {
         const json = JSON.stringify([{ term: 'T', definition: 'D' }]);
@@ -145,6 +265,11 @@ describe('processImport (format dispatch)', () => {
 
     it('routes anki to the Anki parser', () => {
         const { cards } = processImport('#separator:tab\nT\tD', 'anki');
+        expect(cards[0]).toMatchObject({ term: 'T', definition: 'D' });
+    });
+
+    it('routes markdown to the Markdown parser', () => {
+        const { cards } = processImport('T:: D', 'markdown');
         expect(cards[0]).toMatchObject({ term: 'T', definition: 'D' });
     });
 });
