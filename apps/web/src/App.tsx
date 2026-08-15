@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import FeedbackDialog from 'shared/components/FeedbackDialog/FeedbackDialog';
 import Footer from 'views/Footer/Footer';
 import NavBar from 'views/NavBar/NavBar';
+import MobileBottomNav from 'views/NavBar/MobileBottomNav';
 import { useTheme } from 'shared/theme/useTheme';
 import { DARK, LIGHT } from 'shared/constants/index';
 import AppRoutes from './AppRoutes';
@@ -23,14 +24,14 @@ import { ShortcutProvider } from 'shared/keyboard/ShortcutRegistry';
 import { useGlobalKeyListener } from 'shared/keyboard/useGlobalKeyListener';
 import { ShortcutHelpModal } from 'shared/keyboard/ShortcutHelpModal';
 import { NavShortcuts } from 'shared/keyboard/NavShortcuts';
+import { isStudyRoute } from 'shared/utilities/routes';
 
 const ShortcutLayer = () => {
     useGlobalKeyListener();
     const location = useLocation();
-    const isStudyRoute = location.pathname.startsWith('/study/');
     return (
         <>
-            {!isStudyRoute && <NavShortcuts />}
+            {!isStudyRoute(location.pathname) && <NavShortcuts />}
             <ShortcutHelpModal />
         </>
     );
@@ -58,6 +59,7 @@ const App = () => {
                         <AppRoutes />
                     </MainContent>
                     <Footer />
+                    <MobileBottomNav />
                 </AppWrapper>
                 <FeedbackDialog />
                 <ToastContainer theme={theme} />

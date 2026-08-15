@@ -318,7 +318,12 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
                         animate={{ scale: 1, opacity: 1 }}
                         sx={{ borderRadius: 'inherit' }}
                     >
-                        <CardContent sx={{ p: '2.5rem' }}>
+                        <CardContent
+                            sx={{
+                                p: '2.5rem',
+                                pb: 'max(2.5rem, var(--safe-area-bottom))',
+                            }}
+                        >
                             {/* Term Display */}
                             <Typography
                                 variant="h5"

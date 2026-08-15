@@ -15,8 +15,9 @@ export const MultiSelectDeleteFAB = ({
                 onClick={onClick}
                 sx={{
                     position: 'fixed',
-                    bottom: '2rem',
-                    right: '2rem',
+                    bottom: 'calc(var(--bottom-nav-offset) + 2rem)',
+                    right: 'max(2rem, env(safe-area-inset-right, 0px))',
+                    zIndex: (theme) => theme.zIndex.fab,
                 }}
             >
                 <DeleteIcon sx={{ mr: '0.5rem' }} />

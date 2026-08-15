@@ -11,6 +11,10 @@ export const AppWrapper = styled('div')({
     display: 'flex',
     flexDirection: 'column',
     minHeight: '100vh',
+    // Reserves room for the fixed mobile bottom nav + home indicator. Both
+    // tokens (index.css) are 0px above the md breakpoint, so no media query
+    // is needed here.
+    paddingBottom: 'var(--bottom-nav-offset)',
 });
 
 export const MainContent = styled('div')({

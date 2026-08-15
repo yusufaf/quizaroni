@@ -1,5 +1,6 @@
 import { styled } from '@mui/system';
-import { Button, IconButton } from '@mui/material';
+import { Button, IconButton, Paper } from '@mui/material';
+import type { Theme } from '@mui/material/styles';
 import {
     AccountCircle,
     DarkMode,
@@ -147,3 +148,27 @@ export const AccountIconsContainer = styled('div')({
     display: 'flex',
     cursor: 'pointer',
 });
+
+export const BottomNavPaper = styled(Paper)(({ theme }) => ({
+    display: 'flex',
+    position: 'fixed',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    // Below Drawer (1200) and Modal (1300) so the hamburger drawer and any
+    // dialog overlay it; above Fab (1050) and page content.
+    zIndex: (theme as Theme).zIndex.appBar,
+    borderTop: `1px solid ${theme.palette.divider}`,
+    borderRadius: 0,
+    // The box grows to cover the home indicator; padding keeps tap targets
+    // above it. Tokens are defined in index.css and are 0px above md.
+    height: 'calc(var(--bottom-nav-height) + var(--safe-area-bottom))',
+    paddingBottom: 'var(--safe-area-bottom)',
+    [theme.breakpoints.up('md')]: {
+        display: 'none',
+    },
+    '& .Mui-focusVisible': {
+        outline: `2px solid ${theme.palette.primary.main}`,
+        outlineOffset: '-2px',
+    },
+}));

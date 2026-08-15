@@ -357,7 +357,12 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
                         overflow: 'visible',
                     }}
                 >
-                    <CardContent sx={{ p: '2.5rem' }}>
+                    <CardContent
+                        sx={{
+                            p: '2.5rem',
+                            pb: 'max(2.5rem, var(--safe-area-bottom))',
+                        }}
+                    >
                         {/* Timer */}
                         {activeSession.settings.timedMode && (
                             <Box sx={{ mb: '2rem' }}>
