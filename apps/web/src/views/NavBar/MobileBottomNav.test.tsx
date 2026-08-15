@@ -127,4 +127,21 @@ describe('MobileBottomNav', () => {
             container.querySelector('[aria-label="nav.primaryNavigation"]')
         ).toBeNull();
     });
+
+    it('zeroes --bottom-nav-height on study routes so AppWrapper padding and the FABs collapse too, and restores it off study routes', () => {
+        const root = document.documentElement;
+        const { unmount, rerender } = setup('/study/abc/flashcards');
+        expect(root.style.getPropertyValue('--bottom-nav-height')).toBe('0px');
+
+        pathname = '/explore';
+        rerender(
+            <ThemeProvider theme={theme}>
+                <MobileBottomNav />
+            </ThemeProvider>
+        );
+        expect(root.style.getPropertyValue('--bottom-nav-height')).toBe('');
+
+        unmount();
+        expect(root.style.getPropertyValue('--bottom-nav-height')).toBe('');
+    });
 });

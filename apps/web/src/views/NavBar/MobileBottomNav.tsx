@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
     AccountCircle,
     AddCircleOutline,
@@ -31,11 +32,30 @@ const MobileBottomNav = () => {
     const { authStatus } = useAuthenticator((context) => [context.authStatus]);
     const authenticated = authStatus === 'authenticated';
     const { createAndOpen } = useCreateStudysetAction();
+    const hiddenForStudy = isStudyRoute(pathname);
+
+    // --bottom-nav-height only tracks viewport width (index.css), so
+    // AppWrapper's padding-bottom - and both FABs' offset - would otherwise
+    // stay reserved on /study/* even though the bar itself renders nothing
+    // there, leaving a blank gap under the study surface. Zero the token at
+    // the root while a study route is active so every consumer collapses
+    // together, and restore it on route change/unmount.
+    useEffect(() => {
+        const root = document.documentElement;
+        if (hiddenForStudy) {
+            root.style.setProperty('--bottom-nav-height', '0px');
+        } else {
+            root.style.removeProperty('--bottom-nav-height');
+        }
+        return () => {
+            root.style.removeProperty('--bottom-nav-height');
+        };
+    }, [hiddenForStudy]);
 
     // Study is a full-screen focus surface with its own header; the bar
     // would sit on top of the flip/grading controls and risks an accidental
     // tap abandoning an in-progress session.
-    if (isStudyRoute(pathname)) return null;
+    if (hiddenForStudy) return null;
 
     const value = getBottomNavValue(pathname);
     const ariaCurrent = (tab: string) =>

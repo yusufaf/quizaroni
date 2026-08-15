@@ -157,6 +157,9 @@ export const BottomNavPaper = styled(Paper)(({ theme }) => ({
     right: 0,
     // Below Drawer (1200) and Modal (1300) so the hamburger drawer and any
     // dialog overlay it; above Fab (1050) and page content.
+    // Cast needed: unlike palette/breakpoints, zIndex resolves as `unknown`
+    // on this styled() callback's theme param without it (verified - removing
+    // the cast reproduces a TS18046 build error).
     zIndex: (theme as Theme).zIndex.appBar,
     borderTop: `1px solid ${theme.palette.divider}`,
     borderRadius: 0,
