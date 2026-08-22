@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Paper } from '@mui/material/';
 import { useLogto } from '@logto/react';
-import { PAGE_TITLES } from 'shared/constants';
+import { PAGE_TITLES, POST_SIGN_IN_REDIRECT_KEY } from 'shared/constants';
 import useBrowserTitle from 'hooks/useBrowserTitle';
 import { LoginPageContainer, LoginContainer, LoginTitle } from './LoginStyles';
 
@@ -13,12 +14,21 @@ type Props = {};
 const Login = (props: Props) => {
     useBrowserTitle(PAGE_TITLES.LOGIN);
     const { signIn, isAuthenticated } = useLogto();
+    const location = useLocation();
 
     useEffect(() => {
         if (!isAuthenticated) {
+            // RequireAuth (AppRoutes.tsx) passes the path it redirected from
+            // as router state, but that state doesn't survive the full-page
+            // redirect to Logto's hosted domain below — stash it so
+            // Callback.tsx can send the user back where they started.
+            const from = (location.state as { from?: string } | null)?.from;
+            if (from) {
+                sessionStorage.setItem(POST_SIGN_IN_REDIRECT_KEY, from);
+            }
             signIn(`${window.location.origin}/callback`);
         }
-    }, [isAuthenticated, signIn]);
+    }, [isAuthenticated, signIn, location.state]);
 
     return (
         <LoginPageContainer role="page">

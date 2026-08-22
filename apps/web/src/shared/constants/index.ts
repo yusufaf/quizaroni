@@ -27,6 +27,11 @@ export const QUERY_PARAMS = {
     PROFILE_TAB: 'tab',
 } as const;
 
+// Login.tsx stashes the path RequireAuth redirected from here before the
+// full-page redirect to Logto's hosted sign-in (which loses React Router
+// state); Callback.tsx reads it back once the OIDC exchange completes.
+export const POST_SIGN_IN_REDIRECT_KEY = 'quizaroni.postSignInRedirect';
+
 export const PAGE_TITLES = {
     CREATE: 'Create',
     EDIT: 'Edit',

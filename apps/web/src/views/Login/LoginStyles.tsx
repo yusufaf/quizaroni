@@ -1,6 +1,5 @@
 import { styled } from '@mui/system';
-import { Box, Button, Paper, TextField, Typography } from '@mui/material';
-import { StyledLink } from 'styles/AppStyles';
+import { Box, Typography } from '@mui/material';
 
 export const LoginPageContainer = styled(Box)({
     display: 'flex',
@@ -22,24 +21,4 @@ export const LoginContainer = styled(Box)({
 export const LoginTitle = styled(Typography)({
     fontWeight: 'bold',
     alignSelf: 'flex-start',
-});
-
-// TODO: Create a disabled styling in the theme perhaps?
-export const LoginButton = styled(Button)({
-    fontSize: '1rem',
-    margin: '1rem 0',
-    // "&.Mui-disabled": {
-    //     backgroundColor: theme.palette.primary.main,
-    //     cursor: "not-allowed"
-    // },
-});
-
-export const LoginField = styled(TextField)({
-    marginTop: '1rem',
-});
-
-export const ForgotPasswordLink = styled(StyledLink)({
-    display: 'flex',
-    alignSelf: 'flex-end',
-    marginTop: '0.5rem',
 });

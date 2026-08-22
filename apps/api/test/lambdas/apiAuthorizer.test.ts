@@ -142,4 +142,29 @@ describe("apiAuthorizer", () => {
 
         expect(result.isAuthorized).toBe(false);
     });
+
+    it("rejects a token signed with a key not in the JWKS (forged signature)", async () => {
+        // Every other test signs with the one key pair the JWKS server
+        // serves, so a broken implementation that checked only iss/aud/exp
+        // and skipped the actual signature verification would still pass
+        // them. Signing with a second, unrelated key pair proves jwtVerify's
+        // cryptographic check is actually being exercised.
+        const { privateKey: forgedPrivateKey } = await generateKeyPair(
+            "ES384"
+        );
+        const token = await new SignJWT({
+            sub: "user-123",
+            username: "yusufaf",
+        })
+            .setProtectedHeader({ alg: "ES384", kid: KEY_ID })
+            .setIssuedAt()
+            .setIssuer(`${endpoint}${ISSUER_PATH}`)
+            .setAudience(AUDIENCE)
+            .setExpirationTime("1h")
+            .sign(forgedPrivateKey);
+
+        const result = await handler(buildEvent(`Bearer ${token}`), {}, {});
+
+        expect(result.isAuthorized).toBe(false);
+    });
 });

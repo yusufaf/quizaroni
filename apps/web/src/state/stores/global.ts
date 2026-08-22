@@ -16,7 +16,6 @@ type GlobalState = {
     userAuthInfo: any;
     userData: any;
     labelsDialogProps: LabelsDialogProps;
-    confirmationCodeDialogProps: any;
     loadingActions: LoadingAction[];
 
     // Actions
@@ -32,7 +31,6 @@ type GlobalState = {
     setNamedColorsDialogProps: (props: any) => void;
     setFeedbackDialogOpen: (feedbackDialogOpen: boolean) => void;
     setLabelsDialogProps: (props: LabelsDialogProps) => void;
-    setConfirmationCodeDialogProps: (props: any) => void;
     setLoadingAdd: (actionId: LoadingAction) => void;
     setLoadingRemove: (actionId: LoadingAction) => void;
 };
@@ -48,7 +46,6 @@ export const useGlobalStore = create<GlobalState>((set, get) => ({
     labelsDialogProps: {
         open: false,
     },
-    confirmationCodeDialogProps: {},
     loadingActions: [],
 
     setUserAuthState: (info) => set({ userAuthInfo: info }),
@@ -111,8 +108,6 @@ export const useGlobalStore = create<GlobalState>((set, get) => ({
         set({ namedColorsDialogProps: props }),
     setFeedbackDialogOpen: (feedbackDialogOpen) => set({ feedbackDialogOpen }),
     setLabelsDialogProps: (props) => set({ labelsDialogProps: props }),
-    setConfirmationCodeDialogProps: (props) =>
-        set({ confirmationCodeDialogProps: props }),
     setLoadingAdd: (actionId) => {
         const loadingActions = get().loadingActions;
         if (!loadingActions.includes(actionId)) {
