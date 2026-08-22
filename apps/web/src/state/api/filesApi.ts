@@ -39,7 +39,7 @@ export const useInitiateMultipartUpload = () => {
             const response = await fetch(
                 `${BASE_API_URL}/files/initiate-multipart-upload`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({
                         studysetUUID,
                         fileName,
@@ -68,7 +68,7 @@ export const useGetMultipartSignedUploadUrls = () => {
             const response = await fetch(
                 `${BASE_API_URL}/files/get-multipart-signed-upload-urls`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ key, uploadId, numParts }),
                 }
             );
@@ -96,7 +96,7 @@ export const useCompleteMultipartUpload = () => {
             const response = await fetch(
                 `${BASE_API_URL}/files/complete-multipart-upload`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({
                         association,
                         cardUUID,
@@ -122,7 +122,7 @@ export const useDeleteFile = () => {
     return useMutation({
         mutationFn: async ({ key }: DeleteFileRequest) => {
             const response = await fetch(`${BASE_API_URL}/files/delete-file`, {
-                ...getCommonPostRequestProps(),
+                ...(await getCommonPostRequestProps()),
                 body: JSON.stringify({ key }),
             });
             const data = await response.json();
@@ -140,7 +140,7 @@ export const useSendFeedback = () => {
     return useMutation({
         mutationFn: async ({ key }: SendFeedbackRequest) => {
             const response = await fetch(`${BASE_API_URL}/files/sendFeedback`, {
-                ...getCommonPostRequestProps(),
+                ...(await getCommonPostRequestProps()),
                 body: JSON.stringify({ key }),
             });
             const data = await response.json();

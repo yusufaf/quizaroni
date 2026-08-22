@@ -2,15 +2,14 @@ import { lazy, ReactNode, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Landing from 'views/Landing/Landing';
 import LoadingIndicator from 'shared/components/LoadingIndicator/LoadingIndicator';
-// import Login from 'views/Login/Login';
-// import Signup from 'views/Signup/Signup';
-// import ForgotPassword from 'views/ForgotPassword/ForgotPassword';
-// import ConfirmEmail from 'views/ConfirmEmail/ConfirmEmail';
-import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react';
+import Login from 'views/Login/Login';
+import Signup from 'views/Signup/Signup';
+import Callback from 'views/Callback/Callback';
+import { useLogto } from '@logto/react';
 
 // Route-level code splitting: keep Landing eager (first paint for logged-out
 // visitors); lazy-load everything else so heavy deps (jsPDF, data-grid,
-// amplify, framer-motion, react-color, dicebear) stay out of the entry chunk.
+// framer-motion, react-color, dicebear) stay out of the entry chunk.
 const Home = lazy(() => import('views/Home/Home'));
 const CreateSet = lazy(() => import('views/Create/CreateSet'));
 const Profile = lazy(() => import('views/Profile/Profile'));
@@ -39,10 +38,7 @@ const RequireAuth = ({ children, authenticated }: RequireAuthProps) => {
 };
 
 const AppRoutes = () => {
-    const { authStatus } = useAuthenticator((context) => [context.authStatus]);
-    const authenticated = authStatus === 'authenticated';
-
-    const location = useLocation();
+    const { isAuthenticated: authenticated } = useLogto();
 
     const protectedRoutes = [
         { path: '/create', element: <CreateSet /> },
@@ -54,30 +50,6 @@ const AppRoutes = () => {
         { path: '/study/:studysetId/:mode', element: <StudyMode /> },
     ];
 
-    const getInitialState = () => {
-        const path = location.pathname.toLowerCase();
-        switch (path) {
-            case '/login':
-                return 'signIn';
-            case '/signup':
-                return 'signUp';
-            case '/forgotpassword':
-                return 'forgotPassword';
-            default:
-                return undefined;
-        }
-    };
-
-    const AuthenticatorRoute = () => {
-        if (authenticated) {
-            const from = location.state?.from ?? '/';
-            return <Navigate to={from} replace />;
-        }
-
-        const initialState = getInitialState();
-        return <Authenticator initialState={initialState} />;
-    };
-
     return (
         <Suspense fallback={<LoadingIndicator />}>
             <Routes>
@@ -86,8 +58,9 @@ const AppRoutes = () => {
                     path="/"
                     element={authenticated ? <Home /> : <Landing />}
                 />
-                <Route path="/login" element={<AuthenticatorRoute />} />
-                <Route path="/signUp" element={<AuthenticatorRoute />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signUp" element={<Signup />} />
+                <Route path="/callback" element={<Callback />} />
 
                 {/* Study set view — full owner experience when authenticated,
                     read-only public page (via the no-auth endpoint) otherwise.
@@ -99,10 +72,6 @@ const AppRoutes = () => {
                         authenticated ? <ViewStudySet /> : <PublicStudySet />
                     }
                 />
-
-                {/* <Route path="/signup" element={<Signup />} /> */}
-                {/* <Route path="/forgotPassword" element={<ForgotPassword />} />
-            <Route path="/confirmEmail" element={<ConfirmEmail />} /> */}
 
                 {/* Protected Routes */}
                 {protectedRoutes.map(({ path, element }) => (

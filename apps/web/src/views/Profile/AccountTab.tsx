@@ -1,7 +1,6 @@
 import {
     Person,
     RemoveCircleOutline,
-    EmailRounded,
     DataUsageRounded,
 } from '@mui/icons-material';
 import { Typography, TextField } from '@mui/material';
@@ -14,33 +13,21 @@ import {
     InfoChangeContainer,
 } from './ProfileStyles';
 import { useState } from 'react';
-import {
-    type UpdateUserAttributeOutput,
-    updateUserAttribute,
-} from '@aws-amplify/auth';
-import { EMAIL_REGEX } from 'shared/constants';
-import { useNavigate } from 'react-router-dom';
 import { User } from 'shared/types';
-import ChangePasswordSection from './ChangePasswordSection';
 import DownloadDataDialog from './DownloadDataDialog';
-import { useGlobalStore } from 'state/stores/global';
 
 type Props = {
     userData: User;
 };
+// Change Password and Change Email used to live here as Amplify attribute
+// mutations — Logto's hosted pages (and its own account settings) own both
+// now, so this view is down to the fields that are actually app-local.
 const AccountTab = ({ userData }: Props) => {
-    const navigate = useNavigate();
-
-    const { setConfirmationCodeDialogProps } = useGlobalStore();
-
     const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
     const [showDownloadDialog, setShowDownloadDialog] =
         useState<boolean>(false);
     const [deletePassword, setDeletePassword] = useState<string>('');
     const [enteredNewUsername, setEnteredNewUsername] = useState<string>('');
-    const [newEmail, setNewEmail] = useState<string>('');
-
-    const isNewEmailValid = EMAIL_REGEX.test(newEmail);
 
     const handleDeleteAccount = async () => {
         // TODO
@@ -59,61 +46,6 @@ const AccountTab = ({ userData }: Props) => {
 
     const toggleDownloadDataDialog = () => {
         setShowDownloadDialog((prevShowDownload) => !prevShowDownload);
-    };
-
-    const handleUpdateUserAttribute = async (
-        attributeKey: string,
-        value: string
-    ) => {
-        try {
-            const output = await updateUserAttribute({
-                userAttribute: {
-                    attributeKey,
-                    value,
-                },
-            });
-            handleUpdateUserAttributeNextSteps(output);
-        } catch (error) {
-            console.error('Failed to update user attribute:', error);
-        }
-    };
-
-    const handleUpdateUserAttributeNextSteps = (
-        output: UpdateUserAttributeOutput
-    ) => {
-        const { nextStep } = output;
-
-        switch (nextStep.updateAttributeStep) {
-            case 'CONFIRM_ATTRIBUTE_WITH_CODE':
-                setConfirmationCodeDialogProps({
-                    open: true,
-                    actionType: 'changeEmail',
-                    canResend: false,
-                    description: `To confirm you want to change the email associated with your account to ${newEmail}, we've sent a 6-digit confirmation code.`,
-                    newEmail,
-                    title: 'Confirm Email Change',
-                });
-
-                break;
-            case 'DONE':
-                break;
-        }
-    };
-
-    const handleChangeEmail = async () => {
-        handleUpdateUserAttribute('email', newEmail);
-        setNewEmail('');
-    };
-
-    const getChangeEmailHelperText = () => {
-        if (newEmail && !isNewEmailValid) {
-            return 'Please enter a valid email';
-        }
-
-        // Existing email would satisfy regex
-        if (newEmail === userData.email) {
-            return 'Same as current email';
-        }
     };
 
     return (
@@ -136,32 +68,6 @@ const AccountTab = ({ userData }: Props) => {
                         variant="contained"
                         onClick={() => handleChangeUsername()}
                         disabled={enteredNewUsername === ''}
-                    >
-                        Submit
-                    </ActionSubmitButton>
-                </InfoChangeContainer>
-            </ActionSection>
-            <ChangePasswordSection />
-            <ActionSection>
-                <ActionHeader>
-                    <EmailRounded />
-                    <Typography variant="h6">Change Email</Typography>
-                </ActionHeader>
-                <InfoChangeContainer>
-                    <TextField
-                        variant="standard"
-                        label="New Email"
-                        placeholder="Enter new email"
-                        value={newEmail}
-                        onChange={(e) => setNewEmail(e.target.value)}
-                        required={true}
-                        error={Boolean(newEmail) && !isNewEmailValid}
-                        helperText={getChangeEmailHelperText()}
-                    />
-                    <ActionSubmitButton
-                        variant="contained"
-                        onClick={handleChangeEmail}
-                        disabled={!newEmail || !isNewEmailValid}
                     >
                         Submit
                     </ActionSubmitButton>

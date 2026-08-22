@@ -28,7 +28,7 @@ import {
     StyledNavLink,
 } from './NavStyles';
 import DarkModeToggleButton from './DarkModeToggleButton';
-import { useAuthenticator } from '@aws-amplify/ui-react';
+import { useLogto } from '@logto/react';
 import StreakBadge from 'shared/components/StreakBadge/StreakBadge';
 import { QUERY_PARAMS } from 'shared/constants';
 import { useCreateStudysetAction } from 'hooks/useCreateStudysetAction';
@@ -43,8 +43,7 @@ const NavBar = (props: Props) => {
     // TODO: Verify that a medium breakpoint works to handle mobile cases, can always add more breakpoints
     const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
 
-    const { authStatus } = useAuthenticator((context) => [context.authStatus]);
-    const authenticated = authStatus === 'authenticated';
+    const { isAuthenticated: authenticated } = useLogto();
 
     const navigate = useNavigate();
 

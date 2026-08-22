@@ -1,5 +1,7 @@
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useEffect } from 'react';
+import { useLogto } from '@logto/react';
+import { setAccessTokenGetter } from 'state/api/awsAPI';
 import FeedbackDialog from 'shared/components/FeedbackDialog/FeedbackDialog';
 import Footer from 'views/Footer/Footer';
 import NavBar from 'views/NavBar/NavBar';
@@ -13,7 +15,6 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import GlobalConfirmDialog from 'shared/components/GlobalConfirmDialog/GlobalConfirmDialog';
 import ManageLabelsDialog from 'shared/components/ManageLabelsDialog/ManageLabelsDialog';
-import ConfirmationCodeDialog from 'shared/components/ConfirmationCodeDialog/ConfirmationCodeDialog';
 import { useGlobalStore } from 'state/stores/global';
 import LoadingIndicator from 'shared/components/LoadingIndicator/LoadingIndicator';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -42,10 +43,22 @@ const App = () => {
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
     const { loadingActions } = useGlobalStore();
+    const { getAccessToken, isAuthenticated } = useLogto();
 
     useEffect(() => {
         prefersDarkMode ? setTheme(DARK) : setTheme(LIGHT);
     }, [prefersDarkMode]);
+
+    // useLogto() only works inside a component's render tree, so awsAPI.ts
+    // can't call it directly — wire the real getter in here instead.
+    useEffect(() => {
+        setAccessTokenGetter(async () => {
+            if (!isAuthenticated) {
+                return undefined;
+            }
+            return getAccessToken(import.meta.env.VITE_LOGTO_API_RESOURCE);
+        });
+    }, [isAuthenticated, getAccessToken]);
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -65,7 +78,6 @@ const App = () => {
                 <ToastContainer theme={theme} />
                 <GlobalConfirmDialog />
                 <ManageLabelsDialog />
-                <ConfirmationCodeDialog />
                 <ShortcutLayer />
             </ShortcutProvider>
         </QueryClientProvider>

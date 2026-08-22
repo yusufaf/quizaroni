@@ -4,8 +4,6 @@ import { createLightTheme, createDarkTheme } from './themes';
 import { ThemeProvider } from '@mui/material/styles';
 import { LIGHT, DARK } from 'shared/constants';
 import { ThemeName } from 'shared/types';
-import { amplifyThemeOverrides } from './amplifyThemeOverrides';
-import { ThemeProvider as AmplifyThemeProvider } from '@aws-amplify/ui-react';
 
 type Props = {
     children: ReactNode;
@@ -56,18 +54,9 @@ export const CustomThemeProvider = ({ children }: Props) => {
         toggleDarkMode,
     };
 
-    const amplifyTheme = useMemo(
-        () => amplifyThemeOverrides(muiTheme),
-        [muiTheme]
-    );
-
     return (
         <ThemeContext.Provider value={contextValue}>
-            <ThemeProvider theme={muiTheme}>
-                <AmplifyThemeProvider theme={amplifyTheme}>
-                    {children}
-                </AmplifyThemeProvider>
-            </ThemeProvider>
+            <ThemeProvider theme={muiTheme}>{children}</ThemeProvider>
         </ThemeContext.Provider>
     );
 };

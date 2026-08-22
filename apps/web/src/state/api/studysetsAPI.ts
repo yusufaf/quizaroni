@@ -85,7 +85,7 @@ export const useGetAllStudysets = (
             const response = await fetch(
                 `${BASE_API_URL}/studysets/get-all-studysets`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                 }
             );
             const data = await response.json();
@@ -110,7 +110,7 @@ export const useGetStudyset = (
             const response = await fetch(
                 `${BASE_API_URL}/studysets/get-studyset`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUID }),
                 }
             );
@@ -132,7 +132,7 @@ export type GetPublicStudysetResponse = z.infer<
 
 /**
  * Fetches a publicly-shared study set through the unauthenticated endpoint.
- * Deliberately does NOT send Cognito headers, so it works for logged-out
+ * Deliberately does NOT send an auth header, so it works for logged-out
  * visitors. A 404 (private/nonexistent) is surfaced by throwing so callers can
  * render a "not available" state.
  */
@@ -180,7 +180,7 @@ export const useCreateStudyset = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/create-studyset`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                 }
             );
             const data = await response.json();
@@ -204,7 +204,7 @@ export const useDeleteStudyset = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/delete-studyset`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUID }),
                 }
             );
@@ -229,7 +229,7 @@ export const useBatchDeleteStudysets = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/batch-delete-studysets`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUIDs }),
                 }
             );
@@ -254,7 +254,7 @@ export const useDuplicateStudyset = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/duplicate-studyset`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUID }),
                 }
             );
@@ -281,7 +281,7 @@ export const useBatchDuplicateStudysets = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/batch-duplicate-studysets`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUIDs }),
                 }
             );
@@ -310,7 +310,7 @@ export const useUpdateStudyset = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/update-studyset`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({
                         studysetUUID,
                         updates,
@@ -343,7 +343,7 @@ export const useBatchUpdateStudysets = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/batch-update-studysets`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUpdates }),
                 }
             );
@@ -373,7 +373,7 @@ export const useEditCategory = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/editCategory`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({
                         studysetUUID,
                         index,
@@ -405,7 +405,7 @@ export const useCreateNote = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/create-note`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ cardUUID, studysetUUID }),
                 }
             );
@@ -436,7 +436,7 @@ export const useDeleteNote = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/delete-note`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ cardUUID, noteUUID, studysetUUID }),
                 }
             );
@@ -468,7 +468,7 @@ export const useEditNote = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/edit-note`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({
                         cardUUID,
                         noteUUID,
@@ -504,7 +504,7 @@ export const useCreateLabel = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/create-labels`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({
                         label,
                         studysetUUID,
@@ -534,7 +534,7 @@ export const useDeleteLabel = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/delete-labels`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ labelsToDelete }),
                 }
             );
@@ -560,7 +560,7 @@ export const useEditLabel = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/edit-labels`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ index, newLabel, oldLabel }),
                 }
             );
@@ -588,7 +588,7 @@ export const useChangeLabel = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/update-studyset-labels`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUID, labels: [newLabel] }),
                 }
             );
@@ -618,7 +618,7 @@ export const useUpdateStudysetLabels = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/update-studyset-labels`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUID, labels }),
                 }
             );
@@ -647,7 +647,7 @@ export const useBatchUpdateStudysetLabels = () => {
             const response = await fetch(
                 `${BASE_API_URL}/studysets/batch-update-studyset-labels`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUpdates }),
                 }
             );

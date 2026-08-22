@@ -3,41 +3,28 @@ import { FileMetadata, Part, UUID } from 'shared/types';
 export const BASE_API_URL =
     'https://c0yfrps22e.execute-api.us-west-2.amazonaws.com/api';
 
-export const getCommonPostRequestProps = (): RequestInit => {
-    const { accessToken, idToken } = getCognitoTokens();
+// Wired up by App.tsx on mount, once useLogto() is available inside a
+// component's render tree (this module isn't one). Before that happens — or
+// if the user isn't signed in — requests simply go out unauthenticated, same
+// as today; apiAuthorizer.ts is what actually enforces auth.
+type AccessTokenGetter = () => Promise<string | undefined>;
+let getAccessToken: AccessTokenGetter | undefined;
+
+export const setAccessTokenGetter = (getter: AccessTokenGetter): void => {
+    getAccessToken = getter;
+};
+
+export const getCommonPostRequestProps = async (): Promise<RequestInit> => {
+    const accessToken = await getAccessToken?.();
 
     return {
         credentials: 'omit',
         headers: {
             'Content-Type': 'application/json',
-            authorization: `${accessToken} ${idToken}`,
+            ...(accessToken ? { authorization: `Bearer ${accessToken}` } : {}),
         },
         method: 'POST',
     };
-};
-
-export const getCognitoTokens = (): {
-    accessToken: string;
-    idToken: string;
-    refreshToken: string;
-} => {
-    const propertiesToRetrieve = ['idToken', 'refreshToken', 'accessToken'];
-    const tokens = {};
-
-    for (const key in localStorage) {
-        if (!propertiesToRetrieve.some((property) => key.includes(property))) {
-            continue;
-        }
-
-        const value = localStorage.getItem(key) ?? '';
-        const propertyName = key.split('.')[3];
-        if (propertyName && value) {
-            tokens[propertyName] = value;
-        }
-    }
-
-    // @ts-ignore
-    return tokens;
 };
 
 type InitiateMultipartUploadProps = {
@@ -58,7 +45,7 @@ export const initiateMultipartUpload = async ({
     const url = `${BASE_API_URL}/files/initiate-multipart-upload`;
     return await fetch(url, {
         body: JSON.stringify({ studysetUUID, fileName, contentType }),
-        ...getCommonPostRequestProps(),
+        ...(await getCommonPostRequestProps()),
     }).then((response) => response.json());
 };
 
@@ -79,7 +66,7 @@ export const getMultipartSignedUploadUrls = async ({
     const url = `${BASE_API_URL}/files/get-multipart-signed-upload-urls`;
     return await fetch(url, {
         body: JSON.stringify({ key, uploadId, numParts }),
-        ...getCommonPostRequestProps(),
+        ...(await getCommonPostRequestProps()),
     }).then((response) => response.json());
 };
 
@@ -111,7 +98,7 @@ export const completeMultipartUpload = async ({
             studysetUUID,
             uploadId,
         }),
-        ...getCommonPostRequestProps(),
+        ...(await getCommonPostRequestProps()),
     }).then((response) => response.json());
 };
 
@@ -122,7 +109,7 @@ export const deleteFile = async ({ key }: DeleteFileProps) => {
     const url = `${BASE_API_URL}/files/delete-file`;
     return await fetch(url, {
         body: JSON.stringify({ key }),
-        ...getCommonPostRequestProps(),
+        ...(await getCommonPostRequestProps()),
     }).then((response) => response.json());
 };
 
@@ -133,6 +120,6 @@ export const sendFeedback = async ({ key }: SendFeedbackProps) => {
     const url = `${BASE_API_URL}/files/sendFeedback`;
     return await fetch(url, {
         body: JSON.stringify({ key }),
-        ...getCommonPostRequestProps(),
+        ...(await getCommonPostRequestProps()),
     }).then((response) => response.json());
 };
