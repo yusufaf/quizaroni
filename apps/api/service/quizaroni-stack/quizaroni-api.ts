@@ -334,6 +334,18 @@ export class QuizaroniAPI extends Construct {
             methods: [HttpMethod.GET],
         });
 
+        // Logto calls this directly (Console > Webhooks, User.Created) —
+        // deliberately unauthenticated like the routes above, since Logto
+        // never holds a Quizaroni access token. The handler verifies the
+        // logto-signature-sha-256 header itself instead.
+        this.createLambdaHttpIntegration({
+            api,
+            lambdaProps,
+            path: `/api/webhooks/logto-user-created`,
+            lambdaName: 'logtoUserCreatedWebhook',
+            methods: [HttpMethod.POST],
+        });
+
         // this.createLambdaHttpIntegration({
         //     api,
         //     lambdaProps,
