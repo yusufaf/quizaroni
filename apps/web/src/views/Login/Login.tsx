@@ -1,141 +1,35 @@
-import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Paper } from '@mui/material/';
-import PasswordToggle from 'components/PasswordToggle/PasswordToggle';
+import { useLogto } from '@logto/react';
 import { PAGE_TITLES } from 'shared/constants';
 import useBrowserTitle from 'hooks/useBrowserTitle';
-import {
-    ForgotPasswordLink,
-    LoginPageContainer,
-    LoginContainer,
-    LoginField,
-    LoginTitle,
-    LoginButton,
-} from './LoginStyles';
-import { StyledLink } from 'styles/AppStyles';
-import { signIn } from '@aws-amplify/auth';
-import { useGlobalStore } from 'state/stores/global';
+import { LoginPageContainer, LoginContainer, LoginTitle } from './LoginStyles';
 
 type Props = {};
+
+// Logto has no embeddable sign-in form (unlike Amplify's <Authenticator>) —
+// it redirects to its own hosted sign-in page. This view's only job is to
+// kick off that redirect; /callback (Callback.tsx) picks the user back up.
 const Login = (props: Props) => {
     useBrowserTitle(PAGE_TITLES.LOGIN);
-    const navigate = useNavigate();
+    const { signIn, isAuthenticated } = useLogto();
 
-    /* OAuth Variables */
-    // const provider = new GoogleAuthProvider();
-    // provider.setCustomParameters({ prompt: 'select_account' });
-
-    const { setAuthenticated } = useGlobalStore();
-
-    const [username, setUsername] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [passVisibility, setPassVisibility] = useState<boolean>(false);
-    const [showErrorText, setShowErrorText] = useState({
-        emailInput: false,
-        passInput: false,
-    });
-
-    // const handleGoogleSignIn = () => {
-    //     signInWithPopup(auth, provider)
-    //         .then((result) => {
-    //             // This gives you a Google Access Token. You can use it to access the Google API.
-    //             const credential = GoogleAuthProvider.credentialFromResult(result);
-    //             const token = credential.accessToken;
-    //             // The signed-in user info.
-    //             const user = result.user;
-    //             const { uid } = user;
-    //             setUserAuthState(user);
-    //             updateLastSignIn(uid);
-    //             localStorage.setItem('userInfo', JSON.stringify(user));
-    //             displayLoginAlert(C.SUCCESS);
-    //         })
-    //         .catch((error) => {
-    //             console.log(`Couldn't sign in with Google`);
-    //             displayLoginAlert(C.ERROR);
-    //         });
-    // }
-
-    const handleLogin = async () => {
-        try {
-            await signIn({ username, password });
-
-            /* Store cognito user and authenticated in state */
-            // setCognitoUser({ username });
-            setAuthenticated(true);
-
-            // Navigate to home page
-            navigate('/');
-        } catch (error) {
-            console.error('Error signing in', error);
+    useEffect(() => {
+        if (!isAuthenticated) {
+            signIn(`${window.location.origin}/callback`);
         }
-    };
-
-    /* Function to check if "Enter" key was hit and call function */
-    const enterKeyHandler = (e) => {
-        const key = e.key.trim();
-        if (key === 'Enter') {
-            handleLogin();
-        }
-    };
-
-    const handleEmailChange = (e) => {
-        setUsername(e.target.value);
-    };
-
-    const handlePasswordChange = (e) => {
-        setPassword(e.target.value);
-    };
+    }, [isAuthenticated, signIn]);
 
     return (
-        <>
-            <LoginPageContainer role="page">
-                <Paper elevation={6}>
-                    <LoginContainer onKeyUp={enterKeyHandler}>
-                        <LoginTitle variant="h5">Login</LoginTitle>
-                        <LoginField
-                            label="Email or username"
-                            name="emailInput"
-                            value={username}
-                            onChange={handleEmailChange}
-                            error={showErrorText.emailInput}
-                            size="small"
-                        />
-                        <LoginField
-                            label="Password"
-                            type={passVisibility ? 'text' : 'password'}
-                            value={password}
-                            name="passInput"
-                            onChange={handlePasswordChange}
-                            error={showErrorText.passInput}
-                            size="small"
-                            InputProps={{
-                                endAdornment: (
-                                    <PasswordToggle
-                                        passwordVisibility={passVisibility}
-                                        setPasswordVisibility={
-                                            setPassVisibility
-                                        }
-                                    />
-                                ),
-                            }}
-                        />
-                        <ForgotPasswordLink to="/forgotPassword">
-                            Forgot password?
-                        </ForgotPasswordLink>
-                        <LoginButton
-                            variant="contained"
-                            disabled={!username || !password}
-                            onClick={() => handleLogin()}
-                        >
-                            Log In
-                        </LoginButton>
-                        <StyledLink to="/signup">
-                            Don't have an account? Click here to sign up!
-                        </StyledLink>
-                    </LoginContainer>
-                </Paper>
-            </LoginPageContainer>
-        </>
+        <LoginPageContainer role="page">
+            <Paper elevation={6}>
+                <LoginContainer>
+                    <LoginTitle variant="h5">
+                        Redirecting to sign in...
+                    </LoginTitle>
+                </LoginContainer>
+            </Paper>
+        </LoginPageContainer>
     );
 };
 

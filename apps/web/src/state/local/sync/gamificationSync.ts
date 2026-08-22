@@ -1,11 +1,7 @@
 import { BASE_API_URL, getCommonPostRequestProps } from 'state/api/awsAPI';
 import { validate } from 'shared/validation';
 import { UpdateGamificationResponseSchema } from 'shared/schemas';
-import type {
-    CustomAchievement,
-    GamificationState,
-    User,
-} from 'shared/types';
+import type { CustomAchievement, GamificationState, User } from 'shared/types';
 import {
     createInitialGamificationState,
     mergeCustomAchievements,
@@ -26,7 +22,7 @@ export async function pushGamificationToServer(
         const response = await fetch(
             `${BASE_API_URL}/users/update-gamification`,
             {
-                ...getCommonPostRequestProps(),
+                ...(await getCommonPostRequestProps()),
                 body: JSON.stringify({
                     gamification: payload.state,
                     customAchievements: payload.customAchievements,

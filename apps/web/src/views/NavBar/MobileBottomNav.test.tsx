@@ -43,9 +43,9 @@ vi.mock('react-router-dom', () => {
     };
 });
 
-let authStatus: 'authenticated' | 'unauthenticated' = 'authenticated';
-vi.mock('@aws-amplify/ui-react', () => ({
-    useAuthenticator: () => ({ authStatus }),
+let isAuthenticated = true;
+vi.mock('@logto/react', () => ({
+    useLogto: () => ({ isAuthenticated }),
 }));
 
 const createAndOpen = vi.fn();
@@ -65,7 +65,7 @@ const setup = (path: string) => {
 describe('MobileBottomNav', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        authStatus = 'authenticated';
+        isAuthenticated = true;
     });
 
     it('renders the primary-navigation landmark', () => {
@@ -82,7 +82,7 @@ describe('MobileBottomNav', () => {
     });
 
     it('shows Login (not Profile) when logged out', () => {
-        authStatus = 'unauthenticated';
+        isAuthenticated = false;
         setup('/');
         const loginLink = screen.getByRole('link', { name: 'nav.login' });
         expect(loginLink).toBeTruthy();
@@ -112,7 +112,7 @@ describe('MobileBottomNav', () => {
     });
 
     it('Create redirects to login without calling the hook when logged out', () => {
-        authStatus = 'unauthenticated';
+        isAuthenticated = false;
         setup('/explore');
         screen.getByRole('button', { name: 'nav.create' }).click();
         expect(createAndOpen).not.toHaveBeenCalled();

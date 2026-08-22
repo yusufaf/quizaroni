@@ -21,7 +21,7 @@ import {
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuthenticator } from '@aws-amplify/ui-react';
+import { useLogto } from '@logto/react';
 import { AuthenticationButton, LoginButtonsContainer } from './NavStyles';
 import DarkModeToggleButton from './DarkModeToggleButton';
 import { useGlobalStore } from 'state/stores/global';
@@ -52,8 +52,7 @@ const activeNavLinkSx: SxProps<Theme> = {
 const NavDrawer = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { authStatus } = useAuthenticator((context) => [context.authStatus]);
-    const authenticated = authStatus === 'authenticated';
+    const { isAuthenticated: authenticated } = useLogto();
     const setFeedbackDialogOpen = useGlobalStore(
         (state) => state.setFeedbackDialogOpen
     );

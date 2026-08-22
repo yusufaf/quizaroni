@@ -39,7 +39,7 @@ export const useGetUser = (
         queryKey: ['user'],
         queryFn: async () => {
             const response = await fetch(`${BASE_API_URL}/users/get-user`, {
-                ...getCommonPostRequestProps(),
+                ...(await getCommonPostRequestProps()),
             });
             const data = await response.json();
             return validate({
@@ -57,7 +57,7 @@ export const useCreateUser = () => {
     return useMutation({
         mutationFn: async ({ email, username }: CreateUserRequest) => {
             const response = await fetch(`${BASE_API_URL}/users/create`, {
-                ...getCommonPostRequestProps(),
+                ...(await getCommonPostRequestProps()),
                 body: JSON.stringify({ email, username }),
             });
             const data = await response.json();
@@ -78,7 +78,7 @@ export const useUpdateUserMetadata = () => {
             const response = await fetch(
                 `${BASE_API_URL}/users/update-metadata`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ updates }),
                 }
             );
@@ -103,7 +103,7 @@ export const useUpdateDefaultTheme = () => {
             const response = await fetch(
                 `${BASE_API_URL}/users/updateDefaultTheme`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ uuid, newTheme }),
                 }
             );
@@ -126,7 +126,7 @@ export const useUpdateEmail = () => {
     return useMutation({
         mutationFn: async ({ username, newEmail }: UpdateEmailRequest) => {
             const response = await fetch(`${BASE_API_URL}/users/updateEmail`, {
-                ...getCommonPostRequestProps(),
+                ...(await getCommonPostRequestProps()),
                 body: JSON.stringify({ username, newEmail }),
             });
             const data = await response.json();
@@ -149,7 +149,7 @@ export const useDownloadUserData = () => {
             const response = await fetch(
                 `${BASE_API_URL}/users/download-user-data`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify(params),
                 }
             );
@@ -175,7 +175,7 @@ export const useUploadProfilePicture = () => {
             const response = await fetch(
                 `${BASE_API_URL}/users/upload-profile-picture`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ imageData, fileName, contentType }),
                 }
             );
@@ -202,7 +202,7 @@ export const useUpdateNotificationPreferences = () => {
             const response = await fetch(
                 `${BASE_API_URL}/users/update-notification-preferences`,
                 {
-                    ...getCommonPostRequestProps(),
+                    ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ updates }),
                 }
             );

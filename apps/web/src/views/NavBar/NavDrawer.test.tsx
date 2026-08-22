@@ -47,9 +47,9 @@ vi.mock('react-router-dom', () => ({
     ),
 }));
 
-let authStatus: 'authenticated' | 'unauthenticated' = 'authenticated';
-vi.mock('@aws-amplify/ui-react', () => ({
-    useAuthenticator: () => ({ authStatus }),
+let isAuthenticated = true;
+vi.mock('@logto/react', () => ({
+    useLogto: () => ({ isAuthenticated }),
 }));
 
 const handleLogout = vi.fn();
@@ -78,7 +78,7 @@ const openDrawer = () => {
 describe('NavDrawer', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        authStatus = 'authenticated';
+        isAuthenticated = true;
     });
 
     it('the hamburger has an accessible name and toggles aria-expanded', () => {
@@ -98,7 +98,7 @@ describe('NavDrawer', () => {
     });
 
     it('shows Login and Sign up, and no Logout, when logged out', () => {
-        authStatus = 'unauthenticated';
+        isAuthenticated = false;
         setup();
         openDrawer();
         expect(screen.getByText('nav.login')).toBeTruthy();
