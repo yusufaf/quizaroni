@@ -20,15 +20,6 @@ declare const Deno: { env: { get(key: string): string | undefined } };
  * in that case we serve the shell unchanged.
  */
 
-// The deployed AWS API Gateway (matches BASE_API_URL in the web app). Set as
-// a Netlify site env var, visible to edge functions regardless of the VITE_
-// prefix. We call the API directly rather than through netlify.toml's
-// redirects — there is no `/api/*` proxy to rely on.
-const API_BASE = Deno.env.get('API_BASE_URL');
-if (!API_BASE) {
-    throw new Error('API_BASE_URL env var is not set');
-}
-
 const escapeHtml = (value: string): string =>
     value
         .replace(/&/g, '&amp;')
@@ -50,6 +41,19 @@ type PublicSet = {
 };
 
 export default async (request: Request, context: Context) => {
+    // Read lazily inside the handler, not at module top level: Netlify's
+    // build-time edge-function bundler evaluates this module to extract its
+    // config before deploy, when site env vars aren't injected yet — a
+    // top-level throw here fails the build itself, not just a bad request.
+    // The deployed AWS API Gateway (matches BASE_API_URL in the web app),
+    // set as a Netlify site env var, visible to edge functions regardless of
+    // the VITE_ prefix. We call the API directly rather than through
+    // netlify.toml's redirects — there is no `/api/*` proxy to rely on.
+    const API_BASE = Deno.env.get('API_BASE_URL');
+    if (!API_BASE) {
+        throw new Error('API_BASE_URL env var is not set');
+    }
+
     const response = await context.next();
 
     const contentType = response.headers.get('content-type') ?? '';

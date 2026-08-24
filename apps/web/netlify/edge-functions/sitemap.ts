@@ -15,13 +15,6 @@ declare const Deno: { env: { get(key: string): string | undefined } };
  * unauthenticated API the app uses.
  */
 
-// Deployed AWS API Gateway (matches BASE_API_URL in the web app). Set as a
-// Netlify site env var — see the note in og-meta.ts.
-const API_BASE = Deno.env.get('API_BASE_URL');
-if (!API_BASE) {
-    throw new Error('API_BASE_URL env var is not set');
-}
-
 const escapeXml = (value: string): string =>
     value
         .replace(/&/g, '&amp;')
@@ -36,6 +29,14 @@ type PublicSummary = {
 };
 
 export default async (request: Request, _context: Context) => {
+    // Read lazily inside the handler — see the note in og-meta.ts about
+    // Netlify's build-time bundling pass running before env vars exist.
+    // Deployed AWS API Gateway (matches BASE_API_URL in the web app).
+    const API_BASE = Deno.env.get('API_BASE_URL');
+    if (!API_BASE) {
+        throw new Error('API_BASE_URL env var is not set');
+    }
+
     const origin = new URL(request.url).origin;
 
     let studysets: PublicSummary[] = [];
