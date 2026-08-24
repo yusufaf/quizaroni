@@ -10,7 +10,8 @@
 		"watch": "tsc -w",
 		"test": "jest",
 		"cdk": "cdk",
-		"backfill:public-gsi": "ts-node scripts/backfillPublicGsi.ts"
+		"backfill:public-gsi": "ts-node scripts/backfillPublicGsi.ts",
+		"migrate:logto-user": "ts-node scripts/migrateUserToLogto.ts"
 	},
 	"dependencies": {
 		"@quizaroni/shared-types": "workspace:*",
