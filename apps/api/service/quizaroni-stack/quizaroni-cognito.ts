@@ -65,7 +65,7 @@ export class QuizaroniCognito extends Construct {
 
         userPool.addDomain(`${appName}-user-pool-domain`, {
             cognitoDomain: {
-                domainPrefix: appName,
+                domainPrefix: `${appName}-${deploymentType}`,
             },
         });
 
