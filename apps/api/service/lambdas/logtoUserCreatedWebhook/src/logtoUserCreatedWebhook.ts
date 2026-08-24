@@ -20,8 +20,14 @@ type LogtoUser = {
 
 type LogtoWebhookPayload = {
     event: string;
-    user?: LogtoUser;
+    data?: LogtoUser;
 };
+
+// Pulled out of the handler so the User.Created event-shape parsing —
+// `data`, not `user`, is where Logto actually nests the created user — is
+// unit-testable without an AWS SDK double.
+export const extractCreatedUser = (payload: LogtoWebhookPayload): LogtoUser | null =>
+    payload.event === "User.Created" && payload.data ? payload.data : null;
 
 export const verifySignature = (rawBody: string, signature: string): boolean => {
     if (!logtoWebhookSigningKey || !signature) {
@@ -82,14 +88,15 @@ export const handler: Handler = async (
         };
     }
 
-    if (payload.event !== "User.Created" || !payload.user) {
+    const createdUser = extractCreatedUser(payload);
+    if (!createdUser) {
         // Ack anything else so Logto doesn't retry — this endpoint is only
         // registered against User.Created, but ack unknown events safely
         // rather than 400 them.
         return { statusCode: 200, body: JSON.stringify({ message: "Ignored" }) };
     }
 
-    const { id: userUUID, username, primaryEmail: email } = payload.user;
+    const { id: userUUID, username, primaryEmail: email } = createdUser;
     const timestamp = new Date().toISOString();
 
     try {
