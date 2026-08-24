@@ -1,12 +1,15 @@
-import { defineConfig } from 'vite-plus';
+import { defineConfig, loadEnv } from 'vite-plus';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
 // https://vitejs.dev/config/
 // TODO: https://vite-plugin-pwa.netlify.app/guide/#setup
 
+// This file is outside the Vite import graph, so it can't read
+// import.meta.env — load the same .env files Vite itself would for this mode.
 const apiProxyURL =
-    'https://c0yfrps22e.execute-api.us-west-2.amazonaws.com/api';
+    loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '')
+        .VITE_API_BASE_URL ?? 'http://localhost:3000/api';
 
 export default defineConfig({
     staged: {

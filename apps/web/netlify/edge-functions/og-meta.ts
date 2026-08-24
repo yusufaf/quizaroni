@@ -1,5 +1,10 @@
 import type { Context } from '@netlify/edge-functions';
 
+// Netlify Edge Functions run on Deno, not Node. This directory is outside
+// tsconfig.json's `include`, so it gets no ambient Deno types — declare just
+// the slice of the API this file actually calls.
+declare const Deno: { env: { get(key: string): string | undefined } };
+
 /**
  * Per-set Open Graph / Twitter meta for public study sets.
  *
@@ -15,10 +20,14 @@ import type { Context } from '@netlify/edge-functions';
  * in that case we serve the shell unchanged.
  */
 
-// The deployed AWS API Gateway (matches BASE_API_URL in the web app). The
-// repo's netlify.toml `/api/*` proxy points at a different, stale origin, so we
-// call the API directly rather than relying on the redirect.
-const API_BASE = 'https://c0yfrps22e.execute-api.us-west-2.amazonaws.com/api';
+// The deployed AWS API Gateway (matches BASE_API_URL in the web app). Set as
+// a Netlify site env var, visible to edge functions regardless of the VITE_
+// prefix. We call the API directly rather than through netlify.toml's
+// redirects — there is no `/api/*` proxy to rely on.
+const API_BASE = Deno.env.get('API_BASE_URL');
+if (!API_BASE) {
+    throw new Error('API_BASE_URL env var is not set');
+}
 
 const escapeHtml = (value: string): string =>
     value
