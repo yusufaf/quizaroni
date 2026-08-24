@@ -1,5 +1,10 @@
 import type { Context } from '@netlify/edge-functions';
 
+// Netlify Edge Functions run on Deno, not Node. This directory is outside
+// tsconfig.json's `include`, so it gets no ambient Deno types — declare just
+// the slice of the API this file actually calls.
+declare const Deno: { env: { get(key: string): string | undefined } };
+
 /**
  * Dynamic XML sitemap of all public study sets.
  *
@@ -9,10 +14,6 @@ import type { Context } from '@netlify/edge-functions';
  * crawlers a snippet worth indexing. The set list comes from the same
  * unauthenticated API the app uses.
  */
-
-// Deployed AWS API Gateway (matches BASE_API_URL in the web app). See the note
-// in og-meta.ts about the stale netlify.toml /api proxy.
-const API_BASE = 'https://c0yfrps22e.execute-api.us-west-2.amazonaws.com/api';
 
 const escapeXml = (value: string): string =>
     value
@@ -28,6 +29,14 @@ type PublicSummary = {
 };
 
 export default async (request: Request, _context: Context) => {
+    // Read lazily inside the handler — see the note in og-meta.ts about
+    // Netlify's build-time bundling pass running before env vars exist.
+    // Deployed AWS API Gateway (matches BASE_API_URL in the web app).
+    const API_BASE = Deno.env.get('API_BASE_URL');
+    if (!API_BASE) {
+        throw new Error('API_BASE_URL env var is not set');
+    }
+
     const origin = new URL(request.url).origin;
 
     let studysets: PublicSummary[] = [];
@@ -56,7 +65,9 @@ export default async (request: Request, _context: Context) => {
         const lastmod = set.updatedAt
             ? `\n    <lastmod>${escapeXml(set.updatedAt)}</lastmod>`
             : '';
-        urls.push(`  <url>\n    <loc>${escapeXml(loc)}</loc>${lastmod}\n  </url>`);
+        urls.push(
+            `  <url>\n    <loc>${escapeXml(loc)}</loc>${lastmod}\n  </url>`
+        );
     }
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join(

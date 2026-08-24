@@ -19,15 +19,6 @@ function = "og-meta"
 path = "/sitemap.xml"
 function = "sitemap"
 
-# Proxy API calls to the backend. NOTE: the running web app calls the AWS API
-# Gateway directly via BASE_API_URL (apps/web/src/state/api/awsAPI.ts), so this
-# onrender proxy is currently unused — update or remove it to match your
-# deployed backend (see apps/api).
-[[redirects]]
-from = "/api/*"
-to = "https://quizaroni-api.onrender.com/api/:splat"
-status = 200
-
 # SPA fallback.
 [[redirects]]
 from = "/*"

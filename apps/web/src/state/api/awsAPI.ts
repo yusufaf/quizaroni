@@ -1,7 +1,9 @@
 import { FileMetadata, Part, UUID } from 'shared/types';
 
-export const BASE_API_URL =
-    'https://c0yfrps22e.execute-api.us-west-2.amazonaws.com/api';
+export const BASE_API_URL = import.meta.env.VITE_API_BASE_URL;
+if (!BASE_API_URL) {
+    throw new Error('VITE_API_BASE_URL env var is not set');
+}
 
 // Wired up by App.tsx on mount, once useLogto() is available inside a
 // component's render tree (this module isn't one). Before that happens — or
