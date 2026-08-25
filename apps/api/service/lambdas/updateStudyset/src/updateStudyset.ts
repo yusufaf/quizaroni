@@ -29,6 +29,102 @@ type RequestBody = {
     isMetadataUpdate?: boolean;
 };
 
+type BuildUpdateExpressionParams = {
+    updates: { [key: string]: any };
+    isMetadataUpdate: boolean;
+    updatedAt: string;
+    updatedBy: string;
+    studysetUUID: string;
+};
+
+/**
+ * Builds the DynamoDB UpdateExpression for a studyset update.
+ *
+ * Regression test: `updatedAt`/`updatedBy` are always server-set here, but
+ * callers that spread a previously-fetched studyset into `updates` (see
+ * apps/web CreateSet.tsx's saveChanges()) carry the studyset's existing
+ * values for both. Left in, that produced two SET clauses for the same
+ * #updatedAt/#updatedBy attribute paths, which DynamoDB rejects outright —
+ * every save of an existing studyset 500'd, and the frontend's `validate()`
+ * helper doesn't check response.ok, so the error was swallowed and shown to
+ * the user as a successful save. This strips both from the caller-supplied
+ * `updates` before building the expression.
+ */
+export const buildUpdateExpression = ({
+    updates,
+    isMetadataUpdate,
+    updatedAt,
+    updatedBy,
+    studysetUUID,
+}: BuildUpdateExpressionParams) => {
+    const topLevelUpdates = { updatedAt, updatedBy };
+
+    const updateExpressions: string[] = [];
+    const ExpressionAttributeNames: Record<string, string> = {};
+    const ExpressionAttributeValues: Record<string, any> = {};
+
+    // Handle top-level updates for `updatedAt` and `updatedBy`
+    for (const [key, value] of Object.entries(topLevelUpdates)) {
+        const attributeKey = `#${key}`;
+        const attributeValue = `:${key}`;
+        updateExpressions.push(`${attributeKey} = ${attributeValue}`);
+        ExpressionAttributeNames[attributeKey] = key;
+        ExpressionAttributeValues[attributeValue] = value;
+    }
+
+    if (isMetadataUpdate) {
+        // Ensure #metadata is set only once
+        ExpressionAttributeNames[`#metadata`] = 'metadata';
+    }
+
+    const {
+        updatedAt: _ignoredUpdatedAt,
+        updatedBy: _ignoredUpdatedBy,
+        ...clientUpdates
+    } = updates;
+
+    for (const [key, value] of Object.entries(clientUpdates)) {
+        const attributeValue = `:${key}`;
+
+        // Determine the correct key path for metadata vs. standard update
+        const attributeKey = isMetadataUpdate ? `#metadata.#${key}` : `#${key}`;
+
+        // Add the key to ExpressionAttributeNames (same for both cases)
+        ExpressionAttributeNames[`#${key}`] = key;
+
+        // Push the update expression
+        updateExpressions.push(`${attributeKey} = ${attributeValue}`);
+
+        // Add the value to ExpressionAttributeValues
+        ExpressionAttributeValues[attributeValue] = value;
+    }
+
+    // Maintain the public-sharing GSI (PK2/SK2). A set is indexed there
+    // only while it is public, so toggling `publiclyViewable` adds or
+    // removes the index attributes. `publiclyViewable` always arrives as a
+    // metadata update, so we key off its presence in `updates`.
+    const removeExpressions: string[] = [];
+    if (Object.prototype.hasOwnProperty.call(updates, 'publiclyViewable')) {
+        ExpressionAttributeNames['#PK2'] = 'PK2';
+        ExpressionAttributeNames['#SK2'] = 'SK2';
+
+        if (updates.publiclyViewable === true) {
+            ExpressionAttributeValues[':PK2'] = PUBLIC_STUDYSET_PK;
+            ExpressionAttributeValues[':SK2'] = publicStudysetSK(studysetUUID);
+            updateExpressions.push('#PK2 = :PK2', '#SK2 = :SK2');
+        } else {
+            removeExpressions.push('#PK2', '#SK2');
+        }
+    }
+
+    let UpdateExpression = `SET ${updateExpressions.join(', ')}`;
+    if (removeExpressions.length > 0) {
+        UpdateExpression += ` REMOVE ${removeExpressions.join(', ')}`;
+    }
+
+    return { UpdateExpression, ExpressionAttributeNames, ExpressionAttributeValues };
+};
+
 export const handler: Handler = async (
     event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>,
     context
@@ -118,73 +214,14 @@ export const handler: Handler = async (
             }
         }
 
-        // Ensure `updatedAt` and `updatedBy` are at the top level
-        const topLevelUpdates = {
-            updatedAt,
-            updatedBy: username,
-        };
-
-        const updateExpressions: string[] = [];
-        const ExpressionAttributeNames: Record<string, string> = {};
-        const ExpressionAttributeValues: Record<string, any> = {};
-
-        // Handle top-level updates for `updatedAt` and `updatedBy`
-        for (const [key, value] of Object.entries(topLevelUpdates)) {
-            const attributeKey = `#${key}`;
-            const attributeValue = `:${key}`;
-            updateExpressions.push(`${attributeKey} = ${attributeValue}`);
-            ExpressionAttributeNames[attributeKey] = key;
-            ExpressionAttributeValues[attributeValue] = value;
-        }
-
-        if (isMetadataUpdate) {
-            // Ensure #metadata is set only once
-            ExpressionAttributeNames[`#metadata`] = 'metadata';
-        }
-
-        for (const [key, value] of Object.entries(updates)) {
-            const attributeValue = `:${key}`;
-
-            // Determine the correct key path for metadata vs. standard update
-            const attributeKey = isMetadataUpdate
-                ? `#metadata.#${key}`
-                : `#${key}`;
-
-            // Add the key to ExpressionAttributeNames (same for both cases)
-            ExpressionAttributeNames[`#${key}`] = key;
-
-            // Push the update expression
-            updateExpressions.push(`${attributeKey} = ${attributeValue}`);
-
-            // Add the value to ExpressionAttributeValues
-            ExpressionAttributeValues[attributeValue] = value;
-        }
-
-        // Maintain the public-sharing GSI (PK2/SK2). A set is indexed there
-        // only while it is public, so toggling `publiclyViewable` adds or
-        // removes the index attributes. `publiclyViewable` always arrives as a
-        // metadata update, so we key off its presence in `updates`.
-        const removeExpressions: string[] = [];
-        if (
-            Object.prototype.hasOwnProperty.call(updates, 'publiclyViewable')
-        ) {
-            ExpressionAttributeNames['#PK2'] = 'PK2';
-            ExpressionAttributeNames['#SK2'] = 'SK2';
-
-            if (updates.publiclyViewable === true) {
-                ExpressionAttributeValues[':PK2'] = PUBLIC_STUDYSET_PK;
-                ExpressionAttributeValues[':SK2'] =
-                    publicStudysetSK(studysetUUID);
-                updateExpressions.push('#PK2 = :PK2', '#SK2 = :SK2');
-            } else {
-                removeExpressions.push('#PK2', '#SK2');
-            }
-        }
-
-        let UpdateExpression = `SET ${updateExpressions.join(', ')}`;
-        if (removeExpressions.length > 0) {
-            UpdateExpression += ` REMOVE ${removeExpressions.join(', ')}`;
-        }
+        const { ExpressionAttributeNames, ExpressionAttributeValues, UpdateExpression } =
+            buildUpdateExpression({
+                updates,
+                isMetadataUpdate,
+                updatedAt,
+                updatedBy: username,
+                studysetUUID,
+            });
 
         console.log({
             ExpressionAttributeNames,
