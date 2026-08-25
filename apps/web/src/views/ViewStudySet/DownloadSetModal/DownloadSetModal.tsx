@@ -41,9 +41,7 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
     const { t } = useTranslation();
     const {
         data: {
-            user: {
-                metadata: { defaultDownloadFormat },
-            },
+            user: { metadata: { defaultDownloadFormat } = {} } = {},
         } = DEFAULT_USER_RESPONSE,
     } = useGetUser();
 

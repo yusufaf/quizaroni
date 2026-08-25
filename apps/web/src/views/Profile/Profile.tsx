@@ -38,7 +38,11 @@ type Props = {};
 
 const Profile = (props: Props) => {
     const { t } = useTranslation();
-    const { data: { user: userData } = DEFAULT_USER_RESPONSE } = useGetUser();
+    const {
+        data: {
+            user: userData = DEFAULT_USER_RESPONSE.user,
+        } = DEFAULT_USER_RESPONSE,
+    } = useGetUser();
 
     useBrowserTitle(PAGE_TITLES.PROFILE);
 
