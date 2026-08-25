@@ -319,6 +319,17 @@ export const useUpdateStudyset = () => {
                 }
             );
             const data = await response.json();
+            // validate() logs and swallows schema mismatches rather than
+            // throwing, so an error response (which won't match
+            // UpdateStudysetResponseSchema) would otherwise fall through
+            // as if the mutation succeeded — firing onSuccess and losing
+            // the edit silently. Check the HTTP status explicitly first.
+            if (!response.ok) {
+                throw new Error(
+                    data?.message ??
+                        `Failed to update studyset (${response.status})`
+                );
+            }
             return validate({
                 schema: UpdateStudysetResponseSchema,
                 data,
