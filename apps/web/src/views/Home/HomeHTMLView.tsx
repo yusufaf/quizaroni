@@ -1,5 +1,9 @@
 import { Studyset } from 'shared/types';
-import { DEFAULT_USER_RESPONSE, HTML_TABLE_HEADERS } from 'shared/constants';
+import {
+    DEFAULT_USER_RESPONSE,
+    DEFAULT_USER_DATA,
+    HTML_TABLE_HEADERS,
+} from 'shared/constants';
 import {
     HomeHTMLTableWrapper,
     HomeHTMLTable,
@@ -26,8 +30,8 @@ const HomeHTMLView = ({ studysets }: Props) => {
     const {
         data: {
             user: {
-                metadata: { preferredDateFormat },
-            },
+                metadata: { preferredDateFormat } = DEFAULT_USER_DATA.metadata,
+            } = {},
         } = DEFAULT_USER_RESPONSE,
     } = useGetUser();
 

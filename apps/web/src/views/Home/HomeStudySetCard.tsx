@@ -18,7 +18,11 @@ import SetActionsMenu from './SetActionsMenu';
 import { useNavigate } from 'react-router-dom';
 import { Studyset } from 'shared/types';
 import { GhostLink } from 'styles/AppStyles';
-import { DEFAULT_USER_RESPONSE, TIME_FORMATS } from 'shared/constants';
+import {
+    DEFAULT_USER_RESPONSE,
+    DEFAULT_USER_DATA,
+    TIME_FORMATS,
+} from 'shared/constants';
 import { useGetUser } from 'state/api/usersAPI';
 import { formatDateUsingPreferred } from 'shared/utilities/general';
 import { useStudySetsStore } from 'state/stores/studysets';
@@ -54,8 +58,8 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                     preferredDateFormat,
                     preferredTimeFormat,
                     showSeconds,
-                },
-            },
+                } = DEFAULT_USER_DATA.metadata,
+            } = {},
         } = DEFAULT_USER_RESPONSE,
     } = useGetUser();
 

@@ -50,15 +50,17 @@ const App = () => {
     }, [prefersDarkMode]);
 
     // useLogto() only works inside a component's render tree, so awsAPI.ts
-    // can't call it directly — wire the real getter in here instead.
-    useEffect(() => {
-        setAccessTokenGetter(async () => {
-            if (!isAuthenticated) {
-                return undefined;
-            }
-            return getAccessToken(import.meta.env.VITE_LOGTO_API_RESOURCE);
-        });
-    }, [isAuthenticated, getAccessToken]);
+    // can't call it directly — wire the real getter here instead. This runs
+    // during render, not in a useEffect: effects fire children-first, so a
+    // child's query (e.g. useGetUser() on mount) could otherwise call
+    // getCommonPostRequestProps() before this effect ever ran, sending an
+    // unauthenticated request that 401s and gets permanently cached.
+    setAccessTokenGetter(async () => {
+        if (!isAuthenticated) {
+            return undefined;
+        }
+        return getAccessToken(import.meta.env.VITE_LOGTO_API_RESOURCE);
+    });
 
     return (
         <QueryClientProvider client={queryClient}>
