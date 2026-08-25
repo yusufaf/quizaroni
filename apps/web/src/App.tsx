@@ -54,7 +54,11 @@ const App = () => {
     // during render, not in a useEffect: effects fire children-first, so a
     // child's query (e.g. useGetUser() on mount) could otherwise call
     // getCommonPostRequestProps() before this effect ever ran, sending an
-    // unauthenticated request that 401s and gets permanently cached.
+    // unauthenticated request that 401s. React Query would retry and recover
+    // on its own, but by then it's too late: some callers destructure the
+    // errored response without a fallback, so the render throws before the
+    // retry ever lands, and with no error boundary in the app that crash
+    // takes down the whole tree.
     setAccessTokenGetter(async () => {
         if (!isAuthenticated) {
             return undefined;
