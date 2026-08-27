@@ -1,4 +1,8 @@
-import { BASE_API_URL, getCommonPostRequestProps } from 'state/api/awsAPI';
+import {
+    BASE_API_URL,
+    fetchJson,
+    getCommonPostRequestProps,
+} from 'state/api/awsAPI';
 import { validate } from 'shared/validation';
 import {
     BaseResponseSchema,
@@ -18,14 +22,13 @@ export const syncApiClient = {
      * Create a new studyset on the server
      */
     async createStudyset(studyset: Studyset): Promise<unknown> {
-        const response = await fetch(
+        const data = await fetchJson(
             `${BASE_API_URL}/studysets/create-studyset`,
             {
                 ...(await getCommonPostRequestProps()),
                 body: JSON.stringify({ studyset }),
             }
         );
-        const data = await response.json();
         return validate({
             schema: CreateStudysetResponseSchema,
             data,
@@ -41,7 +44,7 @@ export const syncApiClient = {
         studysetUUID: UUID,
         updates: Record<string, unknown>
     ): Promise<unknown> {
-        const response = await fetch(
+        const data = await fetchJson(
             `${BASE_API_URL}/studysets/update-studyset`,
             {
                 ...(await getCommonPostRequestProps()),
@@ -52,7 +55,6 @@ export const syncApiClient = {
                 }),
             }
         );
-        const data = await response.json();
         return validate({
             schema: UpdateStudysetResponseSchema,
             data,
@@ -65,14 +67,13 @@ export const syncApiClient = {
      * Delete a studyset from the server
      */
     async deleteStudyset(studysetUUID: UUID): Promise<unknown> {
-        const response = await fetch(
+        const data = await fetchJson(
             `${BASE_API_URL}/studysets/delete-studyset`,
             {
                 ...(await getCommonPostRequestProps()),
                 body: JSON.stringify({ studysetUUID }),
             }
         );
-        const data = await response.json();
         return validate({
             schema: BaseResponseSchema,
             data,
@@ -92,14 +93,13 @@ export const syncApiClient = {
             updates: changes,
         }));
 
-        const response = await fetch(
+        const data = await fetchJson(
             `${BASE_API_URL}/studysets/batch-update-studysets`,
             {
                 ...(await getCommonPostRequestProps()),
                 body: JSON.stringify({ studysetUpdates }),
             }
         );
-        const data = await response.json();
         return validate({
             schema: BaseResponseSchema,
             data,
@@ -112,13 +112,12 @@ export const syncApiClient = {
      * Fetch all studysets from the server (for initial sync)
      */
     async getAllStudysets(): Promise<Studyset[]> {
-        const response = await fetch(
+        const data = await fetchJson(
             `${BASE_API_URL}/studysets/get-all-studysets`,
             {
                 ...(await getCommonPostRequestProps()),
             }
         );
-        const data = await response.json();
         const validated = validate({
             schema: GetAllStudysetsResponseSchema,
             data,
@@ -134,11 +133,10 @@ export const syncApiClient = {
     async updateUserMetadata(
         updates: Record<string, unknown>
     ): Promise<unknown> {
-        const response = await fetch(`${BASE_API_URL}/users/update-metadata`, {
+        const data = await fetchJson(`${BASE_API_URL}/users/update-metadata`, {
             ...(await getCommonPostRequestProps()),
             body: JSON.stringify({ updates }),
         });
-        const data = await response.json();
         return validate({
             schema: BaseResponseSchema,
             data,

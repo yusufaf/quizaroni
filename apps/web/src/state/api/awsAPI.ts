@@ -20,7 +20,9 @@ export const setAccessTokenGetter = (getter: AccessTokenGetter): void => {
 // every call site (only studysetsAPI.ts's update-studyset checked
 // response.ok), then handed to validate(), which logs-and-swallows schema
 // mismatches by default — so an error body just silently fell through as a
-// "successful" mutation. fetchJson() is the one place that check happens now.
+// "successful" mutation. fetchJson() centralizes that check for call sites
+// that don't need bespoke error handling (a few, like useGetPublicStudyset
+// and pushGamificationToServer, still check response.ok by hand on purpose).
 export const fetchJson = async <T>(
     url: string,
     init?: RequestInit
