@@ -4,7 +4,7 @@ import {
     useQueryClient,
     UseQueryOptions,
 } from '@tanstack/react-query';
-import { BASE_API_URL, getCommonPostRequestProps } from './awsAPI';
+import { BASE_API_URL, fetchJson, getCommonPostRequestProps } from './awsAPI';
 import { validate } from 'shared/validation';
 import {
     BaseResponseSchema,
@@ -82,13 +82,12 @@ export const useGetAllStudysets = (
     return useQuery({
         queryKey: ['studysets'],
         queryFn: async () => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/get-all-studysets`,
                 {
                     ...(await getCommonPostRequestProps()),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: GetAllStudysetsResponseSchema,
                 data,
@@ -107,14 +106,13 @@ export const useGetStudyset = (
     return useQuery({
         queryKey: ['studysets', studysetUUID],
         queryFn: async () => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/get-studyset`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUID }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: GetStudysetResponseSchema,
                 data,
@@ -177,13 +175,12 @@ export const useCreateStudyset = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async () => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/create-studyset`,
                 {
                     ...(await getCommonPostRequestProps()),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: CreateStudysetResponseSchema,
                 data,
@@ -201,14 +198,13 @@ export const useDeleteStudyset = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ studysetUUID }: DeleteStudysetRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/delete-studyset`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUID }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -226,14 +222,13 @@ export const useBatchDeleteStudysets = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ studysetUUIDs }: BatchDeleteStudysetsRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/batch-delete-studysets`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUIDs }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BatchDeleteStudysetsResponseSchema,
                 data,
@@ -251,14 +246,13 @@ export const useDuplicateStudyset = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ studysetUUID }: DuplicateStudysetRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/duplicate-studyset`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUID }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -278,14 +272,13 @@ export const useBatchDuplicateStudysets = () => {
         mutationFn: async ({
             studysetUUIDs,
         }: BatchDuplicateStudysetsRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/batch-duplicate-studysets`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUIDs }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BatchDuplicateStudysetsResponseSchema,
                 data,
@@ -307,7 +300,12 @@ export const useUpdateStudyset = () => {
             updates,
             isMetadataUpdate,
         }: UpdateStudysetRequest) => {
-            const response = await fetch(
+            // fetchJson() throws on a non-2xx response, so an error body
+            // (which won't match UpdateStudysetResponseSchema) can't fall
+            // through validate()'s logs-and-swallows default as if the
+            // mutation succeeded — firing onSuccess and losing the edit
+            // silently, the bug PR #41 fixed by hand here originally.
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/update-studyset`,
                 {
                     ...(await getCommonPostRequestProps()),
@@ -318,18 +316,6 @@ export const useUpdateStudyset = () => {
                     }),
                 }
             );
-            const data = await response.json();
-            // validate() logs and swallows schema mismatches rather than
-            // throwing, so an error response (which won't match
-            // UpdateStudysetResponseSchema) would otherwise fall through
-            // as if the mutation succeeded — firing onSuccess and losing
-            // the edit silently. Check the HTTP status explicitly first.
-            if (!response.ok) {
-                throw new Error(
-                    data?.message ??
-                        `Failed to update studyset (${response.status})`
-                );
-            }
             return validate({
                 schema: UpdateStudysetResponseSchema,
                 data,
@@ -351,14 +337,13 @@ export const useBatchUpdateStudysets = () => {
         mutationFn: async ({
             studysetUpdates,
         }: BatchUpdateStudysetsRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/batch-update-studysets`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUpdates }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -381,7 +366,7 @@ export const useEditCategory = () => {
             newCategory,
             oldCategory,
         }: EditCategoryRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/editCategory`,
                 {
                     ...(await getCommonPostRequestProps()),
@@ -393,7 +378,6 @@ export const useEditCategory = () => {
                     }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -413,14 +397,13 @@ export const useCreateNote = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ cardUUID, studysetUUID }: CreateNoteRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/create-note`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ cardUUID, studysetUUID }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: CreateNoteResponseSchema,
                 data,
@@ -444,14 +427,13 @@ export const useDeleteNote = () => {
             noteUUID,
             studysetUUID,
         }: DeleteNoteRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/delete-note`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ cardUUID, noteUUID, studysetUUID }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -476,7 +458,7 @@ export const useEditNote = () => {
             studysetUUID,
             text,
         }: EditNoteRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/edit-note`,
                 {
                     ...(await getCommonPostRequestProps()),
@@ -488,7 +470,6 @@ export const useEditNote = () => {
                     }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -512,7 +493,7 @@ export const useCreateLabel = () => {
             studysetUUID,
             updateStudysetLabel,
         }: CreateLabelRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/create-labels`,
                 {
                     ...(await getCommonPostRequestProps()),
@@ -523,7 +504,6 @@ export const useCreateLabel = () => {
                     }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -542,14 +522,13 @@ export const useDeleteLabel = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ labelsToDelete }: DeleteLabelRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/delete-labels`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ labelsToDelete }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -568,14 +547,13 @@ export const useEditLabel = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ index, newLabel, oldLabel }: EditLabelRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/edit-labels`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ index, newLabel, oldLabel }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -596,14 +574,13 @@ export const useChangeLabel = () => {
     return useMutation({
         mutationFn: async ({ studysetUUID, newLabel }: ChangeLabelRequest) => {
             // Convert single label to array for backwards compatibility
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/update-studyset-labels`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUID, labels: [newLabel] }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -626,14 +603,13 @@ export const useUpdateStudysetLabels = () => {
             studysetUUID,
             labels,
         }: import('shared/types').UpdateStudysetLabelsRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/update-studyset-labels`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUUID, labels }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -655,14 +631,13 @@ export const useBatchUpdateStudysetLabels = () => {
         mutationFn: async ({
             studysetUpdates,
         }: import('shared/types').BatchUpdateStudysetLabelsRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/studysets/batch-update-studyset-labels`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ studysetUpdates }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
