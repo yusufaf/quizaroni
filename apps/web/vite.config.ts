@@ -17,7 +17,10 @@ export default defineConfig({
         '*.{json,md,css,html,yml,yaml}': 'vp fmt --write',
     },
     lint: { options: { typeAware: true, typeCheck: true } },
-    test: { globals: true },
+    // fetchJson (awsAPI.ts) is now exercised directly by a real unit test
+    // rather than only through mocked hooks, so the module's top-level
+    // `VITE_API_BASE_URL` guard needs something to read in test mode too.
+    test: { globals: true, env: { VITE_API_BASE_URL: 'http://localhost/api' } },
     fmt: {
         trailingComma: 'es5',
         tabWidth: 4,

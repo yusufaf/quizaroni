@@ -4,7 +4,7 @@ import {
     useQueryClient,
     UseQueryOptions,
 } from '@tanstack/react-query';
-import { BASE_API_URL, getCommonPostRequestProps } from './awsAPI';
+import { BASE_API_URL, fetchJson, getCommonPostRequestProps } from './awsAPI';
 import { validate } from 'shared/validation';
 import {
     BaseResponseSchema,
@@ -38,10 +38,9 @@ export const useGetUser = (
     return useQuery({
         queryKey: ['user'],
         queryFn: async () => {
-            const response = await fetch(`${BASE_API_URL}/users/get-user`, {
+            const data = await fetchJson(`${BASE_API_URL}/users/get-user`, {
                 ...(await getCommonPostRequestProps()),
             });
-            const data = await response.json();
             return validate({
                 schema: GetUserResponseSchema,
                 data,
@@ -56,11 +55,10 @@ export const useGetUser = (
 export const useCreateUser = () => {
     return useMutation({
         mutationFn: async ({ email, username }: CreateUserRequest) => {
-            const response = await fetch(`${BASE_API_URL}/users/create`, {
+            const data = await fetchJson(`${BASE_API_URL}/users/create`, {
                 ...(await getCommonPostRequestProps()),
                 body: JSON.stringify({ email, username }),
             });
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -75,14 +73,13 @@ export const useUpdateUserMetadata = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ updates }: UpdateUserMetadataRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/users/update-metadata`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ updates }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -100,14 +97,13 @@ export const useUpdateDefaultTheme = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ newTheme, uuid }: UpdateDefaultThemeRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/users/updateDefaultTheme`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ uuid, newTheme }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -125,11 +121,10 @@ export const useUpdateEmail = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async ({ username, newEmail }: UpdateEmailRequest) => {
-            const response = await fetch(`${BASE_API_URL}/users/updateEmail`, {
+            const data = await fetchJson(`${BASE_API_URL}/users/updateEmail`, {
                 ...(await getCommonPostRequestProps()),
                 body: JSON.stringify({ username, newEmail }),
             });
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -146,14 +141,13 @@ export const useUpdateEmail = () => {
 export const useDownloadUserData = () => {
     return useMutation({
         mutationFn: async (params: DownloadUserDataRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/users/download-user-data`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify(params),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -172,14 +166,13 @@ export const useUploadProfilePicture = () => {
             fileName,
             contentType,
         }: UploadProfilePictureRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/users/upload-profile-picture`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ imageData, fileName, contentType }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: UploadProfilePictureResponseSchema,
                 data,
@@ -199,14 +192,13 @@ export const useUpdateNotificationPreferences = () => {
         mutationFn: async ({
             updates,
         }: UpdateNotificationPreferencesRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/users/update-notification-preferences`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ updates }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,

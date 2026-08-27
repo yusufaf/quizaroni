@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { BASE_API_URL, getCommonPostRequestProps } from './awsAPI';
+import { BASE_API_URL, fetchJson, getCommonPostRequestProps } from './awsAPI';
 import { validate } from 'shared/validation';
 import {
     BaseResponseSchema,
@@ -36,7 +36,7 @@ export const useInitiateMultipartUpload = () => {
             fileName,
             studysetUUID,
         }: InitiateMultipartUploadRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/files/initiate-multipart-upload`,
                 {
                     ...(await getCommonPostRequestProps()),
@@ -47,7 +47,6 @@ export const useInitiateMultipartUpload = () => {
                     }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: InitiateMultipartUploadResponseSchema,
                 data,
@@ -65,14 +64,13 @@ export const useGetMultipartSignedUploadUrls = () => {
             numParts,
             uploadId,
         }: GetMultipartSignedUploadUrlsRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/files/get-multipart-signed-upload-urls`,
                 {
                     ...(await getCommonPostRequestProps()),
                     body: JSON.stringify({ key, uploadId, numParts }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: GetMultipartSignedUploadUrlsResponseSchema,
                 data,
@@ -93,7 +91,7 @@ export const useCompleteMultipartUpload = () => {
             studysetUUID,
             uploadId,
         }: CompleteMultipartUploadRequest) => {
-            const response = await fetch(
+            const data = await fetchJson(
                 `${BASE_API_URL}/files/complete-multipart-upload`,
                 {
                     ...(await getCommonPostRequestProps()),
@@ -107,7 +105,6 @@ export const useCompleteMultipartUpload = () => {
                     }),
                 }
             );
-            const data = await response.json();
             return validate({
                 schema: FileMetadataSchema,
                 data,
@@ -121,11 +118,10 @@ export const useCompleteMultipartUpload = () => {
 export const useDeleteFile = () => {
     return useMutation({
         mutationFn: async ({ key }: DeleteFileRequest) => {
-            const response = await fetch(`${BASE_API_URL}/files/delete-file`, {
+            const data = await fetchJson(`${BASE_API_URL}/files/delete-file`, {
                 ...(await getCommonPostRequestProps()),
                 body: JSON.stringify({ key }),
             });
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,
@@ -139,11 +135,10 @@ export const useDeleteFile = () => {
 export const useSendFeedback = () => {
     return useMutation({
         mutationFn: async ({ key }: SendFeedbackRequest) => {
-            const response = await fetch(`${BASE_API_URL}/files/sendFeedback`, {
+            const data = await fetchJson(`${BASE_API_URL}/files/sendFeedback`, {
                 ...(await getCommonPostRequestProps()),
                 body: JSON.stringify({ key }),
             });
-            const data = await response.json();
             return validate({
                 schema: BaseResponseSchema,
                 data,

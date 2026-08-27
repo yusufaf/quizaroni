@@ -16,6 +16,29 @@ export const setAccessTokenGetter = (getter: AccessTokenGetter): void => {
     getAccessToken = getter;
 };
 
+// A non-2xx response was being parsed as if it were success data at nearly
+// every call site (only studysetsAPI.ts's update-studyset checked
+// response.ok), then handed to validate(), which logs-and-swallows schema
+// mismatches by default — so an error body just silently fell through as a
+// "successful" mutation. fetchJson() centralizes that check for call sites
+// that don't need bespoke error handling (a few, like useGetPublicStudyset
+// and pushGamificationToServer, still check response.ok by hand on purpose).
+export const fetchJson = async <T>(
+    url: string,
+    init?: RequestInit
+): Promise<T> => {
+    const response = await fetch(url, init);
+    if (!response.ok) {
+        const bodyText = await response.text().catch(() => '');
+        throw new Error(
+            `Request to ${url} failed with status ${response.status}${
+                bodyText ? `: ${bodyText}` : ''
+            }`
+        );
+    }
+    return response.json();
+};
+
 export const getCommonPostRequestProps = async (): Promise<RequestInit> => {
     const accessToken = await getAccessToken?.();
 
@@ -45,10 +68,10 @@ export const initiateMultipartUpload = async ({
     studysetUUID = '',
 }: InitiateMultipartUploadProps): Promise<InitiateMultipartUploadResponse> => {
     const url = `${BASE_API_URL}/files/initiate-multipart-upload`;
-    return await fetch(url, {
+    return await fetchJson(url, {
         body: JSON.stringify({ studysetUUID, fileName, contentType }),
         ...(await getCommonPostRequestProps()),
-    }).then((response) => response.json());
+    });
 };
 
 type GetMultipartSignedUploadUrlsProps = {
@@ -66,10 +89,10 @@ export const getMultipartSignedUploadUrls = async ({
     uploadId,
 }: GetMultipartSignedUploadUrlsProps): Promise<GetMultipartSignedUploadUrlsResponse> => {
     const url = `${BASE_API_URL}/files/get-multipart-signed-upload-urls`;
-    return await fetch(url, {
+    return await fetchJson(url, {
         body: JSON.stringify({ key, uploadId, numParts }),
         ...(await getCommonPostRequestProps()),
-    }).then((response) => response.json());
+    });
 };
 
 type CompleteMultipartUploadProps = {
@@ -91,7 +114,7 @@ export const completeMultipartUpload = async ({
     uploadId,
 }: CompleteMultipartUploadProps): Promise<CompleteMultipartUploadResponse> => {
     const url = `${BASE_API_URL}/files/complete-multipart-upload`;
-    return await fetch(url, {
+    return await fetchJson(url, {
         body: JSON.stringify({
             association,
             cardUUID,
@@ -101,7 +124,7 @@ export const completeMultipartUpload = async ({
             uploadId,
         }),
         ...(await getCommonPostRequestProps()),
-    }).then((response) => response.json());
+    });
 };
 
 type DeleteFileProps = {
@@ -109,10 +132,10 @@ type DeleteFileProps = {
 };
 export const deleteFile = async ({ key }: DeleteFileProps) => {
     const url = `${BASE_API_URL}/files/delete-file`;
-    return await fetch(url, {
+    return await fetchJson(url, {
         body: JSON.stringify({ key }),
         ...(await getCommonPostRequestProps()),
-    }).then((response) => response.json());
+    });
 };
 
 type SendFeedbackProps = {
@@ -120,8 +143,8 @@ type SendFeedbackProps = {
 };
 export const sendFeedback = async ({ key }: SendFeedbackProps) => {
     const url = `${BASE_API_URL}/files/sendFeedback`;
-    return await fetch(url, {
+    return await fetchJson(url, {
         body: JSON.stringify({ key }),
         ...(await getCommonPostRequestProps()),
-    }).then((response) => response.json());
+    });
 };
