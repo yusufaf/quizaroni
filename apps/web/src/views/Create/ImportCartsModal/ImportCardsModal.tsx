@@ -31,10 +31,12 @@ import { processImport, ImportFormat } from 'utilities/importUtils';
 import { parseApkg, ApkgErrorKey, MAX_APKG_BYTES } from 'utilities/ankiApkg';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import ImportPreviewTable from './ImportPreviewTable';
 
 type Props = {
     setShowImportModal: Dispatch<SetStateAction<boolean>>;
     onImportCards: (cards: Card[]) => void;
+    existingCards?: Card[];
 };
 
 const EditorContainer = styled(Box)({
@@ -168,7 +170,11 @@ const validateLive = (value: string): string | null => {
     }
 };
 
-const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
+const ImportCardsModal = ({
+    setShowImportModal,
+    onImportCards,
+    existingCards = [],
+}: Props) => {
     const { t } = useTranslation();
     const [jsonInputText, setJsonInputText] = useState<string>('');
     const [selectedFileName, setSelectedFileName] = useState<string | null>(
@@ -188,8 +194,28 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
     const [rowSepCustom, setRowSepCustom] = useState<string>('');
     const [apkgBytes, setApkgBytes] = useState<Uint8Array | null>(null);
 
+    // Preview step: null while the user is still editing/uploading source
+    // content; set once parsing succeeds, so the parsed cards can be
+    // reviewed and individually deselected before onImportCards commits them.
+    const [previewCards, setPreviewCards] = useState<Card[] | null>(null);
+    const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
+    const [mediaSkippedCount, setMediaSkippedCount] = useState<number>(0);
+
     const resolvedFieldSep = fieldSep === 'custom' ? fieldSepCustom : fieldSep;
     const resolvedRowSep = rowSep === 'custom' ? rowSepCustom : rowSep;
+
+    const existingTermSet = new Set(
+        existingCards.map((card) => card.term.trim().toLowerCase())
+    );
+    const duplicateFlags = (previewCards ?? []).map((card) =>
+        existingTermSet.has(card.term.trim().toLowerCase())
+    );
+
+    const resetPreview = useCallback(() => {
+        setPreviewCards(null);
+        setSelectedRows([]);
+        setMediaSkippedCount(0);
+    }, []);
 
     const handleChange = useCallback(
         (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -246,6 +272,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             }
             setSubmitError(null);
             setSelectedFileName(file.name);
+            resetPreview();
 
             if (format === 'apkg') {
                 const reader = new FileReader();
@@ -286,7 +313,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             };
             reader.readAsText(file);
         },
-        [format, t]
+        [format, t, resetPreview]
     );
 
     const handleFormatChange = useCallback(
@@ -296,10 +323,11 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             setSubmitError(null);
             setApkgBytes(null);
             setSelectedFileName(null);
+            resetPreview();
             // Re-run live validation under the new format's rules.
             setLiveError(next === 'json' ? validateLive(jsonInputText) : null);
         },
-        [jsonInputText]
+        [jsonInputText, resetPreview]
     );
 
     const handleDrop = useCallback(
@@ -331,11 +359,25 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
         setLiveError(null);
         setSubmitError(null);
         setApkgBytes(null);
-    }, []);
+        resetPreview();
+    }, [resetPreview]);
 
-    const handleImport = useCallback(async () => {
+    // Parses the current source (text or .apkg bytes) into cards and moves
+    // the dialog into the preview step, rather than importing immediately -
+    // onImportCards is only called once the user confirms from the preview.
+    const handleParse = useCallback(async () => {
         setIsProcessing(true);
         setSubmitError(null);
+
+        const seedSelection = (cards: Card[]) => {
+            setPreviewCards(cards);
+            setSelectedRows(
+                cards.map(
+                    (card) =>
+                        !existingTermSet.has(card.term.trim().toLowerCase())
+                )
+            );
+        };
 
         if (format === 'apkg') {
             if (!apkgBytes) {
@@ -348,7 +390,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                 cards,
                 error: importError,
                 errorKey,
-                mediaSkippedCount,
+                mediaSkippedCount: skippedCount,
             } = await parseApkg(apkgBytes);
             if (importError) {
                 setSubmitError(
@@ -362,16 +404,8 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                 return;
             }
 
-            onImportCards(cards);
-            toast.success(
-                t('create.successfullyImported', { count: cards.length })
-            );
-            if (mediaSkippedCount > 0) {
-                toast.warning(
-                    t('create.apkgMediaSkipped', { count: mediaSkippedCount })
-                );
-            }
-            setShowImportModal(false);
+            seedSelection(cards);
+            setMediaSkippedCount(skippedCount);
             setIsProcessing(false);
             return;
         }
@@ -402,11 +436,7 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             return;
         }
 
-        onImportCards(cards);
-        toast.success(
-            t('create.successfullyImported', { count: cards.length })
-        );
-        setShowImportModal(false);
+        seedSelection(cards);
         setIsProcessing(false);
     }, [
         jsonInputText,
@@ -414,17 +444,51 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
         resolvedFieldSep,
         resolvedRowSep,
         apkgBytes,
-        onImportCards,
-        setShowImportModal,
+        existingTermSet,
         t,
     ]);
+
+    const handleConfirmImport = useCallback(() => {
+        if (!previewCards) return;
+        const cardsToImport = previewCards.filter(
+            (_, index) => selectedRows[index]
+        );
+        if (cardsToImport.length === 0) return;
+
+        onImportCards(cardsToImport);
+        toast.success(
+            t('create.successfullyImported', { count: cardsToImport.length })
+        );
+        setShowImportModal(false);
+    }, [previewCards, selectedRows, onImportCards, setShowImportModal, t]);
+
+    const handleBackToEdit = useCallback(() => {
+        resetPreview();
+    }, [resetPreview]);
+
+    const handleToggleRow = useCallback((index: number) => {
+        setSelectedRows((prev) => {
+            const next = [...prev];
+            next[index] = !next[index];
+            return next;
+        });
+    }, []);
+
+    const handleToggleAllRows = useCallback(
+        (next: boolean) => {
+            setSelectedRows(
+                Array.from({ length: previewCards?.length ?? 0 }, () => next)
+            );
+        },
+        [previewCards]
+    );
 
     const handleKeyDown = useCallback(
         (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                 e.preventDefault();
                 if (jsonInputText.trim() && !liveError) {
-                    void handleImport();
+                    void handleParse();
                 }
                 return;
             }
@@ -443,15 +507,19 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                 });
             }
         },
-        [handleImport, jsonInputText, liveError]
+        [handleParse, jsonInputText, liveError]
     );
 
     const onClose = () => setShowImportModal(false);
 
-    const importDisabled =
+    const isPreviewStep = previewCards !== null;
+
+    const parseDisabled =
         isProcessing ||
         Boolean(liveError) ||
         (format === 'apkg' ? !apkgBytes : !jsonInputText.trim());
+
+    const selectedCount = selectedRows.filter(Boolean).length;
 
     const fileAccept =
         format === 'json'
@@ -479,272 +547,324 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
             />
             <DialogContent>
                 <EditorContainer>
-                    <ToggleButtonGroup
-                        value={format}
-                        exclusive
-                        onChange={handleFormatChange}
-                        size="small"
-                        color="primary"
-                        fullWidth
-                        disabled={isProcessing}
-                    >
-                        <ToggleButton value="json">
-                            {t('create.formatJson')}
-                        </ToggleButton>
-                        <ToggleButton value="quizlet">
-                            {t('create.formatQuizlet')}
-                        </ToggleButton>
-                        <ToggleButton value="anki">
-                            {t('create.formatAnki')}
-                        </ToggleButton>
-                        <ToggleButton value="markdown">
-                            {t('create.formatMarkdown')}
-                        </ToggleButton>
-                        <ToggleButton value="apkg">
-                            {t('create.formatApkg')}
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-
-                    {format === 'quizlet' && (
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                gap: '1rem',
-                                flexWrap: 'wrap',
-                            }}
-                        >
-                            <FormControl
-                                size="small"
-                                sx={{ minWidth: 180, flex: 1 }}
-                            >
-                                <InputLabel>
-                                    {t('create.termDefSeparator')}
-                                </InputLabel>
-                                <Select
-                                    label={t('create.termDefSeparator')}
-                                    value={fieldSep}
-                                    onChange={(e) =>
-                                        setFieldSep(e.target.value as string)
-                                    }
-                                >
-                                    {FIELD_SEPARATORS.map((opt) => (
-                                        <MenuItem
-                                            key={opt.value}
-                                            value={opt.value}
-                                        >
-                                            {t(opt.labelKey)}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            {fieldSep === 'custom' && (
-                                <TextField
-                                    size="small"
-                                    label={t('create.customSeparator')}
-                                    value={fieldSepCustom}
-                                    onChange={(e) =>
-                                        setFieldSepCustom(e.target.value)
-                                    }
-                                    sx={{ width: 140 }}
-                                />
-                            )}
-                            <FormControl
-                                size="small"
-                                sx={{ minWidth: 180, flex: 1 }}
-                            >
-                                <InputLabel>
-                                    {t('create.rowSeparatorLabel')}
-                                </InputLabel>
-                                <Select
-                                    label={t('create.rowSeparatorLabel')}
-                                    value={rowSep}
-                                    onChange={(e) =>
-                                        setRowSep(e.target.value as string)
-                                    }
-                                >
-                                    {ROW_SEPARATORS.map((opt) => (
-                                        <MenuItem
-                                            key={opt.value}
-                                            value={opt.value}
-                                        >
-                                            {t(opt.labelKey)}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            {rowSep === 'custom' && (
-                                <TextField
-                                    size="small"
-                                    label={t('create.customSeparator')}
-                                    value={rowSepCustom}
-                                    onChange={(e) =>
-                                        setRowSepCustom(e.target.value)
-                                    }
-                                    sx={{ width: 140 }}
-                                />
-                            )}
-                        </Box>
-                    )}
-
-                    <EditorHeader>
-                        <Typography variant="body2" color="text.secondary">
-                            {selectedFileName
-                                ? t('create.selectedFile', {
-                                      filename: selectedFileName,
-                                  })
-                                : format === 'json'
-                                  ? t('create.pasteOrUploadJson')
-                                  : format === 'quizlet'
-                                    ? t('create.quizletHint')
-                                    : format === 'markdown'
-                                      ? t('create.markdownHint')
-                                      : format === 'apkg'
-                                        ? t('create.apkgHint')
-                                        : t('create.ankiHint')}
-                        </Typography>
-                        <ActionsRow>
-                            <Tooltip title={t('create.uploadJsonFile')}>
-                                <IconButton
-                                    size="small"
-                                    onClick={() =>
-                                        fileInputRef.current?.click()
-                                    }
-                                    disabled={isProcessing}
-                                >
-                                    <UploadFile />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title={t('create.clearEditor')}>
-                                <span>
-                                    <IconButton
-                                        size="small"
-                                        onClick={handleReset}
-                                        disabled={
-                                            isProcessing || !jsonInputText
-                                        }
-                                    >
-                                        <RestoreIcon />
-                                    </IconButton>
-                                </span>
-                            </Tooltip>
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept={fileAccept}
-                                hidden
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) handleFileUpload(file);
-                                    e.target.value = '';
-                                }}
-                            />
-                        </ActionsRow>
-                    </EditorHeader>
-
-                    {format === 'apkg' ? (
-                        <Box
-                            onClick={() =>
-                                !isProcessing && fileInputRef.current?.click()
-                            }
-                            onDragEnter={handleDragEnter}
-                            onDragLeave={handleDragLeave}
-                            onDragOver={handleDragOver}
-                            onDrop={handleDrop}
-                            sx={{
-                                position: 'relative',
-                                minHeight: '18rem',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '0.75rem',
-                                border: '2px dashed',
-                                borderColor: isDragging
-                                    ? 'primary.main'
-                                    : 'divider',
-                                borderRadius: '0.5rem',
-                                cursor: isProcessing ? 'default' : 'pointer',
-                                transition: 'border-color 0.2s ease',
-                            }}
-                        >
-                            <CloudUploadIcon
-                                sx={{
-                                    fontSize: 48,
-                                    color: isDragging
-                                        ? 'primary.main'
-                                        : 'text.secondary',
-                                }}
-                            />
-                            <Typography
-                                variant="body2"
-                                color={
-                                    isDragging
-                                        ? 'primary.main'
-                                        : 'text.secondary'
-                                }
-                                align="center"
-                            >
-                                {t('create.apkgDropPrompt')}
+                    {isPreviewStep ? (
+                        <>
+                            <Typography variant="body2" color="text.secondary">
+                                {t('create.previewFoundCards', {
+                                    count: previewCards.length,
+                                })}
+                                {duplicateFlags.some(Boolean) && (
+                                    <>
+                                        {' '}
+                                        •{' '}
+                                        {t('create.previewDuplicateCount', {
+                                            count: duplicateFlags.filter(
+                                                Boolean
+                                            ).length,
+                                        })}
+                                    </>
+                                )}
                             </Typography>
-                            {isProcessing && (
+                            {mediaSkippedCount > 0 && (
+                                <Alert severity="info">
+                                    {t('create.apkgMediaSkipped', {
+                                        count: mediaSkippedCount,
+                                    })}
+                                </Alert>
+                            )}
+                            <ImportPreviewTable
+                                cards={previewCards}
+                                selected={selectedRows}
+                                duplicateFlags={duplicateFlags}
+                                onToggle={handleToggleRow}
+                                onToggleAll={handleToggleAllRows}
+                            />
+                        </>
+                    ) : (
+                        <>
+                            <ToggleButtonGroup
+                                value={format}
+                                exclusive
+                                onChange={handleFormatChange}
+                                size="small"
+                                color="primary"
+                                fullWidth
+                                disabled={isProcessing}
+                            >
+                                <ToggleButton value="json">
+                                    {t('create.formatJson')}
+                                </ToggleButton>
+                                <ToggleButton value="quizlet">
+                                    {t('create.formatQuizlet')}
+                                </ToggleButton>
+                                <ToggleButton value="anki">
+                                    {t('create.formatAnki')}
+                                </ToggleButton>
+                                <ToggleButton value="markdown">
+                                    {t('create.formatMarkdown')}
+                                </ToggleButton>
+                                <ToggleButton value="apkg">
+                                    {t('create.formatApkg')}
+                                </ToggleButton>
+                            </ToggleButtonGroup>
+
+                            {format === 'quizlet' && (
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        gap: '1rem',
+                                        flexWrap: 'wrap',
+                                    }}
+                                >
+                                    <FormControl
+                                        size="small"
+                                        sx={{ minWidth: 180, flex: 1 }}
+                                    >
+                                        <InputLabel>
+                                            {t('create.termDefSeparator')}
+                                        </InputLabel>
+                                        <Select
+                                            label={t('create.termDefSeparator')}
+                                            value={fieldSep}
+                                            onChange={(e) =>
+                                                setFieldSep(
+                                                    e.target.value as string
+                                                )
+                                            }
+                                        >
+                                            {FIELD_SEPARATORS.map((opt) => (
+                                                <MenuItem
+                                                    key={opt.value}
+                                                    value={opt.value}
+                                                >
+                                                    {t(opt.labelKey)}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                    {fieldSep === 'custom' && (
+                                        <TextField
+                                            size="small"
+                                            label={t('create.customSeparator')}
+                                            value={fieldSepCustom}
+                                            onChange={(e) =>
+                                                setFieldSepCustom(
+                                                    e.target.value
+                                                )
+                                            }
+                                            sx={{ width: 140 }}
+                                        />
+                                    )}
+                                    <FormControl
+                                        size="small"
+                                        sx={{ minWidth: 180, flex: 1 }}
+                                    >
+                                        <InputLabel>
+                                            {t('create.rowSeparatorLabel')}
+                                        </InputLabel>
+                                        <Select
+                                            label={t(
+                                                'create.rowSeparatorLabel'
+                                            )}
+                                            value={rowSep}
+                                            onChange={(e) =>
+                                                setRowSep(
+                                                    e.target.value as string
+                                                )
+                                            }
+                                        >
+                                            {ROW_SEPARATORS.map((opt) => (
+                                                <MenuItem
+                                                    key={opt.value}
+                                                    value={opt.value}
+                                                >
+                                                    {t(opt.labelKey)}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                    {rowSep === 'custom' && (
+                                        <TextField
+                                            size="small"
+                                            label={t('create.customSeparator')}
+                                            value={rowSepCustom}
+                                            onChange={(e) =>
+                                                setRowSepCustom(e.target.value)
+                                            }
+                                            sx={{ width: 140 }}
+                                        />
+                                    )}
+                                </Box>
+                            )}
+
+                            <EditorHeader>
                                 <Typography
-                                    variant="caption"
+                                    variant="body2"
                                     color="text.secondary"
                                 >
-                                    {t('create.parsingApkg')}
+                                    {selectedFileName
+                                        ? t('create.selectedFile', {
+                                              filename: selectedFileName,
+                                          })
+                                        : format === 'json'
+                                          ? t('create.pasteOrUploadJson')
+                                          : format === 'quizlet'
+                                            ? t('create.quizletHint')
+                                            : format === 'markdown'
+                                              ? t('create.markdownHint')
+                                              : format === 'apkg'
+                                                ? t('create.apkgHint')
+                                                : t('create.ankiHint')}
                                 </Typography>
-                            )}
-                        </Box>
-                    ) : (
-                        <Box sx={{ position: 'relative' }}>
-                            <StyledTextarea
-                                value={jsonInputText}
-                                onChange={handleChange}
-                                onKeyDown={handleKeyDown}
-                                hasError={Boolean(liveError)}
-                                isDragging={isDragging}
-                                spellCheck={false}
-                                autoComplete="off"
-                                autoCorrect="off"
-                                autoCapitalize="off"
-                                placeholder={placeholder}
-                                disabled={isProcessing}
-                                onDragEnter={handleDragEnter}
-                                onDragLeave={handleDragLeave}
-                                onDragOver={handleDragOver}
-                                onDrop={handleDrop}
-                            />
-                            {isDragging && (
-                                <DropOverlay elevation={0}>
+                                <ActionsRow>
+                                    <Tooltip title={t('create.uploadJsonFile')}>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() =>
+                                                fileInputRef.current?.click()
+                                            }
+                                            disabled={isProcessing}
+                                        >
+                                            <UploadFile />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Tooltip title={t('create.clearEditor')}>
+                                        <span>
+                                            <IconButton
+                                                size="small"
+                                                onClick={handleReset}
+                                                disabled={
+                                                    isProcessing ||
+                                                    !jsonInputText
+                                                }
+                                            >
+                                                <RestoreIcon />
+                                            </IconButton>
+                                        </span>
+                                    </Tooltip>
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept={fileAccept}
+                                        hidden
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) handleFileUpload(file);
+                                            e.target.value = '';
+                                        }}
+                                    />
+                                </ActionsRow>
+                            </EditorHeader>
+
+                            {format === 'apkg' ? (
+                                <Box
+                                    onClick={() =>
+                                        !isProcessing &&
+                                        fileInputRef.current?.click()
+                                    }
+                                    onDragEnter={handleDragEnter}
+                                    onDragLeave={handleDragLeave}
+                                    onDragOver={handleDragOver}
+                                    onDrop={handleDrop}
+                                    sx={{
+                                        position: 'relative',
+                                        minHeight: '18rem',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.75rem',
+                                        border: '2px dashed',
+                                        borderColor: isDragging
+                                            ? 'primary.main'
+                                            : 'divider',
+                                        borderRadius: '0.5rem',
+                                        cursor: isProcessing
+                                            ? 'default'
+                                            : 'pointer',
+                                        transition: 'border-color 0.2s ease',
+                                    }}
+                                >
                                     <CloudUploadIcon
                                         sx={{
-                                            fontSize: 56,
-                                            color: 'primary.main',
-                                            mb: 1,
+                                            fontSize: 48,
+                                            color: isDragging
+                                                ? 'primary.main'
+                                                : 'text.secondary',
                                         }}
                                     />
                                     <Typography
-                                        variant="h6"
-                                        color="primary.main"
-                                        fontWeight="medium"
+                                        variant="body2"
+                                        color={
+                                            isDragging
+                                                ? 'primary.main'
+                                                : 'text.secondary'
+                                        }
+                                        align="center"
                                     >
-                                        {t('create.dropJsonFile') ||
-                                            'Drop JSON file here'}
+                                        {t('create.apkgDropPrompt')}
                                     </Typography>
-                                </DropOverlay>
+                                    {isProcessing && (
+                                        <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                        >
+                                            {t('create.parsingApkg')}
+                                        </Typography>
+                                    )}
+                                </Box>
+                            ) : (
+                                <Box sx={{ position: 'relative' }}>
+                                    <StyledTextarea
+                                        value={jsonInputText}
+                                        onChange={handleChange}
+                                        onKeyDown={handleKeyDown}
+                                        hasError={Boolean(liveError)}
+                                        isDragging={isDragging}
+                                        spellCheck={false}
+                                        autoComplete="off"
+                                        autoCorrect="off"
+                                        autoCapitalize="off"
+                                        placeholder={placeholder}
+                                        disabled={isProcessing}
+                                        onDragEnter={handleDragEnter}
+                                        onDragLeave={handleDragLeave}
+                                        onDragOver={handleDragOver}
+                                        onDrop={handleDrop}
+                                    />
+                                    {isDragging && (
+                                        <DropOverlay elevation={0}>
+                                            <CloudUploadIcon
+                                                sx={{
+                                                    fontSize: 56,
+                                                    color: 'primary.main',
+                                                    mb: 1,
+                                                }}
+                                            />
+                                            <Typography
+                                                variant="h6"
+                                                color="primary.main"
+                                                fontWeight="medium"
+                                            >
+                                                {t('create.dropJsonFile') ||
+                                                    'Drop JSON file here'}
+                                            </Typography>
+                                        </DropOverlay>
+                                    )}
+                                </Box>
                             )}
-                        </Box>
-                    )}
 
-                    {liveError && (
-                        <Alert severity="warning" variant="outlined">
-                            <Typography
-                                variant="caption"
-                                sx={{ fontFamily: 'monospace' }}
-                            >
-                                {liveError}
-                            </Typography>
-                        </Alert>
+                            {liveError && (
+                                <Alert severity="warning" variant="outlined">
+                                    <Typography
+                                        variant="caption"
+                                        sx={{ fontFamily: 'monospace' }}
+                                    >
+                                        {liveError}
+                                    </Typography>
+                                </Alert>
+                            )}
+                        </>
                     )}
 
                     {submitError && (
@@ -753,20 +873,39 @@ const ImportCardsModal = ({ setShowImportModal, onImportCards }: Props) => {
                 </EditorContainer>
             </DialogContent>
             <StyledDialogActions>
-                <Button
-                    variant="contained"
-                    onClick={() => void handleImport()}
-                    disabled={importDisabled}
-                    startIcon={
-                        isProcessing ? (
-                            <CircularProgress size={20} color="inherit" />
-                        ) : undefined
-                    }
-                >
-                    {isProcessing
-                        ? t('create.importing')
-                        : t('categories.import')}
-                </Button>
+                {isPreviewStep ? (
+                    <>
+                        <Button onClick={handleBackToEdit}>
+                            {t('create.previewBack')}
+                        </Button>
+                        <Button
+                            variant="contained"
+                            onClick={handleConfirmImport}
+                            disabled={selectedCount === 0}
+                        >
+                            {selectedCount > 0
+                                ? t('create.previewImportCount', {
+                                      count: selectedCount,
+                                  })
+                                : t('create.previewNoneSelected')}
+                        </Button>
+                    </>
+                ) : (
+                    <Button
+                        variant="contained"
+                        onClick={() => void handleParse()}
+                        disabled={parseDisabled}
+                        startIcon={
+                            isProcessing ? (
+                                <CircularProgress size={20} color="inherit" />
+                            ) : undefined
+                        }
+                    >
+                        {isProcessing
+                            ? t('create.importing')
+                            : t('create.preview')}
+                    </Button>
+                )}
             </StyledDialogActions>
         </Dialog>
     );
