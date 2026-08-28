@@ -26,6 +26,8 @@ import { useGlobalKeyListener } from 'shared/keyboard/useGlobalKeyListener';
 import { ShortcutHelpModal } from 'shared/keyboard/ShortcutHelpModal';
 import { NavShortcuts } from 'shared/keyboard/NavShortcuts';
 import { isStudyRoute } from 'shared/utilities/routes';
+import PwaUpdateToast from 'shared/components/PwaUpdateToast/PwaUpdateToast';
+import InstallAppPrompt from 'shared/components/InstallAppPrompt/InstallAppPrompt';
 
 const ShortcutLayer = () => {
     useGlobalKeyListener();
@@ -82,6 +84,8 @@ const App = () => {
                 </AppWrapper>
                 <FeedbackDialog />
                 <ToastContainer theme={theme} />
+                <PwaUpdateToast />
+                <InstallAppPrompt />
                 <GlobalConfirmDialog />
                 <ManageLabelsDialog />
                 <ShortcutLayer />

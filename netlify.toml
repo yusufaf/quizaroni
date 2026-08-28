@@ -34,6 +34,11 @@ for = "/sw.js"
 Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
+for = "/registerSW.js"
+[headers.values]
+Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
 for = "/manifest.json"
 [headers.values]
 Cache-Control = "public, max-age=0, must-revalidate"

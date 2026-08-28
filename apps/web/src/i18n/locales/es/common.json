@@ -654,5 +654,13 @@
             "confirm": "Confirmar / siguiente",
             "submit": "Enviar respuesta"
         }
+    },
+    "pwa": {
+        "updateAvailable": "Hay una nueva versión de Quizaroni disponible.",
+        "reload": "Recargar",
+        "installPrompt": "Instala Quizaroni para acceso rápido y estudio sin conexión.",
+        "install": "Instalar",
+        "installIosInstructions": "Toca Compartir y luego \"Agregar a pantalla de inicio\" para instalar Quizaroni.",
+        "dismissInstall": "Descartar aviso de instalación"
     }
 }
