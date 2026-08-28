@@ -25,7 +25,14 @@ import {
 import { styled } from '@mui/system';
 import { StyledDialogActions } from 'styles/AppStyles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
-import { Dispatch, SetStateAction, useCallback, useRef, useState } from 'react';
+import {
+    Dispatch,
+    SetStateAction,
+    useCallback,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
 import { Card } from 'shared/types';
 import { processImport, ImportFormat } from 'utilities/importUtils';
 import { parseApkg, ApkgErrorKey, MAX_APKG_BYTES } from 'utilities/ankiApkg';
@@ -204,11 +211,23 @@ const ImportCardsModal = ({
     const resolvedFieldSep = fieldSep === 'custom' ? fieldSepCustom : fieldSep;
     const resolvedRowSep = rowSep === 'custom' ? rowSepCustom : rowSep;
 
-    const existingTermSet = new Set(
-        existingCards.map((card) => card.term.trim().toLowerCase())
+    // Rebuilding these on every render (e.g. a single row checkbox toggle)
+    // would re-walk the full existingCards/previewCards arrays each time -
+    // memoized so the PREVIEW_ROW_LIMIT truncation's cost savings aren't
+    // undone by an unbounded recompute on every interaction.
+    const existingTermSet = useMemo(
+        () =>
+            new Set(
+                existingCards.map((card) => card.term.trim().toLowerCase())
+            ),
+        [existingCards]
     );
-    const duplicateFlags = (previewCards ?? []).map((card) =>
-        existingTermSet.has(card.term.trim().toLowerCase())
+    const duplicateFlags = useMemo(
+        () =>
+            (previewCards ?? []).map((card) =>
+                existingTermSet.has(card.term.trim().toLowerCase())
+            ),
+        [previewCards, existingTermSet]
     );
 
     const resetPreview = useCallback(() => {
