@@ -394,6 +394,7 @@ const CreateSet = (props: Props) => {
                 <ImportCardsModal
                     setShowImportModal={setShowImportModal}
                     onImportCards={handleImportCards}
+                    existingCards={createdSetCards}
                 />
             )}
             {namedColorsDialogProps.open && <NamedColorsDialog />}
