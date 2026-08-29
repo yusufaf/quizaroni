@@ -152,7 +152,10 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
         (isTimeout = false) => {
             if (showFeedback || !currentCard) return;
 
-            hapticLight();
+            // Skip on timer-driven auto-submit: some browsers require recent
+            // user activation for navigator.vibrate() and silently no-op
+            // otherwise, so only fire it for the direct user gesture.
+            if (!isTimeout) hapticLight();
 
             const correctIndex = quizOptions.findIndex((opt) => opt.isCorrect);
             const answeredCorrectly =
