@@ -656,5 +656,13 @@
             "confirm": "Confirm / next",
             "submit": "Submit answer"
         }
+    },
+    "pwa": {
+        "updateAvailable": "A new version of Quizaroni is available.",
+        "reload": "Reload",
+        "installPrompt": "Install Quizaroni for quick access and offline studying.",
+        "install": "Install",
+        "installIosInstructions": "Tap Share, then \"Add to Home Screen\" to install Quizaroni.",
+        "dismissInstall": "Dismiss install prompt"
     }
 }

@@ -1,36 +1,43 @@
+import { registerSW } from 'virtual:pwa-register';
+import { usePwaStore } from 'state/stores/pwa';
+
+let updateSW: ((reloadPage?: boolean) => Promise<void>) | undefined;
+
+// Caches left behind by the pre-vite-plugin-pwa hand-written service worker
+// (CACHE_NAME = 'quizaroni-v2'). Workbox's cleanupOutdatedCaches only reaps
+// its own precaches, so returning visitors would otherwise keep this forever.
+const LEGACY_CACHE_PREFIX = 'quizaroni-v';
+
+async function purgeLegacyCaches(): Promise<void> {
+    if (!('caches' in window)) return;
+    const keys = await caches.keys();
+    await Promise.all(
+        keys
+            .filter((key) => key.startsWith(LEGACY_CACHE_PREFIX))
+            .map((key) => caches.delete(key))
+    );
+}
+
 export function registerServiceWorker(): void {
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker
-                .register('/sw.js')
-                .then((registration) => {
-                    console.log('SW registered:', registration.scope);
+    if (!('serviceWorker' in navigator)) return;
 
-                    // Check for updates
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        if (!newWorker) return;
+    void purgeLegacyCaches();
 
-                        newWorker.addEventListener('statechange', () => {
-                            if (
-                                newWorker.state === 'installed' &&
-                                navigator.serviceWorker.controller
-                            ) {
-                                // New update available
-                                console.log('New version available');
-                                // Could dispatch an event here to show update prompt
-                                window.dispatchEvent(
-                                    new CustomEvent('sw-update-available')
-                                );
-                            }
-                        });
-                    });
-                })
-                .catch((error) => {
-                    console.log('SW registration failed:', error);
-                });
-        });
-    }
+    updateSW = registerSW({
+        immediate: true,
+        onNeedRefresh() {
+            usePwaStore.getState().setNeedRefresh(true);
+        },
+        onOfflineReady() {
+            console.log('App ready to work offline');
+        },
+        onRegisteredSW(swUrl, registration) {
+            console.log('SW registered:', swUrl, registration?.scope);
+        },
+        onRegisterError(error) {
+            console.log('SW registration failed:', error);
+        },
+    });
 }
 
 export function unregisterServiceWorker(): Promise<boolean> {
@@ -44,12 +51,10 @@ export function unregisterServiceWorker(): Promise<boolean> {
     return Promise.resolve(false);
 }
 
-// Force update to new version
+// Force update to new version.
 export async function skipWaiting(): Promise<void> {
-    if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.ready;
-        if (registration.waiting) {
-            registration.waiting.postMessage('skipWaiting');
-        }
+    if (updateSW) {
+        await updateSW(true);
+        usePwaStore.getState().setNeedRefresh(false);
     }
 }
