@@ -23,8 +23,13 @@ const PwaUpdateToast = () => {
 
         const reload = async () => {
             toast.dismiss(TOAST_ID);
+            // skipWaiting() only fires the skip-waiting postMessage; it
+            // resolves before the new SW has actually taken control.
+            // vite-plugin-pwa's registerSW already reloads the page itself
+            // once the 'controlling' event confirms the new SW is active -
+            // reloading here too would race ahead of that and can still
+            // serve the outgoing (stale) worker.
             await skipWaiting();
-            window.location.reload();
         };
 
         toast.info(
