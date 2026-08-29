@@ -177,11 +177,12 @@ const CombineSets = () => {
                         }}
                     >
                         <IconButton
-                            onClick={() => navigate(-1)}
-                            color="primary"
-                        >
-                            <ArrowBack />
-                        </IconButton>
+    onClick={() => navigate(-1)}
+    color="primary"
+    aria-label={t('combineSets.goBack')}
+>
+    <ArrowBack />
+</IconButton>
                         <Box>
                             <BoldTypography variant="h4">
                                 Combine sets
@@ -240,15 +241,16 @@ const CombineSets = () => {
                                         {set.title}
                                     </BoldTypography>
                                 </Box>
-                                <IconButton
-                                    onClick={() => handleRemove(set)}
-                                    disabled={
-                                        combinedSets.length === 1 &&
-                                        set.studysetUUID === baseSetUUID
-                                    }
-                                >
-                                    <Remove />
-                                </IconButton>
+                               <IconButton
+    onClick={() => handleRemove(set)}
+    disabled={
+        combinedSets.length === 1 &&
+        set.studysetUUID === baseSetUUID
+    }
+    aria-label={t('combineSets.removeSet', { title: set.title })}
+>
+    <Remove />
+</IconButton>
                             </SetItem>
                         ))}
                     </ScrollableList>

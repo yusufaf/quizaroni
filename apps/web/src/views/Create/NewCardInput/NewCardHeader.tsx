@@ -121,13 +121,12 @@ const NewCardHeader = ({
             </BoldTypography>
             <CenterActions>
                 <Tooltip title="Change card text color" placement="top">
-                    <IconButton
-                        ref={textColorButtonRef}
-                        onClick={toggleTextColorPicker}
-                        sx={showTextColorPicker ? colorPickerActiveStyling : {}}
-                    >
-                        <FormatColorText fontSize="medium" />
-                    </IconButton>
+                   <IconButton
+    ref={textColorButtonRef}
+    onClick={toggleTextColorPicker}
+    aria-label="Change card text color"
+    sx={showTextColorPicker ? colorPickerActiveStyling : {}}
+></IconButton>
                 </Tooltip>
                 {showTextColorPicker && (
                     <CustomColorPicker
@@ -141,15 +140,16 @@ const NewCardHeader = ({
                     />
                 )}
                 <Tooltip title="Change card background color" placement="top">
-                    <IconButton
-                        ref={backgroundColorButtonRef}
-                        onClick={toggleBackgroundColorPicker}
-                        sx={
-                            showBackgroundColorPicker
-                                ? colorPickerActiveStyling
-                                : {}
-                        }
-                    >
+                   <IconButton
+    ref={backgroundColorButtonRef}
+    onClick={toggleBackgroundColorPicker}
+    aria-label="Change card background color"
+    sx={
+        showBackgroundColorPicker
+            ? colorPickerActiveStyling
+            : {}
+    }
+>
                         <FormatColorFill fontSize="medium" />
                     </IconButton>
                 </Tooltip>
@@ -170,45 +170,48 @@ const NewCardHeader = ({
                     />
                 )}
                 <Tooltip title="Swap term and definition" placement="top">
-                    <IconButton
-                        onClick={() =>
-                            swapCard({
-                                createdSetCards,
-                                index,
-                                setStateCallback,
-                            })
-                        }
-                    >
+                   <IconButton
+    onClick={() =>
+        swapCard({
+            createdSetCards,
+            index,
+            setStateCallback,
+        })
+    }
+    aria-label="Swap term and definition"
+>
                         <SwapHoriz fontSize="medium" />
                     </IconButton>
                 </Tooltip>
                 <Tooltip title="Duplicate" placement="top">
-                    <IconButton
-                        onClick={() =>
-                            duplicateCard({
-                                createdSetCards,
-                                index,
-                                setStateCallback,
-                            })
-                        }
-                    >
+                   <IconButton
+    onClick={() =>
+        duplicateCard({
+            createdSetCards,
+            index,
+            setStateCallback,
+        })
+    }
+    aria-label="Duplicate card"
+>
                         <ContentCopy />
                     </IconButton>
                 </Tooltip>
             </CenterActions>
             <RightActions>
                 <Tooltip title="Delete this card" placement="top">
-                    <IconButton
-                        onClick={() =>
-                            deleteCard({
-                                createdSetCards,
-                                index,
-                                setStateCallback,
-                                actionsStack,
-                                setActionsStack,
-                            })
-                        }
-                    >
+                   <IconButton
+    onClick={() =>
+        deleteCard({
+            createdSetCards,
+            index,
+            setStateCallback,
+            actionsStack,
+            setActionsStack,
+        })
+    }
+    aria-label="Delete this card"
+>
                         <Delete fontSize="medium" color="error" />
                     </IconButton>
                 </Tooltip>
