@@ -597,6 +597,10 @@
         "deleteImageTitle": "Eliminar Imagen",
         "deleteImageMessage": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Esto no se puede deshacer."
     },
+        "combineSets": {
+        "goBack": "Atrás",
+        "removeSet": "Eliminar {{title}} de la combinación"
+    },
     "footer": {
         "socials": "Redes Sociales",
         "copyright": "© 2026 Quizaroni"

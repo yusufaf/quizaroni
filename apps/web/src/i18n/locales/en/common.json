@@ -26,6 +26,7 @@
         "home": "Home",
         "explore": "Explore",
         "create": "Create",
+  
         "createStudySet": "Create Study Set",
         "profile": "Profile",
         "logout": "Logout",
@@ -596,6 +597,10 @@
         "imageUploadFailed": "Failed to upload image",
         "deleteImageTitle": "Delete Image",
         "deleteImageMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone."
+    },
+    "combineSets": {
+        "goBack": "Go back",
+        "removeSet": "Remove {{title}} from combination"
     },
     "footer": {
         "socials": "Socials",

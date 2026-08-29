@@ -139,22 +139,24 @@ const ImagePreview = ({
                     {showActions && !isDeleting && (
                         <ActionOverlay>
                             <IconButton
-                                onClick={handleDelete}
-                                size="small"
-                                sx={{ color: 'white' }}
-                                title="Delete image"
-                            >
-                                <DeleteIcon />
-                            </IconButton>
+    onClick={handleDelete}
+    size="small"
+    sx={{ color: 'white' }}
+    title="Delete image"
+    aria-label="Delete image"
+>
+    <DeleteIcon />
+</IconButton>
                             {onReplace && (
-                                <IconButton
-                                    onClick={handleReplace}
-                                    size="small"
-                                    sx={{ color: 'white' }}
-                                    title="Replace image"
-                                >
-                                    <SwapIcon />
-                                </IconButton>
+                              <IconButton
+    onClick={handleReplace}
+    size="small"
+    sx={{ color: 'white' }}
+    title="Replace image"
+    aria-label="Replace image"
+>
+    <SwapIcon />
+</IconButton>
                             )}
                         </ActionOverlay>
                     )}
