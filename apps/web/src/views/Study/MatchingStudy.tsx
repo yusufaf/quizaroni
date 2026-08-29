@@ -19,6 +19,7 @@ import StudyResults from './shared/StudyResults';
 import SettingsDialog from './shared/SettingsDialog';
 import { BasePage } from 'styles/AppStyles';
 import { useShortcuts } from 'shared/keyboard/useShortcuts';
+import useHaptics from 'shared/hooks/useHaptics';
 
 type Props = {
     studysetId: string;
@@ -46,6 +47,9 @@ const MatchingStudy = ({ studysetId }: Props) => {
         incrementScore,
         recordAnswer,
     } = useStudySessionStore();
+
+    const { light: hapticLight, sessionComplete: hapticSessionComplete } =
+        useHaptics();
 
     const [termCards, setTermCards] = useState<MatchCard[]>([]);
     const [definitionCards, setDefinitionCards] = useState<MatchCard[]>([]);
@@ -138,6 +142,7 @@ const MatchingStudy = ({ studysetId }: Props) => {
 
         if (isMatch) {
             // Correct match
+            hapticLight();
             const newMatched = new Set(matchedPairs);
             newMatched.add(card1.cardUUID);
             setMatchedPairs(newMatched);
@@ -204,6 +209,7 @@ const MatchingStudy = ({ studysetId }: Props) => {
     const handleGameComplete = () => {
         if (!activeSession) return;
 
+        hapticSessionComplete();
         const result = endSession();
         setSessionResult(result);
         setShowResults(true);

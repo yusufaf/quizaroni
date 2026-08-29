@@ -24,6 +24,7 @@ import { BasePage } from 'styles/AppStyles';
 import { useTranslation } from 'react-i18next';
 import { useShortcuts } from 'shared/keyboard/useShortcuts';
 import { stringSimilarity } from 'shared/utilities/stringSimilarity';
+import useHaptics from 'shared/hooks/useHaptics';
 
 type Props = {
     studysetId: string;
@@ -46,6 +47,9 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
         incrementScore,
         updateStreak,
     } = useStudySessionStore();
+
+    const { light: hapticLight, sessionComplete: hapticSessionComplete } =
+        useHaptics();
 
     const [userAnswer, setUserAnswer] = useState('');
     const [hintsUsed, setHintsUsed] = useState(0);
@@ -119,6 +123,8 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
     const handleSubmit = () => {
         if (!currentCard || !activeSession) return;
 
+        hapticLight();
+
         const difficulty = activeSession.settings.difficulty || 'medium';
         const correct = checkAnswer(
             userAnswer,
@@ -177,6 +183,7 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
             activeSession.currentCardIndex === activeSession.cards.length - 1;
 
         if (isLastCard) {
+            hapticSessionComplete();
             const result = endSession();
             setSessionResult(result);
             setShowResults(true);

@@ -413,6 +413,8 @@
         "defaultDownloadFormat": "Default Download Format",
         "ttsVoice": "Text-to-Speech Voice",
         "defaultTtsVoice": "Default System Voice",
+        "hapticFeedback": "Haptic Feedback",
+        "hapticFeedbackDescription": "Vibrate on card flip, grade, and session completion. Android/Chromium mobile browsers only — not supported on iOS Safari.",
         "json": "JSON",
         "jsonSettingsTitle": "Settings JSON",
         "jsonSettingsDescription": "Edit your preferences directly as JSON. Changes are validated before saving. Press Ctrl+S to save.",

@@ -413,6 +413,8 @@
         "defaultDownloadFormat": "Formato de Descarga Predeterminado",
         "ttsVoice": "Voz de Texto a Voz",
         "defaultTtsVoice": "Voz del Sistema Predeterminada",
+        "hapticFeedback": "Retroalimentación Háptica",
+        "hapticFeedbackDescription": "Vibra al voltear tarjetas, calificar y completar sesiones. Solo en navegadores móviles Android/Chromium — no compatible con iOS Safari.",
         "json": "JSON",
         "jsonSettingsTitle": "Configuración JSON",
         "jsonSettingsDescription": "Edita tus preferencias directamente como JSON. Los cambios se validan antes de guardar. Presiona Ctrl+S para guardar.",

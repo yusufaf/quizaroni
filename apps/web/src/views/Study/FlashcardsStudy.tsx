@@ -51,6 +51,7 @@ import {
 } from 'shared/utilities/srs';
 import type { CardProgress, StudySessionResult } from 'shared/types';
 import { resolveSwipe, SWIPE_DISTANCE_THRESHOLD } from './swipeGesture';
+import useHaptics from 'shared/hooks/useHaptics';
 
 type Props = {
     studysetId: string;
@@ -110,6 +111,8 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
         [0, 0, 1]
     );
     const didDragRef = useRef(false);
+    const { light: hapticLight, sessionComplete: hapticSessionComplete } =
+        useHaptics();
 
     // Initialize session
     useEffect(() => {
@@ -320,6 +323,7 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
             !lightboxCooldownRef.current &&
             !didDragRef.current
         ) {
+            hapticLight();
             setFlipped(!flipped);
             if (!flipped) {
                 setShowRating(true);
@@ -378,6 +382,7 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
         const quality = GRADE_QUALITY[grade];
 
         setHasRated(true);
+        hapticLight();
 
         updateCardProgress(currentCard.cardUUID, quality);
 
@@ -409,6 +414,7 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
     const handleNext = () => {
         if (isLastCard) {
             // End session and show results
+            hapticSessionComplete();
             const result = endSession();
             setSessionResult(result);
             setShowResults(true);
@@ -434,6 +440,7 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
     };
 
     const handleFlip = () => {
+        hapticLight();
         setFlipped(!flipped);
         if (!flipped) {
             setShowRating(true);
