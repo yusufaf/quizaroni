@@ -54,6 +54,7 @@ export type User = {
         preferredTimeFormat?: PreferredTimeFormat;
         showSeconds?: boolean;
         ttsVoice?: string;
+        hapticsEnabled?: boolean;
         aiProvider?: 'openai' | 'anthropic' | 'google';
         aiModel?: string;
         visibleColumns?: Record<string, boolean>;

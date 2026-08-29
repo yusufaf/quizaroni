@@ -11,6 +11,7 @@ import {
     Download as DownloadIcon,
     WarningAmber as WarningIcon,
     RecordVoiceOver,
+    Vibration,
 } from '@mui/icons-material';
 import {
     Button,
@@ -55,6 +56,7 @@ const LOADING_IDS = {
     DOWNLOAD_FORMAT: 'defaultDownloadFormat',
     DEFAULT_THEME: 'defaultTheme',
     TTS_VOICE: 'ttsVoice',
+    HAPTICS_ENABLED: 'hapticsEnabled',
 };
 
 type Props = {
@@ -81,6 +83,7 @@ const CustomizationTab = ({ userData }: Props) => {
             confirmDestructiveActions = true,
             defaultDownloadFormat = DOWNLOAD_FILE_TYPES.JSON,
             ttsVoice = '',
+            hapticsEnabled = true,
         },
     } = userData;
 
@@ -114,6 +117,10 @@ const CustomizationTab = ({ userData }: Props) => {
 
     const ttsVoiceLoading = useMemo(() => {
         return loadingID === LOADING_IDS.TTS_VOICE;
+    }, [loadingID]);
+
+    const hapticsLoading = useMemo(() => {
+        return loadingID === LOADING_IDS.HAPTICS_ENABLED;
     }, [loadingID]);
 
     const { voices } = useSpeechVoices();
@@ -212,6 +219,26 @@ const CustomizationTab = ({ userData }: Props) => {
             .catch((error) => {
                 console.error(
                     'Failed to update confirm destructive actions preference:',
+                    error
+                );
+            })
+            .finally(() => {
+                setLoadingID('');
+            });
+    };
+
+    const handleHapticsToggle = (
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        setLoadingID(LOADING_IDS.HAPTICS_ENABLED);
+        updateUserMetadata({
+            updates: {
+                hapticsEnabled: event.target.checked,
+            },
+        })
+            .catch((error) => {
+                console.error(
+                    'Failed to update haptic feedback preference:',
                     error
                 );
             })
@@ -487,6 +514,31 @@ const CustomizationTab = ({ userData }: Props) => {
                         ))}
                     </SimpleSelect>
                     {ttsVoiceLoading && <CircularProgress size={24} />}{' '}
+                </SimpleFlexContainer>
+            </ActionColumn>
+            <ActionColumn>
+                <ActionHeader>
+                    <Vibration />
+                    <Typography variant="h6">
+                        {t('profile.hapticFeedback')}
+                    </Typography>
+                </ActionHeader>
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: '0.5rem' }}
+                >
+                    {t('profile.hapticFeedbackDescription')}
+                </Typography>
+                <SimpleFlexContainer
+                    style={{ gap: '1rem', alignItems: 'center' }}
+                >
+                    <Switch
+                        checked={hapticsEnabled}
+                        onChange={handleHapticsToggle}
+                        disabled={hapticsLoading}
+                    />
+                    {hapticsLoading && <CircularProgress size={24} />}
                 </SimpleFlexContainer>
             </ActionColumn>
         </AccountViewContainer>

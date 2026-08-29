@@ -74,10 +74,14 @@ User-facing strings live in `src/i18n/locales/{en,es}/common.json`. Use the `use
 
 ```tsx
 const { t } = useTranslation();
-<Typography>{t('home.title')}</Typography>
+<Typography>{t('home.title')}</Typography>;
 ```
 
 Add new keys to both language files.
+
+## Known Limitations
+
+- **Haptics**: card flip/grade/session-complete vibration (`navigator.vibrate`) works on Android/Chromium mobile browsers only. iOS Safari has never implemented the Vibration API — this is a permanent platform gap, not a bug — and is a no-op there until the app ships a Capacitor native shell (#30), which will use `@capacitor/haptics` instead. Toggle in Profile → Customization.
 
 ## Contributing
 

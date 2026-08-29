@@ -22,6 +22,7 @@ import StudyResults from './shared/StudyResults';
 import SettingsDialog from './shared/SettingsDialog';
 import { BasePage } from 'styles/AppStyles';
 import { useShortcuts } from 'shared/keyboard/useShortcuts';
+import useHaptics from 'shared/hooks/useHaptics';
 
 type Props = {
     studysetId: string;
@@ -48,6 +49,9 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
         incrementScore,
         updateStreak,
     } = useStudySessionStore();
+
+    const { light: hapticLight, sessionComplete: hapticSessionComplete } =
+        useHaptics();
 
     const [selectedOption, setSelectedOption] = useState<number | null>(null);
     const [showFeedback, setShowFeedback] = useState(false);
@@ -148,6 +152,8 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
         (isTimeout = false) => {
             if (showFeedback || !currentCard) return;
 
+            hapticLight();
+
             const correctIndex = quizOptions.findIndex((opt) => opt.isCorrect);
             const answeredCorrectly =
                 selectedOption === correctIndex ||
@@ -205,6 +211,7 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
             currentCard,
             answerStartTime,
             activeSession,
+            hapticLight,
         ]
     );
 
@@ -215,6 +222,7 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
             activeSession.currentCardIndex === activeSession.cards.length - 1;
 
         if (isLastCard) {
+            hapticSessionComplete();
             const result = endSession();
             setSessionResult(result);
             setShowResults(true);
