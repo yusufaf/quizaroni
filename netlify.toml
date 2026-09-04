@@ -25,12 +25,12 @@ function = "sitemap"
 # See C:\Projects\umami-flyio and apps/web/index.html.
 [[redirects]]
 from = "/s.js"
-to = "https://umami-af.fly.dev/s.js"
+to = "https://analytics.yusufaf.dev/s.js"
 status = 200
 
 [[redirects]]
 from = "/api/e"
-to = "https://umami-af.fly.dev/api/e"
+to = "https://analytics.yusufaf.dev/api/e"
 status = 200
 
 # SPA fallback.
