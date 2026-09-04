@@ -19,6 +19,20 @@ function = "og-meta"
 path = "/sitemap.xml"
 function = "sitemap"
 
+# Umami analytics, proxied same-origin so ad blockers treat it as first-party
+# rather than a third-party request to analytics.yusufaf.dev. Must come before
+# the SPA fallback below — Netlify applies the first matching rule.
+# See C:\Projects\umami-flyio and apps/web/index.html.
+[[redirects]]
+from = "/s.js"
+to = "https://umami-af.fly.dev/s.js"
+status = 200
+
+[[redirects]]
+from = "/api/e"
+to = "https://umami-af.fly.dev/api/e"
+status = 200
+
 # SPA fallback.
 [[redirects]]
 from = "/*"
