@@ -160,6 +160,18 @@
         />
         <title>Quizaroni</title>
         <script type="module" src="/src/index.tsx"></script>
+
+        <!-- Umami analytics — self-hosted, cookieless, proxied same-origin via
+             netlify.toml (see that file's /s.js + /api/e redirects, currently
+             pointed at umami-af.fly.dev until analytics.yusufaf.dev's cert is
+             set up) so ad blockers see first-party traffic, not a cross-host
+             request. See C:\Projects\umami-flyio. -->
+        <script
+            defer
+            src="/s.js"
+            data-host-url="/"
+            data-website-id="883ce165-bace-46c2-93df-994219b0f916"
+        ></script>
     </head>
 
     <body>
