@@ -24,14 +24,14 @@ jobs:
     name: pnpm audit --fix
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # No `version:` here on purpose — action-setup reads the pnpm version from
       # the root package.json "packageManager" field. Specifying both errors with
       # ERR_PNPM_BAD_PM_VERSION.
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
           cache: pnpm
@@ -113,7 +113,7 @@ jobs:
             echo 'as a patch release.'
           } > "$RUNNER_TEMP/pr-body.md"
 
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@v3
         id: app-token
         with:
           app-id: ${{ vars.RELEASE_APP_ID }}
