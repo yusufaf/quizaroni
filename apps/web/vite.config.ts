@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from 'vite-plus';
+import { defineConfig, loadEnv, lazyPlugins } from 'vite-plus';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
@@ -12,28 +12,14 @@ const apiProxyURL =
         .VITE_API_BASE_URL ?? 'http://localhost:3000/api';
 
 export default defineConfig({
-    staged: {
-        '*.{js,jsx,ts,tsx}': ['vp lint --fix', 'vp fmt --write'],
-        '*.{json,md,css,html,yml,yaml}': 'vp fmt --write',
-    },
-    lint: { options: { typeAware: true, typeCheck: true } },
     // fetchJson (awsAPI.ts) is now exercised directly by a real unit test
     // rather than only through mocked hooks, so the module's top-level
     // `VITE_API_BASE_URL` guard needs something to read in test mode too.
     test: { globals: true, env: { VITE_API_BASE_URL: 'http://localhost/api' } },
-    fmt: {
-        trailingComma: 'es5',
-        tabWidth: 4,
-        semi: true,
-        singleQuote: true,
-        printWidth: 80,
-        sortPackageJson: false,
-        ignorePatterns: [],
-    },
     define: {
         global: {},
     },
-    plugins: [
+    plugins: lazyPlugins(() => [
         react(),
         VitePWA({
             registerType: 'prompt',
@@ -150,7 +136,7 @@ export default defineConfig({
                 ],
             },
         }),
-    ],
+    ]),
     resolve: {
         dedupe: ['react', 'react-dom'],
         alias: {

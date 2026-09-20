@@ -29,12 +29,12 @@
     "typeRoots": [
       "./node_modules/@types"
     ],
-    "baseUrl": ".",
     "paths": {
       "lambdas/*": ["./service/lambdas/*"],
       "utilities/*": ["./utilities/*"],
       "resources/*": ["./resources/*"],
       "models/*": ["./models/*"],
+      "*": ["./*"],
     }
   },
   "exclude": [

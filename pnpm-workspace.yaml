@@ -1,3 +1,20 @@
 packages:
     - 'apps/*'
     - 'packages/*'
+overrides:
+    dompurify: ^3.4.13
+    js-yaml: ^4.3.2
+    nanoid: ^3.3.17
+    brace-expansion: ^5.0.9
+    fast-uri: ^3.1.6
+    undici: ^7.29.0
+    postcss: ^8.5.18
+    vite@*: 'catalog:'
+catalog:
+    vite: npm:@voidzero-dev/vite-plus-core@0.3.3
+    vite-plus: 0.3.3
+peerDependencyRules:
+    allowAny:
+        - vite
+    allowedVersions:
+        vite: '*'

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vite-plus/test';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ShortcutProvider, useShortcutRegistry } from './ShortcutRegistry';
 import { useGlobalKeyListener } from './useGlobalKeyListener';

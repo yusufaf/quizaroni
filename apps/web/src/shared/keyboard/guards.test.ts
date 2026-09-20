@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { isTypingTarget, hasModifier } from './guards';
 
 const ev = (target: Partial<HTMLElement>, mods: Partial<KeyboardEvent> = {}) =>

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
 import { zipSync } from 'fflate';
 import { pickCollectionEntry, stripAnkiHtml, parseApkg } from './ankiApkg';
 

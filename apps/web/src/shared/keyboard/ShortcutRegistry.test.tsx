@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { renderHook, act } from '@testing-library/react';
 import { ShortcutProvider, useShortcutRegistry } from './ShortcutRegistry';
 import type { Shortcut } from './shortcutTypes';
