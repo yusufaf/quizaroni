@@ -64,7 +64,18 @@ const HeaderAdvancedSection = ({
                 <BoldTypography>
                     {t('create.advanced', { defaultValue: 'Advanced' })}
                 </BoldTypography>
-                <IconButton size="small">
+                <IconButton
+                    size="small"
+                    aria-label={
+                        expanded
+                            ? t('create.collapseAdvanced', {
+                                  defaultValue: 'Collapse advanced',
+                              })
+                            : t('create.expandAdvanced', {
+                                  defaultValue: 'Expand advanced',
+                              })
+                    }
+                >
                     {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </IconButton>
             </SimpleFlexContainer>

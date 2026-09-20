@@ -179,6 +179,7 @@ const CombineSets = () => {
                         <IconButton
                             onClick={() => navigate(-1)}
                             color="primary"
+                            aria-label="Go back"
                         >
                             <ArrowBack />
                         </IconButton>
@@ -242,6 +243,7 @@ const CombineSets = () => {
                                 </Box>
                                 <IconButton
                                     onClick={() => handleRemove(set)}
+                                    aria-label={`Remove ${set.title}`}
                                     disabled={
                                         combinedSets.length === 1 &&
                                         set.studysetUUID === baseSetUUID
