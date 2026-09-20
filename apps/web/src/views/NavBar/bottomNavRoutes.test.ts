@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vite-plus/test';
 import { BOTTOM_NAV_VALUES, getBottomNavValue } from './bottomNavRoutes';
 import { isStudyRoute } from 'shared/utilities/routes';
 

@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from 'vite-plus';
+import { defineConfig, loadEnv, lazyPlugins } from 'vite-plus';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
@@ -33,7 +33,7 @@ export default defineConfig({
     define: {
         global: {},
     },
-    plugins: [
+    plugins: lazyPlugins(() => [
         react(),
         VitePWA({
             registerType: 'prompt',
@@ -150,7 +150,7 @@ export default defineConfig({
                 ],
             },
         }),
-    ],
+    ]),
     resolve: {
         dedupe: ['react', 'react-dom'],
         alias: {
