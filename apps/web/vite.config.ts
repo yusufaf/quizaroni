@@ -12,24 +12,10 @@ const apiProxyURL =
         .VITE_API_BASE_URL ?? 'http://localhost:3000/api';
 
 export default defineConfig({
-    staged: {
-        '*.{js,jsx,ts,tsx}': ['vp lint --fix', 'vp fmt --write'],
-        '*.{json,md,css,html,yml,yaml}': 'vp fmt --write',
-    },
-    lint: { options: { typeAware: true, typeCheck: true } },
     // fetchJson (awsAPI.ts) is now exercised directly by a real unit test
     // rather than only through mocked hooks, so the module's top-level
     // `VITE_API_BASE_URL` guard needs something to read in test mode too.
     test: { globals: true, env: { VITE_API_BASE_URL: 'http://localhost/api' } },
-    fmt: {
-        trailingComma: 'es5',
-        tabWidth: 4,
-        semi: true,
-        singleQuote: true,
-        printWidth: 80,
-        sortPackageJson: false,
-        ignorePatterns: [],
-    },
     define: {
         global: {},
     },
