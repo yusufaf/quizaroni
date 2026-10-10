@@ -5,7 +5,7 @@ workspaces: `apps/web` (React frontend) and `apps/api` (AWS CDK backend).
 
 ## Prerequisites
 
-- Node.js >= 20
+- Node.js 20.19+ or 22.18+ (required by Vite+)
 - pnpm >= 10 (`npm i -g pnpm`)
 - For backend work: an AWS account + the AWS CLI configured, and the AWS CDK.
 
@@ -27,6 +27,7 @@ pnpm build:web    # production build of the frontend
 pnpm build:api    # compile the CDK / Lambda TypeScript
 pnpm synth:api    # synthesize the CloudFormation template
 pnpm deploy:api   # deploy the backend to AWS
+pnpm typecheck    # type-check the frontend
 pnpm test         # run tests across workspaces
 ```
 
@@ -47,32 +48,53 @@ Releases are automated with release-please based on these commit messages.
 
 Issues labeled
 [`good first issue`](https://github.com/yusufaf/quizaroni/labels/good%20first%20issue)
-are scoped for new contributors.
+are scoped for new contributors. For a new feature or a large change, open an
+issue to discuss it before writing code.
 
 1. Comment on the issue to claim it, and wait to be assigned before starting.
-   This avoids two people opening PRs for the same fix.
+   This avoids two people opening PRs for the same fix. I aim to reply within
+   about a week; if you haven't heard back by then, go ahead and start.
 2. Skip issues that already have an assignee or an open PR linked to them.
 3. If an issue says it is blocked on another PR, wait for that PR to merge.
 4. If you can no longer work on an assigned issue, say so in a comment so it
-   can be reassigned. Issues with no activity for two weeks may be reassigned.
+   can be reassigned. If no PR is opened or updated within two weeks of
+   assignment, the issue may be reassigned.
 
 ## Translations
 
-The web app supports English and Spanish via `react-i18next`. User-facing
-strings, including `aria-label`s and tooltip titles, go through `t()` in any
-file that already uses `useTranslation`. Add new keys to both
-`apps/web/src/i18n/locales/en/` and `apps/web/src/i18n/locales/es/`.
+The web app supports English and Spanish via `react-i18next`.
+
+- New user-facing strings, including `aria-label`s and tooltip titles, go
+  through `t()`. New components should always use `useTranslation`. Some
+  older files are still hardcoded (tracked in #49); when editing one of those,
+  matching its existing strings is fine unless your issue is to translate it.
+- Add every new key to both `apps/web/src/i18n/locales/en/` and
+  `apps/web/src/i18n/locales/es/`. If you can't write Spanish, copy the English
+  text into the `es` file and say so in your PR.
+- A new namespace file must also be imported and registered in
+  `apps/web/src/i18n/index.ts`, or `t()` will return raw keys.
 
 ## Pull requests
 
-1. Branch off `main`.
+1. Branch off `main`, and keep each PR focused on one issue.
 2. Make your change with tests/docs where relevant.
-3. Format the `apps/web` files you changed with
-   `pnpm exec vp fmt path/to/File.tsx ...`. Pass only your own files, since
-   running it across the whole repo reformats unrelated code.
-4. Ensure `pnpm typecheck`, `pnpm test` and `pnpm build` pass (CI runs the
-   same checks).
+3. Lint and format the `apps/web` files you changed:
+   ```bash
+   pnpm exec vp lint --fix path/to/File.tsx ...
+   pnpm exec vp fmt path/to/File.tsx ...
+   ```
+   Pass only your own files, since running these across the whole repo
+   rewrites unrelated code.
+4. Make sure `pnpm typecheck`, `pnpm test` and `pnpm build:web` pass. If you
+   touched `apps/api`, also run `pnpm build:api` and `pnpm synth:api`. CI runs
+   all five.
 5. Open a PR with a clear description, and include `Fixes #<issue>` so the
-   issue closes when the PR merges.
+   issue closes when the PR merges. For UI changes, add a screenshot or short
+   recording. Leave "Allow edits from maintainers" checked.
 
 Do **not** commit secrets. All credentials go in untracked `.env` files.
+
+## Questions and security issues
+
+Ask questions by opening an issue. Report security vulnerabilities privately as
+described in [SECURITY.md](SECURITY.md), not in a public issue.
