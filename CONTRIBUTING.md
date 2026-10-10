@@ -5,7 +5,7 @@ workspaces: `apps/web` (React frontend) and `apps/api` (AWS CDK backend).
 
 ## Prerequisites
 
-- Node.js 20.19+ or 22.18+ (required by Vite+)
+- Node.js 20.19+, 22.18+ or 24.11+ (required by Vite+)
 - pnpm >= 10 (`npm i -g pnpm`)
 - For backend work: an AWS account + the AWS CLI configured, and the AWS CDK.
 
