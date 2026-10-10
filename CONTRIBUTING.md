@@ -5,7 +5,8 @@ workspaces: `apps/web` (React frontend) and `apps/api` (AWS CDK backend).
 
 ## Prerequisites
 
-- Node.js 20.19+, 22.18+ or 24.11+ (required by Vite+)
+- Node.js 24.11+ (matches `apps/web/.node-version`) or 22.18+. Node 20.19+ still
+  works but is end-of-life.
 - pnpm >= 10 (`npm i -g pnpm`)
 - For backend work: an AWS account + the AWS CLI configured, and the AWS CDK.
 
@@ -71,23 +72,27 @@ The web app supports English and Spanish via `react-i18next`.
 - Add every new key to both `apps/web/src/i18n/locales/en/` and
   `apps/web/src/i18n/locales/es/`. If you can't write Spanish, copy the English
   text into the `es` file and say so in your PR.
-- A new namespace file must also be imported and registered in
-  `apps/web/src/i18n/index.ts`, or `t()` will return raw keys.
+- A new namespace (a new `.json` file) also needs three edits in
+  `apps/web/src/i18n/index.ts`: import both the `en` and `es` files, add both
+  under `resources`, and add the name to the `ns` array. Otherwise `t()`
+  returns raw keys.
 
 ## Pull requests
 
 1. Branch off `main`, and keep each PR focused on one issue.
 2. Make your change with tests/docs where relevant.
-3. Lint and format the `apps/web` files you changed:
+3. Lint and format only the files you changed, since running these across
+   the whole repo rewrites unrelated code:
    ```bash
-   pnpm exec vp lint --fix path/to/File.tsx ...
-   pnpm exec vp fmt path/to/File.tsx ...
+   # apps/web: lint .ts/.tsx, format .ts/.tsx/.json/.css
+   pnpm exec vp lint --fix apps/web/src/path/to/File.tsx ...
+   pnpm exec vp fmt apps/web/src/path/to/File.tsx ...
+
+   # apps/api (Prettier, paths relative to apps/api)
+   pnpm --filter @quizaroni/api exec prettier --write path/to/file.ts ...
    ```
-   Pass only your own files, since running these across the whole repo
-   rewrites unrelated code.
-4. Make sure `pnpm typecheck`, `pnpm test` and `pnpm build:web` pass. If you
-   touched `apps/api`, also run `pnpm build:api` and `pnpm synth:api`. CI runs
-   all five.
+4. Make sure `pnpm typecheck`, `pnpm test` and `pnpm build` (all workspaces)
+   pass. If you touched `apps/api` or `packages/`, also run `pnpm synth:api`.
 5. Open a PR with a clear description, and include `Fixes #<issue>` so the
    issue closes when the PR merges. For UI changes, add a screenshot or short
    recording. Leave "Allow edits from maintainers" checked.
