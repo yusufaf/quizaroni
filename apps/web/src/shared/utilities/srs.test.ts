@@ -163,6 +163,23 @@ describe('reviewCard', () => {
             expect(days).toBeGreaterThanOrEqual(1);
         }
     });
+
+    it('does not throw when lastStudied is missing or unparseable', () => {
+        for (const lastStudied of [undefined, 'garbage']) {
+            const row = {
+                ...converted(2.5, 6),
+                lastStudied,
+            } as unknown as CardProgress;
+            for (const g of GRADES) {
+                const r = reviewCard(row, g, NOW);
+                expect(Number.isInteger(r.scheduledDays)).toBe(true);
+                expect(r.scheduledDays).toBeGreaterThanOrEqual(1);
+                expect(Number.isNaN(new Date(r.nextReview).getTime())).toBe(
+                    false
+                );
+            }
+        }
+    });
 });
 
 describe('projectInterval', () => {

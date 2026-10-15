@@ -93,12 +93,13 @@ function toFsrsCard(p: CardProgress, now: Date): CardInput {
         reps: p.reps,
         lapses: p.lapses,
         state: p.state,
-        // ts-fsrs throws on a negative elapsed time, e.g. after a device
-        // clock rollback, and projectInterval runs during render.
+        // ts-fsrs throws on a negative elapsed time (e.g. after a device
+        // clock rollback) and returns an invalid due date for an invalid
+        // last_review; projectInterval runs during render.
         last_review:
             p.state === 'New'
                 ? undefined
-                : lastStudied > now
+                : Number.isNaN(lastStudied.getTime()) || lastStudied > now
                   ? now
                   : lastStudied,
     };
