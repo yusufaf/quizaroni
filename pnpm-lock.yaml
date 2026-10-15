@@ -238,6 +238,9 @@ importers:
       sql.js:
         specifier: ^1.13.0
         version: 1.14.2
+      ts-fsrs:
+        specifier: ^5.4.2
+        version: 5.4.2
       zod:
         specifier: ^4.6.5
         version: 4.6.5
@@ -5669,6 +5672,10 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
+  ts-fsrs@5.4.2:
+    resolution: {integrity: sha512-z4qop4pzTcyTzuJ566d9EaX/4bZZzhYfeaPImfVr+xcYT65c5oBgFDijUhCE/D+C78eaolHIhKRZ04/RwF+v2g==}
+    engines: {node: '>=20.0.0'}
+
   ts-jest@29.4.12:
     resolution: {integrity: sha512-Ov6ClY53Fflh6BGAnY2DlTq1hYDrTycz2PVTXBWFW2CU+9zrEqAp9fWdGXl42EXO5RLSFAcAZ2JFKbP+zBTFfw==}
     engines: {node: ^14.15.0 || ^16.10.0 || ^18.0.0 || >=20.0.0}
@@ -8969,12 +8976,12 @@ snapshots:
       '@rolldown/pluginutils': 1.0.1
       vite: '@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3)'
 
-  '@vitest/browser-preview@4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11(@types/node@22.19.20)(@vitest/browser-preview@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@22.19.20)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(jsdom@29.1.1))':
+  '@vitest/browser-preview@4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11)':
     dependencies:
       '@testing-library/dom': 10.4.1
       '@testing-library/user-event': 14.6.7(@testing-library/dom@10.4.1)
-      '@vitest/browser': 4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11(@types/node@22.19.20)(@vitest/browser-preview@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@22.19.20)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(jsdom@29.1.1))
-      vitest: 4.1.11(@types/node@22.19.20)(@vitest/browser-preview@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@22.19.20)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(jsdom@29.1.1)
+      '@vitest/browser': 4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11)
+      vitest: 4.1.11(@types/node@20.19.41)(@vitest/browser-preview@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(jsdom@29.1.1)
     transitivePeerDependencies:
       - bufferutil
       - msw
@@ -8993,7 +9000,7 @@ snapshots:
       - utf-8-validate
       - vite
 
-  '@vitest/browser@4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11(@types/node@22.19.20)(@vitest/browser-preview@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@22.19.20)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(jsdom@29.1.1))':
+  '@vitest/browser@4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11)':
     dependencies:
       '@blazediff/core': 1.9.1
       '@vitest/mocker': 4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))
@@ -9002,7 +9009,7 @@ snapshots:
       pngjs: 7.0.0
       sirv: 3.0.2
       tinyrainbow: 3.1.1
-      vitest: 4.1.11(@types/node@22.19.20)(@vitest/browser-preview@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@22.19.20)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(jsdom@29.1.1)
+      vitest: 4.1.11(@types/node@20.19.41)(@vitest/browser-preview@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(jsdom@29.1.1)
       ws: 8.21.0
     transitivePeerDependencies:
       - bufferutil
@@ -11900,6 +11907,8 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
+  ts-fsrs@5.4.2: {}
+
   ts-jest@29.4.12(@babel/core@7.29.7)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.7))(esbuild@0.28.1)(jest-util@30.4.1)(jest@30.4.2(@types/node@20.19.41)(babel-plugin-macros@3.1.0)(ts-node@10.9.2(@types/node@20.19.41)(typescript@5.9.3)))(typescript@5.9.3):
     dependencies:
       bs-logger: 0.2.6
@@ -12100,8 +12109,8 @@ snapshots:
     dependencies:
       '@oxc-project/types': 0.150.0
       '@oxlint/plugins': 1.79.0
-      '@vitest/browser': 4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11(@types/node@22.19.20)(@vitest/browser-preview@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@22.19.20)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(jsdom@29.1.1))
-      '@vitest/browser-preview': 4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11(@types/node@22.19.20)(@vitest/browser-preview@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@22.19.20)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(jsdom@29.1.1))
+      '@vitest/browser': 4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11)
+      '@vitest/browser-preview': 4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11)
       '@vitest/expect': 4.1.11
       '@vitest/mocker': 4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))
       '@vitest/pretty-format': 4.1.11
@@ -12113,7 +12122,7 @@ snapshots:
       oxlint: 1.83.0(oxlint-tsgolint@7.0.2001)(vite-plus@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(jsdom@29.1.1)(terser@5.51.2)(typescript@5.9.3))
       oxlint-tsgolint: 7.0.2001
       vite: '@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3)'
-      vitest: 4.1.11(@types/node@20.19.41)(@vitest/browser-preview@4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@22.19.20)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11))(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(jsdom@29.1.1)
+      vitest: 4.1.11(@types/node@20.19.41)(@vitest/browser-preview@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(jsdom@29.1.1)
     optionalDependencies:
       '@voidzero-dev/vite-plus-darwin-arm64': 0.3.3
       '@voidzero-dev/vite-plus-darwin-x64': 0.3.3
@@ -12210,7 +12219,7 @@ snapshots:
       - utf-8-validate
       - yaml
 
-  vitest@4.1.11(@types/node@20.19.41)(@vitest/browser-preview@4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@22.19.20)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11))(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(jsdom@29.1.1):
+  vitest@4.1.11(@types/node@20.19.41)(@vitest/browser-preview@4.1.11)(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(jsdom@29.1.1):
     dependencies:
       '@vitest/expect': 4.1.11
       '@vitest/mocker': 4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))
@@ -12234,7 +12243,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 20.19.41
-      '@vitest/browser-preview': 4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@22.19.20)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11)
+      '@vitest/browser-preview': 4.1.11(@voidzero-dev/vite-plus-core@0.3.3(@types/node@20.19.41)(esbuild@0.28.1)(jiti@2.6.1)(terser@5.51.2)(typescript@5.9.3))(vitest@4.1.11)
       jsdom: 29.1.1
     transitivePeerDependencies:
       - msw
