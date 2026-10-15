@@ -81,10 +81,18 @@ function masteryFor(
     return stability >= MASTERED_STABILITY_DAYS ? 'mastered' : 'review';
 }
 
+// Stored rows can hold missing or corrupt timestamps; new Date(null) would
+// silently be 1970, so only strings that parse are accepted.
+function parseTimestamp(value: unknown): Date | undefined {
+    if (typeof value !== 'string') return undefined;
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
 function toFsrsCard(p: CardProgress, now: Date): CardInput {
-    const lastStudied = new Date(p.lastStudied);
+    const lastStudied = parseTimestamp(p.lastStudied);
     return {
-        due: p.nextReview,
+        due: parseTimestamp(p.nextReview) ?? now,
         stability: p.stability,
         difficulty: p.difficulty,
         elapsed_days: 0,
@@ -94,12 +102,12 @@ function toFsrsCard(p: CardProgress, now: Date): CardInput {
         lapses: p.lapses,
         state: p.state,
         // ts-fsrs throws on a negative elapsed time (e.g. after a device
-        // clock rollback) and returns an invalid due date for an invalid
-        // last_review; projectInterval runs during render.
+        // clock rollback) and on invalid dates; projectInterval runs during
+        // render.
         last_review:
             p.state === 'New'
                 ? undefined
-                : Number.isNaN(lastStudied.getTime()) || lastStudied > now
+                : !lastStudied || lastStudied > now
                   ? now
                   : lastStudied,
     };

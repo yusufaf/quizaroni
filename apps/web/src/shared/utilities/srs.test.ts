@@ -164,16 +164,24 @@ describe('reviewCard', () => {
         }
     });
 
-    it('does not throw when lastStudied is missing or unparseable', () => {
-        for (const lastStudied of [undefined, 'garbage']) {
-            const row = {
-                ...converted(2.5, 6),
-                lastStudied,
-            } as unknown as CardProgress;
+    it('does not throw on missing or unparseable timestamps', () => {
+        const corrupt = [undefined, null, 'garbage'];
+        const rows = [
+            ...corrupt.map((lastStudied) => ({ lastStudied })),
+            ...corrupt.map((nextReview) => ({ nextReview })),
+        ].map(
+            (over) =>
+                ({ ...converted(2.5, 6), ...over }) as unknown as CardProgress
+        );
+        // The fixture's lastStudied is NOW, so falling back to `now` must
+        // schedule exactly like the clean row (and not like a 1970 review).
+        const clean = converted(2.5, 6);
+        for (const row of rows) {
             for (const g of GRADES) {
                 const r = reviewCard(row, g, NOW);
-                expect(Number.isInteger(r.scheduledDays)).toBe(true);
-                expect(r.scheduledDays).toBeGreaterThanOrEqual(1);
+                expect(r.scheduledDays).toBe(
+                    reviewCard(clean, g, NOW).scheduledDays
+                );
                 expect(Number.isNaN(new Date(r.nextReview).getTime())).toBe(
                     false
                 );
