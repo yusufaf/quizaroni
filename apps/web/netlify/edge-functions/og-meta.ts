@@ -38,9 +38,13 @@ const escapeHtml = (value: string): string =>
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
 
-/** Replaces a tag matched by `regex` if present; otherwise leaves html as-is. */
+/**
+ * Replaces a tag matched by `regex` if present; otherwise leaves html as-is.
+ * The replacement goes through a function so `$&`, `$'` etc. in set titles
+ * are inserted literally instead of as replacement patterns.
+ */
 const replaceTag = (html: string, regex: RegExp, replacement: string): string =>
-    regex.test(html) ? html.replace(regex, replacement) : html;
+    regex.test(html) ? html.replace(regex, () => replacement) : html;
 
 const addNoindex = (html: string): string =>
     html.replace(
