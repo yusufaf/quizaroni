@@ -76,8 +76,10 @@ export default async (request: Request, context: Context) => {
 
     const headers = new Headers({
         'content-type': 'application/xml; charset=utf-8',
-        // Rebuild at most hourly at the edge; cheap and fresh enough for a
-        // sitemap crawlers re-fetch on their own schedule.
+        // Netlify doesn't cache edge-function output without
+        // `cache = "manual"`, so this runs (and calls the API) on every
+        // request; s-maxage only lets shared caches downstream reuse it for
+        // an hour, which is fresh enough for a sitemap.
         'cache-control': 'public, max-age=0, s-maxage=3600',
     });
     if (!site.indexable) {
