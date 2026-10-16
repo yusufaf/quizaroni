@@ -18,7 +18,7 @@ const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 const INVALID_BODY_MESSAGE =
-    "studysetUpdates must be an array of [studysetUUID, labels[]] tuples";
+    "studysetUpdates must be an array of [studysetUUID, labels[]] tuples with unique studysetUUIDs";
 
 /**
  * Updates a set's labels in place. This used to be a Put, and a Put replaced
@@ -68,7 +68,8 @@ const isValidUpdates = (value: unknown): value is [string, string[]][] =>
             typeof entry[0] === "string" &&
             Array.isArray(entry[1]) &&
             entry[1].every((label: unknown) => typeof label === "string")
-    );
+    ) &&
+    new Set(value.map(([studysetUUID]) => studysetUUID)).size === value.length;
 
 export const summarizeLabelUpdates = (
     studysetUUIDs: string[],

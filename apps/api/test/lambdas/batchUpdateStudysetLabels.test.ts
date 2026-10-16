@@ -135,10 +135,35 @@ describe("batchUpdateStudysetLabels handler", () => {
         });
     });
 
+    it("maps results to the right ids across chunks of 25", async () => {
+        const ids = Array.from({ length: 30 }, (_, i) => `s${i}`);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        send.mockImplementation(async (cmd: any) => {
+            if (cmd.input.Key.SK === "studyset#s27") throw conditionalFail();
+            return {} as never;
+        });
+
+        const res = await invoke({ studysetUpdates: ids.map((id) => [id, ["a"]]) });
+
+        expect(send).toHaveBeenCalledTimes(30);
+        expect(res.statusCode).toBe(404);
+        expect(res.body.notFoundStudysetUUIDs).toEqual(["s27"]);
+        expect(res.body.updatedStudysetUUIDs).toEqual(ids.filter((id) => id !== "s27"));
+    });
+
+    it("returns 200 for an empty update list without touching DynamoDB", async () => {
+        const res = await invoke({ studysetUpdates: [] });
+
+        expect(res.statusCode).toBe(200);
+        expect(send).not.toHaveBeenCalled();
+    });
+
     it("returns 400 for a malformed body without touching DynamoDB", async () => {
         const responses = [
             await invoke({ studysetUpdates: "nope" }),
             await invoke({ studysetUpdates: [["s1", "not-an-array"]] }),
+            // Concurrent updates to one key would race, last write wins
+            await invoke({ studysetUpdates: [["s1", ["a"]], ["s1", ["b"]]] }),
             await invokeRaw("{bad"),
             await invokeRaw("null"),
         ];
