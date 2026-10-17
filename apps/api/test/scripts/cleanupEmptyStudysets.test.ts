@@ -266,11 +266,11 @@ describe('readCleanupConfig', () => {
         });
     });
 
-    it('treats any DRY_RUN value except 0/false as a dry run', () => {
-        for (const value of ['1', 'true', 'yes', 'TRUE']) {
+    it('treats DRY_RUN as a dry run whenever it is set, except to 0/false', () => {
+        for (const value of ['1', 'true', 'yes', 'TRUE', '']) {
             expect(readCleanupConfig({ MAIN_TABLE: 't', DRY_RUN: value }).dryRun).toBe(true);
         }
-        for (const value of ['0', 'false', 'FALSE', '']) {
+        for (const value of ['0', 'false', 'FALSE']) {
             expect(readCleanupConfig({ MAIN_TABLE: 't', DRY_RUN: value }).dryRun).toBe(false);
         }
     });

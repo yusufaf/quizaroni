@@ -64,10 +64,10 @@ export const isEmptyStudysetStub = (
     item.SK.startsWith('studyset#') &&
     absentAttributes(includeLabeled).every((name) => !(name in item));
 
-// Any DRY_RUN value other than 0/false counts, so a typo can't turn a report
-// into real deletes.
+// A set DRY_RUN counts unless it is 0/false, so a typo or an empty value can't
+// turn a report into real deletes.
 const isDryRun = (value: string | undefined) =>
-    !!value && !['0', 'false'].includes(value.toLowerCase());
+    value !== undefined && !['0', 'false'].includes(value.toLowerCase());
 
 export const readCleanupConfig = (env: NodeJS.ProcessEnv): CleanupConfig => {
     const tableName = env.MAIN_TABLE ?? '';
@@ -103,7 +103,7 @@ export const cleanupEmptyStudysets = async ({
         labeledKept: 0,
     };
     // Labeled items are not excluded from the scan so they can be reported.
-    const scanCondition = absentCondition(absentAttributes(true));
+    const scanCondition = absentCondition(STUB_ABSENT_ATTRIBUTES);
     const deleteCondition = absentCondition(absentAttributes(includeLabeled));
     let lastEvaluatedKey: Record<string, unknown> | undefined;
 
