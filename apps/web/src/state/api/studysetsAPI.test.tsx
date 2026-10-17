@@ -84,4 +84,21 @@ describe('useGetAllStudysets', () => {
         await waitFor(() => expect(result.current.isSuccess).toBe(true));
         expect(result.current.data?.studysets).toEqual([validSet]);
     });
+
+    it('drops stubs before validation so the remaining sets still validate', async () => {
+        const qc = new QueryClient({
+            defaultOptions: { queries: { retry: false } },
+        });
+        const wrapper = ({ children }: { children: React.ReactNode }) => (
+            <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+        );
+
+        const { result } = renderHook(() => useGetAllStudysets(), { wrapper });
+
+        await waitFor(() => expect(result.current.isSuccess).toBe(true));
+        expect(console.error).not.toHaveBeenCalledWith(
+            expect.stringContaining('validation failed'),
+            expect.anything()
+        );
+    });
 });

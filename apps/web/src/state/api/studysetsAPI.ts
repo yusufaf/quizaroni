@@ -89,24 +89,24 @@ export const useGetAllStudysets = (
     return useQuery({
         queryKey: ['studysets'],
         queryFn: async () => {
-            const data = await fetchJson(
+            const data = await fetchJson<{ studysets?: unknown }>(
                 `${BASE_API_URL}/studysets/get-all-studysets`,
                 {
                     ...(await getCommonPostRequestProps()),
                 }
             );
-            const validated = validate({
+            // Drop stubs before validating so one stub doesn't fail the whole list.
+            return validate({
                 schema: GetAllStudysetsResponseSchema,
-                data,
+                data: Array.isArray(data?.studysets)
+                    ? {
+                          ...data,
+                          studysets: data.studysets.filter(isCompleteStudyset),
+                      }
+                    : data,
                 type: 'response',
                 context: 'GetAllStudysets',
             });
-            return {
-                ...validated,
-                studysets: (validated?.studysets ?? []).filter(
-                    isCompleteStudyset
-                ),
-            };
         },
         ...options,
     });
