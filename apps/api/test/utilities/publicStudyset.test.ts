@@ -1,3 +1,4 @@
+import { PUBLIC_STUDYSET_PK } from "resources/dynamo/publicSharing";
 import { PublicStudysetSource, toPublicStudyset } from "utilities/publicStudyset";
 
 // #128: the public endpoint used to return the whole stored set minus a few
@@ -14,7 +15,7 @@ const DEFINITION_URL = `https://bucket.s3.amazonaws.com/${DEFINITION_KEY}?X-Amz-
 const storedItem = () => ({
     PK: `userUUID#${USER_UUID}`,
     SK: `studyset#${STUDYSET_UUID}`,
-    PK2: "publicStudyset",
+    PK2: PUBLIC_STUDYSET_PK,
     SK2: `studyset#${STUDYSET_UUID}`,
     userUUID: USER_UUID,
     studysetUUID: STUDYSET_UUID,

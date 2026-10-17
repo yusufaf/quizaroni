@@ -128,15 +128,24 @@ describe('PublicStudySet', () => {
     });
 
     it('renders no attribution and no validation error for a null username', async () => {
-        response = () =>
-            json(200, {
-                studyset: publicSet({ username: null, updatedAt: null }),
-            });
+        response = () => json(200, { studyset: publicSet({ username: null }) });
         renderView();
 
         await screen.findByText('Cell biology');
 
         expect(screen.queryByText('publicView.createdBy')).toBeNull();
+        expect(console.error).not.toHaveBeenCalledWith(
+            expect.stringContaining('validation failed'),
+            expect.anything()
+        );
+    });
+
+    it('accepts a null updatedAt from records that predate it', async () => {
+        response = () => json(200, { studyset: publicSet({ updatedAt: null }) });
+        renderView();
+
+        await screen.findByText('Cell biology');
+
         expect(console.error).not.toHaveBeenCalledWith(
             expect.stringContaining('validation failed'),
             expect.anything()

@@ -23,8 +23,9 @@ import { CardFileMetadata } from 'shared/types';
 type PublicCardFiles =
     GetPublicStudysetResponse['studyset']['cards'][number]['files'];
 
-// The public payload has no storage key or filename, so key by position and
-// label generically. `files` can be missing when an older API response fails
+// The public payload has no storage key or filename, so key by position plus
+// URL (a refreshed URL resets ImageGallery's error state) and label
+// generically. `files` can be missing when an older API response fails
 // validation and reaches the view raw.
 const toGalleryFiles = (
     files: PublicCardFiles | undefined,
@@ -35,7 +36,7 @@ const toGalleryFiles = (
         .filter((file) => file.association === association)
         .map((file, index) => ({
             ...file,
-            key: `${association}-${index}`,
+            key: `${association}-${index}-${file.signedURL}`,
             name,
             size: 0,
         }));

@@ -1,5 +1,6 @@
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import type { APIGatewayProxyStructuredResultV2 } from "aws-lambda";
+import { PUBLIC_STUDYSET_PK } from "resources/dynamo/publicSharing";
 
 // #128: the handler used to strip a few keys and return the rest of the stored
 // set. It must now return only the allowlist from toPublicStudyset.
@@ -22,7 +23,7 @@ const KEY = `${STUDYSET_UUID}/${USER_UUID}/photo.png`;
 const storedItem = {
     PK: `userUUID#${USER_UUID}`,
     SK: `studyset#${STUDYSET_UUID}`,
-    PK2: "publicStudyset",
+    PK2: PUBLIC_STUDYSET_PK,
     SK2: `studyset#${STUDYSET_UUID}`,
     userUUID: USER_UUID,
     studysetUUID: STUDYSET_UUID,

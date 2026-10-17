@@ -18,8 +18,10 @@ export type PublicStudyset = {
     cards: PublicCard[];
 };
 
-// subject/publishedAt arrive with publishing (#132)
-export type PublicStudysetSource = Studyset & {
+// subject/publishedAt arrive with publishing (#132); older records may predate
+// updatedAt.
+export type PublicStudysetSource = Omit<Studyset, 'updatedAt'> & {
+    updatedAt?: Timestamp;
     subject?: string;
     publishedAt?: Timestamp;
 };
@@ -36,7 +38,6 @@ export const toPublicStudyset = (item: PublicStudysetSource): PublicStudyset => 
     username: item.username || null,
     subject: item.subject ?? null,
     publishedAt: item.publishedAt ?? null,
-    // Older records may predate `updatedAt`.
     updatedAt: item.updatedAt ?? null,
     cards: (item.cards ?? []).map((card) => ({
         term: card.term ?? '',
