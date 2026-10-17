@@ -14,7 +14,7 @@ const DEFINITION_URL = `https://bucket.s3.amazonaws.com/${DEFINITION_KEY}?X-Amz-
 const storedItem = () => ({
     PK: `userUUID#${USER_UUID}`,
     SK: `studyset#${STUDYSET_UUID}`,
-    PK2: "public#studyset",
+    PK2: "publicStudyset",
     SK2: `studyset#${STUDYSET_UUID}`,
     userUUID: USER_UUID,
     studysetUUID: STUDYSET_UUID,
@@ -151,18 +151,28 @@ describe("toPublicStudyset", () => {
         expect(out.publishedAt).toBeNull();
     });
 
-    it("drops files without a signedURL and tolerates missing cards/files", () => {
+    it("emits a null updatedAt for records that predate it", () => {
+        const { updatedAt: _updatedAt, ...legacy } = storedItem();
+
+        expect(map(legacy).updatedAt).toBeNull();
+    });
+
+    it("drops files without a signedURL or a known side, and tolerates missing cards/files", () => {
         const item = storedItem();
         const [card] = item.cards;
-        const withUnsignedFile = {
+        const { association: _association, ...unplacedFile } = card.files[1];
+        const withUnusableFiles = {
             ...item,
             cards: [
-                { ...card, files: [{ ...card.files[0], signedURL: "" }, card.files[1]] },
+                {
+                    ...card,
+                    files: [{ ...card.files[0], signedURL: "" }, unplacedFile, card.files[1]],
+                },
                 { term: "No files", definition: "None" },
             ],
         };
 
-        expect(map(withUnsignedFile).cards).toEqual([
+        expect(map(withUnusableFiles).cards).toEqual([
             {
                 term: "Mitochondria",
                 definition: "Powerhouse of the cell",

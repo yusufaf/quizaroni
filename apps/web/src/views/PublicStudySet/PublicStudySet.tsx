@@ -23,8 +23,8 @@ import { CardFileMetadata } from 'shared/types';
 type PublicCardFiles =
     GetPublicStudysetResponse['studyset']['cards'][number]['files'];
 
-// The public payload has no storage key or filename, so key by URL and label
-// generically. `files` can be missing when an older API response fails
+// The public payload has no storage key or filename, so key by position and
+// label generically. `files` can be missing when an older API response fails
 // validation and reaches the view raw.
 const toGalleryFiles = (
     files: PublicCardFiles | undefined,
@@ -33,7 +33,12 @@ const toGalleryFiles = (
 ): CardFileMetadata[] =>
     (files ?? [])
         .filter((file) => file.association === association)
-        .map((file) => ({ ...file, key: file.signedURL, name, size: 0 }));
+        .map((file, index) => ({
+            ...file,
+            key: `${association}-${index}`,
+            name,
+            size: 0,
+        }));
 
 /**
  * Read-only, unauthenticated view of a publicly-shared study set. This is what

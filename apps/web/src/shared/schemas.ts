@@ -229,7 +229,7 @@ export const PublicStudysetSchema = z.object({
     username: z.string().nullable(),
     subject: z.string().nullable(),
     publishedAt: TimestampSchema.nullable(),
-    updatedAt: TimestampSchema,
+    updatedAt: TimestampSchema.nullable(),
     cards: z.array(PublicCardSchema),
 });
 

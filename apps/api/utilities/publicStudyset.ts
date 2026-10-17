@@ -14,7 +14,7 @@ export type PublicStudyset = {
     username: string | null;
     subject: string | null;
     publishedAt: Timestamp | null;
-    updatedAt: Timestamp;
+    updatedAt: Timestamp | null;
     cards: PublicCard[];
 };
 
@@ -36,12 +36,18 @@ export const toPublicStudyset = (item: PublicStudysetSource): PublicStudyset => 
     username: item.username || null,
     subject: item.subject ?? null,
     publishedAt: item.publishedAt ?? null,
-    updatedAt: item.updatedAt,
+    // Older records may predate `updatedAt`.
+    updatedAt: item.updatedAt ?? null,
     cards: (item.cards ?? []).map((card) => ({
         term: card.term ?? '',
         definition: card.definition ?? '',
         files: (card.files ?? [])
-            .filter((file) => !!file.signedURL)
+            .filter(
+                (file) =>
+                    !!file.signedURL &&
+                    (file.association === 'term' ||
+                        file.association === 'definition')
+            )
             .map(({ association, signedURL }) => ({ association, signedURL })),
     })),
 });

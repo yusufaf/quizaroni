@@ -128,7 +128,10 @@ describe('PublicStudySet', () => {
     });
 
     it('renders no attribution and no validation error for a null username', async () => {
-        response = () => json(200, { studyset: publicSet({ username: null }) });
+        response = () =>
+            json(200, {
+                studyset: publicSet({ username: null, updatedAt: null }),
+            });
         renderView();
 
         await screen.findByText('Cell biology');

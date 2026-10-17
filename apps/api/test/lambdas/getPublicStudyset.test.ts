@@ -22,7 +22,7 @@ const KEY = `${STUDYSET_UUID}/${USER_UUID}/photo.png`;
 const storedItem = {
     PK: `userUUID#${USER_UUID}`,
     SK: `studyset#${STUDYSET_UUID}`,
-    PK2: "public#studyset",
+    PK2: "publicStudyset",
     SK2: `studyset#${STUDYSET_UUID}`,
     userUUID: USER_UUID,
     studysetUUID: STUDYSET_UUID,
