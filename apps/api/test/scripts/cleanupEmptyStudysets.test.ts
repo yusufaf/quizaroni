@@ -67,6 +67,11 @@ describe('isEmptyStudysetStub', () => {
         expect(isEmptyStudysetStub({ ...stub, createdAt: NOW })).toBe(false);
     });
 
+    it('rejects items with a studysetUUID or title', () => {
+        expect(isEmptyStudysetStub({ ...stub, studysetUUID: 'x' })).toBe(false);
+        expect(isEmptyStudysetStub({ ...stub, title: 'Biology' })).toBe(false);
+    });
+
     it('rejects non-studyset items', () => {
         expect(isEmptyStudysetStub({ PK: 'userUUID#u1', SK: 'userData' })).toBe(false);
     });
@@ -117,10 +122,14 @@ describe('cleanupEmptyStudysets', () => {
         expect(input.Key).toEqual({ PK: stub.PK, SK: stub.SK });
         expect(input.ConditionExpression).toContain('attribute_not_exists(#cards)');
         expect(input.ConditionExpression).toContain('attribute_not_exists(#createdAt)');
+        expect(input.ConditionExpression).toContain('attribute_not_exists(#studysetUUID)');
+        expect(input.ConditionExpression).toContain('attribute_not_exists(#title)');
         expect(input.ConditionExpression).toContain('attribute_not_exists(#labels)');
         expect(input.ExpressionAttributeNames).toEqual({
             '#cards': 'cards',
             '#createdAt': 'createdAt',
+            '#studysetUUID': 'studysetUUID',
+            '#title': 'title',
             '#labels': 'labels',
         });
         expect(result.deleted).toBe(1);
@@ -219,6 +228,8 @@ describe('cleanupEmptyStudysets', () => {
             expect(cmd.input.ExpressionAttributeNames).toEqual({
                 '#cards': 'cards',
                 '#createdAt': 'createdAt',
+                '#studysetUUID': 'studysetUUID',
+                '#title': 'title',
             });
         }
         expect(result).toEqual({ matched: 2, deleted: 2, skipped: 0, labeledKept: 0 });
@@ -255,8 +266,16 @@ describe('readCleanupConfig', () => {
         });
     });
 
-    it('only treats the exact value 1 as enabled', () => {
-        expect(readCleanupConfig({ MAIN_TABLE: 't', DRY_RUN: 'true' }).dryRun).toBe(false);
+    it('treats any DRY_RUN value except 0/false as a dry run', () => {
+        for (const value of ['1', 'true', 'yes', 'TRUE']) {
+            expect(readCleanupConfig({ MAIN_TABLE: 't', DRY_RUN: value }).dryRun).toBe(true);
+        }
+        for (const value of ['0', 'false', 'FALSE', '']) {
+            expect(readCleanupConfig({ MAIN_TABLE: 't', DRY_RUN: value }).dryRun).toBe(false);
+        }
+    });
+
+    it('only treats INCLUDE_LABELED=1 as enabled', () => {
         expect(
             readCleanupConfig({ MAIN_TABLE: 't', INCLUDE_LABELED: 'true' }).includeLabeled
         ).toBe(false);

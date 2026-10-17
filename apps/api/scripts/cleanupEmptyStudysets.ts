@@ -4,7 +4,8 @@
  * `update-studyset` and the label endpoints upsert, so writing to an id that
  * isn't in the caller's library created an item holding only a few fields
  * (e.g. `lastViewed`, `updatedAt`) and no cards (#127, #146). Every real
- * create path writes `cards` and `createdAt`, so an item missing both is a stub.
+ * create path writes `cards`, `createdAt`, `studysetUUID` and `title`, so an
+ * item missing all four is a stub.
  *
  * Items with a `labels` attribute may be real sets wiped by #124, not upsert
  * stubs. The script keeps them by default and lists them as
@@ -40,15 +41,33 @@ type CleanupConfig = {
     includeLabeled: boolean;
 };
 
+// Every real set has these; upsert stubs have none of them.
+const STUB_ABSENT_ATTRIBUTES = ['cards', 'createdAt', 'studysetUUID', 'title'];
+
+const absentAttributes = (includeLabeled: boolean) =>
+    includeLabeled ? STUB_ABSENT_ATTRIBUTES : [...STUB_ABSENT_ATTRIBUTES, 'labels'];
+
+const absentCondition = (attributes: string[]) => ({
+    ConditionExpression: attributes
+        .map((name) => `attribute_not_exists(#${name})`)
+        .join(' AND '),
+    ExpressionAttributeNames: Object.fromEntries(
+        attributes.map((name) => [`#${name}`, name])
+    ),
+});
+
 export const isEmptyStudysetStub = (
     item: Record<string, unknown>,
     { includeLabeled = false }: StubOptions = {}
 ): boolean =>
     typeof item.SK === 'string' &&
     item.SK.startsWith('studyset#') &&
-    !('cards' in item) &&
-    !('createdAt' in item) &&
-    (includeLabeled || !('labels' in item));
+    absentAttributes(includeLabeled).every((name) => !(name in item));
+
+// Any DRY_RUN value other than 0/false counts, so a typo can't turn a report
+// into real deletes.
+const isDryRun = (value: string | undefined) =>
+    !!value && !['0', 'false'].includes(value.toLowerCase());
 
 export const readCleanupConfig = (env: NodeJS.ProcessEnv): CleanupConfig => {
     const tableName = env.MAIN_TABLE ?? '';
@@ -59,32 +78,10 @@ export const readCleanupConfig = (env: NodeJS.ProcessEnv): CleanupConfig => {
     }
     return {
         tableName,
-        dryRun: env.DRY_RUN === '1',
+        dryRun: isDryRun(env.DRY_RUN),
         includeLabeled: env.INCLUDE_LABELED === '1',
     };
 };
-
-const deleteGuard = (
-    includeLabeled: boolean
-): { ConditionExpression: string; ExpressionAttributeNames: Record<string, string> } =>
-    includeLabeled
-        ? {
-              ConditionExpression:
-                  'attribute_not_exists(#cards) AND attribute_not_exists(#createdAt)',
-              ExpressionAttributeNames: {
-                  '#cards': 'cards',
-                  '#createdAt': 'createdAt',
-              },
-          }
-        : {
-              ConditionExpression:
-                  'attribute_not_exists(#cards) AND attribute_not_exists(#createdAt) AND attribute_not_exists(#labels)',
-              ExpressionAttributeNames: {
-                  '#cards': 'cards',
-                  '#createdAt': 'createdAt',
-                  '#labels': 'labels',
-              },
-          };
 
 export const cleanupEmptyStudysets = async ({
     docClient,
@@ -105,19 +102,19 @@ export const cleanupEmptyStudysets = async ({
         skipped: 0,
         labeledKept: 0,
     };
+    // Labeled items are not excluded from the scan so they can be reported.
+    const scanCondition = absentCondition(absentAttributes(true));
+    const deleteCondition = absentCondition(absentAttributes(includeLabeled));
     let lastEvaluatedKey: Record<string, unknown> | undefined;
 
     do {
         const page = await docClient.send(
             new ScanCommand({
                 TableName: tableName,
-                // Labeled items are not excluded here so they can be reported.
-                FilterExpression:
-                    'begins_with(#SK, :studysetPrefix) AND attribute_not_exists(#cards) AND attribute_not_exists(#createdAt)',
+                FilterExpression: `begins_with(#SK, :studysetPrefix) AND ${scanCondition.ConditionExpression}`,
                 ExpressionAttributeNames: {
                     '#SK': 'SK',
-                    '#cards': 'cards',
-                    '#createdAt': 'createdAt',
+                    ...scanCondition.ExpressionAttributeNames,
                 },
                 ExpressionAttributeValues: { ':studysetPrefix': 'studyset#' },
                 ExclusiveStartKey: lastEvaluatedKey as never,
@@ -154,7 +151,7 @@ export const cleanupEmptyStudysets = async ({
                     new DeleteCommand({
                         TableName: tableName,
                         Key: { PK, SK },
-                        ...deleteGuard(includeLabeled),
+                        ...deleteCondition,
                     })
                 );
                 result.deleted += 1;
