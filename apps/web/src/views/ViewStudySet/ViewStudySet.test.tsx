@@ -94,13 +94,6 @@ const ownedSet = (studysetUUID: string) => ({
     uuid: studysetUUID,
 });
 
-// Sets viewSetLayout so the view-mode persist effect, which fires on mount when
-// cached metadata lacks it, stays out of these lastViewed assertions.
-const cachedSet = (studysetUUID: string) => {
-    const set = ownedSet(studysetUUID);
-    return { studyset: { ...set, metadata: { ...set.metadata, viewSetLayout: 'list' } } };
-};
-
 const json = (status: number, body: unknown) =>
     Promise.resolve(
         new Response(JSON.stringify(body), {
@@ -215,7 +208,7 @@ describe('ViewStudySet lastViewed', () => {
     it('does not trust a cached copy of a set that has since been deleted', async () => {
         getStudyset = () => json(500, { message: 'Studyset not found' });
         const { qc } = renderView((client) =>
-            client.setQueryData(['studysets', ID1], cachedSet(ID1))
+            client.setQueryData(['studysets', ID1], { studyset: ownedSet(ID1) })
         );
 
         await waitFor(() =>
@@ -228,10 +221,14 @@ describe('ViewStudySet lastViewed', () => {
     it('records lastViewed after refetching a fresh cached set', async () => {
         getStudyset = () => json(200, { studyset: ownedSet(ID1) });
         renderView((client) =>
-            client.setQueryData(['studysets', ID1], cachedSet(ID1))
+            client.setQueryData(['studysets', ID1], { studyset: ownedSet(ID1) })
         );
 
         await waitFor(() => expect(updateCalls()).toHaveLength(1));
+        expect(updateBody(0)).toEqual({
+            studysetUUID: ID1,
+            updates: { lastViewed: expect.any(String) },
+        });
         expect(callsTo('/studysets/get-studyset').length).toBeGreaterThan(0);
     });
 

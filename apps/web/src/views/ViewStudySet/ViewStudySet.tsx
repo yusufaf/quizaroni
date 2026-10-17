@@ -167,7 +167,7 @@ const ViewStudySet = (props: Props) => {
   useEffect(() => {
     if (
       viewMode &&
-      selectedStudyset?.studysetUUID &&
+      isOwnedSetLoaded &&
       selectedStudyset?.metadata?.viewSetLayout !== viewMode
     ) {
       updateMetadataField("viewSetLayout", viewMode);
