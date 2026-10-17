@@ -98,10 +98,18 @@ const ViewStudySet = (props: Props) => {
     useGetAllStudysets();
   const studysets = studysetsResponse?.studysets ?? [];
 
-  const { data: studysetResponse, isLoading: isStudySetLoading } =
-    useGetStudyset({ studysetUUID });
+  // Always refetch on mount so the lastViewed gate below never trusts a cached
+  // copy of a set that has since been deleted.
+  const {
+    data: studysetResponse,
+    isLoading: isStudySetLoading,
+    isSuccess: isStudySetSuccess,
+    isFetchedAfterMount: isStudySetFetchedAfterMount,
+  } = useGetStudyset({ studysetUUID }, { refetchOnMount: "always" });
   const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
   const isOwnedSetLoaded =
+    isStudySetSuccess &&
+    isStudySetFetchedAfterMount &&
     studysetResponse?.studyset?.studysetUUID === studysetUUID;
 
   const { mutate: updateStudySet } = useUpdateStudyset();

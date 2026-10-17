@@ -94,6 +94,13 @@ const ownedSet = (studysetUUID: string) => ({
     uuid: studysetUUID,
 });
 
+// Sets viewSetLayout so the view-mode persist effect, which fires on mount when
+// cached metadata lacks it, stays out of these lastViewed assertions.
+const cachedSet = (studysetUUID: string) => {
+    const set = ownedSet(studysetUUID);
+    return { studyset: { ...set, metadata: { ...set.metadata, viewSetLayout: 'list' } } };
+};
+
 const json = (status: number, body: unknown) =>
     Promise.resolve(
         new Response(JSON.stringify(body), {
@@ -130,10 +137,12 @@ const updateCalls = () => callsTo('/studysets/update-studyset');
 const updateBody = (index: number) =>
     JSON.parse(String(updateCalls()[index]?.[1]?.body));
 
-const renderView = () => {
+// staleTime mirrors state/queryClient.ts so cached data behaves as in the app.
+const renderView = (seed?: (qc: QueryClient) => void) => {
     const qc = new QueryClient({
-        defaultOptions: { queries: { retry: false } },
+        defaultOptions: { queries: { retry: false, staleTime: 1000 * 60 * 5 } },
     });
+    seed?.(qc);
     const tree = () => (
         <ThemeProvider theme={muiTheme}>
             <QueryClientProvider client={qc}>
@@ -201,6 +210,29 @@ describe('ViewStudySet lastViewed', () => {
         });
         await waitFor(() => expect(callsTo('/studysets/get-studyset')).toHaveLength(2));
         expect(updateCalls()).toHaveLength(1);
+    });
+
+    it('does not trust a cached copy of a set that has since been deleted', async () => {
+        getStudyset = () => json(500, { message: 'Studyset not found' });
+        const { qc } = renderView((client) =>
+            client.setQueryData(['studysets', ID1], cachedSet(ID1))
+        );
+
+        await waitFor(() =>
+            expect(qc.getQueryState(['studysets', ID1])?.status).toBe('error')
+        );
+        expect(qc.getMutationCache().getAll()).toHaveLength(0);
+        expect(updateCalls()).toHaveLength(0);
+    });
+
+    it('records lastViewed after refetching a fresh cached set', async () => {
+        getStudyset = () => json(200, { studyset: ownedSet(ID1) });
+        renderView((client) =>
+            client.setQueryData(['studysets', ID1], cachedSet(ID1))
+        );
+
+        await waitFor(() => expect(updateCalls()).toHaveLength(1));
+        expect(callsTo('/studysets/get-studyset').length).toBeGreaterThan(0);
     });
 
     it('records lastViewed again when the route switches to another owned set', async () => {
