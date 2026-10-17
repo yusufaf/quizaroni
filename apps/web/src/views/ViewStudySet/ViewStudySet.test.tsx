@@ -128,7 +128,7 @@ const callsTo = (suffix: string) =>
     fetchMock.mock.calls.filter(([input]) => String(input).endsWith(suffix));
 const updateCalls = () => callsTo('/studysets/update-studyset');
 const updateBody = (index: number) =>
-    JSON.parse(String(updateCalls()[index][1]?.body));
+    JSON.parse(String(updateCalls()[index]?.[1]?.body));
 
 const renderView = () => {
     const qc = new QueryClient({
