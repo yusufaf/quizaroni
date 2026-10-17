@@ -72,6 +72,13 @@ import {
     BatchDuplicateStudysetsRequest,
 } from 'shared/types';
 
+// The list can include stub rows an upsert left behind with no cards or id (#127, #146).
+export const isCompleteStudyset = (item: unknown): item is Studyset =>
+    typeof item === 'object' &&
+    item !== null &&
+    typeof (item as Studyset).studysetUUID === 'string' &&
+    Array.isArray((item as Studyset).cards);
+
 // Queries
 export const useGetAllStudysets = (
     options?: Omit<
@@ -88,12 +95,18 @@ export const useGetAllStudysets = (
                     ...(await getCommonPostRequestProps()),
                 }
             );
-            return validate({
+            const validated = validate({
                 schema: GetAllStudysetsResponseSchema,
                 data,
                 type: 'response',
                 context: 'GetAllStudysets',
             });
+            return {
+                ...validated,
+                studysets: (validated?.studysets ?? []).filter(
+                    isCompleteStudyset
+                ),
+            };
         },
         ...options,
     });
