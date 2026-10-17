@@ -101,12 +101,14 @@ const ViewStudySet = (props: Props) => {
   const { data: studysetResponse, isLoading: isStudySetLoading } =
     useGetStudyset({ studysetUUID });
   const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
+  const isOwnedSetLoaded =
+    studysetResponse?.studyset?.studysetUUID === studysetUUID;
 
   const { mutate: updateStudySet } = useUpdateStudyset();
 
   useBrowserTitle(selectedStudyset?.title ?? "");
 
-  const updatedViewTimestamp = useRef<boolean>(false);
+  const lastViewedRecordedFor = useRef<string | null>(null);
   const studyModeIconStyle = {
     fontSize: "5rem",
   };
@@ -123,18 +125,17 @@ const ViewStudySet = (props: Props) => {
     selectedStudyset?.metadata?.viewSetLayout ?? VIEWSET_LAYOUTS.LIST,
   );
 
+  // The owner fetch only returns sets in the caller's library; an update for
+  // any other id upserts an empty stub into it (#127).
   useEffect(() => {
-    if (!updatedViewTimestamp.current && studysetUUID) {
-      const updates = {
-        lastViewed: new Date().toISOString(),
-      };
-      updateStudySet({
-        studysetUUID,
-        updates,
-      });
-      updatedViewTimestamp.current = true;
-    }
-  }, [studysetUUID]);
+    if (!studysetUUID || !isOwnedSetLoaded) return;
+    if (lastViewedRecordedFor.current === studysetUUID) return;
+    updateStudySet({
+      studysetUUID,
+      updates: { lastViewed: new Date().toISOString() },
+    });
+    lastViewedRecordedFor.current = studysetUUID;
+  }, [studysetUUID, isOwnedSetLoaded]);
 
   // Sync drawer initial state from metadata. On narrow screens the drawer is a
   // temporary overlay, so keep it closed on load instead of covering the page.
