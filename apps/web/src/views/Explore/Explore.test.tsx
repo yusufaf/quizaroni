@@ -18,6 +18,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createLightTheme } from 'shared/theme/themes';
 import Explore from './Explore';
+import { FOR_YOU_CAP, FOR_YOU_MAX_TILES } from './forYou';
 
 const OWNER = '33333333-3333-4333-8333-333333333333';
 const OLDER_ID = '11111111-1111-4111-8111-111111111111';
@@ -192,9 +193,11 @@ describe('Explore', () => {
 
         const list = screen.getByRole('list', { hidden: true });
         expect(list.getAttribute('aria-busy')).toBe('true');
-        // Capped at the jump-back-in limit, the most tiles that can load.
+        // Capped at the most tiles the sources can produce.
         const items = list.querySelectorAll('li');
-        expect(items).toHaveLength(3);
+        expect(items).toHaveLength(
+            Math.min(FOR_YOU_CAP.default, FOR_YOU_MAX_TILES)
+        );
         items.forEach((item) =>
             expect(item.getAttribute('aria-hidden')).toBe('true')
         );
@@ -241,6 +244,8 @@ describe('Explore', () => {
             name: 'forYou.retry',
         });
         expect(retry.className).toContain('MuiButton-contained');
+        const status = screen.getByRole('status');
+        expect(status.textContent).toBe('');
 
         const callsBefore = fetchMock.mock.calls.length;
         fireEvent.click(retry);
@@ -250,7 +255,9 @@ describe('Explore', () => {
         // With no data yet, a refetch resets the query to pending, so the
         // skeletons replace the error while it runs.
         expect(screen.queryByRole('alert')).toBeNull();
-        expect(screen.getByRole('status').textContent).toBe('forYou.loading');
+        // Same live region, new text, so screen readers announce it.
+        expect(screen.getByRole('status')).toBe(status);
+        expect(status.textContent).toBe('forYou.loading');
     });
 
     it('disables the hover lift and entry animation for reduced motion', async () => {

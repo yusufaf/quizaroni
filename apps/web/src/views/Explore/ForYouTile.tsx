@@ -24,7 +24,7 @@ const ForYouTile = ({ tile, index }: Props) => {
     const labelKey = KIND_LABEL_KEYS[tile.kind];
     // The list isn't schema-checked strictly, so don't trust the text fields.
     const name = typeof title === 'string' ? title.trim() : '';
-    const blurb = typeof description === 'string' ? description : '';
+    const blurb = typeof description === 'string' ? description.trim() : '';
 
     return (
         <TileArticle style={{ animationDelay: `${index * 50}ms` }}>
