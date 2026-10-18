@@ -192,37 +192,35 @@ describe('Explore', () => {
 
         const list = screen.getByRole('list', { hidden: true });
         expect(list.getAttribute('aria-busy')).toBe('true');
+        // Capped at the jump-back-in limit, the most tiles that can load.
         const items = list.querySelectorAll('li');
-        expect(items).toHaveLength(6);
+        expect(items).toHaveLength(3);
         items.forEach((item) =>
             expect(item.getAttribute('aria-hidden')).toBe('true')
         );
         expect(screen.queryByRole('article')).toBeNull();
+        expect(screen.getByRole('status').textContent).toBe('forYou.loading');
     });
 
-    it('shows 3 skeletons on extra-small screens', () => {
-        vi.stubGlobal(
-            'matchMedia',
-            vi.fn((query: string) => ({
-                matches: query.includes('max-width'),
-                media: query,
-                onchange: null,
-                addListener: vi.fn(),
-                removeListener: vi.fn(),
-                addEventListener: vi.fn(),
-                removeEventListener: vi.fn(),
-                dispatchEvent: vi.fn(),
-            }))
+    it('falls back to the untitled label for a blank title', async () => {
+        fetchMock.mockImplementation(() =>
+            json(200, {
+                studysets: [
+                    makeSet(NEWER_ID, '   ', '2026-10-01T00:00:00.000Z'),
+                ],
+            })
         );
-        fetchMock.mockImplementation(() => new Promise<Response>(() => {}));
         renderExplore();
 
-        const list = screen.getByRole('list', { hidden: true });
-        expect(list.querySelectorAll('li')).toHaveLength(3);
+        const [article] = await screen.findAllByRole('article');
+        expect(within(article!).getByRole('link').textContent).toBe(
+            'tile.untitled'
+        );
     });
 
     it('shows a retry when loading fails', async () => {
-        fetchMock.mockImplementation(() => json(500, { message: 'boom' }));
+        fetchMock.mockImplementationOnce(() => json(500, { message: 'boom' }));
+        fetchMock.mockImplementation(() => new Promise<Response>(() => {}));
         renderExplore();
 
         const alert = await screen.findByRole('alert');
@@ -238,6 +236,10 @@ describe('Explore', () => {
         await waitFor(() =>
             expect(fetchMock.mock.calls.length).toBeGreaterThan(callsBefore)
         );
+        // With no data yet, a refetch resets the query to pending, so the
+        // skeletons replace the error while it runs.
+        expect(screen.queryByRole('alert')).toBeNull();
+        expect(screen.getByRole('status').textContent).toBe('forYou.loading');
     });
 
     it('disables the hover lift and entry animation for reduced motion', async () => {

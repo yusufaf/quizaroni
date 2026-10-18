@@ -3,7 +3,7 @@ import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ForYouTileData } from './forYou';
 import ForYouTile from './ForYouTile';
-import { ForYouGrid, ForYouItem } from './ExploreStyles';
+import { ForYouGrid, ForYouItem, VisuallyHidden } from './ExploreStyles';
 
 type Props = {
     tiles: ForYouTileData[];
@@ -45,22 +45,29 @@ const ForYouSection = ({
         }
         if (isLoading) {
             return (
-                <ForYouGrid aria-busy="true">
-                    {Array.from({ length: skeletonCount }, (_, i) => (
-                        <ForYouItem key={i} aria-hidden="true">
-                            <Skeleton
-                                variant="rectangular"
-                                height="100%"
-                                sx={{
-                                    borderRadius: '0.75rem',
-                                    '@media (prefers-reduced-motion: reduce)': {
-                                        animation: 'none',
-                                    },
-                                }}
-                            />
-                        </ForYouItem>
-                    ))}
-                </ForYouGrid>
+                <>
+                    {/* The skeletons are hidden from assistive tech, so say it here. */}
+                    <VisuallyHidden role="status">
+                        {t('forYou.loading')}
+                    </VisuallyHidden>
+                    <ForYouGrid aria-busy="true">
+                        {Array.from({ length: skeletonCount }, (_, i) => (
+                            <ForYouItem key={i} aria-hidden="true">
+                                <Skeleton
+                                    variant="rectangular"
+                                    height="100%"
+                                    sx={{
+                                        borderRadius: '0.75rem',
+                                        '@media (prefers-reduced-motion: reduce)':
+                                            {
+                                                animation: 'none',
+                                            },
+                                    }}
+                                />
+                            </ForYouItem>
+                        ))}
+                    </ForYouGrid>
+                </>
             );
         }
         return (

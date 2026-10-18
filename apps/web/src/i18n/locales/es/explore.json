@@ -2,6 +2,7 @@
     "title": "Explorar",
     "forYou": {
         "heading": "Para ti",
+        "loading": "Cargando tus sets…",
         "error": "No pudimos cargar tus sets.",
         "retry": "Reintentar"
     },

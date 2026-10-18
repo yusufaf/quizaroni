@@ -36,6 +36,18 @@ export const ForYouGrid = styled('ul')(({ theme }) => ({
     gap: '1rem',
 }));
 
+export const VisuallyHidden = styled('span')({
+    position: 'absolute',
+    width: 1,
+    height: 1,
+    padding: 0,
+    margin: -1,
+    overflow: 'hidden',
+    clip: 'rect(0 0 0 0)',
+    whiteSpace: 'nowrap',
+    border: 0,
+});
+
 export const ForYouItem = styled('li')({
     minWidth: 0,
 });

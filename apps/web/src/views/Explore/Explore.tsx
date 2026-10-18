@@ -14,6 +14,7 @@ import { useGetAllStudysets } from 'state/api/studysetsAPI';
 import { HomeContainer, HomePage, HomePaper } from 'views/Home/HomeStyles';
 import {
     FOR_YOU_CAP,
+    JUMP_BACK_IN_LIMIT,
     composeForYou,
     hasCompleteStudysets,
     selectJumpBackIn,
@@ -27,6 +28,9 @@ const Explore = () => {
     const theme = useTheme();
     const isXs = useMediaQuery(theme.breakpoints.down('sm'), { noSsr: true });
     const cap = isXs ? FOR_YOU_CAP.xs : FOR_YOU_CAP.default;
+    // Jump back in is the only source so far, so more skeletons than its
+    // limit would shrink into fewer tiles on load.
+    const skeletonCount = Math.min(cap, JUMP_BACK_IN_LIMIT);
 
     // Branch on `data`, not `isLoading`: a query paused offline isn't loading
     // and has no data, and must not read as "no sets".
@@ -50,7 +54,7 @@ const Explore = () => {
                     tiles={[]}
                     isLoading={!isError}
                     isError={isError}
-                    skeletonCount={cap}
+                    skeletonCount={skeletonCount}
                     onRetry={() => void refetch()}
                 />
             );
@@ -89,7 +93,7 @@ const Explore = () => {
                     tiles={tiles}
                     isLoading={false}
                     isError={false}
-                    skeletonCount={cap}
+                    skeletonCount={skeletonCount}
                     onRetry={() => void refetch()}
                 />
             )
