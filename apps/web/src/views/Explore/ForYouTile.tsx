@@ -22,8 +22,9 @@ const ForYouTile = ({ tile, index }: Props) => {
     const { t } = useTranslation('explore');
     const { studysetUUID, title, description, cards } = tile.studyset;
     const labelKey = KIND_LABEL_KEYS[tile.kind];
-    // The list isn't schema-checked strictly, so don't trust title's type.
+    // The list isn't schema-checked strictly, so don't trust the text fields.
     const name = typeof title === 'string' ? title.trim() : '';
+    const blurb = typeof description === 'string' ? description : '';
 
     return (
         <TileArticle style={{ animationDelay: `${index * 50}ms` }}>
@@ -33,7 +34,7 @@ const ForYouTile = ({ tile, index }: Props) => {
                     {name || t('tile.untitled')}
                 </TileLink>
             </TileTitle>
-            {description && <TileDescription>{description}</TileDescription>}
+            {blurb && <TileDescription>{blurb}</TileDescription>}
             <TileMeta>{t('tile.cardCount', { count: cards.length })}</TileMeta>
         </TileArticle>
     );

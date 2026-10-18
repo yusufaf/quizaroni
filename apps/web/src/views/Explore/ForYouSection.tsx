@@ -45,29 +45,22 @@ const ForYouSection = ({
         }
         if (isLoading) {
             return (
-                <>
-                    {/* The skeletons are hidden from assistive tech, so say it here. */}
-                    <VisuallyHidden role="status">
-                        {t('forYou.loading')}
-                    </VisuallyHidden>
-                    <ForYouGrid aria-busy="true">
-                        {Array.from({ length: skeletonCount }, (_, i) => (
-                            <ForYouItem key={i} aria-hidden="true">
-                                <Skeleton
-                                    variant="rectangular"
-                                    height="100%"
-                                    sx={{
-                                        borderRadius: '0.75rem',
-                                        '@media (prefers-reduced-motion: reduce)':
-                                            {
-                                                animation: 'none',
-                                            },
-                                    }}
-                                />
-                            </ForYouItem>
-                        ))}
-                    </ForYouGrid>
-                </>
+                <ForYouGrid aria-busy="true">
+                    {Array.from({ length: skeletonCount }, (_, i) => (
+                        <ForYouItem key={i} aria-hidden="true">
+                            <Skeleton
+                                variant="rectangular"
+                                height="100%"
+                                sx={{
+                                    borderRadius: '0.75rem',
+                                    '@media (prefers-reduced-motion: reduce)': {
+                                        animation: 'none',
+                                    },
+                                }}
+                            />
+                        </ForYouItem>
+                    ))}
+                </ForYouGrid>
             );
         }
         return (
@@ -91,6 +84,11 @@ const ForYouSection = ({
             >
                 {t('forYou.heading')}
             </Typography>
+            {/* Mounted for the section's whole life so screen readers notice
+                the text change; the skeletons themselves are aria-hidden. */}
+            <VisuallyHidden role="status">
+                {isLoading ? t('forYou.loading') : ''}
+            </VisuallyHidden>
             {renderBody()}
         </section>
     );

@@ -219,8 +219,19 @@ describe('Explore', () => {
     });
 
     it('shows a retry when loading fails', async () => {
-        fetchMock.mockImplementationOnce(() => json(500, { message: 'boom' }));
-        fetchMock.mockImplementation(() => new Promise<Response>(() => {}));
+        // The first studysets request fails; the retry hangs so its loading
+        // state can be checked.
+        let studysetCalls = 0;
+        fetchMock.mockImplementation((input: RequestInfo | URL) => {
+            const url = input instanceof Request ? input.url : input.toString();
+            if (!url.endsWith('/studysets/get-all-studysets')) {
+                return json(404, { message: 'not found' });
+            }
+            studysetCalls += 1;
+            return studysetCalls === 1
+                ? json(500, { message: 'boom' })
+                : new Promise<Response>(() => {});
+        });
         renderExplore();
 
         const alert = await screen.findByRole('alert');

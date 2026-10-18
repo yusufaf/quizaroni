@@ -15,6 +15,10 @@ export const FOR_YOU_CAP = { default: 6, xs: 3 } as const;
 // Leaves room for favorite and revisit tiles, which rank below jump back in.
 export const JUMP_BACK_IN_LIMIT = 3;
 
+// The most tiles the current sources can produce. Raise it when a source is
+// added, so loading skeletons match what loads.
+export const FOR_YOU_MAX_TILES = JUMP_BACK_IN_LIMIT;
+
 export type ForYouTileData = { kind: ForYouKind; studyset: Studyset };
 
 export type ForYouSources = Partial<Record<ForYouKind, readonly Studyset[]>>;
