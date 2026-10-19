@@ -53,7 +53,7 @@ describe('buildTermPreviews', () => {
 
     it('leaves text of exactly maxChars alone', () => {
         const cards = [{ term: 'abcde', definition: '' }];
-        expect(buildTermPreviews(cards, 1, 5)[0].term).toBe('abcde');
+        expect(buildTermPreviews(cards, 1, 5)[0]!.term).toBe('abcde');
     });
 
     it('truncates longer text to maxChars including the ellipsis', () => {
@@ -65,12 +65,12 @@ describe('buildTermPreviews', () => {
 
     it('trims a trailing space before the ellipsis', () => {
         const cards = [{ term: 'abc defgh', definition: '' }];
-        expect(buildTermPreviews(cards, 1, 5)[0].term).toBe('abc…');
+        expect(buildTermPreviews(cards, 1, 5)[0]!.term).toBe('abc…');
     });
 
     it("doesn't split surrogate pairs", () => {
         const cards = [{ term: '😀😀😀', definition: '' }];
-        expect(buildTermPreviews(cards, 1, 2)[0].term).toBe('😀…');
+        expect(buildTermPreviews(cards, 1, 2)[0]!.term).toBe('😀…');
     });
 
     it('skips malformed entries without throwing', () => {
