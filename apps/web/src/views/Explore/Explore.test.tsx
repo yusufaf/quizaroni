@@ -153,6 +153,7 @@ const favoriteSet = () =>
 
 const staleSet = () =>
     makeSet(OLD_ID, 'Stale Set', isoDaysAgo(40), {
+        description: 'Cell biology basics',
         cards: [
             {
                 cardUUID: 'c0',
@@ -577,6 +578,8 @@ describe('Explore', () => {
             'Mitochondria — Powerhouse of the cell',
             'Ribosome',
         ]);
+        // Previews take the description's place in the fixed-height tile.
+        expect(revisit.textContent).not.toContain('Cell biology basics');
         expect(lastStudiedSpy).toHaveBeenCalled();
     });
 
@@ -684,6 +687,7 @@ describe('Explore', () => {
         renderExplore();
 
         const articles = await screen.findAllByRole('article');
+        expect(articles).toHaveLength(4);
         const revisit = articles[3]!;
         expect(revisit.textContent).toContain('tile.revisit');
         expect(

@@ -22,8 +22,9 @@ export const JUMP_BACK_IN_LIMIT = 3;
 // favorite already shown under jump back in doesn't use up a slot.
 export const FAVORITE_LIMIT = 2;
 
-// Jump back in is limited by its selector instead: it's the first set kind,
-// so the each-set-once rule never skips its sets and both ways count the same.
+// Jump back in is limited by its selector instead, before the each-set-once
+// rule. As the first set kind it only loses a slot to a set listed twice in
+// the library.
 export const FOR_YOU_KIND_LIMIT: Partial<Record<SetTileKind, number>> = {
     favorite: FAVORITE_LIMIT,
 };
