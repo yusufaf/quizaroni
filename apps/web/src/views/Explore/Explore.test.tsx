@@ -427,8 +427,9 @@ describe('Explore', () => {
         );
     });
 
-    it('still shows jump back in when the due lookup fails', async () => {
-        dueSpy.mockRejectedValue(new Error('IndexedDB unavailable'));
+    it('still shows jump back in when the due lookup fails, and logs why', async () => {
+        const failure = new Error('IndexedDB unavailable');
+        dueSpy.mockRejectedValue(failure);
         renderExplore();
 
         const articles = await screen.findAllByRole('article');
@@ -436,6 +437,10 @@ describe('Explore', () => {
         expect(screen.queryByText('tile.due.eyebrow')).toBeNull();
         expect(screen.getByRole('list').getAttribute('aria-busy')).toBe(
             'false'
+        );
+        expect(console.error).toHaveBeenCalledWith(
+            'Failed to count due cards:',
+            failure
         );
     });
 

@@ -15,7 +15,10 @@ export function useDueCountsBySet(
         let cancelled = false;
         void cardProgressRepository
             .getDueCountsBySet(studysets, new Date())
-            .catch(() => new Map<string, number>())
+            .catch((error: unknown) => {
+                console.error('Failed to count due cards:', error);
+                return new Map<string, number>();
+            })
             .then((result) => {
                 if (!cancelled) setCounts(result);
             });
