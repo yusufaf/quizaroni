@@ -228,9 +228,9 @@ describe('Explore', () => {
 
         const list = screen.getByRole('list', { hidden: true });
         expect(list.getAttribute('aria-busy')).toBe('true');
-        // At most 5 tiles can load: due, streak and 3 jump back in.
+        // Revisit fills what the other sources leave, so a full grid can load.
         const items = list.querySelectorAll('li');
-        expect(items).toHaveLength(5);
+        expect(items).toHaveLength(6);
         items.forEach((item) =>
             expect(item.getAttribute('aria-hidden')).toBe('true')
         );
