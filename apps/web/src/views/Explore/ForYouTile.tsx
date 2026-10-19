@@ -119,22 +119,29 @@ const ForYouTile = ({ tile, index }: Props) => {
     // The list isn't schema-checked strictly, so don't trust the text fields.
     const name = typeof title === 'string' ? title.trim() : '';
     const blurb = typeof description === 'string' ? description.trim() : '';
-    const isRevisit = tile.kind === 'revisit';
-    const previews = isRevisit
-        ? buildTermPreviews(cards, REVISIT_PREVIEW_COUNT, REVISIT_PREVIEW_CHARS)
-        : [];
+    // Previews replace the description, and need the title kept to one line
+    // to fit. A set with no text terms keeps the usual layout.
+    const previews =
+        tile.kind === 'revisit'
+            ? buildTermPreviews(
+                  cards,
+                  REVISIT_PREVIEW_COUNT,
+                  REVISIT_PREVIEW_CHARS
+              )
+            : [];
+    const hasPreviews = previews.length > 0;
 
     return (
         <TileArticle interactive style={{ animationDelay: delay }}>
             {labelKey && <TileEyebrow>{t(labelKey)}</TileEyebrow>}
-            <TileTitle lines={isRevisit ? 1 : 2}>
+            <TileTitle lines={hasPreviews ? 1 : 2}>
                 <TileLink to={`/view/${studysetUUID}`}>
                     {name || t('tile.untitled')}
                 </TileLink>
             </TileTitle>
             {/* role="list": WebKit drops list semantics, and with them the
                 label, from a ul with list-style: none. */}
-            {previews.length > 0 && (
+            {hasPreviews && (
                 <TilePreviewList role="list" aria-label={t('tile.previews')}>
                     {previews.map(({ term, definition }, i) => (
                         <TilePreviewItem key={i}>
@@ -144,7 +151,9 @@ const ForYouTile = ({ tile, index }: Props) => {
                     ))}
                 </TilePreviewList>
             )}
-            {!isRevisit && blurb && <TileDescription>{blurb}</TileDescription>}
+            {!hasPreviews && blurb && (
+                <TileDescription>{blurb}</TileDescription>
+            )}
             <TileMeta>{t('tile.cardCount', { count: cards.length })}</TileMeta>
         </TileArticle>
     );

@@ -664,6 +664,40 @@ describe('Explore', () => {
         expect(await screen.findAllByRole('article')).toHaveLength(3);
     });
 
+    it('falls back to the description on a revisit tile with no text terms', async () => {
+        fetchMock.mockImplementation(() =>
+            withLibrary(
+                ...recent(),
+                makeSet(OLD_ID, 'Stale Set', isoDaysAgo(40), {
+                    description: 'Diagrams only',
+                    cards: [
+                        {
+                            cardUUID: 'c0',
+                            term: '',
+                            definition: '',
+                            files: [{ fileUUID: 'f0', association: 'term' }],
+                        },
+                    ],
+                })
+            )
+        );
+        renderExplore();
+
+        const articles = await screen.findAllByRole('article');
+        const revisit = articles[3]!;
+        expect(revisit.textContent).toContain('tile.revisit');
+        expect(
+            within(revisit).queryByRole('list', { name: 'tile.previews' })
+        ).toBeNull();
+        expect(revisit.textContent).toContain('Diagrams only');
+        const heading = within(revisit).getByRole('heading', { level: 3 });
+        expect(allStyles()).toMatch(
+            new RegExp(
+                `\\.${cssClass(heading)} ?\\{[^}]*-webkit-line-clamp: ?2`
+            )
+        );
+    });
+
     it('leaves out revisit tiles when the study-history lookup fails, and logs why', async () => {
         const failure = new Error('IndexedDB unavailable');
         lastStudiedSpy.mockRejectedValue(failure);
