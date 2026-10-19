@@ -18,7 +18,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createLightTheme } from 'shared/theme/themes';
 import Explore from './Explore';
-import { FOR_YOU_CAP, FOR_YOU_MAX_TILES } from './forYou';
 
 const OWNER = '33333333-3333-4333-8333-333333333333';
 const OLDER_ID = '11111111-1111-4111-8111-111111111111';
@@ -193,11 +192,9 @@ describe('Explore', () => {
 
         const list = screen.getByRole('list', { hidden: true });
         expect(list.getAttribute('aria-busy')).toBe('true');
-        // Capped at the most tiles the sources can produce.
+        // Jump back in is the only source, so at most 3 tiles can load.
         const items = list.querySelectorAll('li');
-        expect(items).toHaveLength(
-            Math.min(FOR_YOU_CAP.default, FOR_YOU_MAX_TILES)
-        );
+        expect(items).toHaveLength(3);
         items.forEach((item) =>
             expect(item.getAttribute('aria-hidden')).toBe('true')
         );
@@ -219,6 +216,28 @@ describe('Explore', () => {
         expect(within(article!).getByRole('link').textContent).toBe(
             'tile.untitled'
         );
+    });
+
+    it('leaves out the description when it is only whitespace', async () => {
+        fetchMock.mockImplementation(() =>
+            json(200, {
+                studysets: [
+                    {
+                        ...makeSet(
+                            NEWER_ID,
+                            'Biology',
+                            '2026-10-01T00:00:00.000Z'
+                        ),
+                        description: '  \n ',
+                    },
+                ],
+            })
+        );
+        renderExplore();
+
+        const [article] = await screen.findAllByRole('article');
+        // Eyebrow and card count only.
+        expect(article!.querySelectorAll('p')).toHaveLength(2);
     });
 
     it('shows a retry when loading fails', async () => {
