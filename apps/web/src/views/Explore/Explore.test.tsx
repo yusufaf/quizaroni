@@ -192,9 +192,9 @@ describe('Explore', () => {
 
         const list = screen.getByRole('list', { hidden: true });
         expect(list.getAttribute('aria-busy')).toBe('true');
-        // Jump back in is the only source, so at most 3 tiles can load.
+        // At most 5 tiles can load: due, streak and 3 jump back in.
         const items = list.querySelectorAll('li');
-        expect(items).toHaveLength(3);
+        expect(items).toHaveLength(5);
         items.forEach((item) =>
             expect(item.getAttribute('aria-hidden')).toBe('true')
         );

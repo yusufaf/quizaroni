@@ -20,6 +20,8 @@ type Props = {
 
 const ForYouTile = ({ tile, index }: Props) => {
     const { t } = useTranslation('explore');
+    // Due and streak tiles render in a later slice.
+    if (tile.kind === 'due' || tile.kind === 'streak') return null;
     const { studysetUUID, title, description, cards } = tile.studyset;
     const labelKey = KIND_LABEL_KEYS[tile.kind];
     // The list isn't schema-checked strictly, so don't trust the text fields.
