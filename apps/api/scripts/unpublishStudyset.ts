@@ -12,10 +12,8 @@
  * The set is always looked up on the public index by STUDYSET_UUID. For a set
  * that isn't published, pass its owner as USER_UUID to hide it anyway; for a
  * published set, USER_UUID must match the owner on the index.
- *
- * Duplicates made before #125 can sit on the index under this set's key and
- * would keep serving its public link. The takedown removes their PK2/SK2 too
- * (only while SK2 still points at this set) and changes nothing else on them.
+ * Duplicates made before #125 can sit on the index under this set's key; the
+ * public read paths never serve them (`isOwnIndexRow`), so they are ignored.
  *
  * Usage (with AWS credentials for the target account in the environment):
  *   MAIN_TABLE=quizaroni-<deploymentType>-main AWS_REGION=us-west-2 \
@@ -30,6 +28,7 @@ import {
     UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
 import {
+    isOwnIndexRow,
     PUBLIC_GSI_INDEX_NAME,
     PUBLIC_STUDYSET_PK,
     publicStudysetSK,
@@ -66,13 +65,7 @@ export const readTakedownConfig = (env: NodeJS.ProcessEnv): TakedownConfig => {
     };
 };
 
-export type TakedownTargets = {
-    key: StudysetKey;
-    // Other rows under this set's SK2: pre-#125 copies serving its public link.
-    inheritedCopies: StudysetKey[];
-};
-
-export const findTakedownTargets = async ({
+export const findStudysetKey = async ({
     docClient,
     tableName,
     studysetUUID,
@@ -82,9 +75,8 @@ export const findTakedownTargets = async ({
     tableName: string;
     studysetUUID: string;
     userUUID?: string;
-}): Promise<TakedownTargets> => {
-    const ownSK = `studyset#${studysetUUID}`;
-    const rows: StudysetKey[] = [];
+}): Promise<StudysetKey> => {
+    const rows: Record<string, unknown>[] = [];
     let lastEvaluatedKey: Record<string, unknown> | undefined;
     do {
         const page = await docClient.send(
@@ -96,19 +88,15 @@ export const findTakedownTargets = async ({
                     ':pk2': PUBLIC_STUDYSET_PK,
                     ':sk2': publicStudysetSK(studysetUUID),
                 },
-                ProjectionExpression: 'PK, SK',
+                ProjectionExpression: 'PK, SK, SK2',
                 ExclusiveStartKey: lastEvaluatedKey as never,
             })
         );
-        rows.push(...((page.Items ?? []) as StudysetKey[]));
+        rows.push(...(page.Items ?? []));
         lastEvaluatedKey = page.LastEvaluatedKey as Record<string, unknown> | undefined;
     } while (lastEvaluatedKey);
 
-    const own = rows.find((row) => row.SK === ownSK);
-    const inheritedCopies = rows
-        .filter((row) => row.SK !== ownSK)
-        .map(({ PK, SK }) => ({ PK, SK }));
-
+    const own = rows.find(isOwnIndexRow) as StudysetKey | undefined;
     if (userUUID) {
         const PK = `userUUID#${userUUID}`;
         if (own && own.PK !== PK) {
@@ -116,21 +104,20 @@ export const findTakedownTargets = async ({
                 `Study set ${studysetUUID} is on the public index under ${own.PK}, not ${PK}; fix USER_UUID or leave it out`
             );
         }
-        return { key: { PK, SK: ownSK }, inheritedCopies };
+        return { PK, SK: `studyset#${studysetUUID}` };
     }
     if (!own) {
         throw new Error(
             `Study set ${studysetUUID} is not on the public index; pass USER_UUID to hide it anyway`
         );
     }
-    return { key: { PK: own.PK, SK: own.SK }, inheritedCopies };
+    return { PK: own.PK, SK: own.SK };
 };
 
 export const takedownStudyset = async ({
     docClient,
     tableName,
-    studysetUUID,
-    targets: { key, inheritedCopies },
+    key,
     reason,
     now,
     dryRun,
@@ -138,27 +125,19 @@ export const takedownStudyset = async ({
 }: {
     docClient: DynamoDBDocumentClient;
     tableName: string;
-    studysetUUID: string;
-    targets: TakedownTargets;
+    key: StudysetKey;
     reason?: string;
     now: string;
     dryRun: boolean;
     log?: (message: string) => void;
-}): Promise<{ updated: boolean; copiesCleared: number }> => {
+}): Promise<{ updated: boolean }> => {
     log(
         `${dryRun ? '[dry-run] would hide' : 'hiding'} ${key.PK} ${key.SK}${
             reason ? ` (reason: ${reason})` : ''
         }`
     );
-    if (inheritedCopies.length > 0) {
-        log(
-            `${dryRun ? '[dry-run] would remove' : 'removing'} the public index key from ${
-                inheritedCopies.length
-            } pre-#125 cop${inheritedCopies.length === 1 ? 'y' : 'ies'}`
-        );
-    }
     if (dryRun) {
-        return { updated: false, copiesCleared: 0 };
+        return { updated: false };
     }
 
     await docClient.send(
@@ -181,29 +160,7 @@ export const takedownStudyset = async ({
             },
         })
     );
-
-    let copiesCleared = 0;
-    for (const copy of inheritedCopies) {
-        try {
-            // Index keys only, and only while the copy still points at this set.
-            await docClient.send(
-                new UpdateCommand({
-                    TableName: tableName,
-                    Key: copy,
-                    UpdateExpression: 'REMOVE #PK2, #SK2',
-                    ConditionExpression: '#SK2 = :sk2',
-                    ExpressionAttributeNames: { '#PK2': 'PK2', '#SK2': 'SK2' },
-                    ExpressionAttributeValues: { ':sk2': publicStudysetSK(studysetUUID) },
-                })
-            );
-            copiesCleared += 1;
-        } catch (error) {
-            if ((error as Error)?.name !== 'ConditionalCheckFailedException') {
-                throw error;
-            }
-        }
-    }
-    return { updated: true, copiesCleared };
+    return { updated: true };
 };
 
 if (require.main === module) {
@@ -217,22 +174,20 @@ if (require.main === module) {
 
     const docClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-    findTakedownTargets({ docClient, ...config })
-        .then((targets) =>
+    findStudysetKey({ docClient, ...config })
+        .then((key) =>
             takedownStudyset({
                 docClient,
                 tableName: config.tableName,
-                studysetUUID: config.studysetUUID,
-                targets,
+                key,
                 reason: config.reason,
                 now: new Date().toISOString(),
                 dryRun: config.dryRun,
             })
         )
-        .then(({ updated, copiesCleared }) => {
+        .then(({ updated }) => {
             console.log(
-                `
-Done. updated=${updated} copiesCleared=${copiesCleared}${
+                `\nDone. updated=${updated}${
                     config.dryRun ? ' (dry run — no writes performed)' : ''
                 }`
             );

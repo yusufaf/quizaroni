@@ -58,13 +58,14 @@ export const handler: Handler = async (
                 ':pk': PUBLIC_STUDYSET_PK,
                 ':sk': publicStudysetSK(studysetUUID),
             },
-            Limit: 1,
         });
 
         const result = await docClient.send(queryCommand);
-        const studyset = result.Items?.[0];
+        // No Limit: pre-#125 copies can share this SK2, and only the set's
+        // own row may be served.
+        const studyset = result.Items?.find(isPubliclyListed);
 
-        if (!studyset || !isPubliclyListed(studyset)) {
+        if (!studyset) {
             return notFound();
         }
 

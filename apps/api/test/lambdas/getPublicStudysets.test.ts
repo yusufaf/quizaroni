@@ -36,6 +36,8 @@ const project = (item: Item, projection: string, names: Record<string, string> =
 const stored = (id: string, extra: Item = {}): Item => ({
     PK: `userUUID#u-${id}`,
     SK: `studyset#${id}`,
+    PK2: "publicStudyset",
+    SK2: `studyset#${id}`,
     studysetUUID: id,
     title: `Set ${id}`,
     updatedAt: "2026-10-15T00:00:00.000Z",
@@ -66,6 +68,8 @@ describe("getPublicStudysets handler", () => {
             stored("visible"),
             stored("hidden", { moderation: { hiddenAt: "2026-10-16T00:00:00.000Z" } }),
             stored("flag-off", { metadata: { publiclyViewable: false } }),
+            // #171: a pre-#125 copy indexed under another set's key.
+            stored("copy", { SK2: "studyset#visible" }),
         ];
         send.mockImplementation((async (command: QueryCommand) => {
             const { ProjectionExpression = "", ExpressionAttributeNames } = command.input;

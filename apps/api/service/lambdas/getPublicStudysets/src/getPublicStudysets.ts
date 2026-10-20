@@ -28,9 +28,9 @@ type PublicStudysetSummary = {
 /**
  * Unauthenticated listing of every public study set, used to build the sitemap
  * (and, later, an anonymous Explore). A set is indexed on the PK2 GSI only
- * while published, so this is a single partition Query. Sets with the flag
- * off or hidden by moderation are dropped in the loop, matching the single-set
- * endpoint.
+ * while published, so this is a single partition Query. Rows that fail
+ * `isPubliclyListed` (flag off, hidden by moderation, or a pre-#125 copy under
+ * another set's key) are dropped in the loop, matching the single-set endpoint.
  */
 export const handler: Handler = async (
     event: APIGatewayProxyEventV2,
@@ -51,7 +51,7 @@ export const handler: Handler = async (
                 // `title` / `updatedAt` are not reserved words; alias only if
                 // that ever changes.
                 ProjectionExpression:
-                    'studysetUUID, title, updatedAt, #metadata.#publiclyViewable, #moderation.#hiddenAt',
+                    'studysetUUID, title, updatedAt, SK, SK2, #metadata.#publiclyViewable, #moderation.#hiddenAt',
                 ExpressionAttributeNames: {
                     '#metadata': 'metadata',
                     '#publiclyViewable': 'publiclyViewable',

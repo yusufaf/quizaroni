@@ -25,6 +25,8 @@ export const publicStudysetSK = (studysetUUID: string): string =>
 export const PUBLIC_GSI_INDEX_NAME = 'PK2';
 
 type PublicIndexItem = {
+    SK?: unknown;
+    SK2?: unknown;
     metadata?: { publiclyViewable?: unknown };
     moderation?: { hiddenAt?: unknown };
 };
@@ -32,7 +34,13 @@ type PublicIndexItem = {
 export const isHidden = (item: PublicIndexItem | undefined): boolean =>
     !!item?.moderation?.hiddenAt;
 
+// Writers derive SK2 from the set's own id, so SK2 equals the row's own SK
+// (`studyset#<id>`). Duplicates made before #125 kept their source's SK2;
+// such a row must never be served under the source's id (#171).
+export const isOwnIndexRow = (item: PublicIndexItem | undefined): boolean =>
+    typeof item?.SK === 'string' && item.SK === item.SK2;
+
 // The one rule both public read paths apply, so the sitemap never lists a URL
 // the set endpoint would 404.
 export const isPubliclyListed = (item: PublicIndexItem | undefined): boolean =>
-    item?.metadata?.publiclyViewable === true && !isHidden(item);
+    isOwnIndexRow(item) && item?.metadata?.publiclyViewable === true && !isHidden(item);
