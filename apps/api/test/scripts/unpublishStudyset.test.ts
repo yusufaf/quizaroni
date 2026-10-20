@@ -11,11 +11,24 @@ import {
 
 const KEY = { PK: 'userUUID#u1', SK: 'studyset#s1' };
 const NOW = '2026-10-19T12:00:00.000Z';
+const INDEX_KEYS = { PK2: 'publicStudyset', SK2: 'studyset#s1' };
+const OWN_ROW = { ...KEY, ...INDEX_KEYS, studysetUUID: 's1' };
+// Duplicates made before #125 inherited the source's SK2 (see
+// cleanupPublicDuplicates.ts), so the index can return a copy as well.
+const INHERITED_COPY = {
+    PK: 'userUUID#u2',
+    SK: 'studyset#copy',
+    ...INDEX_KEYS,
+    studysetUUID: 'copy',
+};
 
-const makeClient = (queryItems: Record<string, unknown>[] = []) => {
+type Page = { Items: Record<string, unknown>[]; LastEvaluatedKey?: Record<string, unknown> };
+
+const makeClient = (pages: Page[] = []) => {
+    let page = 0;
     const send = jest.fn((cmd: unknown) => {
         if (cmd instanceof QueryCommand) {
-            return Promise.resolve({ Items: queryItems });
+            return Promise.resolve(pages[page++] ?? { Items: [] });
         }
         if (cmd instanceof UpdateCommand) {
             return Promise.resolve({});
@@ -60,7 +73,7 @@ describe('readTakedownConfig', () => {
 
 describe('findStudysetKey', () => {
     it('looks the set up on the public index', async () => {
-        const { send, docClient } = makeClient([KEY]);
+        const { send, docClient } = makeClient([{ Items: [OWN_ROW] }]);
 
         await expect(
             findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1' })
@@ -74,31 +87,37 @@ describe('findStudysetKey', () => {
         });
     });
 
-    it('throws when the set is not on the public index', async () => {
-        const { docClient } = makeClient([]);
-
-        await expect(
-            findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1' })
-        ).rejects.toThrow(/USER_UUID/);
-    });
-
-    // Duplicates made before #125 inherited the source's SK2 (see
-    // cleanupPublicDuplicates.ts), so the index can return a copy as well.
-    it('picks the set itself, not a copy that inherited its index key', async () => {
-        const copy = { PK: 'userUUID#u2', SK: 'studyset#copy' };
-        const { docClient } = makeClient([copy, KEY]);
+    it('follows the index past the first page', async () => {
+        const { send, docClient } = makeClient([
+            { Items: [], LastEvaluatedKey: { PK2: 'publicStudyset' } },
+            { Items: [OWN_ROW] },
+        ]);
 
         await expect(
             findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1' })
         ).resolves.toEqual(KEY);
+        expect(send).toHaveBeenCalledTimes(2);
     });
 
-    it('throws when only inherited copies are on the index', async () => {
-        const { docClient } = makeClient([{ PK: 'userUUID#u2', SK: 'studyset#copy' }]);
+    it('throws when the set is not on the public index', async () => {
+        const { docClient } = makeClient([{ Items: [] }]);
 
         await expect(
             findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1' })
         ).rejects.toThrow(/USER_UUID/);
+    });
+
+    // A copy under the same SK2 would keep serving the public link after the
+    // takedown, so the moderator has to clear those first.
+    it.each([
+        ['with the set itself', [INHERITED_COPY, OWN_ROW]],
+        ['without the set itself', [INHERITED_COPY]],
+    ])('refuses while inherited copies share the index key (%s)', async (_label, items) => {
+        const { docClient } = makeClient([{ Items: items }]);
+
+        await expect(
+            findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1' })
+        ).rejects.toThrow(/cleanup:public-duplicates/);
     });
 
     it('builds the key from USER_UUID without querying', async () => {
