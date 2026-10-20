@@ -112,4 +112,14 @@ describe("getPublicStudyset handler", () => {
 
         expect(res.statusCode).toBe(404);
     });
+
+    it("404s a set hidden by moderation", async () => {
+        send.mockResolvedValueOnce({
+            Items: [{ ...storedItem, moderation: { hiddenAt: "2026-10-16T00:00:00.000Z" } }],
+        } as never);
+
+        const res = await invoke();
+
+        expect(res.statusCode).toBe(404);
+    });
 });

@@ -8,6 +8,7 @@ import { DynamoDBDocumentClient, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Studyset } from 'models/studysets';
 import {
+    isPubliclyListed,
     PUBLIC_GSI_INDEX_NAME,
     PUBLIC_STUDYSET_PK,
     publicStudysetSK,
@@ -34,8 +35,8 @@ const notFound = (): APIGatewayProxyResultV2 => ({
 /**
  * Unauthenticated read of a single public study set. Registered without the
  * Cognito authorizer so crawlers, social scrapers, and logged-out visitors can
- * fetch it. Only sets whose `metadata.publiclyViewable` is true are indexed on
- * the PK2 GSI, and we re-check the flag as defence in depth.
+ * fetch it. Only published sets are indexed on the PK2 GSI; we re-check the
+ * flag and moderation (`isPubliclyListed`) as defence in depth.
  */
 export const handler: Handler = async (
     event: APIGatewayProxyEventV2,
@@ -63,7 +64,7 @@ export const handler: Handler = async (
         const result = await docClient.send(queryCommand);
         const studyset = result.Items?.[0];
 
-        if (!studyset || studyset.metadata?.publiclyViewable !== true) {
+        if (!studyset || !isPubliclyListed(studyset)) {
             return notFound();
         }
 

@@ -12,8 +12,10 @@
  *   - fetch one public set by id:  Query PK2 = PUBLIC_STUDYSET_PK  AND SK2 = publicStudysetSK(id)
  *   - list every public set:       Query PK2 = PUBLIC_STUDYSET_PK
  *
- * Writers must add these attributes when `metadata.publiclyViewable` becomes
- * true and REMOVE them when it becomes false so the index self-maintains.
+ * PK2/SK2 are written only by the `publish-studyset` / `unpublish-studyset`
+ * lambdas and the `scripts/unpublishStudyset.ts` takedown (plus the legacy
+ * one-off `scripts/backfillPublicGsi.ts`); `update-studyset` strips them.
+ * Readers still apply `isPubliclyListed` as defence in depth.
  */
 export const PUBLIC_STUDYSET_PK = 'publicStudyset';
 
@@ -21,3 +23,16 @@ export const publicStudysetSK = (studysetUUID: string): string =>
     `studyset#${studysetUUID}`;
 
 export const PUBLIC_GSI_INDEX_NAME = 'PK2';
+
+type PublicIndexItem = {
+    metadata?: { publiclyViewable?: unknown };
+    moderation?: { hiddenAt?: unknown };
+};
+
+export const isHidden = (item: PublicIndexItem | undefined): boolean =>
+    !!item?.moderation?.hiddenAt;
+
+// The one rule both public read paths apply, so the sitemap never lists a URL
+// the set endpoint would 404.
+export const isPubliclyListed = (item: PublicIndexItem | undefined): boolean =>
+    item?.metadata?.publiclyViewable === true && !isHidden(item);
