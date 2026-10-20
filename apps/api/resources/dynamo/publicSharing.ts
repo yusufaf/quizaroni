@@ -24,18 +24,6 @@ export const publicStudysetSK = (studysetUUID: string): string =>
 
 export const PUBLIC_GSI_INDEX_NAME = 'PK2';
 
-/**
- * A row on the public index under another set's key. Every writer derives SK2
- * from the set's own id, so SK2 always equals the row's own SK
- * (`studyset#<id>`); duplicates made before #125 kept their source's SK2.
- * Judged by SK rather than `studysetUUID`, which such rows may lack.
- */
-export const isInheritedPublicCopy = (item: Record<string, unknown>): boolean =>
-    item.PK2 === PUBLIC_STUDYSET_PK &&
-    typeof item.SK === 'string' &&
-    typeof item.SK2 === 'string' &&
-    item.SK2 !== item.SK;
-
 type PublicIndexItem = {
     metadata?: { publiclyViewable?: unknown };
     moderation?: { hiddenAt?: unknown };

@@ -11,9 +11,11 @@
  *
  * The set is always looked up on the public index by STUDYSET_UUID. For a set
  * that isn't published, pass its owner as USER_UUID to hide it anyway; for a
- * published set, USER_UUID must match the owner on the index. Duplicates made
- * before #125 can share the set's index key and would keep serving its public
- * link, so the script refuses until `cleanup:public-duplicates` has cleared them.
+ * published set, USER_UUID must match the owner on the index.
+ *
+ * Duplicates made before #125 can sit on the index under this set's key and
+ * would keep serving its public link. The takedown removes their PK2/SK2 too
+ * (only while SK2 still points at this set) and changes nothing else on them.
  *
  * Usage (with AWS credentials for the target account in the environment):
  *   MAIN_TABLE=quizaroni-<deploymentType>-main AWS_REGION=us-west-2 \
@@ -28,7 +30,6 @@ import {
     UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
 import {
-    isInheritedPublicCopy,
     PUBLIC_GSI_INDEX_NAME,
     PUBLIC_STUDYSET_PK,
     publicStudysetSK,
@@ -65,7 +66,13 @@ export const readTakedownConfig = (env: NodeJS.ProcessEnv): TakedownConfig => {
     };
 };
 
-export const findStudysetKey = async ({
+export type TakedownTargets = {
+    key: StudysetKey;
+    // Other rows under this set's SK2: pre-#125 copies serving its public link.
+    inheritedCopies: StudysetKey[];
+};
+
+export const findTakedownTargets = async ({
     docClient,
     tableName,
     studysetUUID,
@@ -75,9 +82,9 @@ export const findStudysetKey = async ({
     tableName: string;
     studysetUUID: string;
     userUUID?: string;
-}): Promise<StudysetKey> => {
+}): Promise<TakedownTargets> => {
     const ownSK = `studyset#${studysetUUID}`;
-    const items: Record<string, unknown>[] = [];
+    const rows: StudysetKey[] = [];
     let lastEvaluatedKey: Record<string, unknown> | undefined;
     do {
         const page = await docClient.send(
@@ -89,45 +96,41 @@ export const findStudysetKey = async ({
                     ':pk2': PUBLIC_STUDYSET_PK,
                     ':sk2': publicStudysetSK(studysetUUID),
                 },
-                ProjectionExpression: 'PK, SK, PK2, SK2',
+                ProjectionExpression: 'PK, SK',
                 ExclusiveStartKey: lastEvaluatedKey as never,
             })
         );
-        items.push(...(page.Items ?? []));
+        rows.push(...((page.Items ?? []) as StudysetKey[]));
         lastEvaluatedKey = page.LastEvaluatedKey as Record<string, unknown> | undefined;
     } while (lastEvaluatedKey);
 
-    // Same rule as cleanup:public-duplicates, so every row this refuses on is
-    // one that cleanup clears. Such a copy would keep serving the public link.
-    const inheritedCopies = items.filter(isInheritedPublicCopy);
-    if (inheritedCopies.length > 0) {
-        const keys = inheritedCopies.map((copy) => `${copy.PK} ${copy.SK}`).join(', ');
-        throw new Error(
-            `${inheritedCopies.length} duplicate(s) made before #125 share the public index key of ${studysetUUID} and would keep serving its public link (${keys}). Run cleanup:public-duplicates first (DRY_RUN=1 to preview), then rerun this script.`
-        );
-    }
-    const item = items.find((candidate) => candidate.SK === ownSK) as StudysetKey | undefined;
+    const own = rows.find((row) => row.SK === ownSK);
+    const inheritedCopies = rows
+        .filter((row) => row.SK !== ownSK)
+        .map(({ PK, SK }) => ({ PK, SK }));
+
     if (userUUID) {
         const PK = `userUUID#${userUUID}`;
-        if (item && item.PK !== PK) {
+        if (own && own.PK !== PK) {
             throw new Error(
-                `Study set ${studysetUUID} is on the public index under ${item.PK}, not ${PK}; fix USER_UUID or leave it out`
+                `Study set ${studysetUUID} is on the public index under ${own.PK}, not ${PK}; fix USER_UUID or leave it out`
             );
         }
-        return { PK, SK: ownSK };
+        return { key: { PK, SK: ownSK }, inheritedCopies };
     }
-    if (!item) {
+    if (!own) {
         throw new Error(
             `Study set ${studysetUUID} is not on the public index; pass USER_UUID to hide it anyway`
         );
     }
-    return { PK: item.PK, SK: item.SK };
+    return { key: { PK: own.PK, SK: own.SK }, inheritedCopies };
 };
 
 export const takedownStudyset = async ({
     docClient,
     tableName,
-    key,
+    studysetUUID,
+    targets: { key, inheritedCopies },
     reason,
     now,
     dryRun,
@@ -135,19 +138,27 @@ export const takedownStudyset = async ({
 }: {
     docClient: DynamoDBDocumentClient;
     tableName: string;
-    key: StudysetKey;
+    studysetUUID: string;
+    targets: TakedownTargets;
     reason?: string;
     now: string;
     dryRun: boolean;
     log?: (message: string) => void;
-}): Promise<{ updated: boolean }> => {
+}): Promise<{ updated: boolean; copiesCleared: number }> => {
     log(
         `${dryRun ? '[dry-run] would hide' : 'hiding'} ${key.PK} ${key.SK}${
             reason ? ` (reason: ${reason})` : ''
         }`
     );
+    if (inheritedCopies.length > 0) {
+        log(
+            `${dryRun ? '[dry-run] would remove' : 'removing'} the public index key from ${
+                inheritedCopies.length
+            } pre-#125 cop${inheritedCopies.length === 1 ? 'y' : 'ies'}`
+        );
+    }
     if (dryRun) {
-        return { updated: false };
+        return { updated: false, copiesCleared: 0 };
     }
 
     await docClient.send(
@@ -170,7 +181,29 @@ export const takedownStudyset = async ({
             },
         })
     );
-    return { updated: true };
+
+    let copiesCleared = 0;
+    for (const copy of inheritedCopies) {
+        try {
+            // Index keys only, and only while the copy still points at this set.
+            await docClient.send(
+                new UpdateCommand({
+                    TableName: tableName,
+                    Key: copy,
+                    UpdateExpression: 'REMOVE #PK2, #SK2',
+                    ConditionExpression: '#SK2 = :sk2',
+                    ExpressionAttributeNames: { '#PK2': 'PK2', '#SK2': 'SK2' },
+                    ExpressionAttributeValues: { ':sk2': publicStudysetSK(studysetUUID) },
+                })
+            );
+            copiesCleared += 1;
+        } catch (error) {
+            if ((error as Error)?.name !== 'ConditionalCheckFailedException') {
+                throw error;
+            }
+        }
+    }
+    return { updated: true, copiesCleared };
 };
 
 if (require.main === module) {
@@ -184,20 +217,22 @@ if (require.main === module) {
 
     const docClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-    findStudysetKey({ docClient, ...config })
-        .then((key) =>
+    findTakedownTargets({ docClient, ...config })
+        .then((targets) =>
             takedownStudyset({
                 docClient,
                 tableName: config.tableName,
-                key,
+                studysetUUID: config.studysetUUID,
+                targets,
                 reason: config.reason,
                 now: new Date().toISOString(),
                 dryRun: config.dryRun,
             })
         )
-        .then(({ updated }) => {
+        .then(({ updated, copiesCleared }) => {
             console.log(
-                `\nDone. updated=${updated}${
+                `
+Done. updated=${updated} copiesCleared=${copiesCleared}${
                     config.dryRun ? ' (dry run — no writes performed)' : ''
                 }`
             );

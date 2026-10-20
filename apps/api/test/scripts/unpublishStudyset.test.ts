@@ -4,7 +4,7 @@ import {
     UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
 import {
-    findStudysetKey,
+    findTakedownTargets,
     readTakedownConfig,
     takedownStudyset,
 } from '../../scripts/unpublishStudyset';
@@ -24,14 +24,19 @@ const INHERITED_COPY = {
 
 type Page = { Items: Record<string, unknown>[]; LastEvaluatedKey?: Record<string, unknown> };
 
-const makeClient = (pages: Page[] = []) => {
+const COPY_KEY = { PK: INHERITED_COPY.PK, SK: INHERITED_COPY.SK };
+
+const makeClient = (
+    pages: Page[] = [],
+    onUpdate: (cmd: UpdateCommand) => Promise<unknown> = () => Promise.resolve({})
+) => {
     let page = 0;
     const send = jest.fn((cmd: unknown) => {
         if (cmd instanceof QueryCommand) {
             return Promise.resolve(pages[page++] ?? { Items: [] });
         }
         if (cmd instanceof UpdateCommand) {
-            return Promise.resolve({});
+            return onUpdate(cmd);
         }
         return Promise.reject(new Error('unexpected command'));
     });
@@ -71,13 +76,14 @@ describe('readTakedownConfig', () => {
     });
 });
 
-describe('findStudysetKey', () => {
+describe('findTakedownTargets', () => {
+    const find = (docClient: DynamoDBDocumentClient, userUUID?: string) =>
+        findTakedownTargets({ docClient, tableName: 't', studysetUUID: 's1', userUUID });
+
     it('looks the set up on the public index', async () => {
         const { send, docClient } = makeClient([{ Items: [OWN_ROW] }]);
 
-        await expect(
-            findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1' })
-        ).resolves.toEqual(KEY);
+        await expect(find(docClient)).resolves.toEqual({ key: KEY, inheritedCopies: [] });
 
         const [query] = send.mock.calls[0] as [QueryCommand];
         expect(query.input.IndexName).toBe('PK2');
@@ -89,102 +95,83 @@ describe('findStudysetKey', () => {
 
     it('follows the index past the first page', async () => {
         const { send, docClient } = makeClient([
-            { Items: [], LastEvaluatedKey: { PK2: 'publicStudyset' } },
+            { Items: [INHERITED_COPY], LastEvaluatedKey: { PK2: 'publicStudyset' } },
             { Items: [OWN_ROW] },
         ]);
 
-        await expect(
-            findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1' })
-        ).resolves.toEqual(KEY);
+        await expect(find(docClient)).resolves.toEqual({
+            key: KEY,
+            inheritedCopies: [COPY_KEY],
+        });
         expect(send).toHaveBeenCalledTimes(2);
     });
 
-    it('throws when the set is not on the public index', async () => {
-        const { docClient } = makeClient([{ Items: [] }]);
+    // Duplicates made before #125 kept the source's SK2; any row under it
+    // whose SK isn't the set's own is one, with or without a studysetUUID.
+    it('returns copies under the key as well as the set', async () => {
+        const { studysetUUID: _id, ...copyWithoutId } = INHERITED_COPY;
+        const { docClient } = makeClient([{ Items: [copyWithoutId, OWN_ROW] }]);
 
-        await expect(
-            findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1' })
-        ).rejects.toThrow(/USER_UUID/);
+        await expect(find(docClient)).resolves.toEqual({
+            key: KEY,
+            inheritedCopies: [COPY_KEY],
+        });
     });
 
-    // A copy under the same SK2 would keep serving the public link after the
-    // takedown, so the moderator has to clear those first.
-    it.each([
-        ['with the set itself', [INHERITED_COPY, OWN_ROW]],
-        ['without the set itself', [INHERITED_COPY]],
-        [
-            'when the copy has no studysetUUID',
-            [{ PK: 'userUUID#u2', SK: 'studyset#copy', ...INDEX_KEYS }, OWN_ROW],
-        ],
-    ])('refuses while inherited copies share the index key (%s)', async (_label, items) => {
-        const { docClient } = makeClient([{ Items: items }]);
+    it('throws when the set is not on the public index', async () => {
+        const { docClient } = makeClient([{ Items: [INHERITED_COPY] }]);
 
-        await expect(
-            findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1' })
-        ).rejects.toThrow(/(userUUID#u2 studyset#copy).*cleanup:public-duplicates/s);
+        await expect(find(docClient)).rejects.toThrow(/USER_UUID/);
     });
 
     it('builds the key from USER_UUID for a set that is not on the index', async () => {
-        const { send, docClient } = makeClient([{ Items: [] }]);
+        const { send, docClient } = makeClient([{ Items: [INHERITED_COPY] }]);
 
-        await expect(
-            findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1', userUUID: 'u1' })
-        ).resolves.toEqual(KEY);
-
-        // The index is still checked, for copies and for the real owner.
+        await expect(find(docClient, 'u1')).resolves.toEqual({
+            key: KEY,
+            inheritedCopies: [COPY_KEY],
+        });
         const [query] = send.mock.calls[0] as [QueryCommand];
-        expect(query.input.IndexName).toBe('PK2');
         expect(query.input.ExpressionAttributeValues?.[':sk2']).toBe('studyset#s1');
     });
 
     it('rejects a USER_UUID that does not own the indexed set', async () => {
         const { docClient } = makeClient([{ Items: [OWN_ROW] }]);
 
-        await expect(
-            findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1', userUUID: 'u9' })
-        ).rejects.toThrow(/userUUID#u1/);
-    });
-
-    it('still refuses inherited copies when USER_UUID is given', async () => {
-        const { docClient } = makeClient([{ Items: [INHERITED_COPY] }]);
-
-        await expect(
-            findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1', userUUID: 'u1' })
-        ).rejects.toThrow(/cleanup:public-duplicates/);
+        await expect(find(docClient, 'u9')).rejects.toThrow(/userUUID#u1/);
     });
 });
 
 describe('takedownStudyset', () => {
+    const run = (
+        docClient: DynamoDBDocumentClient,
+        { dryRun = false, inheritedCopies = [] as typeof KEY[] } = {}
+    ) =>
+        takedownStudyset({
+            docClient,
+            tableName: 't',
+            studysetUUID: 's1',
+            targets: { key: KEY, inheritedCopies },
+            reason: 'spam',
+            now: NOW,
+            dryRun,
+            log: () => {},
+        });
+
     it('writes nothing on a dry run', async () => {
         const { send, docClient } = makeClient();
 
-        await expect(
-            takedownStudyset({
-                docClient,
-                tableName: 't',
-                key: KEY,
-                now: NOW,
-                dryRun: true,
-                log: () => {},
-            })
-        ).resolves.toEqual({ updated: false });
+        await expect(run(docClient, { dryRun: true, inheritedCopies: [COPY_KEY] })).resolves.toEqual({
+            updated: false,
+            copiesCleared: 0,
+        });
         expect(send).not.toHaveBeenCalled();
     });
 
     it('hides the set and removes it from the public index', async () => {
         const { send, docClient } = makeClient();
 
-        await expect(
-            takedownStudyset({
-                docClient,
-                tableName: 't',
-                key: KEY,
-                reason: 'spam',
-                now: NOW,
-                dryRun: false,
-                log: () => {},
-            })
-        ).resolves.toEqual({ updated: true });
+        await expect(run(docClient)).resolves.toEqual({ updated: true, copiesCleared: 0 });
 
         const [update] = send.mock.calls[0] as [UpdateCommand];
         expect(update).toBeInstanceOf(UpdateCommand);
@@ -195,5 +182,33 @@ describe('takedownStudyset', () => {
             reason: 'spam',
         });
         expect(update.input.ConditionExpression).toBe('attribute_exists(PK)');
+    });
+
+    it("removes only the index keys from copies still under the set's key", async () => {
+        const { send, docClient } = makeClient();
+
+        await expect(run(docClient, { inheritedCopies: [COPY_KEY] })).resolves.toEqual({
+            updated: true,
+            copiesCleared: 1,
+        });
+
+        const [, copyUpdate] = send.mock.calls.map(([cmd]) => cmd as UpdateCommand);
+        expect(copyUpdate.input.Key).toEqual(COPY_KEY);
+        expect(copyUpdate.input.UpdateExpression).toBe('REMOVE #PK2, #SK2');
+        expect(copyUpdate.input.ConditionExpression).toBe('#SK2 = :sk2');
+        expect(copyUpdate.input.ExpressionAttributeValues).toEqual({ ':sk2': 'studyset#s1' });
+    });
+
+    it('skips a copy that moved off the key meanwhile', async () => {
+        const { docClient } = makeClient([], (cmd) =>
+            cmd.input.Key?.PK === COPY_KEY.PK
+                ? Promise.reject(Object.assign(new Error('x'), { name: 'ConditionalCheckFailedException' }))
+                : Promise.resolve({})
+        );
+
+        await expect(run(docClient, { inheritedCopies: [COPY_KEY] })).resolves.toEqual({
+            updated: true,
+            copiesCleared: 0,
+        });
     });
 });
