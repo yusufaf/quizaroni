@@ -31,7 +31,6 @@ import {
     PUBLIC_STUDYSET_PK,
     publicStudysetSK,
 } from '../resources/dynamo/publicSharing';
-import { isInheritedPublicCopy } from './cleanupPublicDuplicates';
 import { isDryRun } from './dryRun';
 
 type TakedownConfig = {
@@ -75,10 +74,7 @@ export const findStudysetKey = async ({
     studysetUUID: string;
     userUUID?: string;
 }): Promise<StudysetKey> => {
-    if (userUUID) {
-        return { PK: `userUUID#${userUUID}`, SK: `studyset#${studysetUUID}` };
-    }
-
+    const ownSK = `studyset#${studysetUUID}`;
     const items: Record<string, unknown>[] = [];
     let lastEvaluatedKey: Record<string, unknown> | undefined;
     do {
@@ -91,8 +87,7 @@ export const findStudysetKey = async ({
                     ':pk2': PUBLIC_STUDYSET_PK,
                     ':sk2': publicStudysetSK(studysetUUID),
                 },
-                // isInheritedPublicCopy needs PK2, SK2 and studysetUUID.
-                ProjectionExpression: 'PK, SK, PK2, SK2, studysetUUID',
+                ProjectionExpression: 'PK, SK',
                 ExclusiveStartKey: lastEvaluatedKey as never,
             })
         );
@@ -100,13 +95,18 @@ export const findStudysetKey = async ({
         lastEvaluatedKey = page.LastEvaluatedKey as Record<string, unknown> | undefined;
     } while (lastEvaluatedKey);
 
-    const inheritedCopies = items.filter(isInheritedPublicCopy);
+    // Every other row under this SK2 is a copy that inherited it; it would keep
+    // serving the public link whichever key the takedown hides.
+    const inheritedCopies = items.filter((item) => item.SK !== ownSK);
     if (inheritedCopies.length > 0) {
         throw new Error(
             `${inheritedCopies.length} duplicate(s) made before #125 share the public index key of ${studysetUUID} and would keep serving its public link. Run cleanup:public-duplicates first (DRY_RUN=1 to preview), then rerun this script.`
         );
     }
-    const item = items[0] as StudysetKey | undefined;
+    if (userUUID) {
+        return { PK: `userUUID#${userUUID}`, SK: ownSK };
+    }
+    const item = items.find((candidate) => candidate.SK === ownSK) as StudysetKey | undefined;
     if (!item) {
         throw new Error(
             `Study set ${studysetUUID} is not on the public index; pass USER_UUID to hide it anyway`

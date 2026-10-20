@@ -112,6 +112,10 @@ describe('findStudysetKey', () => {
     it.each([
         ['with the set itself', [INHERITED_COPY, OWN_ROW]],
         ['without the set itself', [INHERITED_COPY]],
+        [
+            'when the copy has no studysetUUID',
+            [{ PK: 'userUUID#u2', SK: 'studyset#copy', ...INDEX_KEYS }, OWN_ROW],
+        ],
     ])('refuses while inherited copies share the index key (%s)', async (_label, items) => {
         const { docClient } = makeClient([{ Items: items }]);
 
@@ -120,13 +124,20 @@ describe('findStudysetKey', () => {
         ).rejects.toThrow(/cleanup:public-duplicates/);
     });
 
-    it('builds the key from USER_UUID without querying', async () => {
-        const { send, docClient } = makeClient();
+    it('builds the key from USER_UUID for a set that is not on the index', async () => {
+        const { docClient } = makeClient([{ Items: [] }]);
 
         await expect(
             findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1', userUUID: 'u1' })
         ).resolves.toEqual(KEY);
-        expect(send).not.toHaveBeenCalled();
+    });
+
+    it('still refuses inherited copies when USER_UUID is given', async () => {
+        const { docClient } = makeClient([{ Items: [INHERITED_COPY] }]);
+
+        await expect(
+            findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1', userUUID: 'u1' })
+        ).rejects.toThrow(/cleanup:public-duplicates/);
     });
 });
 
