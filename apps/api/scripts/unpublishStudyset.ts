@@ -88,7 +88,9 @@ export const findStudysetKey = async ({
             ProjectionExpression: 'PK, SK',
         })
     );
-    const item = Items?.[0];
+    // Copies made before #125 can share this SK2; only the set's own row has a
+    // matching SK.
+    const item = Items?.find((candidate) => candidate.SK === `studyset#${studysetUUID}`);
     if (!item) {
         throw new Error(
             `Study set ${studysetUUID} is not on the public index; pass USER_UUID to hide it anyway`

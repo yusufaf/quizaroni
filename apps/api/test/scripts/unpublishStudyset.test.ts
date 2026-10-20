@@ -82,6 +82,25 @@ describe('findStudysetKey', () => {
         ).rejects.toThrow(/USER_UUID/);
     });
 
+    // Duplicates made before #125 inherited the source's SK2 (see
+    // cleanupPublicDuplicates.ts), so the index can return a copy as well.
+    it('picks the set itself, not a copy that inherited its index key', async () => {
+        const copy = { PK: 'userUUID#u2', SK: 'studyset#copy' };
+        const { docClient } = makeClient([copy, KEY]);
+
+        await expect(
+            findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1' })
+        ).resolves.toEqual(KEY);
+    });
+
+    it('throws when only inherited copies are on the index', async () => {
+        const { docClient } = makeClient([{ PK: 'userUUID#u2', SK: 'studyset#copy' }]);
+
+        await expect(
+            findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1' })
+        ).rejects.toThrow(/USER_UUID/);
+    });
+
     it('builds the key from USER_UUID without querying', async () => {
         const { send, docClient } = makeClient();
 
