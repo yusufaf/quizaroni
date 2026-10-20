@@ -9,8 +9,9 @@
  * There is no un-hide tool: to restore a set, remove its `moderation`
  * attribute by hand; the owner can then publish it again.
  *
- * The set is found on the public index by STUDYSET_UUID. For a set that isn't
- * published, pass its owner as USER_UUID to hide it anyway. Duplicates made
+ * The set is always looked up on the public index by STUDYSET_UUID. For a set
+ * that isn't published, pass its owner as USER_UUID to hide it anyway; for a
+ * published set, USER_UUID must match the owner on the index. Duplicates made
  * before #125 can share the set's index key and would keep serving its public
  * link, so the script refuses until `cleanup:public-duplicates` has cleared them.
  *
@@ -27,6 +28,7 @@ import {
     UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
 import {
+    isInheritedPublicCopy,
     PUBLIC_GSI_INDEX_NAME,
     PUBLIC_STUDYSET_PK,
     publicStudysetSK,
@@ -87,7 +89,7 @@ export const findStudysetKey = async ({
                     ':pk2': PUBLIC_STUDYSET_PK,
                     ':sk2': publicStudysetSK(studysetUUID),
                 },
-                ProjectionExpression: 'PK, SK',
+                ProjectionExpression: 'PK, SK, PK2, SK2',
                 ExclusiveStartKey: lastEvaluatedKey as never,
             })
         );
@@ -95,18 +97,25 @@ export const findStudysetKey = async ({
         lastEvaluatedKey = page.LastEvaluatedKey as Record<string, unknown> | undefined;
     } while (lastEvaluatedKey);
 
-    // Every other row under this SK2 is a copy that inherited it; it would keep
-    // serving the public link whichever key the takedown hides.
-    const inheritedCopies = items.filter((item) => item.SK !== ownSK);
+    // Same rule as cleanup:public-duplicates, so every row this refuses on is
+    // one that cleanup clears. Such a copy would keep serving the public link.
+    const inheritedCopies = items.filter(isInheritedPublicCopy);
     if (inheritedCopies.length > 0) {
+        const keys = inheritedCopies.map((copy) => `${copy.PK} ${copy.SK}`).join(', ');
         throw new Error(
-            `${inheritedCopies.length} duplicate(s) made before #125 share the public index key of ${studysetUUID} and would keep serving its public link. Run cleanup:public-duplicates first (DRY_RUN=1 to preview), then rerun this script.`
+            `${inheritedCopies.length} duplicate(s) made before #125 share the public index key of ${studysetUUID} and would keep serving its public link (${keys}). Run cleanup:public-duplicates first (DRY_RUN=1 to preview), then rerun this script.`
         );
     }
-    if (userUUID) {
-        return { PK: `userUUID#${userUUID}`, SK: ownSK };
-    }
     const item = items.find((candidate) => candidate.SK === ownSK) as StudysetKey | undefined;
+    if (userUUID) {
+        const PK = `userUUID#${userUUID}`;
+        if (item && item.PK !== PK) {
+            throw new Error(
+                `Study set ${studysetUUID} is on the public index under ${item.PK}, not ${PK}; fix USER_UUID or leave it out`
+            );
+        }
+        return { PK, SK: ownSK };
+    }
     if (!item) {
         throw new Error(
             `Study set ${studysetUUID} is not on the public index; pass USER_UUID to hide it anyway`

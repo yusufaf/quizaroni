@@ -3,9 +3,9 @@ import {
     QueryCommand,
     UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
+import { isInheritedPublicCopy } from '../../resources/dynamo/publicSharing';
 import {
     cleanupPublicDuplicates,
-    isInheritedPublicCopy,
     readCleanupConfig,
 } from '../../scripts/cleanupPublicDuplicates';
 
@@ -76,8 +76,15 @@ describe('isInheritedPublicCopy', () => {
         expect(isInheritedPublicCopy({ ...inheritedCopy, PK2: 'other' })).toBe(false);
     });
 
-    it('rejects items without a studysetUUID', () => {
-        const { studysetUUID: _studysetUUID, ...stub } = inheritedCopy;
+    // Judged by the row's own SK, so the takedown and this cleanup agree on
+    // what a copy is even when studysetUUID is missing or stale.
+    it('matches a copy without a studysetUUID', () => {
+        const { studysetUUID: _studysetUUID, ...copy } = inheritedCopy;
+        expect(isInheritedPublicCopy(copy)).toBe(true);
+    });
+
+    it('rejects a stub indexed under its own SK', () => {
+        const { studysetUUID: _studysetUUID, ...stub } = realPublic;
         expect(isInheritedPublicCopy(stub)).toBe(false);
     });
 });

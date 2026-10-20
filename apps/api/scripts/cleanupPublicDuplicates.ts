@@ -6,7 +6,7 @@
  * public set kept `metadata.publiclyViewable: true` and the source's public
  * index keys, with SK2 = `studyset#<source id>` (#125). Every real publish
  * writes SK2 from the set's own id, so an item on the public index whose SK2
- * doesn't match its own `studysetUUID` is an inherited copy. The script sets
+ * doesn't match its own SK is an inherited copy (`isInheritedPublicCopy`). The script sets
  * `publiclyViewable` to false on those items and removes their PK2/SK2; it
  * touches nothing else.
  *
@@ -30,9 +30,9 @@ import {
     UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
 import {
+    isInheritedPublicCopy,
     PUBLIC_GSI_INDEX_NAME,
     PUBLIC_STUDYSET_PK,
-    publicStudysetSK,
 } from '../resources/dynamo/publicSharing';
 import { isDryRun } from './dryRun';
 
@@ -47,12 +47,6 @@ type CleanupConfig = {
     tableName: string;
     dryRun: boolean;
 };
-
-export const isInheritedPublicCopy = (item: Record<string, unknown>): boolean =>
-    item.PK2 === PUBLIC_STUDYSET_PK &&
-    typeof item.studysetUUID === 'string' &&
-    typeof item.SK2 === 'string' &&
-    item.SK2 !== publicStudysetSK(item.studysetUUID);
 
 export const readCleanupConfig = (env: NodeJS.ProcessEnv): CleanupConfig => {
     const tableName = env.MAIN_TABLE ?? '';
@@ -85,7 +79,7 @@ export const cleanupPublicDuplicates = async ({
                 IndexName: PUBLIC_GSI_INDEX_NAME,
                 KeyConditionExpression: 'PK2 = :pk',
                 ExpressionAttributeValues: { ':pk': PUBLIC_STUDYSET_PK },
-                // PK2 must be projected: isInheritedPublicCopy checks it.
+                // PK2, SK and SK2 must be projected: isInheritedPublicCopy checks them.
                 ProjectionExpression: 'PK, SK, PK2, SK2, studysetUUID, title',
                 ExclusiveStartKey: lastEvaluatedKey as never,
             })

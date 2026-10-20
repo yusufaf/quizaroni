@@ -121,15 +121,28 @@ describe('findStudysetKey', () => {
 
         await expect(
             findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1' })
-        ).rejects.toThrow(/cleanup:public-duplicates/);
+        ).rejects.toThrow(/(userUUID#u2 studyset#copy).*cleanup:public-duplicates/s);
     });
 
     it('builds the key from USER_UUID for a set that is not on the index', async () => {
-        const { docClient } = makeClient([{ Items: [] }]);
+        const { send, docClient } = makeClient([{ Items: [] }]);
 
         await expect(
             findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1', userUUID: 'u1' })
         ).resolves.toEqual(KEY);
+
+        // The index is still checked, for copies and for the real owner.
+        const [query] = send.mock.calls[0] as [QueryCommand];
+        expect(query.input.IndexName).toBe('PK2');
+        expect(query.input.ExpressionAttributeValues?.[':sk2']).toBe('studyset#s1');
+    });
+
+    it('rejects a USER_UUID that does not own the indexed set', async () => {
+        const { docClient } = makeClient([{ Items: [OWN_ROW] }]);
+
+        await expect(
+            findStudysetKey({ docClient, tableName: 't', studysetUUID: 's1', userUUID: 'u9' })
+        ).rejects.toThrow(/userUUID#u1/);
     });
 
     it('still refuses inherited copies when USER_UUID is given', async () => {
