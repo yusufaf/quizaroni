@@ -1,5 +1,6 @@
 import {
     DynamoDBDocumentClient,
+    GetCommand,
     QueryCommand,
     UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
@@ -24,11 +25,14 @@ const INHERITED_COPY = {
 
 type Page = { Items: Record<string, unknown>[]; LastEvaluatedKey?: Record<string, unknown> };
 
-const makeClient = (pages: Page[] = []) => {
+const makeClient = (pages: Page[] = [], storedItem: Record<string, unknown> | null = KEY) => {
     let page = 0;
     const send = jest.fn((cmd: unknown) => {
         if (cmd instanceof QueryCommand) {
             return Promise.resolve(pages[page++] ?? { Items: [] });
+        }
+        if (cmd instanceof GetCommand) {
+            return Promise.resolve({ Item: storedItem ?? undefined });
         }
         if (cmd instanceof UpdateCommand) {
             return Promise.resolve({});
@@ -106,6 +110,12 @@ describe('findStudysetKey', () => {
         await expect(find(docClient)).resolves.toEqual(KEY);
     });
 
+    it('throws when the set is not on the public index', async () => {
+        const { docClient } = makeClient([{ Items: [] }]);
+
+        await expect(find(docClient)).rejects.toThrow(/USER_UUID/);
+    });
+
     it('throws when only a copy is on the public index', async () => {
         const { docClient } = makeClient([{ Items: [INHERITED_COPY] }]);
 
@@ -118,6 +128,12 @@ describe('findStudysetKey', () => {
         await expect(find(docClient, 'u1')).resolves.toEqual(KEY);
         const [query] = send.mock.calls[0] as [QueryCommand];
         expect(query.input.ExpressionAttributeValues?.[':sk2']).toBe('studyset#s1');
+    });
+
+    it('rejects a USER_UUID with no such set, even on a dry run', async () => {
+        const { docClient } = makeClient([{ Items: [] }], null);
+
+        await expect(find(docClient, 'u9')).rejects.toThrow(/userUUID#u9/);
     });
 
     it('rejects a USER_UUID that does not own the indexed set', async () => {
@@ -144,6 +160,22 @@ describe('takedownStudyset', () => {
 
         await expect(run(docClient, true)).resolves.toEqual({ updated: false });
         expect(send).not.toHaveBeenCalled();
+    });
+
+    it('stores no reason when none is given', async () => {
+        const { send, docClient } = makeClient();
+
+        await takedownStudyset({
+            docClient,
+            tableName: 't',
+            key: KEY,
+            now: NOW,
+            dryRun: false,
+            log: () => {},
+        });
+
+        const [update] = send.mock.calls[0] as [UpdateCommand];
+        expect(update.input.ExpressionAttributeValues?.[':moderation']).toEqual({ hiddenAt: NOW });
     });
 
     it('hides the set and removes it from the public index', async () => {

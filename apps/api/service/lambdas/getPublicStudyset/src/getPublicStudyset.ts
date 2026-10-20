@@ -35,8 +35,9 @@ const notFound = (): APIGatewayProxyResultV2 => ({
 /**
  * Unauthenticated read of a single public study set. Registered without the
  * Cognito authorizer so crawlers, social scrapers, and logged-out visitors can
- * fetch it. Only published sets are indexed on the PK2 GSI; we re-check the
- * flag and moderation (`isPubliclyListed`) as defence in depth.
+ * fetch it. Only the set's own index row may be served: pre-#125 copies can
+ * share its SK2 (#171). `isPubliclyListed` enforces that and re-checks the
+ * flag and moderation.
  */
 export const handler: Handler = async (
     event: APIGatewayProxyEventV2,
@@ -50,20 +51,29 @@ export const handler: Handler = async (
     }
 
     try {
-        const queryCommand = new QueryCommand({
-            TableName: mainTable,
-            IndexName: PUBLIC_GSI_INDEX_NAME,
-            KeyConditionExpression: 'PK2 = :pk AND SK2 = :sk',
-            ExpressionAttributeValues: {
-                ':pk': PUBLIC_STUDYSET_PK,
-                ':sk': publicStudysetSK(studysetUUID),
-            },
-        });
-
-        const result = await docClient.send(queryCommand);
-        // No Limit: pre-#125 copies can share this SK2, and only the set's
-        // own row may be served.
-        const studyset = result.Items?.find(isPubliclyListed);
+        // No Limit, and keep paging: copies under this SK2 can fill a page
+        // before the set's own row. The filter keeps them out of the payload.
+        let studyset: Record<string, unknown> | undefined;
+        let lastEvaluatedKey: Record<string, unknown> | undefined;
+        do {
+            const result = await docClient.send(
+                new QueryCommand({
+                    TableName: mainTable,
+                    IndexName: PUBLIC_GSI_INDEX_NAME,
+                    KeyConditionExpression: 'PK2 = :pk AND SK2 = :sk',
+                    FilterExpression: 'SK = SK2',
+                    ExpressionAttributeValues: {
+                        ':pk': PUBLIC_STUDYSET_PK,
+                        ':sk': publicStudysetSK(studysetUUID),
+                    },
+                    ExclusiveStartKey: lastEvaluatedKey,
+                })
+            );
+            studyset = result.Items?.find(isPubliclyListed);
+            lastEvaluatedKey = result.LastEvaluatedKey as
+                | Record<string, unknown>
+                | undefined;
+        } while (!studyset && lastEvaluatedKey);
 
         if (!studyset) {
             return notFound();

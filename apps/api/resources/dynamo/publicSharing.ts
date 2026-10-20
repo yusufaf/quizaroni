@@ -3,10 +3,14 @@
  *
  * Public study sets are exposed to unauthenticated readers via the otherwise
  * unused `PK2` global secondary index. A set is indexed there *only while it is
- * public*, so the index always contains exactly the currently-public sets:
+ * public*:
  *
  *   PK2 = "publicStudyset"            (constant partition — all public sets)
- *   SK2 = "studyset#<studysetUUID>"   (sort key — one row per set)
+ *   SK2 = "studyset#<studysetUUID>"   (sort key — the set's own id)
+ *
+ * Not strictly one row per SK2: duplicates made before #125 kept their
+ * source's SK2 (#171). Never take `Items[0]`; readers keep only the set's own
+ * row (`isOwnIndexRow`, part of `isPubliclyListed`).
  *
  * This yields two access patterns from one key design:
  *   - fetch one public set by id:  Query PK2 = PUBLIC_STUDYSET_PK  AND SK2 = publicStudysetSK(id)
@@ -15,7 +19,7 @@
  * PK2/SK2 are written only by the `publish-studyset` / `unpublish-studyset`
  * lambdas and the `scripts/unpublishStudyset.ts` takedown (plus the legacy
  * one-off `scripts/backfillPublicGsi.ts`); `update-studyset` strips them.
- * Readers still apply `isPubliclyListed` as defence in depth.
+ * Readers apply `isPubliclyListed` on every row.
  */
 export const PUBLIC_STUDYSET_PK = 'publicStudyset';
 

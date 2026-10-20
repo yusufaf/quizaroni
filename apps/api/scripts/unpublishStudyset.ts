@@ -24,6 +24,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
     DynamoDBDocumentClient,
+    GetCommand,
     QueryCommand,
     UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
@@ -98,13 +99,20 @@ export const findStudysetKey = async ({
 
     const own = rows.find(isOwnIndexRow) as StudysetKey | undefined;
     if (userUUID) {
-        const PK = `userUUID#${userUUID}`;
-        if (own && own.PK !== PK) {
+        const key = { PK: `userUUID#${userUUID}`, SK: `studyset#${studysetUUID}` };
+        if (own && own.PK !== key.PK) {
             throw new Error(
-                `Study set ${studysetUUID} is on the public index under ${own.PK}, not ${PK}; fix USER_UUID or leave it out`
+                `Study set ${studysetUUID} is on the public index under ${own.PK}, not ${key.PK}; fix USER_UUID or leave it out`
             );
         }
-        return { PK, SK: `studyset#${studysetUUID}` };
+        // Checked here so a dry run catches a wrong USER_UUID too.
+        const { Item } = await docClient.send(
+            new GetCommand({ TableName: tableName, Key: key, ProjectionExpression: 'PK' })
+        );
+        if (!Item) {
+            throw new Error(`No study set ${studysetUUID} under ${key.PK}; check USER_UUID`);
+        }
+        return key;
     }
     if (!own) {
         throw new Error(

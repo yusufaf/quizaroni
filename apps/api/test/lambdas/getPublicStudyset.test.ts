@@ -133,6 +133,18 @@ describe("getPublicStudyset handler", () => {
         expect(query.input.Limit).toBeUndefined();
     });
 
+    it("pages past copies that fill the first page", async () => {
+        send.mockResolvedValueOnce({ Items: [], LastEvaluatedKey: { PK2: "x" } } as never)
+            .mockResolvedValueOnce({ Items: [storedItem] } as never);
+
+        const res = await invoke();
+
+        expect(res.statusCode).toBe(200);
+        expect(send).toHaveBeenCalledTimes(2);
+        const query = send.mock.calls[0][0] as unknown as { input: { FilterExpression?: string } };
+        expect(query.input.FilterExpression).toBe("SK = SK2");
+    });
+
     it("404s when only a copy is left under the set's index key", async () => {
         send.mockResolvedValueOnce({
             Items: [{ ...storedItem, PK: "userUUID#someone-else", SK: "studyset#copy" }],
