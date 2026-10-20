@@ -128,9 +128,12 @@ describe('findStudysetKey', () => {
         await expect(find(docClient, 'u1')).resolves.toEqual(KEY);
         const [query] = send.mock.calls[0] as [QueryCommand];
         expect(query.input.ExpressionAttributeValues?.[':sk2']).toBe('studyset#s1');
+        const [get] = send.mock.calls[1] as [GetCommand];
+        expect(get).toBeInstanceOf(GetCommand);
+        expect(get.input.Key).toEqual(KEY);
     });
 
-    it('rejects a USER_UUID with no such set, even on a dry run', async () => {
+    it('rejects a USER_UUID with no such set before any write', async () => {
         const { docClient } = makeClient([{ Items: [] }], null);
 
         await expect(find(docClient, 'u9')).rejects.toThrow(/userUUID#u9/);

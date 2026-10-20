@@ -105,6 +105,9 @@ export const findStudysetKey = async ({
                 `Study set ${studysetUUID} is on the public index under ${own.PK}, not ${key.PK}; fix USER_UUID or leave it out`
             );
         }
+        if (own) {
+            return key;
+        }
         // Checked here so a dry run catches a wrong USER_UUID too.
         const { Item } = await docClient.send(
             new GetCommand({ TableName: tableName, Key: key, ProjectionExpression: 'PK' })

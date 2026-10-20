@@ -25,6 +25,9 @@ const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 const s3Client = new S3Client({});
 
+// Bounds the pages an anonymous request can read while skipping copies.
+const MAX_PAGES = 5;
+
 const notFound = (): APIGatewayProxyResultV2 => ({
     statusCode: 404,
     body: JSON.stringify({
@@ -55,7 +58,9 @@ export const handler: Handler = async (
         // before the set's own row. The filter keeps them out of the payload.
         let studyset: Record<string, unknown> | undefined;
         let lastEvaluatedKey: Record<string, unknown> | undefined;
+        let pages = 0;
         do {
+            pages += 1;
             const result = await docClient.send(
                 new QueryCommand({
                     TableName: mainTable,
@@ -73,7 +78,7 @@ export const handler: Handler = async (
             lastEvaluatedKey = result.LastEvaluatedKey as
                 | Record<string, unknown>
                 | undefined;
-        } while (!studyset && lastEvaluatedKey);
+        } while (!studyset && lastEvaluatedKey && pages < MAX_PAGES);
 
         if (!studyset) {
             return notFound();

@@ -141,8 +141,10 @@ describe("getPublicStudyset handler", () => {
 
         expect(res.statusCode).toBe(200);
         expect(send).toHaveBeenCalledTimes(2);
-        const query = send.mock.calls[0][0] as unknown as { input: { FilterExpression?: string } };
-        expect(query.input.FilterExpression).toBe("SK = SK2");
+        type QueryInput = { input: { FilterExpression?: string; ExclusiveStartKey?: unknown } };
+        const [first, second] = send.mock.calls.map(([cmd]) => cmd as unknown as QueryInput);
+        expect(first.input.FilterExpression).toBe("SK = SK2");
+        expect(second.input.ExclusiveStartKey).toEqual({ PK2: "x" });
     });
 
     it("404s when only a copy is left under the set's index key", async () => {
