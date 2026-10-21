@@ -184,8 +184,8 @@ afterEach(() => {
 });
 
 describe('ViewStudySet lastViewed', () => {
-    it('does not call update-studyset when the set is not in your library', async () => {
-        getStudyset = () => json(500, { message: 'Studyset not found' });
+    it('does not call update-studyset when get-studyset fails with a server error', async () => {
+        getStudyset = () => json(500, { message: 'boom' });
         const { qc, container } = renderView();
 
         await waitFor(() =>

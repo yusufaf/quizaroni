@@ -41,6 +41,10 @@ const toGalleryFiles = (
             size: 0,
         }));
 
+type Props = {
+    showSignupCta?: boolean;
+};
+
 /**
  * Read-only, unauthenticated view of a publicly-shared study set. This is what
  * logged-out visitors (and social/link recipients) land on at `/view/:id`. It
@@ -50,10 +54,6 @@ const toGalleryFiles = (
  * also falls back to this view, with the sign-up CTA hidden, when a logged-in
  * user opens a set that isn't in their library.
  */
-type Props = {
-    showSignupCta?: boolean;
-};
-
 const PublicStudySet = ({ showSignupCta = true }: Props) => {
     const { t } = useTranslation();
     const { id: studysetUUID = '' } = useParams();
