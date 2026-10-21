@@ -252,6 +252,40 @@ describe("getExploreFeed handler", () => {
         expect(recovered.body.total).toBe(2);
     });
 
+    it("serves the stale feed when a refresh fails, and retries the refresh next time", async () => {
+        seed([stored("a", day(1))]);
+        const now = Date.now();
+        const clock = jest.spyOn(Date, "now").mockReturnValue(now);
+        await call();
+
+        clock.mockReturnValue(now + 61_000);
+        const healthy = queryPages;
+        queryPages = () => {
+            throw new Error("throttled");
+        };
+        const stale = await call();
+        expect(stale.res.statusCode).toBe(200);
+        expect(ids(stale.body)).toEqual(["a"]);
+        expect(warn.mock.calls.map(([line]) => String(line)).join("\n")).toContain("exploreFeedRefreshFailed");
+
+        queryPages = healthy;
+        await call();
+        expect(queryCount()).toBe(3);
+    });
+
+    it("gives up on a stale feed older than 15 minutes", async () => {
+        seed([stored("a", day(1))]);
+        const now = Date.now();
+        const clock = jest.spyOn(Date, "now").mockReturnValue(now);
+        await call();
+
+        clock.mockReturnValue(now + 16 * 60_000);
+        queryPages = () => {
+            throw new Error("throttled");
+        };
+        expect((await call()).res.statusCode).toBe(500);
+    });
+
     it("returns an empty last page for a cursor past the oldest entry", async () => {
         seed([stored("a", day(2))]);
         const cursor = encodeCursor({ publishedAt: day(1), studysetUUID: "z" }, "sort=newest");

@@ -39,6 +39,9 @@ const MAX_ITEMS = 5000;
 const SLOW_REFRESH_MS = 1000;
 const WARN_QUERY_PAGES = 5;
 const BATCH_GET_RETRIES = 2;
+const BATCH_GET_BACKOFF_MS = 50;
+// A failed refresh serves the previous feed for at most this long.
+const STALE_MAX_MS = 15 * 60_000;
 
 // A Lambda instance serves one request at a time, so a refresh never races
 // another refresh on the same instance and needs no in-flight dedupe.
@@ -49,9 +52,7 @@ export const resetExploreCache = () => {
     cache = undefined;
 };
 
-const loadEntries = async (now: number) => {
-    if (cache && now - cache.loadedAt < CACHE_TTL_MS) return cache;
-
+const refreshEntries = async (now: number) => {
     const started = Date.now();
     const entries: FeedEntry[] = [];
     let pages = 0;
@@ -114,6 +115,27 @@ const loadEntries = async (now: number) => {
     return cache;
 };
 
+const loadEntries = async (now: number) => {
+    if (cache && now - cache.loadedAt < CACHE_TTL_MS) return cache;
+    try {
+        return await refreshEntries(now);
+    } catch (error) {
+        if (!cache || now - cache.loadedAt > STALE_MAX_MS) throw error;
+        // Safe to serve stale: every page is rechecked before it's sent.
+        // `loadedAt` is left alone, so the next request tries again.
+        console.warn(
+            JSON.stringify({
+                event: 'exploreFeedRefreshFailed',
+                staleMs: now - cache.loadedAt,
+                message: (error as Error).message,
+            })
+        );
+        return cache;
+    }
+};
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const keyId = (key: { PK?: unknown; SK?: unknown }) => `${key.PK}|${key.SK}`;
 
 /**
@@ -130,6 +152,11 @@ const recheckListed = async (page: FeedEntry[]): Promise<FeedEntry[]> => {
     let keys: Record<string, unknown>[] = page.map((entry) => entry.key);
 
     for (let attempt = 0; attempt <= BATCH_GET_RETRIES && keys.length > 0; attempt += 1) {
+        // Exponential backoff with jitter: an immediate retry against a
+        // throttled table is throttled again.
+        if (attempt > 0) {
+            await sleep(BATCH_GET_BACKOFF_MS * 2 ** (attempt - 1) * (0.5 + Math.random() / 2));
+        }
         const result = await docClient.send(
             new BatchGetCommand({
                 RequestItems: {
