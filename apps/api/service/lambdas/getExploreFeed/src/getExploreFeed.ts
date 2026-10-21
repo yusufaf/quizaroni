@@ -42,14 +42,19 @@ const BATCH_GET_RETRIES = 2;
 const BATCH_GET_BACKOFF_MS = 50;
 // A failed refresh serves the previous feed for at most this long.
 const STALE_MAX_MS = 15 * 60_000;
+// After a failed refresh, serve stale this long before trying again, so a
+// throttled index isn't hit by every request.
+const REFRESH_RETRY_MS = 10_000;
 
 // A Lambda instance serves one request at a time, so a refresh never races
 // another refresh on the same instance and needs no in-flight dedupe.
 let cache: { entries: FeedEntry[]; loadedAt: number; truncated: boolean } | undefined;
+let refreshRetryAt = 0;
 
 // Test seam: jest.resetModules would break the prototype spy the lambda tests use.
 export const resetExploreCache = () => {
     cache = undefined;
+    refreshRetryAt = 0;
 };
 
 const refreshEntries = async (now: number) => {
@@ -115,22 +120,31 @@ const refreshEntries = async (now: number) => {
     return cache;
 };
 
+const describeError = (error: unknown) =>
+    error instanceof Error
+        ? { name: error.name, message: error.message }
+        : { message: String(error) };
+
 const loadEntries = async (now: number) => {
     if (cache && now - cache.loadedAt < CACHE_TTL_MS) return cache;
+    const stale = cache && now - cache.loadedAt <= STALE_MAX_MS ? cache : undefined;
+    if (stale && now < refreshRetryAt) return stale;
     try {
         return await refreshEntries(now);
     } catch (error) {
-        if (!cache || now - cache.loadedAt > STALE_MAX_MS) throw error;
+        if (!stale) throw error;
         // Safe to serve stale: every page is rechecked before it's sent.
-        // `loadedAt` is left alone, so the next request tries again.
-        console.warn(
+        // Logged as an error, not a warning, so a broken deploy still alarms
+        // while users get the previous feed.
+        refreshRetryAt = now + REFRESH_RETRY_MS;
+        console.error(
             JSON.stringify({
                 event: 'exploreFeedRefreshFailed',
-                staleMs: now - cache.loadedAt,
-                message: (error as Error).message,
+                staleMs: now - stale.loadedAt,
+                error: describeError(error),
             })
         );
-        return cache;
+        return stale;
     }
 };
 

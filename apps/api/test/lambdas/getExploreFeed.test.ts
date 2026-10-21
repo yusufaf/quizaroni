@@ -252,7 +252,7 @@ describe("getExploreFeed handler", () => {
         expect(recovered.body.total).toBe(2);
     });
 
-    it("serves the stale feed when a refresh fails, and retries the refresh next time", async () => {
+    it("serves the stale feed when a refresh fails, and waits before retrying the refresh", async () => {
         seed([stored("a", day(1))]);
         const now = Date.now();
         const clock = jest.spyOn(Date, "now").mockReturnValue(now);
@@ -266,9 +266,18 @@ describe("getExploreFeed handler", () => {
         const stale = await call();
         expect(stale.res.statusCode).toBe(200);
         expect(ids(stale.body)).toEqual(["a"]);
-        expect(warn.mock.calls.map(([line]) => String(line)).join("\n")).toContain("exploreFeedRefreshFailed");
+        const logged = (console.error as jest.Mock).mock.calls.map(([line]) => String(line)).join("\n");
+        expect(logged).toContain("exploreFeedRefreshFailed");
+        expect(logged).toContain('"name":"Error"');
+        expect(queryCount()).toBe(2);
 
+        // Inside the retry window the stale feed is served without a Query.
         queryPages = healthy;
+        clock.mockReturnValue(now + 65_000);
+        expect(ids((await call()).body)).toEqual(["a"]);
+        expect(queryCount()).toBe(2);
+
+        clock.mockReturnValue(now + 72_000);
         await call();
         expect(queryCount()).toBe(3);
     });
