@@ -177,7 +177,8 @@ describe('CommunitySection', () => {
         expect(fetchMock.mock.calls.at(-1)?.[0]).toContain('cursor=c1');
         expect(loadMore()!.getAttribute('aria-disabled')).toBe('true');
 
-        page2.resolve({ items: range(25, 30), nextCursor: null, total: 30 });
+        // The server's count grew since page 1; the last page still says 30 of 30.
+        page2.resolve({ items: range(25, 30), nextCursor: null, total: 32 });
         await waitFor(() => expect(titles()).toHaveLength(30));
         expect(feed().getAttribute('aria-busy')).toBe('false');
         await waitFor(() =>
