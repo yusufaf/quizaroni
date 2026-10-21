@@ -131,9 +131,13 @@ const updateBody = (index: number) =>
     JSON.parse(String(updateCalls()[index]?.[1]?.body));
 
 // staleTime mirrors state/queryClient.ts so cached data behaves as in the app.
+// useGetStudyset sets its own retry, which beats retry: false here, so
+// retryDelay: 0 keeps its retries fast.
 const renderView = (seed?: (qc: QueryClient) => void) => {
     const qc = new QueryClient({
-        defaultOptions: { queries: { retry: false, staleTime: 1000 * 60 * 5 } },
+        defaultOptions: {
+            queries: { retry: false, retryDelay: 0, staleTime: 1000 * 60 * 5 },
+        },
     });
     seed?.(qc);
     const tree = () => (
