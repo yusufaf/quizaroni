@@ -150,6 +150,19 @@ describe('CommunitySection', () => {
         );
     });
 
+    it('never reads "X of fewer", and says "Showing X" on a capped last page', async () => {
+        replies[''] = { items: range(1, 24), nextCursor: 'c1', total: 20 };
+        replies.c1 = { items: range(25, 26), nextCursor: null };
+        renderSection();
+        await waitFor(() =>
+            expect(status()).toBe('community.showingOf {"shown":24,"total":24}')
+        );
+        fireEvent.click(loadMore()!);
+        await waitFor(() =>
+            expect(status()).toBe('community.showing {"shown":26}')
+        );
+    });
+
     it('marks the skeleton list busy while the first page loads', () => {
         replies = {};
         const { container } = renderSection();

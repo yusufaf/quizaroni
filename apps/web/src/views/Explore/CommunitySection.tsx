@@ -36,10 +36,18 @@ const CommunitySection = () => {
     } = useExploreFeed();
     const items = useMemo(() => dedupeFeedItems(data?.pages), [data]);
     const shown = items.length;
-    // On the last page everything reachable is shown. The server's count can
-    // be ahead (sets published since page 1 sort before the cursor), and
-    // "30 of 32" with no Load more would promise sets the user can't reach.
-    const total = hasNextPage ? data?.pages.at(-1)?.total : shown;
+    // No `total` means the server's read was capped and has no true count.
+    // Otherwise the count is the newest page's cache size, which can drift
+    // from what keyset paging serves: on the last page everything reachable
+    // is shown ("30 of 32" with no Load more would promise sets the user
+    // can't reach), and while more remain it never reads below `shown`.
+    const lastTotal = data?.pages.at(-1)?.total;
+    const total =
+        lastTotal === undefined
+            ? undefined
+            : hasNextPage
+              ? Math.max(lastTotal, shown)
+              : shown;
 
     // Focus moves to the first new card once its page lands. If nothing new
     // arrived and the button is gone, the heading takes focus instead of
