@@ -1,4 +1,9 @@
-import { buildTermPreviews, isSubjectId, truncateText } from '@quizaroni/shared-types';
+import {
+    buildTermPreviews,
+    isSubjectId,
+    normalizeText,
+    truncateText,
+} from '@quizaroni/shared-types';
 import type { ExploreSetSummary, ExploreSort } from '@quizaroni/shared-types';
 import { isPubliclyListed } from 'resources/dynamo/publicSharing';
 
@@ -38,7 +43,7 @@ export type CursorPosition = { publishedAt: string; studysetUUID: string };
 export type ExploreFilters = { sort: ExploreSort };
 
 const text = (value: unknown, maxChars: number): string =>
-    typeof value === 'string' ? truncateText(value.replace(/\s+/g, ' ').trim(), maxChars) : '';
+    truncateText(normalizeText(value), maxChars);
 
 /**
  * Builds a feed card from an explicit allowlist, field by field and never

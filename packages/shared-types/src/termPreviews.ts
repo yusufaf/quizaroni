@@ -1,6 +1,7 @@
 export type TermPreview = { term: string; definition: string };
 
-const normalize = (value: unknown) =>
+// Collapses whitespace; anything that isn't a string becomes ''.
+export const normalizeText = (value: unknown) =>
     typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : '';
 
 // Counts code points, not UTF-16 units, so an emoji isn't cut in half. The
@@ -30,11 +31,11 @@ export const buildTermPreviews = (
         if (previews.length >= n) break;
         if (typeof card !== 'object' || card === null) continue;
         const { term, definition } = card as Record<string, unknown>;
-        const termText = normalize(term);
+        const termText = normalizeText(term);
         if (!termText) continue;
         previews.push({
             term: truncateText(termText, maxChars),
-            definition: truncateText(normalize(definition), maxChars),
+            definition: truncateText(normalizeText(definition), maxChars),
         });
     }
     return previews;

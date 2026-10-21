@@ -2,6 +2,10 @@ import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 import { TypographyStyle } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
+import {
+    MASONRY_COLUMN_GAP,
+    MASONRY_GRID_COLUMNS,
+} from 'shared/components/MasonryFeed/MasonryFeed';
 
 const TILE_RADIUS = '0.75rem';
 
@@ -221,7 +225,7 @@ export const CommunitySkeletonList = styled('ul')({
     margin: 0,
     padding: 0,
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(min(18rem, 100%), 1fr))',
-    gap: '1.5rem',
+    gridTemplateColumns: MASONRY_GRID_COLUMNS,
+    gap: MASONRY_COLUMN_GAP,
     alignItems: 'start',
 });

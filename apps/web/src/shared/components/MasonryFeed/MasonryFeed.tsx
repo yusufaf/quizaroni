@@ -10,6 +10,11 @@ import {
 import { computeRowSpan, countGridColumns } from './computeRowSpan';
 
 export const MASONRY_ROW_UNIT_PX = 8;
+// Shared with placeholders that stand in for the feed, so swapping them in
+// doesn't shift the columns.
+export const MASONRY_GRID_COLUMNS =
+    'repeat(auto-fill, minmax(min(18rem, 100%), 1fr))';
+export const MASONRY_COLUMN_GAP = '1.5rem';
 
 // No `grid-auto-rows` here: it stays `auto` (plain grid flow) until a flush
 // switches it to the row unit together with the spans. No `dense` and no
@@ -19,8 +24,8 @@ const FeedList = styled('ul')({
     margin: 0,
     padding: 0,
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(min(18rem, 100%), 1fr))',
-    columnGap: '1.5rem',
+    gridTemplateColumns: MASONRY_GRID_COLUMNS,
+    columnGap: MASONRY_COLUMN_GAP,
     rowGap: 0,
 });
 
