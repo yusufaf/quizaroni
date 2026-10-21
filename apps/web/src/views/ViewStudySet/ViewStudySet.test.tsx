@@ -230,7 +230,7 @@ describe('ViewStudySet lastViewed', () => {
     });
 
     it('does not trust a cached copy of a set that has since been deleted', async () => {
-        getStudyset = () => json(500, { message: 'Studyset not found' });
+        getStudyset = () => json(404, { message: 'not found' });
         const { qc } = renderView((client) =>
             client.setQueryData(['studysets', ID1], { studyset: ownedSet(ID1) })
         );
@@ -238,6 +238,7 @@ describe('ViewStudySet lastViewed', () => {
         await waitFor(() =>
             expect(qc.getQueryState(['studysets', ID1])?.status).toBe('error')
         );
+        await screen.findByText('publicView.unavailableTitle');
         expect(qc.getMutationCache().getAll()).toHaveLength(0);
         expect(updateCalls()).toHaveLength(0);
     });
