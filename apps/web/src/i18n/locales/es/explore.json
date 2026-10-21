@@ -37,5 +37,19 @@
         "heading": "Aún no tienes sets de estudio",
         "body": "Crea tu primer set y aparecerá aquí.",
         "createSet": "Crear set"
+    },
+    "community": {
+        "heading": "Comunidad",
+        "loading": "Cargando sets públicos…",
+        "error": "No pudimos cargar los sets públicos.",
+        "retry": "Reintentar",
+        "empty": "Aún no hay sets públicos.",
+        "loadMore": "Cargar más",
+        "loadMoreError": "No pudimos cargar más sets.",
+        "showing": "Mostrando {{shown}}",
+        "showingOf": "Mostrando {{shown}} de {{total}}",
+        "anonymous": "Anónimo",
+        "termCount_one": "{{count}} término",
+        "termCount_other": "{{count}} términos"
     }
 }
