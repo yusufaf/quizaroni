@@ -119,7 +119,7 @@ describe("getStudyset handler", () => {
     });
 
     it("returns 500 when DynamoDB fails", async () => {
-        send.mockRejectedValueOnce(new Error("boom"));
+        send.mockRejectedValueOnce(new Error("boom") as never);
 
         const res = await invoke();
 
