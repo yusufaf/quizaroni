@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import {
     MASONRY_COLUMN_GAP,
     MASONRY_GRID_COLUMNS,
-} from 'shared/components/MasonryFeed/MasonryFeed';
+} from 'shared/components/MasonryFeed/masonryLayout';
 
 const TILE_RADIUS = '0.75rem';
 

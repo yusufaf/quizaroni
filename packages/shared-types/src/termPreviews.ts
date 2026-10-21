@@ -1,6 +1,5 @@
 export type TermPreview = { term: string; definition: string };
 
-// Collapses whitespace; anything that isn't a string becomes ''.
 export const normalizeText = (value: unknown) =>
     typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : '';
 

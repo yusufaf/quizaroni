@@ -8,13 +8,11 @@ import {
     useRef,
 } from 'react';
 import { computeRowSpan, countGridColumns } from './computeRowSpan';
-
-export const MASONRY_ROW_UNIT_PX = 8;
-// Shared with placeholders that stand in for the feed, so swapping them in
-// doesn't shift the columns.
-export const MASONRY_GRID_COLUMNS =
-    'repeat(auto-fill, minmax(min(18rem, 100%), 1fr))';
-export const MASONRY_COLUMN_GAP = '1.5rem';
+import {
+    MASONRY_COLUMN_GAP,
+    MASONRY_GRID_COLUMNS,
+    MASONRY_ROW_UNIT_PX,
+} from './masonryLayout';
 
 // No `grid-auto-rows` here: it stays `auto` (plain grid flow) until a flush
 // switches it to the row unit together with the spans. No `dense` and no
