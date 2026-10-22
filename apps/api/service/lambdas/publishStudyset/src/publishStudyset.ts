@@ -16,6 +16,7 @@ import {
     buildPublishUpdate,
     validatePublishRequest,
 } from 'utilities/publishStudyset';
+import { logRequest } from 'utilities/logging';
 
 const { mainTable = '' } = process.env;
 
@@ -50,7 +51,7 @@ export const handler: Handler = async (
 ): Promise<APIGatewayProxyResultV2> => {
     const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
     const body = parseBody(event.body);
-    console.log(JSON.stringify({ requestId: event.requestContext.requestId, userUUID, body }));
+    logRequest(event);
 
     const { studysetUUID, subject } = body;
     if (typeof studysetUUID !== 'string' || !studysetUUID) {

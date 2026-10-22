@@ -13,41 +13,17 @@ const UTILITIES_DIR = path.join(API_ROOT, "utilities");
 const FORBIDDEN_LOGS: Record<string, RegExp> = {
     eventInObject: /console\.\w+\(\s*(JSON\.stringify\(\s*)?\{[^}]*\bevent\b(?!\.)/g,
     eventDirect: /console\.\w+\(\s*(JSON\.stringify\(\s*)?event\b(?!\.)/g,
-    bareBody: /console\.\w+\(\s*JSON\.stringify\(\s*\{\s*body\s*\}/g,
+    bodyInObject: /console\.\w+\(\s*(JSON\.stringify\(\s*)?\{[^}]*\bbody\b(?!\.)/g,
     storedContent:
         /console\.\w+\([^;]*?JSON\.stringify\(\s*(Item\b|delete\w*Response\b|\{\s*updated\w+\s*\})|console\.\w+\(\s*\{\s*ExpressionAttribute/g,
 };
 
-const SUMMARY_LOGGING_LAMBDAS = [
-    "batchDuplicateStudysets",
-    "batchUpdateStudysetLabels",
-    "batchDeleteStudysets",
-    "createStudyset",
-    "createNote",
-    "completeMultipartUpload",
-    "createLabels",
-    "deleteFile",
-    "deleteLabels",
-    "downloadUserData",
-    "deleteNote",
-    "editLabels",
-    "duplicateStudyset",
-    "getAllStudysets",
-    "deleteStudyset",
-    "editNote",
-    "getPublicStudyset",
-    "getStudyset",
-    "getPublicStudysets",
-    "getUser",
-    "initiateMultipartUpload",
-    "getMultipartSignedUploadUrls",
-    "updateGamification",
-    "uploadProfilePicture",
-    "sendFeedback",
-    "updateStudysetLabels",
-    "updateStudyset",
-    "updateUserMetadata",
-    "updateNotificationPreferences",
+// Every routed handler logs a summary, so a new lambda is covered by
+// default. These are the ones that legitimately do not.
+const NO_SUMMARY_LAMBDAS = [
+    "apiAuthorizer", // logs only the failure name/code; its event is not an HTTP API request
+    "aiChat", // not deployed (no index.ts)
+    "logtoUserCreatedWebhook", // logs fixed strings; Logto sends no Quizaroni token
 ];
 
 const lambdaSource = (name: string) =>
@@ -87,8 +63,14 @@ describe("request logging", () => {
         expect(offenders).toEqual([]);
     });
 
-    it("every formerly full-event handler logs a request summary", () => {
-        const missing = SUMMARY_LOGGING_LAMBDAS.filter(
+    it("every handler logs a request summary", () => {
+        const handlers = fs
+            .readdirSync(LAMBDAS_DIR)
+            .filter((name) => fs.existsSync(lambdaSource(name)))
+            .filter((name) => !NO_SUMMARY_LAMBDAS.includes(name));
+        expect(handlers.length).toBeGreaterThanOrEqual(30);
+
+        const missing = handlers.filter(
             (name) => !fs.readFileSync(lambdaSource(name), "utf8").includes("logRequest(event)")
         );
 
