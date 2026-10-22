@@ -150,13 +150,14 @@ describe('CommunitySection', () => {
         );
     });
 
-    it('never reads "X of fewer", and says "Showing X" on a capped last page', async () => {
+    it('drops a drifted count while more remain, and on a capped last page', async () => {
         replies[''] = { items: range(1, 24), nextCursor: 'c1', total: 20 };
         replies.c1 = { items: range(25, 26), nextCursor: null };
         renderSection();
         await waitFor(() =>
-            expect(status()).toBe('community.showingOf {"shown":24,"total":24}')
+            expect(status()).toBe('community.showing {"shown":24}')
         );
+        expect(loadMore()).toBeTruthy();
         fireEvent.click(loadMore()!);
         await waitFor(() =>
             expect(status()).toBe('community.showing {"shown":26}')

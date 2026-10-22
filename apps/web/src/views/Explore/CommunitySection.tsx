@@ -38,16 +38,17 @@ const CommunitySection = () => {
     const shown = items.length;
     // No `total` means the server's read was capped and has no true count.
     // Otherwise the count is the newest page's cache size, which can drift
-    // from what keyset paging serves: on the last page everything reachable
+    // from what keyset paging serves. On the last page everything reachable
     // is shown ("30 of 32" with no Load more would promise sets the user
-    // can't reach), and while more remain it never reads below `shown`.
+    // can't reach). While more remain, a total at or below `shown` has
+    // drifted, and "24 of 24" next to Load more would be wrong too, so the
+    // count is dropped.
     const lastTotal = data?.pages.at(-1)?.total;
-    const total =
-        lastTotal === undefined
-            ? undefined
-            : hasNextPage
-              ? Math.max(lastTotal, shown)
-              : shown;
+    let total: number | undefined;
+    if (lastTotal !== undefined) {
+        if (!hasNextPage) total = shown;
+        else if (lastTotal > shown) total = lastTotal;
+    }
 
     // Focus moves to the first new card once its page lands. If nothing new
     // arrived and the button is gone, the heading takes focus instead of
