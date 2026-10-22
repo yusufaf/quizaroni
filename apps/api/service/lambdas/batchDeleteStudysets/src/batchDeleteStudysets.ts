@@ -51,9 +51,19 @@ export const handler: Handler = async (
             },
         };
 
-        await docClient.send(
+        const { UnprocessedItems } = await docClient.send(
             new BatchWriteCommand(batchWriteCommandInput)
         );
+        // Keys only. The full response used to be logged, and that log was the
+        // only trace of a partial delete (#179).
+        const unprocessed = UnprocessedItems?.[mainTable] ?? [];
+        if (unprocessed.length > 0) {
+            console.error(
+                JSON.stringify({
+                    unprocessedKeys: unprocessed.map((request) => request.DeleteRequest?.Key),
+                })
+            );
+        }
 
         // TODO: Delete all associated files
 

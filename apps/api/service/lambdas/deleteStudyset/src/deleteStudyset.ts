@@ -3,7 +3,7 @@ import {
     APIGatewayProxyResultV2,
     Handler,
 } from "aws-lambda";
-import { DynamoDBClient, ReturnValue } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DeleteCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { AuthorizerContext } from "models/auth";
@@ -36,7 +36,6 @@ export const handler: Handler = async (
                 PK: `userUUID#${userUUID}`,
                 SK: `studyset#${studysetUUID}`,
             },
-            ReturnValues: ReturnValue.ALL_OLD
         })
 
         await docClient.send(deleteCommand);
