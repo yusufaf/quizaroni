@@ -58,7 +58,7 @@ export const handler: Handler = async (
     } catch (err) {
         // Not the raw error: jose's claim errors carry the decoded token
         // claims on `payload` (#179).
-        const { name, code, message } = err as {
+        const { name, code, message } = (err ?? {}) as {
             name?: string;
             code?: string;
             message?: string;

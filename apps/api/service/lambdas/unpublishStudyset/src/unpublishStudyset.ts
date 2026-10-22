@@ -36,9 +36,10 @@ const parseBody = (raw: string | undefined): { studysetUUID?: string } => {
 export const handler: Handler = async (
     event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>
 ): Promise<APIGatewayProxyResultV2> => {
+    logRequest(event);
+
     const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
     const body = parseBody(event.body);
-    logRequest(event);
 
     const { studysetUUID } = body;
     if (typeof studysetUUID !== 'string' || !studysetUUID) {

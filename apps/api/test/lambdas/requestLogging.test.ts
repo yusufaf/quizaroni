@@ -18,12 +18,11 @@ const FORBIDDEN_LOGS: Record<string, RegExp> = {
         /console\.\w+\([^;]*?JSON\.stringify\(\s*(Item\b|delete\w*Response\b|\{\s*updated\w+\s*\})|console\.\w+\(\s*\{\s*ExpressionAttribute/g,
 };
 
-// Every routed handler logs a summary, so a new lambda is covered by
+// Every deployed handler logs a summary, so a new lambda is covered by
 // default. These are the ones that legitimately do not.
 const NO_SUMMARY_LAMBDAS = [
     "apiAuthorizer", // logs only the failure name/code; its event is not an HTTP API request
-    "aiChat", // not deployed (no index.ts)
-    "logtoUserCreatedWebhook", // logs fixed strings; Logto sends no Quizaroni token
+    "logtoUserCreatedWebhook", // Logto sends no Quizaroni token; logs its own rejection reasons
 ];
 
 const lambdaSource = (name: string) =>
@@ -66,7 +65,7 @@ describe("request logging", () => {
     it("every handler logs a request summary", () => {
         const handlers = fs
             .readdirSync(LAMBDAS_DIR)
-            .filter((name) => fs.existsSync(lambdaSource(name)))
+            .filter((name) => fs.existsSync(path.join(LAMBDAS_DIR, name, "index.ts")))
             .filter((name) => !NO_SUMMARY_LAMBDAS.includes(name));
         expect(handlers.length).toBeGreaterThanOrEqual(30);
 
