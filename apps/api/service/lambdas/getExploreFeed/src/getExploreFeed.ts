@@ -120,9 +120,16 @@ const refreshEntries = async (now: number) => {
     return cache;
 };
 
+// AWS SDK errors carry `$metadata` (requestId, httpStatusCode) for correlating
+// with CloudWatch.
 const describeError = (error: unknown) =>
     error instanceof Error
-        ? { name: error.name, message: error.message }
+        ? {
+              name: error.name,
+              message: error.message,
+              stack: error.stack,
+              $metadata: (error as { $metadata?: unknown }).$metadata,
+          }
         : { message: String(error) };
 
 const loadEntries = async (now: number) => {
@@ -271,12 +278,13 @@ export const handler: Handler = async (
             }),
         };
     } catch (error) {
-        console.error(error);
+        console.error(
+            JSON.stringify({ event: 'exploreFeedFailed', error: describeError(error) })
+        );
+        // A public route: table, index and IAM details stay in the logs.
         return {
             statusCode: 500,
-            body: JSON.stringify({
-                message: (error as Error).message,
-            }),
+            body: JSON.stringify({ message: 'Failed to load the feed' }),
         };
     }
 };

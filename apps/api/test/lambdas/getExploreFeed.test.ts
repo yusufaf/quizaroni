@@ -277,8 +277,10 @@ describe("getExploreFeed handler", () => {
         expect(ids((await call()).body)).toEqual(["a"]);
         expect(queryCount()).toBe(2);
 
+        // After the window a successful refresh replaces the stale feed.
+        table.set("userUUID#u-b|studyset#b", stored("b", day(2)));
         clock.mockReturnValue(now + 72_000);
-        await call();
+        expect(ids((await call()).body)).toEqual(["b", "a"]);
         expect(queryCount()).toBe(3);
     });
 
@@ -305,8 +307,10 @@ describe("getExploreFeed handler", () => {
     });
 
     it("returns 500 when the index read fails", async () => {
-        send.mockRejectedValue(new Error("boom") as never);
-        const { res } = await call();
+        send.mockRejectedValue(new Error("boom: arn:aws:dynamodb:...:table/test-main") as never);
+        const { res, body } = await call();
         expect(res.statusCode).toBe(500);
+        expect(body.message).toBe("Failed to load the feed");
+        expect(res.body).not.toContain("arn:aws");
     });
 });
