@@ -50,6 +50,7 @@ export const handler: Handler = async (
 
         // Handle top-level updates for `updatedAt` and `updatedBy`
         for (const [key, value] of Object.entries(topLevelUpdates)) {
+            if (!value) continue;
             const attributeKey = `#${key}`;
             const attributeValue = `:${key}`;
             updateExpressions.push(`${attributeKey} = ${attributeValue}`);

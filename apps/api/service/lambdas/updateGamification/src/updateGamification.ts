@@ -12,6 +12,7 @@ import {
 import { AuthorizerContext } from 'models/auth';
 import { removeKeys } from 'resources/dynamo/utilities';
 import { logRequest } from 'utilities/logging';
+import { buildUpdatedBy } from 'utilities/updatedBy';
 
 const { usersTable = '' } = process.env;
 
@@ -108,23 +109,27 @@ export const handler: Handler = async (
             customAchievements
         );
 
+        const updatedBy = buildUpdatedBy(username);
         const updateCommand = new UpdateCommand({
             Key: { PK, SK },
             TableName: usersTable,
-            UpdateExpression:
-                'SET #metadata.#gamification = :gamification, #metadata.#customAchievements = :customAchievements, #updatedAt = :updatedAt, #updatedBy = :updatedBy',
+            UpdateExpression: [
+                'SET #metadata.#gamification = :gamification',
+                '#metadata.#customAchievements = :customAchievements',
+                '#updatedAt = :updatedAt',
+                ...updatedBy.clauses,
+            ].join(', '),
             ExpressionAttributeNames: {
                 '#metadata': 'metadata',
                 '#gamification': 'gamification',
                 '#customAchievements': 'customAchievements',
                 '#updatedAt': 'updatedAt',
-                '#updatedBy': 'updatedBy',
             },
             ExpressionAttributeValues: {
                 ':gamification': mergedGamification,
                 ':customAchievements': mergedCustom,
                 ':updatedAt': updatedAt,
-                ':updatedBy': username,
+                ...updatedBy.values,
             },
             ReturnValues: 'ALL_NEW',
         });

@@ -16,6 +16,7 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { getStudysetFromDynamo } from 'utilities/studysets';
 import { logRequest } from 'utilities/logging';
+import { buildUpdatedBy } from 'utilities/updatedBy';
 
 const { mainBucket = '', mainTable = '' } = process.env;
 
@@ -113,6 +114,7 @@ export const handler: Handler = async (
                 });
             }
 
+            const updatedBy = buildUpdatedBy(username);
             const updateCommand = new UpdateCommand({
                 TableName: mainTable,
                 Key: {
@@ -122,10 +124,13 @@ export const handler: Handler = async (
                 ExpressionAttributeValues: {
                     ":newCards": newCards,
                     ':updatedAt': updatedAt,
-                    ':updatedBy': username,
+                    ...updatedBy.values,
                 },
-                UpdateExpression:
-                    'SET cards = :newCards, updatedAt = :updatedAt, updatedBy = :updatedBy',
+                UpdateExpression: [
+                    'SET cards = :newCards',
+                    'updatedAt = :updatedAt',
+                    ...updatedBy.clauses,
+                ].join(', '),
             });
             await docClient.send(updateCommand);
         }

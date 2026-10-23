@@ -106,7 +106,7 @@ const editLabelsInAffectedStudysets = async ({
     oldLabel: string;
     newLabel: string;
     PK: string;
-    username: string;
+    username?: string;
 }) => {
     // Query for all study sets of the user
     const queryCommand = new QueryCommand({
@@ -138,7 +138,7 @@ const editLabelsInAffectedStudysets = async ({
                         ...item,
                         labels: updatedLabels,
                         updatedAt: updatedAt,
-                        updatedBy: username,
+                        ...(username ? { updatedBy: username } : {}),
                     },
                 },
             };

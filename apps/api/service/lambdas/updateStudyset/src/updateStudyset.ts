@@ -30,7 +30,7 @@ type BuildUpdateExpressionParams = {
     updates: { [key: string]: any };
     isMetadataUpdate: boolean;
     updatedAt: string;
-    updatedBy: string;
+    updatedBy?: string;
 };
 
 const SERVER_OWNED_FIELDS = new Set(['subject', 'publishedAt', 'moderation', 'PK2', 'SK2']);
@@ -57,6 +57,7 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> =>
  * unpublish and the takedown script, so they are silently stripped here. A
  * top-level `metadata` object (CreateSet's full save) is merged per key
  * rather than replacing the map, so it can't reset `publiclyViewable`.
+ * `updatedBy` is skipped when the token has no username (#180).
  */
 export const buildUpdateExpression = ({
     updates,
@@ -72,6 +73,7 @@ export const buildUpdateExpression = ({
 
     // Handle top-level updates for `updatedAt` and `updatedBy`
     for (const [key, value] of Object.entries(topLevelUpdates)) {
+        if (!value) continue;
         const attributeKey = `#${key}`;
         const attributeValue = `:${key}`;
         updateExpressions.push(`${attributeKey} = ${attributeValue}`);

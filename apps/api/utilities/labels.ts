@@ -31,8 +31,9 @@ export const buildLabelUpdateInput = ({
         ':updatedAt': updatedAt,
     };
 
-    // username comes from an optional Logto custom JWT claim, and the document
-    // client rejects undefined values.
+    // username comes from an optional Logto custom JWT claim. The document
+    // client drops an undefined value, and DynamoDB then rejects the
+    // expression that still references it (#180).
     if (username) {
         setExpressions.push('#updatedBy = :updatedBy');
         ExpressionAttributeNames['#updatedBy'] = 'updatedBy';

@@ -106,7 +106,7 @@ const deleteLabelsFromStudysets = async ({
 }: {
     labelsToDelete: string[];
     PK: string;
-    username: string;
+    username?: string;
 }) => {
     // Query for all study sets of the user
     const queryCommand = new QueryCommand({
@@ -140,7 +140,7 @@ const deleteLabelsFromStudysets = async ({
                         ...item,
                         labels: updatedLabels,
                         updatedAt: updatedAt,
-                        updatedBy: username,
+                        ...(username ? { updatedBy: username } : {}),
                     },
                 },
             };
