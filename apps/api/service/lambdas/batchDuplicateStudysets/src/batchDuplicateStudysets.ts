@@ -74,7 +74,7 @@ export const handler: Handler = async (
 
 type DuplicateIndividualStudysetParams = {
     studysetUUID: string;
-    username: string;
+    username?: string;
     userUUID: string;
 };
 const duplicateIndividualStudyset = async ({

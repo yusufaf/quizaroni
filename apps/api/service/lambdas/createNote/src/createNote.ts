@@ -13,6 +13,7 @@ import { randomUUID } from "crypto";
 import { AuthorizerContext } from "models/auth";
 import { Studyset } from "models/studysets";
 import { logRequest } from "utilities/logging";
+import { buildUpdatedBy } from "utilities/updatedBy";
 
 const { mainTable = "" } = process.env;
 
@@ -74,6 +75,7 @@ export const handler: Handler = async (
             return card;
         });
 
+        const updatedBy = buildUpdatedBy(username);
         const createNoteCommand = new UpdateCommand({
             TableName: mainTable,
             Key: {
@@ -83,10 +85,13 @@ export const handler: Handler = async (
             ExpressionAttributeValues: {
                 ":newCards": newCards,
                 ":updatedAt": updatedAt,
-                ":updatedBy": username,
+                ...updatedBy.values,
             },
-            UpdateExpression:
-                "SET cards = :newCards, updatedAt = :updatedAt, updatedBy = :updatedBy",
+            UpdateExpression: [
+                "SET cards = :newCards",
+                "updatedAt = :updatedAt",
+                ...updatedBy.clauses,
+            ].join(", "),
         });
         await docClient.send(createNoteCommand);
 

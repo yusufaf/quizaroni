@@ -1,4 +1,5 @@
 import { buildUpdateExpression } from "../../service/lambdas/updateStudyset/src/updateStudyset";
+import { expectValidExpressionInput } from "../helpers/expressionInput";
 
 // Regression test for a real bug caught in production: CreateSet.tsx's
 // saveChanges() spreads a previously-fetched studyset into `updates`, which
@@ -151,6 +152,22 @@ describe("updateStudyset buildUpdateExpression", () => {
 
         expect(result.ExpressionAttributeNames).not.toHaveProperty("#metadata");
         expectAllPlaceholdersUsed(result);
+    });
+
+    it.each([
+        ["a full save", { updates: { title: "x" }, isMetadataUpdate: false }],
+        ["a metadata update", { updates: { terminology: "x" }, isMetadataUpdate: true }],
+    ])("skips updatedBy on %s when the token has no username (#180)", (_label, params) => {
+        const result = buildUpdateExpression({
+            ...params,
+            updatedAt: NOW,
+            updatedBy: undefined,
+        });
+
+        expect(result.UpdateExpression).not.toContain("#updatedBy");
+        expect(result.ExpressionAttributeNames).not.toHaveProperty("#updatedBy");
+        expect(result.ExpressionAttributeValues).not.toHaveProperty(":updatedBy");
+        expectValidExpressionInput(result);
     });
 
     it("drops a non-object metadata value", () => {
