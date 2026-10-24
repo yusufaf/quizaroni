@@ -116,6 +116,28 @@ describe('SubjectChips', () => {
         expect(el.getAttribute('data-fade-end')).toBe('false');
     });
 
+    it('rechecks the fade when the chips resize, not only the row', () => {
+        const observed: Element[] = [];
+        vi.stubGlobal(
+            'ResizeObserver',
+            class {
+                observe(target: Element) {
+                    observed.push(target);
+                }
+                disconnect() {}
+            }
+        );
+        try {
+            renderChips();
+            expect(observed).toContain(group());
+            for (const button of within(group()).getAllByRole('button')) {
+                expect(observed).toContain(button);
+            }
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
     it('turns off the chip transition for reduced motion', () => {
         renderChips();
         const cls = Array.from(chip('common:subjects.math').classList).find(

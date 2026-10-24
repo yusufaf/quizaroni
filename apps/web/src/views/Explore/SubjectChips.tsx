@@ -37,6 +37,9 @@ const SubjectChips = ({ value, onChange }: Props) => {
         if (typeof ResizeObserver !== 'undefined') {
             observer = new ResizeObserver(update);
             observer.observe(el);
+            // The chips too: a language or font-size change widens them
+            // without resizing the group.
+            for (const chip of Array.from(el.children)) observer.observe(chip);
         } else {
             window.addEventListener('resize', update);
         }
