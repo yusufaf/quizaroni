@@ -283,6 +283,16 @@ export const rekeyCardFiles = async ({
                 : card
         );
 
+        // Record before the update, so a crash after it can't leave a legacy
+        // object no manifest names. Recording a key the update then skips is
+        // harmless: the delete pass keeps keys that are still referenced.
+        try {
+            recordMigrated([...newKeys.keys()]);
+        } catch (error) {
+            await removeCopies();
+            throw error;
+        }
+
         try {
             // updatedAt/updatedBy stay as they are: this isn't a user edit.
             await docClient.send(
@@ -310,7 +320,6 @@ export const rekeyCardFiles = async ({
 
         result.updated += 1;
         result.filesCopied += newKeys.size;
-        recordMigrated([...newKeys.keys()]);
     }
 
     return result;

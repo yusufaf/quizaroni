@@ -273,8 +273,23 @@ describe('rekeyCardFiles', () => {
         const result = await rekey(dynamo, s3, { recordMigrated });
 
         expect(s3.deletes).toEqual([`${S}/k1`]);
-        expect(recordMigrated).not.toHaveBeenCalled();
+        // Recorded already, but the item still references it, so the delete
+        // pass keeps it.
+        expect(recordMigrated).toHaveBeenCalledWith([LEGACY]);
         expect(result).toMatchObject({ updated: 0, skipped: 1 });
+    });
+
+    it('records the legacy keys before repointing the cards', async () => {
+        const dynamo = makeDynamo([{ Items: [studyset()] }], () =>
+            Promise.reject(Object.assign(new Error('slow down'), { name: 'ThrottlingException' }))
+        );
+        const recordMigrated = jest.fn();
+
+        await expect(rekey(dynamo, makeS3(), { recordMigrated })).rejects.toMatchObject({
+            name: 'ThrottlingException',
+        });
+
+        expect(recordMigrated).toHaveBeenCalledWith([LEGACY]);
     });
 
     it('leaves a file whose object is missing and re-keys the rest', async () => {
