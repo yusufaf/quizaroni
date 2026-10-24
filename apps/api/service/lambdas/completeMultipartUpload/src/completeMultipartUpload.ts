@@ -14,7 +14,11 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { AuthorizerContext } from 'models/auth';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb';
-import { getStudysetFromDynamo } from 'utilities/studysets';
+import { studysetUUIDOfKey } from 'utilities/cardFiles';
+import {
+    callerOwnsStudyset,
+    getStudysetFromDynamo,
+} from 'utilities/studysets';
 import { logRequest } from 'utilities/logging';
 import { buildUpdatedBy } from 'utilities/updatedBy';
 
@@ -45,7 +49,28 @@ export const handler: Handler = async (
     
     const { association, cardUUID, key, parts, studysetUUID, uploadId } = body;
 
+    const keyStudysetUUID = studysetUUIDOfKey(key);
+    if (!keyStudysetUUID || (studysetUUID && studysetUUID !== keyStudysetUUID)) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ message: 'Invalid file key' }),
+        };
+    }
+
     try {
+        const owned = await callerOwnsStudyset({
+            docClient,
+            mainTable,
+            studysetUUID: keyStudysetUUID,
+            userUUID,
+        });
+        if (!owned) {
+            return {
+                statusCode: 403,
+                body: JSON.stringify({ message: 'Forbidden' }),
+            };
+        }
+
         const completeMultipartUploadCommand =
             new CompleteMultipartUploadCommand({
                 Bucket: mainBucket,

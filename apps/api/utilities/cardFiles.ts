@@ -32,6 +32,65 @@ export const isOpaqueCardFileKey = (
     );
 };
 
+export const isUUID = (value: unknown): value is string =>
+    typeof value === 'string' && UUID_RE.test(value);
+
+/**
+ * A card file's set is the first segment of its key, in both the opaque and
+ * the legacy layouts. Returns undefined for anything that can't name a set.
+ */
+export const studysetUUIDOfKey = (key: unknown): string | undefined => {
+    if (typeof key !== 'string') return undefined;
+    const parts = key.split('/');
+    if (parts.length < 2 || parts.some((part) => part === '')) return undefined;
+    return isUUID(parts[0]) ? parts[0] : undefined;
+};
+
+export const isKeyInStudyset = (key: unknown, studysetUUID: string): boolean =>
+    studysetUUIDOfKey(key) === studysetUUID;
+
+export const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+    typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/**
+ * Collects the file keys a client-sent `cards` value names. `malformed` flags
+ * any shape a stored card can't have, so the caller can reject it.
+ */
+export const collectCardFileKeys = (
+    cards: unknown
+): { keys: Set<string>; malformed: boolean } => {
+    const keys = new Set<string>();
+    if (!Array.isArray(cards)) return { keys, malformed: true };
+
+    let malformed = false;
+    for (const card of cards) {
+        if (!isPlainObject(card)) {
+            malformed = true;
+            continue;
+        }
+        const { files } = card;
+        if (files === undefined || files === null) continue;
+        if (!Array.isArray(files)) {
+            malformed = true;
+            continue;
+        }
+        for (const file of files) {
+            if (!isPlainObject(file)) {
+                malformed = true;
+                continue;
+            }
+            const { key } = file;
+            if (key === undefined || key === null || key === '') continue;
+            if (typeof key !== 'string') {
+                malformed = true;
+                continue;
+            }
+            keys.add(key);
+        }
+    }
+    return { keys, malformed };
+};
+
 // CopySource must be URL-encoded; keep the `/` separators literal.
 export const encodeCopySourceKey = (key: string) =>
     key.split('/').map(encodeURIComponent).join('/');
@@ -39,12 +98,13 @@ export const encodeCopySourceKey = (key: string) =>
 /**
  * Gives every card file a new opaque key under the new set, the layout uploads
  * use, and lists the S3 copies that makes necessary. A key shared by several
- * cards maps to one new key.
+ * cards maps to one new key. `shouldRekey` limits this to some keys.
  */
 export const planCardFileCopies = (
     cards: Card[],
     studysetUUID: UUID,
-    newFileKey: () => string = () => cardFileKey(studysetUUID)
+    newFileKey: () => string = () => cardFileKey(studysetUUID),
+    shouldRekey: (key: string) => boolean = () => true
 ): { cards: Card[]; copies: FileCopy[] } => {
     const newKeys = new Map<string, string>();
 
@@ -60,7 +120,9 @@ export const planCardFileCopies = (
     const rekeyed = cards.map((card) => ({
         ...card,
         files: (card.files ?? []).map((file) =>
-            file.key ? { ...file, key: rekey(file.key) } : file
+            file.key && shouldRekey(file.key)
+                ? { ...file, key: rekey(file.key) }
+                : file
         ),
     }));
 
@@ -82,17 +144,20 @@ export const copyCardFiles = async ({
     cards,
     studysetUUID,
     newFileKey,
+    shouldCopy,
 }: {
     s3Client: S3Client;
     bucket: string;
     cards: Card[];
     studysetUUID: UUID;
     newFileKey?: () => string;
+    shouldCopy?: (key: string) => boolean;
 }): Promise<Card[]> => {
     const { cards: rekeyed, copies } = planCardFileCopies(
         cards,
         studysetUUID,
-        newFileKey
+        newFileKey,
+        shouldCopy
     );
     if (copies.length === 0) return rekeyed;
 

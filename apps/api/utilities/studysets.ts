@@ -1,7 +1,12 @@
-import { DynamoDBDocumentClient, GetCommand } from '@aws-sdk/lib-dynamodb';
+import {
+    DynamoDBDocumentClient,
+    GetCommand,
+    QueryCommand,
+} from '@aws-sdk/lib-dynamodb';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Studyset, Card, CardFileMetadata } from 'models/studysets';
+import { collectCardFileKeys } from 'utilities/cardFiles';
 
 type GetStudysetParams = {
     docClient: DynamoDBDocumentClient;
@@ -35,6 +40,87 @@ export const getStudysetFromDynamo = async ({
     }
 
     return Item as Studyset;
+};
+
+/**
+ * A real set carries its own id. Stubs written by old upserts (#127, #146)
+ * sit at a set's key without it, so they must not count as owning the set.
+ */
+export const isRealStudysetItem = (
+    item: Record<string, unknown> | undefined,
+    studysetUUID: string
+): boolean => item?.studysetUUID === studysetUUID;
+
+export const callerOwnsStudyset = async ({
+    docClient,
+    mainTable,
+    studysetUUID,
+    userUUID,
+}: GetStudysetParams): Promise<boolean> => {
+    const { Item } = await docClient.send(
+        new GetCommand({
+            TableName: mainTable,
+            Key: {
+                PK: `userUUID#${userUUID}`,
+                SK: `studyset#${studysetUUID}`,
+            },
+            // A set created moments ago (Combine) must already count.
+            ConsistentRead: true,
+            ProjectionExpression: '#id',
+            ExpressionAttributeNames: { '#id': 'studysetUUID' },
+        })
+    );
+    return isRealStudysetItem(Item, studysetUUID);
+};
+
+/**
+ * Every card file key the caller's other real sets store. A set duplicated
+ * before #126 points at keys under the source set's prefix, which the caller
+ * may not own but can already read through their own set.
+ */
+export const collectCallerStoredCardFileKeys = async ({
+    docClient,
+    mainTable,
+    userUUID,
+    excludeStudysetUUID,
+}: {
+    docClient: DynamoDBDocumentClient;
+    mainTable: string;
+    userUUID: string;
+    excludeStudysetUUID: string;
+}): Promise<Set<string>> => {
+    const keys = new Set<string>();
+    let ExclusiveStartKey: Record<string, unknown> | undefined;
+    do {
+        const page = await docClient.send(
+            new QueryCommand({
+                TableName: mainTable,
+                KeyConditionExpression: '#pk = :pk AND begins_with(#sk, :sk)',
+                ExpressionAttributeNames: {
+                    '#pk': 'PK',
+                    '#sk': 'SK',
+                    '#sid': 'studysetUUID',
+                    '#cards': 'cards',
+                },
+                ExpressionAttributeValues: {
+                    ':pk': `userUUID#${userUUID}`,
+                    ':sk': 'studyset#',
+                },
+                ProjectionExpression: '#sk, #sid, #cards',
+                ConsistentRead: true,
+                ExclusiveStartKey,
+            })
+        );
+        for (const item of page.Items ?? []) {
+            const id = String(item.SK).slice('studyset#'.length);
+            if (id === excludeStudysetUUID || !isRealStudysetItem(item, id)) {
+                continue;
+            }
+            collectCardFileKeys(item.cards).keys.forEach((key) => keys.add(key));
+        }
+        ExclusiveStartKey = page.LastEvaluatedKey;
+    } while (ExclusiveStartKey);
+    return keys;
 };
 
 const SIGNED_URL_EXPIRATION = 86400; // 24 hours in seconds

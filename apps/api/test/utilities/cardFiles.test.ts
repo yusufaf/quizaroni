@@ -1,6 +1,14 @@
 import { S3Client, CopyObjectCommand } from "@aws-sdk/client-s3";
 import type { Card, CardFileMetadata } from "models/studysets";
-import { planCardFileCopies, copyCardFiles, isOpaqueCardFileKey } from "utilities/cardFiles";
+import {
+    planCardFileCopies,
+    copyCardFiles,
+    isOpaqueCardFileKey,
+    isUUID,
+    studysetUUIDOfKey,
+    isKeyInStudyset,
+    collectCardFileKeys,
+} from "utilities/cardFiles";
 
 // #126: a duplicate kept the source's file keys, so removing an image from
 // the copy deleted the original's S3 object. Copies now get their own objects.
@@ -109,6 +117,19 @@ describe("planCardFileCopies", () => {
 
         expect(input).toEqual(before);
     });
+
+    // #188: Combine copies only the keys from other sets, not the set's own.
+    it("re-keys only the files shouldRekey picks and plans copies only for them", () => {
+        const { cards, copies } = planCardFileCopies(
+            [card([file("NEW/own"), file("src/u1/x.png")])],
+            "NEW",
+            seqKeys(),
+            (key) => key.startsWith("src/")
+        );
+
+        expect(keys(cards)).toEqual([["NEW/own", "NEW/k1"]]);
+        expect(copies).toEqual([{ from: "src/u1/x.png", to: "NEW/k1" }]);
+    });
 });
 
 describe("copyCardFiles", () => {
@@ -171,6 +192,22 @@ describe("copyCardFiles", () => {
 
         await expect(run([card([file("src/u1/a.png")])])).rejects.toMatchObject({ name: "AccessDenied" });
     });
+
+    it("copies only the keys shouldCopy picks", async () => {
+        const { copies } = fakeS3();
+
+        const cards = await copyCardFiles({
+            s3Client,
+            bucket: "bucket",
+            cards: [card([file("NEW/own"), file("src/u1/a.png")])],
+            studysetUUID: "NEW",
+            newFileKey: seqKeys(),
+            shouldCopy: (key) => key === "src/u1/a.png",
+        });
+
+        expect(copies.map((c) => c.CopySource)).toEqual(["bucket/src/u1/a.png"]);
+        expect(keys(cards)).toEqual([["NEW/own", "NEW/k1"]]);
+    });
 });
 
 describe("isOpaqueCardFileKey", () => {
@@ -197,5 +234,73 @@ describe("isOpaqueCardFileKey", () => {
     it("rejects any key when the set id is missing", () => {
         expect(isOpaqueCardFileKey(`${S}/${FILE}`, undefined)).toBe(false);
         expect(isOpaqueCardFileKey(`/${FILE}`, "")).toBe(false);
+    });
+});
+
+describe("studysetUUIDOfKey", () => {
+    const S = "11111111-1111-4111-8111-111111111111";
+    const FILE = "44444444-4444-4444-8444-444444444444";
+
+    it("returns the set id of an opaque key", () => {
+        expect(studysetUUIDOfKey(`${S}/${FILE}`)).toBe(S);
+    });
+
+    it("returns the set id of a legacy key", () => {
+        expect(studysetUUIDOfKey(`${S}/22222222-2222-4222-8222-222222222222/photo.png`)).toBe(S);
+    });
+
+    it.each([
+        ["an empty set segment (what cardFileKey('') makes)", `/${S}`],
+        ["a non-UUID prefix", "notauuid/x"],
+        ["a bare set id", S],
+        ["an empty middle segment", `${S}//x`],
+        ["a trailing slash", `${S}/`],
+        ["a numeric key", 42],
+        ["a missing key", undefined],
+    ])("returns undefined for %s", (_label, key) => {
+        expect(studysetUUIDOfKey(key)).toBeUndefined();
+    });
+});
+
+describe("isUUID", () => {
+    it("accepts a UUID and rejects anything else", () => {
+        expect(isUUID("11111111-1111-4111-8111-111111111111")).toBe(true);
+        expect(isUUID("")).toBe(false);
+        expect(isUUID("abc")).toBe(false);
+        expect(isUUID(undefined)).toBe(false);
+    });
+});
+
+describe("isKeyInStudyset", () => {
+    const S = "11111111-1111-4111-8111-111111111111";
+    const OTHER = "99999999-9999-4999-8999-999999999999";
+
+    it("is true only for keys under the set's prefix", () => {
+        expect(isKeyInStudyset(`${S}/f`, S)).toBe(true);
+        expect(isKeyInStudyset(`${OTHER}/f`, S)).toBe(false);
+        expect(isKeyInStudyset(`/${S}`, S)).toBe(false);
+    });
+});
+
+describe("collectCardFileKeys", () => {
+    it("collects every non-empty key once", () => {
+        const { keys: found, malformed } = collectCardFileKeys([
+            card([file("a/1"), file("")]),
+            card([file("a/1"), file("b/2")]),
+            { ...card([]), files: undefined },
+        ]);
+
+        expect([...found]).toEqual(["a/1", "b/2"]);
+        expect(malformed).toBe(false);
+    });
+
+    it.each([
+        ["cards that are not an array", { 0: card([]) }],
+        ["a card that is not an object", ["card"]],
+        ["files that are not an array", [{ files: "a/1" }]],
+        ["a file that is not an object", [{ files: ["a/1"] }]],
+        ["a numeric key", [{ files: [{ key: 42 }] }]],
+    ])("flags %s as malformed", (_label, cards) => {
+        expect(collectCardFileKeys(cards).malformed).toBe(true);
     });
 });
