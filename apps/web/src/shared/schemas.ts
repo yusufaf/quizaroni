@@ -430,6 +430,7 @@ export const GetMultipartSignedUploadUrlsResponseSchema = z.object({
 export const CompleteMultipartUploadRequestSchema = z.object({
     association: z.enum(['term', 'definition']).optional(),
     cardUUID: UUIDSchema.optional(),
+    fileName: z.string().optional(),
     key: z.string(),
     parts: z.array(PartSchema),
     studysetUUID: UUIDSchema.optional(),
