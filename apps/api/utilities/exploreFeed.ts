@@ -4,7 +4,7 @@ import {
     normalizeText,
     truncateText,
 } from '@quizaroni/shared-types';
-import type { ExploreSetSummary, ExploreSort } from '@quizaroni/shared-types';
+import type { ExploreSetSummary, ExploreSort, SubjectId } from '@quizaroni/shared-types';
 import { isPubliclyListed } from 'resources/dynamo/publicSharing';
 
 export const EXPLORE_DEFAULT_LIMIT = 24;
@@ -40,7 +40,9 @@ export type FeedEntry = {
 
 export type CursorPosition = { publishedAt: string; studysetUUID: string };
 
-export type ExploreFilters = { sort: ExploreSort };
+// `subject` is left out, not null, when unset, so a no-subject query keeps its
+// original filter key and shape.
+export type ExploreFilters = { sort: ExploreSort; subject?: SubjectId };
 
 const text = (value: unknown, maxChars: number): string =>
     truncateText(normalizeText(value), maxChars);
@@ -90,8 +92,20 @@ export const comparePositions = (a: CursorPosition, b: CursorPosition): number =
 export const compareEntries = (a: FeedEntry, b: FeedEntry): number =>
     comparePositions(a.summary, b.summary);
 
-// Later filters (subject, q) are appended in a fixed order.
-export const filterKey = (filters: ExploreFilters): string => `sort=${filters.sort}`;
+// Filters are appended in a fixed order (q, when it lands, goes after subject).
+// Subject ids are [a-z-], so they need no escaping.
+export const filterKey = (filters: ExploreFilters): string =>
+    `sort=${filters.sort}${filters.subject ? `&subject=${filters.subject}` : ''}`;
+
+// Matches on the summary's subject, which toSummary already maps from a
+// retired id to 'other'.
+export const selectEntries = (
+    entries: readonly FeedEntry[],
+    filters: ExploreFilters
+): readonly FeedEntry[] =>
+    filters.subject
+        ? entries.filter((entry) => entry.summary.subject === filters.subject)
+        : entries;
 
 export const encodeCursor = (position: CursorPosition, key: string): string =>
     Buffer.from(
@@ -163,6 +177,16 @@ export const parseExploreQuery = (
         limit = Math.min(Number(params.limit), EXPLORE_MAX_LIMIT);
     }
 
+    const subject = params?.subject || undefined;
+    if (subject !== undefined && !isSubjectId(subject)) {
+        return { ok: false, message: 'Unsupported subject' };
+    }
+
     const cursor = params?.cursor || undefined;
-    return { ok: true, filters: { sort }, limit, ...(cursor ? { cursor } : {}) };
+    return {
+        ok: true,
+        filters: { sort, ...(subject ? { subject } : {}) },
+        limit,
+        ...(cursor ? { cursor } : {}),
+    };
 };
