@@ -2,6 +2,10 @@ import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 import { TypographyStyle } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
+import {
+    MASONRY_COLUMN_GAP,
+    MASONRY_GRID_COLUMNS,
+} from 'shared/components/MasonryFeed/masonryLayout';
 
 const TILE_RADIUS = '0.75rem';
 
@@ -166,11 +170,13 @@ export const TilePreviewList = styled('ul')({
     overflow: 'hidden',
 });
 
-export const TilePreviewItem = styled('li')(({ theme }) => ({
+export const TilePreviewItem = styled('li', {
+    shouldForwardProp: (prop) => prop !== 'lines',
+})<{ lines?: number }>(({ theme, lines = 1 }) => ({
     ...typeScale(theme.typography.body2),
     color: theme.palette.text.secondary,
     display: '-webkit-box',
-    WebkitLineClamp: 1,
+    WebkitLineClamp: lines,
     WebkitBoxOrient: 'vertical',
     overflow: 'hidden',
     overflowWrap: 'anywhere',
@@ -198,4 +204,28 @@ export const TileFooter = styled('div')({
     '& > p': {
         marginTop: 0,
     },
+});
+
+export const CardByline = styled('p')(({ theme }) => ({
+    ...typeScale(theme.typography.caption),
+    margin: 0,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+    flexWrap: 'wrap',
+    minWidth: 0,
+    color: theme.palette.text.secondary,
+    overflowWrap: 'anywhere',
+}));
+
+// Same columns as MasonryFeed, so the first page doesn't jump sideways when
+// the skeletons are replaced.
+export const CommunitySkeletonList = styled('ul')({
+    listStyle: 'none',
+    margin: 0,
+    padding: 0,
+    display: 'grid',
+    gridTemplateColumns: MASONRY_GRID_COLUMNS,
+    gap: MASONRY_COLUMN_GAP,
+    alignItems: 'start',
 });

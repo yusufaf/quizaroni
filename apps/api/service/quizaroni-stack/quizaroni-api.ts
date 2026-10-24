@@ -45,6 +45,8 @@ export class QuizaroniAPI extends Construct {
     deploymentType: string;
     region: string;
     prefix: string;
+    // Stages that carry per-route throttling for the public routes.
+    publicRouteStages: CfnStage[] = [];
 
     constructor(scope: Construct, id: string, props: ExtendedStackProps) {
         super(scope, id);
@@ -133,11 +135,13 @@ export class QuizaroniAPI extends Construct {
         apiGatewayLogWriterRole.addToPolicy(policy);
         accessLogs.grantWrite(apiGatewayLogWriterRole);
 
-        new HttpStage(this, `${deploymentType}-stage}`, {
+        const namedStage = new HttpStage(this, `${deploymentType}-stage}`, {
             httpApi: api,
             stageName: deploymentType,
             autoDeploy: true,
         });
+        // Both stages, so `/<stage>/api/public/...` isn't an unthrottled bypass.
+        this.publicRouteStages = [stage, namedStage.node.defaultChild as CfnStage];
 
         this.createUpdateLambdaRoles();
 
@@ -330,12 +334,23 @@ export class QuizaroniAPI extends Construct {
         // Cognito authorizer so crawlers, social scrapers, and logged-out
         // visitors can read publicly-shared study sets. The lambdas enforce
         // `metadata.publiclyViewable` server-side.
+        //
+        // Route throttling is per route across all callers, not per client:
+        // one heavy caller can use up a route's budget for everyone. A CDN/WAF
+        // for per-client limits is deferred (#123).
+        // The list routes read many rows per request. The single-set route is
+        // one read but sits on every `/view/*` page load (the og-meta edge
+        // function and the logged-in fallback), so it gets more headroom.
+        const PUBLIC_LIST_THROTTLE = { throttlingRateLimit: 20, throttlingBurstLimit: 40 };
+        const PUBLIC_STUDYSET_THROTTLE = { throttlingRateLimit: 100, throttlingBurstLimit: 200 };
+
         this.createLambdaHttpIntegration({
             api,
             lambdaProps,
             path: `/api/public/studyset/{studysetUUID}`,
             lambdaName: 'getPublicStudyset',
             methods: [HttpMethod.GET],
+            throttle: PUBLIC_STUDYSET_THROTTLE,
         });
 
         this.createLambdaHttpIntegration({
@@ -344,6 +359,16 @@ export class QuizaroniAPI extends Construct {
             path: `/api/public/studysets`,
             lambdaName: 'getPublicStudysets',
             methods: [HttpMethod.GET],
+            throttle: PUBLIC_LIST_THROTTLE,
+        });
+
+        this.createLambdaHttpIntegration({
+            api,
+            lambdaProps,
+            path: `/api/public/explore`,
+            lambdaName: 'getExploreFeed',
+            methods: [HttpMethod.GET],
+            throttle: PUBLIC_LIST_THROTTLE,
         });
 
         // Logto calls this directly (Console > Webhooks, User.Created) —
@@ -395,6 +420,7 @@ export class QuizaroniAPI extends Construct {
                 'dynamodb:UpdateItem',
                 'dynamodb:DeleteItem',
                 'dynamodb:BatchWriteItem',
+                'dynamodb:BatchGetItem',
             ],
             resources: dynamoTableResources,
         });
@@ -462,6 +488,7 @@ export class QuizaroniAPI extends Construct {
         path,
         lambdaName,
         authorizer,
+        throttle,
     }: {
         api: HttpApi;
         lambdaName: string;
@@ -469,13 +496,14 @@ export class QuizaroniAPI extends Construct {
         methods?: HttpMethod[];
         path: string;
         authorizer?: IHttpRouteAuthorizer;
+        throttle?: { throttlingRateLimit: number; throttlingBurstLimit: number };
     }) => {
         const lambdaFunction: (props: LambdaProps) => NodejsFunction =
             await getDefaultExportForLambda(lambdaName);
         const lambda = lambdaFunction({ ...lambdaProps });
         this.setLambdaLogRetention(lambda, lambdaName);
 
-        api.addRoutes({
+        const routes = api.addRoutes({
             path,
             methods,
             integration: new HttpLambdaIntegration(
@@ -485,5 +513,17 @@ export class QuizaroniAPI extends Construct {
             ),
             authorizer,
         });
+
+        if (throttle) {
+            const settings = Object.fromEntries(
+                methods.map((method) => [`${method} ${path}`, throttle])
+            );
+            for (const stage of this.publicRouteStages) {
+                stage.routeSettings = { ...(stage.routeSettings ?? {}), ...settings };
+                // CloudFormation rejects route settings for a route key that
+                // doesn't exist yet.
+                routes.forEach((route) => stage.node.addDependency(route));
+            }
+        }
     };
 }

@@ -55,6 +55,10 @@ vi.mock('react-router-dom', () => {
     };
 });
 
+// Community has its own tests and fetches its own feed; keep it out of the
+// library fetch stub here.
+vi.mock('./CommunitySection', () => ({ default: () => null }));
+
 vi.mock('state/local/repositories', () => ({
     cardProgressRepository: {
         getDueCountsBySet: (...args: unknown[]) => dueSpy(...args),

@@ -241,6 +241,27 @@ export const GetPublicStudysetResponseSchema = z.object({
     studyset: PublicStudysetSchema,
 });
 
+// Community feed (#135). Mirrors `toSummary` in
+// `apps/api/utilities/exploreFeed.ts`: text-only previews, no file data.
+// `subject` is a plain string so a retired id doesn't fail validation.
+export const ExploreSetSummarySchema = z.object({
+    studysetUUID: z.string(),
+    title: z.string(),
+    description: z.string(),
+    subject: z.string(),
+    termCount: z.number(),
+    previews: z.array(z.object({ term: z.string(), definition: z.string() })),
+    username: z.string().nullable(),
+    publishedAt: z.string(),
+    updatedAt: z.string().nullable(),
+});
+
+export const ExploreFeedResponseSchema = z.object({
+    items: z.array(ExploreSetSummarySchema),
+    nextCursor: z.string().nullable(),
+    total: z.number().optional(),
+});
+
 export const DeleteStudysetRequestSchema = StudysetUUIDPayloadSchema;
 
 export const BatchDeleteStudysetsRequestSchema = z.object({

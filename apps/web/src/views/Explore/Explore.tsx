@@ -25,6 +25,7 @@ import {
     selectRevisit,
     summarizeDue,
 } from './forYou';
+import CommunitySection from './CommunitySection';
 import ForYouSection from './ForYouSection';
 
 const Explore = () => {
@@ -153,6 +154,11 @@ const Explore = () => {
                         {t('title')}
                     </Typography>
                     {renderContent()}
+                    {/* Below the empty-library state too: a new user can
+                        still browse public sets. */}
+                    <Box sx={{ mt: 5 }}>
+                        <CommunitySection />
+                    </Box>
                 </HomeContainer>
             </HomePaper>
         </HomePage>

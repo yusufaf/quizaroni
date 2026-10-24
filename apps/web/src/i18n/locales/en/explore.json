@@ -37,5 +37,19 @@
         "heading": "No study sets yet",
         "body": "Create your first set and it will show up here.",
         "createSet": "Create set"
+    },
+    "community": {
+        "heading": "Community",
+        "loading": "Loading public sets…",
+        "error": "We couldn't load public sets.",
+        "retry": "Try again",
+        "empty": "No public sets yet.",
+        "loadMore": "Load more",
+        "loadMoreError": "We couldn't load more sets.",
+        "showing": "Showing {{shown}}",
+        "showingOf": "Showing {{shown}} of {{total}}",
+        "anonymous": "Anonymous",
+        "termCount_one": "{{count}} term",
+        "termCount_other": "{{count}} terms"
     }
 }
