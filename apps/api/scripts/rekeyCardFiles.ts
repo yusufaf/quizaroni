@@ -11,7 +11,9 @@
  * - Re-key: for each study set with legacy keys, copy every legacy object to
  *   a new opaque key, then point the cards at the copies with a conditional
  *   update (skipped if the cards changed since the scan). Legacy objects are
- *   never deleted here; each migrated key is appended to the MANIFEST file.
+ *   never deleted here. Before each update, the item's legacy keys are
+ *   appended to the MANIFEST file, so it can also name keys whose update
+ *   was then skipped; the delete pass keeps those while they're referenced.
  * - Delete (DELETE_OLD=1, at least 7 days later): delete the manifest keys
  *   that no study set references any more.
  * Deletion is deferred because an editor tab opened before the migration

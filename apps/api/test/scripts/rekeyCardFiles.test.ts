@@ -292,6 +292,19 @@ describe('rekeyCardFiles', () => {
         expect(recordMigrated).toHaveBeenCalledWith([LEGACY]);
     });
 
+    it('removes its copies and does not update when the manifest write fails', async () => {
+        const dynamo = makeDynamo([{ Items: [studyset()] }]);
+        const s3 = makeS3();
+        const recordMigrated = () => {
+            throw Object.assign(new Error('read-only'), { code: 'EACCES' });
+        };
+
+        await expect(rekey(dynamo, s3, { recordMigrated })).rejects.toMatchObject({ code: 'EACCES' });
+
+        expect(s3.deletes).toEqual([`${S}/k1`]);
+        expect(dynamo.updates).toHaveLength(0);
+    });
+
     it('leaves a file whose object is missing and re-keys the rest', async () => {
         const item = studyset([legacyFile(), legacyFile(OTHER_LEGACY)]);
         const dynamo = makeDynamo([{ Items: [item] }]);
