@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
-import type { ExploreSort } from '@quizaroni/shared-types';
+import type { ExploreSort, SubjectId } from '@quizaroni/shared-types';
 import { BASE_API_URL, fetchJson } from './awsAPI';
 import { validate } from 'shared/validation';
 import { ExploreFeedResponseSchema } from 'shared/schemas';
@@ -10,30 +10,40 @@ export const EXPLORE_STALE_TIME_MS = 60_000;
 
 export const exploreFeedUrl = ({
     sort,
+    subject,
     cursor,
     limit,
 }: {
     sort: ExploreSort;
+    subject: SubjectId | null;
     cursor: string | null;
     limit: number;
 }): string => {
-    const params = new URLSearchParams({ sort, limit: String(limit) });
+    const params = new URLSearchParams({ sort });
+    if (subject) params.set('subject', subject);
+    params.set('limit', String(limit));
     if (cursor) params.set('cursor', cursor);
     return `${BASE_API_URL}/public/explore?${params}`;
 };
 
-/** Newest public sets for the Community feed, a page per Load more. */
+/**
+ * Newest public sets for the Community feed, a page per Load more. With no
+ * placeholderData, a subject not yet cached shows the skeleton rather than
+ * the previous subject's cards.
+ */
 export const useExploreFeed = ({
     sort = 'newest',
-}: { sort?: ExploreSort } = {}) =>
+    subject = null,
+}: { sort?: ExploreSort; subject?: SubjectId | null } = {}) =>
     useInfiniteQuery({
-        queryKey: ['explore-feed', { sort }],
+        queryKey: ['explore-feed', { sort, subject }],
         queryFn: async ({ pageParam, signal }) =>
             validate({
                 schema: ExploreFeedResponseSchema,
                 data: await fetchJson(
                     exploreFeedUrl({
                         sort,
+                        subject,
                         cursor: pageParam,
                         limit: EXPLORE_PAGE_SIZE,
                     }),
