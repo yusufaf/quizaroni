@@ -4,12 +4,16 @@ import {
     Handler,
 } from "aws-lambda";
 import { S3Client, CreateMultipartUploadCommand } from "@aws-sdk/client-s3";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { AuthorizerContext } from "models/auth";
-import { cardFileKey } from "utilities/cardFiles";
+import { cardFileKey, isUUID } from "utilities/cardFiles";
 import { logRequest } from "utilities/logging";
+import { callerOwnsStudyset } from "utilities/studysets";
 
-const { mainBucket = "" } = process.env;
+const { mainBucket = "", mainTable = "" } = process.env;
 
+const docClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 const s3Client = new S3Client();
 
 type RequestBody = {
@@ -31,9 +35,23 @@ export const handler: Handler = async (
 
     const { contentType, studysetUUID, uploadType } = body;
 
-    const key = cardFileKey(studysetUUID ?? "");
+    if (!isUUID(studysetUUID)) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ message: "Invalid studysetUUID" }),
+        };
+    }
+
+    const key = cardFileKey(studysetUUID);
 
     try {
+        if (!(await callerOwnsStudyset({ docClient, mainTable, studysetUUID, userUUID }))) {
+            return {
+                statusCode: 403,
+                body: JSON.stringify({ message: "Forbidden" }),
+            };
+        }
+
         const multipartCommand = new CreateMultipartUploadCommand({
             Bucket: mainBucket,
             Key: key,
