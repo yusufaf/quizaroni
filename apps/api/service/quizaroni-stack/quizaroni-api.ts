@@ -341,8 +341,10 @@ export class QuizaroniAPI extends Construct {
         // The list routes read many rows per request. The single-set route is
         // one read but sits on every `/view/*` page load (the og-meta edge
         // function and the logged-in fallback), so it gets more headroom.
-        const PUBLIC_LIST_THROTTLE = { throttlingRateLimit: 20, throttlingBurstLimit: 40 };
-        const PUBLIC_STUDYSET_THROTTLE = { throttlingRateLimit: 100, throttlingBurstLimit: 200 };
+        // `routeSettings` is passed to CloudFormation as raw JSON, so the keys
+        // must use its PascalCase names.
+        const PUBLIC_LIST_THROTTLE = { ThrottlingRateLimit: 20, ThrottlingBurstLimit: 40 };
+        const PUBLIC_STUDYSET_THROTTLE = { ThrottlingRateLimit: 100, ThrottlingBurstLimit: 200 };
 
         this.createLambdaHttpIntegration({
             api,
@@ -496,7 +498,7 @@ export class QuizaroniAPI extends Construct {
         methods?: HttpMethod[];
         path: string;
         authorizer?: IHttpRouteAuthorizer;
-        throttle?: { throttlingRateLimit: number; throttlingBurstLimit: number };
+        throttle?: { ThrottlingRateLimit: number; ThrottlingBurstLimit: number };
     }) => {
         const lambdaFunction: (props: LambdaProps) => NodejsFunction =
             await getDefaultExportForLambda(lambdaName);
