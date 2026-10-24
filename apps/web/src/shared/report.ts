@@ -12,11 +12,12 @@ export type ReportStrings = {
     reason: string;
 };
 
-// encodeURIComponent throws on a lone surrogate (a title cut mid-emoji), and
-// this runs during render. String.prototype.toWellFormed isn't in Safari 16.0.
-const toWellFormed = (value: string) =>
+// encodeURIComponent throws on a lone surrogate, which a JSON `\uD83E` escape
+// can put in a title, and this runs during render. String.prototype
+// .toWellFormed would do the same, but Safari 16.0-16.3 lacks it.
+const replaceLoneSurrogates = (value: string) =>
     value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDFFF]/g, (match) =>
-        match.length === 2 ? match : '�'
+        match.length === 2 ? match : '\uFFFD'
     );
 
 // encodeURIComponent, not URLSearchParams: mail clients show its `+` for
@@ -34,7 +35,7 @@ export const reportMailto = (
         '',
         `${s.reason}: `,
     ].join('\r\n');
-    return `mailto:${REPORT_EMAIL}?subject=${encodeURIComponent(toWellFormed(s.subject))}&body=${encodeURIComponent(toWellFormed(body))}`;
+    return `mailto:${REPORT_EMAIL}?subject=${encodeURIComponent(replaceLoneSurrogates(s.subject))}&body=${encodeURIComponent(replaceLoneSurrogates(body))}`;
 };
 
 export const useReportHref = (studysetUUID: string, title: string): string => {

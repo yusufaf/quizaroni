@@ -39,14 +39,20 @@ describe('reportMailto', () => {
         expect(params.get('body')).toContain(UUID);
     });
 
-    it('replaces a lone surrogate instead of throwing during render', () => {
-        const href = reportMailto(
-            UUID,
-            ORIGIN,
-            strings({ subject: 'Report: Biology \uD83E 🧬' })
-        );
-        expect(new URL(href).searchParams.get('subject')).toBe(
-            'Report: Biology � 🧬'
-        );
-    });
+    it.each([
+        ['a lone high surrogate', 'Biology \uD83E x', 'Biology \uFFFD x'],
+        ['a trailing high surrogate', 'Biology \uD83E', 'Biology \uFFFD'],
+        ['a lone low surrogate', 'Biology \uDC9E', 'Biology \uFFFD'],
+        ['an intact pair', 'Biology \uD83E\uDDEC', 'Biology \uD83E\uDDEC'],
+    ])(
+        'replaces %s instead of throwing during render',
+        (_, title, expected) => {
+            const href = reportMailto(
+                UUID,
+                ORIGIN,
+                strings({ subject: title })
+            );
+            expect(new URL(href).searchParams.get('subject')).toBe(expected);
+        }
+    );
 });
