@@ -24,7 +24,7 @@ type Props = {
 const SavePublicSetButton = ({ studysetUUID, title, variant }: Props) => {
     const { t } = useTranslation();
     const { isAuthenticated } = useLogto();
-    const { mutate, isPending } = useCopyPublicStudyset();
+    const { mutateAsync, isPending } = useCopyPublicStudyset();
     const [saved, setSaved] = useState(false);
     // isPending only flips after a render, so a fast double click would
     // otherwise send two saves.
@@ -61,19 +61,17 @@ const SavePublicSetButton = ({ studysetUUID, title, variant }: Props) => {
     const save = () => {
         if (inFlight.current || saved) return;
         inFlight.current = true;
-        mutate(
-            { studysetUUID },
-            {
-                onSuccess: () => {
+        // The promise, unlike per-call mutate() callbacks, settles even if the
+        // button unmounts first, so the user still hears how the save went.
+        mutateAsync({ studysetUUID })
+            .then(
+                () => {
                     setSaved(true);
                     toast.success(t('save.success'), {
                         position: toast.POSITION.BOTTOM_LEFT,
                     });
                 },
-                onSettled: () => {
-                    inFlight.current = false;
-                },
-                onError: (error) => {
+                (error: unknown) => {
                     toast.error(
                         t(
                             isHttpStatus(error, 404)
@@ -82,9 +80,11 @@ const SavePublicSetButton = ({ studysetUUID, title, variant }: Props) => {
                         ),
                         { position: toast.POSITION.BOTTOM_LEFT }
                     );
-                },
-            }
-        );
+                }
+            )
+            .finally(() => {
+                inFlight.current = false;
+            });
     };
 
     const busy = isPending || saved;

@@ -192,6 +192,46 @@ describe('SavePublicSetButton', () => {
         );
     });
 
+    // Per-call mutate() callbacks are skipped once the component unmounts.
+    it.each([
+        [200, 'success', 'save.success'],
+        [500, 'error', 'save.error'],
+    ] as const)(
+        'still reports a %s save after the button unmounts',
+        async (status, kind, message) => {
+            authenticated = true;
+            let reply!: () => void;
+            fetchMock.mockImplementation(
+                () =>
+                    new Promise<Response>((resolve) => {
+                        reply = () =>
+                            resolve(
+                                new Response(JSON.stringify({ message: 'x' }), {
+                                    status,
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                })
+                            );
+                    })
+            );
+            const { unmount } = renderButton();
+
+            fireEvent.click(
+                screen.getByRole('button', { name: 'save.action' })
+            );
+            await waitFor(() => expect(copyCalls()).toHaveLength(1));
+            unmount();
+            reply();
+
+            await waitFor(() =>
+                expect(toastMock[kind]).toHaveBeenCalledWith(message, {
+                    position: 'bottom-left',
+                })
+            );
+        }
+    );
+
     it('names the card action after the set', async () => {
         authenticated = true;
         renderButton('icon');
