@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi } from 'vite-plus/test';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { SUBJECT_IDS } from '@quizaroni/shared-types';
 import type { SubjectId } from '@quizaroni/shared-types';
@@ -118,9 +118,13 @@ describe('SubjectChips', () => {
 
     it('rechecks the fade when the chips resize, not only the row', () => {
         const observed: Element[] = [];
+        let onResize = () => {};
         vi.stubGlobal(
             'ResizeObserver',
             class {
+                constructor(callback: () => void) {
+                    onResize = callback;
+                }
                 observe(target: Element) {
                     observed.push(target);
                 }
@@ -133,6 +137,13 @@ describe('SubjectChips', () => {
             for (const button of within(group()).getAllByRole('button')) {
                 expect(observed).toContain(button);
             }
+
+            // Wider labels: the row overflows while its own box stays put.
+            const el = group();
+            expect(el.getAttribute('data-fade-end')).toBe('false');
+            define(el, { scrollWidth: 600, clientWidth: 300, scrollLeft: 0 });
+            act(() => onResize());
+            expect(el.getAttribute('data-fade-end')).toBe('true');
         } finally {
             vi.unstubAllGlobals();
         }
