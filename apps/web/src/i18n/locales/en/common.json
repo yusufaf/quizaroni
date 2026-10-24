@@ -708,5 +708,14 @@
             "hidden": "This set was removed by moderators and can't be published.",
             "generic": "Something went wrong. Try again."
         }
+    },
+    "report": {
+        "action": "Report",
+        "cardLabel": "Report {{title}}",
+        "emailSubject": "Report: {{title}}",
+        "emailIntro": "I'd like to report this public study set.",
+        "setId": "Set ID",
+        "setLink": "Link",
+        "reason": "Reason"
     }
 }
