@@ -86,6 +86,7 @@ export const useCompleteMultipartUpload = () => {
         mutationFn: async ({
             association,
             cardUUID,
+            fileName,
             key,
             parts,
             studysetUUID,
@@ -98,6 +99,7 @@ export const useCompleteMultipartUpload = () => {
                     body: JSON.stringify({
                         association,
                         cardUUID,
+                        fileName,
                         key,
                         parts,
                         studysetUUID,

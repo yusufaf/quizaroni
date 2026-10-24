@@ -7,8 +7,8 @@ import { PublicStudysetSource, toPublicStudyset } from "utilities/publicStudyset
 
 const STUDYSET_UUID = "11111111-1111-4111-8111-111111111111";
 const USER_UUID = "22222222-2222-4222-8222-222222222222";
-const TERM_KEY = `${STUDYSET_UUID}/${USER_UUID}/photo.png`;
-const DEFINITION_KEY = `${STUDYSET_UUID}/${USER_UUID}/diagram.png`;
+const TERM_KEY = `${STUDYSET_UUID}/44444444-4444-4444-8444-444444444444`;
+const DEFINITION_KEY = `${STUDYSET_UUID}/55555555-5555-4555-8555-555555555555`;
 const TERM_URL = `https://bucket.s3.amazonaws.com/${TERM_KEY}?X-Amz-Signature=abc`;
 const DEFINITION_URL = `https://bucket.s3.amazonaws.com/${DEFINITION_KEY}?X-Amz-Signature=def`;
 
@@ -112,9 +112,8 @@ describe("toPublicStudyset", () => {
             expect(out.cards[0].files[0]).not.toHaveProperty(field);
         }
 
-        // Signed URLs carry the S3 key, which embeds the owner id and the
-        // filename, by construction (tracked in #152). Everything else must
-        // be free of them.
+        // Signed URLs carry the S3 key by construction; the key is opaque
+        // (#152). Everything else must be free of it.
         const withoutUrls = {
             ...out,
             cards: out.cards.map((card) => ({
@@ -134,6 +133,25 @@ describe("toPublicStudyset", () => {
         ]) {
             expect(serialized).not.toContain(secret);
         }
+    });
+
+    it("drops files still stored under a legacy key that names the owner and file", () => {
+        const item = storedItem();
+        const [card] = item.cards;
+        const legacyKey = `${STUDYSET_UUID}/${USER_UUID}/secret-scan.png`;
+        const legacyFile = {
+            ...card.files[1],
+            key: legacyKey,
+            name: "secret-scan.png",
+            signedURL: `https://bucket.s3.amazonaws.com/${legacyKey}?X-Amz-Signature=ghi`,
+        };
+
+        const out = map({ ...item, cards: [{ ...card, files: [card.files[0], legacyFile] }] });
+
+        expect(out.cards[0].files).toEqual([{ association: "term", signedURL: TERM_URL }]);
+        const serialized = JSON.stringify(out);
+        expect(serialized).not.toContain(USER_UUID);
+        expect(serialized).not.toContain("secret-scan.png");
     });
 
     it("maps a missing or empty username to null", () => {

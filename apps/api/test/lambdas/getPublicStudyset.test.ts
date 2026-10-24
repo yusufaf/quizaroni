@@ -1,4 +1,5 @@
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import type { APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 import { PUBLIC_STUDYSET_PK } from "resources/dynamo/publicSharing";
 
@@ -18,7 +19,9 @@ let send: ReturnType<typeof spySend>;
 
 const STUDYSET_UUID = "11111111-1111-4111-8111-111111111111";
 const USER_UUID = "22222222-2222-4222-8222-222222222222";
-const KEY = `${STUDYSET_UUID}/${USER_UUID}/photo.png`;
+const FILE_UUID = "44444444-4444-4444-8444-444444444444";
+const OPAQUE_KEY = `${STUDYSET_UUID}/${FILE_UUID}`;
+const LEGACY_KEY = `${STUDYSET_UUID}/${USER_UUID}/diagram.png`;
 
 const storedItem = {
     PK: `userUUID#${USER_UUID}`,
@@ -48,11 +51,18 @@ const storedItem = {
             important: false,
             files: [
                 {
-                    key: KEY,
+                    key: OPAQUE_KEY,
                     name: "photo.png",
                     size: 1234,
                     association: "term",
                     signedURL: "https://stale.example/old",
+                },
+                {
+                    key: LEGACY_KEY,
+                    name: "diagram.png",
+                    size: 5678,
+                    association: "definition",
+                    signedURL: "https://stale.example/legacy",
                 },
             ],
         },
@@ -97,10 +107,40 @@ describe("getPublicStudyset handler", () => {
                 {
                     term: "Mitochondria",
                     definition: "Powerhouse of the cell",
-                    files: [{ association: "term", signedURL: `https://signed.example/${KEY}` }],
+                    files: [{ association: "term", signedURL: `https://signed.example/${OPAQUE_KEY}` }],
                 },
             ],
         });
+    });
+
+    it("never exposes the owner id or an uploaded file name (#152)", async () => {
+        send.mockResolvedValueOnce({ Items: [storedItem] } as never);
+
+        const res = await invoke();
+
+        expect(res.body).not.toContain(USER_UUID);
+        expect(res.body).not.toContain("photo.png");
+        expect(res.body).not.toContain("diagram.png");
+        expect(JSON.parse(res.body ?? "").studyset.cards[0].files).toEqual([
+            { association: "term", signedURL: `https://signed.example/${OPAQUE_KEY}` },
+        ]);
+    });
+
+    it("drops a file whose URL can't be re-signed instead of serving the stored one (#152)", async () => {
+        const staleURL = `https://stale.example/${STUDYSET_UUID}/${USER_UUID}/photo.png`;
+        const item = {
+            ...storedItem,
+            cards: [{ ...storedItem.cards[0], files: [{ ...storedItem.cards[0].files[0], signedURL: staleURL }] }],
+        };
+        send.mockResolvedValueOnce({ Items: [item] } as never);
+        (getSignedUrl as jest.Mock).mockRejectedValueOnce(new Error("no creds"));
+
+        const res = await invoke();
+
+        expect(res.statusCode).toBe(200);
+        expect(JSON.parse(res.body ?? "").studyset.cards[0].files).toEqual([]);
+        expect(res.body).not.toContain(USER_UUID);
+        expect(res.body).not.toContain("stale.example");
     });
 
     it("still 404s a set whose publiclyViewable flag is false", async () => {

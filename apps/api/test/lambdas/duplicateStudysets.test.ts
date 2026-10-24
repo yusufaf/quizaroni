@@ -3,6 +3,7 @@ import { S3Client, CopyObjectCommand, DeleteObjectCommand } from "@aws-sdk/clien
 import type { Studyset } from "models/studysets";
 import { PUBLIC_STUDYSET_PK } from "resources/dynamo/publicSharing";
 import { validatePublishRequest } from "utilities/publishStudyset";
+import { isOpaqueCardFileKey } from "utilities/cardFiles";
 
 // #125: both duplicate lambdas structuredClone'd the stored item, so a copy of
 // a public set was written with the source's PK2/SK2 (pointing at the source's
@@ -168,7 +169,7 @@ describe("duplicateStudyset", () => {
         expect(res.statusCode).toBe(200);
         const copy = puts[0] as unknown as Studyset;
         const key = copy.cards[0].files[0].key;
-        expect(key).toBe(`${copy.studysetUUID}/u1/photo.png`);
+        expect(isOpaqueCardFileKey(key, copy.studysetUUID)).toBe(true);
         expect(key).not.toBe("src/u1/photo.png");
         expect(copies).toEqual([{ Bucket: "test-bucket", CopySource: "test-bucket/src/u1/photo.png", Key: key }]);
     });
@@ -220,7 +221,7 @@ describe("batchDuplicateStudysets images", () => {
         expect(puts).toHaveLength(2);
         for (const put of puts) {
             const copy = put as unknown as Studyset;
-            expect(copy.cards[0].files[0].key).toBe(`${copy.studysetUUID}/u1/photo.png`);
+            expect(isOpaqueCardFileKey(copy.cards[0].files[0].key, copy.studysetUUID)).toBe(true);
         }
         expect(copies).toHaveLength(2);
         expect(new Set(copies.map((c) => c.Key)).size).toBe(2);

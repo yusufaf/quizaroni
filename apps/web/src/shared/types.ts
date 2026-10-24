@@ -450,6 +450,7 @@ export type GetMultipartSignedUploadUrlsResponse = {
 export type CompleteMultipartUploadRequest = {
     association?: 'term' | 'definition';
     cardUUID?: string;
+    fileName?: string;
     key: string;
     parts: Part[];
     studysetUUID?: UUID;

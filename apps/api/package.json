@@ -14,7 +14,8 @@
 		"migrate:logto-user": "ts-node scripts/migrateUserToLogto.ts",
 		"cleanup:empty-studysets": "ts-node scripts/cleanupEmptyStudysets.ts",
 		"cleanup:public-duplicates": "ts-node scripts/cleanupPublicDuplicates.ts",
-		"unpublish:studyset": "ts-node scripts/unpublishStudyset.ts"
+		"unpublish:studyset": "ts-node scripts/unpublishStudyset.ts",
+		"migrate:card-file-keys": "ts-node scripts/rekeyCardFiles.ts"
 	},
 	"dependencies": {
 		"@quizaroni/shared-types": "workspace:*",

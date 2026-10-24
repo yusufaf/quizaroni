@@ -27,6 +27,7 @@ const s3Client = new S3Client();
 type RequestBody = {
     association?: 'term' | 'definition';
     cardUUID?: string;
+    fileName?: string;
     key: string;
     parts: CompletedPart[];
     studysetUUID?: string;
@@ -59,8 +60,12 @@ export const handler: Handler = async (
         );
 
         // Getting file metadata
-        const splitKey = key.split('/');
-        const fileName = splitKey[splitKey.length - 1];
+        // Keys are opaque (#152), so the name comes from the client. Older
+        // clients don't send it; fall back to the key's last segment.
+        const name =
+            typeof body.fileName === 'string' && body.fileName.trim()
+                ? body.fileName.slice(0, 255)
+                : key.slice(key.lastIndexOf('/') + 1);
         const headObjectCommand = new HeadObjectCommand({
             Bucket: mainBucket,
             Key: key,
@@ -76,7 +81,7 @@ export const handler: Handler = async (
         });
 
         const fileMetadata = {
-            name: fileName,
+            name,
             key,
             size: fileSize,
             signedURL,

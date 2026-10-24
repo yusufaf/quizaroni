@@ -89,6 +89,7 @@ const useFileUpload = ({ cardUUID, studysetUUID }: UseFileUploadProps) => {
                     const fileMetadata = await completeMultipartUpload({
                         association,
                         cardUUID,
+                        fileName,
                         key,
                         parts,
                         studysetUUID,
