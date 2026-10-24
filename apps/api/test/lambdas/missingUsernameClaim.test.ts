@@ -15,10 +15,14 @@ jest.mock("@aws-sdk/s3-request-presigner", () => ({
 
 type Fixture = "studyset" | "user";
 
+// The file endpoints and updateStudyset only accept real UUIDs (#188).
+const S1 = "11111111-1111-4111-8111-111111111111";
+
 const fixtures: Record<Fixture, Record<string, unknown>> = {
     studyset: {
         PK: "userUUID#u1",
-        SK: "studyset#s1",
+        SK: `studyset#${S1}`,
+        studysetUUID: S1,
         cards: [{ cardUUID: "c1", notes: [{ noteUUID: "n1", text: "" }] }],
         labels: ["old"],
         updatedBy: "prev",
@@ -34,28 +38,28 @@ type Case = {
 };
 
 const cases: Case[] = [
-    { name: "createNote", body: { cardUUID: "c1", studysetUUID: "s1" }, get: "studyset" },
+    { name: "createNote", body: { cardUUID: "c1", studysetUUID: S1 }, get: "studyset" },
     {
         name: "editNote",
-        body: { cardUUID: "c1", noteUUID: "n1", studysetUUID: "s1", text: "hi" },
+        body: { cardUUID: "c1", noteUUID: "n1", studysetUUID: S1, text: "hi" },
         get: "studyset",
     },
     {
         name: "deleteNote",
-        body: { cardUUID: "c1", noteUUID: "n1", studysetUUID: "s1" },
+        body: { cardUUID: "c1", noteUUID: "n1", studysetUUID: S1 },
         get: "studyset",
     },
     {
         name: "createLabels",
-        body: { label: "bio", studysetUUID: "s1", updateStudysetLabel: true },
+        body: { label: "bio", studysetUUID: S1, updateStudysetLabel: true },
     },
     {
         name: "completeMultipartUpload",
         body: {
-            key: "u1/file.png",
+            key: `${S1}/44444444-4444-4444-8444-444444444444`,
             uploadId: "up",
             parts: [],
-            studysetUUID: "s1",
+            studysetUUID: S1,
             cardUUID: "c1",
             association: "term",
         },
@@ -81,7 +85,7 @@ const cases: Case[] = [
     { name: "updateUserMetadata", body: { updates: { theme: "dark" } }, get: "user" },
     {
         name: "updateStudyset",
-        body: { studysetUUID: "s1", updates: { title: "t" } },
+        body: { studysetUUID: S1, updates: { title: "t" } },
         get: "studyset",
     },
     {

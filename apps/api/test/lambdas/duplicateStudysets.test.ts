@@ -256,6 +256,7 @@ describe("duplicate then remove an image", () => {
     it("removing an image from the copy leaves the original's object alone", async () => {
         const puts = fakeDynamo(withPhoto);
         const { deletes } = fakeS3();
+        const log = jest.spyOn(console, "log").mockImplementation(() => {});
         await invoke(duplicateStudyset, { studysetUUID: "src" });
         const copy = puts[0] as unknown as Studyset;
 
@@ -271,7 +272,10 @@ describe("duplicate then remove an image", () => {
         });
 
         expect(res.statusCode).toBe(200);
-        expect(deletes).toEqual([{ Bucket: "test-bucket", Key: copy.cards[0].files[0].key }]);
-        expect(deletes.map((d) => d.Key)).not.toContain("src/u1/photo.png");
+        // Removed keys are only logged until deletes are turned on (#188).
+        expect(deletes).toEqual([]);
+        expect(log).toHaveBeenCalledWith("Removed card files left in S3 (deletes deferred):", [
+            copy.cards[0].files[0].key,
+        ]);
     });
 });

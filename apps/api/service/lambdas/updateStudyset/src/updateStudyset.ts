@@ -9,10 +9,24 @@ import {
     GetCommand,
     UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client } from '@aws-sdk/client-s3';
 import { AuthorizerContext } from 'models/auth';
+import { Card } from 'models/studysets';
 import { removeKeys } from 'resources/dynamo/utilities';
+import {
+    collectCardFileKeys,
+    copyCardFiles,
+    isKeyInStudyset,
+    isPlainObject,
+    isUUID,
+    studysetUUIDOfKey,
+} from 'utilities/cardFiles';
 import { logRequest } from 'utilities/logging';
+import {
+    callerOwnsStudyset,
+    collectCallerStoredCardFileKeys,
+    isRealStudysetItem,
+} from 'utilities/studysets';
 
 const { mainBucket = '', mainTable = '' } = process.env;
 
@@ -33,11 +47,28 @@ type BuildUpdateExpressionParams = {
     updatedBy?: string;
 };
 
-const SERVER_OWNED_FIELDS = new Set(['subject', 'publishedAt', 'moderation', 'PK2', 'SK2']);
+const SERVER_OWNED_FIELDS = new Set([
+    'subject',
+    'publishedAt',
+    'moderation',
+    'PK2',
+    'SK2',
+    'studysetUUID',
+    'userUUID',
+    'createdAt',
+]);
 const SERVER_OWNED_METADATA_FIELDS = new Set(['publiclyViewable']);
 
-const isPlainObject = (value: unknown): value is Record<string, unknown> =>
-    value !== null && typeof value === 'object' && !Array.isArray(value);
+const respond = (statusCode: number, message: string) => ({
+    statusCode,
+    body: JSON.stringify({ message }),
+});
+
+class RequestError extends Error {
+    constructor(readonly statusCode: number, message: string) {
+        super(message);
+    }
+}
 
 /**
  * Builds the DynamoDB UpdateExpression for a studyset update.
@@ -54,7 +85,8 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> =>
  *
  * Publication fields (`subject`, `publishedAt`, `PK2`/`SK2`,
  * `metadata.publiclyViewable`) and `moderation` are owned by publish,
- * unpublish and the takedown script, so they are silently stripped here. A
+ * unpublish and the takedown script, so they are silently stripped here, as
+ * are the identity fields createStudyset writes (#188). A
  * top-level `metadata` object (CreateSet's full save) is merged per key
  * rather than replacing the map, so it can't reset `publiclyViewable`.
  * `updatedBy` is skipped when the token has no username (#180).
@@ -127,6 +159,98 @@ export const buildUpdateExpression = ({
     return { UpdateExpression, ExpressionAttributeNames, ExpressionAttributeValues };
 };
 
+type CardFilePlan = { cards: Card[]; removed: string[] };
+
+/**
+ * A save may store the set's own card file keys, keys the set already stores
+ * (pre-#126 duplicates until the #189 migration re-keys them), and keys from
+ * the caller's other sets, which are copied into this one (Combine). Anything
+ * else is rejected before any write.
+ */
+const planCardFiles = async ({
+    cards,
+    studysetUUID,
+    userUUID,
+}: {
+    cards: unknown;
+    studysetUUID: string;
+    userUUID: string;
+}): Promise<CardFilePlan> => {
+    const incoming = collectCardFileKeys(cards);
+    if (incoming.malformed) throw new RequestError(400, 'Invalid cards');
+
+    const { Item } = await docClient.send(
+        new GetCommand({
+            Key: { PK: `userUUID#${userUUID}`, SK: `studyset#${studysetUUID}` },
+            TableName: mainTable,
+            ConsistentRead: true,
+        })
+    );
+    if (!isRealStudysetItem(Item, studysetUUID)) {
+        throw new RequestError(404, 'Study set not found');
+    }
+    const stored = collectCardFileKeys(Item?.cards).keys;
+
+    const toCopy = new Set(
+        [...incoming.keys].filter(
+            (key) => !isKeyInStudyset(key, studysetUUID) && !stored.has(key)
+        )
+    );
+
+    let finalCards = cards as Card[];
+    if (toCopy.size > 0) {
+        const setOfKey = new Map(
+            [...toCopy].map((key) => [key, studysetUUIDOfKey(key)])
+        );
+        const sourceSets = new Set<string>();
+        for (const id of setOfKey.values()) {
+            if (!id) throw new RequestError(400, 'Invalid file key');
+            sourceSets.add(id);
+        }
+
+        const owned = new Set<string>();
+        await Promise.all(
+            [...sourceSets].map(async (id) => {
+                const isOwned = await callerOwnsStudyset({
+                    docClient,
+                    mainTable,
+                    studysetUUID: id,
+                    userUUID,
+                });
+                if (isOwned) owned.add(id);
+            })
+        );
+        const unowned = [...toCopy].filter(
+            (key) => !owned.has(setOfKey.get(key) as string)
+        );
+        if (unowned.length > 0) {
+            const referenced = await collectCallerStoredCardFileKeys({
+                docClient,
+                mainTable,
+                userUUID,
+                excludeStudysetUUID: studysetUUID,
+            });
+            if (unowned.some((key) => !referenced.has(key))) {
+                throw new RequestError(403, 'Forbidden');
+            }
+        }
+
+        finalCards = await copyCardFiles({
+            s3Client,
+            bucket: mainBucket,
+            cards: finalCards,
+            studysetUUID,
+            shouldCopy: (key) => toCopy.has(key),
+        });
+    }
+
+    const finalKeys = collectCardFileKeys(finalCards).keys;
+    const removed = [...stored].filter(
+        (key) => !finalKeys.has(key) && isKeyInStudyset(key, studysetUUID)
+    );
+    return { cards: finalCards, removed };
+};
+
 export const handler: Handler = async (
     event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>,
     context
@@ -138,86 +262,30 @@ export const handler: Handler = async (
 
     const { isMetadataUpdate = false, studysetUUID, updates } = body;
 
+    if (!isUUID(studysetUUID)) return respond(400, 'Invalid studysetUUID');
+    if (!isPlainObject(updates)) return respond(400, 'Invalid updates');
+
     try {
         const PK = `userUUID#${userUUID}`;
         const SK = `studyset#${studysetUUID}`;
         const updatedAt = new Date().toISOString();
 
-        // Handle S3 file cleanup if cards are being updated
-        if (updates.cards) {
-            try {
-                // Fetch existing studyset to compare files
-                const getCommand = new GetCommand({
-                    Key: { PK, SK },
-                    TableName: mainTable,
-                });
-                const getResult = await docClient.send(getCommand);
-                const existingStudyset = getResult.Item;
-
-                if (existingStudyset && existingStudyset.cards) {
-                    // Collect all file keys from old studyset
-                    const oldFileKeys = new Set<string>();
-                    existingStudyset.cards.forEach((card: any) => {
-                        if (card.files && Array.isArray(card.files)) {
-                            card.files.forEach((file: any) => {
-                                if (file.key) {
-                                    oldFileKeys.add(file.key);
-                                }
-                            });
-                        }
-                    });
-
-                    // Collect all file keys from new studyset
-                    const newFileKeys = new Set<string>();
-                    updates.cards.forEach((card: any) => {
-                        if (card.files && Array.isArray(card.files)) {
-                            card.files.forEach((file: any) => {
-                                if (file.key) {
-                                    newFileKeys.add(file.key);
-                                }
-                            });
-                        }
-                    });
-
-                    // Find removed files
-                    const removedFileKeys = [...oldFileKeys].filter(
-                        (key) => !newFileKeys.has(key)
-                    );
-
-                    // Delete removed files from S3
-                    if (removedFileKeys.length > 0) {
-                        console.log(
-                            `Deleting ${removedFileKeys.length} removed files from S3:`,
-                            removedFileKeys
-                        );
-
-                        for (const fileKey of removedFileKeys) {
-                            try {
-                                const deleteCommand = new DeleteObjectCommand({
-                                    Bucket: mainBucket,
-                                    Key: fileKey,
-                                });
-                                await s3Client.send(deleteCommand);
-                                console.log(`Successfully deleted file: ${fileKey}`);
-                            } catch (deleteError) {
-                                console.error(
-                                    `Failed to delete file ${fileKey}:`,
-                                    deleteError
-                                );
-                                // Continue with update even if S3 delete fails
-                            }
-                        }
-                    }
-                }
-            } catch (fileCleanupError) {
-                console.error('Error during file cleanup:', fileCleanupError);
-                // Continue with update even if file cleanup fails
-            }
+        let finalUpdates = updates;
+        let removed: string[] = [];
+        // A metadata update writes `metadata.cards`, which holds no files.
+        if (!isMetadataUpdate && updates.cards !== undefined) {
+            const plan = await planCardFiles({
+                cards: updates.cards,
+                studysetUUID,
+                userUUID,
+            });
+            finalUpdates = { ...updates, cards: plan.cards };
+            removed = plan.removed;
         }
 
         const { ExpressionAttributeNames, ExpressionAttributeValues, UpdateExpression } =
             buildUpdateExpression({
-                updates,
+                updates: finalUpdates,
                 isMetadataUpdate,
                 updatedAt,
                 updatedBy: username,
@@ -232,8 +300,17 @@ export const handler: Handler = async (
             ExpressionAttributeNames,
             ExpressionAttributeValues,
             UpdateExpression,
+            // An item created at another set's id would pass as owning that
+            // set's files.
+            ConditionExpression: 'attribute_exists(PK)',
         });
         await docClient.send(updateCommand);
+
+        // The editor drops a just-uploaded file from its cards, so deleting
+        // removed keys would delete new uploads. Logged until that's fixed.
+        if (removed.length > 0) {
+            console.log('Removed card files left in S3 (deletes deferred):', removed);
+        }
 
         const getCommand = new GetCommand({
             Key: {
@@ -253,6 +330,12 @@ export const handler: Handler = async (
             }),
         };
     } catch (err) {
+        if (err instanceof RequestError) {
+            return respond(err.statusCode, err.message);
+        }
+        if ((err as { name?: string }).name === 'ConditionalCheckFailedException') {
+            return respond(404, 'Study set not found');
+        }
         console.error(err);
         return {
             statusCode: 500,

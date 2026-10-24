@@ -98,6 +98,29 @@ describe("updateStudyset buildUpdateExpression", () => {
         expectAllPlaceholdersUsed(result);
     });
 
+    // #188: a client-written studysetUUID would turn a stub into a set that
+    // passes the ownership check.
+    it("ignores identity fields", () => {
+        const result = buildUpdateExpression({
+            updates: {
+                title: "T",
+                studysetUUID: "99999999-9999-4999-8999-999999999999",
+                userUUID: "u",
+                createdAt: "2020-01-01T00:00:00.000Z",
+            },
+            isMetadataUpdate: false,
+            updatedAt: NOW,
+            updatedBy: "turtles",
+        });
+
+        expect(Object.keys(result.ExpressionAttributeNames).sort()).toEqual([
+            "#title",
+            "#updatedAt",
+            "#updatedBy",
+        ]);
+        expectValidExpressionInput(result);
+    });
+
     it("drops publiclyViewable from a metadata update without leaving an unused #metadata", () => {
         const result = buildUpdateExpression({
             updates: { publiclyViewable: true },
