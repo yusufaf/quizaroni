@@ -86,7 +86,8 @@ export const regenerateSignedUrls = async ({
                             `Failed to generate signed URL for key: ${file.key}`,
                             error
                         );
-                        return file;
+                        // The stored URL has expired or names an old key.
+                        return { ...file, signedURL: '' };
                     }
                 })
             );

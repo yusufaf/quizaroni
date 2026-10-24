@@ -1,4 +1,5 @@
 import type { CardFileMetadata, Studyset, Timestamp } from 'models/studysets';
+import { isOpaqueCardFileKey } from 'utilities/cardFiles';
 
 export type PublicCardFile = Pick<CardFileMetadata, 'association' | 'signedURL'>;
 
@@ -30,7 +31,8 @@ export type PublicStudysetSource = Omit<Studyset, 'updatedAt'> & {
  * Builds the unauthenticated public response from an explicit allowlist.
  * Each object is constructed field by field, never spread, so anything new on
  * the stored record (notes, labels, owner ids, storage keys) stays private
- * unless it is added here on purpose.
+ * unless it is added here on purpose. Files are served only under an opaque
+ * key, since a presigned URL carries its key (#152).
  */
 export const toPublicStudyset = (item: PublicStudysetSource): PublicStudyset => ({
     title: item.title ?? '',
@@ -46,6 +48,7 @@ export const toPublicStudyset = (item: PublicStudysetSource): PublicStudyset => 
             .filter(
                 (file) =>
                     !!file.signedURL &&
+                    isOpaqueCardFileKey(file.key, item.studysetUUID) &&
                     (file.association === 'term' ||
                         file.association === 'definition')
             )

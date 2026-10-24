@@ -1,12 +1,41 @@
 import { CopyObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { randomUUID } from 'crypto';
 import type { Card, UUID } from 'models/studysets';
 
 export type FileCopy = { from: string; to: string };
 
 const fileNameOf = (key: string) => key.slice(key.lastIndexOf('/') + 1);
 
+const UUID_RE =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Card files live under `${studysetUUID}/${fileUUID}`. A presigned URL carries
+ * its key in the path, so the key must never hold the owner id or the
+ * uploaded file name (#152).
+ */
+export const cardFileKey = (
+    studysetUUID: string,
+    fileUUID: string = randomUUID()
+): string => `${studysetUUID}/${fileUUID}`;
+
+// Stored cards aren't validated on write, so `key` may be anything.
+export const isOpaqueCardFileKey = (
+    key: unknown,
+    studysetUUID: string | undefined
+): boolean => {
+    if (typeof key !== 'string') return false;
+    if (typeof studysetUUID !== 'string' || studysetUUID === '') return false;
+    const parts = key.split('/');
+    return (
+        parts.length === 2 &&
+        parts[0] === studysetUUID &&
+        UUID_RE.test(parts[1])
+    );
+};
+
 // CopySource must be URL-encoded; keep the `/` separators literal.
-const encodeCopySourceKey = (key: string) =>
+export const encodeCopySourceKey = (key: string) =>
     key.split('/').map(encodeURIComponent).join('/');
 
 /**

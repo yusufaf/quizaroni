@@ -1,6 +1,6 @@
 import { S3Client, CopyObjectCommand } from "@aws-sdk/client-s3";
 import type { Card, CardFileMetadata } from "models/studysets";
-import { planCardFileCopies, copyCardFiles } from "utilities/cardFiles";
+import { planCardFileCopies, copyCardFiles, isOpaqueCardFileKey } from "utilities/cardFiles";
 
 // #126: a duplicate kept the source's file keys, so removing an image from
 // the copy deleted the original's S3 object. Copies now get their own objects.
@@ -154,5 +154,32 @@ describe("copyCardFiles", () => {
         fakeS3(() => "AccessDenied");
 
         await expect(run([card([file("src/u1/a.png")])])).rejects.toMatchObject({ name: "AccessDenied" });
+    });
+});
+
+describe("isOpaqueCardFileKey", () => {
+    const S = "11111111-1111-4111-8111-111111111111";
+    const FILE = "44444444-4444-4444-8444-444444444444";
+
+    it("accepts the set id followed by a file UUID", () => {
+        expect(isOpaqueCardFileKey(`${S}/${FILE}`, S)).toBe(true);
+    });
+
+    it.each([
+        ["a legacy key naming the owner and file", `${S}/22222222-2222-4222-8222-222222222222/photo.png`],
+        ["another set's prefix", `99999999-9999-4999-8999-999999999999/${FILE}`],
+        ["a file UUID with an extension", `${S}/${FILE}.png`],
+        ["an empty key", ""],
+        ["a missing key", undefined],
+        ["an empty set segment", `/${FILE}`],
+        ["a numeric key", 123],
+        ["an object key", {}],
+    ])("rejects %s", (_label, key) => {
+        expect(isOpaqueCardFileKey(key, S)).toBe(false);
+    });
+
+    it("rejects any key when the set id is missing", () => {
+        expect(isOpaqueCardFileKey(`${S}/${FILE}`, undefined)).toBe(false);
+        expect(isOpaqueCardFileKey(`/${FILE}`, "")).toBe(false);
     });
 });
