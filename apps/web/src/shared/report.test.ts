@@ -43,16 +43,10 @@ describe('reportMailto', () => {
         ['a lone high surrogate', 'Biology \uD83E x', 'Biology \uFFFD x'],
         ['a trailing high surrogate', 'Biology \uD83E', 'Biology \uFFFD'],
         ['a lone low surrogate', 'Biology \uDC9E', 'Biology \uFFFD'],
+        ['a reversed pair', 'Biology \uDC9E\uD83E', 'Biology \uFFFD\uFFFD'],
         ['an intact pair', 'Biology \uD83E\uDDEC', 'Biology \uD83E\uDDEC'],
-    ])(
-        'replaces %s instead of throwing during render',
-        (_, title, expected) => {
-            const href = reportMailto(
-                UUID,
-                ORIGIN,
-                strings({ subject: title })
-            );
-            expect(new URL(href).searchParams.get('subject')).toBe(expected);
-        }
-    );
+    ])('handles %s without throwing during render', (_, title, expected) => {
+        const href = reportMailto(UUID, ORIGIN, strings({ subject: title }));
+        expect(new URL(href).searchParams.get('subject')).toBe(expected);
+    });
 });

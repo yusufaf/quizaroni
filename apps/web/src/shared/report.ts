@@ -12,8 +12,9 @@ export type ReportStrings = {
     reason: string;
 };
 
-// encodeURIComponent throws on a lone surrogate, which a JSON `\uD83E` escape
-// can put in a title, and this runs during render. String.prototype
+// encodeURIComponent throws on a lone surrogate, and this runs during render.
+// Titles can hold one: CombineSets cuts them with substring(0, 100), which can
+// split an emoji, and a JSON `\uD83E` escape can send one. String.prototype
 // .toWellFormed would do the same, but Safari 16.0-16.3 lacks it.
 const replaceLoneSurrogates = (value: string) =>
     value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDFFF]/g, (match) =>
