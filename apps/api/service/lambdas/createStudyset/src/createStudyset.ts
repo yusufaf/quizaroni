@@ -7,8 +7,8 @@ import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { randomUUID } from "crypto";
 import { AuthorizerContext } from "models/auth";
-import { StudysetMetadata } from "models/studysets";
 import { removeKeys } from "resources/dynamo/utilities";
+import { defaultStudysetMetadata } from "utilities/defaultMetadata";
 import { logRequest } from "utilities/logging";
 
 const { mainTable = "" } = process.env;
@@ -32,19 +32,7 @@ export const handler: Handler = async (
     try {
         const studysetUUID = randomUUID();
         const timestamp = new Date().toISOString();
-        const initialMetadata: StudysetMetadata = {
-            backgroundColorVisible: false,
-            cardCountVisible: true,
-            contentOnly: false,
-            customLabelTerminology: "",
-            customTerminology: "",
-            labelTerminology: "Card",
-            notesDrawerInitial: "open",
-            notesDrawerPosition: "right",
-            publiclyViewable: false,
-            terminology: "Term/Definition",
-            textColorVisible: false,
-        }
+        const initialMetadata = defaultStudysetMetadata();
         const initialStudySet = {
             PK: `userUUID#${userUUID}`,
             SK: `studyset#${studysetUUID}`,
