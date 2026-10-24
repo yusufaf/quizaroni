@@ -306,6 +306,96 @@ describe("getExploreFeed handler", () => {
         expect(body.nextCursor).toBeNull();
     });
 
+    describe("subject filter (#136)", () => {
+        it("returns only the subject's sets with a per-subject total", async () => {
+            seed([
+                stored("m1", day(1)),
+                stored("s1", day(2), { subject: "science" }),
+                stored("m2", day(3)),
+                stored("s2", day(4), { subject: "science" }),
+                stored("m3", day(5)),
+                stored("retired", day(6), { subject: "astrology" }),
+            ]);
+
+            const science = await call({ subject: "science" });
+            expect(science.res.statusCode).toBe(200);
+            expect(ids(science.body)).toEqual(["s2", "s1"]);
+            expect(science.body.total).toBe(2);
+
+            const other = await call({ subject: "other" });
+            expect(ids(other.body)).toEqual(["retired"]);
+            expect(other.body.items[0].subject).toBe("other");
+            expect(other.body.total).toBe(1);
+
+            const all = await call();
+            expect(ids(all.body)).toEqual(["retired", "m3", "s2", "m2", "s1", "m1"]);
+            expect(all.body.total).toBe(6);
+        });
+
+        it("pages within a subject to the end with no overlap", async () => {
+            seed([
+                stored("m1", day(1)),
+                stored("s1", day(2), { subject: "science" }),
+                stored("m2", day(3)),
+                stored("m3", day(4)),
+                stored("s2", day(5), { subject: "science" }),
+                stored("m4", day(6)),
+                stored("s3", day(7), { subject: "science" }),
+                stored("m5", day(8)),
+            ]);
+
+            const seen: string[][] = [];
+            let cursor: string | undefined;
+            do {
+                const { body } = await call({ subject: "math", limit: "2", ...(cursor ? { cursor } : {}) });
+                seen.push(ids(body));
+                cursor = body.nextCursor ?? undefined;
+            } while (cursor);
+
+            expect(seen).toEqual([["m5", "m4"], ["m3", "m2"], ["m1"]]);
+        });
+
+        it.each([
+            ["a no-subject cursor sent with a subject", {}, { subject: "math" }],
+            ["a math cursor sent with science", { subject: "math" }, { subject: "science" }],
+            ["a math cursor sent with no subject", { subject: "math" }, {}],
+        ])("returns 400 for %s", async (_, first, second) => {
+            seed([1, 2, 3].map((n) => stored(`m${n}`, day(n))));
+            const { body } = await call({ ...first, limit: "1" });
+            expect(body.nextCursor).toEqual(expect.any(String));
+
+            const { res, body: rejected } = await call({ ...second, limit: "1", cursor: body.nextCursor });
+            expect(res.statusCode).toBe(400);
+            expect(rejected.message).toBe("Invalid cursor for these filters");
+        });
+
+        it("returns 400 for an unknown subject without reading the index", async () => {
+            seed([stored("a", day(1))]);
+            const { res, body } = await call({ subject: "astrology" });
+            expect(res.statusCode).toBe(400);
+            expect(body.message).toBe("Unsupported subject");
+            expect(queryCount()).toBe(0);
+        });
+
+        it("returns an empty feed for a subject with no sets", async () => {
+            seed([stored("a", day(1))]);
+            const { res, body } = await call({ subject: "law" });
+            expect(res.statusCode).toBe(200);
+            expect(body).toEqual({ items: [], nextCursor: null, total: 0 });
+        });
+
+        it("drops a hidden set from the subject's feed and total", async () => {
+            seed([stored("a", day(1)), stored("b", day(2)), stored("s", day(3), { subject: "science" })]);
+            expect((await call({ subject: "math" })).body.total).toBe(2);
+
+            table.set("userUUID#u-b|studyset#b", stored("b", day(2), { moderation: { hiddenAt: day(4) } }));
+            const { body } = await call({ subject: "math" });
+
+            expect(ids(body)).toEqual(["a"]);
+            expect(body.total).toBe(1);
+        });
+    });
+
     it("returns 500 when the index read fails", async () => {
         send.mockRejectedValue(new Error("boom: arn:aws:dynamodb:...:table/test-main") as never);
         const { res, body } = await call();

@@ -9,6 +9,7 @@ import {
     filterKey,
     paginate,
     parseExploreQuery,
+    selectEntries,
     toFeedEntry,
     toSummary,
 } from "utilities/exploreFeed";
@@ -175,6 +176,48 @@ describe("cursor", () => {
             reason: "filterMismatch",
         });
     });
+
+    it("ties the cursor to the subject (#136)", () => {
+        const math = filterKey({ sort: "newest", subject: "math" });
+        const science = filterKey({ sort: "newest", subject: "science" });
+        const mismatch = { ok: false, reason: "filterMismatch" };
+        expect(decodeCursor(encodeCursor(position, key), math)).toEqual(mismatch);
+        expect(decodeCursor(encodeCursor(position, math), science)).toEqual(mismatch);
+        expect(decodeCursor(encodeCursor(position, math), key)).toEqual(mismatch);
+        expect(decodeCursor(encodeCursor(position, math), math)).toEqual({ ok: true, position });
+    });
+});
+
+describe("filterKey", () => {
+    it("keeps the no-subject key unchanged, so older cursors stay valid", () => {
+        expect(filterKey({ sort: "newest" })).toBe("sort=newest");
+    });
+
+    it("appends the subject", () => {
+        expect(filterKey({ sort: "newest", subject: "math" })).toBe("sort=newest&subject=math");
+    });
+});
+
+describe("selectEntries", () => {
+    const entries = [
+        listed({ studysetUUID: uuid(1), subject: "math" }),
+        listed({ studysetUUID: uuid(2), subject: "science" }),
+        listed({ studysetUUID: uuid(3), subject: "math" }),
+        listed({ studysetUUID: uuid(4), subject: "astrology" }),
+    ];
+    const ids = (selected: readonly FeedEntry[]) => selected.map((e) => e.summary.studysetUUID);
+
+    it("returns the same array with no subject", () => {
+        expect(selectEntries(entries, { sort: "newest" })).toBe(entries);
+    });
+
+    it("keeps only the subject's entries, in order", () => {
+        expect(ids(selectEntries(entries, { sort: "newest", subject: "math" }))).toEqual([uuid(1), uuid(3)]);
+    });
+
+    it("reads a retired subject as other", () => {
+        expect(ids(selectEntries(entries, { sort: "newest", subject: "other" }))).toEqual([uuid(4)]);
+    });
 });
 
 describe("paginate", () => {
@@ -239,5 +282,19 @@ describe("parseExploreQuery", () => {
 
     it.each([{ limit: "0" }, { limit: "abc" }, { limit: "1.5" }, { sort: "popular" }])("rejects %p", (params) => {
         expect(parseExploreQuery(params).ok).toBe(false);
+    });
+
+    it("passes a known subject through, and ignores an empty one", () => {
+        expect(parseExploreQuery({ subject: "math" })).toEqual({
+            ok: true,
+            filters: { sort: "newest", subject: "math" },
+            limit: 24,
+        });
+        expect(parseExploreQuery({ subject: "" })).toEqual({ ok: true, filters: { sort: "newest" }, limit: 24 });
+    });
+
+    // API Gateway joins a repeated param with commas, so "math,law" is two subjects.
+    it.each(["astrology", "math,law", "Math"])("rejects the subject %p without echoing it", (subject) => {
+        expect(parseExploreQuery({ subject })).toEqual({ ok: false, message: "Unsupported subject" });
     });
 });

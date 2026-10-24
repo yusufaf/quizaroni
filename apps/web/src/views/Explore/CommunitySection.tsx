@@ -1,11 +1,16 @@
 import { Box, Button, Skeleton, Typography } from '@mui/material';
 import { useEffect, useId, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
+import type { SubjectId } from '@quizaroni/shared-types';
 import MasonryFeed from 'shared/components/MasonryFeed/MasonryFeed';
+import { QUERY_PARAMS } from 'shared/constants';
 import { useExploreFeed } from 'state/api/exploreAPI';
 import { dedupeFeedItems } from './communityFeed';
 import ExploreSetCard from './ExploreSetCard';
 import { CommunitySkeletonList, VisuallyHidden } from './ExploreStyles';
+import SubjectChips from './SubjectChips';
+import { parseSubjectParam, withSubject } from './subjectFilter';
 
 // Varied heights hint at the masonry layout that replaces them.
 const SKELETON_HEIGHTS = [176, 232, 200, 248, 184, 216];
@@ -18,12 +23,25 @@ const skeletonSx = {
 };
 
 const CommunitySection = () => {
-    const { t } = useTranslation('explore');
+    const { t } = useTranslation(['explore', 'common']);
     const headingId = useId();
     const headingRef = useRef<HTMLHeadingElement>(null);
     const listRef = useRef<HTMLUListElement>(null);
-    // Index of the first card a Load more is expected to add.
-    const pendingFocusRef = useRef<number | null>(null);
+    // Index of the first card a Load more is expected to add, and the subject
+    // it was asked under.
+    const pendingFocusRef = useRef<{
+        index: number;
+        subject: SubjectId | null;
+    } | null>(null);
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const subject = parseSubjectParam(
+        searchParams.get(QUERY_PARAMS.EXPLORE_SUBJECT)
+    );
+    // Pushes, not replaces, so Back steps through earlier selections.
+    const onSubjectChange = (next: SubjectId | null) =>
+        setSearchParams((prev) => withSubject(prev, next));
+    const subjectLabel = subject ? t(`common:subjects.${subject}`) : null;
 
     const {
         data,
@@ -33,7 +51,7 @@ const CommunitySection = () => {
         hasNextPage,
         isFetchingNextPage,
         isFetchNextPageError,
-    } = useExploreFeed();
+    } = useExploreFeed({ subject });
     const items = useMemo(() => dedupeFeedItems(data?.pages), [data]);
     const shown = items.length;
     // No `total` means the server's read was capped and has no true count.
@@ -53,32 +71,58 @@ const CommunitySection = () => {
     // Focus moves to the first new card once its page lands. If nothing new
     // arrived and the button is gone, the heading takes focus instead of
     // dropping it on the body. A failed load leaves focus on the button.
+    // A Load more from before a subject switch is dropped, so it can't pull
+    // focus off the chip; this effect re-runs in the switch's own commit.
     useEffect(() => {
         const pending = pendingFocusRef.current;
         if (pending === null || isFetchingNextPage) return;
         pendingFocusRef.current = null;
+        if (pending.subject !== subject) return;
         const target =
-            listRef.current?.children[pending]?.querySelector<HTMLElement>('a');
+            listRef.current?.children[
+                pending.index
+            ]?.querySelector<HTMLElement>('a');
         if (target) target.focus();
         else if (!hasNextPage && !isFetchNextPageError)
             headingRef.current?.focus();
-    }, [shown, isFetchingNextPage, hasNextPage, isFetchNextPageError]);
+    }, [shown, isFetchingNextPage, hasNextPage, isFetchNextPageError, subject]);
 
     const onLoadMore = () => {
         if (isFetchingNextPage) return;
-        pendingFocusRef.current = shown;
+        pendingFocusRef.current = { index: shown, subject };
         void fetchNextPage();
     };
 
-    const showingText =
-        typeof total === 'number'
-            ? t('community.showingOf', { shown, total })
-            : t('community.showing', { shown });
+    // Naming the subject means a switch between two subjects with the same
+    // count still changes the status text, so it's announced.
+    let showingText: string;
+    if (subjectLabel) {
+        showingText =
+            typeof total === 'number'
+                ? t('community.showingSubjectOf', {
+                      shown,
+                      total,
+                      subject: subjectLabel,
+                  })
+                : t('community.showingSubject', {
+                      shown,
+                      subject: subjectLabel,
+                  });
+    } else {
+        showingText =
+            typeof total === 'number'
+                ? t('community.showingOf', { shown, total })
+                : t('community.showing', { shown });
+    }
+    const emptyText = subjectLabel
+        ? t('community.emptySubject', { subject: subjectLabel })
+        : t('community.empty');
 
     let status = '';
     if (data === undefined) status = isError ? '' : t('community.loading');
     else if (isFetchNextPageError) status = t('community.loadMoreError');
     else if (shown > 0 || hasNextPage) status = showingText;
+    else status = emptyText;
 
     const renderBody = () => {
         if (data === undefined && isError) {
@@ -116,9 +160,10 @@ const CommunitySection = () => {
             );
         }
         if (shown === 0 && !hasNextPage) {
+            // The status region already announces this line.
             return (
-                <Typography color="text.secondary">
-                    {t('community.empty')}
+                <Typography color="text.secondary" aria-hidden="true">
+                    {emptyText}
                 </Typography>
             );
         }
@@ -176,6 +221,8 @@ const CommunitySection = () => {
             >
                 {t('community.heading')}
             </Typography>
+            {/* Outside renderBody, so a focused chip survives every state. */}
+            <SubjectChips value={subject} onChange={onSubjectChange} />
             {/* Mounted for the section's whole life so screen readers notice
                 the text change. */}
             <VisuallyHidden role="status">{status}</VisuallyHidden>

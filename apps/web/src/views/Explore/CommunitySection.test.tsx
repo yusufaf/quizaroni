@@ -16,6 +16,7 @@ import {
 } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom';
 import type {
     ExploreFeedResponse,
     ExploreSetSummary,
@@ -31,28 +32,12 @@ vi.mock('react-i18next', () => ({
     }),
 }));
 
-vi.mock('react-router-dom', () => {
-    const FakeLink = ({
-        to,
-        children,
-        ...rest
-    }: {
-        to: string;
-        children: React.ReactNode;
-    }) => (
-        <a href={to} {...rest}>
-            {children}
-        </a>
-    );
-    return { Link: FakeLink };
-});
-
 const uuid = (n: number) =>
     `${String(n).padStart(8, '0')}-1111-4111-8111-111111111111`;
 
-const item = (n: number): ExploreSetSummary => ({
+const item = (n: number, title = `Set ${n}`): ExploreSetSummary => ({
     studysetUUID: uuid(n),
-    title: `Set ${n}`,
+    title,
     description: '',
     subject: 'math',
     termCount: 4,
@@ -70,12 +55,15 @@ type Reply =
     | { status: number }
     | Promise<ExploreFeedResponse>;
 
-// Replies keyed by the request's cursor ('' for the first page). A function
-// reply is called per request, so a test can change it between calls.
+// Replies keyed by the request's cursor ('' for the first page), prefixed
+// with `subject:` when the request has one. A function reply is called per
+// request, so a test can change it between calls.
 let replies: Record<string, Reply | (() => Reply)>;
 const fetchMock = vi.fn(async (url: string) => {
-    const cursor = new URL(url).searchParams.get('cursor') ?? '';
-    const entry = replies[cursor];
+    const params = new URL(url).searchParams;
+    const cursor = params.get('cursor') ?? '';
+    const subject = params.get('subject');
+    const entry = replies[subject ? `${subject}:${cursor}` : cursor];
     const reply = await (typeof entry === 'function' ? entry() : entry);
     if (!reply) return new Promise<never>(() => {});
     if ('status' in reply) {
@@ -102,7 +90,21 @@ const deferred = <T,>() => {
     return { promise, resolve };
 };
 
-const renderSection = () =>
+// Shows the router's search string and steps back through its history.
+const LocationProbe = () => {
+    const { search } = useLocation();
+    const navigate = useNavigate();
+    return (
+        <>
+            <span data-testid="search">{search}</span>
+            <button type="button" onClick={() => void navigate(-1)}>
+                probe-back
+            </button>
+        </>
+    );
+};
+
+const renderSection = (entry = '/explore') =>
     render(
         <ThemeProvider theme={createLightTheme()}>
             <QueryClientProvider
@@ -112,7 +114,10 @@ const renderSection = () =>
                     })
                 }
             >
-                <CommunitySection />
+                <MemoryRouter initialEntries={[entry]}>
+                    <CommunitySection />
+                    <LocationProbe />
+                </MemoryRouter>
             </QueryClientProvider>
         </ThemeProvider>
     );
@@ -123,6 +128,17 @@ const titles = () =>
 const status = () => screen.getByRole('status').textContent;
 const loadMore = () =>
     screen.queryByRole('button', { name: 'community.loadMore' });
+const chips = () =>
+    screen.getByRole('group', { name: 'community.subjectFilter' });
+const chip = (name: string) => within(chips()).getByRole('button', { name });
+const isPressed = (name: string) =>
+    chip(name).getAttribute('aria-pressed') === 'true';
+const search = () => screen.getByTestId('search').textContent;
+const fetchedUrls = () => fetchMock.mock.calls.map(([url]) => url);
+const subjectItems = (prefix: string, from: number, count: number) =>
+    Array.from({ length: count }, (_, i) =>
+        item(from + i, `${prefix} ${i + 1}`)
+    );
 
 beforeEach(() => {
     fetchMock.mockClear();
@@ -274,7 +290,9 @@ describe('CommunitySection', () => {
     it('says there are no public sets when the feed is empty', async () => {
         replies[''] = { items: [], nextCursor: null, total: 0 };
         renderSection();
-        expect(await screen.findByText('community.empty')).toBeTruthy();
+        await waitFor(() => expect(status()).toBe('community.empty'));
+        // Visible copy plus the status region.
+        expect(screen.getAllByText('community.empty')).toHaveLength(2);
         expect(loadMore()).toBeNull();
     });
 
@@ -286,5 +304,185 @@ describe('CommunitySection', () => {
         expect(screen.queryByText('community.empty')).toBeNull();
         fireEvent.click(loadMore()!);
         await waitFor(() => expect(titles()).toEqual(['Set 1', 'Set 2']));
+    });
+
+    describe('subject filter (#136)', () => {
+        it('starts on All and fetches without a subject', async () => {
+            renderSection();
+            await waitFor(() => expect(titles()).toHaveLength(24));
+            expect(isPressed('community.allSubjects')).toBe(true);
+            expect(fetchedUrls()[0]).not.toContain('subject=');
+        });
+
+        it('filters by the clicked chip, in the URL, keeping focus on it', async () => {
+            replies['math:'] = {
+                items: subjectItems('Math', 100, 3),
+                nextCursor: null,
+                total: 3,
+            };
+            renderSection();
+            await waitFor(() => expect(titles()).toHaveLength(24));
+
+            const math = chip('common:subjects.math');
+            math.focus();
+            fireEvent.click(math);
+
+            await waitFor(() =>
+                expect(titles()).toEqual(['Math 1', 'Math 2', 'Math 3'])
+            );
+            expect(isPressed('common:subjects.math')).toBe(true);
+            expect(isPressed('community.allSubjects')).toBe(false);
+            expect(search()).toBe('?subject=math');
+            expect(fetchedUrls().at(-1)).toContain('subject=math');
+            expect(document.activeElement).toBe(math);
+        });
+
+        it('restores the subject from the URL on load', async () => {
+            replies['science:'] = {
+                items: subjectItems('Science', 100, 2),
+                nextCursor: null,
+                total: 2,
+            };
+            renderSection('/explore?subject=science');
+            await waitFor(() =>
+                expect(titles()).toEqual(['Science 1', 'Science 2'])
+            );
+            expect(isPressed('common:subjects.science')).toBe(true);
+            expect(fetchedUrls()[0]).toContain('subject=science');
+        });
+
+        it('steps back to the previous subject', async () => {
+            replies['math:'] = {
+                items: subjectItems('Math', 100, 2),
+                nextCursor: null,
+                total: 2,
+            };
+            replies['science:'] = {
+                items: subjectItems('Science', 200, 1),
+                nextCursor: null,
+                total: 1,
+            };
+            renderSection();
+            await waitFor(() => expect(titles()).toHaveLength(24));
+
+            fireEvent.click(chip('common:subjects.math'));
+            await waitFor(() => expect(titles()).toEqual(['Math 1', 'Math 2']));
+            fireEvent.click(chip('common:subjects.science'));
+            await waitFor(() => expect(titles()).toEqual(['Science 1']));
+
+            fireEvent.click(screen.getByRole('button', { name: 'probe-back' }));
+            await waitFor(() => expect(titles()).toEqual(['Math 1', 'Math 2']));
+            expect(isPressed('common:subjects.math')).toBe(true);
+            expect(search()).toBe('?subject=math');
+        });
+
+        it('names the subject in the empty state, seen and announced', async () => {
+            replies['law:'] = { items: [], nextCursor: null, total: 0 };
+            renderSection();
+            await waitFor(() => expect(titles()).toHaveLength(24));
+
+            fireEvent.click(chip('common:subjects.law'));
+            const text =
+                'community.emptySubject {"subject":"common:subjects.law"}';
+            await waitFor(() => expect(status()).toBe(text));
+            expect(screen.getAllByText(text)).toHaveLength(2);
+            expect(screen.queryByText('community.empty')).toBeNull();
+            expect(chips()).toBeTruthy();
+            expect(loadMore()).toBeNull();
+        });
+
+        it('reads a retired subject in the URL as Other, leaving the URL', async () => {
+            replies['other:'] = {
+                items: subjectItems('Other', 100, 1),
+                nextCursor: null,
+                total: 1,
+            };
+            renderSection('/explore?subject=astrology');
+            await waitFor(() => expect(titles()).toEqual(['Other 1']));
+            expect(isPressed('common:subjects.other')).toBe(true);
+            expect(isPressed('community.allSubjects')).toBe(false);
+            expect(fetchedUrls()[0]).toContain('subject=other');
+            expect(fetchedUrls()[0]).not.toContain('astrology');
+            expect(search()).toBe('?subject=astrology');
+
+            fireEvent.click(chip('community.allSubjects'));
+            await waitFor(() => expect(search()).toBe(''));
+            expect(isPressed('community.allSubjects')).toBe(true);
+        });
+
+        it('loads more within the subject', async () => {
+            replies['math:'] = {
+                items: subjectItems('Math', 100, 24),
+                nextCursor: 'm1',
+                total: 26,
+            };
+            replies['math:m1'] = {
+                items: subjectItems('More math', 200, 2),
+                nextCursor: null,
+                total: 26,
+            };
+            renderSection('/explore?subject=math');
+            await waitFor(() => expect(titles()).toHaveLength(24));
+
+            fireEvent.click(loadMore()!);
+            await waitFor(() => expect(titles()).toHaveLength(26));
+            const last = new URL(fetchedUrls().at(-1)!).searchParams;
+            expect(last.get('subject')).toBe('math');
+            expect(last.get('cursor')).toBe('m1');
+        });
+
+        it('keeps focus on the chip when a Load more lands after a switch', async () => {
+            const page2 = deferred<ExploreFeedResponse>();
+            replies.c1 = page2.promise;
+            replies['math:'] = {
+                items: subjectItems('Math', 100, 2),
+                nextCursor: null,
+                total: 2,
+            };
+            renderSection();
+            await waitFor(() => expect(titles()).toHaveLength(24));
+
+            fireEvent.click(loadMore()!);
+            await waitFor(() =>
+                expect(fetchedUrls().at(-1)).toContain('cursor=c1')
+            );
+            const math = chip('common:subjects.math');
+            math.focus();
+            fireEvent.click(math);
+            await waitFor(() => expect(titles()).toEqual(['Math 1', 'Math 2']));
+
+            page2.resolve({
+                items: range(25, 30),
+                nextCursor: null,
+                total: 30,
+            });
+            await new Promise((r) => setTimeout(r, 0));
+            expect(document.activeElement).toBe(math);
+        });
+
+        it('announces a switch between subjects with the same count', async () => {
+            replies['math:'] = {
+                items: subjectItems('Math', 100, 3),
+                nextCursor: null,
+                total: 3,
+            };
+            replies['science:'] = {
+                items: subjectItems('Science', 200, 3),
+                nextCursor: null,
+                total: 3,
+            };
+            const showing = (id: string) =>
+                `community.showingSubjectOf {"shown":3,"total":3,"subject":"common:subjects.${id}"}`;
+            renderSection();
+            await waitFor(() => expect(titles()).toHaveLength(24));
+
+            fireEvent.click(chip('common:subjects.math'));
+            await waitFor(() => expect(status()).toBe(showing('math')));
+            fireEvent.click(chip('common:subjects.science'));
+            await waitFor(() => expect(status()).toBe(showing('science')));
+            // Math is cached now, so this switch has no loading step between.
+            fireEvent.click(chip('common:subjects.math'));
+            await waitFor(() => expect(status()).toBe(showing('math')));
+        });
     });
 });

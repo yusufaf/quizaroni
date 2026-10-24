@@ -23,6 +23,7 @@ import {
     filterKey,
     paginate,
     parseExploreQuery,
+    selectEntries,
     toFeedEntry,
 } from 'utilities/exploreFeed';
 import { logRequest } from 'utilities/logging';
@@ -229,7 +230,8 @@ const recheckListed = async (page: FeedEntry[]): Promise<FeedEntry[]> => {
 
 /**
  * Unauthenticated Community feed for Explore (#135): public sets, newest
- * first, paged with an opaque keyset cursor tied to the filters. Reads the
+ * first, optionally narrowed to one subject (#136), paged with an opaque
+ * keyset cursor tied to the filters. Reads the
  * public index into a 60s module cache and rechecks each served page, so the
  * response itself is `no-cache`.
  */
@@ -262,7 +264,8 @@ export const handler: Handler = async (
         const { entries } = await loadEntries(Date.now());
         // `next` comes from the page before the recheck, so dropped rows never
         // shift the keyset.
-        const { page, next } = paginate(entries, { after, limit: query.limit });
+        const visible = selectEntries(entries, query.filters);
+        const { page, next } = paginate(visible, { after, limit: query.limit });
         const items = (await recheckListed(page)).map((entry) => entry.summary);
 
         return {
@@ -275,7 +278,10 @@ export const handler: Handler = async (
                 items,
                 nextCursor: next ? encodeCursor(next, key) : null,
                 // A capped read has no true total; the web then shows "Showing X".
-                ...(cache && !cache.truncated ? { total: cache.entries.length } : {}),
+                // Counted after the recheck, which may have evicted rows.
+                ...(cache && !cache.truncated
+                    ? { total: selectEntries(cache.entries, query.filters).length }
+                    : {}),
             }),
         };
     } catch (error) {

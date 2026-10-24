@@ -229,3 +229,71 @@ export const CommunitySkeletonList = styled('ul')({
     gap: MASONRY_COLUMN_GAP,
     alignItems: 'start',
 });
+
+const CHIP_FADE = '2rem';
+
+// One row that scrolls sideways on phones and wraps from `sm` up. The fade
+// sits only on a side with more chips (SubjectChips sets the data
+// attributes), and scroll-padding keeps a tabbed-to chip clear of it.
+export const SubjectChipGroup = styled('div')(({ theme }) => ({
+    // Makes this the chips' offsetParent, so their offsetLeft is in its
+    // scroll coordinates.
+    position: 'relative',
+    display: 'flex',
+    gap: '0.5rem',
+    flexWrap: 'nowrap',
+    overflowX: 'auto',
+    // Room for the focus ring, which the scroll box would clip otherwise.
+    padding: '0.25rem',
+    margin: '-0.25rem -0.25rem 1rem',
+    scrollPaddingInline: CHIP_FADE,
+    scrollbarWidth: 'thin',
+    // Only on xs: a stale data-fade after a widen can't fade wrapped chips.
+    [theme.breakpoints.down('sm')]: {
+        '&[data-fade-end="true"]': {
+            maskImage: `linear-gradient(to right, #000 calc(100% - ${CHIP_FADE}), transparent)`,
+        },
+        '&[data-fade-start="true"]': {
+            maskImage: `linear-gradient(to left, #000 calc(100% - ${CHIP_FADE}), transparent)`,
+        },
+        '&[data-fade-start="true"][data-fade-end="true"]': {
+            maskImage: `linear-gradient(to right, transparent, #000 ${CHIP_FADE}, #000 calc(100% - ${CHIP_FADE}), transparent)`,
+        },
+    },
+    [theme.breakpoints.up('sm')]: {
+        flexWrap: 'wrap',
+        overflowX: 'visible',
+    },
+}));
+
+// Pressed is a fill in primaryText with paper text: the pair themes.test.ts
+// holds to 4.5:1 in both themes.
+export const SubjectChip = styled('button')(({ theme }) => ({
+    ...typeScale(theme.typography.body2),
+    fontWeight: 600,
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    minHeight: '2.25rem',
+    padding: '0 0.875rem',
+    borderRadius: '999px',
+    border: `1px solid ${theme.palette.divider}`,
+    background: 'transparent',
+    color: theme.palette.text.primary,
+    cursor: 'pointer',
+    transition: 'background 0.2s, border-color 0.2s, color 0.2s',
+    '&:hover': {
+        borderColor: theme.palette.other.primaryText,
+    },
+    '&[aria-pressed="true"]': {
+        background: theme.palette.other.primaryText,
+        borderColor: theme.palette.other.primaryText,
+        color: theme.palette.background.paper,
+    },
+    '&:focus-visible': {
+        outline: `2px solid ${theme.palette.other.primaryText}`,
+        outlineOffset: '2px',
+    },
+    '@media (prefers-reduced-motion: reduce)': {
+        transition: 'none',
+    },
+}));

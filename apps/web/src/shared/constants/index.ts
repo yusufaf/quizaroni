@@ -25,6 +25,7 @@ export const ROUTES = {
 
 export const QUERY_PARAMS = {
     PROFILE_TAB: 'tab',
+    EXPLORE_SUBJECT: 'subject',
 } as const;
 
 // Login.tsx stashes the path RequireAuth redirected from here before the
