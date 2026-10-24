@@ -36,28 +36,9 @@ export const handler: Handler = async (
         const userSK = 'userData';
         const updatedAt = new Date().toISOString();
 
-        const userLabelsUpdateCommand = new UpdateCommand({
-            Key: {
-                PK: userPK,
-                SK: userSK,
-            },
-            TableName: usersTable,
-            ExpressionAttributeNames: {
-                '#labels': 'labels',
-            },
-            ExpressionAttributeValues: {
-                ':newLabel': [label],
-                ':updatedAt': updatedAt,
-            },
-            UpdateExpression: 'SET #labels = list_append(#labels, :newLabel), updatedAt = :updatedAt',
-        });
-        await docClient.send(userLabelsUpdateCommand);
-
         if (updateStudysetLabel) {
             const studysetsPK = `userUUID#${userUUID}`;
             const studysetsSK = `studyset#${studysetUUID}`;
-            const updatedAt = new Date().toISOString();
-
             const updatedBy = buildUpdatedBy(username);
             const studysetLabelUpdateCommand = new UpdateCommand({
                 Key: {
@@ -79,9 +60,28 @@ export const handler: Handler = async (
                     'updatedAt = :updatedAt',
                     ...updatedBy.clauses,
                 ].join(', '),
+                // Labelling a missing set must not create a stub item.
+                ConditionExpression: 'attribute_exists(PK)',
             });
             await docClient.send(studysetLabelUpdateCommand);
         }
+
+        const userLabelsUpdateCommand = new UpdateCommand({
+            Key: {
+                PK: userPK,
+                SK: userSK,
+            },
+            TableName: usersTable,
+            ExpressionAttributeNames: {
+                '#labels': 'labels',
+            },
+            ExpressionAttributeValues: {
+                ':newLabel': [label],
+                ':updatedAt': updatedAt,
+            },
+            UpdateExpression: 'SET #labels = list_append(#labels, :newLabel), updatedAt = :updatedAt',
+        });
+        await docClient.send(userLabelsUpdateCommand);
 
         return {
             statusCode: 200,
@@ -90,6 +90,15 @@ export const handler: Handler = async (
             }),
         };
     } catch (err) {
+        if ((err as { name?: string })?.name === "ConditionalCheckFailedException") {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({
+                    message: "Studyset not found",
+                }),
+            };
+        }
+
         console.error(err);
         return {
             statusCode: 500,
