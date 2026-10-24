@@ -57,6 +57,7 @@ const SERVER_OWNED_FIELDS = new Set([
     'userUUID',
     'createdAt',
     'copiedFrom',
+    'username',
 ]);
 const SERVER_OWNED_METADATA_FIELDS = new Set(['publiclyViewable']);
 
@@ -87,7 +88,8 @@ class RequestError extends Error {
  * Publication fields (`subject`, `publishedAt`, `PK2`/`SK2`,
  * `metadata.publiclyViewable`) and `moderation` are owned by publish,
  * unpublish and the takedown script, so they are silently stripped here, as
- * are the identity fields createStudyset writes (#188). A
+ * are the identity fields createStudyset writes (#188) and `username`, the
+ * author name a public set shows, which only server paths write (#193). A
  * top-level `metadata` object (CreateSet's full save) is merged per key
  * rather than replacing the map, so it can't reset `publiclyViewable`.
  * `updatedBy` is skipped when the token has no username (#180).

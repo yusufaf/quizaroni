@@ -122,6 +122,27 @@ describe("updateStudyset buildUpdateExpression", () => {
         expectValidExpressionInput(result);
     });
 
+    // #193: username is the author name a public set shows; only server paths write it.
+    it("ignores username", () => {
+        const result = buildUpdateExpression({
+            // CreateSet's full save spreads the fetched set, stored username included.
+            updates: { title: "T", description: "D", username: "someone-else" },
+            isMetadataUpdate: false,
+            updatedAt: NOW,
+            updatedBy: "turtles",
+        });
+
+        expect(Object.keys(result.ExpressionAttributeNames).sort()).toEqual([
+            "#description",
+            "#title",
+            "#updatedAt",
+            "#updatedBy",
+        ]);
+        expect(result.UpdateExpression).not.toContain("#username");
+        expect(result.ExpressionAttributeValues).not.toHaveProperty(":username");
+        expectValidExpressionInput(result);
+    });
+
     it("drops publiclyViewable from a metadata update without leaving an unused #metadata", () => {
         const result = buildUpdateExpression({
             updates: { publiclyViewable: true },
