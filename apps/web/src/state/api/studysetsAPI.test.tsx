@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
     isCompleteStudyset,
     PublishStudysetError,
+    useCopyPublicStudyset,
     useGetAllStudysets,
     useGetStudyset,
     usePublishStudyset,
@@ -191,5 +192,80 @@ describe('usePublishStudyset', () => {
         const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
         expect(url.endsWith('/studysets/publish-studyset')).toBe(true);
         expect(init.body).toBe(JSON.stringify({ studysetUUID: ID, subject: 'math' }));
+    });
+});
+
+describe('useCopyPublicStudyset', () => {
+    const respond = (status: number, body: unknown) =>
+        Promise.resolve(
+            new Response(JSON.stringify(body), {
+                status,
+                headers: { 'Content-Type': 'application/json' },
+            })
+        );
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+        vi.restoreAllMocks();
+    });
+
+    const renderCopy = () => {
+        const qc = new QueryClient({
+            defaultOptions: { mutations: { retry: false } },
+        });
+        const invalidate = vi.spyOn(qc, 'invalidateQueries');
+        const wrapper = ({ children }: { children: React.ReactNode }) => (
+            <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+        );
+        const { result } = renderHook(() => useCopyPublicStudyset(), {
+            wrapper,
+        });
+        return { result, invalidate };
+    };
+
+    it('posts the id and refreshes the library', async () => {
+        const fetchMock = vi.fn(() =>
+            respond(200, {
+                message: 'Successfully saved study set',
+                studyset: {},
+            })
+        );
+        vi.stubGlobal('fetch', fetchMock);
+        const { result, invalidate } = renderCopy();
+
+        await result.current.mutateAsync({ studysetUUID: ID });
+
+        const [url, init] = fetchMock.mock.calls[0] as unknown as [
+            string,
+            RequestInit,
+        ];
+        expect(url.endsWith('/studysets/copy-public-studyset')).toBe(true);
+        expect(init.body).toBe(JSON.stringify({ studysetUUID: ID }));
+        // Exact: a prefix match would also refetch the open set's 404'd query.
+        await waitFor(() =>
+            expect(invalidate).toHaveBeenCalledWith({
+                queryKey: ['studysets'],
+                exact: true,
+            })
+        );
+    });
+
+    it('surfaces a 404', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() =>
+                respond(404, {
+                    message: 'This study set is private or does not exist.',
+                })
+            )
+        );
+        const { result, invalidate } = renderCopy();
+
+        const error = await result.current
+            .mutateAsync({ studysetUUID: ID })
+            .catch((e: unknown) => e);
+
+        expect(isHttpStatus(error, 404)).toBe(true);
+        expect(invalidate).not.toHaveBeenCalled();
     });
 });

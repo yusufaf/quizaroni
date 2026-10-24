@@ -34,6 +34,7 @@ import type { PublishError, SubjectId } from '@quizaroni/shared-types';
     router.post("/api/studysets/delete-studyset", deleteStudyset);
     router.post("/api/studysets/batch-delete-studysets", batchDeleteStudysets);
     router.post("/api/studysets/duplicate-studyset", duplicateStudyset);
+    router.post("/api/studysets/copy-public-studyset", copyPublicStudyset);
     router.post("/api/studysets/batch-duplicate-studysets", batchDuplicateStudysets);
     router.post("/api/studysets/update-studyset", updateStudyset);
     router.post("/api/studysets/batch-update-studysets", batchUpdateStudysets);
@@ -61,6 +62,7 @@ import {
     GetAllStudysetsRequest,
     GetStudysetRequest,
     DuplicateStudysetRequest,
+    CopyPublicStudysetRequest,
     CreateLabelRequest,
     DeleteLabelRequest,
     EditLabelRequest,
@@ -288,6 +290,36 @@ export const useDuplicateStudyset = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['studysets'] });
+        },
+    });
+};
+
+export const useCopyPublicStudyset = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ studysetUUID }: CopyPublicStudysetRequest) => {
+            const data = await fetchJson(
+                `${BASE_API_URL}/studysets/copy-public-studyset`,
+                {
+                    ...(await getCommonPostRequestProps()),
+                    body: JSON.stringify({ studysetUUID }),
+                }
+            );
+            return validate({
+                schema: BaseResponseSchema,
+                data,
+                type: 'response',
+                context: 'CopyPublicStudyset',
+            });
+        },
+        // Exact: a prefix match would also refetch the open set's 404'd
+        // ['studysets', id] query, which flips ViewStudySet out of its
+        // PublicStudySet fallback and remounts the Save button.
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['studysets'],
+                exact: true,
+            });
         },
     });
 };

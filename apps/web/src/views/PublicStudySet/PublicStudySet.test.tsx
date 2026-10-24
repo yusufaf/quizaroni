@@ -20,17 +20,24 @@ vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (k: string) => k }),
 }));
 
+// The Save button reads auth itself (#140).
+vi.mock('@logto/react', () => ({
+    useLogto: () => ({ isAuthenticated: false }),
+}));
+
 // Mocked like the other component tests until #102 moves them to MemoryRouter.
 vi.mock('react-router-dom', () => {
     const FakeLink = ({
         to,
+        state,
         children,
         ...rest
     }: {
         to: string;
+        state?: unknown;
         children: React.ReactNode;
     }) => (
-        <a href={to} {...rest}>
+        <a href={to} data-state={JSON.stringify(state)} {...rest}>
             {children}
         </a>
     );
@@ -115,6 +122,18 @@ describe('PublicStudySet', () => {
             'publicView.termImage',
             'publicView.definitionImage',
         ]);
+    });
+
+    it('sends a logged-out visitor who clicks Save to login and back', async () => {
+        response = () => json(200, { studyset: publicSet() });
+        renderView();
+
+        const save = await screen.findByRole('link', { name: 'save.action' });
+
+        expect(save.getAttribute('href')).toBe('/login');
+        expect(JSON.parse(save.getAttribute('data-state') ?? '{}')).toEqual({
+            from: `/view/${ID}`,
+        });
     });
 
     it('does not render labels, even if an old API still sends them', async () => {

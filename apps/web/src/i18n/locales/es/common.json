@@ -717,5 +717,15 @@
         "setId": "ID del set",
         "setLink": "Enlace",
         "reason": "Motivo"
+    },
+    "save": {
+        "action": "Guardar",
+        "saving": "Guardando…",
+        "saved": "Guardado",
+        "cardLabel": "Guardar {{title}} en tu biblioteca",
+        "savedCardLabel": "{{title}} guardado en tu biblioteca",
+        "success": "Guardado en tu biblioteca",
+        "unavailable": "Este set ya no es público.",
+        "error": "No se pudo guardar este set. Inténtalo de nuevo."
     }
 }

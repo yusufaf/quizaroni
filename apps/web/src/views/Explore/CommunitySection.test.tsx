@@ -32,6 +32,11 @@ vi.mock('react-i18next', () => ({
     }),
 }));
 
+// The Save button reads auth itself (#140).
+vi.mock('@logto/react', () => ({
+    useLogto: () => ({ isAuthenticated: false }),
+}));
+
 const uuid = (n: number) =>
     `${String(n).padStart(8, '0')}-1111-4111-8111-111111111111`;
 

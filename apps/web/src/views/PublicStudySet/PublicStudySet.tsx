@@ -20,6 +20,7 @@ import useBrowserTitle from 'hooks/useBrowserTitle';
 import ImageGallery from 'components/ImageGallery/ImageGallery';
 import { CardFileMetadata } from 'shared/types';
 import { useReportHref } from 'shared/report';
+import SavePublicSetButton from 'shared/components/SavePublicSetButton/SavePublicSetButton';
 
 type PublicCardFiles =
     GetPublicStudysetResponse['studyset']['cards'][number]['files'];
@@ -49,11 +50,11 @@ type Props = {
 /**
  * Read-only, unauthenticated view of a publicly-shared study set. This is what
  * logged-out visitors (and social/link recipients) land on at `/view/:id`. It
- * only talks to the public endpoint — no user, sync, or mutation hooks — so it
- * never fires an authorized request. Owners viewing while logged in continue to
- * get the full `ViewStudySet` experience (routed in AppRoutes). `ViewStudySet`
- * also falls back to this view, with the sign-up CTA hidden, when a logged-in
- * user opens a set that isn't in their library.
+ * only reads the public endpoint — no user or sync hooks — and fires no
+ * authorized request unless a signed-in user clicks Save. Owners viewing
+ * while logged in continue to get the full `ViewStudySet` experience (routed
+ * in AppRoutes). `ViewStudySet` also falls back to this view, with the sign-up
+ * CTA hidden, when a logged-in user opens a set that isn't in their library.
  */
 const PublicStudySet = ({ showSignupCta = true }: Props) => {
     const { t } = useTranslation();
@@ -63,10 +64,8 @@ const PublicStudySet = ({ showSignupCta = true }: Props) => {
     const studyset = data?.studyset;
 
     useBrowserTitle(studyset?.title ?? 'Quizaroni');
-    const reportHref = useReportHref(
-        studysetUUID,
-        studyset?.title?.trim() || t('explore:tile.untitled')
-    );
+    const displayTitle = studyset?.title?.trim() || t('explore:tile.untitled');
+    const reportHref = useReportHref(studysetUUID, displayTitle);
 
     if (isLoading) {
         return (
@@ -131,14 +130,21 @@ const PublicStudySet = ({ showSignupCta = true }: Props) => {
                         color="primary"
                         variant="outlined"
                     />
-                    <Button
-                        size="small"
-                        href={reportHref}
-                        startIcon={<OutlinedFlag />}
-                        sx={{ ml: 'auto', color: 'text.secondary' }}
-                    >
-                        {t('report.action')}
-                    </Button>
+                    <Stack direction="row" spacing={1} sx={{ ml: 'auto' }}>
+                        <SavePublicSetButton
+                            studysetUUID={studysetUUID}
+                            title={displayTitle}
+                            variant="text"
+                        />
+                        <Button
+                            size="small"
+                            href={reportHref}
+                            startIcon={<OutlinedFlag />}
+                            sx={{ color: 'text.secondary' }}
+                        >
+                            {t('report.action')}
+                        </Button>
+                    </Stack>
                 </Stack>
             </Paper>
 

@@ -3,6 +3,7 @@ import { Avatar, Tooltip } from '@mui/material';
 import type { ExploreSetSummary } from '@quizaroni/shared-types';
 import { useTranslation } from 'react-i18next';
 import { useReportHref } from 'shared/report';
+import SavePublicSetButton from 'shared/components/SavePublicSetButton/SavePublicSetButton';
 import { formatRelativeDate, toSubjectId } from './communityFeed';
 import {
     CardByline,
@@ -89,6 +90,11 @@ const ExploreSetCard = ({ item }: Props) => {
                             )}
                         </time>
                     </TileMeta>
+                    <SavePublicSetButton
+                        studysetUUID={studysetUUID}
+                        title={displayTitle}
+                        variant="icon"
+                    />
                     <Tooltip title={t('common:report.action')}>
                         <TileAction
                             size="small"

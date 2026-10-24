@@ -217,10 +217,14 @@ export const TileFooterEnd = styled('div')({
 });
 
 // Sits above the TileLink overlay so it takes its own clicks. The cast puts
-// back IconButton's `href` overload, which styled() drops.
+// back IconButton's `href` overload, which styled() drops. Only the last
+// action pulls into the card's padding, so neighbours don't overlap.
 export const TileAction = styled(IconButton)(({ theme }) => ({
     zIndex: 1,
-    margin: '-0.375rem -0.5rem -0.375rem 0',
+    margin: '-0.375rem 0',
+    '&:last-child': {
+        marginRight: '-0.5rem',
+    },
     color: theme.palette.text.secondary,
     '&:hover': {
         color: theme.palette.other.primaryText,
