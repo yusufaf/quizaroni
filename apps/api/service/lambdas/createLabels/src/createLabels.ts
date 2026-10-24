@@ -36,6 +36,23 @@ export const handler: Handler = async (
         const userSK = 'userData';
         const updatedAt = new Date().toISOString();
 
+        const userLabelsUpdateCommand = new UpdateCommand({
+            Key: {
+                PK: userPK,
+                SK: userSK,
+            },
+            TableName: usersTable,
+            ExpressionAttributeNames: {
+                '#labels': 'labels',
+            },
+            ExpressionAttributeValues: {
+                ':newLabel': [label],
+                ':updatedAt': updatedAt,
+            },
+            UpdateExpression: 'SET #labels = list_append(#labels, :newLabel), updatedAt = :updatedAt',
+        });
+        await docClient.send(userLabelsUpdateCommand);
+
         if (updateStudysetLabel) {
             const studysetsPK = `userUUID#${userUUID}`;
             const studysetsSK = `studyset#${studysetUUID}`;
@@ -65,23 +82,6 @@ export const handler: Handler = async (
             });
             await docClient.send(studysetLabelUpdateCommand);
         }
-
-        const userLabelsUpdateCommand = new UpdateCommand({
-            Key: {
-                PK: userPK,
-                SK: userSK,
-            },
-            TableName: usersTable,
-            ExpressionAttributeNames: {
-                '#labels': 'labels',
-            },
-            ExpressionAttributeValues: {
-                ':newLabel': [label],
-                ':updatedAt': updatedAt,
-            },
-            UpdateExpression: 'SET #labels = list_append(#labels, :newLabel), updatedAt = :updatedAt',
-        });
-        await docClient.send(userLabelsUpdateCommand);
 
         return {
             statusCode: 200,

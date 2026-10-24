@@ -56,16 +56,18 @@ describe("createLabels handler", () => {
         const studysetUpdate = updates.find((u) => u.TableName === "test-main");
         expect(studysetUpdate.ConditionExpression).toBe("attribute_exists(PK)");
         expectValidExpressionInput(studysetUpdate);
-        expect(updates.map((u) => u.TableName)).toEqual(["test-main", "test-users"]);
+        expect(updates.map((u) => u.TableName)).toEqual(["test-users", "test-main"]);
     });
 
-    it("returns 404 and adds no user label when the set doesn't exist", async () => {
+    // The user's label goes first: if the set write then fails, the user
+    // still has the label they created, and no set holds an unlisted label.
+    it("returns 404 when the set doesn't exist, keeping the user's new label", async () => {
         studysetError = Object.assign(new Error("x"), { name: "ConditionalCheckFailedException" });
 
         const res = await invoke({ studysetUUID: STUDYSET_UUID, updateStudysetLabel: true });
 
         expect(res.statusCode).toBe(404);
-        expect(updates).toEqual([]);
+        expect(updates.map((u) => u.TableName)).toEqual(["test-users"]);
     });
 
     it("only updates the user's labels when no set is labelled", async () => {

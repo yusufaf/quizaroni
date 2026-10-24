@@ -107,6 +107,7 @@ export const collectCallerStoredCardFileKeys = async ({
                     ':sk': 'studyset#',
                 },
                 ProjectionExpression: '#sk, #sid, #cards',
+                ConsistentRead: true,
                 ExclusiveStartKey,
             })
         );

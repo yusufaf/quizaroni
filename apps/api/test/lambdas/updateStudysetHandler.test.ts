@@ -197,6 +197,7 @@ describe("updateStudyset handler", () => {
             ":pk": `userUUID#${USER_UUID}`,
             ":sk": "studyset#",
         });
+        expect(queries.every((q) => q.input.ConsistentRead)).toBe(true);
         expect(queries[1].input.ExclusiveStartKey).toEqual({ PK: "p", SK: "s" });
     });
 
