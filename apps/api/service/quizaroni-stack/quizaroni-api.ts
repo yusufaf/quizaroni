@@ -234,6 +234,10 @@ export class QuizaroniAPI extends Construct {
                 lambdaName: 'duplicateStudyset',
             },
             {
+                route: `${studysetsPrefix}/copy-public-studyset`,
+                lambdaName: 'copyPublicStudyset',
+            },
+            {
                 route: `${studysetsPrefix}/publish-studyset`,
                 lambdaName: 'publishStudyset',
             },

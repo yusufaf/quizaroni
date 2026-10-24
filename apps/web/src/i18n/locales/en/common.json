@@ -717,5 +717,15 @@
         "setId": "Set ID",
         "setLink": "Link",
         "reason": "Reason"
+    },
+    "save": {
+        "action": "Save",
+        "saving": "Saving…",
+        "saved": "Saved",
+        "cardLabel": "Save {{title}} to your library",
+        "savedCardLabel": "Saved {{title}} to your library",
+        "success": "Saved to your library",
+        "unavailable": "This set is no longer public.",
+        "error": "Couldn't save this set. Try again."
     }
 }

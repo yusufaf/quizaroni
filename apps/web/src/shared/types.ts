@@ -292,6 +292,8 @@ export type BatchDeleteStudysetsResponse = BaseResponse;
 
 export type DuplicateStudysetRequest = StudysetUUIDPayload;
 
+export type CopyPublicStudysetRequest = StudysetUUIDPayload;
+
 export type BatchDuplicateStudysetsRequest = {
     studysetUUIDs: UUID[];
 };

@@ -2,12 +2,18 @@
 import { describe, it, expect, vi } from 'vite-plus/test';
 import { render, screen, within } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ExploreSetSummary } from '@quizaroni/shared-types';
 import { createLightTheme } from 'shared/theme/themes';
 import ExploreSetCard from './ExploreSetCard';
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (k: string) => k, i18n: { language: 'en' } }),
+}));
+
+// The Save button reads auth itself (#140).
+vi.mock('@logto/react', () => ({
+    useLogto: () => ({ isAuthenticated: false }),
 }));
 
 vi.mock('react-router-dom', () => {
@@ -49,7 +55,9 @@ const item = (
 const renderCard = (overrides: Partial<ExploreSetSummary> = {}) =>
     render(
         <ThemeProvider theme={createLightTheme()}>
-            <ExploreSetCard item={item(overrides)} />
+            <QueryClientProvider client={new QueryClient()}>
+                <ExploreSetCard item={item(overrides)} />
+            </QueryClientProvider>
         </ThemeProvider>
     );
 

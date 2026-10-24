@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vite-plus/test';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
@@ -15,6 +15,24 @@ const NOW = '2026-10-01T12:00:00.000Z';
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (k: string) => k }),
+}));
+
+// The Save button on the fallback reads auth itself (#140).
+let authenticated = false;
+vi.mock('@logto/react', () => ({
+    useLogto: () => ({ isAuthenticated: authenticated }),
+}));
+
+const toastMock = vi.hoisted(() => ({
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    POSITION: { BOTTOM_LEFT: 'bottom-left' },
+}));
+vi.mock('react-toastify', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('react-toastify')>()),
+    toast: toastMock,
 }));
 
 let routeId = ID1;
@@ -133,6 +151,12 @@ const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
         const { studysetUUID } = JSON.parse(String(init?.body ?? '{}'));
         return json(200, { message: 'ok', studyset: ownedSet(studysetUUID) });
     }
+    if (url.endsWith('/studysets/copy-public-studyset')) {
+        return json(200, {
+            message: 'Successfully saved study set',
+            studyset: {},
+        });
+    }
     if (url.includes('/public/studyset/')) {
         return getPublicStudyset();
     }
@@ -172,6 +196,9 @@ const renderView = (seed?: (qc: QueryClient) => void) => {
 
 beforeEach(() => {
     routeId = ID1;
+    authenticated = false;
+    toastMock.success.mockClear();
+    toastMock.error.mockClear();
     getPublicStudyset = () => json(404, { message: 'not found' });
     fetchMock.mockClear();
     vi.stubGlobal('fetch', fetchMock);
@@ -283,6 +310,30 @@ describe('ViewStudySet for a set outside your library', () => {
         expect(callsTo('/studysets/get-studyset')).toHaveLength(1);
         expect(updateCalls()).toHaveLength(0);
         expect(qc.getMutationCache().getAll()).toHaveLength(0);
+    });
+
+    // A prefix invalidation of ['studysets'] refetched the 404'd set, which
+    // dropped the view out of this fallback and remounted the button.
+    it("keeps the Saved state after saving someone else's set", async () => {
+        authenticated = true;
+        getStudyset = () => json(404, { message: 'not found' });
+        getPublicStudyset = () => json(200, { studyset: publicSet() });
+        renderView();
+
+        fireEvent.click(
+            await screen.findByRole('button', { name: 'save.action' })
+        );
+        const getsBefore = callsTo('/studysets/get-studyset').length;
+
+        await screen.findByRole('button', { name: 'save.saved' });
+        await waitFor(() =>
+            expect(toastMock.success).toHaveBeenCalledWith('save.success', {
+                position: 'bottom-left',
+            })
+        );
+        expect(callsTo('/studysets/copy-public-studyset')).toHaveLength(1);
+        expect(callsTo('/studysets/get-studyset')).toHaveLength(getsBefore);
+        expect(screen.getByRole('button', { name: 'save.saved' })).toBeTruthy();
     });
 
     it('shows the unavailable state when the set is private or missing', async () => {

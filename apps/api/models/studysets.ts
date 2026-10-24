@@ -1,4 +1,4 @@
-import type { StudysetBase, Timestamp } from "@quizaroni/shared-types";
+import type { StudysetBase, Timestamp, UUID } from "@quizaroni/shared-types";
 
 export type {
     Card,
@@ -22,4 +22,6 @@ export type Studyset = StudysetBase & {
     SK: string;
     updatedAt: Timestamp;
     moderation?: StudysetModeration;
+    /** Set on a copy saved from someone else's public set (#140). */
+    copiedFrom?: { studysetUUID: UUID };
 };
