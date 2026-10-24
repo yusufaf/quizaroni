@@ -28,9 +28,7 @@ const SubjectChips = ({ value, onChange }: Props) => {
         const update = () => {
             const next = scrollEdges(el);
             setFade((prev) =>
-                prev.start === next.start && prev.end === next.end
-                    ? prev
-                    : next
+                prev.start === next.start && prev.end === next.end ? prev : next
             );
         };
         update();

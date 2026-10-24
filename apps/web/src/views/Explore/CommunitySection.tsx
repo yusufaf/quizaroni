@@ -79,9 +79,9 @@ const CommunitySection = () => {
         pendingFocusRef.current = null;
         if (pending.subject !== subject) return;
         const target =
-            listRef.current?.children[pending.index]?.querySelector<HTMLElement>(
-                'a'
-            );
+            listRef.current?.children[
+                pending.index
+            ]?.querySelector<HTMLElement>('a');
         if (target) target.focus();
         else if (!hasNextPage && !isFetchNextPageError)
             headingRef.current?.focus();

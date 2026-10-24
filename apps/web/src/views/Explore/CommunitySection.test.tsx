@@ -366,16 +366,12 @@ describe('CommunitySection', () => {
             await waitFor(() => expect(titles()).toHaveLength(24));
 
             fireEvent.click(chip('common:subjects.math'));
-            await waitFor(() =>
-                expect(titles()).toEqual(['Math 1', 'Math 2'])
-            );
+            await waitFor(() => expect(titles()).toEqual(['Math 1', 'Math 2']));
             fireEvent.click(chip('common:subjects.science'));
             await waitFor(() => expect(titles()).toEqual(['Science 1']));
 
             fireEvent.click(screen.getByRole('button', { name: 'probe-back' }));
-            await waitFor(() =>
-                expect(titles()).toEqual(['Math 1', 'Math 2'])
-            );
+            await waitFor(() => expect(titles()).toEqual(['Math 1', 'Math 2']));
             expect(isPressed('common:subjects.math')).toBe(true);
             expect(search()).toBe('?subject=math');
         });
@@ -453,11 +449,13 @@ describe('CommunitySection', () => {
             const math = chip('common:subjects.math');
             math.focus();
             fireEvent.click(math);
-            await waitFor(() =>
-                expect(titles()).toEqual(['Math 1', 'Math 2'])
-            );
+            await waitFor(() => expect(titles()).toEqual(['Math 1', 'Math 2']));
 
-            page2.resolve({ items: range(25, 30), nextCursor: null, total: 30 });
+            page2.resolve({
+                items: range(25, 30),
+                nextCursor: null,
+                total: 30,
+            });
             await new Promise((r) => setTimeout(r, 0));
             expect(document.activeElement).toBe(math);
         });
