@@ -152,6 +152,18 @@ describe('PublicStudySet', () => {
         );
     });
 
+    it('offers a Report link that mails the set id', async () => {
+        response = () => json(200, { studyset: publicSet() });
+        renderView();
+
+        const report = await screen.findByRole('link', {
+            name: 'report.action',
+        });
+
+        expect(report.getAttribute('href')).toMatch(/^mailto:/);
+        expect(report.getAttribute('href')).toContain(ID);
+    });
+
     it('shows the sign-up call to action by default', async () => {
         response = () => json(200, { studyset: publicSet() });
         renderView();

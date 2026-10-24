@@ -9,7 +9,7 @@ import {
     Stack,
     Typography,
 } from '@mui/material/';
-import { School as SchoolIcon } from '@mui/icons-material/';
+import { OutlinedFlag, School as SchoolIcon } from '@mui/icons-material/';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import {
@@ -19,6 +19,7 @@ import {
 import useBrowserTitle from 'hooks/useBrowserTitle';
 import ImageGallery from 'components/ImageGallery/ImageGallery';
 import { CardFileMetadata } from 'shared/types';
+import { useReportHref } from 'shared/report';
 
 type PublicCardFiles =
     GetPublicStudysetResponse['studyset']['cards'][number]['files'];
@@ -62,6 +63,10 @@ const PublicStudySet = ({ showSignupCta = true }: Props) => {
     const studyset = data?.studyset;
 
     useBrowserTitle(studyset?.title ?? 'Quizaroni');
+    const reportHref = useReportHref(
+        studysetUUID,
+        studyset?.title?.trim() || t('explore:tile.untitled')
+    );
 
     if (isLoading) {
         return (
@@ -126,6 +131,14 @@ const PublicStudySet = ({ showSignupCta = true }: Props) => {
                         color="primary"
                         variant="outlined"
                     />
+                    <Button
+                        size="small"
+                        href={reportHref}
+                        startIcon={<OutlinedFlag />}
+                        sx={{ ml: 'auto', color: 'text.secondary' }}
+                    >
+                        {t('report.action')}
+                    </Button>
                 </Stack>
             </Paper>
 
