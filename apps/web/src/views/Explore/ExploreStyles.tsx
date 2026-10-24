@@ -1,5 +1,6 @@
 import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
+import { IconButton } from '@mui/material';
 import { TypographyStyle } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import {
@@ -205,6 +206,30 @@ export const TileFooter = styled('div')({
         marginTop: 0,
     },
 });
+
+export const TileFooterEnd = styled('div')({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.25rem',
+    '& > p': {
+        marginTop: 0,
+    },
+});
+
+// Sits above the TileLink overlay so it takes its own clicks. The cast puts
+// back IconButton's `href` overload, which styled() drops.
+export const TileAction = styled(IconButton)(({ theme }) => ({
+    zIndex: 1,
+    margin: '-0.375rem -0.5rem -0.375rem 0',
+    color: theme.palette.text.secondary,
+    '&:hover': {
+        color: theme.palette.other.primaryText,
+    },
+    '&.Mui-focusVisible': {
+        outline: `2px solid ${theme.palette.other.primaryText}`,
+        outlineOffset: '2px',
+    },
+})) as typeof IconButton;
 
 export const CardByline = styled('p')(({ theme }) => ({
     ...typeScale(theme.typography.caption),

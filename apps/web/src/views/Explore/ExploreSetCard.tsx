@@ -1,13 +1,17 @@
-import { Avatar } from '@mui/material';
+import { OutlinedFlag } from '@mui/icons-material';
+import { Avatar, Tooltip } from '@mui/material';
 import type { ExploreSetSummary } from '@quizaroni/shared-types';
 import { useTranslation } from 'react-i18next';
+import { useReportHref } from 'shared/report';
 import { formatRelativeDate, toSubjectId } from './communityFeed';
 import {
     CardByline,
+    TileAction,
     TileArticle,
     TileDescription,
     TileEyebrow,
     TileFooter,
+    TileFooterEnd,
     TileLink,
     TileMeta,
     TilePreviewItem,
@@ -33,6 +37,8 @@ const ExploreSetCard = ({ item }: Props) => {
         publishedAt,
     } = item;
     const locale = i18n?.language ?? 'en';
+    const displayTitle = title.trim() || t('tile.untitled');
+    const reportHref = useReportHref(studysetUUID, displayTitle);
 
     return (
         <TileArticle interactive>
@@ -40,9 +46,7 @@ const ExploreSetCard = ({ item }: Props) => {
                 {t(`common:subjects.${toSubjectId(subject)}`)}
             </TileEyebrow>
             <TileTitle lines={2}>
-                <TileLink to={`/view/${studysetUUID}`}>
-                    {title || t('tile.untitled')}
-                </TileLink>
+                <TileLink to={`/view/${studysetUUID}`}>{displayTitle}</TileLink>
             </TileTitle>
             {/* role="list": WebKit drops list semantics, and with them the
                 label, from a ul with list-style: none. */}
@@ -73,13 +77,30 @@ const ExploreSetCard = ({ item }: Props) => {
                         {username ? `@${username}` : t('community.anonymous')}
                     </span>
                 </CardByline>
-                <TileMeta>
-                    {t('community.termCount', { count: termCount })}
-                    {' · '}
-                    <time dateTime={publishedAt}>
-                        {formatRelativeDate(publishedAt, new Date(), locale)}
-                    </time>
-                </TileMeta>
+                <TileFooterEnd>
+                    <TileMeta>
+                        {t('community.termCount', { count: termCount })}
+                        {' · '}
+                        <time dateTime={publishedAt}>
+                            {formatRelativeDate(
+                                publishedAt,
+                                new Date(),
+                                locale
+                            )}
+                        </time>
+                    </TileMeta>
+                    <Tooltip title={t('common:report.action')}>
+                        <TileAction
+                            size="small"
+                            href={reportHref}
+                            aria-label={t('common:report.cardLabel', {
+                                title: displayTitle,
+                            })}
+                        >
+                            <OutlinedFlag fontSize="small" />
+                        </TileAction>
+                    </Tooltip>
+                </TileFooterEnd>
             </TileFooter>
         </TileArticle>
     );
