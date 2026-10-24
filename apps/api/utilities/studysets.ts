@@ -37,6 +37,37 @@ export const getStudysetFromDynamo = async ({
     return Item as Studyset;
 };
 
+/**
+ * A real set carries its own id. Stubs written by old upserts (#127, #146)
+ * sit at a set's key without it, so they must not count as owning the set.
+ */
+export const isRealStudysetItem = (
+    item: Record<string, unknown> | undefined,
+    studysetUUID: string
+): boolean => item?.studysetUUID === studysetUUID;
+
+export const callerOwnsStudyset = async ({
+    docClient,
+    mainTable,
+    studysetUUID,
+    userUUID,
+}: GetStudysetParams): Promise<boolean> => {
+    const { Item } = await docClient.send(
+        new GetCommand({
+            TableName: mainTable,
+            Key: {
+                PK: `userUUID#${userUUID}`,
+                SK: `studyset#${studysetUUID}`,
+            },
+            // A set created moments ago (Combine) must already count.
+            ConsistentRead: true,
+            ProjectionExpression: '#id',
+            ExpressionAttributeNames: { '#id': 'studysetUUID' },
+        })
+    );
+    return isRealStudysetItem(Item, studysetUUID);
+};
+
 const SIGNED_URL_EXPIRATION = 86400; // 24 hours in seconds
 
 type RegenerateSignedUrlsParams = {

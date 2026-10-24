@@ -4,11 +4,16 @@ import {
     Handler,
 } from "aws-lambda";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { AuthorizerContext } from "models/auth";
+import { studysetUUIDOfKey } from "utilities/cardFiles";
 import { logRequest } from "utilities/logging";
+import { callerOwnsStudyset } from "utilities/studysets";
 
-const { mainBucket = "" } = process.env;
+const { mainBucket = "", mainTable = "" } = process.env;
 
+const docClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 const s3Client = new S3Client();
 
 type RequestBody = {
@@ -21,11 +26,27 @@ export const handler: Handler = async (
 ): Promise<APIGatewayProxyResultV2> => {
     logRequest(event);
 
+    const { sub: userUUID } = event.requestContext.authorizer.lambda;
     const body: RequestBody = JSON.parse(event.body ?? "{}");
     
     const { key } = body;    
 
+    const studysetUUID = studysetUUIDOfKey(key);
+    if (!studysetUUID) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ message: "Invalid file key" }),
+        };
+    }
+
     try {
+        if (!(await callerOwnsStudyset({ docClient, mainTable, studysetUUID, userUUID }))) {
+            return {
+                statusCode: 403,
+                body: JSON.stringify({ message: "Forbidden" }),
+            };
+        }
+
 
         const deleteCommand = new DeleteObjectCommand({
             Bucket: mainBucket,
