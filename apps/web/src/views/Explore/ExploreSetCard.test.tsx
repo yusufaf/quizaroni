@@ -113,6 +113,28 @@ describe('ExploreSetCard', () => {
         );
     });
 
+    it('offers a Report link above the card link, mailing the set id', () => {
+        renderCard();
+        const report = screen.getByRole('link', {
+            name: 'common:report.cardLabel',
+        });
+        expect(report.getAttribute('href')).toMatch(/^mailto:/);
+        expect(report.getAttribute('href')).toContain(UUID);
+        expect(report.closest('h3')).toBeNull();
+        // Load more focuses a card's first link, which must stay the title.
+        expect(screen.getAllByRole('link')[0]?.getAttribute('href')).toBe(
+            `/view/${UUID}`
+        );
+        report.focus();
+        expect(document.activeElement).toBe(report);
+        const cls = Array.from(report.classList).find((c) =>
+            c.startsWith('css-')
+        );
+        expect(allStyles()).toMatch(
+            new RegExp(`\\.${escapeRegExp(cls!)} ?\\{[^}]*z-index: ?1`)
+        );
+    });
+
     it('turns off motion under reduced motion', () => {
         const { container } = renderCard();
         const article = container.querySelector('article')!;

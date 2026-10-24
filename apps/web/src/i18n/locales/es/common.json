@@ -708,5 +708,14 @@
             "hidden": "Los moderadores retiraron este set y no se puede publicar.",
             "generic": "Algo salió mal. Inténtalo de nuevo."
         }
+    },
+    "report": {
+        "action": "Denunciar",
+        "cardLabel": "Denunciar {{title}}",
+        "emailSubject": "Denuncia: {{title}}",
+        "emailIntro": "Quiero denunciar este set público.",
+        "setId": "ID del set",
+        "setLink": "Enlace",
+        "reason": "Motivo"
     }
 }

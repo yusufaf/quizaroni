@@ -11,7 +11,7 @@ const flatKeys = (obj: object, prefix = ''): string[] =>
     );
 
 describe('publish strings', () => {
-    it.each(['subjects', 'publish'] as const)(
+    it.each(['subjects', 'publish', 'report'] as const)(
         'has the same %s keys in en and es',
         (section) => {
             expect(flatKeys(es[section]).sort()).toEqual(
