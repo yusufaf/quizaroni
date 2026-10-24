@@ -1,4 +1,4 @@
-import { DynamoDBDocumentClient, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, TransactWriteCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { expectValidExpressionInput } from "../helpers/expressionInput";
 
 // #188: labelling a set the caller doesn't have created a stub item at that
@@ -18,20 +18,38 @@ beforeAll(() => {
     ({ handler } = require("../../service/lambdas/createLabels/src/createLabels"));
 });
 
+// Committed update inputs; a transaction's items commit together or not at all.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let updates: any[];
-let studysetError: unknown;
+let transactions: number;
+let missingSet: boolean;
 
 beforeEach(() => {
     jest.spyOn(console, "log").mockImplementation(() => {});
     jest.spyOn(console, "error").mockImplementation(() => {});
     updates = [];
-    studysetError = undefined;
+    transactions = 0;
+    missingSet = false;
     jest.spyOn(DynamoDBDocumentClient.prototype, "send").mockImplementation((async (command: unknown) => {
-        if (!(command instanceof UpdateCommand)) throw new Error("unexpected DynamoDB command");
-        if (command.input.TableName === "test-main" && studysetError) throw studysetError;
-        updates.push(command.input);
-        return {};
+        if (command instanceof UpdateCommand) {
+            updates.push(command.input);
+            return {};
+        }
+        if (command instanceof TransactWriteCommand) {
+            transactions++;
+            const items = command.input.TransactItems ?? [];
+            if (missingSet) {
+                throw Object.assign(new Error("x"), {
+                    name: "TransactionCanceledException",
+                    CancellationReasons: items.map((item) =>
+                        item.Update?.TableName === "test-main" ? { Code: "ConditionalCheckFailed" } : { Code: "None" }
+                    ),
+                });
+            }
+            updates.push(...items.map((item) => item.Update));
+            return {};
+        }
+        throw new Error("unexpected DynamoDB command");
     }) as never);
 });
 
@@ -56,18 +74,28 @@ describe("createLabels handler", () => {
         const studysetUpdate = updates.find((u) => u.TableName === "test-main");
         expect(studysetUpdate.ConditionExpression).toBe("attribute_exists(PK)");
         expectValidExpressionInput(studysetUpdate);
-        expect(updates.map((u) => u.TableName)).toEqual(["test-users", "test-main"]);
+        expect(transactions).toBe(1);
+        expect(updates.map((u) => u.TableName).sort()).toEqual(["test-main", "test-users"]);
+        updates.forEach(expectValidExpressionInput);
     });
 
-    // The user's label goes first: if the set write then fails, the user
-    // still has the label they created, and no set holds an unlisted label.
-    it("returns 404 when the set doesn't exist, keeping the user's new label", async () => {
-        studysetError = Object.assign(new Error("x"), { name: "ConditionalCheckFailedException" });
+    // Either write alone would leave a set label the user's list lacks, or a
+    // user label behind a 404 that a retry then duplicates.
+    it("returns 404 and writes nothing when the set doesn't exist", async () => {
+        missingSet = true;
 
         const res = await invoke({ studysetUUID: STUDYSET_UUID, updateStudysetLabel: true });
 
         expect(res.statusCode).toBe(404);
-        expect(updates.map((u) => u.TableName)).toEqual(["test-users"]);
+        expect(updates).toEqual([]);
+    });
+
+    it("rejects labelling a set without a studysetUUID", async () => {
+        const res = await invoke({ updateStudysetLabel: true });
+
+        expect(res.statusCode).toBe(400);
+        expect(updates).toEqual([]);
+        expect(transactions).toBe(0);
     });
 
     it("only updates the user's labels when no set is labelled", async () => {
@@ -75,5 +103,6 @@ describe("createLabels handler", () => {
 
         expect(res.statusCode).toBe(200);
         expect(updates.map((u) => u.TableName)).toEqual(["test-users"]);
+        expect(transactions).toBe(0);
     });
 });

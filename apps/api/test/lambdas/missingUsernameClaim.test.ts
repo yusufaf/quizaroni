@@ -163,9 +163,13 @@ describe.each(cases)("$name", (testCase) => {
 
         expect(statusCode).toBe(200);
 
-        const updateInputs = commands
-            .filter((cmd) => cmd.constructor.name === "UpdateCommand")
-            .map((cmd) => cmd.input);
+        const updateInputs = [
+            ...commands.filter((cmd) => cmd.constructor.name === "UpdateCommand").map((cmd) => cmd.input),
+            ...commands
+                .filter((cmd) => cmd.constructor.name === "TransactWriteCommand")
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .flatMap((cmd) => cmd.input.TransactItems.map((item: any) => item.Update)),
+        ];
         updateInputs.forEach(expectValidExpressionInput);
 
         const updatedByValues = updateInputs
