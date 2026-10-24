@@ -12,6 +12,13 @@ export type ReportStrings = {
     reason: string;
 };
 
+// encodeURIComponent throws on a lone surrogate (a title cut mid-emoji), and
+// this runs during render. String.prototype.toWellFormed isn't in Safari 16.0.
+const toWellFormed = (value: string) =>
+    value.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-\uDFFF]/g, (match) =>
+        match.length === 2 ? match : '�'
+    );
+
 // encodeURIComponent, not URLSearchParams: mail clients show its `+` for
 // spaces literally. RFC 6068 wants CRLF line breaks in the body.
 export const reportMailto = (
@@ -27,7 +34,7 @@ export const reportMailto = (
         '',
         `${s.reason}: `,
     ].join('\r\n');
-    return `mailto:${REPORT_EMAIL}?subject=${encodeURIComponent(s.subject)}&body=${encodeURIComponent(body)}`;
+    return `mailto:${REPORT_EMAIL}?subject=${encodeURIComponent(toWellFormed(s.subject))}&body=${encodeURIComponent(toWellFormed(body))}`;
 };
 
 export const useReportHref = (studysetUUID: string, title: string): string => {

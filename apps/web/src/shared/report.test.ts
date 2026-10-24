@@ -38,4 +38,15 @@ describe('reportMailto', () => {
         expect(params.get('subject')).toBe(subject);
         expect(params.get('body')).toContain(UUID);
     });
+
+    it('replaces a lone surrogate instead of throwing during render', () => {
+        const href = reportMailto(
+            UUID,
+            ORIGIN,
+            strings({ subject: 'Report: Biology \uD83E 🧬' })
+        );
+        expect(new URL(href).searchParams.get('subject')).toBe(
+            'Report: Biology � 🧬'
+        );
+    });
 });
