@@ -150,19 +150,26 @@ describe('CommunitySection', () => {
         );
     });
 
-    it('drops a drifted count while more remain, and on a capped last page', async () => {
-        replies[''] = { items: range(1, 24), nextCursor: 'c1', total: 20 };
-        replies.c1 = { items: range(25, 26), nextCursor: null };
-        renderSection();
-        await waitFor(() =>
-            expect(status()).toBe('community.showing {"shown":24}')
-        );
-        expect(loadMore()).toBeTruthy();
-        fireEvent.click(loadMore()!);
-        await waitFor(() =>
-            expect(status()).toBe('community.showing {"shown":26}')
-        );
-    });
+    it.each([20, 24])(
+        'drops a drifted count (total %i) while more remain, and on a capped last page',
+        async (drifted) => {
+            replies[''] = {
+                items: range(1, 24),
+                nextCursor: 'c1',
+                total: drifted,
+            };
+            replies.c1 = { items: range(25, 26), nextCursor: null };
+            renderSection();
+            await waitFor(() =>
+                expect(status()).toBe('community.showing {"shown":24}')
+            );
+            expect(loadMore()).toBeTruthy();
+            fireEvent.click(loadMore()!);
+            await waitFor(() =>
+                expect(status()).toBe('community.showing {"shown":26}')
+            );
+        }
+    );
 
     it('marks the skeleton list busy while the first page loads', () => {
         replies = {};

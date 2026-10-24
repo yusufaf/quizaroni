@@ -312,5 +312,8 @@ describe("getExploreFeed handler", () => {
         expect(res.statusCode).toBe(500);
         expect(body.message).toBe("Failed to load the feed");
         expect(res.body).not.toContain("arn:aws");
+        const logged = (console.error as jest.Mock).mock.calls.map(([line]) => String(line)).join("\n");
+        expect(logged).toContain("exploreFeedFailed");
+        expect(logged).toContain("boom: arn:aws");
     });
 });

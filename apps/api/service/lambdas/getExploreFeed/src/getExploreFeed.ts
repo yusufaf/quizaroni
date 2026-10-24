@@ -25,6 +25,7 @@ import {
     parseExploreQuery,
     toFeedEntry,
 } from 'utilities/exploreFeed';
+import { logRequest } from 'utilities/logging';
 
 const { mainTable = '' } = process.env;
 
@@ -107,7 +108,7 @@ const refreshEntries = async (now: number) => {
     if (truncated || durationMs > SLOW_REFRESH_MS || pages > WARN_QUERY_PAGES) {
         console.warn(
             JSON.stringify({
-                event: 'exploreFeedRefresh',
+                kind: 'exploreFeedRefresh',
                 items: entries.length,
                 pages,
                 durationMs,
@@ -146,7 +147,7 @@ const loadEntries = async (now: number) => {
         refreshRetryAt = now + REFRESH_RETRY_MS;
         console.error(
             JSON.stringify({
-                event: 'exploreFeedRefreshFailed',
+                kind: 'exploreFeedRefreshFailed',
                 staleMs: now - stale.loadedAt,
                 error: describeError(error),
             })
@@ -205,7 +206,7 @@ const recheckListed = async (page: FeedEntry[]): Promise<FeedEntry[]> => {
     const unprocessed = new Set(keys.map(keyId));
     if (unprocessed.size > 0) {
         console.warn(
-            JSON.stringify({ event: 'exploreFeedRecheckUnprocessed', count: unprocessed.size })
+            JSON.stringify({ kind: 'exploreFeedRecheckUnprocessed', count: unprocessed.size })
         );
     }
 
@@ -236,7 +237,7 @@ export const handler: Handler = async (
     event: APIGatewayProxyEventV2,
     context
 ): Promise<APIGatewayProxyResultV2> => {
-    console.log(JSON.stringify({ event, context }, null, 4));
+    logRequest(event);
 
     const query = parseExploreQuery(event.queryStringParameters);
     if (!query.ok) {
@@ -279,7 +280,7 @@ export const handler: Handler = async (
         };
     } catch (error) {
         console.error(
-            JSON.stringify({ event: 'exploreFeedFailed', error: describeError(error) })
+            JSON.stringify({ kind: 'exploreFeedFailed', error: describeError(error) })
         );
         // A public route: table, index and IAM details stay in the logs.
         return {
