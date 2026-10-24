@@ -26,17 +26,22 @@ beforeAll(() => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let updates: any[];
+let s3Commands: unknown[];
+let storedItem: Record<string, unknown> | undefined;
 
 beforeEach(() => {
     jest.spyOn(console, "log").mockImplementation(() => {});
     updates = [];
+    s3Commands = [];
+    storedItem = { studysetUUID: STUDYSET_UUID, cards: [{ cardUUID: "c1", files: [] }] };
     jest.spyOn(S3Client.prototype, "send").mockImplementation((async (command: unknown) => {
+        s3Commands.push(command);
         if (command instanceof CompleteMultipartUploadCommand) return {};
         if (command instanceof HeadObjectCommand) return { ContentLength: 5 };
         throw new Error("unexpected S3 command");
     }) as never);
     jest.spyOn(DynamoDBDocumentClient.prototype, "send").mockImplementation((async (command: unknown) => {
-        if (command instanceof GetCommand) return { Item: { cards: [{ cardUUID: "c1", files: [] }] } };
+        if (command instanceof GetCommand) return { Item: storedItem };
         if (command instanceof UpdateCommand) {
             updates.push(command.input);
             return {};
@@ -87,5 +92,31 @@ describe("completeMultipartUpload handler", () => {
         const res = await invoke({ fileName: "a".repeat(300) });
 
         expect(JSON.parse(res.body).name).toBe("a".repeat(255));
+    });
+
+    // #188: any caller could complete an upload under another user's set.
+    it("rejects a key under a set the caller doesn't own", async () => {
+        storedItem = undefined;
+
+        const res = await invoke({ fileName: "photo.png" });
+
+        expect(res.statusCode).toBe(403);
+        expect(s3Commands).toEqual([]);
+        expect(updates).toEqual([]);
+    });
+
+    it("rejects a studysetUUID that doesn't match the key's set", async () => {
+        const res = await invoke({ studysetUUID: "99999999-9999-4999-8999-999999999999", cardUUID: "c1" });
+
+        expect(res.statusCode).toBe(400);
+        expect(s3Commands).toEqual([]);
+        expect(updates).toEqual([]);
+    });
+
+    it("rejects a malformed key", async () => {
+        const res = await invoke({ key: "notauuid/x" });
+
+        expect(res.statusCode).toBe(400);
+        expect(s3Commands).toEqual([]);
     });
 });
