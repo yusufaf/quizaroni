@@ -12,6 +12,8 @@ import {
 import { AuthorizerContext } from 'models/auth';
 import { removeKeys } from 'resources/dynamo/utilities';
 import { NotificationPreferences } from 'models/user';
+import { logRequest } from 'utilities/logging';
+import { buildUpdatedBy } from 'utilities/updatedBy';
 
 const { usersTable = '' } = process.env;
 
@@ -26,11 +28,10 @@ export const handler: Handler = async (
     event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>,
     context
 ): Promise<APIGatewayProxyResultV2> => {
-    console.log(JSON.stringify({ event, context }, null, 4));
+    logRequest(event);
 
     const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
     const body: RequestBody = JSON.parse(event.body ?? '{}');
-    console.log(JSON.stringify({ body }, null, 4));
 
     const { updates } = body;
 
@@ -59,29 +60,30 @@ export const handler: Handler = async (
         const mergedNotifications = deepMerge(currentNotifications, updates);
 
         // Build the update expression
+        const updatedBy = buildUpdatedBy(username);
         const updateCommand = new UpdateCommand({
             Key: { PK, SK },
             TableName: usersTable,
-            UpdateExpression:
-                'SET #metadata.#notifications = :notifications, #updatedAt = :updatedAt, #updatedBy = :updatedBy',
+            UpdateExpression: [
+                'SET #metadata.#notifications = :notifications',
+                '#updatedAt = :updatedAt',
+                ...updatedBy.clauses,
+            ].join(', '),
             ExpressionAttributeNames: {
                 '#metadata': 'metadata',
                 '#notifications': 'notifications',
                 '#updatedAt': 'updatedAt',
-                '#updatedBy': 'updatedBy',
             },
             ExpressionAttributeValues: {
                 ':notifications': mergedNotifications,
                 ':updatedAt': updatedAt,
-                ':updatedBy': username,
+                ...updatedBy.values,
             },
             ReturnValues: 'ALL_NEW',
         });
 
         const updateResult = await docClient.send(updateCommand);
         const updatedUser = updateResult.Attributes;
-
-        console.log(JSON.stringify({ updatedUser }, null, 4));
 
         return {
             statusCode: 200,

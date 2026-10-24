@@ -11,6 +11,8 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { AuthorizerContext } from 'models/auth';
 import { removeKeys } from 'resources/dynamo/utilities';
+import { logRequest } from 'utilities/logging';
+import { buildUpdatedBy } from 'utilities/updatedBy';
 
 const { usersTable = '' } = process.env;
 
@@ -58,11 +60,10 @@ export const handler: Handler = async (
     event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>,
     context
 ): Promise<APIGatewayProxyResultV2> => {
-    console.log(JSON.stringify({ event, context }, null, 4));
+    logRequest(event);
 
     const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
     const body: RequestBody = JSON.parse(event.body ?? '{}');
-    console.log(JSON.stringify({ body }, null, 4));
 
     const { gamification, customAchievements } = body;
 
@@ -108,23 +109,27 @@ export const handler: Handler = async (
             customAchievements
         );
 
+        const updatedBy = buildUpdatedBy(username);
         const updateCommand = new UpdateCommand({
             Key: { PK, SK },
             TableName: usersTable,
-            UpdateExpression:
-                'SET #metadata.#gamification = :gamification, #metadata.#customAchievements = :customAchievements, #updatedAt = :updatedAt, #updatedBy = :updatedBy',
+            UpdateExpression: [
+                'SET #metadata.#gamification = :gamification',
+                '#metadata.#customAchievements = :customAchievements',
+                '#updatedAt = :updatedAt',
+                ...updatedBy.clauses,
+            ].join(', '),
             ExpressionAttributeNames: {
                 '#metadata': 'metadata',
                 '#gamification': 'gamification',
                 '#customAchievements': 'customAchievements',
                 '#updatedAt': 'updatedAt',
-                '#updatedBy': 'updatedBy',
             },
             ExpressionAttributeValues: {
                 ':gamification': mergedGamification,
                 ':customAchievements': mergedCustom,
                 ':updatedAt': updatedAt,
-                ':updatedBy': username,
+                ...updatedBy.values,
             },
             ReturnValues: 'ALL_NEW',
         });

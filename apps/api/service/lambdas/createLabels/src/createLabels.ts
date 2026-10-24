@@ -6,6 +6,8 @@ import {
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { AuthorizerContext } from "models/auth";
+import { logRequest } from "utilities/logging";
+import { buildUpdatedBy } from "utilities/updatedBy";
 
 const { mainTable = "", usersTable = "" } = process.env;
 
@@ -22,11 +24,10 @@ export const handler: Handler = async (
     event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>,
     context
 ): Promise<APIGatewayProxyResultV2> => {
-    console.log(JSON.stringify({ event, context }, null, 4));
+    logRequest(event);
 
     const { sub: userUUID, username } = event.requestContext.authorizer.lambda
     const body: RequestBody = JSON.parse(event.body ?? "{}");
-    console.log(JSON.stringify({body}, null, 4));
 
     const { label, studysetUUID = "", updateStudysetLabel = false } = body;
 
@@ -57,6 +58,7 @@ export const handler: Handler = async (
             const studysetsSK = `studyset#${studysetUUID}`;
             const updatedAt = new Date().toISOString();
 
+            const updatedBy = buildUpdatedBy(username);
             const studysetLabelUpdateCommand = new UpdateCommand({
                 Key: {
                     PK: studysetsPK,
@@ -70,9 +72,13 @@ export const handler: Handler = async (
                     ':newLabelArray': [label],
                     ':emptyList': [],
                     ':updatedAt': updatedAt,
-                    ':updatedBy': username,
+                    ...updatedBy.values,
                 },
-                UpdateExpression: 'SET #labels = list_append(if_not_exists(#labels, :emptyList), :newLabelArray), updatedAt = :updatedAt, updatedBy = :updatedBy',
+                UpdateExpression: [
+                    'SET #labels = list_append(if_not_exists(#labels, :emptyList), :newLabelArray)',
+                    'updatedAt = :updatedAt',
+                    ...updatedBy.clauses,
+                ].join(', '),
             });
             await docClient.send(studysetLabelUpdateCommand);
         }

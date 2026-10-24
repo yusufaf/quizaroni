@@ -13,6 +13,7 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { AuthorizerContext } from 'models/auth';
 import { User } from 'models/user';
+import { logRequest } from 'utilities/logging';
 
 const { mainTable = '', usersTable = '' } = process.env;
 
@@ -29,11 +30,10 @@ export const handler: Handler = async (
     event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>,
     context
 ): Promise<APIGatewayProxyResultV2> => {
-    console.log(JSON.stringify({ event, context }, null, 4));
+    logRequest(event);
 
     const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
     const body: RequestBody = JSON.parse(event.body ?? '{}');
-    console.log(JSON.stringify({ body }, null, 4));
 
     const { index, newLabel, oldLabel } = body;
 
@@ -106,7 +106,7 @@ const editLabelsInAffectedStudysets = async ({
     oldLabel: string;
     newLabel: string;
     PK: string;
-    username: string;
+    username?: string;
 }) => {
     // Query for all study sets of the user
     const queryCommand = new QueryCommand({
@@ -138,7 +138,7 @@ const editLabelsInAffectedStudysets = async ({
                         ...item,
                         labels: updatedLabels,
                         updatedAt: updatedAt,
-                        updatedBy: username,
+                        ...(username ? { updatedBy: username } : {}),
                     },
                 },
             };

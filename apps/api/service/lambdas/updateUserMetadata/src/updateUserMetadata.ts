@@ -11,6 +11,7 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { AuthorizerContext } from 'models/auth';
 import { removeKeys } from 'resources/dynamo/utilities';
+import { logRequest } from 'utilities/logging';
 
 const { usersTable = '' } = process.env;
 
@@ -25,11 +26,10 @@ export const handler: Handler = async (
     event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>,
     context
 ): Promise<APIGatewayProxyResultV2> => {
-    console.log(JSON.stringify({ event, context }, null, 4));
+    logRequest(event);
 
     const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
     const body: RequestBody = JSON.parse(event.body ?? '{}');
-    console.log(JSON.stringify({ body }, null, 4));
 
     const { updates } = body;
 
@@ -50,6 +50,7 @@ export const handler: Handler = async (
 
         // Handle top-level updates for `updatedAt` and `updatedBy`
         for (const [key, value] of Object.entries(topLevelUpdates)) {
+            if (!value) continue;
             const attributeKey = `#${key}`;
             const attributeValue = `:${key}`;
             updateExpressions.push(`${attributeKey} = ${attributeValue}`);
@@ -78,11 +79,6 @@ export const handler: Handler = async (
 
         const UpdateExpression = `SET ${updateExpressions.join(', ')}`;
 
-        console.log({
-            ExpressionAttributeNames,
-            ExpressionAttributeValues,
-            UpdateExpression,
-        });
         const updateCommand = new UpdateCommand({
             Key: {
                 PK,
@@ -104,8 +100,6 @@ export const handler: Handler = async (
         });
         const getResult = await docClient.send(getCommand);
         const updatedUser = getResult.Item;
-
-        console.log(JSON.stringify({ updatedUser }, null, 4));
 
         return {
             statusCode: 200,

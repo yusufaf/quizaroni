@@ -12,6 +12,7 @@ import {
 import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { AuthorizerContext } from 'models/auth';
 import { removeKeys } from 'resources/dynamo/utilities';
+import { logRequest } from 'utilities/logging';
 
 const { mainBucket = '', mainTable = '' } = process.env;
 
@@ -29,7 +30,7 @@ type BuildUpdateExpressionParams = {
     updates: { [key: string]: any };
     isMetadataUpdate: boolean;
     updatedAt: string;
-    updatedBy: string;
+    updatedBy?: string;
 };
 
 const SERVER_OWNED_FIELDS = new Set(['subject', 'publishedAt', 'moderation', 'PK2', 'SK2']);
@@ -56,6 +57,7 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> =>
  * unpublish and the takedown script, so they are silently stripped here. A
  * top-level `metadata` object (CreateSet's full save) is merged per key
  * rather than replacing the map, so it can't reset `publiclyViewable`.
+ * `updatedBy` is skipped when the token has no username (#180).
  */
 export const buildUpdateExpression = ({
     updates,
@@ -71,6 +73,7 @@ export const buildUpdateExpression = ({
 
     // Handle top-level updates for `updatedAt` and `updatedBy`
     for (const [key, value] of Object.entries(topLevelUpdates)) {
+        if (!value) continue;
         const attributeKey = `#${key}`;
         const attributeValue = `:${key}`;
         updateExpressions.push(`${attributeKey} = ${attributeValue}`);
@@ -128,11 +131,10 @@ export const handler: Handler = async (
     event: APIGatewayProxyEventV2WithLambdaAuthorizer<AuthorizerContext>,
     context
 ): Promise<APIGatewayProxyResultV2> => {
-    console.log(JSON.stringify({ event, context }, null, 4));
+    logRequest(event);
 
     const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
     const body: RequestBody = JSON.parse(event.body ?? '{}');
-    console.log(JSON.stringify({ body }, null, 4));
 
     const { isMetadataUpdate = false, studysetUUID, updates } = body;
 
@@ -221,11 +223,6 @@ export const handler: Handler = async (
                 updatedBy: username,
             });
 
-        console.log({
-            ExpressionAttributeNames,
-            ExpressionAttributeValues,
-            UpdateExpression,
-        });
         const updateCommand = new UpdateCommand({
             Key: {
                 PK,
@@ -247,8 +244,6 @@ export const handler: Handler = async (
         });
         const getResult = await docClient.send(getCommand);
         const updatedStudyset = getResult.Item;
-
-        console.log(JSON.stringify({ updatedStudyset }, null, 4));
 
         return {
             statusCode: 200,
