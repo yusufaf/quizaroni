@@ -56,6 +56,7 @@ const SERVER_OWNED_FIELDS = new Set([
     'studysetUUID',
     'userUUID',
     'createdAt',
+    'copiedFrom',
 ]);
 const SERVER_OWNED_METADATA_FIELDS = new Set(['publiclyViewable']);
 

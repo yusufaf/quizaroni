@@ -107,6 +107,7 @@ describe("updateStudyset buildUpdateExpression", () => {
                 studysetUUID: "99999999-9999-4999-8999-999999999999",
                 userUUID: "u",
                 createdAt: "2020-01-01T00:00:00.000Z",
+                copiedFrom: { studysetUUID: "x" },
             },
             isMetadataUpdate: false,
             updatedAt: NOW,
