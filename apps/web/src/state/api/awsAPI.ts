@@ -112,6 +112,7 @@ export const getMultipartSignedUploadUrls = async ({
 type CompleteMultipartUploadProps = {
     association?: 'term' | 'definition';
     cardUUID?: string;
+    fileName?: string;
     key: string;
     parts: Part[];
     studysetUUID?: UUID;
@@ -122,6 +123,7 @@ type CompleteMultipartUploadResponse = FileMetadata;
 export const completeMultipartUpload = async ({
     association,
     cardUUID,
+    fileName,
     key,
     parts,
     studysetUUID,
@@ -132,6 +134,7 @@ export const completeMultipartUpload = async ({
         body: JSON.stringify({
             association,
             cardUUID,
+            fileName,
             key,
             parts,
             studysetUUID,

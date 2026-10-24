@@ -59,7 +59,6 @@ export const handler: Handler = async (
             bucket: mainBucket,
             cards: duplicatedStudyset.cards,
             studysetUUID: newStudysetUUID,
-            ownerUUID: userUUID,
         });
 
         const putCommand = new PutCommand({

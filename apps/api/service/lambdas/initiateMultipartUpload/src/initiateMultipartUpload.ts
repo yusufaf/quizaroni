@@ -5,6 +5,7 @@ import {
 } from "aws-lambda";
 import { S3Client, CreateMultipartUploadCommand } from "@aws-sdk/client-s3";
 import { AuthorizerContext } from "models/auth";
+import { cardFileKey } from "utilities/cardFiles";
 import { logRequest } from "utilities/logging";
 
 const { mainBucket = "" } = process.env;
@@ -28,9 +29,9 @@ export const handler: Handler = async (
 
     const body: RequestBody = JSON.parse(event.body ?? "{}");
 
-    const { contentType, fileName, studysetUUID, uploadType } = body;
-    
-    const key = `${studysetUUID}/${userUUID}/${fileName}`;
+    const { contentType, studysetUUID, uploadType } = body;
+
+    const key = cardFileKey(studysetUUID ?? "");
 
     try {
         const multipartCommand = new CreateMultipartUploadCommand({
