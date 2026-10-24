@@ -82,6 +82,7 @@ const SavePublicSetButton = ({ studysetUUID, title, variant }: Props) => {
                     );
                 }
             )
+            .catch((error: unknown) => console.error(error))
             .finally(() => {
                 inFlight.current = false;
             });
