@@ -11,11 +11,9 @@
  * - Re-key: for each study set with legacy keys, copy every legacy object to
  *   a new opaque key, then point the cards at the copies with a conditional
  *   update (skipped if the cards changed since the scan). Legacy objects are
- *   never deleted here. Before each update, the item's legacy keys and the
- *   keys of their copies are appended to the MANIFEST file.
+ *   never deleted here; each migrated key is appended to the MANIFEST file.
  * - Delete (DELETE_OLD=1, at least 7 days later): delete the manifest keys
- *   that no study set references any more: the legacy objects, plus any copy
- *   an aborted update left unused.
+ *   that no study set references any more.
  * Deletion is deferred because an editor tab opened before the migration
  * saves its full stale cards: updateStudyset then deletes the new copies and
  * writes the legacy keys back. The legacy objects have to outlive those tabs;
@@ -194,7 +192,7 @@ export const rekeyCardFiles = async ({
     dryRun: boolean;
     log?: (message: string) => void;
     newFileKey?: (studysetUUID: string) => string;
-    recordMigrated: (keys: string[]) => void;
+    recordMigrated: (oldKeys: string[]) => void;
 }): Promise<RekeyResult> => {
     const result: RekeyResult = {
         scanned: 0,
@@ -285,12 +283,11 @@ export const rekeyCardFiles = async ({
                 : card
         );
 
-        // Record the legacy keys and their copies before the update, so
-        // whatever a crash or failed update leaves behind is named in the
-        // manifest. The delete pass only removes keys no card references, so
-        // recording a key that stays in use is harmless.
+        // Record before the update, so a crash after it can't leave a legacy
+        // object no manifest names. Recording a key the update then skips is
+        // harmless: the delete pass keeps keys that are still referenced.
         try {
-            recordMigrated([...newKeys.keys(), ...newKeys.values()]);
+            recordMigrated([...newKeys.keys()]);
         } catch (error) {
             await removeCopies();
             throw error;

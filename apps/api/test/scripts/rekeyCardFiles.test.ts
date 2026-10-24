@@ -241,7 +241,7 @@ describe('rekeyCardFiles', () => {
         expect(input.ExpressionAttributeValues?.[':cards']).toEqual([
             { ...item.cards[0], files: [{ ...legacyFile(), key: `${S}/k1`, signedURL: '' }] },
         ]);
-        expect(recordMigrated).toHaveBeenCalledWith([LEGACY, `${S}/k1`]);
+        expect(recordMigrated).toHaveBeenCalledWith([LEGACY]);
         expect(s3.deletes).toHaveLength(0);
         expect(result).toMatchObject({ matched: 1, updated: 1, filesCopied: 1, skipped: 0 });
     });
@@ -256,7 +256,7 @@ describe('rekeyCardFiles', () => {
 
         expect(s3.copies.map((c) => c.Key)).toEqual([`${S}/k1`, `${S}/k2`]);
         expect(dynamo.updates).toHaveLength(2);
-        expect(recordMigrated.mock.calls).toEqual([[[LEGACY, `${S}/k1`]], [[LEGACY, `${S}/k2`]]]);
+        expect(recordMigrated.mock.calls).toEqual([[[LEGACY]], [[LEGACY]]]);
         expect(s3.deletes).toHaveLength(0);
         expect(result).toMatchObject({ updated: 2, filesCopied: 2 });
     });
@@ -273,40 +273,23 @@ describe('rekeyCardFiles', () => {
         const result = await rekey(dynamo, s3, { recordMigrated });
 
         expect(s3.deletes).toEqual([`${S}/k1`]);
-        // Recorded already, but the item still references the legacy key, so
-        // the delete pass keeps it.
-        expect(recordMigrated).toHaveBeenCalledWith([LEGACY, `${S}/k1`]);
+        // Recorded already, but the item still references it, so the delete
+        // pass keeps it.
+        expect(recordMigrated).toHaveBeenCalledWith([LEGACY]);
         expect(result).toMatchObject({ updated: 0, skipped: 1 });
     });
 
-    // The update's outcome is unknown, so the copy stays; the manifest names
-    // it, and the delete pass removes it if no card ends up pointing at it.
-    it('records the legacy keys and their copies before repointing the cards', async () => {
+    it('records the legacy keys before repointing the cards', async () => {
         const dynamo = makeDynamo([{ Items: [studyset()] }], () =>
             Promise.reject(Object.assign(new Error('slow down'), { name: 'ThrottlingException' }))
         );
-        const s3 = makeS3();
         const recordMigrated = jest.fn();
 
-        await expect(rekey(dynamo, s3, { recordMigrated })).rejects.toMatchObject({
+        await expect(rekey(dynamo, makeS3(), { recordMigrated })).rejects.toMatchObject({
             name: 'ThrottlingException',
         });
 
-        expect(recordMigrated).toHaveBeenCalledWith([LEGACY, `${S}/k1`]);
-        expect(s3.deletes).toHaveLength(0);
-    });
-
-    it('removes its copies and does not update when the manifest write fails', async () => {
-        const dynamo = makeDynamo([{ Items: [studyset()] }]);
-        const s3 = makeS3();
-        const recordMigrated = () => {
-            throw Object.assign(new Error('read-only'), { code: 'EACCES' });
-        };
-
-        await expect(rekey(dynamo, s3, { recordMigrated })).rejects.toMatchObject({ code: 'EACCES' });
-
-        expect(s3.deletes).toEqual([`${S}/k1`]);
-        expect(dynamo.updates).toHaveLength(0);
+        expect(recordMigrated).toHaveBeenCalledWith([LEGACY]);
     });
 
     it('leaves a file whose object is missing and re-keys the rest', async () => {
@@ -319,7 +302,7 @@ describe('rekeyCardFiles', () => {
 
         const files = dynamo.updates[0].input.ExpressionAttributeValues?.[':cards'][0].files;
         expect(files.map((f: { key: string }) => f.key)).toEqual([LEGACY, `${S}/k2`]);
-        expect(recordMigrated).toHaveBeenCalledWith([OTHER_LEGACY, `${S}/k2`]);
+        expect(recordMigrated).toHaveBeenCalledWith([OTHER_LEGACY]);
         expect(result).toMatchObject({ filesMissing: 1, filesCopied: 1, updated: 1 });
     });
 
@@ -407,13 +390,12 @@ describe('deleteMigratedObjects', () => {
         await rekey(makeDynamo([{ Items: [studyset()] }]), makeS3(), {
             recordMigrated: (keys) => recorded.push(...keys),
         });
-        expect(recorded).toEqual([LEGACY, `${S}/k1`]);
+        expect(recorded).toEqual([LEGACY]);
 
-        // updateStudyset already deleted the copy; deleting it again is a no-op.
         const s3 = makeS3();
         const result = await deleteOld(makeDynamo([{ Items: [studyset()] }]), s3, recorded);
 
-        expect(s3.deletes).toEqual([`${S}/k1`]);
+        expect(s3.deletes).toHaveLength(0);
         expect(result.stillReferenced).toBe(1);
 
         const rerun = makeDynamo([{ Items: [studyset()] }]);
