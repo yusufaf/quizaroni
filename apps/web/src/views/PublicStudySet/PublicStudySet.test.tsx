@@ -50,7 +50,6 @@ vi.mock('react-router-dom', () => {
     );
     return {
         useParams: () => ({ id: ID }),
-        useLocation: () => ({ pathname: `/view/${ID}`, search: '' }),
         Link: FakeLink,
     };
 });
