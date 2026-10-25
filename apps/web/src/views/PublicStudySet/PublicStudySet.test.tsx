@@ -1,5 +1,12 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vite-plus/test';
+import {
+    describe,
+    it,
+    expect,
+    vi,
+    beforeEach,
+    afterEach,
+} from 'vite-plus/test';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -43,6 +50,7 @@ vi.mock('react-router-dom', () => {
     );
     return {
         useParams: () => ({ id: ID }),
+        useLocation: () => ({ pathname: `/view/${ID}`, search: '' }),
         Link: FakeLink,
     };
 });
@@ -160,7 +168,8 @@ describe('PublicStudySet', () => {
     });
 
     it('accepts a null updatedAt from records that predate it', async () => {
-        response = () => json(200, { studyset: publicSet({ updatedAt: null }) });
+        response = () =>
+            json(200, { studyset: publicSet({ updatedAt: null }) });
         renderView();
 
         await screen.findByText('Cell biology');
@@ -189,7 +198,12 @@ describe('PublicStudySet', () => {
 
         await screen.findByText('Cell biology');
 
-        expect(screen.getByText('publicView.ctaButton')).toBeTruthy();
+        const cta = screen.getByText('publicView.ctaButton').closest('a');
+        expect(cta?.getAttribute('href')).toBe('/signUp');
+        // Sign-up comes back to this set (#139).
+        expect(cta?.getAttribute('data-state')).toBe(
+            JSON.stringify({ from: `/view/${ID}` })
+        );
     });
 
     it('hides the sign-up call to action when showSignupCta is false', async () => {

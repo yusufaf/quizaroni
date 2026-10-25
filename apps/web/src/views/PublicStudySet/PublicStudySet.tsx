@@ -11,7 +11,7 @@ import {
 } from '@mui/material/';
 import { OutlinedFlag, School as SchoolIcon } from '@mui/icons-material/';
 import { useTranslation } from 'react-i18next';
-import { Link as RouterLink, useParams } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
 import {
     GetPublicStudysetResponse,
     useGetPublicStudyset,
@@ -59,6 +59,7 @@ type Props = {
 const PublicStudySet = ({ showSignupCta = true }: Props) => {
     const { t } = useTranslation();
     const { id: studysetUUID = '' } = useParams();
+    const location = useLocation();
 
     const { data, isLoading, isError } = useGetPublicStudyset(studysetUUID);
     const studyset = data?.studyset;
@@ -218,6 +219,7 @@ const PublicStudySet = ({ showSignupCta = true }: Props) => {
                         size="large"
                         component={RouterLink}
                         to="/signUp"
+                        state={{ from: location.pathname + location.search }}
                     >
                         {t('publicView.ctaButton')}
                     </Button>
