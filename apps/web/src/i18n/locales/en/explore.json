@@ -38,6 +38,11 @@
         "body": "Create your first set and it will show up here.",
         "createSet": "Create set"
     },
+    "signUpBanner": {
+        "heading": "Make these sets your own",
+        "body": "Sign up free to save public sets, study them with spaced repetition and track your progress.",
+        "cta": "Sign up free"
+    },
     "featured": {
         "heading": "Featured"
     },
