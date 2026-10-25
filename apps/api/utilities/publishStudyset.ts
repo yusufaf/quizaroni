@@ -13,6 +13,16 @@ export const countCompleteCards = (
     cards: Partial<Pick<Card, 'term' | 'definition'>>[] | undefined = [],
 ): number => cards.filter((card) => isFilled(card?.term) && isFilled(card?.definition)).length;
 
+/** The gate's card rule on its own, for saves of an already published set (#170). */
+export const cardsGateError = (
+    cards: Parameters<typeof countCompleteCards>[0],
+): Extract<PublishError, { code: 'notEnoughCards' }> | undefined => {
+    const actual = countCompleteCards(cards);
+    return actual < MIN_PUBLISHABLE_CARDS
+        ? { code: 'notEnoughCards', required: MIN_PUBLISHABLE_CARDS, actual }
+        : undefined;
+};
+
 export type PublishValidation =
     | { ok: true; subject: SubjectId; publishedAt: Timestamp }
     | { ok: false; errors: PublishError[] };
@@ -40,9 +50,9 @@ export const validatePublishRequest = ({
     if (!validSubject) {
         errors.push({ code: 'invalidSubject' });
     }
-    const actual = countCompleteCards(studyset.cards);
-    if (actual < MIN_PUBLISHABLE_CARDS) {
-        errors.push({ code: 'notEnoughCards', required: MIN_PUBLISHABLE_CARDS, actual });
+    const cardsError = cardsGateError(studyset.cards);
+    if (cardsError) {
+        errors.push(cardsError);
     }
     if (!validSubject || errors.length > 0) {
         return { ok: false, errors };
@@ -111,18 +121,28 @@ export const buildPublishUpdate = ({
     };
 };
 
-/** Takes the set off the public index; subject and publishedAt stay for a later republish. */
-export const buildUnpublishUpdate = ({ username, now }: { username?: string; now: Timestamp }) => {
-    const setExpressions = ['#metadata.#publiclyViewable = :false', '#updatedAt = :now'];
-    const ExpressionAttributeNames: Record<string, string> = {
+/** What taking a set off the public index writes; shared by unpublish and a below-gate save. */
+export const UNPUBLISH_EXPRESSION = {
+    set: ['#metadata.#publiclyViewable = :false'],
+    remove: 'REMOVE #PK2, #SK2',
+    names: {
         '#metadata': 'metadata',
         '#publiclyViewable': 'publiclyViewable',
-        '#updatedAt': 'updatedAt',
         '#PK2': 'PK2',
         '#SK2': 'SK2',
+    },
+    values: { ':false': false },
+} as const;
+
+/** Takes the set off the public index; subject and publishedAt stay for a later republish. */
+export const buildUnpublishUpdate = ({ username, now }: { username?: string; now: Timestamp }) => {
+    const setExpressions: string[] = [...UNPUBLISH_EXPRESSION.set, '#updatedAt = :now'];
+    const ExpressionAttributeNames: Record<string, string> = {
+        ...UNPUBLISH_EXPRESSION.names,
+        '#updatedAt': 'updatedAt',
     };
     const ExpressionAttributeValues: Record<string, unknown> = {
-        ':false': false,
+        ...UNPUBLISH_EXPRESSION.values,
         ':now': now,
     };
 
@@ -133,7 +153,7 @@ export const buildUnpublishUpdate = ({ username, now }: { username?: string; now
     }
 
     return {
-        UpdateExpression: `SET ${setExpressions.join(', ')} REMOVE #PK2, #SK2`,
+        UpdateExpression: `SET ${setExpressions.join(', ')} ${UNPUBLISH_EXPRESSION.remove}`,
         ConditionExpression: 'attribute_exists(PK)',
         ExpressionAttributeNames,
         ExpressionAttributeValues,

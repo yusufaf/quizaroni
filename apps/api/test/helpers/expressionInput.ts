@@ -40,6 +40,7 @@ export const resolveWrites = (input: ExpressionInput): Record<string, any> => {
     const names = input.ExpressionAttributeNames ?? {};
     const values = input.ExpressionAttributeValues ?? {};
     const clauses = (input.UpdateExpression ?? "")
+        .split(" REMOVE ")[0]
         .replace(/^SET /, "")
         .split(", ")
         .map((clause) => {
@@ -51,4 +52,15 @@ export const resolveWrites = (input: ExpressionInput): Record<string, any> => {
         });
     expect(new Set(clauses.map(([path]) => path)).size).toBe(clauses.length);
     return Object.fromEntries(clauses);
+};
+
+// The attributes a trailing `REMOVE a, b` clause deletes, e.g. ["PK2", "SK2"].
+export const resolveRemoves = (input: ExpressionInput): string[] => {
+    const names = input.ExpressionAttributeNames ?? {};
+    const [, removes] = (input.UpdateExpression ?? "").split(" REMOVE ");
+    if (removes === undefined) return [];
+    return removes.split(", ").map((name) => {
+        expect(Object.keys(names)).toContain(name);
+        return names[name];
+    });
 };

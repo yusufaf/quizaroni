@@ -3,6 +3,7 @@ import type { Card } from "models/studysets";
 import {
     buildPublishUpdate,
     buildUnpublishUpdate,
+    cardsGateError,
     countCompleteCards,
     validatePublishRequest,
 } from "utilities/publishStudyset";
@@ -48,6 +49,20 @@ describe("countCompleteCards", () => {
 
     it("treats missing cards as zero", () => {
         expect(countCompleteCards(undefined)).toBe(0);
+    });
+});
+
+describe("cardsGateError", () => {
+    it("reports three complete cards out of four", () => {
+        expect(cardsGateError([...fourCards().slice(0, 3), card("d", " ")])).toEqual({
+            code: "notEnoughCards",
+            required: 4,
+            actual: 3,
+        });
+    });
+
+    it("passes four complete cards", () => {
+        expect(cardsGateError(fourCards())).toBeUndefined();
     });
 });
 

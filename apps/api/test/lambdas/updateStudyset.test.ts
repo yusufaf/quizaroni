@@ -1,5 +1,5 @@
 import { buildUpdateExpression } from "../../service/lambdas/updateStudyset/src/updateStudyset";
-import { expectValidExpressionInput, resolveWrites } from "../helpers/expressionInput";
+import { expectValidExpressionInput, resolveRemoves, resolveWrites } from "../helpers/expressionInput";
 
 // Regression test for a real bug caught in production: CreateSet.tsx's
 // saveChanges() spreads a previously-fetched studyset into `updates`, which
@@ -259,6 +259,51 @@ describe("updateStudyset buildUpdateExpression", () => {
         expect(result.ExpressionAttributeNames).not.toHaveProperty("#updatedBy");
         expect(result.ExpressionAttributeValues).not.toHaveProperty(":updatedBy");
         expectValidExpressionInput(result);
+    });
+
+    it("adds the unpublish clauses when asked (#170)", () => {
+        const result = buildUpdateExpression({
+            updates: { cards: [] },
+            isMetadataUpdate: false,
+            updatedAt: NOW,
+            updatedBy: "turtles",
+            unpublish: true,
+        });
+
+        expect(resolveWrites(result)["metadata.publiclyViewable"]).toBe(false);
+        expect(resolveRemoves(result)).toEqual(["PK2", "SK2"]);
+        expectValidExpressionInput(result);
+    });
+
+    it("unpublishes alongside a full-save metadata object (#170)", () => {
+        const result = buildUpdateExpression({
+            updates: { title: "T", metadata: { textColorVisible: true, publiclyViewable: true } },
+            isMetadataUpdate: false,
+            updatedAt: NOW,
+            updatedBy: "turtles",
+            unpublish: true,
+        });
+
+        expect(resolveWrites(result)).toEqual({
+            updatedAt: NOW,
+            updatedBy: "turtles",
+            title: "T",
+            "metadata.textColorVisible": true,
+            "metadata.publiclyViewable": false,
+        });
+        expectValidExpressionInput(result);
+    });
+
+    it("writes no REMOVE by default", () => {
+        const result = buildUpdateExpression({
+            updates: { title: "T" },
+            isMetadataUpdate: false,
+            updatedAt: NOW,
+            updatedBy: "turtles",
+        });
+
+        expect(result.UpdateExpression).not.toContain("REMOVE");
+        expect(resolveRemoves(result)).toEqual([]);
     });
 
     it("drops a non-object metadata value", () => {

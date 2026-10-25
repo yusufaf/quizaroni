@@ -1,7 +1,7 @@
 import { S3Client, CopyObjectCommand } from "@aws-sdk/client-s3";
 import { DynamoDBDocumentClient, GetCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { isOpaqueCardFileKey } from "utilities/cardFiles";
-import { expectValidExpressionInput, resolveWrites } from "../helpers/expressionInput";
+import { expectValidExpressionInput, resolveRemoves, resolveWrites } from "../helpers/expressionInput";
 
 // #188: updateStudyset stored any card file key the client sent and deleted
 // removed keys whatever set they belonged to, so a save could name and later
@@ -274,5 +274,88 @@ describe("updateStudyset handler", () => {
         // Only the re-read after the update.
         expect(sent(GetCommand)).toHaveLength(1);
         expect(calls.indexOf(sent(GetCommand)[0])).toBeGreaterThan(calls.indexOf(sent(UpdateCommand)[0]));
+    });
+});
+
+// #170: the publish gate (#132) ran only on publish, so a later save could
+// leave a set with too few complete cards on the public index.
+describe("publish gate on save (#170)", () => {
+    const card = (term: string, definition: string) => ({ cardUUID: "c", term, definition });
+    const published = () => ({
+        studysetUUID: STUDYSET_UUID,
+        cards: [],
+        metadata: { publiclyViewable: true },
+        subject: "math",
+    });
+    const update = () => sent(UpdateCommand)[0].input;
+
+    it("unpublishes a published set saved with fewer than four complete cards (repro)", async () => {
+        items[STUDYSET_UUID] = published();
+
+        const res = await invoke({ updates: { cards: [card("a", "1"), card("b", "2"), card("c", "3")] } });
+
+        expect(res.statusCode).toBe(200);
+        expect(resolveWrites(update())["metadata.publiclyViewable"]).toBe(false);
+        expect(resolveRemoves(update())).toEqual(["PK2", "SK2"]);
+        expectValidExpressionInput(update());
+        expect(JSON.parse(res.body).unpublished).toEqual({
+            errors: [{ code: "notEnoughCards", required: 4, actual: 3 }],
+        });
+    });
+
+    it("counts cards with a blank side as incomplete", async () => {
+        items[STUDYSET_UUID] = published();
+
+        const res = await invoke({
+            updates: { cards: [card("a", "1"), card("b", "2"), card("  ", "3"), card("  ", "4")] },
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(resolveRemoves(update())).toEqual(["PK2", "SK2"]);
+        expect(JSON.parse(res.body).unpublished.errors[0].actual).toBe(2);
+    });
+
+    it("keeps a published set with four complete cards", async () => {
+        items[STUDYSET_UUID] = published();
+
+        const res = await invoke({
+            updates: {
+                cards: [card("a", "1"), card("b", "2"), card("c", "3"), card("d", "4"), card("e", "")],
+            },
+        });
+
+        expect(res.statusCode).toBe(200);
+        expect(update().UpdateExpression).not.toContain("REMOVE");
+        expect(JSON.parse(res.body)).not.toHaveProperty("unpublished");
+    });
+
+    it("leaves an unpublished set alone", async () => {
+        items[STUDYSET_UUID] = { ...published(), metadata: { publiclyViewable: false } };
+
+        const res = await invoke({ updates: { cards: [card("a", "1")] } });
+
+        expect(res.statusCode).toBe(200);
+        expect(update().UpdateExpression).not.toContain("REMOVE");
+        expect(JSON.parse(res.body)).not.toHaveProperty("unpublished");
+    });
+
+    it("skips the gate on a metadata update", async () => {
+        items[STUDYSET_UUID] = published();
+
+        const res = await invoke({ isMetadataUpdate: true, updates: { cards: [] } });
+
+        expect(res.statusCode).toBe(200);
+        expect(update().UpdateExpression).not.toContain("REMOVE");
+        expect(JSON.parse(res.body)).not.toHaveProperty("unpublished");
+    });
+
+    it("skips the gate when the save has no cards", async () => {
+        items[STUDYSET_UUID] = published();
+
+        const res = await invoke({ updates: { title: "T" } });
+
+        expect(res.statusCode).toBe(200);
+        expect(update().UpdateExpression).not.toContain("REMOVE");
+        expect(JSON.parse(res.body)).not.toHaveProperty("unpublished");
     });
 });
