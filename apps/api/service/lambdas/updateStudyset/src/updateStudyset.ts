@@ -10,6 +10,7 @@ import {
     UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
 import { S3Client } from '@aws-sdk/client-s3';
+import type { UnpublishedOnSave } from '@quizaroni/shared-types';
 import { AuthorizerContext } from 'models/auth';
 import { Card } from 'models/studysets';
 import { removeKeys } from 'resources/dynamo/utilities';
@@ -22,6 +23,7 @@ import {
     studysetUUIDOfKey,
 } from 'utilities/cardFiles';
 import { logRequest } from 'utilities/logging';
+import { cardsGateError, UNPUBLISH_EXPRESSION } from 'utilities/publishStudyset';
 import {
     callerOwnsStudyset,
     collectCallerStoredCardFileKeys,
@@ -45,6 +47,7 @@ type BuildUpdateExpressionParams = {
     isMetadataUpdate: boolean;
     updatedAt: string;
     updatedBy?: string;
+    unpublish?: boolean;
 };
 
 const SERVER_OWNED_FIELDS = new Set([
@@ -96,12 +99,15 @@ class RequestError extends Error {
  * so a key like `metadataKey0` can't redirect another clause to a server-owned
  * field (#193).
  * `updatedBy` is skipped when the token has no username (#180).
+ * `unpublish` adds the unpublish clauses, for a save that drops a published
+ * set below the publish gate (#170).
  */
 export const buildUpdateExpression = ({
     updates,
     isMetadataUpdate,
     updatedAt,
     updatedBy,
+    unpublish = false,
 }: BuildUpdateExpressionParams) => {
     const topLevelUpdates = { updatedAt, updatedBy };
 
@@ -149,17 +155,25 @@ export const buildUpdateExpression = ({
         }
     }
 
+    if (unpublish) {
+        updateExpressions.push(...UNPUBLISH_EXPRESSION.set);
+        Object.assign(ExpressionAttributeNames, UNPUBLISH_EXPRESSION.names);
+        Object.assign(ExpressionAttributeValues, UNPUBLISH_EXPRESSION.values);
+    }
+
     // An unused name makes DynamoDB reject the whole update.
     if (updateExpressions.some((expression) => expression.startsWith('#metadata.'))) {
         ExpressionAttributeNames['#metadata'] = 'metadata';
     }
 
-    const UpdateExpression = `SET ${updateExpressions.join(', ')}`;
+    const UpdateExpression = `SET ${updateExpressions.join(', ')}${
+        unpublish ? ` ${UNPUBLISH_EXPRESSION.remove}` : ''
+    }`;
 
     return { UpdateExpression, ExpressionAttributeNames, ExpressionAttributeValues };
 };
 
-type CardFilePlan = { cards: Card[]; removed: string[] };
+type CardFilePlan = { cards: Card[]; removed: string[]; published: boolean };
 
 /**
  * A save may store the set's own card file keys, keys the set already stores
@@ -248,7 +262,11 @@ const planCardFiles = async ({
     const removed = [...stored].filter(
         (key) => !finalKeys.has(key) && isKeyInStudyset(key, studysetUUID)
     );
-    return { cards: finalCards, removed };
+    return {
+        cards: finalCards,
+        removed,
+        published: Item?.metadata?.publiclyViewable === true,
+    };
 };
 
 export const handler: Handler = async (
@@ -272,6 +290,7 @@ export const handler: Handler = async (
 
         let finalUpdates = updates;
         let removed: string[] = [];
+        let gateError: ReturnType<typeof cardsGateError>;
         // A metadata update writes `metadata.cards`, which holds no files.
         if (!isMetadataUpdate && updates.cards !== undefined) {
             const plan = await planCardFiles({
@@ -281,6 +300,7 @@ export const handler: Handler = async (
             });
             finalUpdates = { ...updates, cards: plan.cards };
             removed = plan.removed;
+            gateError = plan.published ? cardsGateError(plan.cards) : undefined;
         }
 
         const { ExpressionAttributeNames, ExpressionAttributeValues, UpdateExpression } =
@@ -289,6 +309,7 @@ export const handler: Handler = async (
                 isMetadataUpdate,
                 updatedAt,
                 updatedBy: username,
+                unpublish: gateError !== undefined,
             });
 
         const updateCommand = new UpdateCommand({
@@ -327,6 +348,9 @@ export const handler: Handler = async (
             body: JSON.stringify({
                 message: 'Successfully updated study set',
                 studyset: removeKeys(updatedStudyset ?? {}),
+                ...(gateError && {
+                    unpublished: { errors: [gateError] } satisfies UnpublishedOnSave,
+                }),
             }),
         };
     } catch (err) {

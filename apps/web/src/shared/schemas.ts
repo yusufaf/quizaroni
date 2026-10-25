@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { SUBJECT_IDS } from '@quizaroni/shared-types';
+import type { PublishError } from '@quizaroni/shared-types';
 
 // #region Base Schemas
 export const UUIDSchema = z.uuid({
@@ -286,11 +287,32 @@ export const UpdateStudysetRequestSchema = z.object({
     updates: UpdatesSchema,
 });
 
-export const UpdateStudysetResponseSchema = BaseResponseSchema.extend({
+const PublishErrorSchema = z.discriminatedUnion('code', [
+    z.object({ code: z.literal('invalidSubject') }),
+    z.object({
+        code: z.literal('notEnoughCards'),
+        required: z.number(),
+        actual: z.number(),
+    }),
+    z.object({ code: z.literal('hidden') }),
+]) satisfies z.ZodType<PublishError>;
+
+// The reverse of the `satisfies`: a PublishError the schema can't parse
+// (a new code, say) fails to compile instead of failing validation, which
+// logs an error on every save that carries it.
+type _PublishErrorSchemaCovers<
+    T extends z.infer<typeof PublishErrorSchema> = PublishError,
+> = T;
+
+const StudysetResponseSchema = BaseResponseSchema.extend({
     studyset: StudysetSchema,
 });
 
-export const PublishStudysetResponseSchema = UpdateStudysetResponseSchema;
+export const UpdateStudysetResponseSchema = StudysetResponseSchema.extend({
+    unpublished: z.object({ errors: z.array(PublishErrorSchema) }).optional(),
+});
+
+export const PublishStudysetResponseSchema = StudysetResponseSchema;
 
 export const BatchUpdateStudysetsRequestSchema = z.object({
     studysetUpdates: z.array(z.tuple([UUIDSchema, UpdatesSchema])),

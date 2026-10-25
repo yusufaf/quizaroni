@@ -702,6 +702,7 @@
         "unpublish": "Unpublish",
         "success": "Published to Explore",
         "unpublishSuccess": "Removed from Explore",
+        "unpublishedOnSave": "Removed from Explore. A published set needs at least {{required}} cards with both a term and a definition. This set has {{actual}}.",
         "errors": {
             "invalidSubject": "Choose a subject.",
             "notEnoughCards": "Add at least {{required}} cards with both a term and a definition. This set has {{actual}}.",

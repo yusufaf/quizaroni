@@ -18,7 +18,9 @@
  *
  * PK2/SK2 are written only by the `publish-studyset` / `unpublish-studyset`
  * lambdas and the `scripts/unpublishStudyset.ts` takedown (plus the legacy
- * one-off `scripts/backfillPublicGsi.ts`); `update-studyset` strips them.
+ * one-off `scripts/backfillPublicGsi.ts`); `update-studyset` strips them
+ * from client input and removes them itself when a save drops a published set
+ * below the publish gate (#170).
  * Readers apply `isPubliclyListed` on every row.
  */
 export const PUBLIC_STUDYSET_PK = 'publicStudyset';

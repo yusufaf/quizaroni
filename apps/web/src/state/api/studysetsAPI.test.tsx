@@ -9,8 +9,23 @@ import {
     useGetAllStudysets,
     useGetStudyset,
     usePublishStudyset,
+    useUpdateStudyset,
 } from './studysetsAPI';
 import { isHttpStatus } from './awsAPI';
+
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (k: string, o?: object) => (o ? `${k} ${JSON.stringify(o)}` : k),
+    }),
+}));
+
+const toastMock = vi.hoisted(() => ({
+    warning: vi.fn(),
+    success: vi.fn(),
+    error: vi.fn(),
+    POSITION: { BOTTOM_LEFT: 'bottom-left' },
+}));
+vi.mock('react-toastify', () => ({ toast: toastMock }));
 
 const ID = '11111111-1111-4111-8111-111111111111';
 const OWNER = '33333333-3333-4333-8333-333333333333';
@@ -192,6 +207,77 @@ describe('usePublishStudyset', () => {
         const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
         expect(url.endsWith('/studysets/publish-studyset')).toBe(true);
         expect(init.body).toBe(JSON.stringify({ studysetUUID: ID, subject: 'math' }));
+    });
+});
+
+// #170: a save that drops a published set below the publish gate unpublishes
+// it, and every screen that saves cards goes through this hook.
+describe('useUpdateStudyset', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+        vi.restoreAllMocks();
+    });
+
+    const save = async (extra: Record<string, unknown>) => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() =>
+                Promise.resolve(
+                    new Response(
+                        JSON.stringify({
+                            message: 'ok',
+                            studyset: validSet,
+                            ...extra,
+                        }),
+                        {
+                            status: 200,
+                            headers: { 'Content-Type': 'application/json' },
+                        }
+                    )
+                )
+            )
+        );
+        const qc = new QueryClient();
+        const invalidate = vi.spyOn(qc, 'invalidateQueries');
+        const wrapper = ({ children }: { children: React.ReactNode }) => (
+            <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+        );
+        const { result } = renderHook(() => useUpdateStudyset(), { wrapper });
+
+        await result.current.mutateAsync({
+            studysetUUID: ID,
+            updates: { cards: [] },
+        });
+        return { invalidate };
+    };
+
+    it('warns and refreshes the public set when the save unpublished it', async () => {
+        const { invalidate } = await save({
+            unpublished: {
+                errors: [{ code: 'notEnoughCards', required: 4, actual: 2 }],
+            },
+        });
+
+        expect(toastMock.warning).toHaveBeenCalledWith(
+            'publish.unpublishedOnSave {"required":4,"actual":2}',
+            expect.anything()
+        );
+        expect(invalidate).toHaveBeenCalledWith({
+            queryKey: ['public-studyset', ID],
+        });
+    });
+
+    it('stays quiet on an ordinary save', async () => {
+        const { invalidate } = await save({});
+
+        expect(toastMock.warning).not.toHaveBeenCalled();
+        expect(invalidate).not.toHaveBeenCalledWith({
+            queryKey: ['public-studyset', ID],
+        });
     });
 });
 
