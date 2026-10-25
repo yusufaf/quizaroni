@@ -15,8 +15,13 @@ const FeaturedSection = () => {
     const { t } = useTranslation('explore');
     const headingId = useId();
     const { data } = useFeaturedSets();
-    // Same guard as the feed: a reply that fails its schema renders nothing.
-    const items = useMemo(() => dedupeFeedItems(data && [data]), [data]);
+    // An API from before #141 ignores featured=1 and sends the newest feed,
+    // so only a reply marked featured counts. dedupeFeedItems skips a reply
+    // whose items aren't an array (validate() passes a failed reply through).
+    const items = useMemo(
+        () => (data?.featured === true ? dedupeFeedItems([data]) : []),
+        [data]
+    );
 
     if (items.length === 0) return null;
 

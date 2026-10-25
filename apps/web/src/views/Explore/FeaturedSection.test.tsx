@@ -47,7 +47,15 @@ const item = (n: number): ExploreSetSummary => ({
     updatedAt: null,
 });
 
-let reply: ExploreFeedResponse | { status: number } | { unexpected: true };
+let reply:
+    | ExploreFeedResponse
+    | { status: number }
+    | { items: string; nextCursor: null; featured: true };
+const featured = (items: ExploreSetSummary[]): ExploreFeedResponse => ({
+    items,
+    nextCursor: null,
+    featured: true,
+});
 const fetchMock = vi.fn(async (_url: string, _init?: RequestInit) => {
     if ('status' in reply) {
         return {
@@ -95,7 +103,7 @@ beforeEach(() => {
     queryClient = new QueryClient({
         defaultOptions: { queries: { retry: false } },
     });
-    reply = { items: [item(3), item(1), item(2)], nextCursor: null };
+    reply = featured([item(3), item(1), item(2)]);
 });
 
 afterEach(() => {
@@ -121,7 +129,7 @@ describe('FeaturedSection', () => {
     });
 
     it('renders nothing when nothing is featured', async () => {
-        reply = { items: [], nextCursor: null };
+        reply = featured([]);
         const { container } = renderSection();
 
         await settled();
@@ -147,7 +155,17 @@ describe('FeaturedSection', () => {
 
     // validate() hands back the raw reply when it fails the schema.
     it('renders nothing for a reply without an items array', async () => {
-        reply = { unexpected: true };
+        reply = { items: 'oops', nextCursor: null, featured: true };
+        const { container } = renderSection();
+
+        await settled();
+
+        expect(container.innerHTML).toBe('');
+    });
+
+    // An API from before #141 ignores featured=1 and sends the newest feed.
+    it('renders nothing for a reply not marked as featured', async () => {
+        reply = { items: [item(1), item(2)], nextCursor: 'c1', total: 30 };
         const { container } = renderSection();
 
         await settled();
