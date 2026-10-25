@@ -298,8 +298,9 @@ const PublishErrorSchema = z.discriminatedUnion('code', [
 ]) satisfies z.ZodType<PublishError>;
 
 // The reverse of the `satisfies`: a PublishError the schema can't parse
-// (a new code, say) fails to compile instead of failing the whole response.
-export type PublishErrorSchemaCovers<
+// (a new code, say) fails to compile instead of failing validation, which
+// logs an error on every save that carries it.
+type _PublishErrorSchemaCovers<
     T extends z.infer<typeof PublishErrorSchema> = PublishError,
 > = T;
 
