@@ -1,7 +1,7 @@
 import { S3Client, CopyObjectCommand } from "@aws-sdk/client-s3";
 import { DynamoDBDocumentClient, GetCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { isOpaqueCardFileKey } from "utilities/cardFiles";
-import { expectValidExpressionInput } from "../helpers/expressionInput";
+import { expectValidExpressionInput, resolveWrites } from "../helpers/expressionInput";
 
 // #188: updateStudyset stored any card file key the client sent and deleted
 // removed keys whatever set they belonged to, so a save could name and later
@@ -162,7 +162,7 @@ describe("updateStudyset handler", () => {
         expect(res.statusCode).toBe(200);
         expect(s3Calls).toEqual([]);
         expect(ownershipGets()).toEqual([]);
-        expect(sent(UpdateCommand)[0].input.ExpressionAttributeValues?.[":cards"][0].files[0].key).toBe(
+        expect(resolveWrites(sent(UpdateCommand)[0].input).cards[0].files[0].key).toBe(
             `${OTHER_SET}/g`
         );
     });
@@ -175,7 +175,7 @@ describe("updateStudyset handler", () => {
         expect(res.statusCode).toBe(200);
         const [copy] = sent(CopyObjectCommand);
         expect(copy.input).toMatchObject({ Bucket: "test-bucket", CopySource: `test-bucket/${SRC_SET}/f` });
-        const storedKey = sent(UpdateCommand)[0].input.ExpressionAttributeValues?.[":cards"][0].files[0].key;
+        const storedKey = resolveWrites(sent(UpdateCommand)[0].input).cards[0].files[0].key;
         expect(storedKey).toBe(copy.input.Key);
         expect(isOpaqueCardFileKey(storedKey, STUDYSET_UUID)).toBe(true);
         expect(sent(QueryCommand)).toEqual([]);
