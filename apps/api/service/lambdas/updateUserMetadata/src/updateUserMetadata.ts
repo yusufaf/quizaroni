@@ -11,6 +11,7 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { AuthorizerContext } from 'models/auth';
 import { removeKeys } from 'resources/dynamo/utilities';
+import { isPlainObject } from 'utilities/cardFiles';
 import { logRequest } from 'utilities/logging';
 
 const { usersTable = '' } = process.env;
@@ -19,7 +20,61 @@ const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
 type RequestBody = {
-    updates: { [key: string]: any };
+    updates: unknown;
+};
+
+const respond = (statusCode: number, message: string) => ({
+    statusCode,
+    body: JSON.stringify({ message }),
+});
+
+/**
+ * Client keys never become placeholder names (they get `#key<N>`/`:value<N>`),
+ * so a key can't overwrite the server's `updatedAt`/`updatedBy` or build an
+ * invalid placeholder (#203, #185). Both are server-set, so copies in
+ * `updates` are dropped. `#metadata` is sent only when a clause uses it, since
+ * DynamoDB rejects an unused name (#184). `updatedBy` is skipped when the
+ * token has no username (#180).
+ */
+const buildUserMetadataUpdate = ({
+    updates,
+    updatedAt,
+    updatedBy,
+}: {
+    updates: Record<string, unknown>;
+    updatedAt: string;
+    updatedBy?: string;
+}) => {
+    const updateExpressions = ['#updatedAt = :updatedAt'];
+    const ExpressionAttributeNames: Record<string, string> = { '#updatedAt': 'updatedAt' };
+    const ExpressionAttributeValues: Record<string, unknown> = { ':updatedAt': updatedAt };
+
+    if (updatedBy) {
+        updateExpressions.push('#updatedBy = :updatedBy');
+        ExpressionAttributeNames['#updatedBy'] = 'updatedBy';
+        ExpressionAttributeValues[':updatedBy'] = updatedBy;
+    }
+
+    const {
+        updatedAt: _ignoredUpdatedAt,
+        updatedBy: _ignoredUpdatedBy,
+        ...clientUpdates
+    } = updates;
+
+    Object.entries(clientUpdates).forEach(([key, value], index) => {
+        updateExpressions.push(`#metadata.#key${index} = :value${index}`);
+        ExpressionAttributeNames[`#key${index}`] = key;
+        ExpressionAttributeValues[`:value${index}`] = value;
+    });
+    if (Object.keys(clientUpdates).length > 0) {
+        ExpressionAttributeNames['#metadata'] = 'metadata';
+    }
+
+    return {
+        UpdateExpression: `SET ${updateExpressions.join(', ')}`,
+        ExpressionAttributeNames,
+        ExpressionAttributeValues,
+    };
 };
 
 export const handler: Handler = async (
@@ -29,55 +84,20 @@ export const handler: Handler = async (
     logRequest(event);
 
     const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
-    const body: RequestBody = JSON.parse(event.body ?? '{}');
+    const updates = (JSON.parse(event.body ?? '{}') as RequestBody | null)?.updates;
 
-    const { updates } = body;
+    // DynamoDB rejects an empty attribute name.
+    if (!isPlainObject(updates) || '' in updates) {
+        return respond(400, 'Invalid updates');
+    }
 
     try {
         const PK = `user#${userUUID}`;
         const SK = `userData`;
         const updatedAt = new Date().toISOString();
 
-        // Ensure `updatedAt` and `updatedBy` are at the top level
-        const topLevelUpdates = {
-            updatedAt,
-            updatedBy: username,
-        };
-
-        const updateExpressions: string[] = [];
-        const ExpressionAttributeNames: Record<string, string> = {};
-        const ExpressionAttributeValues: Record<string, any> = {};
-
-        // Handle top-level updates for `updatedAt` and `updatedBy`
-        for (const [key, value] of Object.entries(topLevelUpdates)) {
-            if (!value) continue;
-            const attributeKey = `#${key}`;
-            const attributeValue = `:${key}`;
-            updateExpressions.push(`${attributeKey} = ${attributeValue}`);
-            ExpressionAttributeNames[attributeKey] = key;
-            ExpressionAttributeValues[attributeValue] = value;
-        }
-
-        // Ensure #metadata is set only once
-        ExpressionAttributeNames[`#metadata`] = 'metadata';
-
-        for (const [key, value] of Object.entries(updates)) {
-            const attributeValue = `:${key}`;
-
-            // Determine the correct key path for metadata vs. standard update
-            const attributeKey = `#metadata.#${key}`;
-
-            // Add the key to ExpressionAttributeNames (same for both cases)
-            ExpressionAttributeNames[`#${key}`] = key;
-
-            // Push the update expression
-            updateExpressions.push(`${attributeKey} = ${attributeValue}`);
-
-            // Add the value to ExpressionAttributeValues
-            ExpressionAttributeValues[attributeValue] = value;
-        }
-
-        const UpdateExpression = `SET ${updateExpressions.join(', ')}`;
+        const { UpdateExpression, ExpressionAttributeNames, ExpressionAttributeValues } =
+            buildUserMetadataUpdate({ updates, updatedAt, updatedBy: username });
 
         const updateCommand = new UpdateCommand({
             Key: {
