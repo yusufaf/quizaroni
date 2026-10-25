@@ -19,7 +19,11 @@ afterEach(() => {
     jest.restoreAllMocks();
 });
 
-const run = async (body: unknown, lambda: unknown = { sub: "u1", username: "turtles" }) => {
+const run = async (
+    body: unknown,
+    lambda: unknown = { sub: "u1", username: "turtles" },
+    rawBody = JSON.stringify(body)
+) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updates: any[] = [];
     jest.spyOn(console, "log").mockImplementation(() => {});
@@ -30,7 +34,7 @@ const run = async (body: unknown, lambda: unknown = { sub: "u1", username: "turt
     }) as never);
 
     const res = await handler(
-        { requestContext: { authorizer: { lambda } }, body: JSON.stringify(body) },
+        { requestContext: { authorizer: { lambda } }, body: rawBody },
         {}
     );
     return { statusCode: res.statusCode, updates };
@@ -98,6 +102,13 @@ describe("updateUserMetadata", () => {
         ["an empty key", { updates: { "": 1 } }],
     ])("returns 400 for %s without writing (#184)", async (_label, body) => {
         const { statusCode, updates } = await run(body);
+
+        expect(statusCode).toBe(400);
+        expect(updates).toEqual([]);
+    });
+
+    it("returns 400 for a body that isn't JSON", async () => {
+        const { statusCode, updates } = await run(undefined, undefined, "{updates:");
 
         expect(statusCode).toBe(400);
         expect(updates).toEqual([]);

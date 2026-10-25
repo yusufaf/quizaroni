@@ -63,18 +63,24 @@ const buildUserMetadataUpdate = ({
 
     Object.entries(clientUpdates).forEach(([key, value], index) => {
         updateExpressions.push(`#metadata.#key${index} = :value${index}`);
+        ExpressionAttributeNames['#metadata'] = 'metadata';
         ExpressionAttributeNames[`#key${index}`] = key;
         ExpressionAttributeValues[`:value${index}`] = value;
     });
-    if (Object.keys(clientUpdates).length > 0) {
-        ExpressionAttributeNames['#metadata'] = 'metadata';
-    }
 
     return {
         UpdateExpression: `SET ${updateExpressions.join(', ')}`,
         ExpressionAttributeNames,
         ExpressionAttributeValues,
     };
+};
+
+const parseUpdates = (body: string | undefined): unknown => {
+    try {
+        return (JSON.parse(body ?? '{}') as RequestBody | null)?.updates;
+    } catch {
+        return undefined;
+    }
 };
 
 export const handler: Handler = async (
@@ -84,7 +90,7 @@ export const handler: Handler = async (
     logRequest(event);
 
     const { sub: userUUID, username } = event.requestContext.authorizer.lambda;
-    const updates = (JSON.parse(event.body ?? '{}') as RequestBody | null)?.updates;
+    const updates = parseUpdates(event.body);
 
     // DynamoDB rejects an empty attribute name.
     if (!isPlainObject(updates) || '' in updates) {
