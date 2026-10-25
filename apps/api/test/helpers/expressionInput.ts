@@ -44,7 +44,10 @@ export const resolveWrites = (input: ExpressionInput): Record<string, any> => {
         .split(", ")
         .map((clause) => {
             const [path, value] = clause.split(" = ");
-            return [path.split(".").map((name) => names[name]).join("."), values[value]] as const;
+            const segments = path.split(".");
+            for (const name of segments) expect(Object.keys(names)).toContain(name);
+            expect(Object.keys(values)).toContain(value);
+            return [segments.map((name) => names[name]).join("."), values[value]] as const;
         });
     expect(new Set(clauses.map(([path]) => path)).size).toBe(clauses.length);
     return Object.fromEntries(clauses);

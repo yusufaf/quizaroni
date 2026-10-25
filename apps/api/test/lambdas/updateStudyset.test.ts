@@ -133,7 +133,8 @@ describe("updateStudyset buildUpdateExpression", () => {
 
     // #193: a client key that spells a generated placeholder (#metadataKey0,
     // :metadataValue0) used to redirect another clause, so it could write
-    // username or any other server-owned field.
+    // username or any other server-owned field. The current spellings (#key0,
+    // :value0) are covered too.
     it.each([
         [
             "a name placeholder",
@@ -144,6 +145,16 @@ describe("updateStudyset buildUpdateExpression", () => {
             "a value placeholder",
             { metadata: { textColorVisible: true }, metadataValue0: "clobber" },
             { "metadata.textColorVisible": true, metadataValue0: "clobber" },
+        ],
+        [
+            "the current name placeholder",
+            { key0: "forged", metadata: { username: "x" } },
+            { key0: "forged", "metadata.username": "x" },
+        ],
+        [
+            "the current value placeholder",
+            { metadata: { textColorVisible: true }, value0: "clobber" },
+            { "metadata.textColorVisible": true, value0: "clobber" },
         ],
     ])("can't hijack %s with a client key", (_label, updates, expected) => {
         const result = buildUpdateExpression({
@@ -164,6 +175,10 @@ describe("updateStudyset buildUpdateExpression", () => {
         const result = buildUpdateExpression({ updates, isMetadataUpdate, updatedAt: NOW, updatedBy: "turtles" });
 
         expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", ...expected });
+        // resolveWrites joins path segments with ".", so check "a.b" stays one name, not a nested path.
+        expect(Object.values(result.ExpressionAttributeNames)).toEqual(
+            expect.arrayContaining(Object.keys(updates))
+        );
         expectValidExpressionInput(result);
     });
 
