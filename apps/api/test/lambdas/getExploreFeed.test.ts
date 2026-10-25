@@ -413,6 +413,7 @@ describe("getExploreFeed handler", () => {
             expect(res.headers?.["Cache-Control"]).toBe("no-cache");
             expect(ids(body)).toEqual(["new-pick", "old-pick"]);
             expect(body.nextCursor).toBeNull();
+            expect(body.featured).toBe(true);
             expect(body).not.toHaveProperty("total");
             expect(JSON.stringify(body)).not.toContain("featuredAt");
         });
@@ -426,7 +427,7 @@ describe("getExploreFeed handler", () => {
             seed([stored("a", day(1))]);
             const { res, body } = await call({ featured: "1" });
             expect(res.statusCode).toBe(200);
-            expect(body).toEqual({ items: [], nextCursor: null });
+            expect(body).toEqual({ items: [], nextCursor: null, featured: true });
         });
 
         it("shares the feed's cache", async () => {

@@ -143,7 +143,7 @@ export const featureStudyset = async ({
                 Key: key,
                 UpdateExpression: 'SET #featuredAt = :now',
                 ConditionExpression:
-                    'attribute_exists(PK) AND #SK2 = :sk2 AND #metadata.#publiclyViewable = :true AND attribute_exists(#publishedAt) AND attribute_not_exists(#moderation.#hiddenAt)',
+                    'attribute_exists(PK) AND #SK2 = :sk2 AND #metadata.#publiclyViewable = :true AND attribute_type(#publishedAt, :string) AND size(#publishedAt) > :zero AND attribute_not_exists(#moderation.#hiddenAt)',
                 ExpressionAttributeNames: {
                     '#featuredAt': 'featuredAt',
                     '#SK2': 'SK2',
@@ -153,7 +153,13 @@ export const featureStudyset = async ({
                     '#moderation': 'moderation',
                     '#hiddenAt': 'hiddenAt',
                 },
-                ExpressionAttributeValues: { ':now': now, ':sk2': key.SK, ':true': true },
+                ExpressionAttributeValues: {
+                    ':now': now,
+                    ':sk2': key.SK,
+                    ':true': true,
+                    ':string': 'S',
+                    ':zero': 0,
+                },
             })
         );
     } catch (error) {

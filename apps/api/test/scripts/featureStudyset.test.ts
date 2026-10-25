@@ -90,12 +90,14 @@ describe('featureStudyset', () => {
         expect(update.input.Key).toEqual(KEY);
         expect(update.input.UpdateExpression).toBe('SET #featuredAt = :now');
         expect(update.input.ConditionExpression).toBe(
-            'attribute_exists(PK) AND #SK2 = :sk2 AND #metadata.#publiclyViewable = :true AND attribute_exists(#publishedAt) AND attribute_not_exists(#moderation.#hiddenAt)'
+            'attribute_exists(PK) AND #SK2 = :sk2 AND #metadata.#publiclyViewable = :true AND attribute_type(#publishedAt, :string) AND size(#publishedAt) > :zero AND attribute_not_exists(#moderation.#hiddenAt)'
         );
         expect(update.input.ExpressionAttributeValues).toEqual({
             ':now': NOW,
             ':sk2': KEY.SK,
             ':true': true,
+            ':string': 'S',
+            ':zero': 0,
         });
     });
 
