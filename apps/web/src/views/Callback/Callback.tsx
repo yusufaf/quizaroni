@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useHandleSignInCallback } from '@logto/react';
 import { Box, Typography } from '@mui/material';
 import { POST_SIGN_IN_REDIRECT_KEY } from 'shared/constants';
+import { isSafeReturnPath } from 'shared/utilities/returnPath';
 
 type Props = {};
 
@@ -14,7 +15,7 @@ const Callback = (props: Props) => {
     const { isLoading } = useHandleSignInCallback(() => {
         const from = sessionStorage.getItem(POST_SIGN_IN_REDIRECT_KEY);
         sessionStorage.removeItem(POST_SIGN_IN_REDIRECT_KEY);
-        navigate(from ?? '/');
+        navigate(isSafeReturnPath(from) ? from : '/');
     });
 
     return (

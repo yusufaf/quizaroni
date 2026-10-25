@@ -20,6 +20,9 @@ describe('isSafeReturnPath', () => {
     it.each([
         '//evil.com',
         '/\\evil.com',
+        // URL parsing drops tabs and newlines, leaving //evil.com.
+        '/\t/evil.com',
+        '/\n/evil.com',
         'https://evil.com',
         'explore',
         '',
