@@ -255,8 +255,9 @@ const feedFailed = (error: unknown): APIGatewayProxyResultV2 => {
  * first, optionally narrowed to one subject (#136), paged with an opaque
  * keyset cursor tied to the filters. `featured=1` instead returns the curated
  * row (#141): up to 6 sets with a featuredAt, newest featuredAt first, no
- * cursor or total, marked `featured: true`. Reads the public index into a 60s module cache and rechecks
- * each served page, so the response itself is `no-cache`.
+ * cursor or total, marked `featured: true`. Reads the public index into a 60s
+ * module cache and rechecks each served page, so the response itself is
+ * `no-cache`.
  */
 export const handler: Handler = async (
     event: APIGatewayProxyEventV2,
