@@ -26,6 +26,7 @@ import {
     summarizeDue,
 } from './forYou';
 import CommunitySection from './CommunitySection';
+import FeaturedSection from './FeaturedSection';
 import ForYouSection from './ForYouSection';
 
 const Explore = () => {
@@ -155,7 +156,9 @@ const Explore = () => {
                     </Typography>
                     {renderContent()}
                     {/* Below the empty-library state too: a new user can
-                        still browse public sets. */}
+                        still browse public sets. Featured renders nothing
+                        until it has sets. */}
+                    <FeaturedSection />
                     <Box sx={{ mt: 5 }}>
                         <CommunitySection />
                     </Box>

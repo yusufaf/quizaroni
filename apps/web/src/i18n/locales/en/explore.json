@@ -38,6 +38,9 @@
         "body": "Create your first set and it will show up here.",
         "createSet": "Create set"
     },
+    "featured": {
+        "heading": "Featured"
+    },
     "community": {
         "heading": "Community",
         "loading": "Loading public sets…",

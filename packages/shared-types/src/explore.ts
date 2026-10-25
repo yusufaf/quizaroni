@@ -17,9 +17,12 @@ export type ExploreSetSummary = {
     updatedAt: Timestamp | null;
 };
 
-// `total` is left out when the server's read hit its item cap.
+// `total` is left out when the server's read hit its item cap. `featured` is
+// set only on a featured=1 reply, so the web can tell it from the feed an
+// older API sends when it ignores the param (#141).
 export type ExploreFeedResponse = {
     items: ExploreSetSummary[];
     nextCursor: string | null;
     total?: number;
+    featured?: true;
 };

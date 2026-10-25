@@ -4,12 +4,14 @@ import {
     CursorPosition,
     decodeCursor,
     encodeCursor,
+    FEATURED_LIMIT,
     FeedEntry,
     FeedSource,
     filterKey,
     paginate,
     parseExploreQuery,
     selectEntries,
+    selectFeatured,
     toFeedEntry,
     toSummary,
 } from "utilities/exploreFeed";
@@ -147,6 +149,21 @@ describe("toFeedEntry", () => {
     ])("returns null for %s", (_, overrides) => {
         expect(toFeedEntry(storedItem(overrides))).toBeNull();
     });
+
+    // #141: featuredAt stays server-side next to the key, never in the summary.
+    it("keeps a featuredAt beside the summary", () => {
+        const entry = listed({ featuredAt: "2026-10-20T00:00:00.000Z" });
+        expect(entry.featuredAt).toBe("2026-10-20T00:00:00.000Z");
+        expect(entry.summary).not.toHaveProperty("featuredAt");
+    });
+
+    it.each([
+        ["missing", undefined],
+        ["empty", ""],
+        ["not a string", 1234],
+    ])("leaves featuredAt off when it is %s", (_, featuredAt) => {
+        expect(listed({ featuredAt })).not.toHaveProperty("featuredAt");
+    });
 });
 
 describe("cursor", () => {
@@ -217,6 +234,44 @@ describe("selectEntries", () => {
 
     it("reads a retired subject as other", () => {
         expect(ids(selectEntries(entries, { sort: "newest", subject: "other" }))).toEqual([uuid(4)]);
+    });
+});
+
+describe("selectFeatured", () => {
+    const entry = (n: number, featuredAt?: string, publishedAt = "2026-10-10T00:00:00.000Z") =>
+        listed({ studysetUUID: uuid(n), publishedAt, ...(featuredAt ? { featuredAt } : {}) });
+    const ids = (entries: readonly FeedEntry[]) => entries.map((e) => e.summary.studysetUUID);
+    const at = (day: number) => `2026-10-${String(day).padStart(2, "0")}T00:00:00.000Z`;
+
+    it("keeps only featured entries, newest featuredAt first", () => {
+        const entries = [entry(1, at(3)), entry(2), entry(3, at(5)), entry(4, at(1))];
+        expect(ids(selectFeatured(entries))).toEqual([uuid(3), uuid(1), uuid(4)]);
+    });
+
+    it("breaks a featuredAt tie by publishedAt, then uuid", () => {
+        const entries = [
+            entry(1, at(5), at(1)),
+            entry(2, at(5), at(2)),
+            entry(3, at(5), at(2)),
+        ];
+        expect(ids(selectFeatured(entries))).toEqual([uuid(3), uuid(2), uuid(1)]);
+    });
+
+    it("caps at FEATURED_LIMIT, or a smaller limit", () => {
+        const entries = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => entry(n, at(n)));
+        expect(FEATURED_LIMIT).toBe(6);
+        expect(ids(selectFeatured(entries))).toEqual([8, 7, 6, 5, 4, 3].map(uuid));
+        expect(ids(selectFeatured(entries, 2))).toEqual([uuid(8), uuid(7)]);
+    });
+
+    it("does not reorder its input", () => {
+        const entries = [entry(1, at(1)), entry(2, at(2))];
+        selectFeatured(entries);
+        expect(ids(entries)).toEqual([uuid(1), uuid(2)]);
+    });
+
+    it("returns an empty list when nothing is featured", () => {
+        expect(selectFeatured([entry(1), entry(2)])).toEqual([]);
     });
 });
 
@@ -291,6 +346,32 @@ describe("parseExploreQuery", () => {
             limit: 24,
         });
         expect(parseExploreQuery({ subject: "" })).toEqual({ ok: true, filters: { sort: "newest" }, limit: 24 });
+    });
+
+    // #141
+    it("reads featured=1 as the featured row, capped at 6", () => {
+        expect(parseExploreQuery({ featured: "1" })).toEqual({ ok: true, featured: true, limit: 6 });
+        expect(parseExploreQuery({ featured: "1", limit: "3" })).toEqual({ ok: true, featured: true, limit: 3 });
+        expect(parseExploreQuery({ featured: "1", limit: "100" })).toEqual({ ok: true, featured: true, limit: 6 });
+    });
+
+    it("ignores an empty featured", () => {
+        expect(parseExploreQuery({ featured: "" })).toEqual({ ok: true, filters: { sort: "newest" }, limit: 24 });
+    });
+
+    it.each(["0", "yes", "true"])("rejects featured=%p", (featured) => {
+        expect(parseExploreQuery({ featured })).toEqual({ ok: false, message: "Unsupported featured" });
+    });
+
+    it.each([{ subject: "math" }, { cursor: "abc" }])("rejects featured with %p", (params) => {
+        expect(parseExploreQuery({ featured: "1", ...params })).toEqual({
+            ok: false,
+            message: "featured does not combine with subject or cursor",
+        });
+    });
+
+    it.each([{ limit: "0" }, { sort: "oldest" }])("still validates %p in featured mode", (params) => {
+        expect(parseExploreQuery({ featured: "1", ...params }).ok).toBe(false);
     });
 
     // API Gateway joins a repeated param with commas, so "math,law" is two subjects.

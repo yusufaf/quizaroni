@@ -121,20 +121,28 @@ export const buildPublishUpdate = ({
     };
 };
 
-/** What taking a set off the public index writes; shared by unpublish and a below-gate save. */
+/**
+ * What taking a set off the public index writes; shared by unpublish and a
+ * below-gate save. It also clears `featuredAt`, so a republish isn't featured
+ * again (#141).
+ */
 export const UNPUBLISH_EXPRESSION = {
     set: ['#metadata.#publiclyViewable = :false'],
-    remove: 'REMOVE #PK2, #SK2',
+    remove: 'REMOVE #PK2, #SK2, #featuredAt',
     names: {
         '#metadata': 'metadata',
         '#publiclyViewable': 'publiclyViewable',
         '#PK2': 'PK2',
         '#SK2': 'SK2',
+        '#featuredAt': 'featuredAt',
     },
     values: { ':false': false },
 } as const;
 
-/** Takes the set off the public index; subject and publishedAt stay for a later republish. */
+/**
+ * Takes the set off the public index; subject and publishedAt stay for a later
+ * republish, featuredAt is cleared.
+ */
 export const buildUnpublishUpdate = ({ username, now }: { username?: string; now: Timestamp }) => {
     const setExpressions: string[] = [...UNPUBLISH_EXPRESSION.set, '#updatedAt = :now'];
     const ExpressionAttributeNames: Record<string, string> = {

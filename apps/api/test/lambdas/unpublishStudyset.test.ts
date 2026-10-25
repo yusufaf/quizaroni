@@ -55,7 +55,8 @@ describe("unpublishStudyset handler", () => {
         const { input } = command as UpdateCommand;
         expect(input.TableName).toBe("test-main");
         expect(input.Key).toEqual(KEY);
-        expect(input.UpdateExpression).toContain("REMOVE #PK2, #SK2");
+        expect(input.UpdateExpression).toContain("REMOVE #PK2, #SK2, #featuredAt");
+        expect(input.ExpressionAttributeNames?.["#featuredAt"]).toBe("featuredAt");
         expect(input.ExpressionAttributeValues?.[":false"]).toBe(false);
         expect(JSON.parse(res.body ?? "").studyset).not.toHaveProperty("PK");
     });

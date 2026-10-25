@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import type { ExploreSort, SubjectId } from '@quizaroni/shared-types';
 import { BASE_API_URL, fetchJson } from './awsAPI';
 import { validate } from 'shared/validation';
@@ -55,5 +55,26 @@ export const useExploreFeed = ({
             }),
         initialPageParam: null as string | null,
         getNextPageParam: (last) => last.nextCursor ?? null,
+        staleTime: EXPLORE_STALE_TIME_MS,
+    });
+
+export const featuredSetsUrl = (): string =>
+    `${BASE_API_URL}/public/explore?featured=1`;
+
+/** The curated Featured row above the Community feed (#141). */
+export const useFeaturedSets = () =>
+    useQuery({
+        queryKey: ['explore-featured'],
+        queryFn: async ({ signal }) =>
+            validate({
+                schema: ExploreFeedResponseSchema,
+                data: await fetchJson(featuredSetsUrl(), {
+                    method: 'GET',
+                    credentials: 'omit',
+                    signal,
+                }),
+                type: 'response',
+                context: 'ExploreFeatured',
+            }),
         staleTime: EXPLORE_STALE_TIME_MS,
     });
