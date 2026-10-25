@@ -24,6 +24,7 @@ import {
     paginate,
     parseExploreQuery,
     selectEntries,
+    selectFeatured,
     toFeedEntry,
 } from 'utilities/exploreFeed';
 import { logRequest } from 'utilities/logging';
@@ -75,7 +76,7 @@ const refreshEntries = async (now: number) => {
                 KeyConditionExpression: 'PK2 = :pk',
                 ExpressionAttributeValues: { ':pk': PUBLIC_STUDYSET_PK },
                 ProjectionExpression:
-                    'PK, SK, SK2, studysetUUID, #title, #description, #subject, #cards, #username, #publishedAt, #updatedAt, #metadata.#publiclyViewable, #moderation.#hiddenAt',
+                    'PK, SK, SK2, studysetUUID, #title, #description, #subject, #cards, #username, #publishedAt, #updatedAt, #featuredAt, #metadata.#publiclyViewable, #moderation.#hiddenAt',
                 ExpressionAttributeNames: {
                     '#title': 'title',
                     '#description': 'description',
@@ -84,6 +85,7 @@ const refreshEntries = async (now: number) => {
                     '#username': 'username',
                     '#publishedAt': 'publishedAt',
                     '#updatedAt': 'updatedAt',
+                    '#featuredAt': 'featuredAt',
                     '#metadata': 'metadata',
                     '#publiclyViewable': 'publiclyViewable',
                     '#moderation': 'moderation',
@@ -167,8 +169,13 @@ const keyId = (key: { PK?: unknown; SK?: unknown }) => `${key.PK}|${key.SK}`;
  * are gone or no longer listed are evicted from the cache too. Keys DynamoDB
  * still couldn't process after the retries are left out of this response only
  * (fail closed) and stay cached, so throttling doesn't hide a valid set.
+ * For the featured row, a set whose featuredAt was cleared also drops out and
+ * stops counting as featured in the cache, but stays in the feed.
  */
-const recheckListed = async (page: FeedEntry[]): Promise<FeedEntry[]> => {
+const recheckListed = async (
+    page: FeedEntry[],
+    { featured = false }: { featured?: boolean } = {}
+): Promise<FeedEntry[]> => {
     if (page.length === 0) return page;
 
     const rows = new Map<string, Record<string, unknown>>();
@@ -186,8 +193,9 @@ const recheckListed = async (page: FeedEntry[]): Promise<FeedEntry[]> => {
                     [mainTable]: {
                         Keys: keys,
                         ProjectionExpression:
-                            'PK, SK, SK2, #metadata.#publiclyViewable, #moderation.#hiddenAt',
+                            'PK, SK, SK2, #featuredAt, #metadata.#publiclyViewable, #moderation.#hiddenAt',
                         ExpressionAttributeNames: {
+                            '#featuredAt': 'featuredAt',
                             '#metadata': 'metadata',
                             '#publiclyViewable': 'publiclyViewable',
                             '#moderation': 'moderation',
@@ -215,8 +223,13 @@ const recheckListed = async (page: FeedEntry[]): Promise<FeedEntry[]> => {
     const kept = page.filter((entry) => {
         const id = keyId(entry.key);
         if (unprocessed.has(id)) return false;
-        if (!isPubliclyListed(rows.get(id))) {
+        const row = rows.get(id);
+        if (!isPubliclyListed(row)) {
             unlisted.add(entry);
+            return false;
+        }
+        if (featured && !(typeof row?.featuredAt === 'string' && row.featuredAt)) {
+            delete entry.featuredAt;
             return false;
         }
         return true;
@@ -228,12 +241,22 @@ const recheckListed = async (page: FeedEntry[]): Promise<FeedEntry[]> => {
     return kept;
 };
 
+const feedFailed = (error: unknown): APIGatewayProxyResultV2 => {
+    console.error(JSON.stringify({ kind: 'exploreFeedFailed', error: describeError(error) }));
+    // A public route: table, index and IAM details stay in the logs.
+    return {
+        statusCode: 500,
+        body: JSON.stringify({ message: 'Failed to load the feed' }),
+    };
+};
+
 /**
  * Unauthenticated Community feed for Explore (#135): public sets, newest
  * first, optionally narrowed to one subject (#136), paged with an opaque
- * keyset cursor tied to the filters. Reads the
- * public index into a 60s module cache and rechecks each served page, so the
- * response itself is `no-cache`.
+ * keyset cursor tied to the filters. `featured=1` instead returns the curated
+ * row (#141): up to 6 sets with a featuredAt, newest featuredAt first, no
+ * cursor or total. Reads the public index into a 60s module cache and rechecks
+ * each served page, so the response itself is `no-cache`.
  */
 export const handler: Handler = async (
     event: APIGatewayProxyEventV2,
@@ -244,6 +267,28 @@ export const handler: Handler = async (
     const query = parseExploreQuery(event.queryStringParameters);
     if (!query.ok) {
         return { statusCode: 400, body: JSON.stringify({ message: query.message }) };
+    }
+
+    const headers = {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
+    };
+
+    if ('featured' in query) {
+        try {
+            const { entries } = await loadEntries(Date.now());
+            const picks = selectFeatured(entries, query.limit);
+            const items = (await recheckListed(picks, { featured: true })).map(
+                (entry) => entry.summary
+            );
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({ items, nextCursor: null }),
+            };
+        } catch (error) {
+            return feedFailed(error);
+        }
     }
 
     const key = filterKey(query.filters);
@@ -270,10 +315,7 @@ export const handler: Handler = async (
 
         return {
             statusCode: 200,
-            headers: {
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache',
-            },
+            headers,
             body: JSON.stringify({
                 items,
                 nextCursor: next ? encodeCursor(next, key) : null,
@@ -285,13 +327,6 @@ export const handler: Handler = async (
             }),
         };
     } catch (error) {
-        console.error(
-            JSON.stringify({ kind: 'exploreFeedFailed', error: describeError(error) })
-        );
-        // A public route: table, index and IAM details stay in the logs.
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ message: 'Failed to load the feed' }),
-        };
+        return feedFailed(error);
     }
 };

@@ -396,6 +396,80 @@ describe("getExploreFeed handler", () => {
         });
     });
 
+    describe("featured row (#141)", () => {
+        const featured = (id: string, featuredAt: string, publishedAt = day(1), extra: Item = {}) =>
+            stored(id, publishedAt, { featuredAt, ...extra });
+
+        it("returns only featured sets, newest featuredAt first, with no cursor or total", async () => {
+            seed([
+                featured("old-pick", day(10), day(5)),
+                stored("plain", day(9)),
+                featured("new-pick", day(12), day(2)),
+            ]);
+
+            const { res, body } = await call({ featured: "1" });
+
+            expect(res.statusCode).toBe(200);
+            expect(res.headers?.["Cache-Control"]).toBe("no-cache");
+            expect(ids(body)).toEqual(["new-pick", "old-pick"]);
+            expect(body.nextCursor).toBeNull();
+            expect(body).not.toHaveProperty("total");
+            expect(JSON.stringify(body)).not.toContain("featuredAt");
+        });
+
+        it("caps the row at 6", async () => {
+            seed([1, 2, 3, 4, 5, 6, 7, 8].map((n) => featured(`s${n}`, day(n))));
+            expect(ids((await call({ featured: "1" })).body)).toEqual(["s8", "s7", "s6", "s5", "s4", "s3"]);
+        });
+
+        it("returns an empty row when nothing is featured", async () => {
+            seed([stored("a", day(1))]);
+            const { res, body } = await call({ featured: "1" });
+            expect(res.statusCode).toBe(200);
+            expect(body).toEqual({ items: [], nextCursor: null });
+        });
+
+        it("shares the feed's cache", async () => {
+            seed([featured("a", day(3)), stored("b", day(2))]);
+            await call();
+            await call({ featured: "1" });
+            expect(queryCount()).toBe(1);
+        });
+
+        it.each([
+            ["hidden", { moderation: { hiddenAt: day(20) } }],
+            ["unpublished", { metadata: { publiclyViewable: false }, PK2: undefined, SK2: undefined }],
+        ])("drops a featured set %s after the cache was filled", async (_, change) => {
+            seed([featured("a", day(10)), featured("b", day(11))]);
+            expect(ids((await call({ featured: "1" })).body)).toEqual(["b", "a"]);
+
+            table.set("userUUID#u-b|studyset#b", featured("b", day(11), day(1), change));
+            const { body } = await call({ featured: "1" });
+
+            expect(ids(body)).toEqual(["a"]);
+            expect(queryCount()).toBe(1);
+        });
+
+        it("drops an unfeatured set from the row but keeps it in the feed", async () => {
+            seed([featured("a", day(10)), featured("b", day(11), day(2))]);
+            expect(ids((await call({ featured: "1" })).body)).toEqual(["b", "a"]);
+
+            table.set("userUUID#u-b|studyset#b", stored("b", day(2)));
+            expect(ids((await call({ featured: "1" })).body)).toEqual(["a"]);
+            expect(ids((await call({ featured: "1" })).body)).toEqual(["a"]);
+            expect(ids((await call()).body)).toEqual(["b", "a"]);
+            expect(queryCount()).toBe(1);
+        });
+
+        it("returns 400 for featured with a subject without reading the index", async () => {
+            seed([featured("a", day(1))]);
+            const { res, body } = await call({ featured: "1", subject: "math" });
+            expect(res.statusCode).toBe(400);
+            expect(body.message).toBe("featured does not combine with subject or cursor");
+            expect(queryCount()).toBe(0);
+        });
+    });
+
     it("returns 500 when the index read fails", async () => {
         send.mockRejectedValue(new Error("boom: arn:aws:dynamodb:...:table/test-main") as never);
         const { res, body } = await call();
