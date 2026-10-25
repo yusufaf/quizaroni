@@ -32,3 +32,23 @@ export const expectValidExpressionInput = (input: ExpressionInput): void => {
         expect(Object.keys(input.ExpressionAttributeNames).length).toBeGreaterThan(0);
     }
 };
+
+// What a SET update would write: attribute path -> value, e.g.
+// { title: "T", "metadata.textColorVisible": true }.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const resolveWrites = (input: ExpressionInput): Record<string, any> => {
+    const names = input.ExpressionAttributeNames ?? {};
+    const values = input.ExpressionAttributeValues ?? {};
+    const clauses = (input.UpdateExpression ?? "")
+        .replace(/^SET /, "")
+        .split(", ")
+        .map((clause) => {
+            const [path, value] = clause.split(" = ");
+            const segments = path.split(".");
+            for (const name of segments) expect(Object.keys(names)).toContain(name);
+            expect(Object.keys(values)).toContain(value);
+            return [segments.map((name) => names[name]).join("."), values[value]] as const;
+        });
+    expect(new Set(clauses.map(([path]) => path)).size).toBe(clauses.length);
+    return Object.fromEntries(clauses);
+};

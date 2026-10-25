@@ -57,6 +57,7 @@ const SERVER_OWNED_FIELDS = new Set([
     'userUUID',
     'createdAt',
     'copiedFrom',
+    'username',
 ]);
 const SERVER_OWNED_METADATA_FIELDS = new Set(['publiclyViewable']);
 
@@ -87,9 +88,13 @@ class RequestError extends Error {
  * Publication fields (`subject`, `publishedAt`, `PK2`/`SK2`,
  * `metadata.publiclyViewable`) and `moderation` are owned by publish,
  * unpublish and the takedown script, so they are silently stripped here, as
- * are the identity fields createStudyset writes (#188). A
+ * are the identity fields createStudyset writes (#188) and `username`, the
+ * author name a public set shows, which only server paths write (#193). A
  * top-level `metadata` object (CreateSet's full save) is merged per key
  * rather than replacing the map, so it can't reset `publiclyViewable`.
+ * Client keys never become placeholder names (they get `#key<N>`/`:value<N>`),
+ * so a key like `metadataKey0` can't redirect another clause to a server-owned
+ * field (#193).
  * `updatedBy` is skipped when the token has no username (#180).
  */
 export const buildUpdateExpression = ({
@@ -120,33 +125,27 @@ export const buildUpdateExpression = ({
         ...clientUpdates
     } = updates;
 
-    let metadataKeyCount = 0;
-    const setMetadataKey = (key: string, value: unknown) => {
-        // Index-based placeholders so a metadata key can't collide with a
-        // top-level one of the same name.
-        const index = metadataKeyCount++;
-        updateExpressions.push(`#metadata.#metadataKey${index} = :metadataValue${index}`);
-        ExpressionAttributeNames[`#metadataKey${index}`] = key;
-        ExpressionAttributeValues[`:metadataValue${index}`] = value;
+    let clientKeyCount = 0;
+    const setClientKey = (key: string, value: unknown, inMetadata: boolean) => {
+        const index = clientKeyCount++;
+        updateExpressions.push(`${inMetadata ? '#metadata.' : ''}#key${index} = :value${index}`);
+        ExpressionAttributeNames[`#key${index}`] = key;
+        ExpressionAttributeValues[`:value${index}`] = value;
     };
 
     for (const [key, value] of Object.entries(clientUpdates)) {
         if (isMetadataUpdate) {
             if (SERVER_OWNED_METADATA_FIELDS.has(key)) continue;
-            updateExpressions.push(`#metadata.#${key} = :${key}`);
-            ExpressionAttributeNames[`#${key}`] = key;
-            ExpressionAttributeValues[`:${key}`] = value;
+            setClientKey(key, value, true);
         } else if (key === 'metadata') {
             if (!isPlainObject(value)) continue;
             for (const [metadataKey, metadataValue] of Object.entries(value)) {
                 if (!SERVER_OWNED_METADATA_FIELDS.has(metadataKey)) {
-                    setMetadataKey(metadataKey, metadataValue);
+                    setClientKey(metadataKey, metadataValue, true);
                 }
             }
         } else if (!SERVER_OWNED_FIELDS.has(key)) {
-            updateExpressions.push(`#${key} = :${key}`);
-            ExpressionAttributeNames[`#${key}`] = key;
-            ExpressionAttributeValues[`:${key}`] = value;
+            setClientKey(key, value, false);
         }
     }
 

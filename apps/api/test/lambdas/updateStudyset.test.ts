@@ -1,5 +1,5 @@
 import { buildUpdateExpression } from "../../service/lambdas/updateStudyset/src/updateStudyset";
-import { expectValidExpressionInput } from "../helpers/expressionInput";
+import { expectValidExpressionInput, resolveWrites } from "../helpers/expressionInput";
 
 // Regression test for a real bug caught in production: CreateSet.tsx's
 // saveChanges() spreads a previously-fetched studyset into `updates`, which
@@ -38,7 +38,7 @@ describe("updateStudyset buildUpdateExpression", () => {
             updatedAt: NOW,
             updatedBy: "turtles",
         });
-        const { UpdateExpression, ExpressionAttributeNames, ExpressionAttributeValues } = result;
+        const { UpdateExpression, ExpressionAttributeValues } = result;
 
         const updatedAtOccurrences = (
             UpdateExpression.match(/#updatedAt = :updatedAt/g) ?? []
@@ -52,8 +52,7 @@ describe("updateStudyset buildUpdateExpression", () => {
         // The server-set values win, not the caller's stale copies.
         expect(ExpressionAttributeValues[":updatedAt"]).toBe(NOW);
         expect(ExpressionAttributeValues[":updatedBy"]).toBe("turtles");
-        expect(ExpressionAttributeNames["#title"]).toBe("title");
-        expect(ExpressionAttributeValues[":title"]).toBe("New Title");
+        expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", title: "New Title" });
         expectAllPlaceholdersUsed(result);
     });
 
@@ -67,8 +66,7 @@ describe("updateStudyset buildUpdateExpression", () => {
 
         expect(result.UpdateExpression).toContain("#updatedAt = :updatedAt");
         expect(result.UpdateExpression).toContain("#updatedBy = :updatedBy");
-        expect(result.UpdateExpression).toContain("#title = :title");
-        expect(result.ExpressionAttributeValues[":title"]).toBe("New Title");
+        expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", title: "New Title" });
         expectAllPlaceholdersUsed(result);
     });
 
@@ -89,11 +87,7 @@ describe("updateStudyset buildUpdateExpression", () => {
             updatedBy: "turtles",
         });
 
-        expect(Object.keys(result.ExpressionAttributeNames).sort()).toEqual([
-            "#title",
-            "#updatedAt",
-            "#updatedBy",
-        ]);
+        expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", title: "T" });
         expect(result.UpdateExpression).not.toContain("REMOVE");
         expectAllPlaceholdersUsed(result);
     });
@@ -114,11 +108,77 @@ describe("updateStudyset buildUpdateExpression", () => {
             updatedBy: "turtles",
         });
 
-        expect(Object.keys(result.ExpressionAttributeNames).sort()).toEqual([
-            "#title",
-            "#updatedAt",
-            "#updatedBy",
-        ]);
+        expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", title: "T" });
+        expectValidExpressionInput(result);
+    });
+
+    // #193: username is the author name a public set shows; only server paths write it.
+    it("ignores username", () => {
+        const result = buildUpdateExpression({
+            // CreateSet's full save spreads the fetched set, stored username included.
+            updates: { title: "T", description: "D", username: "someone-else" },
+            isMetadataUpdate: false,
+            updatedAt: NOW,
+            updatedBy: "turtles",
+        });
+
+        expect(resolveWrites(result)).toEqual({
+            updatedAt: NOW,
+            updatedBy: "turtles",
+            title: "T",
+            description: "D",
+        });
+        expectValidExpressionInput(result);
+    });
+
+    // #193: a client key that spells a generated placeholder (#metadataKey0,
+    // :metadataValue0) used to redirect another clause, so it could write
+    // username or any other server-owned field. The current spellings (#key0,
+    // :value0) are covered too.
+    it.each([
+        [
+            "a name placeholder",
+            { metadataKey0: "forged", metadata: { username: "x" } },
+            { metadataKey0: "forged", "metadata.username": "x" },
+        ],
+        [
+            "a value placeholder",
+            { metadata: { textColorVisible: true }, metadataValue0: "clobber" },
+            { "metadata.textColorVisible": true, metadataValue0: "clobber" },
+        ],
+        [
+            "the current name placeholder",
+            { key0: "forged", metadata: { username: "x" } },
+            { key0: "forged", "metadata.username": "x" },
+        ],
+        [
+            "the current value placeholder",
+            { metadata: { textColorVisible: true }, value0: "clobber" },
+            { "metadata.textColorVisible": true, value0: "clobber" },
+        ],
+    ])("can't hijack %s with a client key", (_label, updates, expected) => {
+        const result = buildUpdateExpression({
+            updates,
+            isMetadataUpdate: false,
+            updatedAt: NOW,
+            updatedBy: "turtles",
+        });
+
+        expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", ...expected });
+        expectValidExpressionInput(result);
+    });
+
+    it.each([
+        ["a full save", { "my-field": 1, "a.b": 2 }, false, { "my-field": 1, "a.b": 2 }],
+        ["a metadata update", { "x y": 1 }, true, { "metadata.x y": 1 }],
+    ])("writes keys that aren't valid placeholder names on %s", (_label, updates, isMetadataUpdate, expected) => {
+        const result = buildUpdateExpression({ updates, isMetadataUpdate, updatedAt: NOW, updatedBy: "turtles" });
+
+        expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", ...expected });
+        // resolveWrites joins path segments with ".", so check "a.b" stays one name, not a nested path.
+        expect(Object.values(result.ExpressionAttributeNames)).toEqual(
+            expect.arrayContaining(Object.keys(updates))
+        );
         expectValidExpressionInput(result);
     });
 
@@ -144,9 +204,12 @@ describe("updateStudyset buildUpdateExpression", () => {
             updatedBy: "turtles",
         });
 
-        expect(result.UpdateExpression).toContain("#metadata.#textColorVisible = :textColorVisible");
+        expect(resolveWrites(result)).toEqual({
+            updatedAt: NOW,
+            updatedBy: "turtles",
+            "metadata.textColorVisible": true,
+        });
         expect(result.ExpressionAttributeNames["#metadata"]).toBe("metadata");
-        expect(result.ExpressionAttributeNames).not.toHaveProperty("#publiclyViewable");
         expectAllPlaceholdersUsed(result);
     });
 
@@ -159,8 +222,12 @@ describe("updateStudyset buildUpdateExpression", () => {
             updatedBy: "turtles",
         });
 
-        expect(result.UpdateExpression).toContain("#metadata.#metadataKey0 = :metadataValue0");
-        expect(result.ExpressionAttributeNames["#metadataKey0"]).toBe("textColorVisible");
+        expect(resolveWrites(result)).toEqual({
+            updatedAt: NOW,
+            updatedBy: "turtles",
+            title: "T",
+            "metadata.textColorVisible": true,
+        });
         expect(result.UpdateExpression).not.toContain("#metadata = ");
         expect(Object.values(result.ExpressionAttributeNames)).not.toContain("publiclyViewable");
         expectAllPlaceholdersUsed(result);
