@@ -44,7 +44,6 @@ const AppRoutes = () => {
         { path: '/create', element: <CreateSet /> },
         { path: '/create/:id', element: <CreateSet /> },
         { path: '/profile', element: <Profile /> },
-        { path: '/explore', element: <Explore /> },
         { path: '/combine/:id', element: <CombineSets /> },
         { path: '/edit/:id', element: <CreateSet /> },
         { path: '/study/:studysetId/:mode', element: <StudyMode /> },
@@ -74,6 +73,10 @@ const AppRoutes = () => {
                         authenticated ? <ViewStudySet /> : <PublicStudySet />
                     }
                 />
+
+                {/* Logged-out visitors get Featured, Community and a sign-up
+                    banner (#139); Explore branches on auth itself. */}
+                <Route path="/explore" element={<Explore />} />
 
                 {/* Protected Routes */}
                 {protectedRoutes.map(({ path, element }) => (
