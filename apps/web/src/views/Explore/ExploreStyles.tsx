@@ -247,6 +247,21 @@ export const CardByline = styled('p')(({ theme }) => ({
     overflowWrap: 'anywhere',
 }));
 
+// Same columns as the Community feed below it. Rows stretch, so the cards in
+// a row share a height.
+export const FeaturedGrid = styled('ul')({
+    listStyle: 'none',
+    margin: 0,
+    padding: 0,
+    display: 'grid',
+    gridTemplateColumns: MASONRY_GRID_COLUMNS,
+    gap: MASONRY_COLUMN_GAP,
+});
+
+export const FeaturedItem = styled('li')({
+    minWidth: 0,
+});
+
 // Same columns as MasonryFeed, so the first page doesn't jump sideways when
 // the skeletons are replaced.
 export const CommunitySkeletonList = styled('ul')({
