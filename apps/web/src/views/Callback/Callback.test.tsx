@@ -1,7 +1,13 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
+import {
+    MemoryRouter,
+    Route,
+    Routes,
+    useLocation,
+    useNavigationType,
+} from 'react-router-dom';
 import { POST_SIGN_IN_REDIRECT_KEY } from 'shared/constants';
 import Callback from './Callback';
 
@@ -18,7 +24,13 @@ vi.mock('@logto/react', async () => {
 
 const Where = () => {
     const { pathname, search } = useLocation();
-    return <span data-testid="where">{pathname + search}</span>;
+    const action = useNavigationType();
+    return (
+        <>
+            <span data-testid="where">{pathname + search}</span>
+            <span data-testid="action">{action}</span>
+        </>
+    );
 };
 
 const renderCallback = () =>
@@ -55,9 +67,30 @@ describe('Callback', () => {
     });
 
     // The key is checked when written too; this covers a value from anywhere else.
-    it('goes home instead of to an unsafe stashed path', async () => {
-        sessionStorage.setItem(POST_SIGN_IN_REDIRECT_KEY, '//evil.com');
+    it.each(['//evil.com', '/\t/evil.com', '/..//evil.com'])(
+        'goes home instead of to the unsafe stashed path %p',
+        async (path) => {
+            sessionStorage.setItem(POST_SIGN_IN_REDIRECT_KEY, path);
+            renderCallback();
+            expect((await screen.findByTestId('where')).textContent).toBe('/');
+        }
+    );
+
+    it('goes to the stashed path as the browser resolves it', async () => {
+        sessionStorage.setItem(POST_SIGN_IN_REDIRECT_KEY, '/explore/../view/a');
         renderCallback();
-        expect((await screen.findByTestId('where')).textContent).toBe('/');
+        expect((await screen.findByTestId('where')).textContent).toBe(
+            '/view/a'
+        );
+    });
+
+    // Back must not reload the spent callback URL.
+    it('replaces the callback entry in history', async () => {
+        sessionStorage.setItem(POST_SIGN_IN_REDIRECT_KEY, '/explore');
+        renderCallback();
+        expect(await screen.findByTestId('action')).toHaveProperty(
+            'textContent',
+            'REPLACE'
+        );
     });
 });

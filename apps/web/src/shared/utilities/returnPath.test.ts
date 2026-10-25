@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from 'vite-plus/test';
 import { POST_SIGN_IN_REDIRECT_KEY } from 'shared/constants';
-import { isSafeReturnPath, rememberReturnPath } from './returnPath';
+import { rememberReturnPath, toReturnPath } from './returnPath';
 
 const stored = () => sessionStorage.getItem(POST_SIGN_IN_REDIRECT_KEY);
 
@@ -9,13 +9,17 @@ beforeEach(() => {
     sessionStorage.clear();
 });
 
-describe('isSafeReturnPath', () => {
+describe('toReturnPath', () => {
     it.each(['/', '/explore', '/explore?subject=biology', '/view/abc'])(
-        'accepts the in-app path %p',
+        'keeps the in-app path %p',
         (path) => {
-            expect(isSafeReturnPath(path)).toBe(true);
+            expect(toReturnPath(path)).toBe(path);
         }
     );
+
+    it('returns the path as the browser resolves it', () => {
+        expect(toReturnPath('/explore/../view/abc?x=1')).toBe('/view/abc?x=1');
+    });
 
     it.each([
         '//evil.com',
@@ -23,6 +27,10 @@ describe('isSafeReturnPath', () => {
         // URL parsing drops tabs and newlines, leaving //evil.com.
         '/\t/evil.com',
         '/\n/evil.com',
+        // Same origin, but resolves to the path //evil.com, which history
+        // reads as another origin.
+        '/..//evil.com',
+        '/./\\evil.com',
         'https://evil.com',
         'explore',
         '',
@@ -30,7 +38,7 @@ describe('isSafeReturnPath', () => {
         null,
         undefined,
     ])('rejects %p', (path) => {
-        expect(isSafeReturnPath(path)).toBe(false);
+        expect(toReturnPath(path)).toBeNull();
     });
 });
 
@@ -43,6 +51,7 @@ describe('rememberReturnPath', () => {
     it.each([
         { from: '//evil.com' },
         { from: '/\\evil.com' },
+        { from: '/..//evil.com' },
         { from: 'https://evil.com' },
         { from: 'explore' },
         { from: '' },

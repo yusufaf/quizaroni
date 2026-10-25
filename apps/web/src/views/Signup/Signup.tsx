@@ -24,7 +24,7 @@ const Signup = (props: Props) => {
 
     useEffect(() => {
         if (!isAuthenticated) {
-            // Sign-up CTAs (Explore's banner) pass a return path as router state.
+            // Sign-up CTAs pass a return path as router state.
             rememberReturnPath(location.state);
             signIn(`${window.location.origin}/callback`, 'signUp');
         }
