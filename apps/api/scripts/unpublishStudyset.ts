@@ -2,9 +2,10 @@
  * Moderation takedown: hide a study set and take it off Explore.
  *
  * Sets `moderation.hiddenAt` (and `moderation.reason` when REASON is given),
- * turns `metadata.publiclyViewable` off and removes the PK2/SK2 public-index
- * keys. A hidden set 404s at its public link, is left out of the sitemap list,
- * and its owner can't republish it. Content is not deleted.
+ * turns `metadata.publiclyViewable` off, removes the PK2/SK2 public-index
+ * keys and clears `featuredAt` (#141). A hidden set 404s at its public link,
+ * is left out of the sitemap list, and its owner can't republish it. Content
+ * is not deleted.
  *
  * There is no un-hide tool: to restore a set, remove its `moderation`
  * attribute by hand; the owner can then publish it again. Copies the owner
@@ -158,7 +159,7 @@ export const takedownStudyset = async ({
             TableName: tableName,
             Key: key,
             UpdateExpression:
-                'SET #moderation = :moderation, #metadata.#publiclyViewable = :false REMOVE #PK2, #SK2',
+                'SET #moderation = :moderation, #metadata.#publiclyViewable = :false REMOVE #PK2, #SK2, #featuredAt',
             ConditionExpression: 'attribute_exists(PK)',
             ExpressionAttributeNames: {
                 '#moderation': 'moderation',
@@ -166,6 +167,7 @@ export const takedownStudyset = async ({
                 '#publiclyViewable': 'publiclyViewable',
                 '#PK2': 'PK2',
                 '#SK2': 'SK2',
+                '#featuredAt': 'featuredAt',
             },
             ExpressionAttributeValues: {
                 ':moderation': { hiddenAt: now, ...(reason ? { reason } : {}) },

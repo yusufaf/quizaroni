@@ -112,6 +112,19 @@ describe("updateStudyset buildUpdateExpression", () => {
         expectValidExpressionInput(result);
     });
 
+    // #141: only the admin script features a set.
+    it("ignores featuredAt", () => {
+        const result = buildUpdateExpression({
+            updates: { title: "T", featuredAt: "2026-10-20T00:00:00.000Z" },
+            isMetadataUpdate: false,
+            updatedAt: NOW,
+            updatedBy: "turtles",
+        });
+
+        expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", title: "T" });
+        expectValidExpressionInput(result);
+    });
+
     // #193: username is the author name a public set shows; only server paths write it.
     it("ignores username", () => {
         const result = buildUpdateExpression({
@@ -271,7 +284,7 @@ describe("updateStudyset buildUpdateExpression", () => {
         });
 
         expect(resolveWrites(result)["metadata.publiclyViewable"]).toBe(false);
-        expect(resolveRemoves(result)).toEqual(["PK2", "SK2"]);
+        expect(resolveRemoves(result)).toEqual(["PK2", "SK2", "featuredAt"]);
         expectValidExpressionInput(result);
     });
 

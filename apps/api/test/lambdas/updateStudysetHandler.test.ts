@@ -296,7 +296,7 @@ describe("publish gate on save (#170)", () => {
 
         expect(res.statusCode).toBe(200);
         expect(resolveWrites(update())["metadata.publiclyViewable"]).toBe(false);
-        expect(resolveRemoves(update())).toEqual(["PK2", "SK2"]);
+        expect(resolveRemoves(update())).toEqual(["PK2", "SK2", "featuredAt"]);
         expectValidExpressionInput(update());
         expect(JSON.parse(res.body).unpublished).toEqual({
             errors: [{ code: "notEnoughCards", required: 4, actual: 3 }],
@@ -311,7 +311,7 @@ describe("publish gate on save (#170)", () => {
         });
 
         expect(res.statusCode).toBe(200);
-        expect(resolveRemoves(update())).toEqual(["PK2", "SK2"]);
+        expect(resolveRemoves(update())).toEqual(["PK2", "SK2", "featuredAt"]);
         expect(JSON.parse(res.body).unpublished.errors[0].actual).toBe(2);
     });
 

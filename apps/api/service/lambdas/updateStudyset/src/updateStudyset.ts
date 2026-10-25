@@ -61,6 +61,7 @@ const SERVER_OWNED_FIELDS = new Set([
     'createdAt',
     'copiedFrom',
     'username',
+    'featuredAt',
 ]);
 const SERVER_OWNED_METADATA_FIELDS = new Set(['publiclyViewable']);
 
@@ -92,7 +93,8 @@ class RequestError extends Error {
  * `metadata.publiclyViewable`) and `moderation` are owned by publish,
  * unpublish and the takedown script, so they are silently stripped here, as
  * are the identity fields createStudyset writes (#188) and `username`, the
- * author name a public set shows, which only server paths write (#193). A
+ * author name a public set shows, which only server paths write (#193), and
+ * `featuredAt`, which only the feature script writes (#141). A
  * top-level `metadata` object (CreateSet's full save) is merged per key
  * rather than replacing the map, so it can't reset `publiclyViewable`.
  * Client keys never become placeholder names (they get `#key<N>`/`:value<N>`),
