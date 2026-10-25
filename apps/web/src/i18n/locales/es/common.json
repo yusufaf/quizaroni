@@ -702,6 +702,7 @@
         "unpublish": "Despublicar",
         "success": "Publicado en Explorar",
         "unpublishSuccess": "Retirado de Explorar",
+        "unpublishedOnSave": "Retirado de Explorar. Un set publicado necesita al menos {{required}} tarjetas con término y definición. Este set tiene {{actual}}.",
         "errors": {
             "invalidSubject": "Elige un tema.",
             "notEnoughCards": "Añade al menos {{required}} tarjetas con término y definición. Este set tiene {{actual}}.",

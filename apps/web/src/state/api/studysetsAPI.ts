@@ -25,6 +25,8 @@ import {
 } from 'shared/schemas';
 import type { z } from 'zod';
 import type { PublishError, SubjectId } from '@quizaroni/shared-types';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
 /* Endpoints
     Studyset Operations
@@ -352,6 +354,8 @@ export const useBatchDuplicateStudysets = () => {
 
 export const useUpdateStudyset = () => {
     const queryClient = useQueryClient();
+    const { t } = useTranslation();
+    const onPublicationChange = usePublicationMutationSuccess();
     return useMutation({
         mutationFn: async ({
             studysetUUID,
@@ -381,10 +385,27 @@ export const useUpdateStudyset = () => {
                 context: 'UpdateStudyset',
             });
         },
-        onSuccess: (_data, variables) => {
+        onSuccess: (data, variables) => {
             queryClient.invalidateQueries({
                 queryKey: ['studysets', variables.studysetUUID],
             });
+            // The notice lives here, not in a view, because every screen
+            // that saves cards goes through this hook (#170).
+            if (data?.unpublished) {
+                onPublicationChange(data, variables);
+                const gate = data.unpublished.errors.find(
+                    (error) => error.code === 'notEnoughCards'
+                );
+                toast.warning(
+                    gate
+                        ? t('publish.unpublishedOnSave', {
+                              required: gate.required,
+                              actual: gate.actual,
+                          })
+                        : t('publish.unpublishSuccess'),
+                    { position: toast.POSITION.BOTTOM_LEFT, autoClose: 10000 }
+                );
+            }
         },
     });
 };

@@ -4,6 +4,7 @@ import type {
     Card,
     StudysetBase,
     Timestamp,
+    UnpublishedOnSave,
     UUID,
 } from '@quizaroni/shared-types';
 
@@ -310,6 +311,7 @@ export type UpdateStudysetRequest = {
 
 export type UpdateStudysetResponse = BaseResponse & {
     studyset: Studyset;
+    unpublished?: UnpublishedOnSave;
 };
 
 type StudysetUpdatesMap = [UUID, Updates][];

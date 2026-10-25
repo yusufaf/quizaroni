@@ -286,11 +286,25 @@ export const UpdateStudysetRequestSchema = z.object({
     updates: UpdatesSchema,
 });
 
-export const UpdateStudysetResponseSchema = BaseResponseSchema.extend({
+const PublishErrorSchema = z.discriminatedUnion('code', [
+    z.object({ code: z.literal('invalidSubject') }),
+    z.object({
+        code: z.literal('notEnoughCards'),
+        required: z.number(),
+        actual: z.number(),
+    }),
+    z.object({ code: z.literal('hidden') }),
+]);
+
+const StudysetResponseSchema = BaseResponseSchema.extend({
     studyset: StudysetSchema,
 });
 
-export const PublishStudysetResponseSchema = UpdateStudysetResponseSchema;
+export const UpdateStudysetResponseSchema = StudysetResponseSchema.extend({
+    unpublished: z.object({ errors: z.array(PublishErrorSchema) }).optional(),
+});
+
+export const PublishStudysetResponseSchema = StudysetResponseSchema;
 
 export const BatchUpdateStudysetsRequestSchema = z.object({
     studysetUpdates: z.array(z.tuple([UUIDSchema, UpdatesSchema])),
