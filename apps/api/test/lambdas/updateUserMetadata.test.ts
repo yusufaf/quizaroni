@@ -1,4 +1,4 @@
-import { DynamoDBDocumentClient, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import {
     CLIENT_EDITABLE_USER_METADATA_KEYS,
     SERVER_MANAGED_USER_METADATA_KEYS,
@@ -25,26 +25,38 @@ afterEach(() => {
     jest.restoreAllMocks();
 });
 
+const STORED = { PK: "user#u1", SK: "userData", email: "a@b.c", metadata: { defaultTheme: "dark" } };
+
 const run = async (
     body: unknown,
     lambda: unknown = { sub: "u1", username: "turtles" },
-    rawBody = JSON.stringify(body)
+    rawBody = JSON.stringify(body),
+    updateError?: Error
 ) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updates: any[] = [];
+    const sent: unknown[] = [];
     jest.spyOn(console, "log").mockImplementation(() => {});
     jest.spyOn(console, "error").mockImplementation(() => {});
     jest.spyOn(DynamoDBDocumentClient.prototype, "send").mockImplementation((async (cmd: unknown) => {
-        if (cmd instanceof UpdateCommand) updates.push(cmd.input);
-        return { Item: { PK: "user#u1", SK: "userData", metadata: {} } };
+        sent.push(cmd);
+        if (cmd instanceof UpdateCommand) {
+            updates.push(cmd.input);
+            if (updateError) throw updateError;
+            return { Attributes: structuredClone(STORED) };
+        }
+        return { Item: structuredClone(STORED) };
     }) as never);
 
     const res = await handler(
         { requestContext: { authorizer: { lambda } }, body: rawBody },
         {}
     );
-    return { statusCode: res.statusCode, updates };
+    return { statusCode: res.statusCode, body: JSON.parse(res.body), updates, sent };
 };
+
+const conditionFailed = () =>
+    Object.assign(new Error("The conditional request failed"), { name: "ConditionalCheckFailedException" });
 
 describe("updateUserMetadata", () => {
     it("ignores updatedAt/updatedBy in updates (#203, #185)", async () => {
@@ -170,16 +182,65 @@ describe("updateUserMetadata", () => {
         expect(updates).toEqual([]);
     });
 
-    it("doesn't send #metadata when updates is empty (#184)", async () => {
+    it("writes only updatedAt/updatedBy, guarded by the row check, when updates is empty (#184, #208)", async () => {
         const { statusCode, updates } = await run({ updates: {} });
 
         expect(statusCode).toBe(200);
         expectValidExpressionInput(updates[0]);
-        expect(updates[0].ExpressionAttributeNames).not.toHaveProperty("#metadata");
+        expect(updates[0].ConditionExpression).toBe("attribute_exists(PK) AND attribute_exists(#metadata)");
         expect(resolveWrites(updates[0])).toEqual({
             updatedAt: expect.any(String),
             updatedBy: "turtles",
         });
+    });
+
+    it("only writes to an existing, provisioned row (#208)", async () => {
+        const { updates } = await run({ updates: { defaultTheme: "light" } });
+
+        expectValidExpressionInput(updates[0]);
+        expect(updates[0].ConditionExpression).toBe("attribute_exists(PK) AND attribute_exists(#metadata)");
+        expect(updates[0].ExpressionAttributeNames["#metadata"]).toBe("metadata");
+    });
+
+    // Both reach the handler as a failed condition; DynamoDB Local returned
+    // ConditionalCheckFailedException for each.
+    it.each([["no userData row (#208)"], ["a row without metadata (#206 review)"]])(
+        "returns 404 User not found for %s without creating a row",
+        async () => {
+            const { statusCode, body, updates, sent } = await run(
+                { updates: { defaultTheme: "light" } },
+                undefined,
+                undefined,
+                conditionFailed()
+            );
+
+            expect(statusCode).toBe(404);
+            expect(body).toEqual({ message: "User not found" });
+            expect(updates).toHaveLength(1);
+            expect(updates[0].ConditionExpression).toContain("attribute_exists(PK)");
+            expect(updates[0].ConditionExpression).toContain("attribute_exists(#metadata)");
+            expect(sent.filter((cmd) => cmd instanceof GetCommand || cmd instanceof PutCommand)).toEqual([]);
+        }
+    );
+
+    it("returns the updated row as user in one round trip", async () => {
+        const { statusCode, body, updates, sent } = await run({ updates: { defaultTheme: "light" } });
+
+        expect(statusCode).toBe(200);
+        expect(updates[0].ReturnValues).toBe("ALL_NEW");
+        expect(sent).toHaveLength(1);
+        expect(body.user).toEqual({ email: "a@b.c", metadata: { defaultTheme: "dark" } });
+    });
+
+    it("returns 500 on other errors", async () => {
+        const { statusCode } = await run(
+            { updates: { defaultTheme: "light" } },
+            undefined,
+            undefined,
+            Object.assign(new Error("boom"), { name: "ProvisionedThroughputExceededException" })
+        );
+
+        expect(statusCode).toBe(500);
     });
 
     it.each([

@@ -4,11 +4,7 @@ import {
     Handler,
 } from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import {
-    DynamoDBDocumentClient,
-    GetCommand,
-    UpdateCommand,
-} from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { pickClientEditableUserMetadata } from '@quizaroni/shared-types';
 import { AuthorizerContext } from 'models/auth';
 import { removeKeys } from 'resources/dynamo/utilities';
@@ -61,9 +57,14 @@ const isStorableValue = (value: unknown, depth = 0): boolean => {
  * Client keys never become placeholder names (they get `#key<N>`/`:value<N>`),
  * so a key can't build an invalid placeholder (#203, #185). The caller passes
  * only allowlisted keys (#207), which excludes the server's own
- * `updatedAt`/`updatedBy`. `#metadata` is sent only when a clause uses it,
- * since DynamoDB rejects an unused name (#184). `updatedBy` is skipped when
- * the token has no username (#180).
+ * `updatedAt`/`updatedBy`. `updatedBy` is skipped when the token has no
+ * username (#180).
+ *
+ * The condition stops the write from creating a row (#208): an upsert would
+ * make the sign-up webhook's `attribute_not_exists(PK)` put skip, leaving the
+ * user without a profile. Every provisioning path seeds `metadata`, so a row
+ * without it is such a stub. The condition always uses `#metadata`, so the
+ * name is never unused (#184).
  */
 const buildUserMetadataUpdate = ({
     updates,
@@ -75,7 +76,10 @@ const buildUserMetadataUpdate = ({
     updatedBy?: string;
 }) => {
     const updateExpressions = ['#updatedAt = :updatedAt'];
-    const ExpressionAttributeNames: Record<string, string> = { '#updatedAt': 'updatedAt' };
+    const ExpressionAttributeNames: Record<string, string> = {
+        '#updatedAt': 'updatedAt',
+        '#metadata': 'metadata',
+    };
     const ExpressionAttributeValues: Record<string, unknown> = { ':updatedAt': updatedAt };
 
     if (updatedBy) {
@@ -86,13 +90,13 @@ const buildUserMetadataUpdate = ({
 
     Object.entries(updates).forEach(([key, value], index) => {
         updateExpressions.push(`#metadata.#key${index} = :value${index}`);
-        ExpressionAttributeNames['#metadata'] = 'metadata';
         ExpressionAttributeNames[`#key${index}`] = key;
         ExpressionAttributeValues[`:value${index}`] = value;
     });
 
     return {
         UpdateExpression: `SET ${updateExpressions.join(', ')}`,
+        ConditionExpression: 'attribute_exists(PK) AND attribute_exists(#metadata)',
         ExpressionAttributeNames,
         ExpressionAttributeValues,
     };
@@ -138,39 +142,28 @@ export const handler: Handler = async (
         const SK = `userData`;
         const updatedAt = new Date().toISOString();
 
-        const { UpdateExpression, ExpressionAttributeNames, ExpressionAttributeValues } =
-            buildUserMetadataUpdate({ updates: allowedUpdates, updatedAt, updatedBy: username });
-
         const updateCommand = new UpdateCommand({
             Key: {
                 PK,
                 SK,
             },
             TableName: usersTable,
-            ExpressionAttributeNames,
-            ExpressionAttributeValues,
-            UpdateExpression,
+            ...buildUserMetadataUpdate({ updates: allowedUpdates, updatedAt, updatedBy: username }),
+            ReturnValues: 'ALL_NEW',
         });
-        await docClient.send(updateCommand);
-
-        const getCommand = new GetCommand({
-            Key: {
-                PK,
-                SK,
-            },
-            TableName: usersTable,
-        });
-        const getResult = await docClient.send(getCommand);
-        const updatedUser = getResult.Item;
+        const { Attributes } = await docClient.send(updateCommand);
 
         return {
             statusCode: 200,
             body: JSON.stringify({
                 message: 'Successfully updated user metadata',
-                user: removeKeys(updatedUser ?? {}),
+                user: removeKeys(Attributes ?? {}),
             }),
         };
     } catch (err) {
+        if ((err as { name?: string }).name === 'ConditionalCheckFailedException') {
+            return respond(404, 'User not found');
+        }
         console.error(err);
         return {
             statusCode: 500,
