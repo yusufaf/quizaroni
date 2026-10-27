@@ -4,17 +4,28 @@
  * account's username, the same way the publish lambda does it.
  *
  * Every file is validated against the publish gate before anything is
- * written. Set ids are derived from the owner and the file's slug, and a set
- * that already exists is skipped untouched, so a rerun only adds new files and
- * never republishes a set its owner has since edited or unpublished.
+ * written. Set ids are derived from the owner and the file's slug, so a rerun
+ * reaches the same sets:
+ * - a set that was never created is created and published;
+ * - a set created by an earlier run that stopped before publishing it is
+ *   published;
+ * - a set that has been published is left untouched, so its owner's later
+ *   edits and unpublishes stand.
+ * A seed set deleted in the app has no row left, so a rerun recreates it:
+ * delete its file as well.
  *
- * publishedAt is staggered a minute apart in slug order (first slug newest),
- * so the Community feed shows the sets in a stable order. Slugs listed in
- * FEATURE are then featured, newest first in the order given.
+ * Sets are timestamped a minute apart in slug order (first slug newest), so
+ * the Community feed shows them in a stable order. Slugs listed in FEATURE are
+ * then featured, the first one newest, after checking that all of them are
+ * listed.
+ *
+ * The public author name is the account's Logto username. The users table
+ * keeps it as of sign-up only, so pass USERNAME if it has changed since.
  *
  * Usage (with AWS credentials for the target account in the environment):
  *   MAIN_TABLE=quizaroni-<deploymentType>-main AWS_REGION=us-west-2 \
- *     USER_UUID=<owner> [FEATURE=slug-a,slug-b] \
+ *     USER_UUID=<owner> [USERNAME=<name>] [FEATURE=slug-a,slug-b] \
+ *     [USERS_TABLE=<defaults to MAIN_TABLE with -users for -main>] \
  *     pnpm --filter @quizaroni/api seed:studysets
  *   # add DRY_RUN=1 to only report what would change.
  */
@@ -25,8 +36,9 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import type { SubjectId } from '@quizaroni/shared-types';
 import type { Card } from 'models/studysets';
+import { isPubliclyListed } from '../resources/dynamo/publicSharing';
 import { defaultStudysetMetadata } from '../utilities/defaultMetadata';
-import { buildPublishUpdate, validatePublishRequest } from '../utilities/publishStudyset';
+import { buildPublishUpdate, isFilled, validatePublishRequest } from '../utilities/publishStudyset';
 import { isDryRun } from './dryRun';
 import { featureStudyset } from './featureStudyset';
 
@@ -42,7 +54,9 @@ export type SeedSet = {
 
 type SeedConfig = {
     tableName: string;
+    usersTable: string;
     userUUID: string;
+    username?: string;
     feature: string[];
     dryRun: boolean;
 };
@@ -52,6 +66,10 @@ export const readSeedConfig = (env: NodeJS.ProcessEnv): SeedConfig => {
     if (!tableName) {
         throw new Error('Set MAIN_TABLE to the target table name, e.g. quizaroni-production-main');
     }
+    const usersTable = env.USERS_TABLE || (tableName.endsWith('-main') ? tableName.replace(/-main$/, '-users') : '');
+    if (!usersTable) {
+        throw new Error('Set USERS_TABLE; it can only be derived from a MAIN_TABLE ending in -main');
+    }
     const userUUID = env.USER_UUID ?? '';
     if (!userUUID) {
         throw new Error('Set USER_UUID to the Logto user id of the account that will own the sets');
@@ -60,24 +78,26 @@ export const readSeedConfig = (env: NodeJS.ProcessEnv): SeedConfig => {
         .split(',')
         .map((slug) => slug.trim())
         .filter(Boolean);
-    return { tableName, userUUID, feature, dryRun: isDryRun(env.DRY_RUN) };
+    return {
+        tableName,
+        usersTable,
+        userUUID,
+        username: env.USERNAME?.trim() || undefined,
+        feature,
+        dryRun: isDryRun(env.DRY_RUN),
+    };
 };
-
-const isNonEmptyString = (value: unknown): value is string =>
-    typeof value === 'string' && value.trim() !== '';
 
 /** Checks one parsed file; returns its problems, or none if it can be seeded. */
 export const validateSeedSet = (raw: unknown, fileSlug: string): string[] => {
     const set = (raw ?? {}) as Partial<Record<keyof SeedSet, unknown>>;
     const problems: string[] = [];
     if (set.slug !== fileSlug) problems.push(`slug must match the file name ("${fileSlug}")`);
-    if (!isNonEmptyString(set.title)) problems.push('title is missing');
-    if (!isNonEmptyString(set.description)) problems.push('description is missing');
+    if (!isFilled(set.title)) problems.push('title is missing');
+    if (!isFilled(set.description)) problems.push('description is missing');
     if (!Array.isArray(set.cards)) {
         problems.push('cards must be an array');
-    } else if (
-        set.cards.some((card) => !isNonEmptyString(card?.term) || !isNonEmptyString(card?.definition))
-    ) {
+    } else if (set.cards.some((card) => !isFilled(card?.term) || !isFilled(card?.definition))) {
         problems.push('every card needs a term and a definition');
     }
 
@@ -132,6 +152,11 @@ export const seedStudysetUUID = (userUUID: string, slug: string): string => {
     return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 };
 
+const seedKey = (userUUID: string, slug: string) => ({
+    PK: `userUUID#${userUUID}`,
+    SK: `studyset#${seedStudysetUUID(userUUID, slug)}`,
+});
+
 const toCard = ({ term, definition }: SeedSet['cards'][number]): Card => ({
     cardUUID: randomUUID(),
     term: term.trim(),
@@ -142,22 +167,30 @@ const toCard = ({ term, definition }: SeedSet['cards'][number]): Card => ({
     notes: [],
 });
 
-/** The owner's public name, read from the row the Logto sign-up webhook writes. */
-export const readOwnerUsername = async (
+/**
+ * Checks the owner exists in the users table (written by the Logto sign-up
+ * webhook) and returns the name to publish under: USERNAME if given, else the
+ * username stored at sign-up.
+ */
+export const resolveOwnerUsername = async (
     docClient: DynamoDBDocumentClient,
-    tableName: string,
-    userUUID: string
+    usersTable: string,
+    userUUID: string,
+    override?: string
 ): Promise<string> => {
     const { Item } = await docClient.send(
-        new GetCommand({ TableName: tableName, Key: { PK: `user#${userUUID}`, SK: 'userData' } })
+        new GetCommand({ TableName: usersTable, Key: { PK: `user#${userUUID}`, SK: 'userData' } })
     );
     if (!Item) {
-        throw new Error(`No user ${userUUID} in ${tableName}; sign the account up on this environment first`);
+        throw new Error(`No user ${userUUID} in ${usersTable}; sign the account up on this environment first`);
     }
-    if (!isNonEmptyString(Item.username)) {
-        throw new Error(`User ${userUUID} has no username; set one in Logto so the sets have a public author`);
+    const username = override ?? (isFilled(Item.username) ? Item.username : undefined);
+    if (!username) {
+        throw new Error(
+            `User ${userUUID} had no username at sign-up; set USERNAME to the account's Logto username`
+        );
     }
-    return Item.username;
+    return username;
 };
 
 export const seedStudysets = async ({
@@ -180,7 +213,7 @@ export const seedStudysets = async ({
     now: Date;
     dryRun: boolean;
     log?: (message: string) => void;
-}): Promise<{ created: string[]; skipped: string[] }> => {
+}): Promise<{ created: string[]; published: string[]; skipped: string[] }> => {
     const slugs = new Set(sets.map((set) => set.slug));
     const unknown = feature.filter((slug) => !slugs.has(slug));
     if (unknown.length > 0) {
@@ -188,28 +221,34 @@ export const seedStudysets = async ({
     }
 
     const created: string[] = [];
+    const published: string[] = [];
     const skipped: string[] = [];
     const prefix = dryRun ? '[dry-run] would ' : '';
 
     for (const [index, set] of sets.entries()) {
         const studysetUUID = seedStudysetUUID(userUUID, set.slug);
-        const Key = { PK: `userUUID#${userUUID}`, SK: `studyset#${studysetUUID}` };
+        const Key = seedKey(userUUID, set.slug);
+        const timestamp = new Date(now.getTime() - index * 60_000).toISOString();
 
         const { Item } = await docClient.send(
-            new GetCommand({ TableName: tableName, Key, ProjectionExpression: 'PK' })
+            new GetCommand({ TableName: tableName, Key, ProjectionExpression: 'PK, publishedAt' })
         );
-        if (Item) {
-            log(`skip ${set.slug} (${studysetUUID}): already exists`);
+        if (Item?.publishedAt) {
+            log(`skip ${set.slug} (${studysetUUID}): already published`);
             skipped.push(set.slug);
             continue;
         }
 
-        log(`${prefix}create and publish ${set.slug} (${studysetUUID}): ${set.cards.length} cards, ${set.subject}`);
-        created.push(set.slug);
+        if (Item) {
+            log(`${prefix}publish ${set.slug} (${studysetUUID}): created by an earlier run`);
+            published.push(set.slug);
+        } else {
+            log(`${prefix}create and publish ${set.slug} (${studysetUUID}): ${set.cards.length} cards, ${set.subject}`);
+            created.push(set.slug);
+        }
         if (dryRun) continue;
 
-        const timestamp = now.toISOString();
-        try {
+        if (!Item) {
             await docClient.send(
                 new PutCommand({
                     TableName: tableName,
@@ -232,14 +271,6 @@ export const seedStudysets = async ({
                     ConditionExpression: 'attribute_not_exists(PK)',
                 })
             );
-        } catch (error) {
-            if ((error as Error).name === 'ConditionalCheckFailedException') {
-                log(`skip ${set.slug} (${studysetUUID}): created by someone else just now`);
-                created.pop();
-                skipped.push(set.slug);
-                continue;
-            }
-            throw error;
         }
 
         await docClient.send(
@@ -249,7 +280,7 @@ export const seedStudysets = async ({
                 ...buildPublishUpdate({
                     studysetUUID,
                     subject: set.subject,
-                    publishedAt: new Date(now.getTime() - index * 60_000).toISOString(),
+                    publishedAt: timestamp,
                     username,
                     now: timestamp,
                 }),
@@ -257,11 +288,24 @@ export const seedStudysets = async ({
         );
     }
 
+    // Check every slug first, so one that isn't listed can't leave the row half reordered.
+    const pendingInDryRun = new Set(dryRun ? [...created, ...published] : []);
+    const notListed: string[] = [];
+    for (const slug of feature) {
+        if (pendingInDryRun.has(slug)) continue;
+        const { Item } = await docClient.send(
+            new GetCommand({ TableName: tableName, Key: seedKey(userUUID, slug) })
+        );
+        if (!isPubliclyListed(Item) || !isFilled(Item?.publishedAt)) notListed.push(slug);
+    }
+    if (notListed.length > 0) {
+        throw new Error(`FEATURE names sets that aren't listed on Explore: ${notListed.join(', ')}`);
+    }
+
     // Featured is ordered by featuredAt, newest first, so the first slug gets the latest time.
     for (const [index, slug] of feature.entries()) {
-        const studysetUUID = seedStudysetUUID(userUUID, slug);
-        const key = { PK: `userUUID#${userUUID}`, SK: `studyset#${studysetUUID}` };
-        if (dryRun && created.includes(slug)) {
+        const key = seedKey(userUUID, slug);
+        if (pendingInDryRun.has(slug)) {
             log(`[dry-run] would feature ${key.PK} ${key.SK}`);
             continue;
         }
@@ -276,7 +320,7 @@ export const seedStudysets = async ({
         });
     }
 
-    return { created, skipped };
+    return { created, published, skipped };
 };
 
 if (require.main === module) {
@@ -292,14 +336,14 @@ if (require.main === module) {
 
     const docClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-    readOwnerUsername(docClient, config.tableName, config.userUUID)
+    resolveOwnerUsername(docClient, config.usersTable, config.userUUID, config.username)
         .then((username) => {
             console.log(`Seeding ${sets.length} sets into ${config.tableName} as "${username}"\n`);
             return seedStudysets({ docClient, ...config, username, sets, now: new Date() });
         })
-        .then(({ created, skipped }) => {
+        .then(({ created, published, skipped }) => {
             console.log(
-                `\nDone. created=${created.length} skipped=${skipped.length}${
+                `\nDone. created=${created.length} published=${published.length} skipped=${skipped.length}${
                     config.dryRun ? ' (dry run — no writes performed)' : ''
                 }`
             );

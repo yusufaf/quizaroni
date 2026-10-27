@@ -6,7 +6,7 @@ import {
     SEED_DIR,
     SeedSet,
     loadSeedSets,
-    readOwnerUsername,
+    resolveOwnerUsername,
     readSeedConfig,
     seedStudysetUUID,
     seedStudysets,
@@ -28,30 +28,37 @@ const SET_A: SeedSet = {
 const SET_B: SeedSet = { ...SET_A, slug: 'set-b', title: 'Set B', subject: 'history' };
 const NOW = new Date('2026-10-27T12:00:00.000Z');
 
-const LISTED_ROW = {
-    metadata: { publiclyViewable: true },
-    publishedAt: '2026-10-27T12:00:00.000Z',
-};
+type Row = Record<string, unknown>;
 
-/** A fake table: `existing` holds the keys of rows that are already there. */
-const makeClient = (existing: Set<string> = new Set()) => {
+/** A fake main table keyed by `PK|SK`; a publish update marks the row listed. */
+const makeClient = (rows: Map<string, Row> = new Map()) => {
+    const keyOf = (key: unknown) => {
+        const { PK, SK } = key as { PK: string; SK: string };
+        return `${PK}|${SK}`;
+    };
     const send = jest.fn((cmd: unknown) => {
         if (cmd instanceof GetCommand) {
-            const { PK, SK } = cmd.input.Key as { PK: string; SK: string };
-            const item = existing.has(`${PK}|${SK}`) ? { PK, SK, SK2: SK, ...LISTED_ROW } : undefined;
-            return Promise.resolve({ Item: item });
+            return Promise.resolve({ Item: rows.get(keyOf(cmd.input.Key)) });
         }
         if (cmd instanceof PutCommand) {
-            const { PK, SK } = cmd.input.Item as { PK: string; SK: string };
-            existing.add(`${PK}|${SK}`);
+            rows.set(keyOf(cmd.input.Item), { ...cmd.input.Item });
             return Promise.resolve({});
         }
         if (cmd instanceof UpdateCommand) {
+            const values = cmd.input.ExpressionAttributeValues ?? {};
+            const row = rows.get(keyOf(cmd.input.Key));
+            if (row && values[':pk2']) {
+                Object.assign(row, {
+                    SK2: values[':sk2'],
+                    publishedAt: row.publishedAt ?? values[':publishedAt'],
+                    metadata: { ...(row.metadata as object), publiclyViewable: true },
+                });
+            }
             return Promise.resolve({});
         }
         return Promise.reject(new Error('unexpected command'));
     });
-    return { send, docClient: { send } as unknown as DynamoDBDocumentClient };
+    return { send, rows, docClient: { send } as unknown as DynamoDBDocumentClient };
 };
 
 const sentOf = <T>(send: jest.Mock, type: new (...args: never[]) => T): T[] =>
@@ -74,16 +81,39 @@ const run = (
         ...overrides,
     });
 
+const keyFor = (slug: string) => `userUUID#u1|studyset#${seedStudysetUUID('u1', slug)}`;
+
 describe('readSeedConfig', () => {
     it('requires MAIN_TABLE and USER_UUID', () => {
         expect(() => readSeedConfig({ USER_UUID: 'u1' })).toThrow(/MAIN_TABLE/);
-        expect(() => readSeedConfig({ MAIN_TABLE: 't' })).toThrow(/USER_UUID/);
+        expect(() => readSeedConfig({ MAIN_TABLE: 't-main' })).toThrow(/USER_UUID/);
     });
 
-    it('splits FEATURE and reads DRY_RUN', () => {
+    it('derives the users table from MAIN_TABLE, or needs it given', () => {
+        expect(readSeedConfig({ MAIN_TABLE: 'quizaroni-production-main', USER_UUID: 'u1' }).usersTable).toBe(
+            'quizaroni-production-users'
+        );
+        expect(() => readSeedConfig({ MAIN_TABLE: 't', USER_UUID: 'u1' })).toThrow(/USERS_TABLE/);
+        expect(readSeedConfig({ MAIN_TABLE: 't', USERS_TABLE: 'u', USER_UUID: 'u1' }).usersTable).toBe('u');
+    });
+
+    it('reads USERNAME, splits FEATURE and reads DRY_RUN', () => {
         expect(
-            readSeedConfig({ MAIN_TABLE: 't', USER_UUID: 'u1', FEATURE: ' set-a, ,set-b ', DRY_RUN: '1' })
-        ).toEqual({ tableName: 't', userUUID: 'u1', feature: ['set-a', 'set-b'], dryRun: true });
+            readSeedConfig({
+                MAIN_TABLE: 't-main',
+                USER_UUID: 'u1',
+                USERNAME: ' Quizaroni ',
+                FEATURE: ' set-a, ,set-b ',
+                DRY_RUN: '1',
+            })
+        ).toEqual({
+            tableName: 't-main',
+            usersTable: 't-users',
+            userUUID: 'u1',
+            username: 'Quizaroni',
+            feature: ['set-a', 'set-b'],
+            dryRun: true,
+        });
     });
 });
 
@@ -150,20 +180,36 @@ describe('seedStudysetUUID', () => {
     });
 });
 
-describe('readOwnerUsername', () => {
-    const clientWith = (Item: Record<string, unknown> | undefined) =>
-        ({ send: jest.fn(() => Promise.resolve({ Item })) }) as unknown as DynamoDBDocumentClient;
+describe('resolveOwnerUsername', () => {
+    const clientWith = (Item: Row | undefined) => {
+        const send = jest.fn((_cmd: unknown) => Promise.resolve({ Item }));
+        return { send, docClient: { send } as unknown as DynamoDBDocumentClient };
+    };
 
-    it('reads the username from the user row', async () => {
-        await expect(readOwnerUsername(clientWith({ username: 'Quizaroni' }), 't', 'u1')).resolves.toBe(
-            'Quizaroni'
+    it('reads the user row from the users table', async () => {
+        const { send, docClient } = clientWith({ username: 'Quizaroni' });
+        await expect(resolveOwnerUsername(docClient, 'users', 'u1')).resolves.toBe('Quizaroni');
+        expect((send.mock.calls[0][0] as GetCommand).input).toEqual({
+            TableName: 'users',
+            Key: { PK: 'user#u1', SK: 'userData' },
+        });
+    });
+
+    it('prefers USERNAME, but still needs the user to exist', async () => {
+        await expect(
+            resolveOwnerUsername(clientWith({ username: 'old' }).docClient, 'users', 'u1', 'new')
+        ).resolves.toBe('new');
+        await expect(
+            resolveOwnerUsername(clientWith({ username: null }).docClient, 'users', 'u1', 'new')
+        ).resolves.toBe('new');
+        await expect(resolveOwnerUsername(clientWith(undefined).docClient, 'users', 'u1', 'new')).rejects.toThrow(
+            /No user u1 in users/
         );
     });
 
-    it('refuses an unknown user or one without a username', async () => {
-        await expect(readOwnerUsername(clientWith(undefined), 't', 'u1')).rejects.toThrow(/No user u1/);
-        await expect(readOwnerUsername(clientWith({ username: null }), 't', 'u1')).rejects.toThrow(
-            /no username/
+    it('asks for USERNAME when the account had none at sign-up', async () => {
+        await expect(resolveOwnerUsername(clientWith({ username: null }).docClient, 'users', 'u1')).rejects.toThrow(
+            /set USERNAME/
         );
     });
 });
@@ -171,7 +217,7 @@ describe('readOwnerUsername', () => {
 describe('seedStudysets', () => {
     it('creates each set and publishes it as the owner', async () => {
         const client = makeClient();
-        await expect(run(client)).resolves.toEqual({ created: ['set-a', 'set-b'], skipped: [] });
+        await expect(run(client)).resolves.toEqual({ created: ['set-a', 'set-b'], published: [], skipped: [] });
 
         const [put] = sentOf(client.send, PutCommand);
         const id = seedStudysetUUID('u1', 'set-a');
@@ -206,27 +252,48 @@ describe('seedStudysets', () => {
         });
     });
 
-    it('staggers publishedAt a minute apart, first slug newest', async () => {
+    it('timestamps each set a minute apart, first slug newest, publishedAt with createdAt', async () => {
         const client = makeClient();
         await run(client);
-        const publishedAt = sentOf(client.send, UpdateCommand).map(
-            (cmd) => cmd.input.ExpressionAttributeValues?.[':publishedAt']
-        );
-        expect(publishedAt).toEqual(['2026-10-27T12:00:00.000Z', '2026-10-27T11:59:00.000Z']);
+        const stamps = ['set-a', 'set-b'].map((slug) => {
+            const row = client.rows.get(keyFor(slug)) as Row;
+            return [row.createdAt, row.updatedAt, row.lastViewed, row.publishedAt];
+        });
+        expect(stamps).toEqual([
+            Array(4).fill('2026-10-27T12:00:00.000Z'),
+            Array(4).fill('2026-10-27T11:59:00.000Z'),
+        ]);
     });
 
-    it('leaves a set that already exists untouched', async () => {
-        const id = seedStudysetUUID('u1', 'set-a');
-        const client = makeClient(new Set([`userUUID#u1|studyset#${id}`]));
-        await expect(run(client)).resolves.toEqual({ created: ['set-b'], skipped: ['set-a'] });
+    it('leaves a published set untouched, even one its owner has since unpublished', async () => {
+        const rows = new Map<string, Row>([
+            [keyFor('set-a'), { publishedAt: '2026-10-01T00:00:00.000Z', metadata: { publiclyViewable: false } }],
+        ]);
+        const client = makeClient(rows);
+        await expect(run(client)).resolves.toEqual({ created: ['set-b'], published: [], skipped: ['set-a'] });
         expect(sentOf(client.send, PutCommand)).toHaveLength(1);
         expect(sentOf(client.send, UpdateCommand)).toHaveLength(1);
+        expect(rows.get(keyFor('set-a'))?.metadata).toEqual({ publiclyViewable: false });
+    });
+
+    it('publishes a set an earlier run created but stopped before publishing', async () => {
+        const rows = new Map<string, Row>([[keyFor('set-a'), { metadata: { publiclyViewable: false } }]]);
+        const client = makeClient(rows);
+        await expect(run(client)).resolves.toEqual({ created: ['set-b'], published: ['set-a'], skipped: [] });
+        expect(sentOf(client.send, PutCommand).map((cmd) => cmd.input.Item?.SK)).toEqual([
+            `studyset#${seedStudysetUUID('u1', 'set-b')}`,
+        ]);
+        expect(rows.get(keyFor('set-a'))).toMatchObject({
+            publishedAt: '2026-10-27T12:00:00.000Z',
+            metadata: { publiclyViewable: true },
+        });
     });
 
     it('writes nothing on a dry run', async () => {
         const client = makeClient();
         await expect(run(client, { dryRun: true, feature: ['set-b'] })).resolves.toEqual({
             created: ['set-a', 'set-b'],
+            published: [],
             skipped: [],
         });
         expect(sentOf(client.send, PutCommand)).toHaveLength(0);
@@ -245,9 +312,24 @@ describe('seedStudysets', () => {
         ]);
     });
 
+    it('features nothing if any FEATURE slug is not listed', async () => {
+        const rows = new Map<string, Row>([
+            [keyFor('set-b'), { publishedAt: '2026-10-01T00:00:00.000Z', metadata: { publiclyViewable: false } }],
+        ]);
+        const client = makeClient(rows);
+        await expect(run(client, { feature: ['set-a', 'set-b'] })).rejects.toThrow(
+            /FEATURE names sets that aren't listed on Explore: set-b$/
+        );
+        const featured = sentOf(client.send, UpdateCommand).filter(
+            (cmd) => cmd.input.UpdateExpression === 'SET #featuredAt = :now'
+        );
+        expect(featured).toHaveLength(0);
+    });
+
     it('refuses a FEATURE slug with no seed file before writing', async () => {
         const client = makeClient();
         await expect(run(client, { feature: ['nope'] })).rejects.toThrow(/nope/);
         expect(client.send).not.toHaveBeenCalled();
     });
 });
+
