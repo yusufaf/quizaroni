@@ -57,7 +57,7 @@
         "react-virtuoso": "^4.18.13",
         "sql.js": "^1.13.0",
         "ts-fsrs": "^5.4.2",
-        "zod": "^4.6.5",
+        "zod": "^4.6.6",
         "zustand": "^5.0.15"
     },
     "devDependencies": {
