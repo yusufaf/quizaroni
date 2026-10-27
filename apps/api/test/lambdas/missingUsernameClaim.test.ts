@@ -82,7 +82,7 @@ const cases: Case[] = [
         get: "user",
     },
     { name: "updateNotificationPreferences", body: { updates: {} }, get: "user" },
-    { name: "updateUserMetadata", body: { updates: { theme: "dark" } }, get: "user" },
+    { name: "updateUserMetadata", body: { updates: { defaultTheme: "dark" } }, get: "user" },
     { name: "updateUserMetadata", body: { updates: {} }, get: "user" },
     {
         name: "updateStudyset",
