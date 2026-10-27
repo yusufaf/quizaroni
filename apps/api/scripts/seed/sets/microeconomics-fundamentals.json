@@ -1,0 +1,33 @@
+{
+  "slug": "microeconomics-fundamentals",
+  "title": "Microeconomics Fundamentals",
+  "description": "Core ideas from an intro microeconomics course: supply and demand, elasticity, surplus, market structures, and market failures.",
+  "subject": "business-economics",
+  "cards": [
+    { "term": "Opportunity cost", "definition": "The value of the best alternative you give up when you make a choice." },
+    { "term": "Price elasticity of demand", "definition": "How strongly quantity demanded responds to a price change: the percent change in quantity divided by the percent change in price." },
+    { "term": "Deadweight loss", "definition": "The total surplus lost when a market produces something other than the efficient quantity, for example because of a tax." },
+    { "term": "Scarcity", "definition": "The basic problem that wants exceed the limited resources available, which forces choices about how to use them." },
+    { "term": "Law of demand", "definition": "All else equal, when a good's price rises, the quantity demanded falls." },
+    { "term": "Law of supply", "definition": "All else equal, when a good's price rises, the quantity supplied rises." },
+    { "term": "Market equilibrium", "definition": "The price at which quantity demanded equals quantity supplied, so there is no shortage or surplus." },
+    { "term": "Shortage", "definition": "Quantity demanded exceeds quantity supplied, usually because the price is below equilibrium." },
+    { "term": "Surplus (excess supply)", "definition": "Quantity supplied exceeds quantity demanded, usually because the price is above equilibrium." },
+    { "term": "Price ceiling", "definition": "A legal maximum price. When set below the equilibrium price, it causes a shortage." },
+    { "term": "Price floor", "definition": "A legal minimum price, such as a minimum wage. When set above the equilibrium price, it causes a surplus." },
+    { "term": "Elastic demand", "definition": "Quantity demanded changes by a larger percentage than price, so the elasticity's absolute value is greater than 1." },
+    { "term": "Inelastic demand", "definition": "Quantity demanded changes by a smaller percentage than price. Common for necessities with few substitutes." },
+    { "term": "Substitutes", "definition": "Goods used in place of each other. A price rise for one increases demand for the other." },
+    { "term": "Complements", "definition": "Goods used together. A price rise for one decreases demand for the other." },
+    { "term": "Normal good", "definition": "A good whose demand rises when consumers' incomes rise." },
+    { "term": "Inferior good", "definition": "A good whose demand falls when consumers' incomes rise." },
+    { "term": "Diminishing marginal utility", "definition": "Each additional unit of a good consumed adds less satisfaction than the one before it." },
+    { "term": "Consumer surplus", "definition": "The difference between what buyers are willing to pay and what they actually pay." },
+    { "term": "Producer surplus", "definition": "The difference between the price sellers receive and the lowest price they would have accepted." },
+    { "term": "Marginal cost", "definition": "The additional cost of producing one more unit of output." },
+    { "term": "Profit-maximizing output", "definition": "The quantity where marginal revenue equals marginal cost." },
+    { "term": "Perfect competition", "definition": "Many firms sell identical products with free entry and exit, so no single firm can influence the market price." },
+    { "term": "Monopoly", "definition": "A single seller of a product with no close substitutes, able to set its price above marginal cost." },
+    { "term": "Externality", "definition": "A cost or benefit of an activity that falls on third parties who are not part of the transaction, such as pollution." }
+  ]
+}

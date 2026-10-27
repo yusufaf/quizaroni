@@ -15,6 +15,8 @@
 		"cleanup:empty-studysets": "ts-node scripts/cleanupEmptyStudysets.ts",
 		"cleanup:public-duplicates": "ts-node scripts/cleanupPublicDuplicates.ts",
 		"unpublish:studyset": "ts-node scripts/unpublishStudyset.ts",
+		"feature:studyset": "ts-node scripts/featureStudyset.ts",
+		"seed:studysets": "ts-node scripts/seedStudysets.ts",
 		"migrate:card-file-keys": "ts-node scripts/rekeyCardFiles.ts"
 	},
 	"dependencies": {

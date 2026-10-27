@@ -1,0 +1,32 @@
+{
+  "slug": "contract-law-basics",
+  "title": "Contract Law Fundamentals",
+  "description": "Core U.S. common-law contract concepts, from offer and acceptance to remedies for breach. For study only, not legal advice.",
+  "subject": "law",
+  "cards": [
+    { "term": "Offer", "definition": "A proposal to enter a bargain, made so the other party understands that their agreement will create a contract." },
+    { "term": "Acceptance", "definition": "Agreement to the terms of an offer, in the manner the offer invites, which forms a contract." },
+    { "term": "Consideration", "definition": "Something of legal value that each party bargains for and gives in exchange, such as money, goods, services, or a promise." },
+    { "term": "Mutual assent", "definition": "Both parties' agreement to the same terms, usually shown through offer and acceptance; often called a meeting of the minds." },
+    { "term": "Counteroffer", "definition": "A response that changes the terms of an offer; it rejects the original offer and makes a new one." },
+    { "term": "Mirror image rule", "definition": "Common-law rule that an acceptance must match the offer's terms exactly; otherwise it acts as a counteroffer." },
+    { "term": "Mailbox rule", "definition": "Common-law rule that an acceptance is generally effective once it is sent, such as when mailed, rather than when it is received." },
+    { "term": "Revocation", "definition": "The offeror's withdrawal of an offer before it has been accepted." },
+    { "term": "Option contract", "definition": "A promise, supported by consideration, to keep an offer open for a set time, during which the offeror can't revoke it." },
+    { "term": "Capacity", "definition": "Legal ability to enter a binding contract; contracts made by minors, for example, are generally voidable by the minor." },
+    { "term": "Statute of frauds", "definition": "Rule requiring certain contracts, such as those for an interest in land or that can't be performed within a year, to be in writing." },
+    { "term": "Promissory estoppel", "definition": "Doctrine that can enforce a promise lacking consideration when the other party reasonably relied on it to their detriment." },
+    { "term": "Void contract", "definition": "An agreement with no legal effect from the start, such as one for an illegal purpose." },
+    { "term": "Voidable contract", "definition": "A valid contract that one party has the right to cancel, such as one induced by fraud or duress." },
+    { "term": "Duress", "definition": "Improper threats or pressure that force a person into a contract, which can make the contract voidable." },
+    { "term": "Unconscionability", "definition": "A contract or term so one-sided and unfair that a court may refuse to enforce it." },
+    { "term": "Parol evidence rule", "definition": "Rule limiting the use of earlier or side agreements to contradict the terms of a final written contract." },
+    { "term": "Breach of contract", "definition": "Failure, without a legal excuse, to perform a promise made in a contract." },
+    { "term": "Material breach", "definition": "A breach serious enough to defeat the contract's main purpose, letting the other party stop performing and sue for damages." },
+    { "term": "Expectation damages", "definition": "Money that puts the injured party in the position they would have been in if the contract had been performed." },
+    { "term": "Mitigation of damages", "definition": "The injured party's duty to take reasonable steps to limit their losses after a breach." },
+    { "term": "Liquidated damages", "definition": "An amount set in the contract in advance, enforceable if it's a reasonable estimate of likely harm rather than a penalty." },
+    { "term": "Specific performance", "definition": "A court order requiring a party to carry out the contract, used when money damages are inadequate, as with unique property like land." },
+    { "term": "UCC Article 2", "definition": "Part of the Uniform Commercial Code, adopted by nearly every U.S. state, that governs contracts for the sale of goods." }
+  ]
+}

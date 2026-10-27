@@ -1,0 +1,31 @@
+{
+  "slug": "world-war-ii-key-events",
+  "title": "World War II: Key Events & Turning Points",
+  "description": "The major battles, invasions, and conferences of World War II, with when each happened and why it mattered.",
+  "subject": "history",
+  "cards": [
+    { "term": "Invasion of Poland", "definition": "Germany invaded Poland on September 1, 1939; Britain and France declared war on Germany two days later, starting the war in Europe." },
+    { "term": "Attack on Pearl Harbor", "definition": "Japan's surprise attack on the U.S. Pacific Fleet in Hawaii on December 7, 1941; the United States declared war on Japan the next day." },
+    { "term": "D-Day", "definition": "June 6, 1944 Allied amphibious landings on the beaches of Normandy, France, opening a western front against Germany as part of Operation Overlord." },
+    { "term": "Molotov–Ribbentrop Pact", "definition": "August 1939 nonaggression pact between Nazi Germany and the Soviet Union, with secret protocols dividing Eastern Europe between them." },
+    { "term": "Dunkirk evacuation", "definition": "Late May to early June 1940 rescue of more than 300,000 Allied troops from the beaches of Dunkirk, France, as German forces closed in." },
+    { "term": "Fall of France", "definition": "France signed an armistice with Germany in June 1940 after a rapid German offensive, leaving Britain to fight on without its main ally on the continent." },
+    { "term": "Battle of Britain", "definition": "1940 air campaign in which the Royal Air Force defeated the Luftwaffe's bid for air superiority over Britain, forcing Germany to shelve its invasion plans." },
+    { "term": "The Blitz", "definition": "Sustained German bombing of British cities, especially London, from September 1940 to May 1941." },
+    { "term": "Lend-Lease Act", "definition": "March 1941 U.S. law letting the president supply war materials to Allied nations such as Britain, before the United States entered the war." },
+    { "term": "Operation Barbarossa", "definition": "Germany's invasion of the Soviet Union, launched June 22, 1941, which opened the Eastern Front, the war's largest theater of land combat." },
+    { "term": "Battle of Midway", "definition": "June 1942 naval battle in which the U.S. sank four Japanese aircraft carriers, turning the tide of the war in the Pacific." },
+    { "term": "Guadalcanal campaign", "definition": "August 1942 to February 1943 fight for Guadalcanal in the Solomon Islands; the first major Allied land offensive against Japan." },
+    { "term": "Second Battle of El Alamein", "definition": "Late 1942 British-led victory in Egypt that drove back Axis forces and marked a turning point in the North African campaign." },
+    { "term": "Operation Torch", "definition": "November 1942 Anglo-American landings in French North Africa, in Morocco and Algeria." },
+    { "term": "Battle of Stalingrad", "definition": "August 1942 to February 1943 battle that ended with the surrender of the German Sixth Army; widely seen as the turning point on the Eastern Front." },
+    { "term": "Battle of Kursk", "definition": "July 1943 battle in the Soviet Union, one of the largest tank battles in history; afterward the Soviets held the strategic initiative in the East." },
+    { "term": "Allied invasion of Sicily", "definition": "July 1943 Allied landings in Sicily that helped bring about Mussolini's removal from power later that month." },
+    { "term": "Battle of Leyte Gulf", "definition": "October 1944 naval battle in the Philippines, often called the largest naval battle in history, which crippled the Japanese fleet." },
+    { "term": "Battle of the Bulge", "definition": "Germany's last major offensive in the West, launched through the Ardennes in December 1944 and defeated by January 1945." },
+    { "term": "Yalta Conference", "definition": "February 1945 meeting of Roosevelt, Churchill, and Stalin to plan the defeat of Germany and the shape of postwar Europe." },
+    { "term": "V-E Day", "definition": "May 8, 1945, when the Allies celebrated Germany's unconditional surrender, ending the war in Europe." },
+    { "term": "Atomic bombings of Hiroshima and Nagasaki", "definition": "The U.S. dropped atomic bombs on Hiroshima on August 6, 1945, and Nagasaki on August 9, 1945, the only use of nuclear weapons in war." },
+    { "term": "V-J Day", "definition": "Victory over Japan. Japan announced its surrender on August 15, 1945, and signed the formal surrender on September 2, 1945, ending World War II." }
+  ]
+}

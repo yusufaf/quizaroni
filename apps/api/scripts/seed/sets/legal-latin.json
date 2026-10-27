@@ -1,0 +1,32 @@
+{
+  "slug": "legal-latin",
+  "title": "Common Legal Latin Terms",
+  "description": "Latin phrases you'll meet in court opinions, law school, and the news, each with a literal translation and what it means in practice.",
+  "subject": "law",
+  "cards": [
+    { "term": "Habeas corpus", "definition": "\"You shall have the body.\" A court order requiring that a detained person be brought before a judge to decide whether the detention is lawful." },
+    { "term": "Mens rea", "definition": "\"Guilty mind.\" The mental state, such as intent or recklessness, that the prosecution must prove for many crimes." },
+    { "term": "Res ipsa loquitur", "definition": "\"The thing speaks for itself.\" Doctrine allowing negligence to be inferred when an accident normally wouldn't happen without it." },
+    { "term": "Actus reus", "definition": "\"Guilty act.\" The physical conduct, or unlawful failure to act, that makes up a crime." },
+    { "term": "Pro bono", "definition": "\"For the good,\" short for pro bono publico, \"for the public good.\" Legal work done for free, usually for people or groups who can't afford a lawyer." },
+    { "term": "Pro se", "definition": "\"For oneself.\" Representing yourself in a legal case without a lawyer." },
+    { "term": "Stare decisis", "definition": "\"To stand by things decided.\" The principle that courts follow precedent set in earlier decisions." },
+    { "term": "Amicus curiae", "definition": "\"Friend of the court.\" Someone who isn't a party to a case but offers information or arguments, usually in a written brief." },
+    { "term": "Bona fide", "definition": "\"In good faith.\" Genuine and sincere, without intent to deceive." },
+    { "term": "De facto", "definition": "\"In fact.\" Existing in practice, whether or not it is officially or legally recognized." },
+    { "term": "De jure", "definition": "\"By law.\" Existing by legal right or official recognition." },
+    { "term": "Ex post facto", "definition": "\"After the fact.\" Describes a law applied retroactively; the U.S. Constitution bars ex post facto criminal laws." },
+    { "term": "Prima facie", "definition": "\"At first sight.\" Evidence strong enough to establish a fact or claim unless it is rebutted." },
+    { "term": "Res judicata", "definition": "\"A matter judged.\" Rule that a claim decided on the merits can't be relitigated between the same parties." },
+    { "term": "Per curiam", "definition": "\"By the court.\" An opinion issued in the name of the court as a whole rather than signed by a particular judge." },
+    { "term": "In camera", "definition": "\"In chambers.\" Proceedings or review held in private, such as in a judge's chambers, away from the public." },
+    { "term": "Certiorari", "definition": "\"To be made more certain.\" A writ by which a higher court, such as the U.S. Supreme Court, agrees to review a lower court's decision." },
+    { "term": "Subpoena", "definition": "\"Under penalty.\" A legal order requiring a person to testify or produce documents, with penalties for refusing." },
+    { "term": "Caveat emptor", "definition": "\"Let the buyer beware.\" The principle that a buyer is responsible for checking the quality of goods before purchase." },
+    { "term": "Quid pro quo", "definition": "\"Something for something.\" An exchange in which one thing is given in return for another." },
+    { "term": "Sua sponte", "definition": "\"Of its own accord.\" Action a court takes on its own initiative, without a request from either party." },
+    { "term": "Ultra vires", "definition": "\"Beyond the powers.\" Acts taken beyond the legal authority of a person, government body, or corporation." },
+    { "term": "Nolo contendere", "definition": "\"I do not wish to contend.\" A no-contest plea in which a defendant accepts punishment without admitting guilt." },
+    { "term": "In loco parentis", "definition": "\"In the place of a parent.\" Taking on some of a parent's legal responsibilities, as schools may for students." }
+  ]
+}

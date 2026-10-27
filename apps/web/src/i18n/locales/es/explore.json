@@ -38,6 +38,14 @@
         "body": "Crea tu primer set y aparecerá aquí.",
         "createSet": "Crear set"
     },
+    "signUpBanner": {
+        "heading": "Haz tuyos estos sets",
+        "body": "Regístrate gratis para guardar sets públicos, estudiarlos con repetición espaciada y seguir tu progreso.",
+        "cta": "Regístrate gratis"
+    },
+    "featured": {
+        "heading": "Destacados"
+    },
     "community": {
         "heading": "Comunidad",
         "loading": "Cargando sets públicos…",

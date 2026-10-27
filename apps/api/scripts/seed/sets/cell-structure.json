@@ -1,0 +1,30 @@
+{
+  "slug": "cell-structure",
+  "title": "Cell Structure & Organelles",
+  "description": "The main parts of plant and animal cells and what each one does. A solid review for intro biology.",
+  "subject": "science",
+  "cards": [
+    { "term": "Mitochondrion", "definition": "Organelle that produces most of the cell's ATP through cellular respiration, often called the powerhouse of the cell." },
+    { "term": "Nucleus", "definition": "Membrane-bound organelle that contains the cell's DNA and controls which genes are expressed." },
+    { "term": "Chloroplast", "definition": "Organelle in plant and algal cells where photosynthesis turns light energy into chemical energy stored in sugar." },
+    { "term": "Cell membrane", "definition": "Phospholipid bilayer that surrounds the cell and controls what enters and leaves. Also called the plasma membrane." },
+    { "term": "Cell wall", "definition": "Rigid layer outside the cell membrane of plants, fungi, and most bacteria that provides support and protection." },
+    { "term": "Cytoplasm", "definition": "Everything inside the cell membrane except the nucleus, including the fluid cytosol and the organelles." },
+    { "term": "Ribosome", "definition": "Small structure made of RNA and protein that builds proteins by reading mRNA. Found in both prokaryotic and eukaryotic cells and not surrounded by a membrane." },
+    { "term": "Rough endoplasmic reticulum", "definition": "Network of membranes studded with ribosomes that makes proteins for membranes, for export, or for other organelles." },
+    { "term": "Smooth endoplasmic reticulum", "definition": "Network of membranes without ribosomes that makes lipids, helps detoxify drugs, and stores calcium ions." },
+    { "term": "Golgi apparatus", "definition": "Stack of flattened membrane sacs that modifies, sorts, and packages proteins and lipids for delivery." },
+    { "term": "Lysosome", "definition": "Membrane sac of digestive enzymes that breaks down worn-out organelles, food particles, and engulfed microbes." },
+    { "term": "Vacuole", "definition": "Membrane-bound storage sac. Plant cells usually have a large central vacuole that stores water and helps keep the cell firm." },
+    { "term": "Vesicle", "definition": "Small membrane-bound sac that carries materials within the cell or to the cell surface." },
+    { "term": "Cytoskeleton", "definition": "Network of protein fibers, including microtubules and microfilaments, that gives the cell its shape and helps it move." },
+    { "term": "Centriole", "definition": "Cylinder made of microtubules, found in pairs in animal cells, that helps organize microtubules during cell division." },
+    { "term": "Nucleolus", "definition": "Dense region inside the nucleus where ribosomal RNA is made and ribosome subunits are assembled." },
+    { "term": "Nuclear envelope", "definition": "Double membrane around the nucleus, with nuclear pores that control what passes in and out." },
+    { "term": "Peroxisome", "definition": "Small organelle with enzymes that break down fatty acids and toxic substances, producing and then breaking down hydrogen peroxide." },
+    { "term": "Flagellum", "definition": "Long, whiplike structure that propels a cell, such as a sperm cell, through fluid." },
+    { "term": "Cilia", "definition": "Short, hairlike projections that beat together to move a cell or to sweep fluid across the cell's surface." },
+    { "term": "Prokaryotic cell", "definition": "A cell with no nucleus or membrane-bound organelles. Bacteria and archaea are prokaryotes." },
+    { "term": "Eukaryotic cell", "definition": "A cell with a nucleus and membrane-bound organelles. Plants, animals, fungi, and protists are eukaryotes." }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "slug": "intro-psychology",
+  "title": "Intro Psychology: Key Concepts",
+  "description": "Core ideas from an introductory psychology course, covering learning, memory, the brain, development, social behavior, and research methods.",
+  "subject": "social-sciences",
+  "cards": [
+    { "term": "Classical conditioning", "definition": "Learning in which a neutral stimulus becomes linked to a meaningful one and comes to trigger a similar response; studied by Ivan Pavlov with dogs." },
+    { "term": "Cognitive dissonance", "definition": "Mental discomfort from holding conflicting beliefs or acting against one's beliefs, which pushes people to reduce the conflict." },
+    { "term": "Bystander effect", "definition": "Tendency for people to be less likely to help someone in need when other people are present." },
+    { "term": "Operant conditioning", "definition": "Learning in which behavior is shaped by its consequences through reinforcement and punishment; associated with B. F. Skinner." },
+    { "term": "Positive reinforcement", "definition": "Adding a desirable stimulus after a behavior to make that behavior more likely to happen again." },
+    { "term": "Negative reinforcement", "definition": "Removing an unpleasant stimulus after a behavior to make that behavior more likely; it is not the same as punishment." },
+    { "term": "Punishment", "definition": "A consequence that makes a behavior less likely to happen again." },
+    { "term": "Maslow's hierarchy of needs", "definition": "Abraham Maslow's model of human needs, rising from physiological and safety needs through belonging and esteem to self-actualization." },
+    { "term": "Nature vs. nurture", "definition": "Debate over how much traits and behavior come from genetics versus environment and experience." },
+    { "term": "Neurotransmitter", "definition": "Chemical messenger that carries signals across the synapse from one neuron to another." },
+    { "term": "Hippocampus", "definition": "Brain structure in the temporal lobe that is essential for forming new explicit long-term memories of facts and events." },
+    { "term": "Amygdala", "definition": "Almond-shaped brain structure involved in processing emotions, especially fear." },
+    { "term": "Working memory", "definition": "System that briefly holds and manipulates information needed for tasks like reasoning, reading, and problem-solving." },
+    { "term": "Long-term memory", "definition": "Relatively lasting store of knowledge, skills, and experiences with a very large capacity." },
+    { "term": "Object permanence", "definition": "Understanding that objects still exist when they can't be seen; Jean Piaget placed its development in infancy's sensorimotor stage." },
+    { "term": "Attachment theory", "definition": "Theory, developed by John Bowlby, that early emotional bonds with caregivers shape later social and emotional development." },
+    { "term": "Conformity", "definition": "Adjusting one's behavior or beliefs to match a group; demonstrated in Solomon Asch's line-judgment experiments." },
+    { "term": "Obedience", "definition": "Following direct orders from an authority figure; famously studied in Stanley Milgram's shock experiments." },
+    { "term": "Placebo effect", "definition": "Improvement in a condition caused by a person's expectations rather than by an active treatment." },
+    { "term": "Heuristic", "definition": "Mental shortcut that allows quick judgments and decisions but can sometimes lead to errors." },
+    { "term": "Id, ego, and superego", "definition": "Sigmund Freud's three parts of personality: instinctual drives, the realistic mediator, and internalized moral standards." },
+    { "term": "Independent variable", "definition": "The factor a researcher deliberately changes in an experiment to test its effect." },
+    { "term": "Dependent variable", "definition": "The outcome a researcher measures in an experiment to see whether the independent variable affected it." },
+    { "term": "Correlation", "definition": "Statistical relationship between two variables; a correlation on its own does not show that one causes the other." }
+  ]
+}

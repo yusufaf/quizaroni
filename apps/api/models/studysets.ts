@@ -24,4 +24,6 @@ export type Studyset = StudysetBase & {
     moderation?: StudysetModeration;
     /** Set on a copy saved from someone else's public set (#140). */
     copiedFrom?: { studysetUUID: UUID };
+    /** Set by scripts/featureStudyset.ts; cleared on unpublish and takedown (#141). */
+    featuredAt?: Timestamp;
 };

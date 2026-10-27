@@ -1,0 +1,28 @@
+{
+  "slug": "french-common-verbs",
+  "title": "French: 20 Most Common Verbs",
+  "description": "Twenty high-frequency French verbs with their English meanings and a short example sentence for each.",
+  "subject": "languages",
+  "cards": [
+    { "term": "être", "definition": "To be. Example: Je suis fatigué. (I am tired.)" },
+    { "term": "avoir", "definition": "To have. Example: J'ai un chat. (I have a cat.)" },
+    { "term": "aller", "definition": "To go. Example: Nous allons au cinéma. (We are going to the movies.)" },
+    { "term": "faire", "definition": "To do; to make. Example: Il fait ses devoirs. (He is doing his homework.)" },
+    { "term": "dire", "definition": "To say; to tell. Example: Elle dit bonjour. (She says hello.)" },
+    { "term": "pouvoir", "definition": "To be able to; can. Example: Je peux venir demain. (I can come tomorrow.)" },
+    { "term": "vouloir", "definition": "To want. Example: Je veux du café. (I want some coffee.)" },
+    { "term": "savoir", "definition": "To know (a fact or how to do something). Example: Je sais nager. (I know how to swim.)" },
+    { "term": "voir", "definition": "To see. Example: Je vois la mer. (I see the sea.)" },
+    { "term": "venir", "definition": "To come. Example: Elle vient de Paris. (She comes from Paris.)" },
+    { "term": "devoir", "definition": "To have to; must; to owe. Example: Je dois partir. (I have to leave.)" },
+    { "term": "prendre", "definition": "To take. Example: Je prends le bus. (I take the bus.)" },
+    { "term": "donner", "definition": "To give. Example: Il me donne un livre. (He gives me a book.)" },
+    { "term": "parler", "definition": "To speak; to talk. Example: Nous parlons français. (We speak French.)" },
+    { "term": "mettre", "definition": "To put; to put on. Example: Mets ton manteau. (Put on your coat.)" },
+    { "term": "trouver", "definition": "To find. Example: Je ne trouve pas mes clés. (I can't find my keys.)" },
+    { "term": "croire", "definition": "To believe. Example: Je te crois. (I believe you.)" },
+    { "term": "penser", "definition": "To think. Example: Je pense que oui. (I think so.)" },
+    { "term": "aimer", "definition": "To like; to love. Example: J'aime la musique. (I like music.)" },
+    { "term": "passer", "definition": "To pass; to spend (time); to stop by. Example: Nous passons l'été ici. (We are spending the summer here.)" }
+  ]
+}

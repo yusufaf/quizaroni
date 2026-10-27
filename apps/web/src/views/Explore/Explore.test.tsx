@@ -58,6 +58,12 @@ vi.mock('react-router-dom', () => {
 // Community has its own tests and fetches its own feed; keep it out of the
 // library fetch stub here.
 vi.mock('./CommunitySection', () => ({ default: () => null }));
+vi.mock('./FeaturedSection', () => ({ default: () => null }));
+
+// Signed in: For you. The logged-out page has its own test file.
+vi.mock('@logto/react', () => ({
+    useLogto: () => ({ isAuthenticated: true, isLoading: false }),
+}));
 
 vi.mock('state/local/repositories', () => ({
     cardProgressRepository: {
@@ -262,6 +268,9 @@ describe('Explore', () => {
         expect(
             screen.getByRole('heading', { level: 2, name: 'forYou.heading' })
         ).toBeTruthy();
+        expect(
+            screen.queryByRole('link', { name: 'signUpBanner.cta' })
+        ).toBeNull();
     });
 
     it('hides For you and shows the create-set empty state when there are no sets', async () => {

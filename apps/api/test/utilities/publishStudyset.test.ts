@@ -206,4 +206,12 @@ describe("buildUnpublishUpdate", () => {
         expect(update.UpdateExpression).not.toContain("publishedAt");
         expect(update.ConditionExpression).toBe("attribute_exists(PK)");
     });
+
+    // #141: a republished set isn't featured again.
+    it("clears featuredAt", () => {
+        const update = buildUnpublishUpdate({ now: NOW });
+
+        expect(update.UpdateExpression).toContain("REMOVE #PK2, #SK2, #featuredAt");
+        expect(update.ExpressionAttributeNames["#featuredAt"]).toBe("featuredAt");
+    });
 });

@@ -189,7 +189,8 @@ describe('takedownStudyset', () => {
         const [update] = send.mock.calls[0] as [UpdateCommand];
         expect(update).toBeInstanceOf(UpdateCommand);
         expect(update.input.Key).toEqual(KEY);
-        expect(update.input.UpdateExpression).toContain('REMOVE #PK2, #SK2');
+        expect(update.input.UpdateExpression).toContain('REMOVE #PK2, #SK2, #featuredAt');
+        expect(update.input.ExpressionAttributeNames?.['#featuredAt']).toBe('featuredAt');
         expect(update.input.ExpressionAttributeValues?.[':moderation']).toEqual({
             hiddenAt: NOW,
             reason: 'spam',

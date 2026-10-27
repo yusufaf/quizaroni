@@ -261,6 +261,7 @@ export const ExploreFeedResponseSchema = z.object({
     items: z.array(ExploreSetSummarySchema),
     nextCursor: z.string().nullable(),
     total: z.number().optional(),
+    featured: z.literal(true).optional(),
 });
 
 export const DeleteStudysetRequestSchema = StudysetUUIDPayloadSchema;

@@ -1,0 +1,32 @@
+{
+  "slug": "git-essentials",
+  "title": "Git Essentials: Commands & Concepts",
+  "description": "The everyday Git commands and ideas you need to track changes, work with branches, and collaborate through a remote.",
+  "subject": "computer-science",
+  "cards": [
+    { "term": "Staging area (index)", "definition": "Holds the snapshot of changes that will go into the next commit. You add changes to it with git add." },
+    { "term": "git rebase", "definition": "Replays your commits on top of a different base commit, producing a linear history. The replayed commits get new hashes." },
+    { "term": "git stash", "definition": "Shelves your uncommitted changes to tracked files so you can work on something else and reapply them later." },
+    { "term": "git init", "definition": "Creates a new, empty Git repository in the current directory." },
+    { "term": "git clone", "definition": "Copies an existing repository, including its full history, and sets up a remote named origin." },
+    { "term": "git add", "definition": "Stages changes from the working tree so they are included in the next commit." },
+    { "term": "git commit", "definition": "Records the staged snapshot in history, along with a message, the author, and a link to its parent commit." },
+    { "term": "git status", "definition": "Shows which files are staged, which are modified but unstaged, and which are untracked." },
+    { "term": "git diff", "definition": "Shows line-by-line changes. With no arguments, it compares the working tree to the staging area." },
+    { "term": "git log", "definition": "Lists the commit history, newest first by default." },
+    { "term": "Branch", "definition": "A lightweight, movable pointer to a commit that advances automatically as you commit on it." },
+    { "term": "HEAD", "definition": "A reference to the commit you currently have checked out, usually by way of the current branch." },
+    { "term": "Detached HEAD", "definition": "HEAD points directly at a commit instead of a branch, so any new commits you make don't belong to a branch." },
+    { "term": "git merge", "definition": "Brings another branch's changes into the current branch, creating a merge commit unless a fast-forward is possible." },
+    { "term": "Fast-forward merge", "definition": "A merge where the current branch has no commits of its own since the branches split, so Git just moves its pointer ahead." },
+    { "term": "Merge conflict", "definition": "Happens when two branches change the same lines differently and Git can't combine them automatically, so you resolve it by hand." },
+    { "term": "Remote", "definition": "A named reference to another copy of the repository, such as origin, that you fetch from and push to." },
+    { "term": "git fetch", "definition": "Downloads new commits and branch updates from a remote without changing your local branches or working tree." },
+    { "term": "git pull", "definition": "Fetches from a remote and then integrates the changes into the current branch, by merging or rebasing." },
+    { "term": "git push", "definition": "Uploads the commits on your local branch to a remote repository." },
+    { "term": "git revert", "definition": "Creates a new commit that undoes the changes from an earlier commit, without rewriting history." },
+    { "term": "git reset --hard", "definition": "Moves the current branch to a given commit and discards all staged and unstaged changes to tracked files." },
+    { "term": "git cherry-pick", "definition": "Applies the changes from a specific existing commit onto the current branch as a new commit." },
+    { "term": ".gitignore", "definition": "A file of patterns for untracked files Git should ignore. It has no effect on files that are already tracked." }
+  ]
+}

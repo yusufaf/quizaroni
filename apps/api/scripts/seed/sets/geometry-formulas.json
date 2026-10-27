@@ -1,0 +1,29 @@
+{
+  "slug": "geometry-formulas",
+  "title": "Geometry Formulas: Area, Perimeter & Volume",
+  "description": "The essential formulas for area, perimeter, surface area, and volume of common 2D and 3D shapes.",
+  "subject": "math",
+  "cards": [
+    { "term": "Area of a circle", "definition": "A = πr², where r is the radius." },
+    { "term": "Circumference of a circle", "definition": "C = 2πr or C = πd, where r is the radius and d is the diameter." },
+    { "term": "Volume of a cylinder", "definition": "V = πr²h, where r is the radius of the base and h is the height." },
+    { "term": "Area of a rectangle", "definition": "A = lw, where l is the length and w is the width." },
+    { "term": "Perimeter of a rectangle", "definition": "P = 2l + 2w, where l is the length and w is the width." },
+    { "term": "Area of a square", "definition": "A = s², where s is the side length." },
+    { "term": "Perimeter of a square", "definition": "P = 4s, where s is the side length." },
+    { "term": "Area of a triangle", "definition": "A = (1/2)bh, where b is the base and h is the height measured perpendicular to the base." },
+    { "term": "Perimeter of a triangle", "definition": "P = a + b + c, where a, b, and c are the side lengths." },
+    { "term": "Area of a parallelogram", "definition": "A = bh, where b is the base and h is the perpendicular height." },
+    { "term": "Area of a trapezoid", "definition": "A = (1/2)(b₁ + b₂)h, where b₁ and b₂ are the parallel bases and h is the height." },
+    { "term": "Area of a rhombus", "definition": "A = (1/2)d₁d₂, where d₁ and d₂ are the lengths of the diagonals." },
+    { "term": "Volume of a cube", "definition": "V = s³, where s is the edge length." },
+    { "term": "Surface area of a cube", "definition": "SA = 6s², where s is the edge length." },
+    { "term": "Volume of a rectangular prism", "definition": "V = lwh, where l is the length, w is the width, and h is the height." },
+    { "term": "Surface area of a rectangular prism", "definition": "SA = 2lw + 2lh + 2wh, where l is the length, w is the width, and h is the height." },
+    { "term": "Surface area of a cylinder", "definition": "SA = 2πr² + 2πrh, where r is the radius and h is the height." },
+    { "term": "Volume of a cone", "definition": "V = (1/3)πr²h, where r is the radius of the base and h is the height." },
+    { "term": "Volume of a pyramid", "definition": "V = (1/3)Bh, where B is the area of the base and h is the height." },
+    { "term": "Volume of a sphere", "definition": "V = (4/3)πr³, where r is the radius." },
+    { "term": "Surface area of a sphere", "definition": "SA = 4πr², where r is the radius." }
+  ]
+}

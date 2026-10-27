@@ -1,0 +1,32 @@
+{
+  "slug": "accounting-basics",
+  "title": "Accounting Basics: Key Terms",
+  "description": "Essential accounting vocabulary, from the accounting equation and debits and credits to the three main financial statements.",
+  "subject": "business-economics",
+  "cards": [
+    { "term": "Accounting equation", "definition": "Assets = Liabilities + Equity. Every transaction keeps both sides in balance." },
+    { "term": "Double-entry bookkeeping", "definition": "Every transaction is recorded in at least two accounts, with total debits always equal to total credits." },
+    { "term": "Accrual basis accounting", "definition": "Records revenue when it is earned and expenses when they are incurred, regardless of when cash changes hands." },
+    { "term": "Cash basis accounting", "definition": "Records revenue and expenses only when cash is actually received or paid." },
+    { "term": "Asset", "definition": "A resource the business controls that is expected to provide future benefit, such as cash, inventory, or equipment." },
+    { "term": "Liability", "definition": "An obligation the business owes to others, such as a loan or an unpaid supplier bill." },
+    { "term": "Equity", "definition": "The owners' residual claim on the business: what is left of the assets after liabilities are subtracted." },
+    { "term": "Revenue", "definition": "Income earned from a business's normal operations, such as selling goods or providing services." },
+    { "term": "Expense", "definition": "A cost incurred to earn revenue during a period, such as rent, wages, or utilities." },
+    { "term": "Debit", "definition": "An entry on the left side of an account. It increases assets and expenses, and decreases liabilities, equity, and revenue." },
+    { "term": "Credit", "definition": "An entry on the right side of an account. It increases liabilities, equity, and revenue, and decreases assets and expenses." },
+    { "term": "Balance sheet", "definition": "Shows a company's assets, liabilities, and equity at a single point in time." },
+    { "term": "Income statement", "definition": "Reports revenue, expenses, and the resulting net income or loss over a period of time." },
+    { "term": "Cash flow statement", "definition": "Shows cash moving in and out over a period, grouped into operating, investing, and financing activities." },
+    { "term": "Accounts receivable", "definition": "Money customers owe the business for goods or services already delivered on credit." },
+    { "term": "Accounts payable", "definition": "Money the business owes suppliers for goods or services it bought on credit." },
+    { "term": "Cost of goods sold (COGS)", "definition": "The direct costs of making or buying the goods a business sold during the period." },
+    { "term": "Gross profit", "definition": "Revenue minus cost of goods sold." },
+    { "term": "Net income", "definition": "Revenue minus all expenses for the period. When the result is negative, it is a net loss." },
+    { "term": "Retained earnings", "definition": "The cumulative net income a company has kept in the business rather than paid out as dividends." },
+    { "term": "Depreciation", "definition": "Spreading the cost of a long-lived physical asset, like a machine, over its useful life as an expense." },
+    { "term": "Working capital", "definition": "Current assets minus current liabilities. A measure of a company's ability to cover its short-term obligations." },
+    { "term": "General ledger", "definition": "The master record of all of a business's accounts and the transactions posted to them." },
+    { "term": "Trial balance", "definition": "A list of every ledger account's balance, used to check that total debits equal total credits." }
+  ]
+}

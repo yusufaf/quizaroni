@@ -1,11 +1,12 @@
 import { isSubjectId } from '@quizaroni/shared-types';
 import type { PublishError, SubjectId } from '@quizaroni/shared-types';
 import type { Card, Studyset, Timestamp, UUID } from 'models/studysets';
-import { PUBLIC_STUDYSET_PK, publicStudysetSK } from 'resources/dynamo/publicSharing';
+// Relative, not the `resources/*` alias: scripts/seedStudysets.ts runs this under plain ts-node.
+import { PUBLIC_STUDYSET_PK, publicStudysetSK } from '../resources/dynamo/publicSharing';
 
 export const MIN_PUBLISHABLE_CARDS = 4;
 
-const isFilled = (value: unknown): boolean =>
+export const isFilled = (value: unknown): value is string =>
     typeof value === 'string' && value.trim() !== '';
 
 // Stored cards aren't validated on write, so a side may be missing or not a string.
@@ -121,20 +122,28 @@ export const buildPublishUpdate = ({
     };
 };
 
-/** What taking a set off the public index writes; shared by unpublish and a below-gate save. */
+/**
+ * What taking a set off the public index writes; shared by unpublish and a
+ * below-gate save. It also clears `featuredAt`, so a republish isn't featured
+ * again (#141).
+ */
 export const UNPUBLISH_EXPRESSION = {
     set: ['#metadata.#publiclyViewable = :false'],
-    remove: 'REMOVE #PK2, #SK2',
+    remove: 'REMOVE #PK2, #SK2, #featuredAt',
     names: {
         '#metadata': 'metadata',
         '#publiclyViewable': 'publiclyViewable',
         '#PK2': 'PK2',
         '#SK2': 'SK2',
+        '#featuredAt': 'featuredAt',
     },
     values: { ':false': false },
 } as const;
 
-/** Takes the set off the public index; subject and publishedAt stay for a later republish. */
+/**
+ * Takes the set off the public index; subject and publishedAt stay for a later
+ * republish, featuredAt is cleared.
+ */
 export const buildUnpublishUpdate = ({ username, now }: { username?: string; now: Timestamp }) => {
     const setExpressions: string[] = [...UNPUBLISH_EXPRESSION.set, '#updatedAt = :now'];
     const ExpressionAttributeNames: Record<string, string> = {

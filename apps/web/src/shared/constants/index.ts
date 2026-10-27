@@ -28,9 +28,9 @@ export const QUERY_PARAMS = {
     EXPLORE_SUBJECT: 'subject',
 } as const;
 
-// Login.tsx stashes the path RequireAuth redirected from here before the
-// full-page redirect to Logto's hosted sign-in (which loses React Router
-// state); Callback.tsx reads it back once the OIDC exchange completes.
+// Login.tsx and Signup.tsx stash the return path here (rememberReturnPath)
+// before the full-page redirect to Logto's hosted page (which loses React
+// Router state); Callback.tsx reads it back once the OIDC exchange completes.
 export const POST_SIGN_IN_REDIRECT_KEY = 'quizaroni.postSignInRedirect';
 
 export const PAGE_TITLES = {

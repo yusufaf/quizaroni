@@ -9,6 +9,7 @@ import { isPubliclyListed } from 'resources/dynamo/publicSharing';
 
 export const EXPLORE_DEFAULT_LIMIT = 24;
 export const EXPLORE_MAX_LIMIT = 48;
+export const FEATURED_LIMIT = 6;
 export const SUMMARY_PREVIEW_COUNT = 5;
 export const SUMMARY_PREVIEW_CHARS = 120;
 export const SUMMARY_DESCRIPTION_CHARS = 200;
@@ -28,14 +29,16 @@ export type FeedSource = {
     username?: unknown;
     publishedAt?: unknown;
     updatedAt?: unknown;
+    featuredAt?: unknown;
     metadata?: { publiclyViewable?: unknown };
     moderation?: { hiddenAt?: unknown };
 };
 
-// `key` stays server-side for the per-response recheck; only `summary` is sent.
+// `key` and `featuredAt` stay server-side; only `summary` is sent.
 export type FeedEntry = {
     key: { PK: string; SK: string };
     summary: ExploreSetSummary;
+    featuredAt?: string;
 };
 
 export type CursorPosition = { publishedAt: string; studysetUUID: string };
@@ -78,7 +81,13 @@ export const toFeedEntry = (item: FeedSource): FeedEntry | null => {
     if (typeof studysetUUID !== 'string' || typeof publishedAt !== 'string' || !publishedAt) {
         return null;
     }
-    return { key: { PK, SK }, summary: toSummary({ ...item, studysetUUID, publishedAt }) };
+    return {
+        key: { PK, SK },
+        summary: toSummary({ ...item, studysetUUID, publishedAt }),
+        ...(typeof item.featuredAt === 'string' && item.featuredAt
+            ? { featuredAt: item.featuredAt }
+            : {}),
+    };
 };
 
 // Newest first, then uuid descending. Plain `<`/`>` rather than localeCompare,
@@ -91,6 +100,24 @@ export const comparePositions = (a: CursorPosition, b: CursorPosition): number =
 
 export const compareEntries = (a: FeedEntry, b: FeedEntry): number =>
     comparePositions(a.summary, b.summary);
+
+// Newest featuredAt first; a tie falls back to the feed's order.
+export const compareFeatured = (a: FeedEntry, b: FeedEntry): number => {
+    const left = a.featuredAt ?? '';
+    const right = b.featuredAt ?? '';
+    if (left !== right) return left > right ? -1 : 1;
+    return compareEntries(a, b);
+};
+
+// #141: the curated row above the Community feed.
+export const selectFeatured = (
+    entries: readonly FeedEntry[],
+    limit = FEATURED_LIMIT
+): FeedEntry[] =>
+    entries
+        .filter((entry) => entry.featuredAt)
+        .sort(compareFeatured)
+        .slice(0, limit);
 
 // Filters are appended in a fixed order (q, when it lands, goes after subject).
 // Subject ids are [a-z-], so they need no escaping.
@@ -161,6 +188,7 @@ export const paginate = (
 
 export type ParsedExploreQuery =
     | { ok: true; filters: ExploreFilters; limit: number; cursor?: string }
+    | { ok: true; featured: true; limit: number }
     | { ok: false; message: string };
 
 export const parseExploreQuery = (
@@ -175,6 +203,21 @@ export const parseExploreQuery = (
             return { ok: false, message: 'limit must be a positive integer' };
         }
         limit = Math.min(Number(params.limit), EXPLORE_MAX_LIMIT);
+    }
+
+    // The featured row has no filters or paging, so those params are refused
+    // rather than silently ignored.
+    const featured = params?.featured || undefined;
+    if (featured !== undefined) {
+        if (featured !== '1') return { ok: false, message: 'Unsupported featured' };
+        if (params?.subject || params?.cursor) {
+            return { ok: false, message: 'featured does not combine with subject or cursor' };
+        }
+        return {
+            ok: true,
+            featured: true,
+            limit: Math.min(params?.limit === undefined ? FEATURED_LIMIT : limit, FEATURED_LIMIT),
+        };
     }
 
     const subject = params?.subject || undefined;
