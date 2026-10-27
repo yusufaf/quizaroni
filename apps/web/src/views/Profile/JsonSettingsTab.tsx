@@ -16,6 +16,7 @@ import {
 } from '@mui/icons-material';
 import { styled } from '@mui/system';
 import { useTranslation } from 'react-i18next';
+import { SERVER_MANAGED_USER_METADATA_KEYS } from '@quizaroni/shared-types';
 import { User } from 'shared/types';
 import { useUpdateUserMetadata } from 'state/api/usersAPI';
 import { EditableUserMetadataSchema } from 'shared/schemas';
@@ -83,20 +84,29 @@ const ButtonRow = styled(Box)({
     alignItems: 'center',
 });
 
-// Fields that shouldn't be edited via JSON (managed by other UI flows)
-const EXCLUDED_FIELDS = ['avatar', 'namedColors', 'notifications'] as const;
-
+// Shows only the keys the save schema accepts, so the two can't drift.
 const formatMetadataForEditor = (metadata: User['metadata']): string => {
     const filtered = Object.fromEntries(
         Object.entries(metadata).filter(
-            ([key]) =>
-                !EXCLUDED_FIELDS.includes(
-                    key as (typeof EXCLUDED_FIELDS)[number]
-                )
+            ([key]) => key in EditableUserMetadataSchema.shape
         )
     );
     return JSON.stringify(filtered, null, 4);
 };
+
+// Settings files exported before #207 include gamification and
+// customAchievements, which the editor no longer accepts.
+const withoutServerManagedKeys = (parsed: unknown): unknown =>
+    typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)
+        ? Object.fromEntries(
+              Object.entries(parsed).filter(
+                  ([key]) =>
+                      !(
+                          SERVER_MANAGED_USER_METADATA_KEYS as readonly string[]
+                      ).includes(key)
+              )
+          )
+        : parsed;
 
 type ValidationError = {
     path: string;
@@ -221,7 +231,9 @@ const JsonSettingsTab = ({ userData }: Props) => {
 
                 // Try to pretty-print if valid JSON
                 try {
-                    const parsed = JSON.parse(content);
+                    const parsed = withoutServerManagedKeys(
+                        JSON.parse(content)
+                    );
                     const formatted = JSON.stringify(parsed, null, 4);
                     setEditorValue(formatted);
                     const { errors: newErrors } = validateJson(formatted);
