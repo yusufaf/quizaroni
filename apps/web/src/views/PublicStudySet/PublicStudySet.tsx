@@ -218,6 +218,7 @@ const PublicStudySet = ({ showSignupCta = true }: Props) => {
                         size="large"
                         component={RouterLink}
                         to="/signUp"
+                        state={{ from: `/view/${studysetUUID}` }}
                     >
                         {t('publicView.ctaButton')}
                     </Button>

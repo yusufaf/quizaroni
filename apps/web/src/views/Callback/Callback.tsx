@@ -2,19 +2,21 @@ import { useNavigate } from 'react-router-dom';
 import { useHandleSignInCallback } from '@logto/react';
 import { Box, Typography } from '@mui/material';
 import { POST_SIGN_IN_REDIRECT_KEY } from 'shared/constants';
+import { toReturnPath } from 'shared/utilities/returnPath';
 
 type Props = {};
 
 // Completes the OIDC authorization-code exchange, then returns the user to
-// where they started (the path Login.tsx stashed via POST_SIGN_IN_REDIRECT_KEY,
-// see Login.tsx), or home on first sign-in / plain sign-up.
+// where they started (the path Login.tsx or Signup.tsx stashed via
+// rememberReturnPath), or home when none was stashed.
 const Callback = (props: Props) => {
     const navigate = useNavigate();
 
     const { isLoading } = useHandleSignInCallback(() => {
         const from = sessionStorage.getItem(POST_SIGN_IN_REDIRECT_KEY);
         sessionStorage.removeItem(POST_SIGN_IN_REDIRECT_KEY);
-        navigate(from ?? '/');
+        // Replace: Back mustn't reload this spent callback URL.
+        navigate(toReturnPath(from) ?? '/', { replace: true });
     });
 
     return (
