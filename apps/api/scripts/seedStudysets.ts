@@ -7,9 +7,10 @@
  * written. Set ids are derived from the owner and the file's slug, so a rerun
  * reaches the same sets and only creates the ones that don't exist; an
  * existing set is never written, so its owner's edits and unpublishes stand.
- * Creating and publishing are two writes. If a run stops between them, the
- * set is left private and later runs report it as incomplete rather than
- * publish whatever the row holds by then: publish or delete it in the app.
+ * Creating and publishing are two writes. If the publish fails, the create is
+ * undone. If the run dies between them anyway, the set is left private and
+ * later runs report it as incomplete rather than publish whatever the row
+ * holds by then: publish or delete it in the app.
  * A seed set deleted in the app has no row left, so a rerun recreates it:
  * delete its file as well.
  *
@@ -33,7 +34,13 @@ import { createHash, randomUUID } from 'crypto';
 import { readdirSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import {
+    DeleteCommand,
+    DynamoDBDocumentClient,
+    GetCommand,
+    PutCommand,
+    UpdateCommand,
+} from '@aws-sdk/lib-dynamodb';
 import type { SubjectId } from '@quizaroni/shared-types';
 import type { Card } from 'models/studysets';
 import { defaultStudysetMetadata } from '../utilities/defaultMetadata';
@@ -286,21 +293,37 @@ export const seedStudysets = async ({
             }
             throw error;
         }
-        created.push(set.slug);
 
-        await docClient.send(
-            new UpdateCommand({
-                TableName: tableName,
-                Key,
-                ...buildPublishUpdate({
-                    studysetUUID,
-                    subject: set.subject,
-                    publishedAt: timestamp,
-                    username,
-                    now: timestamp,
-                }),
-            })
-        );
+        try {
+            await docClient.send(
+                new UpdateCommand({
+                    TableName: tableName,
+                    Key,
+                    ...buildPublishUpdate({
+                        studysetUUID,
+                        subject: set.subject,
+                        publishedAt: timestamp,
+                        username,
+                        now: timestamp,
+                    }),
+                })
+            );
+        } catch (error) {
+            // Undo the create so a rerun starts this set afresh instead of reporting it incomplete.
+            await docClient
+                .send(
+                    new DeleteCommand({
+                        TableName: tableName,
+                        Key,
+                        ConditionExpression: 'attribute_not_exists(publishedAt)',
+                    })
+                )
+                .catch((deleteError) =>
+                    log(`could not undo the create of ${set.slug}: ${(deleteError as Error).message}`)
+                );
+            throw error;
+        }
+        created.push(set.slug);
     }
 
     // Check every slug before writing any featuredAt, so a typo or an unlisted
@@ -314,7 +337,8 @@ export const seedStudysets = async ({
         }
     }
     if (notListed.length > 0) {
-        throw new Error(`FEATURE names sets that aren't listed on Explore: ${notListed.join(', ')}`);
+        const named = notListed.map((slug) => (incomplete.includes(slug) ? `${slug} (incomplete)` : slug));
+        throw new Error(`FEATURE names sets that aren't listed on Explore: ${named.join(', ')}`);
     }
 
     // Featured is ordered by featuredAt, newest first, so the first slug gets the latest time.
@@ -362,7 +386,7 @@ if (require.main === module) {
                     config.dryRun ? ' (dry run — no writes performed)' : ''
                 }`
             );
-            if (incomplete.length > 0) process.exitCode = 1;
+            if (incomplete.length > 0 && !config.dryRun) process.exitCode = 1;
         })
         .catch((error) => {
             console.error(error);

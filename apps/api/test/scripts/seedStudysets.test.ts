@@ -1,7 +1,13 @@
 import { mkdtempSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
-import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import {
+    DeleteCommand,
+    DynamoDBDocumentClient,
+    GetCommand,
+    PutCommand,
+    UpdateCommand,
+} from '@aws-sdk/lib-dynamodb';
 import {
     SEED_DIR,
     SeedSet,
@@ -54,6 +60,10 @@ const makeClient = (rows: Map<string, Row> = new Map()) => {
                     metadata: { ...(row.metadata as object), publiclyViewable: true },
                 });
             }
+            return Promise.resolve({});
+        }
+        if (cmd instanceof DeleteCommand) {
+            rows.delete(keyOf(cmd.input.Key));
             return Promise.resolve({});
         }
         return Promise.reject(new Error('unexpected command'));
@@ -195,13 +205,22 @@ describe('resolveOwnerUsername', () => {
         });
     });
 
-    it('prefers USERNAME, but still needs the user to exist', async () => {
+    it('prefers USERNAME, warning only when it differs from the stored one', async () => {
+        const log = jest.fn();
         await expect(
-            resolveOwnerUsername(clientWith({ username: 'old' }).docClient, 'users', 'u1', 'new')
+            resolveOwnerUsername(clientWith({ username: 'old' }).docClient, 'users', 'u1', 'new', log)
         ).resolves.toBe('new');
+        expect(log).toHaveBeenCalledWith('USERNAME "new" differs from the username at sign-up, "old"; using "new"');
+
+        log.mockClear();
+        await resolveOwnerUsername(clientWith({ username: 'same' }).docClient, 'users', 'u1', 'same', log);
         await expect(
-            resolveOwnerUsername(clientWith({ username: null }).docClient, 'users', 'u1', 'new')
+            resolveOwnerUsername(clientWith({ username: null }).docClient, 'users', 'u1', 'new', log)
         ).resolves.toBe('new');
+        expect(log).not.toHaveBeenCalled();
+    });
+
+    it('needs the user to exist even with USERNAME', async () => {
         await expect(resolveOwnerUsername(clientWith(undefined).docClient, 'users', 'u1', 'new')).rejects.toThrow(
             /No user u1 in users/
         );
@@ -287,6 +306,22 @@ describe('seedStudysets', () => {
             )
         ).toEqual([`studyset#${seedStudysetUUID('u1', 'set-b')}`, `studyset#${seedStudysetUUID('u1', 'set-b')}`]);
         expect(rows.get(keyFor('set-a'))).toEqual({ metadata: { publiclyViewable: false } });
+    });
+
+    it('undoes the create when the publish fails, so a rerun starts afresh', async () => {
+        const client = makeClient();
+        const send = client.send.getMockImplementation()!;
+        client.send.mockImplementation((cmd: unknown) =>
+            cmd instanceof UpdateCommand ? Promise.reject(new Error('throttled')) : send(cmd)
+        );
+        await expect(run(client)).rejects.toThrow('throttled');
+        const [del] = sentOf(client.send, DeleteCommand);
+        expect(del.input).toEqual({
+            TableName: 't',
+            Key: { PK: 'userUUID#u1', SK: `studyset#${seedStudysetUUID('u1', 'set-a')}` },
+            ConditionExpression: 'attribute_not_exists(publishedAt)',
+        });
+        expect(client.rows.size).toBe(0);
     });
 
     it('skips a set another run creates between its check and its write', async () => {
