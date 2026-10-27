@@ -1,3 +1,4 @@
+import { pickClientEditableUserMetadata } from '@quizaroni/shared-types';
 import { getDatabase, hasPendingSync, type LocalStudyset } from '../db';
 import { studysetRepository, userRepository } from '../repositories';
 import type { Studyset, UUID } from 'shared/types';
@@ -334,7 +335,11 @@ export class SyncEngine {
 
         for (const user of pending) {
             try {
-                const metadataUpdates = { ...user.metadata };
+                // A stale local copy of the server-managed keys would revert
+                // values the dedicated endpoints wrote since (#207).
+                const metadataUpdates = pickClientEditableUserMetadata(
+                    user.metadata
+                );
                 await this.options.apiClient.updateUserMetadata(
                     metadataUpdates
                 );

@@ -5,3 +5,4 @@ export type * from './publishing';
 export type * from './explore';
 export * from './subjects';
 export * from './termPreviews';
+export * from './userMetadata';

@@ -144,12 +144,15 @@ export const CustomAchievementSchema = z.object({
 });
 
 export const UserMetadataSchema = z.object({
+    aiModel: z.string().optional(),
+    aiProvider: z.enum(['openai', 'anthropic', 'google']).optional(),
     avatar: AvatarMetadataSchema.optional(),
     confirmDestructiveActions: z.boolean().optional(),
     defaultDownloadFormat: z.enum(['TXT', 'JSON', 'CSV', 'MD']),
     defaultTheme: z.enum(['light', 'dark']),
     density: z.enum(['compact', 'standard', 'comfortable']).optional(),
     fontSizeScale: z.number().min(0.75).max(1.5).optional(),
+    hapticsEnabled: z.boolean().optional(),
     homeView: z.enum(['table', 'grid', 'html']),
     namedColors: z.array(NamedColorSchema),
     notifications: NotificationPreferencesSchema.optional(),
@@ -162,16 +165,14 @@ export const UserMetadataSchema = z.object({
     visibleColumns: z.record(z.string(), z.boolean()).optional(),
 });
 
-// Strict schema for the JSON settings editor — rejects unknown keys
-const EDITOR_EXCLUDED_FIELDS = [
-    'avatar',
-    'namedColors',
-    'notifications',
-] as const;
+// Strict schema for the JSON settings editor — rejects unknown keys. The
+// server-managed keys are left out so the editor can't revert them (#207).
 export const EditableUserMetadataSchema = UserMetadataSchema.omit({
     avatar: true,
     namedColors: true,
     notifications: true,
+    gamification: true,
+    customAchievements: true,
 })
     .partial()
     .strict();
