@@ -107,12 +107,12 @@ describe('readSeedConfig', () => {
         expect(readSeedConfig({ MAIN_TABLE: 't', USERS_TABLE: 'u', USER_UUID: 'u1' }).usersTable).toBe('u');
     });
 
-    it('reads USERNAME, splits FEATURE and reads DRY_RUN', () => {
+    it('reads AUTHOR_NAME, splits FEATURE and reads DRY_RUN', () => {
         expect(
             readSeedConfig({
                 MAIN_TABLE: 't-main',
                 USER_UUID: 'u1',
-                USERNAME: ' Quizaroni ',
+                AUTHOR_NAME: ' Quizaroni ',
                 FEATURE: ' set-a, ,set-b ',
                 DRY_RUN: '1',
             })
@@ -124,6 +124,10 @@ describe('readSeedConfig', () => {
             feature: ['set-a', 'set-b'],
             dryRun: true,
         });
+    });
+
+    it("ignores USERNAME, which Windows sets to the OS login name", () => {
+        expect(readSeedConfig({ MAIN_TABLE: 't-main', USER_UUID: 'u1', USERNAME: 'Yusuf' }).username).toBeUndefined();
     });
 });
 
@@ -205,12 +209,12 @@ describe('resolveOwnerUsername', () => {
         });
     });
 
-    it('prefers USERNAME, warning only when it differs from the stored one', async () => {
+    it('prefers AUTHOR_NAME, warning only when it differs from the stored one', async () => {
         const log = jest.fn();
         await expect(
             resolveOwnerUsername(clientWith({ username: 'old' }).docClient, 'users', 'u1', 'new', log)
         ).resolves.toBe('new');
-        expect(log).toHaveBeenCalledWith('USERNAME "new" differs from the username at sign-up, "old"; using "new"');
+        expect(log).toHaveBeenCalledWith('AUTHOR_NAME "new" differs from the username at sign-up, "old"; using "new"');
 
         log.mockClear();
         await resolveOwnerUsername(clientWith({ username: 'same' }).docClient, 'users', 'u1', 'same', log);
@@ -220,15 +224,15 @@ describe('resolveOwnerUsername', () => {
         expect(log).not.toHaveBeenCalled();
     });
 
-    it('needs the user to exist even with USERNAME', async () => {
+    it('needs the user to exist even with AUTHOR_NAME', async () => {
         await expect(resolveOwnerUsername(clientWith(undefined).docClient, 'users', 'u1', 'new')).rejects.toThrow(
             /No user u1 in users/
         );
     });
 
-    it('asks for USERNAME when the account had none at sign-up', async () => {
+    it('asks for AUTHOR_NAME when the account had none at sign-up', async () => {
         await expect(resolveOwnerUsername(clientWith({ username: null }).docClient, 'users', 'u1')).rejects.toThrow(
-            /set USERNAME/
+            /set AUTHOR_NAME/
         );
     });
 });

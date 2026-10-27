@@ -20,12 +20,12 @@
  * first, so a typo or an unlisted set fails before any featuredAt is written.
  *
  * The public author name is the account's Logto username. The users table
- * keeps it as of sign-up only, so pass USERNAME if it has changed since; it
+ * keeps it as of sign-up only, so pass AUTHOR_NAME if it has changed since; it
  * applies only to sets this run creates.
  *
  * Usage (with AWS credentials for the target account in the environment):
  *   MAIN_TABLE=quizaroni-<deploymentType>-main AWS_REGION=us-west-2 \
- *     USER_UUID=<owner> [USERNAME=<name>] [FEATURE=slug-a,slug-b] \
+ *     USER_UUID=<owner> [AUTHOR_NAME=<name>] [FEATURE=slug-a,slug-b] \
  *     [USERS_TABLE=<defaults to MAIN_TABLE with -users for -main>] \
  *     pnpm --filter @quizaroni/api seed:studysets
  *   # add DRY_RUN=1 to only report what would change.
@@ -88,7 +88,8 @@ export const readSeedConfig = (env: NodeJS.ProcessEnv): SeedConfig => {
         tableName,
         usersTable,
         userUUID,
-        username: env.USERNAME?.trim() || undefined,
+        // Not USERNAME: Windows always sets that to the OS login name.
+        username: env.AUTHOR_NAME?.trim() || undefined,
         feature,
         dryRun: isDryRun(env.DRY_RUN),
     };
@@ -175,7 +176,7 @@ const toCard = ({ term, definition }: SeedSet['cards'][number]): Card => ({
 
 /**
  * Checks the owner exists in the users table (written by the Logto sign-up
- * webhook) and returns the name to publish under: USERNAME if given, else the
+ * webhook) and returns the name to publish under: AUTHOR_NAME if given, else the
  * username stored at sign-up.
  */
 export const resolveOwnerUsername = async (
@@ -193,12 +194,12 @@ export const resolveOwnerUsername = async (
     }
     const stored = isFilled(Item.username) ? Item.username : undefined;
     if (override && stored && override !== stored) {
-        log(`USERNAME "${override}" differs from the username at sign-up, "${stored}"; using "${override}"`);
+        log(`AUTHOR_NAME "${override}" differs from the username at sign-up, "${stored}"; using "${override}"`);
     }
     const username = override ?? stored;
     if (!username) {
         throw new Error(
-            `User ${userUUID} had no username at sign-up; set USERNAME to the account's Logto username`
+            `User ${userUUID} had no username at sign-up; set AUTHOR_NAME to the name Explore should show`
         );
     }
     return username;
