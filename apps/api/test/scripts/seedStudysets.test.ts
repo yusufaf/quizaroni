@@ -217,7 +217,7 @@ describe('resolveOwnerUsername', () => {
 describe('seedStudysets', () => {
     it('creates each set and publishes it as the owner', async () => {
         const client = makeClient();
-        await expect(run(client)).resolves.toEqual({ created: ['set-a', 'set-b'], published: [], skipped: [] });
+        await expect(run(client)).resolves.toEqual({ created: ['set-a', 'set-b'], incomplete: [], skipped: [] });
 
         const [put] = sentOf(client.send, PutCommand);
         const id = seedStudysetUUID('u1', 'set-a');
@@ -270,30 +270,42 @@ describe('seedStudysets', () => {
             [keyFor('set-a'), { publishedAt: '2026-10-01T00:00:00.000Z', metadata: { publiclyViewable: false } }],
         ]);
         const client = makeClient(rows);
-        await expect(run(client)).resolves.toEqual({ created: ['set-b'], published: [], skipped: ['set-a'] });
+        await expect(run(client)).resolves.toEqual({ created: ['set-b'], incomplete: [], skipped: ['set-a'] });
         expect(sentOf(client.send, PutCommand)).toHaveLength(1);
         expect(sentOf(client.send, UpdateCommand)).toHaveLength(1);
         expect(rows.get(keyFor('set-a'))?.metadata).toEqual({ publiclyViewable: false });
     });
 
-    it('publishes a set an earlier run created but stopped before publishing', async () => {
+    // Its cards may have been edited since, so publishing it could skip the gate.
+    it('reports a set created but never published instead of publishing it', async () => {
         const rows = new Map<string, Row>([[keyFor('set-a'), { metadata: { publiclyViewable: false } }]]);
         const client = makeClient(rows);
-        await expect(run(client)).resolves.toEqual({ created: ['set-b'], published: ['set-a'], skipped: [] });
-        expect(sentOf(client.send, PutCommand).map((cmd) => cmd.input.Item?.SK)).toEqual([
-            `studyset#${seedStudysetUUID('u1', 'set-b')}`,
-        ]);
-        expect(rows.get(keyFor('set-a'))).toMatchObject({
-            publishedAt: '2026-10-27T12:00:00.000Z',
-            metadata: { publiclyViewable: true },
-        });
+        await expect(run(client)).resolves.toEqual({ created: ['set-b'], incomplete: ['set-a'], skipped: [] });
+        expect(
+            [...sentOf(client.send, PutCommand), ...sentOf(client.send, UpdateCommand)].map(
+                (cmd) => ('Item' in cmd.input ? cmd.input.Item : cmd.input.Key)?.SK
+            )
+        ).toEqual([`studyset#${seedStudysetUUID('u1', 'set-b')}`, `studyset#${seedStudysetUUID('u1', 'set-b')}`]);
+        expect(rows.get(keyFor('set-a'))).toEqual({ metadata: { publiclyViewable: false } });
+    });
+
+    it('skips a set another run creates between its check and its write', async () => {
+        const client = makeClient();
+        const send = client.send.getMockImplementation()!;
+        client.send.mockImplementation((cmd: unknown) =>
+            cmd instanceof PutCommand && (cmd.input.Item as Row).title === 'Set A'
+                ? Promise.reject(Object.assign(new Error('taken'), { name: 'ConditionalCheckFailedException' }))
+                : send(cmd)
+        );
+        await expect(run(client)).resolves.toEqual({ created: ['set-b'], incomplete: [], skipped: ['set-a'] });
+        expect(sentOf(client.send, UpdateCommand)).toHaveLength(1);
     });
 
     it('writes nothing on a dry run', async () => {
         const client = makeClient();
         await expect(run(client, { dryRun: true, feature: ['set-b'] })).resolves.toEqual({
             created: ['set-a', 'set-b'],
-            published: [],
+            incomplete: [],
             skipped: [],
         });
         expect(sentOf(client.send, PutCommand)).toHaveLength(0);
@@ -332,4 +344,3 @@ describe('seedStudysets', () => {
         expect(client.send).not.toHaveBeenCalled();
     });
 });
-

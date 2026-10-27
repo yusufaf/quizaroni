@@ -5,22 +5,22 @@
  *
  * Every file is validated against the publish gate before anything is
  * written. Set ids are derived from the owner and the file's slug, so a rerun
- * reaches the same sets:
- * - a set that was never created is created and published;
- * - a set created by an earlier run that stopped before publishing it is
- *   published;
- * - a set that has been published is left untouched, so its owner's later
- *   edits and unpublishes stand.
+ * reaches the same sets and only creates the ones that don't exist; an
+ * existing set is never written, so its owner's edits and unpublishes stand.
+ * Creating and publishing are two writes. If a run stops between them, the
+ * set is left private and later runs report it as incomplete rather than
+ * publish whatever the row holds by then: publish or delete it in the app.
  * A seed set deleted in the app has no row left, so a rerun recreates it:
  * delete its file as well.
  *
- * Sets are timestamped a minute apart in slug order (first slug newest), so
- * the Community feed shows them in a stable order. Slugs listed in FEATURE are
- * then featured, the first one newest, after checking that all of them are
- * listed.
+ * Within a run, sets are timestamped a minute apart in slug order (first slug
+ * newest), so the Community feed shows them in a stable order. Slugs listed in
+ * FEATURE are then featured, the first one newest. All of them are checked
+ * first, so a typo or an unlisted set fails before any featuredAt is written.
  *
  * The public author name is the account's Logto username. The users table
- * keeps it as of sign-up only, so pass USERNAME if it has changed since.
+ * keeps it as of sign-up only, so pass USERNAME if it has changed since; it
+ * applies only to sets this run creates.
  *
  * Usage (with AWS credentials for the target account in the environment):
  *   MAIN_TABLE=quizaroni-<deploymentType>-main AWS_REGION=us-west-2 \
@@ -36,11 +36,10 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import type { SubjectId } from '@quizaroni/shared-types';
 import type { Card } from 'models/studysets';
-import { isPubliclyListed } from '../resources/dynamo/publicSharing';
 import { defaultStudysetMetadata } from '../utilities/defaultMetadata';
 import { buildPublishUpdate, isFilled, validatePublishRequest } from '../utilities/publishStudyset';
 import { isDryRun } from './dryRun';
-import { featureStudyset } from './featureStudyset';
+import { featureStudyset, isListedForFeature } from './featureStudyset';
 
 export const SEED_DIR = join(__dirname, 'seed', 'sets');
 
@@ -176,7 +175,8 @@ export const resolveOwnerUsername = async (
     docClient: DynamoDBDocumentClient,
     usersTable: string,
     userUUID: string,
-    override?: string
+    override?: string,
+    log: (message: string) => void = console.log
 ): Promise<string> => {
     const { Item } = await docClient.send(
         new GetCommand({ TableName: usersTable, Key: { PK: `user#${userUUID}`, SK: 'userData' } })
@@ -184,7 +184,11 @@ export const resolveOwnerUsername = async (
     if (!Item) {
         throw new Error(`No user ${userUUID} in ${usersTable}; sign the account up on this environment first`);
     }
-    const username = override ?? (isFilled(Item.username) ? Item.username : undefined);
+    const stored = isFilled(Item.username) ? Item.username : undefined;
+    if (override && stored && override !== stored) {
+        log(`USERNAME "${override}" differs from the username at sign-up, "${stored}"; using "${override}"`);
+    }
+    const username = override ?? stored;
     if (!username) {
         throw new Error(
             `User ${userUUID} had no username at sign-up; set USERNAME to the account's Logto username`
@@ -213,7 +217,7 @@ export const seedStudysets = async ({
     now: Date;
     dryRun: boolean;
     log?: (message: string) => void;
-}): Promise<{ created: string[]; published: string[]; skipped: string[] }> => {
+}): Promise<{ created: string[]; incomplete: string[]; skipped: string[] }> => {
     const slugs = new Set(sets.map((set) => set.slug));
     const unknown = feature.filter((slug) => !slugs.has(slug));
     if (unknown.length > 0) {
@@ -221,9 +225,8 @@ export const seedStudysets = async ({
     }
 
     const created: string[] = [];
-    const published: string[] = [];
+    const incomplete: string[] = [];
     const skipped: string[] = [];
-    const prefix = dryRun ? '[dry-run] would ' : '';
 
     for (const [index, set] of sets.entries()) {
         const studysetUUID = seedStudysetUUID(userUUID, set.slug);
@@ -238,17 +241,21 @@ export const seedStudysets = async ({
             skipped.push(set.slug);
             continue;
         }
-
         if (Item) {
-            log(`${prefix}publish ${set.slug} (${studysetUUID}): created by an earlier run`);
-            published.push(set.slug);
-        } else {
-            log(`${prefix}create and publish ${set.slug} (${studysetUUID}): ${set.cards.length} cards, ${set.subject}`);
-            created.push(set.slug);
+            log(`INCOMPLETE ${set.slug} (${studysetUUID}): created but never published; publish or delete it in the app`);
+            incomplete.push(set.slug);
+            continue;
         }
-        if (dryRun) continue;
 
-        if (!Item) {
+        log(
+            `${dryRun ? '[dry-run] would ' : ''}create and publish ${set.slug} (${studysetUUID}): ${set.cards.length} cards, ${set.subject}`
+        );
+        if (dryRun) {
+            created.push(set.slug);
+            continue;
+        }
+
+        try {
             await docClient.send(
                 new PutCommand({
                     TableName: tableName,
@@ -271,7 +278,15 @@ export const seedStudysets = async ({
                     ConditionExpression: 'attribute_not_exists(PK)',
                 })
             );
+        } catch (error) {
+            if ((error as Error).name === 'ConditionalCheckFailedException') {
+                log(`skip ${set.slug} (${studysetUUID}): created by another run just now`);
+                skipped.push(set.slug);
+                continue;
+            }
+            throw error;
         }
+        created.push(set.slug);
 
         await docClient.send(
             new UpdateCommand({
@@ -288,15 +303,15 @@ export const seedStudysets = async ({
         );
     }
 
-    // Check every slug first, so one that isn't listed can't leave the row half reordered.
-    const pendingInDryRun = new Set(dryRun ? [...created, ...published] : []);
+    // Check every slug before writing any featuredAt, so a typo or an unlisted
+    // set doesn't leave the row half reordered.
+    const pendingInDryRun = new Set(dryRun ? created : []);
     const notListed: string[] = [];
     for (const slug of feature) {
         if (pendingInDryRun.has(slug)) continue;
-        const { Item } = await docClient.send(
-            new GetCommand({ TableName: tableName, Key: seedKey(userUUID, slug) })
-        );
-        if (!isPubliclyListed(Item) || !isFilled(Item?.publishedAt)) notListed.push(slug);
+        if (!(await isListedForFeature(docClient, tableName, seedKey(userUUID, slug)))) {
+            notListed.push(slug);
+        }
     }
     if (notListed.length > 0) {
         throw new Error(`FEATURE names sets that aren't listed on Explore: ${notListed.join(', ')}`);
@@ -320,7 +335,7 @@ export const seedStudysets = async ({
         });
     }
 
-    return { created, published, skipped };
+    return { created, incomplete, skipped };
 };
 
 if (require.main === module) {
@@ -341,12 +356,13 @@ if (require.main === module) {
             console.log(`Seeding ${sets.length} sets into ${config.tableName} as "${username}"\n`);
             return seedStudysets({ docClient, ...config, username, sets, now: new Date() });
         })
-        .then(({ created, published, skipped }) => {
+        .then(({ created, incomplete, skipped }) => {
             console.log(
-                `\nDone. created=${created.length} published=${published.length} skipped=${skipped.length}${
+                `\nDone. created=${created.length} skipped=${skipped.length} incomplete=${incomplete.length}${
                     config.dryRun ? ' (dry run — no writes performed)' : ''
                 }`
             );
+            if (incomplete.length > 0) process.exitCode = 1;
         })
         .catch((error) => {
             console.error(error);
