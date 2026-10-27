@@ -1,0 +1,32 @@
+{
+  "slug": "medical-prefixes-suffixes",
+  "title": "Medical Terminology: Prefixes & Suffixes",
+  "description": "Common prefixes and suffixes used in medical terms, each with an example word. Useful for health science students.",
+  "subject": "medicine-health",
+  "cards": [
+    { "term": "-itis", "definition": "Inflammation. Example: tonsillitis, inflammation of the tonsils." },
+    { "term": "tachy-", "definition": "Fast. Example: tachycardia, an abnormally fast heart rate." },
+    { "term": "-ectomy", "definition": "Surgical removal. Example: appendectomy, removal of the appendix." },
+    { "term": "brady-", "definition": "Slow. Example: bradycardia, an abnormally slow heart rate." },
+    { "term": "hyper-", "definition": "Above normal or excessive. Example: hypertension, high blood pressure." },
+    { "term": "hypo-", "definition": "Below normal or deficient. Example: hypoglycemia, low blood sugar." },
+    { "term": "dys-", "definition": "Bad, difficult, or painful. Example: dyspnea, difficult breathing." },
+    { "term": "a-, an-", "definition": "Without or absence of. Example: apnea, a temporary stop in breathing." },
+    { "term": "peri-", "definition": "Around. Example: pericardium, the sac surrounding the heart." },
+    { "term": "intra-", "definition": "Within or inside. Example: intravenous, within a vein." },
+    { "term": "poly-", "definition": "Many or excessive. Example: polyuria, producing an excessive amount of urine." },
+    { "term": "hemi-", "definition": "Half. Example: hemiplegia, paralysis of one side of the body." },
+    { "term": "-ology", "definition": "Study of. Example: cardiology, the study of the heart." },
+    { "term": "-algia", "definition": "Pain. Example: neuralgia, nerve pain." },
+    { "term": "-otomy", "definition": "Cutting into; incision. Example: tracheotomy, an incision into the trachea." },
+    { "term": "-ostomy", "definition": "Surgical creation of an opening. Example: colostomy, an opening from the colon through the abdominal wall." },
+    { "term": "-scopy", "definition": "Visual examination with an instrument. Example: endoscopy, viewing inside the body with a scope." },
+    { "term": "-plasty", "definition": "Surgical repair or reshaping. Example: rhinoplasty, surgery to reshape the nose." },
+    { "term": "-emia", "definition": "Condition of the blood. Example: anemia, a shortage of red blood cells or hemoglobin." },
+    { "term": "-penia", "definition": "Deficiency. Example: leukopenia, a low white blood cell count." },
+    { "term": "-oma", "definition": "Tumor or mass. Example: lipoma, a benign tumor made of fat tissue." },
+    { "term": "-pathy", "definition": "Disease. Example: neuropathy, disease or damage of the nerves." },
+    { "term": "-megaly", "definition": "Enlargement. Example: cardiomegaly, an enlarged heart." },
+    { "term": "-rrhea", "definition": "Flow or discharge. Example: rhinorrhea, a runny nose." }
+  ]
+}

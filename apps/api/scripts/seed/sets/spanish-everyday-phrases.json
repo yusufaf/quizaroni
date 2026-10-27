@@ -1,0 +1,32 @@
+{
+  "slug": "spanish-everyday-phrases",
+  "title": "Spanish Basics: Greetings & Everyday Phrases",
+  "description": "Common Spanish greetings and polite phrases for beginners, from saying hello to asking for directions.",
+  "subject": "languages",
+  "cards": [
+    { "term": "¿Cómo estás?", "definition": "How are you? (informal, used with friends and family)" },
+    { "term": "Mucho gusto", "definition": "Nice to meet you." },
+    { "term": "¿Dónde está el baño?", "definition": "Where is the bathroom?" },
+    { "term": "Hola", "definition": "Hello; hi." },
+    { "term": "Buenos días", "definition": "Good morning." },
+    { "term": "Buenas tardes", "definition": "Good afternoon." },
+    { "term": "Buenas noches", "definition": "Good evening; good night." },
+    { "term": "¿Qué tal?", "definition": "How's it going? (casual greeting)" },
+    { "term": "Bien, gracias", "definition": "Fine, thanks." },
+    { "term": "¿Cómo te llamas?", "definition": "What's your name? (informal)" },
+    { "term": "Me llamo...", "definition": "My name is..." },
+    { "term": "Por favor", "definition": "Please." },
+    { "term": "Gracias", "definition": "Thank you." },
+    { "term": "De nada", "definition": "You're welcome." },
+    { "term": "Lo siento", "definition": "I'm sorry." },
+    { "term": "Disculpe", "definition": "Excuse me (formal), used to politely get someone's attention." },
+    { "term": "Con permiso", "definition": "Excuse me, used when you need to pass by someone or leave." },
+    { "term": "No entiendo", "definition": "I don't understand." },
+    { "term": "¿Hablas inglés?", "definition": "Do you speak English? (informal)" },
+    { "term": "¿Puede repetir, por favor?", "definition": "Can you repeat that, please? (formal)" },
+    { "term": "¿Cuánto cuesta?", "definition": "How much does it cost?" },
+    { "term": "Adiós", "definition": "Goodbye." },
+    { "term": "Hasta luego", "definition": "See you later." },
+    { "term": "Hasta mañana", "definition": "See you tomorrow." }
+  ]
+}

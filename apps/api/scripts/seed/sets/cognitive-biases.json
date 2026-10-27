@@ -1,0 +1,31 @@
+{
+  "slug": "cognitive-biases",
+  "title": "Cognitive Biases You Should Know",
+  "description": "Common thinking traps that skew judgment and decisions, each with a plain-language explanation so you can spot them in everyday life.",
+  "subject": "social-sciences",
+  "cards": [
+    { "term": "Confirmation bias", "definition": "Tendency to seek out, favor, and remember information that supports what you already believe." },
+    { "term": "Sunk cost fallacy", "definition": "Sticking with something because of what you've already put into it, rather than judging it on its future value." },
+    { "term": "Survivorship bias", "definition": "Drawing conclusions only from the successes that remain visible while overlooking the failures that dropped out of view." },
+    { "term": "Anchoring bias", "definition": "Relying too heavily on the first piece of information you encounter, such as an opening price, when making a judgment." },
+    { "term": "Availability heuristic", "definition": "Judging how likely or common something is by how easily examples come to mind." },
+    { "term": "Dunning–Kruger effect", "definition": "Tendency for people with limited skill in an area to overestimate their own competence." },
+    { "term": "Hindsight bias", "definition": "Believing after an event that you knew all along it would happen." },
+    { "term": "Fundamental attribution error", "definition": "Overemphasizing personality and underestimating the situation when explaining other people's behavior." },
+    { "term": "Self-serving bias", "definition": "Crediting your successes to your own abilities while blaming your failures on outside factors." },
+    { "term": "Bandwagon effect", "definition": "Adopting a belief or behavior because many other people have already adopted it." },
+    { "term": "Halo effect", "definition": "Letting one positive trait, such as attractiveness, shape your overall impression of a person." },
+    { "term": "Loss aversion", "definition": "Feeling the pain of a loss more strongly than the pleasure of an equivalent gain." },
+    { "term": "Framing effect", "definition": "Reacting differently to the same information depending on how it's presented, such as \"90% survive\" versus \"10% die.\"" },
+    { "term": "Gambler's fallacy", "definition": "Believing past random outcomes change the odds of future independent ones, like expecting heads after a run of tails." },
+    { "term": "Status quo bias", "definition": "Preferring that things stay the same, even when a change would likely leave you better off." },
+    { "term": "Negativity bias", "definition": "Giving more weight and attention to negative experiences or information than to equally strong positive ones." },
+    { "term": "Optimism bias", "definition": "Believing you are less likely than other people to experience bad outcomes." },
+    { "term": "Planning fallacy", "definition": "Underestimating how much time, money, or effort a future task will take, even when similar tasks have run over before." },
+    { "term": "Spotlight effect", "definition": "Overestimating how much other people notice your appearance or behavior." },
+    { "term": "Curse of knowledge", "definition": "Difficulty imagining what it's like not to know something you already know, which makes explaining it to beginners harder." },
+    { "term": "In-group bias", "definition": "Favoring members of your own group over people outside it." },
+    { "term": "Endowment effect", "definition": "Valuing something more highly simply because you own it." },
+    { "term": "False consensus effect", "definition": "Overestimating how much other people share your opinions, beliefs, and habits." }
+  ]
+}

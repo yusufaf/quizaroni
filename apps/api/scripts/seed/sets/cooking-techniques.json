@@ -1,0 +1,32 @@
+{
+  "slug": "cooking-techniques",
+  "title": "Cooking Techniques & Kitchen Terms",
+  "description": "The cooking methods, knife cuts, and kitchen vocabulary that show up in recipes, explained in plain language for home cooks.",
+  "subject": "other",
+  "cards": [
+    { "term": "Mise en place", "definition": "French for \"putting in place,\" often rendered \"everything in its place.\" Prepping and organizing all ingredients and tools before you start cooking." },
+    { "term": "Deglaze", "definition": "Adding liquid, like wine or stock, to a hot pan to loosen the browned bits stuck to the bottom, often as the start of a sauce." },
+    { "term": "Maillard reaction", "definition": "A browning reaction between amino acids and sugars under heat that creates the savory flavors of seared meat, toast, and roasted coffee." },
+    { "term": "Sauté", "definition": "Cooking food quickly in a small amount of fat over fairly high heat, stirring or tossing often." },
+    { "term": "Sear", "definition": "Browning the surface of food over high heat to build flavor and color." },
+    { "term": "Braise", "definition": "Browning food, then cooking it slowly in a covered pot with some liquid. Ideal for tough cuts of meat." },
+    { "term": "Poach", "definition": "Gently cooking food submerged in liquid kept below a boil." },
+    { "term": "Simmer", "definition": "Cooking a liquid just below a boil, with small bubbles gently breaking the surface." },
+    { "term": "Blanch", "definition": "Briefly boiling food, then plunging it into ice water to stop the cooking." },
+    { "term": "Reduce", "definition": "Simmering a liquid uncovered so water evaporates, concentrating its flavor and thickening it." },
+    { "term": "Caramelization", "definition": "The browning of sugar under heat, which produces sweet, nutty, slightly bitter flavors." },
+    { "term": "Emulsion", "definition": "A mixture of two liquids that normally don't combine, like oil and vinegar. Mayonnaise is a classic example." },
+    { "term": "Roux", "definition": "Fat and flour cooked together, usually in equal parts, used to thicken sauces, soups, and gravies." },
+    { "term": "Temper", "definition": "Slowly adding hot liquid to a delicate ingredient like eggs, raising its temperature gradually so it doesn't curdle." },
+    { "term": "Fold", "definition": "Gently combining a light mixture, like whipped egg whites, into a heavier one without knocking out the air." },
+    { "term": "Al dente", "definition": "Italian for \"to the tooth.\" Pasta cooked until tender but still slightly firm when bitten." },
+    { "term": "Brine", "definition": "Soaking food in salted water to season it and help it stay moist during cooking." },
+    { "term": "Proof", "definition": "Letting yeast dough rest and rise before baking." },
+    { "term": "Rest (meat)", "definition": "Letting cooked meat sit for a few minutes before cutting so its juices settle instead of running out." },
+    { "term": "Bain-marie", "definition": "A hot water bath used to cook or melt delicate foods, like custards or chocolate, with gentle, even heat." },
+    { "term": "Julienne", "definition": "Cutting food into thin, matchstick-shaped strips." },
+    { "term": "Dice", "definition": "Cutting food into small, uniform cubes." },
+    { "term": "Mince", "definition": "Chopping food into very fine pieces." },
+    { "term": "Chiffonade", "definition": "Stacking and rolling leafy herbs or greens, then slicing across the roll into thin ribbons." }
+  ]
+}

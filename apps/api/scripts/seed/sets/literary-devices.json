@@ -1,0 +1,31 @@
+{
+  "slug": "literary-devices",
+  "title": "Literary Devices",
+  "description": "Common literary devices with plain definitions and short examples, for English class, essay writing, and close reading.",
+  "subject": "arts-humanities",
+  "cards": [
+    { "term": "Metaphor", "definition": "Describes one thing as if it were another, without using \"like\" or \"as.\" Example: \"The hallway was a river of backpacks.\"" },
+    { "term": "Dramatic irony", "definition": "The audience knows something that a character does not, creating tension or humor." },
+    { "term": "Foreshadowing", "definition": "Hints early in a story about events that will happen later." },
+    { "term": "Simile", "definition": "Compares two unlike things using \"like\" or \"as.\" Example: \"The puppy was as restless as a spinning top.\"" },
+    { "term": "Personification", "definition": "Gives human qualities to something non-human. Example: \"The old car groaned up the hill.\"" },
+    { "term": "Alliteration", "definition": "Repeats the same starting consonant sound in nearby words. Example: \"Seven sleepy sailors sang softly.\"" },
+    { "term": "Assonance", "definition": "Repeats vowel sounds in nearby words. Example: \"Rain made the lane gray.\"" },
+    { "term": "Onomatopoeia", "definition": "A word that imitates the sound it names, such as buzz, crash, or sizzle." },
+    { "term": "Hyperbole", "definition": "Deliberate exaggeration for emphasis or effect. Example: \"This backpack weighs a ton.\"" },
+    { "term": "Understatement", "definition": "Presents something as less important than it really is. Example: calling a hurricane \"a bit of wind.\"" },
+    { "term": "Verbal irony", "definition": "Saying the opposite of what you mean. Example: \"What lovely weather,\" said during a downpour." },
+    { "term": "Situational irony", "definition": "An outcome turns out to be the opposite of what was expected. Example: a fire station burns down." },
+    { "term": "Oxymoron", "definition": "Two contradictory words placed side by side. Example: \"a deafening silence.\"" },
+    { "term": "Paradox", "definition": "A statement that seems to contradict itself but reveals a deeper truth. Example: \"The more I learn, the less I know.\"" },
+    { "term": "Imagery", "definition": "Vivid sensory language that helps the reader see, hear, smell, taste, or feel a scene." },
+    { "term": "Symbolism", "definition": "Using an object, character, or event to stand for a larger idea, such as a dove representing peace." },
+    { "term": "Motif", "definition": "A recurring image, object, or idea in a work that helps develop its theme." },
+    { "term": "Allusion", "definition": "A brief reference to a well-known person, place, event, or work. Example: calling a huge job \"a Herculean task.\"" },
+    { "term": "Juxtaposition", "definition": "Placing contrasting elements side by side to highlight their differences." },
+    { "term": "Anaphora", "definition": "Repeating a word or phrase at the start of successive clauses. Example: \"Every day I wait. Every day I wonder.\"" },
+    { "term": "Euphemism", "definition": "A mild or indirect expression used in place of a harsh or blunt one. Example: \"passed away\" instead of \"died.\"" },
+    { "term": "Flashback", "definition": "A scene that interrupts the present action to show events from the past." },
+    { "term": "Point of view", "definition": "The perspective a story is told from, such as first person (\"I\") or third person (\"she,\" \"they\")." }
+  ]
+}

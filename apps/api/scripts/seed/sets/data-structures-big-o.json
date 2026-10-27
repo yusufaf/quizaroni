@@ -1,0 +1,30 @@
+{
+  "slug": "data-structures-big-o",
+  "title": "Data Structures & Big-O Complexity",
+  "description": "Time complexity of common operations on arrays, lists, trees, heaps, and hash tables, each with a one-line reason. Handy for CS courses and interview prep.",
+  "subject": "computer-science",
+  "cards": [
+    { "term": "Hash table lookup (average)", "definition": "O(1). Hashing the key jumps straight to its bucket, so the time doesn't grow with the number of entries." },
+    { "term": "Binary search on a sorted array", "definition": "O(log n). Each comparison discards half of the remaining elements." },
+    { "term": "Quicksort (average vs. worst case)", "definition": "O(n log n) on average, O(n²) in the worst case. Consistently bad pivots make the partitions lopsided." },
+    { "term": "Array access by index", "definition": "O(1). The element's address is computed directly from the start address and the index." },
+    { "term": "Hash table lookup (worst case)", "definition": "O(n). If many keys collide into the same bucket, a lookup may have to check every one of them." },
+    { "term": "Linear search in an unsorted array", "definition": "O(n). With no ordering to exploit, every element may need to be checked." },
+    { "term": "Insert at the front of an array", "definition": "O(n). Every existing element must shift one position to make room." },
+    { "term": "Append to a dynamic array (amortized)", "definition": "O(1). Resizing copies everything, but growing the capacity geometrically makes resizes rare enough to average out." },
+    { "term": "Insert at the head of a singly linked list", "definition": "O(1). Only the new node's next pointer and the head pointer change." },
+    { "term": "Access the k-th element of a linked list", "definition": "O(n). There is no direct indexing, so nodes must be followed one by one from the head." },
+    { "term": "Stack push or pop", "definition": "O(1). Both operations touch only the top element." },
+    { "term": "Queue enqueue or dequeue", "definition": "O(1). With a linked list or circular buffer, both ends are reachable directly." },
+    { "term": "Balanced binary search tree search", "definition": "O(log n). The tree's height stays logarithmic, so a search follows one short root-to-leaf path." },
+    { "term": "Unbalanced binary search tree search (worst case)", "definition": "O(n). Inserting keys in sorted order can degrade the tree into a single chain." },
+    { "term": "Binary heap peek at min or max", "definition": "O(1). The smallest (or largest) element always sits at the root." },
+    { "term": "Binary heap insert", "definition": "O(log n). The new element sifts up at most the height of the tree." },
+    { "term": "Binary heap extract min or max", "definition": "O(log n). The last element moves to the root and sifts down at most the height of the tree." },
+    { "term": "Build a binary heap from n elements", "definition": "O(n). Bottom-up heapify does most of its work on low nodes, which only sift down a short distance." },
+    { "term": "Merge sort", "definition": "O(n log n) in every case. The input is halved about log n times, and each level merges n elements." },
+    { "term": "Insertion sort on already-sorted input", "definition": "O(n). Each element is compared once with its neighbor and never needs to move." },
+    { "term": "Breadth-first search on a graph", "definition": "O(V + E) with an adjacency list. Each vertex is visited once and each edge is examined a constant number of times." },
+    { "term": "Trie lookup of a word", "definition": "O(L), where L is the word's length. One step per character, no matter how many words are stored." }
+  ]
+}
