@@ -2,14 +2,14 @@
 // resources/cognito/index.ts's shape, which this replaces for auth. Same
 // pattern used in team-builder-cdk's resources/logto/index.ts.
 //
-// endpoint starts pointed at the Fly-provided hostname (logto-flyio isn't cut
-// over to auth.yusufaf.dev yet — see that repo's README). Update both entries
-// to "https://auth.yusufaf.dev" once the DNS cutover lands; nothing else in
-// the authorizer needs to change, since it derives issuer/JWKS URI from this
-// value.
+// Must match the `iss` Logto puts in its tokens: the authorizer derives the
+// issuer and JWKS URI from this value, so a mismatch rejects every request.
+// Logto has been cut over to auth.yusufaf.dev, and its discovery document at
+// /oidc/.well-known/openid-configuration reports that host as the issuer,
+// even for sign-ins that go through the old logto-af.fly.dev hostname.
 export const LOGTO_ENDPOINT: { [key: string]: string } = {
-    development: "https://logto-af.fly.dev",
-    production: "https://logto-af.fly.dev",
+    development: "https://auth.yusufaf.dev",
+    production: "https://auth.yusufaf.dev",
 };
 
 // The API resource identifier created in the Logto console (Authorization >
