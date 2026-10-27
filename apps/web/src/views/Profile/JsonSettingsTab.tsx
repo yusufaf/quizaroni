@@ -87,8 +87,8 @@ const ButtonRow = styled(Box)({
 // Shows only the keys the save schema accepts, so the two can't drift.
 const formatMetadataForEditor = (metadata: User['metadata']): string => {
     const filtered = Object.fromEntries(
-        Object.entries(metadata).filter(
-            ([key]) => key in EditableUserMetadataSchema.shape
+        Object.entries(metadata).filter(([key]) =>
+            Object.hasOwn(EditableUserMetadataSchema.shape, key)
         )
     );
     return JSON.stringify(filtered, null, 4);
