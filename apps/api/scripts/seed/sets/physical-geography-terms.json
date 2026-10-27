@@ -1,0 +1,30 @@
+{
+  "slug": "physical-geography-terms",
+  "title": "Physical Geography Terms",
+  "description": "Common landforms and water features, from deltas and fjords to moraines and atolls. Useful for geography classes and map lovers.",
+  "subject": "geography",
+  "cards": [
+    { "term": "Delta", "definition": "Landform built from sediment deposited where a river slows and spreads out as it enters a sea, lake, or larger river." },
+    { "term": "Isthmus", "definition": "Narrow strip of land with water on both sides that connects two larger landmasses." },
+    { "term": "Fjord", "definition": "Long, narrow, deep inlet of the sea between steep cliffs, carved out by a glacier." },
+    { "term": "Archipelago", "definition": "Group or chain of islands clustered together." },
+    { "term": "Peninsula", "definition": "Piece of land surrounded by water on three sides and attached to a larger landmass." },
+    { "term": "Strait", "definition": "Narrow natural waterway that connects two larger bodies of water." },
+    { "term": "Estuary", "definition": "Partly enclosed coastal area where fresh water from a river mixes with salt water from the sea." },
+    { "term": "Tributary", "definition": "Stream or river that flows into a larger river." },
+    { "term": "Watershed", "definition": "All the land that drains into a particular river, lake, or other body of water; also called a drainage basin." },
+    { "term": "Plateau", "definition": "Large, relatively flat area of land raised well above the surrounding terrain." },
+    { "term": "Mesa", "definition": "Flat-topped landform with steep sides that is wider than it is tall." },
+    { "term": "Butte", "definition": "Isolated flat-topped hill with steep sides, smaller than a mesa and usually taller than it is wide." },
+    { "term": "Meander", "definition": "Looping bend in a river, formed as the current erodes the outer bank and deposits sediment on the inner bank." },
+    { "term": "Oxbow lake", "definition": "U-shaped lake that forms when a river meander is cut off from the main channel." },
+    { "term": "Floodplain", "definition": "Flat land beside a river that is built up by sediment deposited during floods." },
+    { "term": "Alluvial fan", "definition": "Fan-shaped deposit of sediment that forms where a stream flows out of steep terrain onto flatter ground." },
+    { "term": "Moraine", "definition": "Ridge or mound of rock and soil debris carried and deposited by a glacier." },
+    { "term": "Cirque", "definition": "Bowl-shaped hollow carved into a mountainside by the head of a glacier." },
+    { "term": "Atoll", "definition": "Ring-shaped coral reef or chain of coral islands that encloses a lagoon." },
+    { "term": "Lagoon", "definition": "Shallow body of water separated from the sea by a reef, sandbar, or barrier island." },
+    { "term": "Escarpment", "definition": "Long, steep slope or cliff that separates two relatively level areas at different elevations." },
+    { "term": "Headland", "definition": "Point of high land that juts out into the sea, often with steep cliffs." }
+  ]
+}

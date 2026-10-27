@@ -1,0 +1,28 @@
+{
+  "slug": "art-movements",
+  "title": "Major Art Movements",
+  "description": "Western art movements from the Renaissance to Minimalism, each with its era, defining traits, and one artist to know.",
+  "subject": "arts-humanities",
+  "cards": [
+    { "term": "Impressionism", "definition": "Late 19th-century France. Loose, visible brushwork and everyday scenes, often painted outdoors to capture changing light. Artist: Claude Monet." },
+    { "term": "Cubism", "definition": "Early 20th century. Breaks subjects into geometric planes and shows several viewpoints at once. Artist: Pablo Picasso." },
+    { "term": "Surrealism", "definition": "1920s onward. Dreamlike, irrational imagery meant to tap the unconscious mind. Artist: Salvador Dalí." },
+    { "term": "Italian Renaissance", "definition": "15th and 16th centuries. Revived classical ideals with linear perspective, realistic anatomy, and balanced composition. Artist: Leonardo da Vinci." },
+    { "term": "Baroque", "definition": "17th-century Europe. Dramatic contrasts of light and shadow, movement, and emotional intensity. Artist: Caravaggio." },
+    { "term": "Rococo", "definition": "18th-century France. Light, ornate, playful scenes in soft pastel colors. Artist: Jean-Honoré Fragonard." },
+    { "term": "Neoclassicism", "definition": "Late 18th to early 19th century. Restrained, orderly works modeled on ancient Greece and Rome. Artist: Jacques-Louis David." },
+    { "term": "Romanticism", "definition": "Late 18th to mid-19th century. Emotion and imagination over cool reason, and the overwhelming power of nature. Artist: Caspar David Friedrich." },
+    { "term": "Realism", "definition": "Mid-19th-century France. Unidealized depictions of ordinary people and everyday life. Artist: Gustave Courbet." },
+    { "term": "Post-Impressionism", "definition": "Late 19th century. Built on Impressionism with bolder color, stronger form, and personal expression. Artist: Vincent van Gogh." },
+    { "term": "Art Nouveau", "definition": "Around 1890 to 1910. Decorative style of flowing, organic lines inspired by plants and natural forms. Artist: Alphonse Mucha." },
+    { "term": "Fauvism", "definition": "Early 1900s France. Wild, non-naturalistic color applied in bold, flat strokes. Artist: Henri Matisse." },
+    { "term": "Expressionism", "definition": "Early 20th century, centered in Germany. Distorted forms and intense color used to convey inner emotion. Artist: Ernst Ludwig Kirchner." },
+    { "term": "Futurism", "definition": "Founded in Italy in 1909. Celebrated speed, machines, and modern life with dynamic, fragmented images of motion. Artist: Umberto Boccioni." },
+    { "term": "Dada", "definition": "Began in 1916, during World War I. An anti-art movement that used absurdity and chance to mock convention. Artist: Marcel Duchamp." },
+    { "term": "De Stijl", "definition": "Founded in the Netherlands in 1917. Pure abstraction using straight lines, right angles, and primary colors. Artist: Piet Mondrian." },
+    { "term": "Bauhaus", "definition": "German school, 1919 to 1933. Unified art, craft, and industrial design around simple, functional forms. Founder: architect Walter Gropius." },
+    { "term": "Abstract Expressionism", "definition": "1940s and 1950s New York. Large-scale abstraction emphasizing spontaneous gesture or fields of color. Artist: Jackson Pollock." },
+    { "term": "Pop Art", "definition": "Mid-1950s and 1960s, Britain and the US. Borrowed imagery from advertising, comics, and consumer products. Artist: Andy Warhol." },
+    { "term": "Minimalism", "definition": "1960s. Simple geometric forms and industrial materials, stripped of personal expression. Artist: Donald Judd." }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "slug": "algebra-essentials",
+  "title": "Algebra Essentials: Key Terms & Rules",
+  "description": "Core algebra vocabulary, properties, and exponent rules to review before a test or a new math course.",
+  "subject": "math",
+  "cards": [
+    { "term": "Variable", "definition": "A symbol, usually a letter, that stands for an unknown or changing value." },
+    { "term": "Distributive property", "definition": "a(b + c) = ab + ac. Multiply the outside factor by each term inside the parentheses." },
+    { "term": "Slope-intercept form", "definition": "y = mx + b, where m is the slope of the line and b is the y-intercept." },
+    { "term": "Coefficient", "definition": "The number multiplied by a variable in a term, such as 5 in 5x." },
+    { "term": "Constant", "definition": "A term with a fixed value that does not change, such as 7 in 3x + 7." },
+    { "term": "Term", "definition": "A single number, variable, or product of numbers and variables, separated from other terms by + or − signs." },
+    { "term": "Like terms", "definition": "Terms with the same variables raised to the same powers, such as 3x² and −5x². Combine them by adding their coefficients." },
+    { "term": "Expression", "definition": "A combination of numbers, variables, and operations with no equals sign, such as 4x − 9." },
+    { "term": "Equation", "definition": "A statement that two expressions are equal, such as 2x + 3 = 11." },
+    { "term": "Inequality", "definition": "A statement that compares two expressions using <, >, ≤, or ≥." },
+    { "term": "Order of operations", "definition": "Parentheses, exponents, multiplication and division (left to right), then addition and subtraction (left to right). Often remembered as PEMDAS." },
+    { "term": "Commutative property", "definition": "Changing the order doesn't change a sum or product: a + b = b + a and ab = ba." },
+    { "term": "Associative property", "definition": "Changing the grouping doesn't change a sum or product: (a + b) + c = a + (b + c) and (ab)c = a(bc)." },
+    { "term": "Inverse operations", "definition": "Operations that undo each other, such as addition and subtraction. Used to isolate a variable when solving an equation." },
+    { "term": "Slope", "definition": "The steepness of a line, rise over run: m = (y₂ − y₁) / (x₂ − x₁)." },
+    { "term": "y-intercept", "definition": "The point where a line crosses the y-axis, where x = 0." },
+    { "term": "Product rule for exponents", "definition": "x^m · x^n = x^(m + n). When multiplying powers with the same base, add the exponents." },
+    { "term": "Quotient rule for exponents", "definition": "x^m / x^n = x^(m − n) for x ≠ 0. When dividing powers with the same base, subtract the exponents." },
+    { "term": "Power of a power rule", "definition": "(x^m)^n = x^(mn). When raising a power to a power, multiply the exponents." },
+    { "term": "Zero exponent rule", "definition": "Any nonzero number raised to the power 0 equals 1: x^0 = 1 for x ≠ 0." },
+    { "term": "Negative exponent rule", "definition": "x^(−n) = 1 / x^n for x ≠ 0. A negative exponent means take the reciprocal." },
+    { "term": "FOIL", "definition": "First, Outer, Inner, Last: a method for multiplying two binomials, such as (x + 2)(x + 3)." },
+    { "term": "Difference of squares", "definition": "a² − b² = (a + b)(a − b)." },
+    { "term": "Quadratic formula", "definition": "x = (−b ± √(b² − 4ac)) / (2a). Solves any equation of the form ax² + bx + c = 0 where a ≠ 0." }
+  ]
+}

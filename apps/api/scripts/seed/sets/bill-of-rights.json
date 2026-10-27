@@ -1,0 +1,24 @@
+{
+  "slug": "bill-of-rights",
+  "title": "The Bill of Rights: First 10 Amendments",
+  "description": "What each of the first ten amendments to the U.S. Constitution protects, plus a few key related terms. Great for civics and U.S. history students.",
+  "subject": "history",
+  "cards": [
+    { "term": "First Amendment", "definition": "Protects freedom of religion, speech, and the press, along with the rights to peaceably assemble and to petition the government." },
+    { "term": "Fourth Amendment", "definition": "Protects against unreasonable searches and seizures; warrants require probable cause and must describe what is to be searched or seized." },
+    { "term": "Fifth Amendment", "definition": "Requires grand juries for serious federal charges and bars double jeopardy, forced self-incrimination, loss of life, liberty, or property without due process, and takings without just compensation." },
+    { "term": "Second Amendment", "definition": "Protects the right of the people to keep and bear arms, with a reference to a well regulated militia." },
+    { "term": "Third Amendment", "definition": "Bars quartering soldiers in private homes without the owner's consent in peacetime, and in wartime except as prescribed by law." },
+    { "term": "Sixth Amendment", "definition": "Gives criminal defendants a speedy, public trial by an impartial jury, notice of the charges, the right to confront witnesses, and the assistance of counsel." },
+    { "term": "Seventh Amendment", "definition": "Preserves the right to a jury trial in federal civil suits at common law where the amount in dispute exceeds twenty dollars." },
+    { "term": "Eighth Amendment", "definition": "Prohibits excessive bail, excessive fines, and cruel and unusual punishments." },
+    { "term": "Ninth Amendment", "definition": "States that listing certain rights in the Constitution does not deny or disparage other rights retained by the people." },
+    { "term": "Tenth Amendment", "definition": "Reserves to the states, or to the people, the powers not delegated to the federal government nor prohibited to the states." },
+    { "term": "Bill of Rights", "definition": "The first ten amendments to the U.S. Constitution, ratified in 1791 to spell out individual rights and limit federal power." },
+    { "term": "Establishment Clause", "definition": "First Amendment clause forbidding Congress from making any law respecting an establishment of religion, such as creating an official state church." },
+    { "term": "Free Exercise Clause", "definition": "First Amendment clause protecting people's right to practice their religion without government prohibition." },
+    { "term": "Double jeopardy", "definition": "Being prosecuted or punished twice for the same offense, which the Fifth Amendment forbids." },
+    { "term": "Due process", "definition": "Fair legal procedures the government must follow before taking a person's life, liberty, or property; required by the Fifth and Fourteenth Amendments." },
+    { "term": "Incorporation doctrine", "definition": "Doctrine under which the Fourteenth Amendment's Due Process Clause applies most Bill of Rights protections to state governments." }
+  ]
+}

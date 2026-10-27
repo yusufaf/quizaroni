@@ -1,0 +1,33 @@
+{
+  "slug": "european-capitals",
+  "title": "European Capitals",
+  "description": "Match 25 European countries to their capital cities, from the big names to a few that often trip people up.",
+  "subject": "geography",
+  "cards": [
+    { "term": "Hungary", "definition": "Budapest" },
+    { "term": "Portugal", "definition": "Lisbon" },
+    { "term": "Iceland", "definition": "Reykjavík" },
+    { "term": "France", "definition": "Paris" },
+    { "term": "Germany", "definition": "Berlin" },
+    { "term": "Italy", "definition": "Rome" },
+    { "term": "Spain", "definition": "Madrid" },
+    { "term": "United Kingdom", "definition": "London" },
+    { "term": "Ireland", "definition": "Dublin" },
+    { "term": "Belgium", "definition": "Brussels" },
+    { "term": "Austria", "definition": "Vienna" },
+    { "term": "Poland", "definition": "Warsaw" },
+    { "term": "Czechia (Czech Republic)", "definition": "Prague" },
+    { "term": "Greece", "definition": "Athens" },
+    { "term": "Sweden", "definition": "Stockholm" },
+    { "term": "Norway", "definition": "Oslo" },
+    { "term": "Denmark", "definition": "Copenhagen" },
+    { "term": "Finland", "definition": "Helsinki" },
+    { "term": "Romania", "definition": "Bucharest" },
+    { "term": "Bulgaria", "definition": "Sofia" },
+    { "term": "Croatia", "definition": "Zagreb" },
+    { "term": "Serbia", "definition": "Belgrade" },
+    { "term": "Ukraine", "definition": "Kyiv" },
+    { "term": "Slovenia", "definition": "Ljubljana" },
+    { "term": "Lithuania", "definition": "Vilnius" }
+  ]
+}

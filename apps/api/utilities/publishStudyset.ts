@@ -1,11 +1,12 @@
 import { isSubjectId } from '@quizaroni/shared-types';
 import type { PublishError, SubjectId } from '@quizaroni/shared-types';
 import type { Card, Studyset, Timestamp, UUID } from 'models/studysets';
-import { PUBLIC_STUDYSET_PK, publicStudysetSK } from 'resources/dynamo/publicSharing';
+// Relative, not the `resources/*` alias: scripts/seedStudysets.ts runs this under plain ts-node.
+import { PUBLIC_STUDYSET_PK, publicStudysetSK } from '../resources/dynamo/publicSharing';
 
 export const MIN_PUBLISHABLE_CARDS = 4;
 
-const isFilled = (value: unknown): boolean =>
+export const isFilled = (value: unknown): value is string =>
     typeof value === 'string' && value.trim() !== '';
 
 // Stored cards aren't validated on write, so a side may be missing or not a string.

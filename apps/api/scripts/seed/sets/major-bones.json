@@ -1,0 +1,33 @@
+{
+  "slug": "major-bones",
+  "title": "Major Bones of the Human Body",
+  "description": "The major bones of the human skeleton, from skull to feet, with their common names and locations.",
+  "subject": "medicine-health",
+  "cards": [
+    { "term": "Femur", "definition": "Thigh bone, running from the hip to the knee. The longest and strongest bone in the human body." },
+    { "term": "Stapes", "definition": "Stirrup-shaped bone of the middle ear that passes sound vibrations to the inner ear. The smallest bone in the body." },
+    { "term": "Patella", "definition": "Kneecap. A bone embedded in the tendon of the quadriceps that protects the front of the knee joint." },
+    { "term": "Cranium", "definition": "The part of the skull that encloses and protects the brain." },
+    { "term": "Mandible", "definition": "Lower jawbone. It holds the lower teeth and hinges with the skull to allow chewing and speaking." },
+    { "term": "Maxilla", "definition": "Upper jawbone. It holds the upper teeth and forms part of the hard palate." },
+    { "term": "Hyoid", "definition": "U-shaped bone in the neck that supports the tongue. It does not form a joint with any other bone." },
+    { "term": "Clavicle", "definition": "Collarbone. A long, S-shaped bone that connects the sternum to the scapula." },
+    { "term": "Scapula", "definition": "Shoulder blade. A flat, triangular bone on the upper back that connects the humerus to the clavicle." },
+    { "term": "Sternum", "definition": "Breastbone. A flat bone in the center of the chest that most ribs attach to through cartilage." },
+    { "term": "Ribs", "definition": "Twelve pairs of curved bones that form the rib cage and protect the heart and lungs." },
+    { "term": "Vertebrae", "definition": "The stacked bones of the spinal column, which support the body and protect the spinal cord." },
+    { "term": "Humerus", "definition": "Upper arm bone, running from the shoulder to the elbow." },
+    { "term": "Radius", "definition": "Forearm bone on the thumb side." },
+    { "term": "Ulna", "definition": "Forearm bone on the pinky side. Its upper end forms the point of the elbow." },
+    { "term": "Carpals", "definition": "The eight small bones of the wrist." },
+    { "term": "Metacarpals", "definition": "The five bones of the palm, connecting the wrist to the fingers." },
+    { "term": "Phalanges", "definition": "The bones of the fingers and toes. Each hand and each foot has 14." },
+    { "term": "Pelvis", "definition": "Bowl-shaped ring formed by the two hip bones, sacrum, and coccyx. It supports the spine and protects pelvic organs." },
+    { "term": "Sacrum", "definition": "Triangular bone at the base of the spine, formed from five fused vertebrae." },
+    { "term": "Coccyx", "definition": "Tailbone. A small bone at the very bottom of the spine made of fused vertebrae." },
+    { "term": "Tibia", "definition": "Shinbone. The larger, weight-bearing bone of the lower leg." },
+    { "term": "Fibula", "definition": "The thin bone that runs alongside the tibia on the outer side of the lower leg." },
+    { "term": "Tarsals", "definition": "The seven bones of the ankle and back of the foot, including the talus and the calcaneus (heel bone)." },
+    { "term": "Metatarsals", "definition": "The five long bones of the foot between the ankle and the toes." }
+  ]
+}

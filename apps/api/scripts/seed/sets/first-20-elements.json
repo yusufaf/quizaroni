@@ -1,0 +1,28 @@
+{
+  "slug": "first-20-elements",
+  "title": "Periodic Table: The First 20 Elements",
+  "description": "Learn the symbols, names, and atomic numbers of elements 1 through 20, each with one fact to help it stick.",
+  "subject": "science",
+  "cards": [
+    { "term": "H", "definition": "Hydrogen, atomic number 1. The lightest element and the most abundant one in the universe." },
+    { "term": "He", "definition": "Helium, atomic number 2. A noble gas lighter than air, used to fill balloons." },
+    { "term": "Li", "definition": "Lithium, atomic number 3. The lightest metal, widely used in rechargeable batteries." },
+    { "term": "Be", "definition": "Beryllium, atomic number 4. A light, stiff alkaline earth metal used in aerospace parts and X-ray windows." },
+    { "term": "B", "definition": "Boron, atomic number 5. A metalloid used to make heat-resistant borosilicate glass." },
+    { "term": "C", "definition": "Carbon, atomic number 6. The backbone of organic molecules. Diamond and graphite are both pure carbon." },
+    { "term": "N", "definition": "Nitrogen, atomic number 7. Makes up about 78% of Earth's atmosphere." },
+    { "term": "O", "definition": "Oxygen, atomic number 8. Makes up about 21% of the air and is needed for cellular respiration." },
+    { "term": "F", "definition": "Fluorine, atomic number 9. The most electronegative element. Its compounds, fluorides, are added to toothpaste." },
+    { "term": "Ne", "definition": "Neon, atomic number 10. A noble gas that glows reddish-orange in electric signs." },
+    { "term": "Na", "definition": "Sodium, atomic number 11. A soft, reactive alkali metal that combines with chlorine to form table salt." },
+    { "term": "Mg", "definition": "Magnesium, atomic number 12. An alkaline earth metal that burns with a brilliant white flame." },
+    { "term": "Al", "definition": "Aluminum, atomic number 13. The most abundant metal in Earth's crust; light and resistant to corrosion." },
+    { "term": "Si", "definition": "Silicon, atomic number 14. A metalloid used in computer chips and the second most abundant element in Earth's crust." },
+    { "term": "P", "definition": "Phosphorus, atomic number 15. Part of the sugar-phosphate backbone of DNA and of the energy molecule ATP." },
+    { "term": "S", "definition": "Sulfur, atomic number 16. A yellow nonmetal. Its compound hydrogen sulfide smells like rotten eggs." },
+    { "term": "Cl", "definition": "Chlorine, atomic number 17. A toxic yellow-green halogen gas used to disinfect drinking water and pools." },
+    { "term": "Ar", "definition": "Argon, atomic number 18. A noble gas that makes up nearly 1% of Earth's atmosphere." },
+    { "term": "K", "definition": "Potassium, atomic number 19. A reactive alkali metal essential for nerve and muscle function. Its symbol comes from the Latin kalium." },
+    { "term": "Ca", "definition": "Calcium, atomic number 20. An alkaline earth metal and the main mineral in bones and teeth." }
+  ]
+}

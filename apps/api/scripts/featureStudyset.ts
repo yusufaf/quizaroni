@@ -73,6 +73,32 @@ const notListedError = (sk: string) =>
         `Study set ${sk} is not listed on Explore (unpublished, hidden or never published); only a listed set can be featured`
     );
 
+/** Same rule as the feed: listed, with a publishedAt (legacy shares have none). */
+export const isListedForFeature = async (
+    docClient: DynamoDBDocumentClient,
+    tableName: string,
+    key: StudysetKey
+): Promise<boolean> => {
+    const { Item } = await docClient.send(
+        new GetCommand({
+            TableName: tableName,
+            Key: key,
+            ProjectionExpression:
+                'PK, SK, #SK2, #metadata.#publiclyViewable, #publishedAt, #moderation.#hiddenAt',
+            ExpressionAttributeNames: {
+                '#SK2': 'SK2',
+                '#metadata': 'metadata',
+                '#publiclyViewable': 'publiclyViewable',
+                '#publishedAt': 'publishedAt',
+                '#moderation': 'moderation',
+                '#hiddenAt': 'hiddenAt',
+            },
+        })
+    );
+    const published = typeof Item?.publishedAt === 'string' && Item.publishedAt !== '';
+    return isPubliclyListed(Item) && published;
+};
+
 export const featureStudyset = async ({
     docClient,
     tableName,
@@ -90,28 +116,8 @@ export const featureStudyset = async ({
     dryRun: boolean;
     log?: (message: string) => void;
 }): Promise<{ updated: boolean }> => {
-    // Same rule as the feed: listed, with a publishedAt (legacy shares have none).
-    if (!clear) {
-        const { Item } = await docClient.send(
-            new GetCommand({
-                TableName: tableName,
-                Key: key,
-                ProjectionExpression:
-                    'PK, SK, #SK2, #metadata.#publiclyViewable, #publishedAt, #moderation.#hiddenAt',
-                ExpressionAttributeNames: {
-                    '#SK2': 'SK2',
-                    '#metadata': 'metadata',
-                    '#publiclyViewable': 'publiclyViewable',
-                    '#publishedAt': 'publishedAt',
-                    '#moderation': 'moderation',
-                    '#hiddenAt': 'hiddenAt',
-                },
-            })
-        );
-        const published = typeof Item?.publishedAt === 'string' && Item.publishedAt !== '';
-        if (!isPubliclyListed(Item) || !published) {
-            throw notListedError(key.SK);
-        }
+    if (!clear && !(await isListedForFeature(docClient, tableName, key))) {
+        throw notListedError(key.SK);
     }
 
     log(

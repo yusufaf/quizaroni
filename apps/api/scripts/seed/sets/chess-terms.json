@@ -1,0 +1,32 @@
+{
+  "slug": "chess-terms",
+  "title": "Chess Terms for Beginners",
+  "description": "Key chess rules, tactics, and vocabulary for new players, from castling and en passant to forks, pins, and the endgame.",
+  "subject": "other",
+  "cards": [
+    { "term": "Fork", "definition": "A single piece attacks two or more enemy pieces at the same time, so the opponent can't save them all." },
+    { "term": "Castling", "definition": "The king moves two squares toward a rook, and that rook moves to the square the king passed over. Neither piece may have moved before, and the king may not castle out of, through, or into check." },
+    { "term": "En passant", "definition": "When a pawn advances two squares and lands beside an enemy pawn, that pawn may capture it as if it had moved one square, but only on the next move." },
+    { "term": "Check", "definition": "The king is under direct attack. The player must get out of check on their next move." },
+    { "term": "Checkmate", "definition": "The king is in check and has no legal way to escape. The game is over." },
+    { "term": "Stalemate", "definition": "The player to move is not in check but has no legal moves. The game is a draw." },
+    { "term": "Pin", "definition": "A piece can't move, or shouldn't, because doing so would expose a more valuable piece or the king behind it." },
+    { "term": "Skewer", "definition": "A valuable piece is attacked, and when it moves out of the way, a less valuable piece behind it can be captured." },
+    { "term": "Discovered attack", "definition": "Moving one piece out of the way reveals an attack by another piece behind it." },
+    { "term": "Promotion", "definition": "A pawn that reaches the far end of the board is replaced by a queen, rook, bishop, or knight of the same color." },
+    { "term": "Piece values", "definition": "A common rule of thumb: pawn 1, knight 3, bishop 3, rook 5, queen 9. The king can't be traded, so it has no point value." },
+    { "term": "Opening", "definition": "The first phase of the game, focused on developing pieces, controlling the center, and getting the king to safety." },
+    { "term": "Middlegame", "definition": "The phase after the opening, where most of the plans, attacks, and tactics play out." },
+    { "term": "Endgame", "definition": "The final phase, with few pieces left, where an active king and pushing pawns to promotion matter most." },
+    { "term": "Development", "definition": "Moving pieces off their starting squares to active positions, especially in the opening." },
+    { "term": "Gambit", "definition": "An opening that offers material, usually a pawn, in exchange for faster development or the initiative." },
+    { "term": "Sacrifice", "definition": "Deliberately giving up material to gain an advantage such as a strong attack or a better position." },
+    { "term": "Tempo", "definition": "A single move treated as a unit of time. Gaining a tempo means reaching a goal with one move fewer than expected." },
+    { "term": "Zugzwang", "definition": "A position where any move the player makes will worsen their position, but they are not allowed to pass." },
+    { "term": "Back-rank mate", "definition": "Checkmate by a rook or queen along the king's home row, when the king is boxed in by its own pawns." },
+    { "term": "Threefold repetition", "definition": "A player can claim a draw when the same position occurs three times with the same player to move." },
+    { "term": "Fifty-move rule", "definition": "A player can claim a draw after 50 moves by each side with no pawn move and no capture." },
+    { "term": "Touch-move rule", "definition": "In formal games, if you deliberately touch one of your pieces, you must move it if it has a legal move." },
+    { "term": "Algebraic notation", "definition": "The standard way to record moves, naming squares by file (a to h) and rank (1 to 8), as in Nf3." }
+  ]
+}
