@@ -1,4 +1,7 @@
-import { buildUpdateExpression } from "../../service/lambdas/updateStudyset/src/updateStudyset";
+import {
+    buildUpdateExpression,
+    CLIENT_EDITABLE_STUDYSET_FIELDS,
+} from "../../service/lambdas/updateStudyset/src/updateStudyset";
 import { expectValidExpressionInput, resolveRemoves, resolveWrites } from "../helpers/expressionInput";
 
 // Regression test for a real bug caught in production: CreateSet.tsx's
@@ -147,32 +150,38 @@ describe("updateStudyset buildUpdateExpression", () => {
     // #193: a client key that spells a generated placeholder (#metadataKey0,
     // :metadataValue0) used to redirect another clause, so it could write
     // username or any other server-owned field. The current spellings (#key0,
-    // :value0) are covered too.
+    // :value0) are covered too. Since #204 only metadata keys are free-form,
+    // so that's where these spellings can still appear.
     it.each([
         [
             "a name placeholder",
-            { metadataKey0: "forged", metadata: { username: "x" } },
-            { metadataKey0: "forged", "metadata.username": "x" },
+            { metadata: { metadataKey0: "forged", username: "x" } },
+            false,
+            { "metadata.metadataKey0": "forged", "metadata.username": "x" },
         ],
         [
             "a value placeholder",
-            { metadata: { textColorVisible: true }, metadataValue0: "clobber" },
-            { "metadata.textColorVisible": true, metadataValue0: "clobber" },
+            { metadata: { textColorVisible: true, metadataValue0: "clobber" } },
+            false,
+            { "metadata.textColorVisible": true, "metadata.metadataValue0": "clobber" },
         ],
         [
-            "the current name placeholder",
-            { key0: "forged", metadata: { username: "x" } },
-            { key0: "forged", "metadata.username": "x" },
+            "the current name placeholder in a metadata update",
+            { key0: "forged", username: "x" },
+            true,
+            { "metadata.key0": "forged", "metadata.username": "x" },
         ],
         [
-            "the current value placeholder",
-            { metadata: { textColorVisible: true }, value0: "clobber" },
-            { "metadata.textColorVisible": true, value0: "clobber" },
+            "the current value placeholder in a metadata update",
+            { textColorVisible: true, value0: "clobber" },
+            true,
+            { "metadata.textColorVisible": true, "metadata.value0": "clobber" },
         ],
-    ])("can't hijack %s with a client key", (_label, updates, expected) => {
+        ["a placeholder-shaped top-level key", { key0: "forged", value0: "clobber", title: "T" }, false, { title: "T" }],
+    ])("can't hijack %s with a client key", (_label, updates, isMetadataUpdate, expected) => {
         const result = buildUpdateExpression({
             updates,
-            isMetadataUpdate: false,
+            isMetadataUpdate,
             updatedAt: NOW,
             updatedBy: "turtles",
         });
@@ -182,17 +191,36 @@ describe("updateStudyset buildUpdateExpression", () => {
     });
 
     it.each([
-        ["a full save", { "my-field": 1, "a.b": 2 }, false, { "my-field": 1, "a.b": 2 }],
-        ["a metadata update", { "x y": 1 }, true, { "metadata.x y": 1 }],
-    ])("writes keys that aren't valid placeholder names on %s", (_label, updates, isMetadataUpdate, expected) => {
+        ["a full-save metadata object", { metadata: { "my-field": 1, "a.b": 2 } }, false, { "metadata.my-field": 1, "metadata.a.b": 2 }, ["my-field", "a.b"]],
+        ["a metadata update", { "x y": 1 }, true, { "metadata.x y": 1 }, ["x y"]],
+    ])("writes keys that aren't valid placeholder names on %s", (_label, updates, isMetadataUpdate, expected, names) => {
         const result = buildUpdateExpression({ updates, isMetadataUpdate, updatedAt: NOW, updatedBy: "turtles" });
 
         expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", ...expected });
         // resolveWrites joins path segments with ".", so check "a.b" stays one name, not a nested path.
-        expect(Object.values(result.ExpressionAttributeNames)).toEqual(
-            expect.arrayContaining(Object.keys(updates))
-        );
+        expect(Object.values(result.ExpressionAttributeNames)).toEqual(expect.arrayContaining(names));
         expectValidExpressionInput(result);
+    });
+
+    it("drops top-level fields outside the allowlist (#204)", () => {
+        const updates = JSON.parse('{"title":"T","notAField":1,"uuid":"u","PK":"x","SK":"y","":1,"__proto__":{"x":1}}');
+        updates["k".repeat(70_000)] = 1;
+
+        const result = buildUpdateExpression({ updates, isMetadataUpdate: false, updatedAt: NOW, updatedBy: "turtles" });
+
+        expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", title: "T" });
+        expectValidExpressionInput(result);
+    });
+
+    it.each([...CLIENT_EDITABLE_STUDYSET_FIELDS])("writes the client-editable field %s (#204)", (field) => {
+        const result = buildUpdateExpression({
+            updates: { [field]: "v" },
+            isMetadataUpdate: false,
+            updatedAt: NOW,
+            updatedBy: "turtles",
+        });
+
+        expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", [field]: "v" });
     });
 
     it("drops publiclyViewable from a metadata update without leaving an unused #metadata", () => {
@@ -397,6 +425,8 @@ describe("web callers keep the fields they edit (#204)", () => {
         ],
         ["PrintDialog", { printConfig: { layout: "grid" } }, true, { "metadata.printConfig": { layout: "grid" } }],
         ["StudysetActions control menu", { contentOnly: true }, true, { "metadata.contentOnly": true }],
+        // The whole local Dexie row, which may hold server fields from an import.
+        ["SyncEngine", { ...FETCHED_SET, title: "Edited", description: "edited", labels: ["l2"], uuid: "s1" }, false, FULL_SAVE_WRITES],
     ])("%s", (_caller, updates, isMetadataUpdate, expected) => {
         const result = buildUpdateExpression({ updates, isMetadataUpdate, updatedAt: NOW, updatedBy: "turtles" });
 

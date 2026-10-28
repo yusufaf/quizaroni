@@ -12,7 +12,7 @@ import {
 import { S3Client } from '@aws-sdk/client-s3';
 import type { UnpublishedOnSave } from '@quizaroni/shared-types';
 import { AuthorizerContext } from 'models/auth';
-import { Card } from 'models/studysets';
+import { Card, Studyset } from 'models/studysets';
 import { removeKeys } from 'resources/dynamo/utilities';
 import {
     collectCardFileKeys,
@@ -50,20 +50,18 @@ type BuildUpdateExpressionParams = {
     unpublish?: boolean;
 };
 
-const SERVER_OWNED_FIELDS = new Set([
-    'subject',
-    'publishedAt',
-    'moderation',
-    'PK2',
-    'SK2',
-    'studysetUUID',
-    'userUUID',
-    'createdAt',
-    'copiedFrom',
-    'username',
-    'featuredAt',
-]);
 const SERVER_OWNED_METADATA_FIELDS = new Set(['publiclyViewable']);
+
+/** The top-level fields a client may write (#204). `metadata` is merged per key in buildUpdateExpression. */
+export const CLIENT_EDITABLE_STUDYSET_FIELDS: ReadonlySet<string> = new Set([
+    'cards',
+    'categories',
+    'description',
+    'favorited',
+    'labels',
+    'lastViewed',
+    'title',
+] satisfies (keyof Studyset)[]);
 
 const respond = (statusCode: number, message: string) => ({
     statusCode,
@@ -89,14 +87,15 @@ class RequestError extends Error {
  * the user as a successful save. This strips both from the caller-supplied
  * `updates` before building the expression.
  *
- * Publication fields (`subject`, `publishedAt`, `PK2`/`SK2`,
- * `metadata.publiclyViewable`) and `moderation` are owned by publish,
- * unpublish and the takedown script, so they are silently stripped here, as
- * are the identity fields createStudyset writes (#188) and `username`, the
- * author name a public set shows, which only server paths write (#193), and
- * `featuredAt`, which only the feature script writes (#141). A
- * top-level `metadata` object (CreateSet's full save) is merged per key
- * rather than replacing the map, so it can't reset `publiclyViewable`.
+ * A client top-level key is written only if it's in
+ * CLIENT_EDITABLE_STUDYSET_FIELDS; every other key is dropped silently. So a
+ * server-owned attribute (the publication fields and `moderation`, the
+ * identity fields createStudyset writes, the `username` a public set shows,
+ * `featuredAt`, or a future GSI key) is protected without a list entry (#204;
+ * previously #132, #188, #193, #141). Keys are dropped rather than rejected so
+ * cached clients that send the whole set keep saving. A top-level `metadata`
+ * object (CreateSet's full save) is merged per key rather than replacing the
+ * map, so it can't reset `publiclyViewable`, which only publish paths write.
  * Client keys never become placeholder names (they get `#key<N>`/`:value<N>`),
  * so a key like `metadataKey0` can't redirect another clause to a server-owned
  * field (#193).
@@ -152,7 +151,7 @@ export const buildUpdateExpression = ({
                     setClientKey(metadataKey, metadataValue, true);
                 }
             }
-        } else if (!SERVER_OWNED_FIELDS.has(key)) {
+        } else if (CLIENT_EDITABLE_STUDYSET_FIELDS.has(key)) {
             setClientKey(key, value, false);
         }
     }
