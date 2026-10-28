@@ -275,6 +275,51 @@ describe("updateStudyset handler", () => {
         expect(sent(GetCommand)).toHaveLength(1);
         expect(calls.indexOf(sent(GetCommand)[0])).toBeGreaterThan(calls.indexOf(sent(UpdateCommand)[0]));
     });
+
+    // CreateSet sends back the whole set it fetched, server fields included.
+    it("saves a full CreateSet payload, writing only client-editable fields (#204)", async () => {
+        const res = await invoke({
+            updates: {
+                cards: [cardWith()],
+                categories: ["A"],
+                createdAt: "2026-01-01T00:00:00.000Z",
+                description: "desc",
+                favorited: false,
+                labels: ["l"],
+                lastViewed: "2026-02-01T00:00:00.000Z",
+                metadata: { publiclyViewable: true, textColorVisible: true },
+                publishedAt: "2026-01-02T00:00:00.000Z",
+                studysetUUID: STUDYSET_UUID,
+                subject: "science",
+                title: "Title",
+                username: "author",
+                userUUID: USER_UUID,
+                updatedAt: "2026-01-03T00:00:00.000Z",
+                updatedBy: "someone",
+                moderation: { hiddenAt: null },
+                copiedFrom: SRC_SET,
+                featuredAt: "2026-01-04T00:00:00.000Z",
+                PK2: "PUBLIC",
+                uuid: STUDYSET_UUID,
+            },
+        });
+
+        expect(res.statusCode).toBe(200);
+        const [update] = sent(UpdateCommand);
+        expect(Object.keys(resolveWrites(update.input)).sort()).toEqual([
+            "cards",
+            "categories",
+            "description",
+            "favorited",
+            "labels",
+            "lastViewed",
+            "metadata.textColorVisible",
+            "title",
+            "updatedAt",
+            "updatedBy",
+        ]);
+        expectValidExpressionInput(update.input);
+    });
 });
 
 // #170: the publish gate (#132) ran only on publish, so a later save could

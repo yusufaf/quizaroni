@@ -1,4 +1,7 @@
-import { buildUpdateExpression } from "../../service/lambdas/updateStudyset/src/updateStudyset";
+import {
+    buildUpdateExpression,
+    CLIENT_EDITABLE_STUDYSET_FIELDS,
+} from "../../service/lambdas/updateStudyset/src/updateStudyset";
 import { expectValidExpressionInput, resolveRemoves, resolveWrites } from "../helpers/expressionInput";
 
 // Regression test for a real bug caught in production: CreateSet.tsx's
@@ -147,32 +150,38 @@ describe("updateStudyset buildUpdateExpression", () => {
     // #193: a client key that spells a generated placeholder (#metadataKey0,
     // :metadataValue0) used to redirect another clause, so it could write
     // username or any other server-owned field. The current spellings (#key0,
-    // :value0) are covered too.
+    // :value0) are covered too. Since #204 only metadata keys are free-form,
+    // so that's where these spellings can still appear.
     it.each([
         [
             "a name placeholder",
-            { metadataKey0: "forged", metadata: { username: "x" } },
-            { metadataKey0: "forged", "metadata.username": "x" },
+            { metadata: { metadataKey0: "forged", username: "x" } },
+            false,
+            { "metadata.metadataKey0": "forged", "metadata.username": "x" },
         ],
         [
             "a value placeholder",
-            { metadata: { textColorVisible: true }, metadataValue0: "clobber" },
-            { "metadata.textColorVisible": true, metadataValue0: "clobber" },
+            { metadata: { textColorVisible: true, metadataValue0: "clobber" } },
+            false,
+            { "metadata.textColorVisible": true, "metadata.metadataValue0": "clobber" },
         ],
         [
-            "the current name placeholder",
-            { key0: "forged", metadata: { username: "x" } },
-            { key0: "forged", "metadata.username": "x" },
+            "the current name placeholder in a metadata update",
+            { key0: "forged", username: "x" },
+            true,
+            { "metadata.key0": "forged", "metadata.username": "x" },
         ],
         [
-            "the current value placeholder",
-            { metadata: { textColorVisible: true }, value0: "clobber" },
-            { "metadata.textColorVisible": true, value0: "clobber" },
+            "the current value placeholder in a metadata update",
+            { textColorVisible: true, value0: "clobber" },
+            true,
+            { "metadata.textColorVisible": true, "metadata.value0": "clobber" },
         ],
-    ])("can't hijack %s with a client key", (_label, updates, expected) => {
+        ["a placeholder-shaped top-level key", { key0: "forged", value0: "clobber", title: "T" }, false, { title: "T" }],
+    ])("can't hijack %s with a client key", (_label, updates, isMetadataUpdate, expected) => {
         const result = buildUpdateExpression({
             updates,
-            isMetadataUpdate: false,
+            isMetadataUpdate,
             updatedAt: NOW,
             updatedBy: "turtles",
         });
@@ -182,17 +191,88 @@ describe("updateStudyset buildUpdateExpression", () => {
     });
 
     it.each([
-        ["a full save", { "my-field": 1, "a.b": 2 }, false, { "my-field": 1, "a.b": 2 }],
-        ["a metadata update", { "x y": 1 }, true, { "metadata.x y": 1 }],
-    ])("writes keys that aren't valid placeholder names on %s", (_label, updates, isMetadataUpdate, expected) => {
+        ["a full-save metadata object", { metadata: { "my-field": 1, "a.b": 2 } }, false, { "metadata.my-field": 1, "metadata.a.b": 2 }, ["my-field", "a.b"]],
+        ["a metadata update", { "x y": 1 }, true, { "metadata.x y": 1 }, ["x y"]],
+    ])("writes keys that aren't valid placeholder names on %s", (_label, updates, isMetadataUpdate, expected, names) => {
         const result = buildUpdateExpression({ updates, isMetadataUpdate, updatedAt: NOW, updatedBy: "turtles" });
 
         expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", ...expected });
         // resolveWrites joins path segments with ".", so check "a.b" stays one name, not a nested path.
-        expect(Object.values(result.ExpressionAttributeNames)).toEqual(
-            expect.arrayContaining(Object.keys(updates))
-        );
+        expect(Object.values(result.ExpressionAttributeNames)).toEqual(expect.arrayContaining(names));
         expectValidExpressionInput(result);
+    });
+
+    it("drops top-level fields outside the allowlist (#204)", () => {
+        const updates = JSON.parse('{"title":"T","notAField":1,"uuid":"u","PK":"x","SK":"y","":1,"__proto__":{"x":1}}');
+        updates["k".repeat(70_000)] = 1;
+
+        const result = buildUpdateExpression({ updates, isMetadataUpdate: false, updatedAt: NOW, updatedBy: "turtles" });
+
+        expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", title: "T" });
+        expectValidExpressionInput(result);
+    });
+
+    // DynamoDB rejects an empty attribute name, so these used to 500.
+    it.each([
+        ["a metadata update", { "": 1, textColorVisible: true }, true],
+        ["a full-save metadata object", { metadata: { "": 1, textColorVisible: true } }, false],
+    ])("drops an empty metadata key on %s (#204)", (_label, updates, isMetadataUpdate) => {
+        const result = buildUpdateExpression({ updates, isMetadataUpdate, updatedAt: NOW, updatedBy: "turtles" });
+
+        expect(resolveWrites(result)).toEqual({
+            updatedAt: NOW,
+            updatedBy: "turtles",
+            "metadata.textColorVisible": true,
+        });
+        expectValidExpressionInput(result);
+    });
+
+    // DynamoDB rejects names of 65536 bytes or more (measured on DynamoDB Local).
+    it.each([
+        ["a metadata update", true, (key: string) => ({ [key]: 1, textColorVisible: true })],
+        ["a full-save metadata object", false, (key: string) => ({ metadata: { [key]: 1, textColorVisible: true } })],
+    ])("drops an oversized or __proto__ metadata key on %s", (_label, isMetadataUpdate, build) => {
+        // "é" is two UTF-8 bytes, so this key is 65536 bytes. Round-tripping
+        // through JSON makes "__proto__" an own key, as in a request body.
+        for (const key of ["é".repeat(32_768), "__proto__"]) {
+            const updates = JSON.parse(JSON.stringify(build(key)));
+            const result = buildUpdateExpression({ updates, isMetadataUpdate, updatedAt: NOW, updatedBy: "turtles" });
+
+            expect(Object.values(result.ExpressionAttributeNames)).not.toContain(key);
+            expect(resolveWrites(result)["metadata.textColorVisible"]).toBe(true);
+            expectValidExpressionInput(result);
+        }
+    });
+
+    it("keeps a metadata key just under DynamoDB's name limit", () => {
+        const key = "k".repeat(65_535);
+
+        const result = buildUpdateExpression({ updates: { [key]: 1 }, isMetadataUpdate: true, updatedAt: NOW, updatedBy: "turtles" });
+
+        expect(Object.values(result.ExpressionAttributeNames)).toContain(key);
+    });
+
+    it("leaves no #metadata when the only metadata key is empty (#204)", () => {
+        const result = buildUpdateExpression({
+            updates: { "": 1 },
+            isMetadataUpdate: true,
+            updatedAt: NOW,
+            updatedBy: "turtles",
+        });
+
+        expect(result.UpdateExpression).toBe("SET #updatedAt = :updatedAt, #updatedBy = :updatedBy");
+        expectValidExpressionInput(result);
+    });
+
+    it.each([...CLIENT_EDITABLE_STUDYSET_FIELDS])("writes the client-editable field %s (#204)", (field) => {
+        const result = buildUpdateExpression({
+            updates: { [field]: "v" },
+            isMetadataUpdate: false,
+            updatedAt: NOW,
+            updatedBy: "turtles",
+        });
+
+        expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", [field]: "v" });
     });
 
     it("drops publiclyViewable from a metadata update without leaving an unused #metadata", () => {
@@ -329,5 +409,80 @@ describe("updateStudyset buildUpdateExpression", () => {
 
         expect(result.ExpressionAttributeNames).not.toHaveProperty("#metadata");
         expectAllPlaceholdersUsed(result);
+    });
+});
+
+// #204: what each web caller sends, and what must still be written.
+const CARD = { cardUUID: "c1", term: "t", definition: "d", files: [], categories: [], important: false, notes: [] };
+
+// A set as CreateSet gets it from get-studyset: every stored attribute.
+const FETCHED_SET = {
+    cards: [CARD],
+    categories: ["A"],
+    createdAt: "2026-01-01T00:00:00.000Z",
+    description: "desc",
+    favorited: false,
+    labels: ["l1"],
+    lastViewed: "2026-02-01T00:00:00.000Z",
+    metadata: { publiclyViewable: true, textColorVisible: true, viewSetLayout: "grid" },
+    publishedAt: "2026-01-02T00:00:00.000Z",
+    studysetUUID: "s1",
+    subject: "science",
+    title: "Title",
+    username: "author",
+    userUUID: "u1",
+    updatedAt: "2026-01-03T00:00:00.000Z",
+    updatedBy: "someone",
+    moderation: { hiddenAt: null },
+    copiedFrom: "s0",
+    featuredAt: "2026-01-04T00:00:00.000Z",
+};
+
+const FULL_SAVE_WRITES = {
+    cards: [CARD],
+    categories: ["A"],
+    description: "edited",
+    favorited: false,
+    labels: ["l2"],
+    lastViewed: "2026-02-01T00:00:00.000Z",
+    title: "Edited",
+    "metadata.textColorVisible": true,
+    "metadata.viewSetLayout": "grid",
+};
+
+describe("web callers keep the fields they edit (#204)", () => {
+    it.each([
+        [
+            "CreateSet full save",
+            { ...FETCHED_SET, title: "Edited", description: "edited", labels: ["l2"] },
+            false,
+            FULL_SAVE_WRITES,
+        ],
+        [
+            "CombineSets",
+            { title: "T", cards: [CARD], description: "d", labels: ["l"], metadata: { publiclyViewable: true, terminology: "x" } },
+            false,
+            { title: "T", cards: [CARD], description: "d", labels: ["l"], "metadata.terminology": "x" },
+        ],
+        ["ManageCategoriesDialog rename/delete", { cards: [CARD], categories: ["A", "B"] }, false, { cards: [CARD], categories: ["A", "B"] }],
+        ["ManageCategoriesDialog create/import", { categories: ["A"] }, false, { categories: ["A"] }],
+        ["SuggestedCards / mark important / reorder", { cards: [CARD] }, false, { cards: [CARD] }],
+        ["favorite toggle", { favorited: true }, false, { favorited: true }],
+        ["ViewStudySet lastViewed", { lastViewed: NOW }, false, { lastViewed: NOW }],
+        [
+            "NotesDrawer",
+            { notesSortBy: "date", notesSortDirection: "asc" },
+            true,
+            { "metadata.notesSortBy": "date", "metadata.notesSortDirection": "asc" },
+        ],
+        ["PrintDialog", { printConfig: { layout: "grid" } }, true, { "metadata.printConfig": { layout: "grid" } }],
+        ["StudysetActions control menu", { contentOnly: true }, true, { "metadata.contentOnly": true }],
+        // The whole local Dexie row, which may hold server fields from an import.
+        ["SyncEngine", { ...FETCHED_SET, title: "Edited", description: "edited", labels: ["l2"], uuid: "s1" }, false, FULL_SAVE_WRITES],
+    ])("%s", (_caller, updates, isMetadataUpdate, expected) => {
+        const result = buildUpdateExpression({ updates, isMetadataUpdate, updatedAt: NOW, updatedBy: "turtles" });
+
+        expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", ...expected });
+        expectValidExpressionInput(result);
     });
 });
