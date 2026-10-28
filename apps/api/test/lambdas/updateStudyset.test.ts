@@ -331,3 +331,76 @@ describe("updateStudyset buildUpdateExpression", () => {
         expectAllPlaceholdersUsed(result);
     });
 });
+
+// #204: what each web caller sends, and what must still be written.
+const CARD = { cardUUID: "c1", term: "t", definition: "d", files: [], categories: [], important: false, notes: [] };
+
+// A set as CreateSet gets it from get-studyset: every stored attribute.
+const FETCHED_SET = {
+    cards: [CARD],
+    categories: ["A"],
+    createdAt: "2026-01-01T00:00:00.000Z",
+    description: "desc",
+    favorited: false,
+    labels: ["l1"],
+    lastViewed: "2026-02-01T00:00:00.000Z",
+    metadata: { publiclyViewable: true, textColorVisible: true, viewSetLayout: "grid" },
+    publishedAt: "2026-01-02T00:00:00.000Z",
+    studysetUUID: "s1",
+    subject: "science",
+    title: "Title",
+    username: "author",
+    userUUID: "u1",
+    updatedAt: "2026-01-03T00:00:00.000Z",
+    updatedBy: "someone",
+    moderation: { hiddenAt: null },
+    copiedFrom: "s0",
+    featuredAt: "2026-01-04T00:00:00.000Z",
+};
+
+const FULL_SAVE_WRITES = {
+    cards: [CARD],
+    categories: ["A"],
+    description: "edited",
+    favorited: false,
+    labels: ["l2"],
+    lastViewed: "2026-02-01T00:00:00.000Z",
+    title: "Edited",
+    "metadata.textColorVisible": true,
+    "metadata.viewSetLayout": "grid",
+};
+
+describe("web callers keep the fields they edit (#204)", () => {
+    it.each([
+        [
+            "CreateSet full save",
+            { ...FETCHED_SET, title: "Edited", description: "edited", labels: ["l2"] },
+            false,
+            FULL_SAVE_WRITES,
+        ],
+        [
+            "CombineSets",
+            { title: "T", cards: [CARD], description: "d", labels: ["l"], metadata: { publiclyViewable: true, terminology: "x" } },
+            false,
+            { title: "T", cards: [CARD], description: "d", labels: ["l"], "metadata.terminology": "x" },
+        ],
+        ["ManageCategoriesDialog rename/delete", { cards: [CARD], categories: ["A", "B"] }, false, { cards: [CARD], categories: ["A", "B"] }],
+        ["ManageCategoriesDialog create/import", { categories: ["A"] }, false, { categories: ["A"] }],
+        ["SuggestedCards / mark important / reorder", { cards: [CARD] }, false, { cards: [CARD] }],
+        ["favorite toggle", { favorited: true }, false, { favorited: true }],
+        ["ViewStudySet lastViewed", { lastViewed: NOW }, false, { lastViewed: NOW }],
+        [
+            "NotesDrawer",
+            { notesSortBy: "date", notesSortDirection: "asc" },
+            true,
+            { "metadata.notesSortBy": "date", "metadata.notesSortDirection": "asc" },
+        ],
+        ["PrintDialog", { printConfig: { layout: "grid" } }, true, { "metadata.printConfig": { layout: "grid" } }],
+        ["StudysetActions control menu", { contentOnly: true }, true, { "metadata.contentOnly": true }],
+    ])("%s", (_caller, updates, isMetadataUpdate, expected) => {
+        const result = buildUpdateExpression({ updates, isMetadataUpdate, updatedAt: NOW, updatedBy: "turtles" });
+
+        expect(resolveWrites(result)).toEqual({ updatedAt: NOW, updatedBy: "turtles", ...expected });
+        expectValidExpressionInput(result);
+    });
+});
