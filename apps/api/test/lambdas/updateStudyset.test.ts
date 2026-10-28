@@ -212,6 +212,33 @@ describe("updateStudyset buildUpdateExpression", () => {
         expectValidExpressionInput(result);
     });
 
+    // DynamoDB rejects an empty attribute name, so these used to 500.
+    it.each([
+        ["a metadata update", { "": 1, textColorVisible: true }, true],
+        ["a full-save metadata object", { metadata: { "": 1, textColorVisible: true } }, false],
+    ])("drops an empty metadata key on %s (#204)", (_label, updates, isMetadataUpdate) => {
+        const result = buildUpdateExpression({ updates, isMetadataUpdate, updatedAt: NOW, updatedBy: "turtles" });
+
+        expect(resolveWrites(result)).toEqual({
+            updatedAt: NOW,
+            updatedBy: "turtles",
+            "metadata.textColorVisible": true,
+        });
+        expectValidExpressionInput(result);
+    });
+
+    it("leaves no #metadata when the only metadata key is empty (#204)", () => {
+        const result = buildUpdateExpression({
+            updates: { "": 1 },
+            isMetadataUpdate: true,
+            updatedAt: NOW,
+            updatedBy: "turtles",
+        });
+
+        expect(result.UpdateExpression).toBe("SET #updatedAt = :updatedAt, #updatedBy = :updatedBy");
+        expectValidExpressionInput(result);
+    });
+
     it.each([...CLIENT_EDITABLE_STUDYSET_FIELDS])("writes the client-editable field %s (#204)", (field) => {
         const result = buildUpdateExpression({
             updates: { [field]: "v" },

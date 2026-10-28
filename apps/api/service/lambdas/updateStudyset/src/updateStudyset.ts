@@ -52,6 +52,9 @@ type BuildUpdateExpressionParams = {
 
 const SERVER_OWNED_METADATA_FIELDS = new Set(['publiclyViewable']);
 
+// DynamoDB rejects an empty attribute name.
+const isWritableMetadataKey = (key: string) => key !== '' && !SERVER_OWNED_METADATA_FIELDS.has(key);
+
 /** The top-level fields a client may write (#204). `metadata` is merged per key in buildUpdateExpression. */
 export const CLIENT_EDITABLE_STUDYSET_FIELDS: ReadonlySet<string> = new Set([
     'cards',
@@ -142,12 +145,12 @@ export const buildUpdateExpression = ({
 
     for (const [key, value] of Object.entries(clientUpdates)) {
         if (isMetadataUpdate) {
-            if (SERVER_OWNED_METADATA_FIELDS.has(key)) continue;
+            if (!isWritableMetadataKey(key)) continue;
             setClientKey(key, value, true);
         } else if (key === 'metadata') {
             if (!isPlainObject(value)) continue;
             for (const [metadataKey, metadataValue] of Object.entries(value)) {
-                if (!SERVER_OWNED_METADATA_FIELDS.has(metadataKey)) {
+                if (isWritableMetadataKey(metadataKey)) {
                     setClientKey(metadataKey, metadataValue, true);
                 }
             }
