@@ -52,8 +52,13 @@ type BuildUpdateExpressionParams = {
 
 const SERVER_OWNED_METADATA_FIELDS = new Set(['publiclyViewable']);
 
-// DynamoDB rejects an empty attribute name.
-const isWritableMetadataKey = (key: string) => key !== '' && !SERVER_OWNED_METADATA_FIELDS.has(key);
+// DynamoDB rejects an empty name or one of 65536 bytes or more. `__proto__`
+// would become a prototype setter when a client merges the stored metadata.
+const isWritableMetadataKey = (key: string) =>
+    key !== '' &&
+    key !== '__proto__' &&
+    Buffer.byteLength(key) < 65_536 &&
+    !SERVER_OWNED_METADATA_FIELDS.has(key);
 
 /** The top-level fields a client may write (#204). `metadata` is merged per key in buildUpdateExpression. */
 export const CLIENT_EDITABLE_STUDYSET_FIELDS: ReadonlySet<string> = new Set([

@@ -227,6 +227,31 @@ describe("updateStudyset buildUpdateExpression", () => {
         expectValidExpressionInput(result);
     });
 
+    // DynamoDB rejects names of 65536 bytes or more (measured on DynamoDB Local).
+    it.each([
+        ["a metadata update", true, (key: string) => ({ [key]: 1, textColorVisible: true })],
+        ["a full-save metadata object", false, (key: string) => ({ metadata: { [key]: 1, textColorVisible: true } })],
+    ])("drops an oversized or __proto__ metadata key on %s", (_label, isMetadataUpdate, build) => {
+        // "é" is two UTF-8 bytes, so this key is 65536 bytes. Round-tripping
+        // through JSON makes "__proto__" an own key, as in a request body.
+        for (const key of ["é".repeat(32_768), "__proto__"]) {
+            const updates = JSON.parse(JSON.stringify(build(key)));
+            const result = buildUpdateExpression({ updates, isMetadataUpdate, updatedAt: NOW, updatedBy: "turtles" });
+
+            expect(Object.values(result.ExpressionAttributeNames)).not.toContain(key);
+            expect(resolveWrites(result)["metadata.textColorVisible"]).toBe(true);
+            expectValidExpressionInput(result);
+        }
+    });
+
+    it("keeps a metadata key just under DynamoDB's name limit", () => {
+        const key = "k".repeat(65_535);
+
+        const result = buildUpdateExpression({ updates: { [key]: 1 }, isMetadataUpdate: true, updatedAt: NOW, updatedBy: "turtles" });
+
+        expect(Object.values(result.ExpressionAttributeNames)).toContain(key);
+    });
+
     it("leaves no #metadata when the only metadata key is empty (#204)", () => {
         const result = buildUpdateExpression({
             updates: { "": 1 },
