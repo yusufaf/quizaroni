@@ -101,6 +101,15 @@ describe('ExploreSearchField (#137)', () => {
         expect(location()).toBe('/explore?q=bio');
     });
 
+    // Clicking a subject chip blurs the field first, so the search lands
+    // before the chip's change instead of after it as a second push.
+    it('commits on blur without waiting', () => {
+        renderField();
+        type('bio');
+        fireEvent.blur(box());
+        expect(location()).toBe('/explore?q=bio');
+    });
+
     it('pushes when a search starts and replaces while refining', () => {
         renderField();
         type('bio');

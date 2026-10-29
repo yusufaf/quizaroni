@@ -93,6 +93,9 @@ const ExploreSearchField = () => {
                 onKeyDown={(e) => {
                     if (e.key === 'Enter') commit(draft);
                 }}
+                // Clicking a subject chip blurs the field first, so a pending
+                // search lands before the chip's change, not after it.
+                onBlur={() => commit(draft)}
                 inputRef={inputRef}
                 inputProps={{
                     'data-shortcut-search': 'true',
