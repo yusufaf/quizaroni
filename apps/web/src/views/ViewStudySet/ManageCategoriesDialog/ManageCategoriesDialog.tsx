@@ -187,6 +187,11 @@ const ManageCategoriesDialog = (props: Props) => {
         if (pending.studysetUUID !== studysetUUIDRef.current) {
             dropAssign();
             toast.error(t('categories.assignFailed'));
+            setAssignedCategoriesSelection(
+                cardsRef.current.find(
+                    (card) => card.cardUUID === selectedCardUUIDRef.current
+                )?.categories ?? []
+            );
             return;
         }
         // cardsRef is about to be replaced by the in-flight save's refetch.
@@ -334,6 +339,16 @@ const ManageCategoriesDialog = (props: Props) => {
         },
         [validateCategory]
     );
+
+    // A name kept in the field across a save is checked against the new list.
+    // Keyed on the server data, not the defaulted categories array, which is
+    // a new [] on every render while the set loads.
+    useEffect(() => {
+        if (categoryNameRef.current) {
+            setErrorInfo(validateCategory(categoryNameRef.current));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedStudyset.categories]);
 
     const createCategory = useCallback(async () => {
         if (!studysetUUID || !categoryName.trim() || errorInfo || isBusy()) {

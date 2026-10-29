@@ -457,6 +457,9 @@ describe('ManageCategoriesDialog', () => {
             expect(toastMock.error).toHaveBeenCalledWith(
                 'categories.assignFailed'
             );
+            expect(
+                screen.getByText('categories.noCategoriesAssigned')
+            ).toBeTruthy();
         });
     });
 
@@ -542,6 +545,24 @@ describe('ManageCategoriesDialog', () => {
                 await new Promise((r) => setTimeout(r, 50));
             });
             expect(input.value).toBe('second');
+        });
+
+        it('rechecks a typed name when the category list changes', () => {
+            const { rerenderWith } = renderDialog();
+            fireEvent.change(screen.getByLabelText('categories.categoryName'), {
+                target: { value: 'dup' },
+            });
+            expect(
+                screen.queryByText('categories.categoryAlreadyExists')
+            ).toBeNull();
+
+            rerenderWith({
+                ...fixture,
+                categories: ['used', 'unused', 'dup'],
+            } as unknown as Studyset);
+            expect(
+                screen.getByText('categories.categoryAlreadyExists')
+            ).toBeTruthy();
         });
 
         it('sends one save for a double Enter and locks Delete Selected meanwhile', async () => {
