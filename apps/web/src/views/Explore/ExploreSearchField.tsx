@@ -114,6 +114,9 @@ const ExploreSearchField = () => {
                                 size="small"
                                 aria-label={t('search.clear')}
                                 onClick={onClear}
+                                // Keeps focus in the field, so the blur commit
+                                // doesn't push the draft just before clearing it.
+                                onMouseDown={(e) => e.preventDefault()}
                             >
                                 <CloseRounded />
                             </IconButton>
