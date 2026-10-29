@@ -85,6 +85,10 @@ const ManageCategoriesDialog = (props: Props) => {
     selectedStudysetRef.current = selectedStudyset;
     const selectedCardUUIDRef = useRef(selectedCardUUID);
     selectedCardUUIDRef.current = selectedCardUUID;
+    const categoryNameRef = useRef(categoryName);
+    categoryNameRef.current = categoryName;
+    const tRef = useRef(t);
+    tRef.current = t;
 
     // Render-time state: a save or the refetch it starts is in flight...
     const isRefetching =
@@ -182,6 +186,7 @@ const ManageCategoriesDialog = (props: Props) => {
         // Its cards payload can only be built from the set it was picked in.
         if (pending.studysetUUID !== studysetUUIDRef.current) {
             dropAssign();
+            toast.error(t('categories.assignFailed'));
             return;
         }
         // cardsRef is about to be replaced by the in-flight save's refetch.
@@ -244,7 +249,7 @@ const ManageCategoriesDialog = (props: Props) => {
             clearAssignTimer();
             // The cleanup can't wait for an in-flight save, and its refetch
             // would replace the cards this payload is built from, so the
-            // pick is dropped in that case.
+            // pick is dropped in that case, with the same error as a failed save.
             if (
                 pending.studysetUUID === studysetUUIDRef.current &&
                 !isSaveInFlight()
@@ -256,6 +261,8 @@ const ManageCategoriesDialog = (props: Props) => {
                     ),
                     'categories.assignFailed'
                 );
+            } else {
+                toast.error(tRef.current('categories.assignFailed'));
             }
         },
         // Only touches refs and the stable query client
@@ -332,9 +339,15 @@ const ManageCategoriesDialog = (props: Props) => {
         if (!studysetUUID || !categoryName.trim() || errorInfo || isBusy()) {
             return;
         }
+        const submittedName = categoryName;
         const newCategories = [...categories, categoryName.trim()];
         if (
-            await save({ categories: newCategories }, 'categories.createFailed')
+            (await save(
+                { categories: newCategories },
+                'categories.createFailed'
+            )) &&
+            // Keep anything typed while the save was in flight
+            categoryNameRef.current === submittedName
         ) {
             setCategoryName('');
             setErrorInfo(null);

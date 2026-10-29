@@ -436,6 +436,9 @@ describe('ManageCategoriesDialog', () => {
             await wait(600);
 
             expect(updateCalls()).toHaveLength(1);
+            expect(toastMock.error).toHaveBeenCalledWith(
+                'categories.assignFailed'
+            );
         });
 
         it('drops a pending pick when the dialog switches to another set', async () => {
@@ -451,6 +454,9 @@ describe('ManageCategoriesDialog', () => {
             await wait(600);
 
             expect(updateCalls()).toHaveLength(0);
+            expect(toastMock.error).toHaveBeenCalledWith(
+                'categories.assignFailed'
+            );
         });
     });
 
@@ -517,6 +523,25 @@ describe('ManageCategoriesDialog', () => {
             await wait(50);
 
             expect(updateCalls()).toHaveLength(0);
+        });
+
+        it('keeps a name typed while the create save was in flight', async () => {
+            const held = deferred<Response>();
+            fetchMock.mockImplementationOnce(() => held.promise);
+            renderDialog();
+            const input = screen.getByLabelText(
+                'categories.categoryName'
+            ) as HTMLInputElement;
+            fireEvent.change(input, { target: { value: 'first' } });
+            fireEvent.keyDown(input, { key: 'Enter' });
+            await waitFor(() => expect(updateCalls()).toHaveLength(1));
+            fireEvent.change(input, { target: { value: 'second' } });
+
+            await act(async () => {
+                held.resolve(ok());
+                await new Promise((r) => setTimeout(r, 50));
+            });
+            expect(input.value).toBe('second');
         });
 
         it('sends one save for a double Enter and locks Delete Selected meanwhile', async () => {
