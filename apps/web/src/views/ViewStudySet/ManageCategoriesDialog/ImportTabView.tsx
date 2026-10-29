@@ -29,6 +29,7 @@ type Props = {
     studysets: Studyset[];
     handleImport: () => void;
     onFileImport: (categories: string[]) => void;
+    isLoading?: boolean;
 };
 
 const ACCEPTED_EXTENSIONS = ['.json', '.txt', '.csv'];
@@ -67,6 +68,7 @@ const ImportTabView = (props: Props) => {
         studysets,
         handleImport,
         onFileImport,
+        isLoading = false,
     } = props;
 
     const { t } = useTranslation();
@@ -238,7 +240,11 @@ const ImportTabView = (props: Props) => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {/* From Study Set */}
-            <Typography variant="h6" color="text.primary" sx={{ fontWeight: 600 }}>
+            <Typography
+                variant="h6"
+                color="text.primary"
+                sx={{ fontWeight: 600 }}
+            >
                 {t('categories.fromStudyset')}
             </Typography>
 
@@ -400,7 +406,7 @@ const ImportTabView = (props: Props) => {
                         <Button
                             variant="contained"
                             onClick={handleImport}
-                            disabled={newCategories.length === 0}
+                            disabled={newCategories.length === 0 || isLoading}
                             sx={{ fontWeight: 600 }}
                         >
                             {newCategories.length > 0
@@ -416,7 +422,11 @@ const ImportTabView = (props: Props) => {
             <Divider />
 
             {/* From File */}
-            <Typography variant="h6" color="text.primary" sx={{ fontWeight: 600, mt: '0.5rem' }}>
+            <Typography
+                variant="h6"
+                color="text.primary"
+                sx={{ fontWeight: 600, mt: '0.5rem' }}
+            >
                 {t('categories.fromFile')}
             </Typography>
 
@@ -579,7 +589,9 @@ const ImportTabView = (props: Props) => {
                         <Button
                             variant="contained"
                             onClick={handleFileImport}
-                            disabled={newFileCategories.length === 0}
+                            disabled={
+                                newFileCategories.length === 0 || isLoading
+                            }
                             sx={{ fontWeight: 600 }}
                         >
                             {newFileCategories.length > 0

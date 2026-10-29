@@ -1,15 +1,13 @@
 import { Box, SelectChangeEvent } from '@mui/material';
-import { Studyset } from 'shared/types';
 import {
-    ChangeEvent,
-    useState,
-    useCallback,
-    SyntheticEvent,
-    useRef,
-    useEffect,
-} from 'react';
+    GetStudysetResponse,
+    Studyset,
+    UpdateStudysetRequest,
+} from 'shared/types';
+import { ChangeEvent, useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+import { useIsFetching, useQueryClient } from '@tanstack/react-query';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
 import AssignTabView from './AssignTabView';
 import { CategoriesCreateTab } from './CategoriesCreateTab';
@@ -34,10 +32,21 @@ type Props = {
     studysets: Studyset[];
 };
 
+// An Assign pick waiting for its debounce. The set and card are captured when
+// the pick is made, not when the timer fires.
+type PendingAssign = {
+    studysetUUID: string;
+    targetCardUUID: string;
+    newCategories: string[];
+};
+
+const ASSIGN_DEBOUNCE_MS = 400;
+
 const ManageCategoriesDialog = (props: Props) => {
     const { open, onClose, selectedStudyset, studysets } = props;
 
     const { t } = useTranslation();
+    const queryClient = useQueryClient();
 
     const {
         cards = [],
@@ -46,7 +55,10 @@ const ManageCategoriesDialog = (props: Props) => {
         studysetUUID = '',
     } = selectedStudyset;
 
-    const { mutate: updateStudySet } = useUpdateStudyset();
+    // mutateAsync, not mutate: per-call mutate() callbacks only run for the
+    // latest call on the hook, so a second save dropped the first one's
+    // error handling (#113).
+    const { mutateAsync: updateStudySet } = useUpdateStudyset();
 
     const [selectedTab, setSelectedTab] = useState<string>(TABS.MANAGE);
     const [errorInfo, setErrorInfo] = useState<ErrorInfo>(null);
@@ -58,34 +70,196 @@ const ManageCategoriesDialog = (props: Props) => {
     const [selectedCardUUID, setSelectedCardUUID] = useState<string>('');
     const [assignedCategoriesSelection, setAssignedCategoriesSelection] =
         useState<string[]>([]);
-    const [isUpdating, setIsUpdating] = useState(false);
+    const [savingCount, setSavingCount] = useState(0);
+    const [assignPending, setAssignPending] = useState(false);
 
-    const assignDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(
-        null
-    );
+    const savingRef = useRef(0);
+    const assignTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const pendingAssignRef = useRef<PendingAssign | null>(null);
+    const assignSeqRef = useRef(0);
     const cardsRef = useRef(cards);
     cardsRef.current = cards;
     const studysetUUIDRef = useRef(studysetUUID);
     studysetUUIDRef.current = studysetUUID;
+    const selectedStudysetRef = useRef(selectedStudyset);
+    selectedStudysetRef.current = selectedStudyset;
     const selectedCardUUIDRef = useRef(selectedCardUUID);
     selectedCardUUIDRef.current = selectedCardUUID;
 
+    // Render-time state: a save or the refetch it starts is in flight...
+    const isRefetching =
+        useIsFetching({ queryKey: ['studysets', studysetUUID] }) > 0;
+    const isSaving = savingCount > 0 || isRefetching;
+    // ...or an Assign pick is still waiting for its debounce.
+    const isUpdating = isSaving || assignPending;
+
+    // Handler-time check. It asks the query client instead of reading render
+    // state: the refetch starts inside invalidateQueries before mutateAsync
+    // resolves, and its data reaches these props a tick after it ends.
+    // ViewStudySet passes the cached studyset object as is, so a different
+    // object in the cache means the props are behind.
+    const isSaveInFlight = useCallback(() => {
+        const queryKey = ['studysets', studysetUUIDRef.current];
+        const cached =
+            queryClient.getQueryData<GetStudysetResponse>(queryKey)?.studyset;
+        return (
+            savingRef.current > 0 ||
+            queryClient.isFetching({ queryKey }) > 0 ||
+            (cached !== undefined && cached !== selectedStudysetRef.current)
+        );
+    }, [queryClient]);
+
+    const isBusy = useCallback(
+        () => isSaveInFlight() || assignTimerRef.current !== null,
+        [isSaveInFlight]
+    );
+
+    const save = useCallback(
+        async (
+            updates: UpdateStudysetRequest['updates'],
+            errorKey: string
+        ): Promise<boolean> => {
+            savingRef.current += 1;
+            setSavingCount((n) => n + 1);
+            try {
+                await updateStudySet({
+                    studysetUUID: studysetUUIDRef.current,
+                    updates,
+                });
+                return true;
+            } catch {
+                toast.error(t(errorKey));
+                return false;
+            } finally {
+                savingRef.current -= 1;
+                setSavingCount((n) => n - 1);
+            }
+        },
+        [updateStudySet, t]
+    );
+    const saveRef = useRef(save);
+    saveRef.current = save;
+
+    const buildAssignUpdates = (
+        targetCardUUID: string,
+        newCategories: string[]
+    ): UpdateStudysetRequest['updates'] => ({
+        cards: cardsRef.current.map((card) =>
+            card.cardUUID === targetCardUUID
+                ? { ...card, categories: newCategories }
+                : card
+        ),
+    });
+
+    const clearAssignTimer = () => {
+        if (assignTimerRef.current) {
+            clearTimeout(assignTimerRef.current);
+        }
+        assignTimerRef.current = null;
+    };
+
+    const armAssign = (pending: PendingAssign) => {
+        pendingAssignRef.current = pending;
+        clearAssignTimer();
+        assignTimerRef.current = setTimeout(
+            () => void runAssignRef.current(),
+            ASSIGN_DEBOUNCE_MS
+        );
+        setAssignPending(true);
+    };
+
+    const dropAssign = () => {
+        clearAssignTimer();
+        pendingAssignRef.current = null;
+        setAssignPending(false);
+    };
+
+    const runAssign = async () => {
+        const pending = pendingAssignRef.current;
+        if (!pending) {
+            return;
+        }
+        // Its cards payload can only be built from the set it was picked in.
+        if (pending.studysetUUID !== studysetUUIDRef.current) {
+            dropAssign();
+            return;
+        }
+        // cardsRef is about to be replaced by the in-flight save's refetch.
+        if (isSaveInFlight()) {
+            armAssign(pending);
+            return;
+        }
+        dropAssign();
+        const seq = ++assignSeqRef.current;
+        const saved = await saveRef.current(
+            buildAssignUpdates(pending.targetCardUUID, pending.newCategories),
+            'categories.assignFailed'
+        );
+        // Revert unless a newer pick has taken over the selection.
+        if (
+            !saved &&
+            seq === assignSeqRef.current &&
+            pendingAssignRef.current === null &&
+            selectedCardUUIDRef.current === pending.targetCardUUID
+        ) {
+            setAssignedCategoriesSelection(
+                cardsRef.current.find(
+                    (card) => card.cardUUID === pending.targetCardUUID
+                )?.categories ?? []
+            );
+        }
+    };
+    const runAssignRef = useRef(runAssign);
+    runAssignRef.current = runAssign;
+
+    const flushAssign = () => {
+        if (!pendingAssignRef.current) {
+            return;
+        }
+        clearAssignTimer();
+        void runAssignRef.current();
+    };
+
     useEffect(() => {
-        // Use cardsRef to avoid dependency on cards array reference
+        // A pick for this card that hasn't saved yet wins over the server copy.
+        if (pendingAssignRef.current?.targetCardUUID === selectedCardUUID) {
+            return;
+        }
+        // Use cardsRef to avoid dependency on the defaulted cards array,
+        // which is a new [] on every render while the set loads.
         const card = cardsRef.current.find(
             (c) => c.cardUUID === selectedCardUUID
         );
         setAssignedCategoriesSelection(card?.categories ?? []);
-        // Only run when selectedCardUUID or open changes
+        // Re-run when the server data changes, not only on card/open change
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedCardUUID, open]);
+    }, [selectedCardUUID, open, selectedStudyset.cards]);
 
     useEffect(
         () => () => {
-            if (assignDebounceRef.current) {
-                clearTimeout(assignDebounceRef.current);
+            const pending = pendingAssignRef.current;
+            if (!pending) {
+                return;
+            }
+            clearAssignTimer();
+            // The cleanup can't wait for an in-flight save, and its refetch
+            // would replace the cards this payload is built from, so the
+            // pick is dropped in that case.
+            if (
+                pending.studysetUUID === studysetUUIDRef.current &&
+                !isSaveInFlight()
+            ) {
+                void saveRef.current(
+                    buildAssignUpdates(
+                        pending.targetCardUUID,
+                        pending.newCategories
+                    ),
+                    'categories.assignFailed'
+                );
             }
         },
+        // Only touches refs and the stable query client
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         []
     );
 
@@ -111,8 +285,19 @@ const ManageCategoriesDialog = (props: Props) => {
     const isImportTab = selectedTab === TABS.IMPORT;
     const isAssignTab = selectedTab === TABS.ASSIGN;
 
-    const onTabChange = (_e: SyntheticEvent, newTab: string) => {
+    const handleTabChange = (newTab: string) => {
+        flushAssign();
         setSelectedTab(newTab);
+    };
+
+    const handleClose = () => {
+        flushAssign();
+        onClose();
+    };
+
+    const handleCardChange = (cardUUID: string) => {
+        flushAssign();
+        setSelectedCardUUID(cardUUID);
     };
 
     // Validation
@@ -143,38 +328,18 @@ const ManageCategoriesDialog = (props: Props) => {
         [validateCategory]
     );
 
-    const createCategory = useCallback(() => {
-        if (!studysetUUID || !categoryName.trim() || errorInfo) {
+    const createCategory = useCallback(async () => {
+        if (!studysetUUID || !categoryName.trim() || errorInfo || isBusy()) {
             return;
         }
         const newCategories = [...categories, categoryName.trim()];
-        setIsUpdating(true);
-        updateStudySet(
-            {
-                studysetUUID,
-                updates: {
-                    categories: newCategories,
-                },
-            },
-            {
-                onSuccess: () => {
-                    setCategoryName('');
-                    setErrorInfo(null);
-                    setIsUpdating(false);
-                },
-                onError: () => {
-                    setIsUpdating(false);
-                },
-            }
-        );
-    }, [
-        studysetUUID,
-        categoryName,
-        errorInfo,
-        categories,
-        updateStudySet,
-        validateCategory,
-    ]);
+        if (
+            await save({ categories: newCategories }, 'categories.createFailed')
+        ) {
+            setCategoryName('');
+            setErrorInfo(null);
+        }
+    }, [studysetUUID, categoryName, errorInfo, categories, isBusy, save]);
 
     // Edit Category (inline)
     const handleEditStart = useCallback((index: number) => {
@@ -187,10 +352,13 @@ const ManageCategoriesDialog = (props: Props) => {
     }, []);
 
     const handleEdit = useCallback(
-        (index: number, newName: string) => {
+        async (index: number, newName: string) => {
             const oldCategoryName = categories[index];
             if (!oldCategoryName || newName === oldCategoryName) {
                 setEditIndex(null);
+                return;
+            }
+            if (isBusy()) {
                 return;
             }
 
@@ -205,27 +373,16 @@ const ManageCategoriesDialog = (props: Props) => {
                 ),
             }));
 
-            setIsUpdating(true);
-            updateStudySet(
-                {
-                    studysetUUID,
-                    updates: {
-                        cards: modifiedCards,
-                        categories: categoriesAfterEdit,
-                    },
-                },
-                {
-                    onSuccess: () => {
-                        setEditIndex(null);
-                        setIsUpdating(false);
-                    },
-                    onError: () => {
-                        setIsUpdating(false);
-                    },
-                }
-            );
+            if (
+                await save(
+                    { cards: modifiedCards, categories: categoriesAfterEdit },
+                    'categories.renameFailed'
+                )
+            ) {
+                setEditIndex(null);
+            }
         },
-        [studysetUUID, categories, cards, updateStudySet]
+        [categories, cards, isBusy, save]
     );
 
     // Delete Categories
@@ -238,8 +395,8 @@ const ManageCategoriesDialog = (props: Props) => {
         setEditIndex(null);
     }, []);
 
-    const handleDelete = useCallback(() => {
-        if (deleteIndices.length === 0) return;
+    const handleDelete = useCallback(async () => {
+        if (deleteIndices.length === 0 || isBusy()) return;
 
         const categoriesToDelete = deleteIndices.map((i) => categories[i]);
         const filteredCategories = categories.filter(
@@ -254,26 +411,15 @@ const ManageCategoriesDialog = (props: Props) => {
             ),
         }));
 
-        setIsUpdating(true);
-        updateStudySet(
-            {
-                studysetUUID,
-                updates: {
-                    cards: modifiedCards,
-                    categories: filteredCategories,
-                },
-            },
-            {
-                onSuccess: () => {
-                    setDeleteIndices([]);
-                    setIsUpdating(false);
-                },
-                onError: () => {
-                    setIsUpdating(false);
-                },
-            }
-        );
-    }, [studysetUUID, deleteIndices, categories, cards, updateStudySet]);
+        if (
+            await save(
+                { cards: modifiedCards, categories: filteredCategories },
+                'categories.deleteFailed'
+            )
+        ) {
+            setDeleteIndices([]);
+        }
+    }, [deleteIndices, categories, cards, isBusy, save]);
 
     const onAssignedCategoriesChange = (e: SelectChangeEvent<string[]>) => {
         const raw = e.target.value;
@@ -282,30 +428,15 @@ const ManageCategoriesDialog = (props: Props) => {
                 ? (raw as string).split(',')
                 : (raw as string[]);
         setAssignedCategoriesSelection(newCategories);
-
-        if (assignDebounceRef.current) {
-            clearTimeout(assignDebounceRef.current);
-        }
-        assignDebounceRef.current = setTimeout(() => {
-            const snapshotCards = cardsRef.current;
-            const targetCardUUID = selectedCardUUIDRef.current;
-            const modifiedCards = snapshotCards.map((card) =>
-                card.cardUUID === targetCardUUID
-                    ? { ...card, categories: newCategories }
-                    : card
-            );
-            updateStudySet({
-                studysetUUID: studysetUUIDRef.current,
-                updates: {
-                    cards: modifiedCards,
-                },
-            });
-            assignDebounceRef.current = null;
-        }, 400);
+        armAssign({
+            studysetUUID: studysetUUIDRef.current,
+            targetCardUUID: selectedCardUUIDRef.current,
+            newCategories,
+        });
     };
 
     const handleImport = () => {
-        if (!selectedStudysetUUID) {
+        if (!selectedStudysetUUID || isBusy()) {
             return;
         }
         const importSetCategories =
@@ -319,29 +450,31 @@ const ManageCategoriesDialog = (props: Props) => {
         );
 
         const combinedCategories = categories.concat(categoriesToImport);
-        updateStudySet({
-            studysetUUID,
-            updates: {
-                categories: combinedCategories,
-            },
-        });
+        void save(
+            { categories: combinedCategories },
+            'categories.importFailed'
+        );
     };
 
     const handleFileImport = useCallback(
         (newCategories: string[]) => {
+            if (isBusy()) {
+                return;
+            }
             const combinedCategories = categories.concat(newCategories);
-            updateStudySet({
-                studysetUUID,
-                updates: {
-                    categories: combinedCategories,
-                },
-            });
+            void save(
+                { categories: combinedCategories },
+                'categories.importFailed'
+            );
         },
-        [studysetUUID, categories, updateStudySet]
+        [categories, isBusy, save]
     );
 
     // Delete Unused Categories
     const handleDeleteUnused = useCallback(() => {
+        if (isBusy()) {
+            return;
+        }
         const usedCategories = new Set(
             cards.flatMap((card) => card.categories)
         );
@@ -358,34 +491,20 @@ const ManageCategoriesDialog = (props: Props) => {
             usedCategories.has(cat)
         );
 
-        setIsUpdating(true);
-        updateStudySet(
-            {
-                studysetUUID,
-                updates: {
-                    categories: filteredCategories,
-                },
-            },
-            {
-                onSuccess: () => {
-                    setIsUpdating(false);
-                },
-                onError: () => {
-                    toast.error(t('categories.deleteUnusedFailed'));
-                    setIsUpdating(false);
-                },
-            }
+        void save(
+            { categories: filteredCategories },
+            'categories.deleteUnusedFailed'
         );
-    }, [studysetUUID, categories, cards, updateStudySet, t]);
+    }, [categories, cards, isBusy, save, t]);
 
     return (
         <MetadataDialogShell
             open={open}
-            onClose={onClose}
+            onClose={handleClose}
             title={t('categories.manageCategories')}
             tabs={tabs}
             selectedTab={selectedTab}
-            onTabChange={setSelectedTab}
+            onTabChange={handleTabChange}
             maxWidth="lg"
         >
             <Box
@@ -442,6 +561,7 @@ const ManageCategoriesDialog = (props: Props) => {
                         setSelectedStudysetUUID={setSelectedStudysetUUID}
                         handleImport={handleImport}
                         onFileImport={handleFileImport}
+                        isLoading={isUpdating}
                     />
                 )}
 
@@ -449,10 +569,11 @@ const ManageCategoriesDialog = (props: Props) => {
                 {isAssignTab && (
                     <AssignTabView
                         selectedCardUUID={selectedCardUUID}
-                        setSelectedCardUUID={setSelectedCardUUID}
+                        setSelectedCardUUID={handleCardChange}
                         selectedStudyset={selectedStudyset}
                         assignedCategories={assignedCategoriesSelection}
                         onAssignedCategoriesChange={onAssignedCategoriesChange}
+                        isAssigningCategories={isSaving}
                     />
                 )}
             </Box>

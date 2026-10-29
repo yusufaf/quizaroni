@@ -185,6 +185,7 @@ export const CategoriesManageTab = ({
                         size="small"
                         startIcon={<DeleteIcon />}
                         onClick={onDeleteSelected}
+                        disabled={isLoading}
                         sx={{
                             borderColor: 'currentColor',
                             fontSize: '0.75rem',
