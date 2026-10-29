@@ -1,7 +1,10 @@
 import {
     buildTermPreviews,
+    EXPLORE_QUERY_MAX_CHARS,
+    foldForSearch,
     isSubjectId,
     normalizeText,
+    searchTokens,
     truncateText,
 } from '@quizaroni/shared-types';
 import type { ExploreSetSummary, ExploreSort, SubjectId } from '@quizaroni/shared-types';
@@ -14,6 +17,9 @@ export const SUMMARY_PREVIEW_COUNT = 5;
 export const SUMMARY_PREVIEW_CHARS = 120;
 export const SUMMARY_DESCRIPTION_CHARS = 200;
 export const SUMMARY_TITLE_CHARS = 200;
+// Search reads more of the title and description than the card shows, but
+// descriptions aren't length-checked on write, so this bounds cache memory.
+export const SEARCH_FIELD_CHARS = 1000;
 
 // A stored row as read from the public index. Nothing on it is validated on
 // write, so every field is treated as unknown.
@@ -34,21 +40,32 @@ export type FeedSource = {
     moderation?: { hiddenAt?: unknown };
 };
 
-// `key` and `featuredAt` stay server-side; only `summary` is sent.
+// `key`, `searchText` and `featuredAt` stay server-side; only `summary` is sent.
 export type FeedEntry = {
     key: { PK: string; SK: string };
     summary: ExploreSetSummary;
+    // The folded title and description (#137), computed once per cache refresh.
+    searchText: string;
     featuredAt?: string;
 };
 
 export type CursorPosition = { publishedAt: string; studysetUUID: string };
 
-// `subject` is left out, not null, when unset, so a no-subject query keeps its
-// original filter key and shape.
-export type ExploreFilters = { sort: ExploreSort; subject?: SubjectId };
+// `subject` and `q` are left out, not null or '', when unset, so a query
+// without them keeps its original filter key and shape. `q` holds the folded
+// search words joined by single spaces.
+export type ExploreFilters = { sort: ExploreSort; subject?: SubjectId; q?: string };
 
 const text = (value: unknown, maxChars: number): string =>
     truncateText(normalizeText(value), maxChars);
+
+// Every word must appear somewhere in the folded text, in any order (#137).
+// No words matches everything.
+export const matchesTokens = (folded: string, tokens: readonly string[]): boolean =>
+    tokens.every((token) => folded.includes(token));
+
+export const matchesQuery = (value: string, query: string): boolean =>
+    matchesTokens(foldForSearch(value), searchTokens(query));
 
 /**
  * Builds a feed card from an explicit allowlist, field by field and never
@@ -84,6 +101,10 @@ export const toFeedEntry = (item: FeedSource): FeedEntry | null => {
     return {
         key: { PK, SK },
         summary: toSummary({ ...item, studysetUUID, publishedAt }),
+        // Folded tokens never contain a space, so none can match across the join.
+        searchText: foldForSearch(
+            `${text(item.title, SEARCH_FIELD_CHARS)} ${text(item.description, SEARCH_FIELD_CHARS)}`
+        ),
         ...(typeof item.featuredAt === 'string' && item.featuredAt
             ? { featuredAt: item.featuredAt }
             : {}),
@@ -119,20 +140,28 @@ export const selectFeatured = (
         .sort(compareFeatured)
         .slice(0, limit);
 
-// Filters are appended in a fixed order (q, when it lands, goes after subject).
-// Subject ids are [a-z-], so they need no escaping.
+// Filters are appended in a fixed order: subject, then q. Subject ids are
+// [a-z-], so they need no escaping; q does.
 export const filterKey = (filters: ExploreFilters): string =>
-    `sort=${filters.sort}${filters.subject ? `&subject=${filters.subject}` : ''}`;
+    `sort=${filters.sort}${filters.subject ? `&subject=${filters.subject}` : ''}${
+        filters.q ? `&q=${encodeURIComponent(filters.q)}` : ''
+    }`;
 
 // Matches on the summary's subject, which toSummary already maps from a
 // retired id to 'other'.
 export const selectEntries = (
     entries: readonly FeedEntry[],
     filters: ExploreFilters
-): readonly FeedEntry[] =>
-    filters.subject
-        ? entries.filter((entry) => entry.summary.subject === filters.subject)
-        : entries;
+): readonly FeedEntry[] => {
+    const { subject, q } = filters;
+    const tokens = q ? q.split(' ') : [];
+    if (!subject && tokens.length === 0) return entries;
+    return entries.filter(
+        (entry) =>
+            (!subject || entry.summary.subject === subject) &&
+            matchesTokens(entry.searchText, tokens)
+    );
+};
 
 export const encodeCursor = (position: CursorPosition, key: string): string =>
     Buffer.from(
@@ -210,8 +239,8 @@ export const parseExploreQuery = (
     const featured = params?.featured || undefined;
     if (featured !== undefined) {
         if (featured !== '1') return { ok: false, message: 'Unsupported featured' };
-        if (params?.subject || params?.cursor) {
-            return { ok: false, message: 'featured does not combine with subject or cursor' };
+        if (params?.subject || params?.cursor || params?.q?.trim()) {
+            return { ok: false, message: 'featured does not combine with subject, q or cursor' };
         }
         return {
             ok: true,
@@ -225,10 +254,19 @@ export const parseExploreQuery = (
         return { ok: false, message: 'Unsupported subject' };
     }
 
+    // Refused rather than truncated, so the cursor key matches what was asked.
+    // q is never echoed back.
+    const rawQuery = params?.q?.trim() ?? '';
+    if (Array.from(rawQuery).length > EXPLORE_QUERY_MAX_CHARS) {
+        return { ok: false, message: 'q is too long' };
+    }
+    // A q with no words ('?!') is no q, so its filter key and cursors are unchanged.
+    const q = searchTokens(rawQuery).join(' ');
+
     const cursor = params?.cursor || undefined;
     return {
         ok: true,
-        filters: { sort, ...(subject ? { subject } : {}) },
+        filters: { sort, ...(subject ? { subject } : {}), ...(q ? { q } : {}) },
         limit,
         ...(cursor ? { cursor } : {}),
     };

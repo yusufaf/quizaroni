@@ -466,8 +466,101 @@ describe("getExploreFeed handler", () => {
             seed([featured("a", day(1))]);
             const { res, body } = await call({ featured: "1", subject: "math" });
             expect(res.statusCode).toBe(400);
-            expect(body.message).toBe("featured does not combine with subject or cursor");
+            expect(body.message).toBe("featured does not combine with subject, q or cursor");
             expect(queryCount()).toBe(0);
+        });
+
+        it("returns 400 for featured with q", async () => {
+            seed([featured("a", day(1))]);
+            const { res, body } = await call({ featured: "1", q: "bio" });
+            expect(res.statusCode).toBe(400);
+            expect(body.message).toBe("featured does not combine with subject, q or cursor");
+        });
+    });
+
+    describe("search (#137)", () => {
+        it("returns sets matching the title or description, accent-insensitively, with a per-query total", async () => {
+            seed([
+                stored("es", day(1), { title: "Verbos en español", subject: "languages" }),
+                stored("desc", day(2), { title: "Grammar", description: "Spanish verb tables" }),
+                stored("other", day(3), { title: "Atoms" }),
+            ]);
+
+            const { res, body } = await call({ q: "ESPAÑOL" });
+            expect(res.statusCode).toBe(200);
+            expect(ids(body)).toEqual(["es"]);
+            expect(body.total).toBe(1);
+
+            const spanish = await call({ q: "spanish verb" });
+            expect(ids(spanish.body)).toEqual(["desc"]);
+        });
+
+        it("combines with the subject", async () => {
+            seed([
+                stored("m", day(1), { title: "Algebra basics" }),
+                stored("s", day(2), { title: "Chemistry basics", subject: "science" }),
+            ]);
+            const { body } = await call({ q: "basics", subject: "science" });
+            expect(ids(body)).toEqual(["s"]);
+            expect(body.total).toBe(1);
+        });
+
+        it("pages within a query to the end with no overlap", async () => {
+            seed([
+                stored("b1", day(1), { title: "Biology 1" }),
+                stored("x1", day(2), { title: "Algebra" }),
+                stored("b2", day(3), { title: "Biology 2" }),
+                stored("b3", day(4), { title: "Biology 3" }),
+                stored("x2", day(5), { title: "Geometry" }),
+                stored("b4", day(6), { title: "Biology 4" }),
+                stored("b5", day(7), { title: "Biology 5" }),
+            ]);
+
+            const seen: string[][] = [];
+            let cursor: string | undefined;
+            do {
+                const { body } = await call({ q: "biology", limit: "2", ...(cursor ? { cursor } : {}) });
+                seen.push(ids(body));
+                cursor = body.nextCursor ?? undefined;
+            } while (cursor);
+
+            expect(seen).toEqual([["b5", "b4"], ["b3", "b2"], ["b1"]]);
+        });
+
+        it.each([
+            ["a no-q cursor sent with q", {}, { q: "biology" }],
+            ["a q cursor sent with another q", { q: "biology" }, { q: "bio" }],
+            ["a q cursor sent with no q", { q: "biology" }, {}],
+        ])("returns 400 for %s", async (_, first, second) => {
+            seed([1, 2, 3].map((n) => stored(`b${n}`, day(n), { title: `Biology ${n}` })));
+            const { body } = await call({ ...first, limit: "1" });
+            expect(body.nextCursor).toEqual(expect.any(String));
+
+            const { res, body: rejected } = await call({ ...second, limit: "1", cursor: body.nextCursor });
+            expect(res.statusCode).toBe(400);
+            expect(rejected.message).toBe("Invalid cursor for these filters");
+        });
+
+        it("accepts a no-q cursor with a whitespace-only q", async () => {
+            seed([1, 2, 3].map((n) => stored(`m${n}`, day(n))));
+            const { body } = await call({ limit: "1" });
+            const { res } = await call({ q: "   ", limit: "1", cursor: body.nextCursor });
+            expect(res.statusCode).toBe(200);
+        });
+
+        it("returns 400 for a q over 100 characters without reading the index", async () => {
+            seed([stored("a", day(1))]);
+            const { res, body } = await call({ q: "a".repeat(101) });
+            expect(res.statusCode).toBe(400);
+            expect(body.message).toBe("q is too long");
+            expect(queryCount()).toBe(0);
+        });
+
+        it("returns an empty feed when nothing matches", async () => {
+            seed([stored("a", day(1))]);
+            const { res, body } = await call({ q: "zygote" });
+            expect(res.statusCode).toBe(200);
+            expect(body).toEqual({ items: [], nextCursor: null, total: 0 });
         });
     });
 

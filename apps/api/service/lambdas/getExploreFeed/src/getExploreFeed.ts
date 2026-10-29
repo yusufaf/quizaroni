@@ -252,10 +252,12 @@ const feedFailed = (error: unknown): APIGatewayProxyResultV2 => {
 
 /**
  * Unauthenticated Community feed for Explore (#135): public sets, newest
- * first, optionally narrowed to one subject (#136), paged with an opaque
- * keyset cursor tied to the filters. `featured=1` instead returns the curated
- * row (#141): up to 6 sets with a featuredAt, newest featuredAt first, no
- * cursor or total, marked `featured: true`. Reads the public index into a 60s
+ * first, optionally narrowed to one subject (#136) and to sets whose title or
+ * description contains every word of `q` (#137, accent- and case-insensitive),
+ * paged with an opaque keyset cursor tied to the filters. `featured=1` instead
+ * returns the curated row (#141): up to 6 sets with a featuredAt, newest
+ * featuredAt first, no cursor or total, marked `featured: true`, and refuses
+ * subject, q or cursor. Reads the public index into a 60s
  * module cache and rechecks each served page, so the response itself is
  * `no-cache`.
  */
