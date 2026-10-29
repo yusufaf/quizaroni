@@ -458,6 +458,10 @@ describe("parseExploreQuery", () => {
         });
     });
 
+    it.each(["", "   ", "?!"])("ignores a q with no words (%p) in featured mode, as elsewhere", (q) => {
+        expect(parseExploreQuery({ featured: "1", q })).toEqual({ ok: true, featured: true, limit: 6 });
+    });
+
     // #137
     it("folds q into the filters", () => {
         expect(parseExploreQuery({ q: "  Español  Básico " })).toEqual({

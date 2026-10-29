@@ -239,7 +239,8 @@ export const parseExploreQuery = (
     const featured = params?.featured || undefined;
     if (featured !== undefined) {
         if (featured !== '1') return { ok: false, message: 'Unsupported featured' };
-        if (params?.subject || params?.cursor || params?.q?.trim()) {
+        // A q with no words is ignored here as it is in the feed.
+        if (params?.subject || params?.cursor || searchTokens(params?.q ?? '').length > 0) {
             return { ok: false, message: 'featured does not combine with subject, q or cursor' };
         }
         return {
