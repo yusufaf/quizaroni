@@ -34,6 +34,9 @@ vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (k: string) => k }),
 }));
 
+// The page's URL query; tests set it before rendering (#137).
+const router = vi.hoisted(() => ({ searchParams: new URLSearchParams() }));
+
 // Mocked like the other component tests until #102 moves them to MemoryRouter.
 vi.mock('react-router-dom', () => {
     const FakeLink = ({
@@ -50,10 +53,14 @@ vi.mock('react-router-dom', () => {
     );
     return {
         useNavigate: () => vi.fn(),
+        useSearchParams: () => [router.searchParams, vi.fn()],
         Link: FakeLink,
         NavLink: FakeLink,
     };
 });
+
+// The field has its own tests with a real router.
+vi.mock('./ExploreSearchField', () => ({ default: () => null }));
 
 // Community has its own tests and fetches its own feed; keep it out of the
 // library fetch stub here.
@@ -238,6 +245,7 @@ describe('Explore', () => {
         lastStudiedSpy.mockReset();
         lastStudiedSpy.mockResolvedValue(new Map());
         gam = { currentStreak: 0, lastStudyDate: null };
+        router.searchParams = new URLSearchParams();
         fetchMock.mockClear();
         fetchMock.mockImplementation(() => withSets());
         vi.stubGlobal('fetch', fetchMock);
@@ -247,6 +255,36 @@ describe('Explore', () => {
     afterEach(() => {
         vi.unstubAllGlobals();
         vi.restoreAllMocks();
+    });
+
+    describe('while searching (#137)', () => {
+        it('hides For you so the results sit under the search field', async () => {
+            router.searchParams = new URLSearchParams('q=bio');
+            renderExplore();
+            await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+            await act(async () => {
+                await new Promise((r) => setTimeout(r, 50));
+            });
+            expect(screen.queryByRole('article')).toBeNull();
+            expect(
+                screen.queryByRole('heading', { name: 'forYou.heading' })
+            ).toBeNull();
+        });
+
+        it('keeps the create-set prompt for an empty library', async () => {
+            router.searchParams = new URLSearchParams('q=bio');
+            fetchMock.mockImplementation(() => json(200, { studysets: [] }));
+            renderExplore();
+            expect(
+                await screen.findByRole('button', { name: 'empty.createSet' })
+            ).toBeTruthy();
+        });
+
+        it('still shows For you for a query with no words', async () => {
+            router.searchParams = new URLSearchParams('q=%3F!');
+            renderExplore();
+            expect(await screen.findAllByRole('article')).toHaveLength(2);
+        });
     });
 
     it('renders each jump-back-in tile as an article whose H3 links to its set', async () => {

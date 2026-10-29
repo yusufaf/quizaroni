@@ -61,14 +61,17 @@ type Reply =
     | Promise<ExploreFeedResponse>;
 
 // Replies keyed by the request's cursor ('' for the first page), prefixed
-// with `subject:` when the request has one. A function reply is called per
-// request, so a test can change it between calls.
+// with `subject:` when the request has one, and that with `q=<q>|` when it
+// has a query. A function reply is called per request, so a test can change
+// it between calls.
 let replies: Record<string, Reply | (() => Reply)>;
 const fetchMock = vi.fn(async (url: string) => {
     const params = new URL(url).searchParams;
     const cursor = params.get('cursor') ?? '';
     const subject = params.get('subject');
-    const entry = replies[subject ? `${subject}:${cursor}` : cursor];
+    const q = params.get('q');
+    const base = subject ? `${subject}:${cursor}` : cursor;
+    const entry = replies[q ? `q=${q}|${base}` : base];
     const reply = await (typeof entry === 'function' ? entry() : entry);
     if (!reply) return new Promise<never>(() => {});
     if ('status' in reply) {
@@ -488,6 +491,66 @@ describe('CommunitySection', () => {
             // Math is cached now, so this switch has no loading step between.
             fireEvent.click(chip('common:subjects.math'));
             await waitFor(() => expect(status()).toBe(showing('math')));
+        });
+    });
+
+    describe('search (#137)', () => {
+        it('sends q and announces what it found', async () => {
+            replies['q=bio|'] = {
+                items: subjectItems('Bio', 100, 2),
+                nextCursor: null,
+                total: 2,
+            };
+            renderSection('/explore?q=bio');
+            await waitFor(() => expect(titles()).toEqual(['Bio 1', 'Bio 2']));
+            expect(fetchedUrls()[0]).toContain('q=bio');
+            expect(status()).toBe(
+                'community.showingQueryOf {"shown":2,"total":2,"query":"bio"}'
+            );
+        });
+
+        it('announces no results through the status region', async () => {
+            replies['q=bio|'] = { items: [], nextCursor: null, total: 0 };
+            renderSection('/explore?q=bio');
+            const text = 'community.emptyQuery {"query":"bio"}';
+            await waitFor(() => expect(status()).toBe(text));
+            const visible = screen
+                .getAllByText(text)
+                .find((el) => el.getAttribute('role') !== 'status');
+            expect(visible?.getAttribute('aria-hidden')).toBe('true');
+        });
+
+        it('names the subject and the query together', async () => {
+            replies['q=bio|math:'] = {
+                items: subjectItems('Math bio', 100, 1),
+                nextCursor: null,
+                total: 1,
+            };
+            renderSection('/explore?subject=math&q=bio');
+            await waitFor(() =>
+                expect(status()).toBe(
+                    'community.showingSubjectQueryOf {"shown":1,"total":1,"subject":"common:subjects.math","query":"bio"}'
+                )
+            );
+        });
+
+        it('says no sets in the subject match the query', async () => {
+            replies['q=bio|math:'] = { items: [], nextCursor: null, total: 0 };
+            renderSection('/explore?subject=math&q=bio');
+            await waitFor(() =>
+                expect(status()).toBe(
+                    'community.emptySubjectQuery {"subject":"common:subjects.math","query":"bio"}'
+                )
+            );
+        });
+
+        it('treats a query with no words as no search', async () => {
+            renderSection('/explore?q=%3F!');
+            await waitFor(() => expect(titles()).toHaveLength(24));
+            expect(fetchedUrls()[0]).not.toContain('q=');
+            expect(status()).toBe(
+                'community.showingOf {"shown":24,"total":30}'
+            );
         });
     });
 });

@@ -21,6 +21,21 @@ export const dedupeFeedItems = (
     return items;
 };
 
+// The status key for the Community feed: community.{showing|empty}, then
+// Subject and Query for each filter in use, then Of when a total is known
+// (#137). An empty feed has no total to show.
+export const statusKey = (
+    base: 'showing' | 'empty',
+    {
+        subject,
+        query,
+        total,
+    }: { subject: boolean; query: boolean; total: boolean }
+): string =>
+    `community.${base}${subject ? 'Subject' : ''}${query ? 'Query' : ''}${
+        base === 'showing' && total ? 'Of' : ''
+    }`;
+
 export const toSubjectId = (value: unknown): SubjectId =>
     isSubjectId(value) ? value : 'other';
 

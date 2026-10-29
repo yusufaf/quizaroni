@@ -26,6 +26,7 @@ export const ROUTES = {
 export const QUERY_PARAMS = {
     PROFILE_TAB: 'tab',
     EXPLORE_SUBJECT: 'subject',
+    EXPLORE_QUERY: 'q',
 } as const;
 
 // Login.tsx and Signup.tsx stash the return path here (rememberReturnPath)

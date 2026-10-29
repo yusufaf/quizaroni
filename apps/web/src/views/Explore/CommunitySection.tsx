@@ -6,10 +6,11 @@ import type { SubjectId } from '@quizaroni/shared-types';
 import MasonryFeed from 'shared/components/MasonryFeed/MasonryFeed';
 import { QUERY_PARAMS } from 'shared/constants';
 import { useExploreFeed } from 'state/api/exploreAPI';
-import { dedupeFeedItems } from './communityFeed';
+import { dedupeFeedItems, statusKey } from './communityFeed';
 import ExploreSetCard from './ExploreSetCard';
 import { CommunitySkeletonList, VisuallyHidden } from './ExploreStyles';
 import SubjectChips from './SubjectChips';
+import { activeQuery } from './searchQuery';
 import { parseSubjectParam, withSubject } from './subjectFilter';
 
 // Varied heights hint at the masonry layout that replaces them.
@@ -27,11 +28,11 @@ const CommunitySection = () => {
     const headingId = useId();
     const headingRef = useRef<HTMLHeadingElement>(null);
     const listRef = useRef<HTMLUListElement>(null);
-    // Index of the first card a Load more is expected to add, and the subject
+    // Index of the first card a Load more is expected to add, and the filters
     // it was asked under.
     const pendingFocusRef = useRef<{
         index: number;
-        subject: SubjectId | null;
+        filters: string;
     } | null>(null);
 
     const [searchParams, setSearchParams] = useSearchParams();
@@ -42,6 +43,9 @@ const CommunitySection = () => {
     const onSubjectChange = (next: SubjectId | null) =>
         setSearchParams((prev) => withSubject(prev, next));
     const subjectLabel = subject ? t(`common:subjects.${subject}`) : null;
+    // A query with no words isn't sent and isn't named in the status (#137).
+    const query = activeQuery(searchParams.get(QUERY_PARAMS.EXPLORE_QUERY));
+    const filters = `${subject ?? ''}|${query}`;
 
     const {
         data,
@@ -51,7 +55,7 @@ const CommunitySection = () => {
         hasNextPage,
         isFetchingNextPage,
         isFetchNextPageError,
-    } = useExploreFeed({ subject });
+    } = useExploreFeed({ subject, q: query });
     const items = useMemo(() => dedupeFeedItems(data?.pages), [data]);
     const shown = items.length;
     // No `total` means the server's read was capped and has no true count.
@@ -71,13 +75,14 @@ const CommunitySection = () => {
     // Focus moves to the first new card once its page lands. If nothing new
     // arrived and the button is gone, the heading takes focus instead of
     // dropping it on the body. A failed load leaves focus on the button.
-    // A Load more from before a subject switch is dropped, so it can't pull
-    // focus off the chip; this effect re-runs in the switch's own commit.
+    // A Load more from before a subject or query change is dropped, so it
+    // can't pull focus off the chip or the search field; this effect re-runs
+    // in the change's own commit.
     useEffect(() => {
         const pending = pendingFocusRef.current;
         if (pending === null || isFetchingNextPage) return;
         pendingFocusRef.current = null;
-        if (pending.subject !== subject) return;
+        if (pending.filters !== filters) return;
         const target =
             listRef.current?.children[
                 pending.index
@@ -85,38 +90,43 @@ const CommunitySection = () => {
         if (target) target.focus();
         else if (!hasNextPage && !isFetchNextPageError)
             headingRef.current?.focus();
-    }, [shown, isFetchingNextPage, hasNextPage, isFetchNextPageError, subject]);
+    }, [shown, isFetchingNextPage, hasNextPage, isFetchNextPageError, filters]);
 
     const onLoadMore = () => {
         if (isFetchingNextPage) return;
-        pendingFocusRef.current = { index: shown, subject };
+        pendingFocusRef.current = { index: shown, filters };
         void fetchNextPage();
     };
 
-    // Naming the subject means a switch between two subjects with the same
+    // Naming the subject and query means a switch between two with the same
     // count still changes the status text, so it's announced.
-    let showingText: string;
-    if (subjectLabel) {
-        showingText =
-            typeof total === 'number'
-                ? t('community.showingSubjectOf', {
-                      shown,
-                      total,
-                      subject: subjectLabel,
-                  })
-                : t('community.showingSubject', {
-                      shown,
-                      subject: subjectLabel,
-                  });
-    } else {
-        showingText =
-            typeof total === 'number'
-                ? t('community.showingOf', { shown, total })
-                : t('community.showing', { shown });
-    }
-    const emptyText = subjectLabel
-        ? t('community.emptySubject', { subject: subjectLabel })
-        : t('community.empty');
+    const hasTotal = typeof total === 'number';
+    const showingText = t(
+        statusKey('showing', {
+            subject: !!subjectLabel,
+            query: !!query,
+            total: hasTotal,
+        }),
+        {
+            shown,
+            ...(hasTotal ? { total } : {}),
+            ...(subjectLabel ? { subject: subjectLabel } : {}),
+            ...(query ? { query } : {}),
+        }
+    );
+    const emptyFilters = {
+        ...(subjectLabel ? { subject: subjectLabel } : {}),
+        ...(query ? { query } : {}),
+    };
+    const emptyKey = statusKey('empty', {
+        subject: !!subjectLabel,
+        query: !!query,
+        total: false,
+    });
+    const emptyText =
+        Object.keys(emptyFilters).length > 0
+            ? t(emptyKey, emptyFilters)
+            : t(emptyKey);
 
     let status = '';
     if (data === undefined) status = isError ? '' : t('community.loading');

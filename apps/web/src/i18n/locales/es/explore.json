@@ -63,6 +63,16 @@
         "allSubjects": "Todos",
         "anonymous": "Anónimo",
         "termCount_one": "{{count}} término",
-        "termCount_other": "{{count}} términos"
+        "termCount_other": "{{count}} términos",
+        "showingQuery": "Mostrando {{shown}} para «{{query}}»",
+        "showingQueryOf": "Mostrando {{shown}} de {{total}} para «{{query}}»",
+        "showingSubjectQuery": "Mostrando {{shown}} en {{subject}} para «{{query}}»",
+        "showingSubjectQueryOf": "Mostrando {{shown}} de {{total}} en {{subject}} para «{{query}}»",
+        "emptyQuery": "Ningún set público coincide con «{{query}}».",
+        "emptySubjectQuery": "Ningún set público en {{subject}} coincide con «{{query}}»."
+    },
+    "search": {
+        "label": "Buscar sets públicos",
+        "clear": "Borrar búsqueda"
     }
 }

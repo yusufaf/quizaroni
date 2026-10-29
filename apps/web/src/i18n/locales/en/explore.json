@@ -63,6 +63,16 @@
         "allSubjects": "All",
         "anonymous": "Anonymous",
         "termCount_one": "{{count}} term",
-        "termCount_other": "{{count}} terms"
+        "termCount_other": "{{count}} terms",
+        "showingQuery": "Showing {{shown}} for “{{query}}”",
+        "showingQueryOf": "Showing {{shown}} of {{total}} for “{{query}}”",
+        "showingSubjectQuery": "Showing {{shown}} in {{subject}} for “{{query}}”",
+        "showingSubjectQueryOf": "Showing {{shown}} of {{total}} in {{subject}} for “{{query}}”",
+        "emptyQuery": "No public sets match “{{query}}”.",
+        "emptySubjectQuery": "No public sets in {{subject}} match “{{query}}”."
+    },
+    "search": {
+        "label": "Search public sets",
+        "clear": "Clear search"
     }
 }
