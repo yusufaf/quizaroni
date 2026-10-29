@@ -29,6 +29,7 @@ type Props = {
     studysets: Studyset[];
     handleImport: () => void;
     onFileImport: (categories: string[]) => void;
+    isLoading?: boolean;
 };
 
 const ACCEPTED_EXTENSIONS = ['.json', '.txt', '.csv'];
@@ -67,6 +68,7 @@ const ImportTabView = (props: Props) => {
         studysets,
         handleImport,
         onFileImport,
+        isLoading = false,
     } = props;
 
     const { t } = useTranslation();
@@ -400,7 +402,7 @@ const ImportTabView = (props: Props) => {
                         <Button
                             variant="contained"
                             onClick={handleImport}
-                            disabled={newCategories.length === 0}
+                            disabled={newCategories.length === 0 || isLoading}
                             sx={{ fontWeight: 600 }}
                         >
                             {newCategories.length > 0
@@ -579,7 +581,9 @@ const ImportTabView = (props: Props) => {
                         <Button
                             variant="contained"
                             onClick={handleFileImport}
-                            disabled={newFileCategories.length === 0}
+                            disabled={
+                                newFileCategories.length === 0 || isLoading
+                            }
                             sx={{ fontWeight: 600 }}
                         >
                             {newFileCategories.length > 0

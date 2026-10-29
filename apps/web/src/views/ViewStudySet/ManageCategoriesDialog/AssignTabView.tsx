@@ -7,13 +7,12 @@ import {
     Typography,
     MenuItem,
 } from '@mui/material';
-import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
     selectedStudyset: Studyset;
     selectedCardUUID: string;
-    setSelectedCardUUID: Dispatch<SetStateAction<string>>;
+    setSelectedCardUUID: (cardUUID: string) => void;
     assignedCategories: string[];
     onAssignedCategoriesChange: (e: SelectChangeEvent<string[]>) => void;
     isAssigningCategories?: boolean;
@@ -44,6 +43,7 @@ const AssignTabView = (props: Props) => {
                     label={t('categories.selectCard')}
                     value={selectedCardUUID}
                     onChange={(e) => setSelectedCardUUID(e.target.value)}
+                    disabled={isAssigningCategories}
                 >
                     {cards.map((card) => {
                         const text = t('categories.termDefinitionFormat', {
