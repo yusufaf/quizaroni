@@ -13,6 +13,10 @@ import { useTranslation } from 'react-i18next';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import { Studyset } from 'shared/types';
 
+// select() leaves read-only inputs unselected on iOS Safari.
+const selectLink = (input: HTMLInputElement | HTMLTextAreaElement) =>
+    input.setSelectionRange(0, input.value.length);
+
 type Props = {
     open: boolean;
     onClose: () => void;
@@ -39,10 +43,12 @@ const ShareDialog = ({ open, onClose, studyset, onOpenPublish }: Props) => {
             });
         } catch {
             // The toast asks the user to copy by hand, so have the link ready.
+            // focus() fires no focus event if the field already has focus.
             const link = linkRef.current;
-            link?.focus();
-            // select() leaves read-only inputs unselected on iOS Safari.
-            link?.setSelectionRange(0, link.value.length);
+            if (link) {
+                link.focus();
+                selectLink(link);
+            }
             toast.error(t('dialogs.share.copyFailed'), {
                 position: toast.POSITION.BOTTOM_LEFT,
             });
@@ -69,7 +75,7 @@ const ShareDialog = ({ open, onClose, studyset, onOpenPublish }: Props) => {
                             fullWidth
                             inputRef={linkRef}
                             InputProps={{ readOnly: true }}
-                            onFocus={(event) => event.target.select()}
+                            onFocus={(event) => selectLink(event.target)}
                         />
                         <Button
                             variant="contained"
