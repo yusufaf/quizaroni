@@ -70,10 +70,14 @@ describe('ShareDialog', () => {
         renderDialog(published());
         const url = `${window.location.origin}/view/${ID}`;
 
-        const link = screen.getByLabelText('dialogs.share.linkLabel') as HTMLInputElement;
+        const link = screen.getByLabelText(
+            'dialogs.share.linkLabel'
+        ) as HTMLInputElement;
         expect(link.value).toBe(url);
 
-        fireEvent.click(screen.getByRole('button', { name: 'dialogs.share.copy' }));
+        fireEvent.click(
+            screen.getByRole('button', { name: 'dialogs.share.copy' })
+        );
 
         expect(writeText).toHaveBeenCalledWith(url);
         await waitFor(() =>
@@ -88,7 +92,9 @@ describe('ShareDialog', () => {
         writeText.mockRejectedValue(new Error('denied'));
         renderDialog(published());
 
-        fireEvent.click(screen.getByRole('button', { name: 'dialogs.share.copy' }));
+        fireEvent.click(
+            screen.getByRole('button', { name: 'dialogs.share.copy' })
+        );
 
         await waitFor(() =>
             expect(toast.error).toHaveBeenCalledWith(
@@ -105,9 +111,13 @@ describe('ShareDialog', () => {
 
         expect(screen.getByText('dialogs.share.notPublished')).toBeTruthy();
         expect(screen.queryByRole('textbox')).toBeNull();
-        expect(screen.queryByRole('button', { name: 'dialogs.share.copy' })).toBeNull();
+        expect(
+            screen.queryByRole('button', { name: 'dialogs.share.copy' })
+        ).toBeNull();
 
-        fireEvent.click(screen.getByRole('button', { name: 'publish.menuPublish' }));
+        fireEvent.click(
+            screen.getByRole('button', { name: 'publish.menuPublish' })
+        );
         expect(onOpenPublish).toHaveBeenCalled();
     });
 
@@ -115,13 +125,17 @@ describe('ShareDialog', () => {
         renderDialog(makeStudyset());
 
         expect(screen.getByText('dialogs.share.notPublished')).toBeTruthy();
-        expect(screen.queryByRole('button', { name: 'publish.menuPublish' })).toBeNull();
+        expect(
+            screen.queryByRole('button', { name: 'publish.menuPublish' })
+        ).toBeNull();
     });
 
     it('treats a still-loading empty studyset as unpublished', () => {
         renderDialog({} as Studyset);
 
         expect(screen.getByText('dialogs.share.notPublished')).toBeTruthy();
-        expect(screen.queryByRole('button', { name: 'dialogs.share.copy' })).toBeNull();
+        expect(
+            screen.queryByRole('button', { name: 'dialogs.share.copy' })
+        ).toBeNull();
     });
 });

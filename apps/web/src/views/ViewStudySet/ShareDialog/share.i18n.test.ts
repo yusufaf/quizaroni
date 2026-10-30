@@ -16,11 +16,14 @@ describe('share strings', () => {
         );
     });
 
-    it.each(['linkLabel', 'copy', 'copied', 'copyFailed', 'notPublished'] as const)(
-        'translates dialogs.share.%s in en and es',
-        (key) => {
-            expect(en.dialogs.share[key]).toBeTruthy();
-            expect(es.dialogs.share[key]).toBeTruthy();
-        }
-    );
+    it.each([
+        'linkLabel',
+        'copy',
+        'copied',
+        'copyFailed',
+        'notPublished',
+    ] as const)('translates dialogs.share.%s in en and es', (key) => {
+        expect(en.dialogs.share[key]).toBeTruthy();
+        expect(es.dialogs.share[key]).toBeTruthy();
+    });
 });

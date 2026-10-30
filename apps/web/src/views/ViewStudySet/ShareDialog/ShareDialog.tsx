@@ -74,7 +74,9 @@ const ShareDialog = ({ open, onClose, studyset, onOpenPublish }: Props) => {
                     </Stack>
                 ) : (
                     <Stack spacing={2} alignItems="flex-start" sx={{ pt: 1 }}>
-                        <Typography>{t('dialogs.share.notPublished')}</Typography>
+                        <Typography>
+                            {t('dialogs.share.notPublished')}
+                        </Typography>
                         {onOpenPublish && (
                             <Button variant="contained" onClick={onOpenPublish}>
                                 {t('publish.menuPublish')}

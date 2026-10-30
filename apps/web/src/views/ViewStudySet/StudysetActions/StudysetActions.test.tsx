@@ -1,5 +1,12 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vite-plus/test';
+import {
+    describe,
+    it,
+    expect,
+    vi,
+    beforeEach,
+    afterEach,
+} from 'vite-plus/test';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Studyset } from 'shared/types';
@@ -78,7 +85,9 @@ describe('StudysetActions share dialog', () => {
         openShare();
 
         fireEvent.click(
-            within(screen.getByRole('dialog')).getByRole('button', { name: 'close' })
+            within(screen.getByRole('dialog')).getByRole('button', {
+                name: 'close',
+            })
         );
         expect(useViewSetsStore.getState().selectedDialog).toBe('');
     });
@@ -104,6 +113,8 @@ describe('StudysetActions share dialog', () => {
         openShare();
 
         expect(screen.getByText('dialogs.share.notPublished')).toBeTruthy();
-        expect(screen.queryByRole('button', { name: 'publish.menuPublish' })).toBeNull();
+        expect(
+            screen.queryByRole('button', { name: 'publish.menuPublish' })
+        ).toBeNull();
     });
 });
