@@ -26,6 +26,7 @@ import {
 import { ActionButtonsRow } from '../styles';
 import ControlMenu from './ControlMenu';
 import PublishDialog from '../PublishDialog/PublishDialog';
+import ShareDialog from '../ShareDialog/ShareDialog';
 import { isPublishEnabled } from 'shared/featureFlags';
 
 type Props = {
@@ -41,11 +42,13 @@ const StudysetActions = (props: Props) => {
     const { id: studySetUUID } = useParams();
 
     const { showConfirmDialog } = useGlobalStore();
-    const { setSelectedDialog } = useViewSetsStore();
+    const { selectedDialog, setSelectedDialog } = useViewSetsStore();
 
     const [showControlMenu, setShowControlMenu] = useState<boolean>(false);
     const [showPublishDialog, setShowPublishDialog] = useState(false);
     const controlAnchorRef = useRef(null);
+
+    const canPublish = isPublishEnabled() && !!selectedStudyset?.studysetUUID;
 
     const handleOpenControlMenu = () => {
         setShowControlMenu(true);
@@ -230,13 +233,26 @@ const StudysetActions = (props: Props) => {
                     setShowPublishDialog(true);
                 }}
             />
-            {isPublishEnabled() && selectedStudyset?.studysetUUID && (
+            {canPublish && selectedStudyset && (
                 <PublishDialog
                     open={showPublishDialog}
                     onClose={() => setShowPublishDialog(false)}
                     studyset={selectedStudyset}
                 />
             )}
+            <ShareDialog
+                open={selectedDialog === VIEW_SET_DIALOGS.SHARE}
+                onClose={() => setSelectedDialog('')}
+                studyset={selectedStudyset}
+                onOpenPublish={
+                    canPublish
+                        ? () => {
+                              setSelectedDialog('');
+                              setShowPublishDialog(true);
+                          }
+                        : undefined
+                }
+            />
         </>
     );
 };
