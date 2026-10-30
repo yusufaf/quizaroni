@@ -80,7 +80,7 @@ const StateProbe = () => (
     <span data-testid="state">{JSON.stringify(useLocation().state)}</span>
 );
 
-const renderExplore = () =>
+const renderExplore = (entry = '/explore?subject=biology') =>
     render(
         <ThemeProvider theme={createLightTheme()}>
             <QueryClientProvider
@@ -90,7 +90,7 @@ const renderExplore = () =>
                     })
                 }
             >
-                <MemoryRouter initialEntries={['/explore?subject=biology']}>
+                <MemoryRouter initialEntries={[entry]}>
                     <Routes>
                         <Route path="/explore" element={<Explore />} />
                         <Route path="/signUp" element={<StateProbe />} />
@@ -122,6 +122,21 @@ afterEach(() => {
 });
 
 describe('Explore, logged out', () => {
+    it('hides Featured while searching but keeps the banner and Community (#137)', async () => {
+        renderExplore('/explore?q=bio');
+
+        await screen.findByText('Community set');
+        expect(heading('featured.heading')).toBeNull();
+        expect(heading('signUpBanner.heading')).toBeTruthy();
+        expect(heading('community.heading')).toBeTruthy();
+        expect(
+            fetchMock.mock.calls.some(([url]) => url.includes('featured=1'))
+        ).toBe(false);
+        expect(
+            screen.getByRole('searchbox', { name: 'search.label' })
+        ).toBeTruthy();
+    });
+
     it('makes only unauthenticated public requests', async () => {
         renderExplore();
 

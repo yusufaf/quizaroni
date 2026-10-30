@@ -11,32 +11,37 @@ export const EXPLORE_STALE_TIME_MS = 60_000;
 export const exploreFeedUrl = ({
     sort,
     subject,
+    q = '',
     cursor,
     limit,
 }: {
     sort: ExploreSort;
     subject: SubjectId | null;
+    q?: string;
     cursor: string | null;
     limit: number;
 }): string => {
     const params = new URLSearchParams({ sort });
     if (subject) params.set('subject', subject);
+    if (q) params.set('q', q);
     params.set('limit', String(limit));
     if (cursor) params.set('cursor', cursor);
     return `${BASE_API_URL}/public/explore?${params}`;
 };
 
 /**
- * Newest public sets for the Community feed, a page per Load more. With no
- * placeholderData, a subject not yet cached shows the skeleton rather than
- * the previous subject's cards.
+ * Newest public sets for the Community feed, a page per Load more,
+ * optionally narrowed to a subject and a search query (#137). With no
+ * placeholderData, a subject or query not yet cached shows the skeleton
+ * rather than the previous results.
  */
 export const useExploreFeed = ({
     sort = 'newest',
     subject = null,
-}: { sort?: ExploreSort; subject?: SubjectId | null } = {}) =>
+    q = '',
+}: { sort?: ExploreSort; subject?: SubjectId | null; q?: string } = {}) =>
     useInfiniteQuery({
-        queryKey: ['explore-feed', { sort, subject }],
+        queryKey: ['explore-feed', { sort, subject, q }],
         queryFn: async ({ pageParam, signal }) =>
             validate({
                 schema: ExploreFeedResponseSchema,
@@ -44,6 +49,7 @@ export const useExploreFeed = ({
                     exploreFeedUrl({
                         sort,
                         subject,
+                        q,
                         cursor: pageParam,
                         limit: EXPLORE_PAGE_SIZE,
                     }),

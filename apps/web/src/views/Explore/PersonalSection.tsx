@@ -28,9 +28,11 @@ import ForYouSection from './ForYouSection';
 /**
  * The signed-in half of Explore: For you, or the empty-library prompt. Its
  * own component so a logged-out visitor never runs the library query, the
- * local progress lookups or the create action (#139).
+ * local progress lookups or the create action (#139). While searching, For
+ * you steps aside but the empty-library prompt stays, like the logged-out
+ * banner (#137).
  */
-const PersonalSection = () => {
+const PersonalSection = ({ searching = false }: { searching?: boolean }) => {
     const { t } = useTranslation('explore');
 
     const theme = useTheme();
@@ -76,6 +78,7 @@ const PersonalSection = () => {
     const hasSets = hasCompleteStudysets(data?.studysets);
 
     const renderContent = () => {
+        if (searching && (data === undefined || hasSets)) return null;
         if (data === undefined) {
             return (
                 <ForYouSection

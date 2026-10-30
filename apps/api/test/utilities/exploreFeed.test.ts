@@ -8,6 +8,7 @@ import {
     FeedEntry,
     FeedSource,
     filterKey,
+    matchesQuery,
     paginate,
     parseExploreQuery,
     selectEntries,
@@ -164,6 +165,55 @@ describe("toFeedEntry", () => {
     ])("leaves featuredAt off when it is %s", (_, featuredAt) => {
         expect(listed({ featuredAt })).not.toHaveProperty("featuredAt");
     });
+
+    // #137
+    it("keeps searchText server-side", () => {
+        const entry = listed();
+        expect(entry.searchText).toBe("cell biology organelles and what they do");
+        expect(entry.summary).not.toHaveProperty("searchText");
+    });
+
+    it("searches description text past what the card shows", () => {
+        const entry = listed({ description: `${"a".repeat(300)} zygote` });
+        expect(entry.summary.description).not.toContain("zygote");
+        expect(selectEntries([entry], { sort: "newest", q: "zygote" })).toEqual([entry]);
+    });
+});
+
+describe("matchesQuery (#137)", () => {
+    it("ignores case", () => {
+        expect(matchesQuery("Cell Biology", "cell BIO")).toBe(true);
+    });
+
+    it.each([
+        ["Verbos en español", "espanol"],
+        ["Espanol basico", "Español Básico"],
+        ["Niño", "nino"],
+        ["CAFÉ", "café"],
+    ])("ignores accents on either side: %p / %p", (text, query) => {
+        expect(matchesQuery(text, query)).toBe(true);
+    });
+
+    it.each([
+        ["Cell biology", ""],
+        ["Cell biology", "   "],
+        ["", ""],
+    ])("matches everything for an empty or whitespace-only query: %p / %p", (text, query) => {
+        expect(matchesQuery(text, query)).toBe(true);
+    });
+
+    it("needs every word, in any order", () => {
+        expect(matchesQuery("Spanish verbs", "verbs spanish")).toBe(true);
+        expect(matchesQuery("Spanish verbs", "spanish nouns")).toBe(false);
+    });
+
+    it("matches inside words", () => {
+        expect(matchesQuery("Photosynthesis", "synth")).toBe(true);
+    });
+
+    it("ignores punctuation", () => {
+        expect(matchesQuery("Cell biology: organelles", "biology, organelles")).toBe(true);
+    });
 });
 
 describe("cursor", () => {
@@ -203,6 +253,16 @@ describe("cursor", () => {
         expect(decodeCursor(encodeCursor(position, math), key)).toEqual(mismatch);
         expect(decodeCursor(encodeCursor(position, math), math)).toEqual({ ok: true, position });
     });
+
+    it("ties the cursor to the query (#137)", () => {
+        const bio = filterKey({ sort: "newest", q: "bio" });
+        const chem = filterKey({ sort: "newest", q: "chem" });
+        const mismatch = { ok: false, reason: "filterMismatch" };
+        expect(decodeCursor(encodeCursor(position, key), bio)).toEqual(mismatch);
+        expect(decodeCursor(encodeCursor(position, bio), chem)).toEqual(mismatch);
+        expect(decodeCursor(encodeCursor(position, bio), key)).toEqual(mismatch);
+        expect(decodeCursor(encodeCursor(position, bio), bio)).toEqual({ ok: true, position });
+    });
 });
 
 describe("filterKey", () => {
@@ -212,6 +272,12 @@ describe("filterKey", () => {
 
     it("appends the subject", () => {
         expect(filterKey({ sort: "newest", subject: "math" })).toBe("sort=newest&subject=math");
+    });
+
+    it("appends q after the subject (#137)", () => {
+        expect(filterKey({ sort: "newest", subject: "math", q: "cell bio" })).toBe(
+            "sort=newest&subject=math&q=cell%20bio"
+        );
     });
 });
 
@@ -234,6 +300,28 @@ describe("selectEntries", () => {
 
     it("reads a retired subject as other", () => {
         expect(ids(selectEntries(entries, { sort: "newest", subject: "other" }))).toEqual([uuid(4)]);
+    });
+
+    describe("with a query (#137)", () => {
+        const searchable = [
+            listed({ studysetUUID: uuid(1), subject: "languages", title: "Verbos en español", description: "" }),
+            listed({ studysetUUID: uuid(2), subject: "science", title: "Cells", description: "Spanish names" }),
+            listed({ studysetUUID: uuid(3), subject: "science", title: "Atoms", description: "Chemistry" }),
+        ];
+
+        it("matches the title", () => {
+            expect(ids(selectEntries(searchable, { sort: "newest", q: "verbos" }))).toEqual([uuid(1)]);
+        });
+
+        it("matches the description", () => {
+            expect(ids(selectEntries(searchable, { sort: "newest", q: "chemistry" }))).toEqual([uuid(3)]);
+        });
+
+        it("combines with the subject", () => {
+            expect(ids(selectEntries(searchable, { sort: "newest", subject: "science", q: "spanish" }))).toEqual([
+                uuid(2),
+            ]);
+        });
     });
 });
 
@@ -363,11 +451,33 @@ describe("parseExploreQuery", () => {
         expect(parseExploreQuery({ featured })).toEqual({ ok: false, message: "Unsupported featured" });
     });
 
-    it.each([{ subject: "math" }, { cursor: "abc" }])("rejects featured with %p", (params) => {
+    it.each([{ subject: "math" }, { cursor: "abc" }, { q: "x" }])("rejects featured with %p", (params) => {
         expect(parseExploreQuery({ featured: "1", ...params })).toEqual({
             ok: false,
-            message: "featured does not combine with subject or cursor",
+            message: "featured does not combine with subject, q or cursor",
         });
+    });
+
+    it.each(["", "   ", "?!"])("ignores a q with no words (%p) in featured mode, as elsewhere", (q) => {
+        expect(parseExploreQuery({ featured: "1", q })).toEqual({ ok: true, featured: true, limit: 6 });
+    });
+
+    // #137
+    it("folds q into the filters", () => {
+        expect(parseExploreQuery({ q: "  Español  Básico " })).toEqual({
+            ok: true,
+            filters: { sort: "newest", q: "espanol basico" },
+            limit: 24,
+        });
+    });
+
+    it.each(["", "   ", "?!"])("leaves a q with no words (%p) out of the filters", (q) => {
+        expect(parseExploreQuery({ q })).toEqual({ ok: true, filters: { sort: "newest" }, limit: 24 });
+    });
+
+    it("accepts a 100-character q and refuses 101 without echoing it", () => {
+        expect(parseExploreQuery({ q: "a".repeat(100) }).ok).toBe(true);
+        expect(parseExploreQuery({ q: "a".repeat(101) })).toEqual({ ok: false, message: "q is too long" });
     });
 
     it.each([{ limit: "0" }, { sort: "oldest" }])("still validates %p in featured mode", (params) => {

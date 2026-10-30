@@ -3,8 +3,48 @@ import type { ExploreSetSummary } from '@quizaroni/shared-types';
 import {
     dedupeFeedItems,
     formatRelativeDate,
+    statusKey,
     toSubjectId,
 } from './communityFeed';
+
+describe('statusKey (#137)', () => {
+    it.each([
+        [{ subject: false, query: false, total: false }, 'community.showing'],
+        [{ subject: false, query: false, total: true }, 'community.showingOf'],
+        [
+            { subject: true, query: false, total: true },
+            'community.showingSubjectOf',
+        ],
+        [
+            { subject: false, query: true, total: false },
+            'community.showingQuery',
+        ],
+        [
+            { subject: false, query: true, total: true },
+            'community.showingQueryOf',
+        ],
+        [
+            { subject: true, query: true, total: false },
+            'community.showingSubjectQuery',
+        ],
+        [
+            { subject: true, query: true, total: true },
+            'community.showingSubjectQueryOf',
+        ],
+    ])('builds the showing key for %p', (flags, key) => {
+        expect(statusKey('showing', flags)).toBe(key);
+    });
+
+    it.each([
+        [{ subject: false, query: false }, 'community.empty'],
+        [{ subject: true, query: false }, 'community.emptySubject'],
+        [{ subject: false, query: true }, 'community.emptyQuery'],
+        [{ subject: true, query: true }, 'community.emptySubjectQuery'],
+    ])('builds the empty key for %p, ignoring total', (flags, key) => {
+        expect(statusKey('empty', { ...flags, total: true })).toBe(key);
+        expect(statusKey('empty', { ...flags, total: false })).toBe(key);
+    });
+});
 
 const item = (id: string): ExploreSetSummary => ({
     studysetUUID: id,
