@@ -39,8 +39,10 @@ const ShareDialog = ({ open, onClose, studyset, onOpenPublish }: Props) => {
             });
         } catch {
             // The toast asks the user to copy by hand, so have the link ready.
-            linkRef.current?.focus();
-            linkRef.current?.select();
+            const link = linkRef.current;
+            link?.focus();
+            // select() leaves read-only inputs unselected on iOS Safari.
+            link?.setSelectionRange(0, link.value.length);
             toast.error(t('dialogs.share.copyFailed'), {
                 position: toast.POSITION.BOTTOM_LEFT,
             });
