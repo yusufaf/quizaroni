@@ -75,7 +75,12 @@
             "message": "The following sets will be duplicated:"
         },
         "share": {
-            "title": "Share"
+            "title": "Share",
+            "linkLabel": "Public link",
+            "copy": "Copy link",
+            "copied": "Link copied",
+            "copyFailed": "Couldn't copy the link. Select it and copy it yourself.",
+            "notPublished": "Publish this set to share it."
         },
         "confirmationCode": {
             "codeResent": "Confirmation code resent",
