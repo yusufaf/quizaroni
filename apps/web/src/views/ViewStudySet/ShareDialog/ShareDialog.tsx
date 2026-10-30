@@ -7,6 +7,7 @@ import {
     TextField,
     Typography,
 } from '@mui/material/';
+import { useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
@@ -22,6 +23,7 @@ type Props = {
 
 const ShareDialog = ({ open, onClose, studyset, onOpenPublish }: Props) => {
     const { t } = useTranslation();
+    const linkRef = useRef<HTMLInputElement>(null);
 
     const studysetUUID = studyset?.studysetUUID;
     const isPublished =
@@ -36,6 +38,9 @@ const ShareDialog = ({ open, onClose, studyset, onOpenPublish }: Props) => {
                 position: toast.POSITION.BOTTOM_LEFT,
             });
         } catch {
+            // The toast asks the user to copy by hand, so have the link ready.
+            linkRef.current?.focus();
+            linkRef.current?.select();
             toast.error(t('dialogs.share.copyFailed'), {
                 position: toast.POSITION.BOTTOM_LEFT,
             });
@@ -60,6 +65,7 @@ const ShareDialog = ({ open, onClose, studyset, onOpenPublish }: Props) => {
                             label={t('dialogs.share.linkLabel')}
                             value={url}
                             fullWidth
+                            inputRef={linkRef}
                             InputProps={{ readOnly: true }}
                             onFocus={(event) => event.target.select()}
                         />

@@ -88,9 +88,12 @@ describe('ShareDialog', () => {
         );
     });
 
-    it('shows an error toast when the clipboard write fails', async () => {
+    it('shows an error toast and selects the link when the clipboard write fails', async () => {
         writeText.mockRejectedValue(new Error('denied'));
         renderDialog(published());
+        const link = screen.getByLabelText(
+            'dialogs.share.linkLabel'
+        ) as HTMLInputElement;
 
         fireEvent.click(
             screen.getByRole('button', { name: 'dialogs.share.copy' })
@@ -103,6 +106,9 @@ describe('ShareDialog', () => {
             )
         );
         expect(toast.success).not.toHaveBeenCalled();
+        expect(document.activeElement).toBe(link);
+        expect(link.selectionStart).toBe(0);
+        expect(link.selectionEnd).toBe(link.value.length);
     });
 
     it('shows the publish hint instead of a link for an unpublished set', () => {
