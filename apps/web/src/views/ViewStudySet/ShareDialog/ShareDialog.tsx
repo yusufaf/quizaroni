@@ -1,32 +1,90 @@
+import { ContentCopyRounded } from '@mui/icons-material/';
 import {
-    Box,
     Button,
-    DialogActions,
+    Dialog,
     DialogContent,
-    IconButton,
+    Stack,
+    TextField,
+    Typography,
 } from '@mui/material/';
-import { StyledDialog } from './styles';
-import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
+import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
+import { Studyset } from 'shared/types';
 
 type Props = {
-    onClose: () => void;
     open: boolean;
+    onClose: () => void;
+    studyset: Studyset | undefined;
+    // Omitted when publishing is unavailable, which hides the hint's button.
+    onOpenPublish?: () => void;
 };
 
-const NotificationsDialog = (props: Props) => {
-    const { open, onClose } = props;
+const ShareDialog = ({ open, onClose, studyset, onOpenPublish }: Props) => {
     const { t } = useTranslation();
 
+    const studysetUUID = studyset?.studysetUUID;
+    const isPublished =
+        !!studysetUUID && studyset?.metadata?.publiclyViewable === true;
+    const url = `${window.location.origin}/view/${studysetUUID}`;
+
+    // A missing navigator.clipboard (insecure origin) throws here too.
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(url);
+            toast.success(t('dialogs.share.copied'), {
+                position: toast.POSITION.BOTTOM_LEFT,
+            });
+        } catch {
+            toast.error(t('dialogs.share.copyFailed'), {
+                position: toast.POSITION.BOTTOM_LEFT,
+            });
+        }
+    };
+
     return (
-        <StyledDialog open={open} onClose={onClose} fullWidth maxWidth="lg">
+        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
             <StandardDialogTitle
                 title={t('dialogs.share.title')}
                 onClose={onClose}
             />
-            <DialogContent></DialogContent>
-        </StyledDialog>
+            <DialogContent>
+                {isPublished ? (
+                    <Stack
+                        direction={{ xs: 'column', sm: 'row' }}
+                        spacing={1}
+                        sx={{ pt: 1 }}
+                    >
+                        <TextField
+                            id="share-link"
+                            label={t('dialogs.share.linkLabel')}
+                            value={url}
+                            fullWidth
+                            InputProps={{ readOnly: true }}
+                            onFocus={(event) => event.target.select()}
+                        />
+                        <Button
+                            variant="contained"
+                            startIcon={<ContentCopyRounded />}
+                            onClick={handleCopy}
+                            sx={{ flexShrink: 0 }}
+                        >
+                            {t('dialogs.share.copy')}
+                        </Button>
+                    </Stack>
+                ) : (
+                    <Stack spacing={2} alignItems="flex-start" sx={{ pt: 1 }}>
+                        <Typography>{t('dialogs.share.notPublished')}</Typography>
+                        {onOpenPublish && (
+                            <Button variant="contained" onClick={onOpenPublish}>
+                                {t('publish.menuPublish')}
+                            </Button>
+                        )}
+                    </Stack>
+                )}
+            </DialogContent>
+        </Dialog>
     );
 };
 
-export default NotificationsDialog;
+export default ShareDialog;
