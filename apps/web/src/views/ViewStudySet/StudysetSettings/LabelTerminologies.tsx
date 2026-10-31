@@ -58,19 +58,26 @@ const LabelTerminologies = ({ studyset }: Props) => {
         (value: string) => {
             const { studysetUUID = '' } = studyset ?? {};
 
-            updateStudySet({
-                studysetUUID,
-                updates: {
-                    customLabelTerminology: value,
+            updateStudySet(
+                {
+                    studysetUUID,
+                    updates: {
+                        customLabelTerminology: value,
+                    },
+                    isMetadataUpdate: true,
                 },
-                isMetadataUpdate: true,
-            });
-            setIsSaved(true);
+                {
+                    // Only claim "Saved" once the server confirms it.
+                    onSuccess: () => {
+                        setIsSaved(true);
 
-            // Hide saved indicator after 2 seconds
-            setTimeout(() => {
-                setIsSaved(false);
-            }, 2000);
+                        // Hide saved indicator after 2 seconds
+                        setTimeout(() => {
+                            setIsSaved(false);
+                        }, 2000);
+                    },
+                }
+            );
         },
         [studyset, updateStudySet]
     );
