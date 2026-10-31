@@ -15,7 +15,7 @@ import {
 } from './schemas';
 
 // Logto user ids are 12-character strings, not UUIDs.
-const LOGTO_USER_ID = '710itwyy5r2r';
+const LOGTO_USER_ID = 'a1b2c3d4e5f6';
 const NOW = '2026-10-27T05:49:52.225Z';
 
 describe('stored record shapes', () => {
@@ -60,7 +60,7 @@ describe('stored record shapes', () => {
                     },
                     publishedAt: NOW,
                     // The seed script derives v5 ids (seedStudysetUUID).
-                    studysetUUID: '124ab08d-6292-591b-a27e-0abeed412841',
+                    studysetUUID: '5a1e7c3b-2d4f-5e6a-8b9c-0d1e2f3a4b5c',
                     subject: 'math',
                     title: 'Cell biology',
                     username: 'turtles',

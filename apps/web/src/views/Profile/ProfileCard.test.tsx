@@ -26,7 +26,7 @@ const renderCard = (overrides: Partial<User>) =>
                     ...DEFAULT_USER_DATA,
                     createdAt: '2026-10-27T05:49:52.225Z',
                     email: 'zed@example.com',
-                    userUUID: '710itwyy5r2r',
+                    userUUID: 'a1b2c3d4e5f6',
                     ...overrides,
                 }}
             />
