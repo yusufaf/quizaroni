@@ -352,7 +352,14 @@ export const useBatchDuplicateStudysets = () => {
     });
 };
 
-export const useUpdateStudyset = () => {
+type UseUpdateStudysetOptions = {
+    /** i18n key for the failure toast; false when the caller reports failures itself. */
+    errorToast?: string | false;
+};
+
+export const useUpdateStudyset = ({
+    errorToast = 'errors.saveFailed',
+}: UseUpdateStudysetOptions = {}) => {
     const queryClient = useQueryClient();
     const { t } = useTranslation();
     const onPublicationChange = usePublicationMutationSuccess();
@@ -389,6 +396,12 @@ export const useUpdateStudyset = () => {
             queryClient.invalidateQueries({
                 queryKey: ['studysets', variables.studysetUUID],
             });
+            // The single-set key above never matches the library list, and
+            // exact keeps this from refetching every cached set.
+            queryClient.invalidateQueries({
+                queryKey: ['studysets'],
+                exact: true,
+            });
             // The notice lives here, not in a view, because every screen
             // that saves cards goes through this hook (#170).
             if (data?.unpublished) {
@@ -406,6 +419,15 @@ export const useUpdateStudyset = () => {
                     { position: toast.POSITION.BOTTOM_LEFT, autoClose: 10000 }
                 );
             }
+        },
+        // Hook-level so it still runs when a later save on the same hook or
+        // an unmount drops the per-call mutate callbacks (#218).
+        onError: () => {
+            if (errorToast === false) return;
+            toast.error(t(errorToast), {
+                position: toast.POSITION.BOTTOM_LEFT,
+                toastId: `updateStudyset:${errorToast}`,
+            });
         },
     });
 };

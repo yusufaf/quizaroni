@@ -69,19 +69,26 @@ const FormatTerminologies = ({ studyset }: Props) => {
             const { studysetUUID = '' } = studyset ?? {};
             const newValue = `${term1}/${term2}`;
 
-            updateStudySet({
-                studysetUUID,
-                updates: {
-                    customTerminology: newValue,
+            updateStudySet(
+                {
+                    studysetUUID,
+                    updates: {
+                        customTerminology: newValue,
+                    },
+                    isMetadataUpdate: true,
                 },
-                isMetadataUpdate: true,
-            });
-            setIsSaved(true);
+                {
+                    // Only claim "Saved" once the server confirms it.
+                    onSuccess: () => {
+                        setIsSaved(true);
 
-            // Hide saved indicator after 2 seconds
-            setTimeout(() => {
-                setIsSaved(false);
-            }, 2000);
+                        // Hide saved indicator after 2 seconds
+                        setTimeout(() => {
+                            setIsSaved(false);
+                        }, 2000);
+                    },
+                }
+            );
         },
         [studyset, updateStudySet]
     );

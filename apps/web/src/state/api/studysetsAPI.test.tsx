@@ -12,6 +12,8 @@ import {
     useUpdateStudyset,
 } from './studysetsAPI';
 import { isHttpStatus } from './awsAPI';
+import en from 'i18n/locales/en/common.json';
+import es from 'i18n/locales/es/common.json';
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({
@@ -275,9 +277,164 @@ describe('useUpdateStudyset', () => {
         const { invalidate } = await save({});
 
         expect(toastMock.warning).not.toHaveBeenCalled();
+        expect(toastMock.error).not.toHaveBeenCalled();
         expect(invalidate).not.toHaveBeenCalledWith({
             queryKey: ['public-studyset', ID],
         });
+    });
+
+    it('refreshes the library list after a save', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() =>
+                Promise.resolve(
+                    new Response(
+                        JSON.stringify({ message: 'ok', studyset: validSet }),
+                        {
+                            status: 200,
+                            headers: { 'Content-Type': 'application/json' },
+                        }
+                    )
+                )
+            )
+        );
+        const qc = new QueryClient();
+        qc.setQueryData(['studysets'], { studysets: [] });
+        qc.setQueryData(['studysets', ID], { studyset: validSet });
+        const wrapper = ({ children }: { children: React.ReactNode }) => (
+            <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+        );
+        const { result } = renderHook(() => useUpdateStudyset(), { wrapper });
+
+        await result.current.mutateAsync({
+            studysetUUID: ID,
+            updates: { favorited: true },
+        });
+
+        expect(qc.getQueryState(['studysets'])?.isInvalidated).toBe(true);
+    });
+});
+
+// #218: callers use mutate(), which swallows the rejection, and a per-call
+// onError is dropped by a later save on the same hook or by unmount.
+describe('useUpdateStudyset failures', () => {
+    const failed = () =>
+        new Response(JSON.stringify({ message: 'boom' }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    const ok = () =>
+        new Response(JSON.stringify({ message: 'ok', studyset: validSet }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+    const renderUpdate = (
+        options?: Parameters<typeof useUpdateStudyset>[0]
+    ) => {
+        const qc = new QueryClient({
+            defaultOptions: { mutations: { retry: false } },
+        });
+        const wrapper = ({ children }: { children: React.ReactNode }) => (
+            <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+        );
+        return renderHook(() => useUpdateStudyset(options), { wrapper });
+    };
+
+    const request = { studysetUUID: ID, updates: { favorited: true } };
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
+        vi.restoreAllMocks();
+    });
+
+    it('shows a save-failed toast', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() => Promise.resolve(failed()))
+        );
+        const { result } = renderUpdate();
+
+        await result.current.mutateAsync(request).catch(() => {});
+
+        expect(toastMock.error).toHaveBeenCalledTimes(1);
+        expect(toastMock.error).toHaveBeenCalledWith(
+            'errors.saveFailed',
+            expect.objectContaining({
+                toastId: 'updateStudyset:errors.saveFailed',
+            })
+        );
+    });
+
+    it('uses the message the caller passes', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() => Promise.resolve(failed()))
+        );
+        const { result } = renderUpdate({ errorToast: 'create.errorUpdate' });
+
+        await result.current.mutateAsync(request).catch(() => {});
+
+        expect(toastMock.error).toHaveBeenCalledWith(
+            'create.errorUpdate',
+            expect.anything()
+        );
+    });
+
+    it('stays quiet when the caller reports failures itself', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() => Promise.resolve(failed()))
+        );
+        const { result } = renderUpdate({ errorToast: false });
+
+        await result.current.mutateAsync(request).catch(() => {});
+
+        expect(toastMock.error).not.toHaveBeenCalled();
+    });
+
+    it('reports a failed save that a later save replaced', async () => {
+        let failFirst: (response: Response) => void = () => {};
+        const fetchMock = vi
+            .fn()
+            .mockImplementationOnce(
+                () => new Promise<Response>((resolve) => (failFirst = resolve))
+            )
+            .mockImplementationOnce(() => Promise.resolve(ok()));
+        vi.stubGlobal('fetch', fetchMock);
+        const { result } = renderUpdate();
+
+        result.current.mutate(request);
+        result.current.mutate({ ...request, updates: { favorited: false } });
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+        failFirst(failed());
+
+        await waitFor(() => expect(toastMock.error).toHaveBeenCalledTimes(1));
+    });
+
+    it('reports a failed save after the caller unmounts', async () => {
+        let fail: (response: Response) => void = () => {};
+        const fetchMock = vi.fn(
+            () => new Promise<Response>((resolve) => (fail = resolve))
+        );
+        vi.stubGlobal('fetch', fetchMock);
+        const { result, unmount } = renderUpdate();
+
+        result.current.mutate(request);
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+        unmount();
+        fail(failed());
+
+        await waitFor(() => expect(toastMock.error).toHaveBeenCalled());
+    });
+
+    it('has the save-failed message in en and es', () => {
+        expect(en.errors.saveFailed).toBeTruthy();
+        expect(es.errors.saveFailed).toBeTruthy();
     });
 });
 

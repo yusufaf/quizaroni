@@ -182,6 +182,7 @@ describe('ManageCategoriesDialog', () => {
                 )
             );
             await wait(50);
+            expect(toastMock.error).toHaveBeenCalledTimes(1);
             expect(
                 (
                     screen.getByLabelText(

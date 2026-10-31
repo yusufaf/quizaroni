@@ -215,7 +215,8 @@
     "errors": {
         "generic": "Algo salió mal",
         "notFound": "No encontrado",
-        "unauthorized": "No autorizado"
+        "unauthorized": "No autorizado",
+        "saveFailed": "No se pudieron guardar los cambios. Inténtalo de nuevo."
     },
     "imageGallery": {
         "uploaded": "Subido el {{date}}"
