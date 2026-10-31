@@ -1,7 +1,7 @@
 import { Box, Button, Typography, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 const FooterCTA = () => {
     const { t } = useTranslation();
@@ -16,7 +16,7 @@ const FooterCTA = () => {
                 paddingBottom: '4rem',
             }}
         >
-            <motion.div
+            <m.div
                 initial={{ opacity: 0, y: 1.5 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-64px' }}
@@ -115,7 +115,7 @@ const FooterCTA = () => {
                         </Button>
                     </Box>
                 </Box>
-            </motion.div>
+            </m.div>
         </Box>
     );
 };

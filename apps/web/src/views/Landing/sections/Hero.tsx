@@ -5,7 +5,7 @@ import {
     useTheme,
     useMediaQuery,
 } from '@mui/material';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { VerifiedOutlined as VerifiedIcon } from '@mui/icons-material/';
@@ -40,11 +40,9 @@ const Hero = () => {
                 }}
             >
                 <Box sx={{ position: 'relative', zIndex: 2 }}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 1.5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, ease: 'easeOut' }}
-                    >
+                    {/* No fade-in: the headline is the page's LCP element,
+                        and Chrome doesn't count it until it's visible. */}
+                    <div>
                         <Typography
                             component="h1"
                             sx={{
@@ -73,9 +71,9 @@ const Hero = () => {
                                 {t('landing.hero.headlineHighlight')}
                             </Box>
                         </Typography>
-                    </motion.div>
+                    </div>
 
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, y: 1 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{
@@ -97,9 +95,9 @@ const Hero = () => {
                         >
                             {t('landing.hero.subheadline')}
                         </Typography>
-                    </motion.div>
+                    </m.div>
 
-                    <motion.div
+                    <m.div
                         initial={{ opacity: 0, y: 1 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{
@@ -185,7 +183,7 @@ const Hero = () => {
                             <VerifiedIcon sx={{ fontSize: '1rem' }} />
                             <span>{t('landing.hero.trustLine')}</span>
                         </Box>
-                    </motion.div>
+                    </m.div>
                 </Box>
 
                 {isMdUp && (
