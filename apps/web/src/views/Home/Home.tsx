@@ -423,7 +423,8 @@ const Home = (props: Props) => {
             setContextMenuStudyset((prevContextMenuStudyset) => {
                 const localStudyset = studysets.find(
                     (studyset: Studyset) =>
-                        studyset.uuid === prevContextMenuStudyset?.uuid
+                        studyset.studysetUUID ===
+                        prevContextMenuStudyset?.studysetUUID
                 );
                 return localStudyset ?? null;
             });
