@@ -336,6 +336,10 @@ export type UpdateUserMetadataRequest = {
     updates: Updates;
 };
 
+export type UpdateUsernameRequest = {
+    username: string;
+};
+
 export type UpdateNotificationPreferencesRequest = {
     updates: Partial<NotificationPreferences>;
 };
