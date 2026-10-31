@@ -28,8 +28,7 @@ import { NavShortcuts } from 'shared/keyboard/NavShortcuts';
 import { isStudyRoute } from 'shared/utilities/routes';
 import PwaUpdateToast from 'shared/components/PwaUpdateToast/PwaUpdateToast';
 import InstallAppPrompt from 'shared/components/InstallAppPrompt/InstallAppPrompt';
-import ErrorBoundary from 'shared/components/ErrorBoundary/ErrorBoundary';
-import CrashFallback from 'shared/components/ErrorBoundary/CrashFallback';
+import RouteErrorBoundary from 'shared/components/ErrorBoundary/RouteErrorBoundary';
 
 const ShortcutLayer = () => {
     useGlobalKeyListener();
@@ -39,17 +38,6 @@ const ShortcutLayer = () => {
             {!isStudyRoute(location.pathname) && <NavShortcuts />}
             <ShortcutHelpModal />
         </>
-    );
-};
-
-// Keeps the nav and toasts (including the PWA update toast) mounted when a
-// page crashes, and clears the error on navigation.
-const RouteErrorBoundary = () => {
-    const { pathname } = useLocation();
-    return (
-        <ErrorBoundary fallback={<CrashFallback />} resetKey={pathname}>
-            <AppRoutes />
-        </ErrorBoundary>
     );
 };
 
@@ -89,7 +77,9 @@ const App = () => {
                     <NavBar />
                     {loadingActions.length > 0 && <LoadingIndicator />}
                     <MainContent>
-                        <RouteErrorBoundary />
+                        <RouteErrorBoundary>
+                            <AppRoutes />
+                        </RouteErrorBoundary>
                     </MainContent>
                     <Footer />
                     <MobileBottomNav />

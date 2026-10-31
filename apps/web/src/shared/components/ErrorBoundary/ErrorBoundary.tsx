@@ -1,9 +1,9 @@
-import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Component, type ReactNode } from 'react';
 
 type Props = {
     children: ReactNode;
     fallback: ReactNode;
-    /** A change (e.g. the pathname) clears a caught error. */
+    /** A change (e.g. the location key) clears a caught error. */
     resetKey?: unknown;
 };
 
@@ -13,17 +13,14 @@ type State = {
 
 /**
  * Without a boundary, one render error unmounts the whole app, including the
- * PWA update toast that would deliver the fix.
+ * PWA update toast that would deliver the fix. React itself logs what it
+ * catches, with the component stack.
  */
 class ErrorBoundary extends Component<Props, State> {
     state: State = { error: null };
 
     static getDerivedStateFromError(error: Error): State {
         return { error };
-    }
-
-    componentDidCatch(error: Error, info: ErrorInfo) {
-        console.error(error, info.componentStack);
     }
 
     componentDidUpdate(prevProps: Props) {

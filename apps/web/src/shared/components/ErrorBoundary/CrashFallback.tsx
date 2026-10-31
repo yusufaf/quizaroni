@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { usePwaStore } from 'state/stores/pwa';
 import { skipWaiting } from 'state/local/pwa/registerSW';
@@ -30,19 +30,26 @@ const CrashFallback = () => {
                     ? t('errorBoundary.updateBody')
                     : t('errorBoundary.body')}
             </Typography>
-            {needRefresh ? (
-                // registerSW reloads the page once the new worker takes control.
-                <Button variant="contained" onClick={() => void skipWaiting()}>
-                    {t('errorBoundary.updateAndReload')}
-                </Button>
-            ) : (
+            <Stack direction="row" spacing={1} justifyContent="center">
+                {needRefresh && (
+                    // registerSW reloads the page once the new worker takes
+                    // control.
+                    <Button
+                        variant="contained"
+                        onClick={() => void skipWaiting()}
+                    >
+                        {t('errorBoundary.updateAndReload')}
+                    </Button>
+                )}
+                {/* Still offered with an update waiting, in case the new
+                    worker never takes control. */}
                 <Button
-                    variant="contained"
+                    variant={needRefresh ? 'text' : 'contained'}
                     onClick={() => window.location.reload()}
                 >
                     {t('pwa.reload')}
                 </Button>
-            )}
+            </Stack>
         </Box>
     );
 };

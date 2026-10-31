@@ -11,6 +11,8 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { usePwaStore } from 'state/stores/pwa';
 import ErrorBoundary from './ErrorBoundary';
 import CrashFallback from './CrashFallback';
+import RouteErrorBoundary from './RouteErrorBoundary';
+import { Link, MemoryRouter } from 'react-router-dom';
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (k: string) => k }),
@@ -67,6 +69,8 @@ describe('ErrorBoundary', () => {
 
         expect(screen.getByText('errorBoundary.updateBody')).toBeTruthy();
         expect(skipWaiting).toHaveBeenCalledOnce();
+        // Still there in case the new worker never takes control.
+        expect(screen.getByRole('button', { name: 'pwa.reload' })).toBeTruthy();
     });
 
     it('clears the error when the reset key changes', () => {
@@ -77,6 +81,28 @@ describe('ErrorBoundary', () => {
                 <Boom crash={false} />
             </ErrorBoundary>
         );
+
+        expect(screen.getByText('page content')).toBeTruthy();
+    });
+
+    // The page still throws when it first re-renders; only following a link
+    // (even back to the same path) should clear the error.
+    it('clears the route error when a link to the same path is followed', () => {
+        let crash = true;
+        const Page = () => <Boom crash={crash} />;
+
+        render(
+            <MemoryRouter initialEntries={['/profile']}>
+                <Link to="/profile">profile link</Link>
+                <RouteErrorBoundary>
+                    <Page />
+                </RouteErrorBoundary>
+            </MemoryRouter>
+        );
+        expect(screen.getByText('errorBoundary.title')).toBeTruthy();
+
+        crash = false;
+        fireEvent.click(screen.getByText('profile link'));
 
         expect(screen.getByText('page content')).toBeTruthy();
     });
