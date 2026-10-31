@@ -1,5 +1,12 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vite-plus/test';
+import {
+    describe,
+    it,
+    expect,
+    vi,
+    beforeEach,
+    afterEach,
+} from 'vite-plus/test';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider, createTheme } from '@mui/material/styles';

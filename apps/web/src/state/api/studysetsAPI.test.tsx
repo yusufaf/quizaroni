@@ -353,7 +353,10 @@ describe('useUpdateStudyset failures', () => {
     });
 
     it('shows a save-failed toast', async () => {
-        vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(failed())));
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() => Promise.resolve(failed()))
+        );
         const { result } = renderUpdate();
 
         await result.current.mutateAsync(request).catch(() => {});
@@ -361,12 +364,17 @@ describe('useUpdateStudyset failures', () => {
         expect(toastMock.error).toHaveBeenCalledTimes(1);
         expect(toastMock.error).toHaveBeenCalledWith(
             'errors.saveFailed',
-            expect.objectContaining({ toastId: 'updateStudyset:errors.saveFailed' })
+            expect.objectContaining({
+                toastId: 'updateStudyset:errors.saveFailed',
+            })
         );
     });
 
     it('uses the message the caller passes', async () => {
-        vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(failed())));
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() => Promise.resolve(failed()))
+        );
         const { result } = renderUpdate({ errorToast: 'create.errorUpdate' });
 
         await result.current.mutateAsync(request).catch(() => {});
@@ -378,7 +386,10 @@ describe('useUpdateStudyset failures', () => {
     });
 
     it('stays quiet when the caller reports failures itself', async () => {
-        vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(failed())));
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() => Promise.resolve(failed()))
+        );
         const { result } = renderUpdate({ errorToast: false });
 
         await result.current.mutateAsync(request).catch(() => {});

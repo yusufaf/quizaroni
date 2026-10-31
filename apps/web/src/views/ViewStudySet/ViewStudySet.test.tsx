@@ -268,7 +268,9 @@ describe('ViewStudySet lastViewed', () => {
 
         await waitFor(() => expect(updateCalls()).toHaveLength(1));
         await waitFor(() =>
-            expect(qc.getMutationCache().getAll()[0]?.state.status).toBe('error')
+            expect(qc.getMutationCache().getAll()[0]?.state.status).toBe(
+                'error'
+            )
         );
         expect(toastMock.error).not.toHaveBeenCalled();
     });

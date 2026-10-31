@@ -118,7 +118,8 @@ const ViewStudySet = (props: Props) => {
   const isOutsideLibrary = isHttpStatus(studySetError, 404);
 
   const { mutate: updateStudySet } = useUpdateStudyset();
-  // lastViewed is a background write the user didn't ask for, so it fails quietly.
+  // lastViewed is a background write the user didn't ask for, so it fails
+  // quietly.
   const { mutate: recordLastViewed } = useUpdateStudyset({ errorToast: false });
 
   useBrowserTitle(selectedStudyset?.title ?? "");
