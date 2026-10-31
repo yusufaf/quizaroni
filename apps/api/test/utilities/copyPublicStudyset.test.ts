@@ -121,8 +121,8 @@ describe("buildPublicCopy", () => {
         expect(copy.lastViewed).toBe(NOW);
     });
 
-    it("uses an empty username when the token has none", () => {
-        expect(copyOf(publicSource(), { userUUID: SAVER_UUID }).username).toBe("");
+    it("uses a null username when the token has none", () => {
+        expect(copyOf(publicSource(), { userUUID: SAVER_UUID }).username).toBeNull();
     });
 
     it("drops notes and labels", () => {

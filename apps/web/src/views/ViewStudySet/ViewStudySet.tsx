@@ -323,17 +323,19 @@ const ViewStudySet = (props: Props) => {
                     <>{selectedStudyset?.title}</>
                   )}
                 </BoldTypography>
-                <Typography variant="subtitle1">
-                  {isStudySetLoading ? (
-                    <Skeleton />
-                  ) : (
-                    <>
-                      {t("viewStudySet.createdBy", {
-                        username: selectedStudyset?.username,
-                      })}
-                    </>
-                  )}
-                </Typography>
+                {(isStudySetLoading || selectedStudyset?.username) && (
+                  <Typography variant="subtitle1">
+                    {isStudySetLoading ? (
+                      <Skeleton />
+                    ) : (
+                      <>
+                        {t("viewStudySet.createdBy", {
+                          username: selectedStudyset?.username,
+                        })}
+                      </>
+                    )}
+                  </Typography>
+                )}
                 <StudysetDescription variant="body1">
                   {isStudySetLoading ? (
                     <Skeleton />

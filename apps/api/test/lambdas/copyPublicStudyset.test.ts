@@ -264,7 +264,7 @@ describe("copyPublicStudyset", () => {
         const result = await invoke({ studysetUUID: SOURCE_UUID }, { sub: CALLER_UUID });
 
         expect(result.statusCode).toBe(200);
-        expect(calls.puts[0].username).toBe("");
+        expect(calls.puts[0].username).toBeNull();
     });
 
     it("lets an author save their own set", async () => {

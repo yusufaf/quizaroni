@@ -47,7 +47,8 @@ export const handler: Handler = async (
             updatedAt: timestamp,
             studysetUUID,
             title: "Untitled Studyset",
-            username,
+            // The claim is optional (missing, null or empty); null means no author name (#226).
+            username: username || null,
             userUUID,
         }
 

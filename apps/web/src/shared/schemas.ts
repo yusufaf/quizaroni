@@ -65,7 +65,8 @@ export const StudysetSchema = z.object({
     studysetUUID: UUIDSchema,
     subject: z.enum(SUBJECT_IDS).optional(),
     title: z.string(),
-    username: z.string(),
+    // Null when the creator's Logto account has no username (#226).
+    username: z.string().nullable(),
     userUUID: UserIdSchema,
     // Client-only; the API never stores it.
     uuid: UUIDSchema.optional(),
