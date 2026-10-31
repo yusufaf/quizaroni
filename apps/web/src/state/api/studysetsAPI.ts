@@ -1,4 +1,5 @@
 import {
+    QueryClient,
     useQuery,
     useMutation,
     useQueryClient,
@@ -352,56 +353,107 @@ export const useBatchDuplicateStudysets = () => {
     });
 };
 
+type SetSaves = { last: Promise<unknown>; unsettled: number };
+
+// Keyed by client so each test's QueryClient starts with no queued saves.
+const setSavesByClient = new WeakMap<QueryClient, Map<string, SetSaves>>();
+
+const setSavesFor = (client: QueryClient, studysetUUID: string): SetSaves => {
+    let sets = setSavesByClient.get(client);
+    if (!sets) {
+        sets = new Map();
+        setSavesByClient.set(client, sets);
+    }
+    let saves = sets.get(studysetUUID);
+    if (!saves) {
+        saves = { last: Promise.resolve(), unsettled: 0 };
+        sets.set(studysetUUID, saves);
+    }
+    return saves;
+};
+
 type UseUpdateStudysetOptions = {
     /** i18n key for the failure toast; false when the caller reports failures itself. */
     errorToast?: string | false;
+    /** false for an editor that keeps its own copy of the set: a cache write would reload its form. */
+    optimistic?: boolean;
 };
 
 export const useUpdateStudyset = ({
     errorToast = 'errors.saveFailed',
+    optimistic = true,
 }: UseUpdateStudysetOptions = {}) => {
     const queryClient = useQueryClient();
     const { t } = useTranslation();
     const onPublicationChange = usePublicationMutationSuccess();
     return useMutation({
-        mutationFn: async ({
+        mutationFn: ({
             studysetUUID,
             updates,
             isMetadataUpdate,
         }: UpdateStudysetRequest) => {
-            // fetchJson() throws on a non-2xx response, so an error body
-            // (which won't match UpdateStudysetResponseSchema) can't fall
-            // through validate()'s logs-and-swallows default as if the
-            // mutation succeeded — firing onSuccess and losing the edit
-            // silently, the bug PR #41 fixed by hand here originally.
-            const data = await fetchJson(
-                `${BASE_API_URL}/studysets/update-studyset`,
-                {
-                    ...(await getCommonPostRequestProps()),
-                    body: JSON.stringify({
-                        studysetUUID,
-                        updates,
-                        isMetadataUpdate,
-                    }),
-                }
+            // Whole-cards payloads are built from the cached set, so a set's
+            // saves must reach the server one at a time, in the order they
+            // were made (#222). onMutate is synchronous, so this runs in
+            // mutate() order.
+            const saves = setSavesFor(queryClient, studysetUUID);
+            const request = saves.last
+                .catch(() => undefined)
+                .then(async () => {
+                    // fetchJson() throws on a non-2xx response, so an error body
+                    // (which won't match UpdateStudysetResponseSchema) can't fall
+                    // through validate()'s logs-and-swallows default as if the
+                    // mutation succeeded — firing onSuccess and losing the edit
+                    // silently, the bug PR #41 fixed by hand here originally.
+                    const data = await fetchJson(
+                        `${BASE_API_URL}/studysets/update-studyset`,
+                        {
+                            ...(await getCommonPostRequestProps()),
+                            body: JSON.stringify({
+                                studysetUUID,
+                                updates,
+                                isMetadataUpdate,
+                            }),
+                        }
+                    );
+                    return validate({
+                        schema: UpdateStudysetResponseSchema,
+                        data,
+                        type: 'response',
+                        context: 'UpdateStudyset',
+                    });
+                });
+            saves.last = request;
+            return request;
+        },
+        onMutate: ({ studysetUUID, updates, isMetadataUpdate }) => {
+            setSavesFor(queryClient, studysetUUID).unsettled += 1;
+            if (
+                !optimistic ||
+                isMetadataUpdate ||
+                !Array.isArray(updates.cards)
+            ) {
+                return;
+            }
+            const queryKey = ['studysets', studysetUUID];
+            // An in-flight refetch would land older cards over the write below.
+            void queryClient.cancelQueries({ queryKey, exact: true });
+            queryClient.setQueryData<GetStudysetResponse>(queryKey, (old) =>
+                old?.studyset
+                    ? {
+                          ...old,
+                          studyset: {
+                              ...old.studyset,
+                              cards: updates.cards,
+                              ...(Array.isArray(updates.categories) && {
+                                  categories: updates.categories,
+                              }),
+                          },
+                      }
+                    : old
             );
-            return validate({
-                schema: UpdateStudysetResponseSchema,
-                data,
-                type: 'response',
-                context: 'UpdateStudyset',
-            });
         },
         onSuccess: (data, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: ['studysets', variables.studysetUUID],
-            });
-            // The single-set key above never matches the library list, and
-            // exact keeps this from refetching every cached set.
-            queryClient.invalidateQueries({
-                queryKey: ['studysets'],
-                exact: true,
-            });
             // The notice lives here, not in a view, because every screen
             // that saves cards goes through this hook (#170).
             if (data?.unpublished) {
@@ -427,6 +479,29 @@ export const useUpdateStudyset = ({
             toast.error(t(errorToast), {
                 position: toast.POSITION.BOTTOM_LEFT,
                 toastId: `updateStudyset:${errorToast}`,
+            });
+        },
+        // A refetch while another save of this set is unsettled would load
+        // cards without that save's change, and the next click would build
+        // on them (#222). The last save refreshes for all of them, and a
+        // failed save's refetch puts the server's cards back.
+        onSettled: (_data, error, { studysetUUID }) => {
+            const saves = setSavesFor(queryClient, studysetUUID);
+            saves.unsettled -= 1;
+            if (saves.unsettled > 0) return;
+            setSavesByClient.get(queryClient)?.delete(studysetUUID);
+            // Nothing optimistic to undo, and the refetch would reload an
+            // editor's form over its unsaved edits (fresh signed file URLs
+            // make every refetch a new object).
+            if (error && !optimistic) return;
+            queryClient.invalidateQueries({
+                queryKey: ['studysets', studysetUUID],
+            });
+            // The single-set key above never matches the library list, and
+            // exact keeps this from refetching every cached set.
+            queryClient.invalidateQueries({
+                queryKey: ['studysets'],
+                exact: true,
             });
         },
     });

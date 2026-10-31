@@ -81,6 +81,7 @@ const CreateSet = (props: Props) => {
     const { mutate: createStudyset } = useCreateStudyset();
     const { mutate: updateStudyset } = useUpdateStudyset({
         errorToast: 'create.errorUpdate',
+        optimistic: false,
     });
 
     /* Local State */

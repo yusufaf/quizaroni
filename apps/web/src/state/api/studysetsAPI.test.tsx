@@ -1,7 +1,11 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vite-plus/test';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+    focusManager,
+    QueryClient,
+    QueryClientProvider,
+} from '@tanstack/react-query';
 import {
     isCompleteStudyset,
     PublishStudysetError,
@@ -12,6 +16,7 @@ import {
     useUpdateStudyset,
 } from './studysetsAPI';
 import { isHttpStatus } from './awsAPI';
+import { EMPTY_CARD } from 'shared/constants';
 import en from 'i18n/locales/en/common.json';
 import es from 'i18n/locales/es/common.json';
 
@@ -410,8 +415,10 @@ describe('useUpdateStudyset failures', () => {
 
         result.current.mutate(request);
         result.current.mutate({ ...request, updates: { favorited: false } });
-        await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+        // A set's saves go out one at a time (#222), so the second waits.
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
         failFirst(failed());
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
 
         await waitFor(() => expect(toastMock.error).toHaveBeenCalledTimes(1));
     });
@@ -435,6 +442,261 @@ describe('useUpdateStudyset failures', () => {
     it('has the save-failed message in en and es', () => {
         expect(en.errors.saveFailed).toBeTruthy();
         expect(es.errors.saveFailed).toBeTruthy();
+    });
+});
+
+// #222: whole-cards saves are built from the cached set, so overlapping
+// saves of one set must not lose each other's changes.
+describe('useUpdateStudyset overlapping saves', () => {
+    const OTHER_ID = '22222222-2222-4222-8222-222222222222';
+    const cardA = {
+        ...EMPTY_CARD,
+        cardUUID: 'card-a',
+        term: 'A',
+        definition: 'a',
+    };
+    const cardB = {
+        ...EMPTY_CARD,
+        cardUUID: 'card-b',
+        term: 'B',
+        definition: 'b',
+    };
+    const seeded = { ...validSet, cards: [cardA, cardB] };
+    const markedA = [{ ...cardA, important: true }, cardB];
+    const markedBoth = [
+        { ...cardA, important: true },
+        { ...cardB, important: true },
+    ];
+
+    const failed = () =>
+        new Response(JSON.stringify({ message: 'boom' }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+        });
+    const ok = () =>
+        new Response(JSON.stringify({ message: 'ok', studyset: seeded }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+        });
+
+    const holdFetch = () => {
+        const pending: Array<(response: Response) => void> = [];
+        const fetchMock = vi.fn(
+            () => new Promise<Response>((resolve) => pending.push(resolve))
+        );
+        vi.stubGlobal('fetch', fetchMock);
+        return { fetchMock, pending };
+    };
+
+    const renderTwoCards = (
+        options?: Parameters<typeof useUpdateStudyset>[0]
+    ) => {
+        const qc = new QueryClient({
+            defaultOptions: { mutations: { retry: false } },
+        });
+        qc.setQueryData(['studysets'], { studysets: [] });
+        qc.setQueryData(['studysets', ID], { studyset: seeded });
+        const wrapper = ({ children }: { children: React.ReactNode }) => (
+            <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+        );
+        // Two hook instances, like two card components.
+        const { result } = renderHook(
+            () =>
+                [
+                    useUpdateStudyset(options),
+                    useUpdateStudyset(options),
+                ] as const,
+            { wrapper }
+        );
+        return { qc, result };
+    };
+
+    const cachedCards = (qc: QueryClient) =>
+        qc.getQueryData<{ studyset: typeof seeded }>(['studysets', ID])
+            ?.studyset.cards;
+    const bodyOf = (fetchMock: ReturnType<typeof vi.fn>, call: number) =>
+        JSON.parse(
+            String(
+                (
+                    fetchMock.mock.calls[call] as unknown as [
+                        string,
+                        RequestInit,
+                    ]
+                )[1].body
+            )
+        );
+    const isInvalidated = (qc: QueryClient, queryKey: unknown[]) =>
+        qc.getQueryState(queryKey)?.isInvalidated;
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+        focusManager.setFocused(undefined);
+        vi.unstubAllGlobals();
+        vi.restoreAllMocks();
+    });
+
+    it('shows the new cards while the save is pending', async () => {
+        const { fetchMock } = holdFetch();
+        const { qc, result } = renderTwoCards();
+
+        result.current[0].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedA },
+        });
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+
+        expect(cachedCards(qc)).toEqual(markedA);
+    });
+
+    it("sends a set's saves one at a time, in order", async () => {
+        const { fetchMock, pending } = holdFetch();
+        const { result } = renderTwoCards();
+
+        result.current[0].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedA },
+        });
+        result.current[1].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedBoth },
+        });
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        expect(fetchMock).toHaveBeenCalledTimes(1);
+
+        pending[0]!(ok());
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+        expect(bodyOf(fetchMock, 1).updates.cards).toEqual(markedBoth);
+    });
+
+    it('refetches the set only after its last pending save', async () => {
+        const { fetchMock, pending } = holdFetch();
+        const { qc, result } = renderTwoCards();
+
+        result.current[0].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedA },
+        });
+        result.current[1].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedBoth },
+        });
+        await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+        pending[0]!(ok());
+        await waitFor(() => expect(result.current[0].isSuccess).toBe(true));
+        expect(isInvalidated(qc, ['studysets', ID])).toBe(false);
+
+        await waitFor(() => expect(pending).toHaveLength(2));
+        pending[1]!(ok());
+        await waitFor(() =>
+            expect(isInvalidated(qc, ['studysets', ID])).toBe(true)
+        );
+        expect(isInvalidated(qc, ['studysets'])).toBe(true);
+    });
+
+    it('refetches the set after a failed cards save', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() => Promise.resolve(failed()))
+        );
+        const { qc, result } = renderTwoCards();
+
+        await result.current[0]
+            .mutateAsync({
+                studysetUUID: ID,
+                updates: { cards: [cardB, cardA] },
+            })
+            .catch(() => {});
+
+        expect(isInvalidated(qc, ['studysets', ID])).toBe(true);
+    });
+
+    it('leaves the cached set alone for saves without cards', async () => {
+        const { fetchMock } = holdFetch();
+        const { qc, result } = renderTwoCards();
+        const before = qc.getQueryData(['studysets', ID]);
+
+        result.current[0].mutate({
+            studysetUUID: ID,
+            updates: { viewSetLayout: 'grid' },
+            isMetadataUpdate: true,
+        });
+        result.current[1].mutate({
+            studysetUUID: ID,
+            updates: { favorited: true },
+        });
+        await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+
+        expect(qc.getQueryData(['studysets', ID])).toBe(before);
+    });
+
+    it('sends saves of different sets at the same time', async () => {
+        const { fetchMock } = holdFetch();
+        const { result } = renderTwoCards();
+
+        result.current[0].mutate({
+            studysetUUID: ID,
+            updates: { cards: [cardB, cardA] },
+        });
+        result.current[1].mutate({
+            studysetUUID: OTHER_ID,
+            updates: { favorited: true },
+        });
+
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    });
+
+    it('sends a queued save while the tab is hidden', async () => {
+        focusManager.setFocused(false);
+        const { fetchMock, pending } = holdFetch();
+        const { result } = renderTwoCards();
+
+        result.current[0].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedA },
+        });
+        result.current[1].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedBoth },
+        });
+        await waitFor(() => expect(pending.length).toBeGreaterThan(0));
+        pending[0]!(ok());
+
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    });
+
+    it('leaves the cached set alone when optimistic is off', async () => {
+        const { fetchMock } = holdFetch();
+        const { qc, result } = renderTwoCards({ optimistic: false });
+        const before = qc.getQueryData(['studysets', ID]);
+
+        result.current[0].mutate({
+            studysetUUID: ID,
+            updates: { cards: [cardB, cardA], title: 'New' },
+        });
+        await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+
+        expect(qc.getQueryData(['studysets', ID])).toBe(before);
+    });
+
+    it("doesn't refetch after a failed save when optimistic is off", async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() => Promise.resolve(failed()))
+        );
+        const { qc, result } = renderTwoCards({ optimistic: false });
+
+        await result.current[0]
+            .mutateAsync({
+                studysetUUID: ID,
+                updates: { cards: [cardB, cardA], title: 'New' },
+            })
+            .catch(() => {});
+
+        expect(isInvalidated(qc, ['studysets', ID])).toBe(false);
     });
 });
 
