@@ -66,7 +66,6 @@ const ownedSet = (studysetUUID: string) => ({
     title: 'Owned set',
     username: 'owner',
     userUUID: OWNER,
-    uuid: studysetUUID,
 });
 
 const json = (status: number, body: unknown) =>

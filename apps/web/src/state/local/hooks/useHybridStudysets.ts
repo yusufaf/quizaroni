@@ -254,7 +254,6 @@ export function useHybridDuplicateStudyset() {
             const duplicated: Studyset = {
                 ...sourceStudyset,
                 studysetUUID: newUUID,
-                uuid: newUUID, // Some systems use both
                 title: `${sourceStudyset.title} (Copy)`,
                 createdAt: now,
                 lastViewed: now,
