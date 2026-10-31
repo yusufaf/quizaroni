@@ -28,6 +28,7 @@ import { NavShortcuts } from 'shared/keyboard/NavShortcuts';
 import { isStudyRoute } from 'shared/utilities/routes';
 import PwaUpdateToast from 'shared/components/PwaUpdateToast/PwaUpdateToast';
 import InstallAppPrompt from 'shared/components/InstallAppPrompt/InstallAppPrompt';
+import RouteErrorBoundary from 'shared/components/ErrorBoundary/RouteErrorBoundary';
 
 const ShortcutLayer = () => {
     useGlobalKeyListener();
@@ -59,8 +60,7 @@ const App = () => {
     // unauthenticated request that 401s. React Query would retry and recover
     // on its own, but by then it's too late: some callers destructure the
     // errored response without a fallback, so the render throws before the
-    // retry ever lands, and with no error boundary in the app that crash
-    // takes down the whole tree.
+    // retry ever lands and the page falls back to the crash screen.
     setAccessTokenGetter(async () => {
         if (!isAuthenticated) {
             return undefined;
@@ -77,7 +77,9 @@ const App = () => {
                     <NavBar />
                     {loadingActions.length > 0 && <LoadingIndicator />}
                     <MainContent>
-                        <AppRoutes />
+                        <RouteErrorBoundary>
+                            <AppRoutes />
+                        </RouteErrorBoundary>
                     </MainContent>
                     <Footer />
                     <MobileBottomNav />

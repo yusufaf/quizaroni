@@ -681,6 +681,12 @@
         "installIosInstructions": "Tap Share, then \"Add to Home Screen\" to install Quizaroni.",
         "dismissInstall": "Dismiss install prompt"
     },
+    "errorBoundary": {
+        "title": "Something went wrong",
+        "body": "This page hit an error. Reloading usually fixes it.",
+        "updateBody": "This page hit an error. A newer version of Quizaroni is ready and may fix it.",
+        "updateAndReload": "Update and reload"
+    },
     "combineSets": {
         "goBack": "Go back",
         "removeSet": "Remove {{title}} from combination",
