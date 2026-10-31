@@ -68,7 +68,7 @@ export const buildPublicCopy = (
         ...base,
         PK: `userUUID#${saver.userUUID}`,
         userUUID: saver.userUUID,
-        username: saver.username || '',
+        username: saver.username || null,
         title: source.title ?? '',
         description: source.description ?? '',
         labels: [],

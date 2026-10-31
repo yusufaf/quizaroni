@@ -69,5 +69,6 @@ export type StudysetBase = {
     subject?: SubjectId;
     title: string;
     userUUID: UUID;
-    username: string;
+    /** Null for a Logto account without a username (#226). */
+    username: string | null;
 };
