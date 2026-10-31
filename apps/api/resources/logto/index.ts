@@ -28,3 +28,14 @@ export const LOGTO_API_RESOURCE: { [key: string]: string } = {
 // commit it. logtoUserCreatedWebhook.ts uses it to verify the
 // logto-signature-sha-256 header so the endpoint can't be spoofed.
 export const LOGTO_WEBHOOK_SIGNING_KEY = process.env.LOGTO_WEBHOOK_SIGNING_KEY ?? "";
+
+// Resource indicator of the Management API on a self-hosted (OSS) Logto. The
+// M2M token requested for it has the single `all` scope, i.e. full admin.
+export const LOGTO_MANAGEMENT_API_RESOURCE = "https://default.logto.app/api";
+
+// Machine-to-machine app (Console > Applications > "Quizaroni API username
+// sync") with the "Logto Management API access" role. updateUsername.ts uses
+// it to change a user's username. Set both in apps/api/.env (see
+// .env.example) — never commit the secret.
+export const LOGTO_M2M_APP_ID = process.env.LOGTO_M2M_APP_ID ?? "";
+export const LOGTO_M2M_APP_SECRET = process.env.LOGTO_M2M_APP_SECRET ?? "";

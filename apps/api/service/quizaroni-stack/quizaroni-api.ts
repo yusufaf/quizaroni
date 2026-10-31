@@ -301,6 +301,10 @@ export class QuizaroniAPI extends Construct {
                 lambdaName: 'updateUserMetadata',
             },
             {
+                route: `${usersPrefix}/update-username`,
+                lambdaName: 'updateUsername',
+            },
+            {
                 route: `${usersPrefix}/update-notification-preferences`,
                 lambdaName: 'updateNotificationPreferences',
             },

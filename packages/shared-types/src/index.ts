@@ -7,3 +7,4 @@ export * from './subjects';
 export * from './search';
 export * from './termPreviews';
 export * from './userMetadata';
+export * from './username';
