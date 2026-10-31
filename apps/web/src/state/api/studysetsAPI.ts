@@ -428,7 +428,11 @@ export const useUpdateStudyset = ({
         },
         onMutate: ({ studysetUUID, updates, isMetadataUpdate }) => {
             setSavesFor(queryClient, studysetUUID).unsettled += 1;
-            if (!optimistic || isMetadataUpdate || !Array.isArray(updates.cards)) {
+            if (
+                !optimistic ||
+                isMetadataUpdate ||
+                !Array.isArray(updates.cards)
+            ) {
                 return;
             }
             const queryKey = ['studysets', studysetUUID];

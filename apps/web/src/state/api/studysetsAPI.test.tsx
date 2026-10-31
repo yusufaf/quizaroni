@@ -449,8 +449,18 @@ describe('useUpdateStudyset failures', () => {
 // saves of one set must not lose each other's changes.
 describe('useUpdateStudyset overlapping saves', () => {
     const OTHER_ID = '22222222-2222-4222-8222-222222222222';
-    const cardA = { ...EMPTY_CARD, cardUUID: 'card-a', term: 'A', definition: 'a' };
-    const cardB = { ...EMPTY_CARD, cardUUID: 'card-b', term: 'B', definition: 'b' };
+    const cardA = {
+        ...EMPTY_CARD,
+        cardUUID: 'card-a',
+        term: 'A',
+        definition: 'a',
+    };
+    const cardB = {
+        ...EMPTY_CARD,
+        cardUUID: 'card-b',
+        term: 'B',
+        definition: 'b',
+    };
     const seeded = { ...validSet, cards: [cardA, cardB] };
     const markedA = [{ ...cardA, important: true }, cardB];
     const markedBoth = [
@@ -491,20 +501,28 @@ describe('useUpdateStudyset overlapping saves', () => {
         );
         // Two hook instances, like two card components.
         const { result } = renderHook(
-            () => [useUpdateStudyset(options), useUpdateStudyset(options)] as const,
+            () =>
+                [
+                    useUpdateStudyset(options),
+                    useUpdateStudyset(options),
+                ] as const,
             { wrapper }
         );
         return { qc, result };
     };
 
     const cachedCards = (qc: QueryClient) =>
-        qc.getQueryData<{ studyset: typeof seeded }>(['studysets', ID])?.studyset
-            .cards;
+        qc.getQueryData<{ studyset: typeof seeded }>(['studysets', ID])
+            ?.studyset.cards;
     const bodyOf = (fetchMock: ReturnType<typeof vi.fn>, call: number) =>
         JSON.parse(
             String(
-                (fetchMock.mock.calls[call] as unknown as [string, RequestInit])[1]
-                    .body
+                (
+                    fetchMock.mock.calls[call] as unknown as [
+                        string,
+                        RequestInit,
+                    ]
+                )[1].body
             )
         );
     const isInvalidated = (qc: QueryClient, queryKey: unknown[]) =>
@@ -524,7 +542,10 @@ describe('useUpdateStudyset overlapping saves', () => {
         const { fetchMock } = holdFetch();
         const { qc, result } = renderTwoCards();
 
-        result.current[0].mutate({ studysetUUID: ID, updates: { cards: markedA } });
+        result.current[0].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedA },
+        });
         await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
 
         expect(cachedCards(qc)).toEqual(markedA);
@@ -534,8 +555,14 @@ describe('useUpdateStudyset overlapping saves', () => {
         const { fetchMock, pending } = holdFetch();
         const { result } = renderTwoCards();
 
-        result.current[0].mutate({ studysetUUID: ID, updates: { cards: markedA } });
-        result.current[1].mutate({ studysetUUID: ID, updates: { cards: markedBoth } });
+        result.current[0].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedA },
+        });
+        result.current[1].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedBoth },
+        });
         await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
         await new Promise((resolve) => setTimeout(resolve, 20));
         expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -549,8 +576,14 @@ describe('useUpdateStudyset overlapping saves', () => {
         const { fetchMock, pending } = holdFetch();
         const { qc, result } = renderTwoCards();
 
-        result.current[0].mutate({ studysetUUID: ID, updates: { cards: markedA } });
-        result.current[1].mutate({ studysetUUID: ID, updates: { cards: markedBoth } });
+        result.current[0].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedA },
+        });
+        result.current[1].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedBoth },
+        });
         await waitFor(() => expect(fetchMock).toHaveBeenCalled());
         pending[0]!(ok());
         await waitFor(() => expect(result.current[0].isSuccess).toBe(true));
@@ -572,7 +605,10 @@ describe('useUpdateStudyset overlapping saves', () => {
         const { qc, result } = renderTwoCards();
 
         await result.current[0]
-            .mutateAsync({ studysetUUID: ID, updates: { cards: [cardB, cardA] } })
+            .mutateAsync({
+                studysetUUID: ID,
+                updates: { cards: [cardB, cardA] },
+            })
             .catch(() => {});
 
         expect(isInvalidated(qc, ['studysets', ID])).toBe(true);
@@ -588,7 +624,10 @@ describe('useUpdateStudyset overlapping saves', () => {
             updates: { viewSetLayout: 'grid' },
             isMetadataUpdate: true,
         });
-        result.current[1].mutate({ studysetUUID: ID, updates: { favorited: true } });
+        result.current[1].mutate({
+            studysetUUID: ID,
+            updates: { favorited: true },
+        });
         await waitFor(() => expect(fetchMock).toHaveBeenCalled());
 
         expect(qc.getQueryData(['studysets', ID])).toBe(before);
@@ -615,8 +654,14 @@ describe('useUpdateStudyset overlapping saves', () => {
         const { fetchMock, pending } = holdFetch();
         const { result } = renderTwoCards();
 
-        result.current[0].mutate({ studysetUUID: ID, updates: { cards: markedA } });
-        result.current[1].mutate({ studysetUUID: ID, updates: { cards: markedBoth } });
+        result.current[0].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedA },
+        });
+        result.current[1].mutate({
+            studysetUUID: ID,
+            updates: { cards: markedBoth },
+        });
         await waitFor(() => expect(pending.length).toBeGreaterThan(0));
         pending[0]!(ok());
 
