@@ -55,7 +55,6 @@ const customSet = {
     title: 'Biology Basics',
     username: 'owner',
     userUUID: OWNER,
-    uuid: ID,
 };
 
 const json = (status: number, body: unknown) =>

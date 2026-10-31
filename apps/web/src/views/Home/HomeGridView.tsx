@@ -114,7 +114,7 @@ const HomeGridView = ({ studysets, isLoading = false }: Props) => {
                 <AnimatePresence mode="wait">
                     {paginatedStudySets.map((studyset, index) => (
                         <motion.div
-                            key={studyset.uuid}
+                            key={studyset.studysetUUID}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}

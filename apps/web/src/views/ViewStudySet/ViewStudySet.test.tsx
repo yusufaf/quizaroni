@@ -112,7 +112,6 @@ const ownedSet = (
     title: 'Owned set',
     username: 'owner',
     userUUID: OWNER,
-    uuid: studysetUUID,
     ...overrides,
 });
 

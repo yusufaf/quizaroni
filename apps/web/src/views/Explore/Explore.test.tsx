@@ -129,7 +129,6 @@ const makeSet = (
     title,
     username: 'owner',
     userUUID: OWNER,
-    uuid: id,
     ...overrides,
 });
 

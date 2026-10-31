@@ -26,11 +26,9 @@ export type {
     StudysetMetadata,
 } from '@quizaroni/shared-types';
 
-/** The client-side shape. The API's persisted record differs: it carries a
- * PK/SK key pair and `updatedAt` instead of `uuid`. */
-export type Studyset = StudysetBase & {
-    uuid?: UUID;
-};
+/** The client-side shape. The API's persisted record also carries a PK/SK
+ * key pair and `updatedAt`. */
+export type Studyset = StudysetBase;
 
 // #endregion
 

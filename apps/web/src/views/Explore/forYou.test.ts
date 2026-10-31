@@ -15,7 +15,6 @@ import {
 const makeSet = (id: string, overrides: Partial<Studyset> = {}): Studyset =>
     ({
         studysetUUID: id,
-        uuid: id,
         title: `Set ${id}`,
         description: '',
         cards: [],

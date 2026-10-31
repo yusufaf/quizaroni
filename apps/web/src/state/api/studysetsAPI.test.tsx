@@ -63,7 +63,6 @@ const validSet = {
     title: 'Biology Basics',
     username: 'owner',
     userUUID: OWNER,
-    uuid: ID,
 };
 
 const lastViewedStub = { lastViewed: NOW, updatedAt: NOW, updatedBy: OWNER };
