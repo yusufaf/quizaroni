@@ -1,5 +1,5 @@
 import { Box, Typography, useTheme } from '@mui/material';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ReactNode } from 'react';
 
 type FloatingCardProps = {
@@ -35,7 +35,7 @@ const FloatingCard = ({
           : 'rgba(0, 0, 0, 0.08)';
 
     return (
-        <motion.div
+        <m.div
             initial={{ opacity: 0, y: 2 }}
             animate={{
                 opacity: 1,
@@ -120,7 +120,7 @@ const FloatingCard = ({
                     </Box>
                 )}
             </Box>
-        </motion.div>
+        </m.div>
     );
 };
 

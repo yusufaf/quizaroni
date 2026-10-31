@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { Button } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { usePwaStore } from 'state/stores/pwa';
-import { skipWaiting } from 'state/local';
+import { skipWaiting } from 'state/local/pwa/registerSW';
 
 const TOAST_ID = 'pwa-update-available';
 

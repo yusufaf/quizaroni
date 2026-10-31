@@ -1,5 +1,5 @@
 import { Box, Typography, useTheme } from '@mui/material';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { ReactNode } from 'react';
 
 type FeatureCardProps = {
@@ -22,7 +22,7 @@ const FeatureCard = ({
     const accent = accentColor ?? theme.palette.primary.main;
 
     return (
-        <motion.div
+        <m.div
             initial={{ opacity: 0, y: 1.5 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-96px' }}
@@ -94,7 +94,7 @@ const FeatureCard = ({
                     {description}
                 </Typography>
             </Box>
-        </motion.div>
+        </m.div>
     );
 };
 

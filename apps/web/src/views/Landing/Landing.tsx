@@ -1,31 +1,37 @@
 import { Box, useTheme } from '@mui/material';
+import { LazyMotion, domAnimation } from 'framer-motion';
 import Hero from './sections/Hero';
 import Features from './sections/Features';
 import HowItWorks from './sections/HowItWorks';
 import FooterCTA from './sections/FooterCTA';
 
+// Landing is in the entry chunk: m.* with domAnimation leaves out drag,
+// layout and the rest of framer-motion. The features load synchronously so
+// sections that start at opacity 0 never wait on another request.
 const Landing = () => {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
 
     return (
-        <Box
-            sx={{
-                position: 'relative',
-                minHeight: '100%',
-                background: isDark ? '#0e0e0e' : '#fafafc',
-                backgroundImage: isDark
-                    ? 'radial-gradient(circle, #262626 0.0625rem, transparent 0.0625rem)'
-                    : 'radial-gradient(circle, rgba(0, 0, 0, 0.06) 0.0625rem, transparent 0.0625rem)',
-                backgroundSize: '2rem 2rem',
-                overflowX: 'hidden',
-            }}
-        >
-            <Hero />
-            <Features />
-            <HowItWorks />
-            <FooterCTA />
-        </Box>
+        <LazyMotion features={domAnimation} strict>
+            <Box
+                sx={{
+                    position: 'relative',
+                    minHeight: '100%',
+                    background: isDark ? '#0e0e0e' : '#fafafc',
+                    backgroundImage: isDark
+                        ? 'radial-gradient(circle, #262626 0.0625rem, transparent 0.0625rem)'
+                        : 'radial-gradient(circle, rgba(0, 0, 0, 0.06) 0.0625rem, transparent 0.0625rem)',
+                    backgroundSize: '2rem 2rem',
+                    overflowX: 'hidden',
+                }}
+            >
+                <Hero />
+                <Features />
+                <HowItWorks />
+                <FooterCTA />
+            </Box>
+        </LazyMotion>
     );
 };
 

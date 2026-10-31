@@ -114,8 +114,12 @@ async function main() {
     );
     await writeFile(resolve(PUBLIC, 'favicon.ico'), await pngToIco(icoSizes));
 
-    // App logo imported by the NavBar (the original was a JPEG renamed .png).
-    await resizePng(src, 1024, resolve(RES, 'logo.png'));
+    // App logo imported by the NavBar, shown at 40px: 120px covers 3x screens.
+    // It loads before the landing page's LCP, so keep it small.
+    await sharp(src)
+        .resize(120, 120, { fit: 'cover' })
+        .webp({ quality: 90 })
+        .toFile(resolve(RES, 'logo.webp'));
 
     // iOS Splash Screens
     const splashDir = resolve(PUBLIC, 'splash');

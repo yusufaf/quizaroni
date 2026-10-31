@@ -1,20 +1,15 @@
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { useLogto } from '@logto/react';
 import { setAccessTokenGetter } from 'state/api/awsAPI';
-import FeedbackDialog from 'shared/components/FeedbackDialog/FeedbackDialog';
 import Footer from 'views/Footer/Footer';
 import NavBar from 'views/NavBar/NavBar';
 import MobileBottomNav from 'views/NavBar/MobileBottomNav';
 import { useTheme } from 'shared/theme/useTheme';
 import { DARK, LIGHT } from 'shared/constants/index';
 import AppRoutes from './AppRoutes';
-import { GlobalSyncInitializer } from 'state/local';
-import { GamificationSyncInitializer } from 'state/local/components/GamificationSyncInitializer';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import GlobalConfirmDialog from 'shared/components/GlobalConfirmDialog/GlobalConfirmDialog';
-import ManageLabelsDialog from 'shared/components/ManageLabelsDialog/ManageLabelsDialog';
 import { useGlobalStore } from 'state/stores/global';
 import LoadingIndicator from 'shared/components/LoadingIndicator/LoadingIndicator';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -28,7 +23,32 @@ import { NavShortcuts } from 'shared/keyboard/NavShortcuts';
 import { isStudyRoute } from 'shared/utilities/routes';
 import PwaUpdateToast from 'shared/components/PwaUpdateToast/PwaUpdateToast';
 import InstallAppPrompt from 'shared/components/InstallAppPrompt/InstallAppPrompt';
+import MountOnFirstOpen from 'shared/components/MountOnFirstOpen/MountOnFirstOpen';
 import RouteErrorBoundary from 'shared/components/ErrorBoundary/RouteErrorBoundary';
+
+// The sync engine and gamification store pull in the local database (Dexie),
+// which the landing page doesn't need for its first paint.
+const GlobalSyncInitializer = lazy(() =>
+    import('state/local/components/GlobalSyncInitializer').then((m) => ({
+        default: m.GlobalSyncInitializer,
+    }))
+);
+const GamificationSyncInitializer = lazy(() =>
+    import('state/local/components/GamificationSyncInitializer').then((m) => ({
+        default: m.GamificationSyncInitializer,
+    }))
+);
+
+// Out of the entry chunk: the landing page never opens these.
+const FeedbackDialog = lazy(
+    () => import('shared/components/FeedbackDialog/FeedbackDialog')
+);
+const GlobalConfirmDialog = lazy(
+    () => import('shared/components/GlobalConfirmDialog/GlobalConfirmDialog')
+);
+const ManageLabelsDialog = lazy(
+    () => import('shared/components/ManageLabelsDialog/ManageLabelsDialog')
+);
 
 const ShortcutLayer = () => {
     useGlobalKeyListener();
@@ -45,7 +65,12 @@ const App = () => {
     const { setTheme, theme } = useTheme();
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
-    const { loadingActions } = useGlobalStore();
+    const {
+        loadingActions,
+        feedbackDialogOpen,
+        confirmDialogProps,
+        labelsDialogProps,
+    } = useGlobalStore();
     const { getAccessToken, isAuthenticated } = useLogto();
 
     useEffect(() => {
@@ -71,8 +96,10 @@ const App = () => {
     return (
         <QueryClientProvider client={queryClient}>
             <ShortcutProvider>
-                <GlobalSyncInitializer enableSync={true} />
-                <GamificationSyncInitializer />
+                <Suspense fallback={null}>
+                    <GlobalSyncInitializer enableSync={true} />
+                    <GamificationSyncInitializer />
+                </Suspense>
                 <AppWrapper>
                     <NavBar />
                     {loadingActions.length > 0 && <LoadingIndicator />}
@@ -84,12 +111,18 @@ const App = () => {
                     <Footer />
                     <MobileBottomNav />
                 </AppWrapper>
-                <FeedbackDialog />
+                <MountOnFirstOpen open={feedbackDialogOpen}>
+                    <FeedbackDialog />
+                </MountOnFirstOpen>
                 <ToastContainer theme={theme} />
                 <PwaUpdateToast />
                 <InstallAppPrompt />
-                <GlobalConfirmDialog />
-                <ManageLabelsDialog />
+                <MountOnFirstOpen open={!!confirmDialogProps?.open}>
+                    <GlobalConfirmDialog />
+                </MountOnFirstOpen>
+                <MountOnFirstOpen open={!!labelsDialogProps?.open}>
+                    <ManageLabelsDialog />
+                </MountOnFirstOpen>
                 <ShortcutLayer />
             </ShortcutProvider>
         </QueryClientProvider>

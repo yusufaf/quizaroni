@@ -1,6 +1,6 @@
 import { Box, Typography, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 const HowItWorks = () => {
     const { t } = useTranslation();
@@ -31,7 +31,7 @@ const HowItWorks = () => {
             }}
         >
             <Box sx={{ maxWidth: '80rem', marginX: 'auto' }}>
-                <motion.div
+                <m.div
                     initial={{ opacity: 0, y: 1.25 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-64px' }}
@@ -52,7 +52,7 @@ const HowItWorks = () => {
                     >
                         {t('landing.howItWorks.sectionTitle')}
                     </Typography>
-                </motion.div>
+                </m.div>
 
                 <Box sx={{ position: 'relative' }}>
                     <Box
@@ -81,7 +81,7 @@ const HowItWorks = () => {
                         }}
                     >
                         {steps.map((step, i) => (
-                            <motion.div
+                            <m.div
                                 key={step.title}
                                 initial={{ opacity: 0, y: 1.25 }}
                                 whileInView={{ opacity: 1, y: 0 }}
@@ -143,7 +143,7 @@ const HowItWorks = () => {
                                         {step.description}
                                     </Typography>
                                 </Box>
-                            </motion.div>
+                            </m.div>
                         ))}
                     </Box>
                 </Box>

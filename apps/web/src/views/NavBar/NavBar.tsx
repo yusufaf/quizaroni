@@ -1,5 +1,5 @@
 import { Add, Logout as LogoutIcon } from '@mui/icons-material';
-import logoUrl from '../../resources/logo.png';
+import logoUrl from '../../resources/logo.webp';
 import {
     AppBar,
     Toolbar,
@@ -7,13 +7,12 @@ import {
     Typography,
     useMediaQuery,
 } from '@mui/material/';
-import { useRef, useState } from 'react';
+import { lazy, Suspense, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import ProfileDropdown from 'views/Profile/ProfileDropdown';
 import { useTheme } from 'theme/useTheme';
 import { ROUTES } from 'shared/constants';
-import { SyncStatusIndicator } from 'state/local';
 import NavDrawer from './NavDrawer';
 import {
     AuthenticationButton,
@@ -29,10 +28,19 @@ import {
 } from './NavStyles';
 import DarkModeToggleButton from './DarkModeToggleButton';
 import { useLogto } from '@logto/react';
-import StreakBadge from 'shared/components/StreakBadge/StreakBadge';
 import { QUERY_PARAMS } from 'shared/constants';
 import { useCreateStudysetAction } from 'hooks/useCreateStudysetAction';
 import { useLogout } from 'hooks/useLogout';
+
+// Lazy: both read the local database (Dexie), which the landing page doesn't need.
+const SyncStatusIndicator = lazy(() =>
+    import('state/local/components/SyncStatusIndicator').then((m) => ({
+        default: m.SyncStatusIndicator,
+    }))
+);
+const StreakBadge = lazy(
+    () => import('shared/components/StreakBadge/StreakBadge')
+);
 
 type Props = {};
 
@@ -117,16 +125,18 @@ const NavBar = (props: Props) => {
                             </CreateStudySetButton>
                         </NavLinksContainer>
                         <NavRightActions>
-                            <SyncStatusIndicator />
-                            {authenticated && (
-                                <StreakBadge
-                                    onClick={() =>
-                                        navigate(
-                                            `/profile?${QUERY_PARAMS.PROFILE_TAB}=Achievements`
-                                        )
-                                    }
-                                />
-                            )}
+                            <Suspense fallback={null}>
+                                <SyncStatusIndicator />
+                                {authenticated && (
+                                    <StreakBadge
+                                        onClick={() =>
+                                            navigate(
+                                                `/profile?${QUERY_PARAMS.PROFILE_TAB}=Achievements`
+                                            )
+                                        }
+                                    />
+                                )}
+                            </Suspense>
                             {authenticated ? (
                                 <Tooltip title={t('nav.logout')}>
                                     <LogoutIconButton
