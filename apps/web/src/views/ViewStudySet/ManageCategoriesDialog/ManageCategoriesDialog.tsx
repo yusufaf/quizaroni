@@ -58,7 +58,9 @@ const ManageCategoriesDialog = (props: Props) => {
     // mutateAsync, not mutate: per-call mutate() callbacks only run for the
     // latest call on the hook, so a second save dropped the first one's
     // error handling (#113).
-    const { mutateAsync: updateStudySet } = useUpdateStudyset();
+    const { mutateAsync: updateStudySet } = useUpdateStudyset({
+        errorToast: false,
+    });
 
     const [selectedTab, setSelectedTab] = useState<string>(TABS.MANAGE);
     const [errorInfo, setErrorInfo] = useState<ErrorInfo>(null);

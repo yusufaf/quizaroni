@@ -118,6 +118,8 @@ const ViewStudySet = (props: Props) => {
   const isOutsideLibrary = isHttpStatus(studySetError, 404);
 
   const { mutate: updateStudySet } = useUpdateStudyset();
+  // lastViewed is a background write the user didn't ask for, so it fails quietly.
+  const { mutate: recordLastViewed } = useUpdateStudyset({ errorToast: false });
 
   useBrowserTitle(selectedStudyset?.title ?? "");
 
@@ -143,7 +145,7 @@ const ViewStudySet = (props: Props) => {
   useEffect(() => {
     if (!studysetUUID || !isOwnedSetLoaded) return;
     if (lastViewedRecordedFor.current === studysetUUID) return;
-    updateStudySet({
+    recordLastViewed({
       studysetUUID,
       updates: { lastViewed: new Date().toISOString() },
     });
@@ -180,17 +182,13 @@ const ViewStudySet = (props: Props) => {
   }, [viewMode]);
 
   const updateMetadataField = (property: string, newValue: any) => {
-    try {
-      updateStudySet({
-        studysetUUID,
-        updates: {
-          [property]: newValue,
-        },
-        isMetadataUpdate: true,
-      });
-    } catch (error) {
-      console.error("Error updating study set metadata");
-    }
+    updateStudySet({
+      studysetUUID,
+      updates: {
+        [property]: newValue,
+      },
+      isMetadataUpdate: true,
+    });
   };
 
   const handleBackClick = () => {

@@ -54,8 +54,8 @@ const SuggestedCards = ({ cards, studyset }: Props) => {
             toast.success(
                 t('aiChat.suggestedCards.added', { count: newCards.length })
             );
-        } catch (err) {
-            toast.error((err as Error).message);
+        } catch {
+            // useUpdateStudyset already shows the error.
         }
     };
 

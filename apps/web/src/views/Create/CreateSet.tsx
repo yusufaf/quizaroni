@@ -79,7 +79,9 @@ const CreateSet = (props: Props) => {
     const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
 
     const { mutate: createStudyset } = useCreateStudyset();
-    const { mutate: updateStudyset } = useUpdateStudyset();
+    const { mutate: updateStudyset } = useUpdateStudyset({
+        errorToast: 'create.errorUpdate',
+    });
 
     /* Local State */
     const [title, setTitle] = useState<string>('');
@@ -194,11 +196,6 @@ const CreateSet = (props: Props) => {
                         position: toast.POSITION.BOTTOM_LEFT,
                     });
                     navigate(`/view/${studysetUUID}`);
-                },
-                onError: () => {
-                    toast.error(t('create.errorUpdate'), {
-                        position: toast.POSITION.BOTTOM_LEFT,
-                    });
                 },
             }
         );

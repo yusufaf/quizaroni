@@ -124,6 +124,8 @@ type GetStudysetHandler = (requestedId: string) => Promise<Response>;
 let getStudyset: GetStudysetHandler;
 type PublicHandler = () => Promise<Response>;
 let getPublicStudyset: PublicHandler;
+type UpdateHandler = (requestedId: string) => Promise<Response>;
+let updateStudyset: UpdateHandler;
 
 const publicSet = () => ({
     title: "Someone else's set",
@@ -149,7 +151,7 @@ const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
     }
     if (url.endsWith('/studysets/update-studyset')) {
         const { studysetUUID } = JSON.parse(String(init?.body ?? '{}'));
-        return json(200, { message: 'ok', studyset: ownedSet(studysetUUID) });
+        return updateStudyset(studysetUUID);
     }
     if (url.endsWith('/studysets/copy-public-studyset')) {
         return json(200, {
@@ -200,6 +202,8 @@ beforeEach(() => {
     toastMock.success.mockClear();
     toastMock.error.mockClear();
     getPublicStudyset = () => json(404, { message: 'not found' });
+    updateStudyset = (id) =>
+        json(200, { message: 'ok', studyset: ownedSet(id) });
     fetchMock.mockClear();
     vi.stubGlobal('fetch', fetchMock);
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -254,6 +258,19 @@ describe('ViewStudySet lastViewed', () => {
         });
         await waitFor(() => expect(callsTo('/studysets/get-studyset')).toHaveLength(2));
         expect(updateCalls()).toHaveLength(1);
+    });
+
+    // #218: lastViewed is a background write the user didn't ask for.
+    it('does not toast when recording lastViewed fails', async () => {
+        getStudyset = () => json(200, { studyset: ownedSet(ID1) });
+        updateStudyset = () => json(500, { message: 'boom' });
+        const { qc } = renderView();
+
+        await waitFor(() => expect(updateCalls()).toHaveLength(1));
+        await waitFor(() =>
+            expect(qc.getMutationCache().getAll()[0]?.state.status).toBe('error')
+        );
+        expect(toastMock.error).not.toHaveBeenCalled();
     });
 
     it('does not trust a cached copy of a set that has since been deleted', async () => {
