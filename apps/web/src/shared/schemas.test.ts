@@ -8,6 +8,7 @@ import {
     DEFAULT_USER_DATA,
 } from 'shared/constants';
 import {
+    CreateStudysetResponseSchema,
     EditableUserMetadataSchema,
     GetAllStudysetsResponseSchema,
     GetUserResponseSchema,
@@ -67,6 +68,41 @@ describe('stored record shapes', () => {
                     userUUID: LOGTO_USER_ID,
                 },
             ],
+        });
+
+        expect(result.error?.issues).toBeUndefined();
+    });
+
+    // create-studyset stores null when the token has no username (#226).
+    it('accepts a study set created by an account without a username', () => {
+        const result = CreateStudysetResponseSchema.safeParse({
+            message: 'ok',
+            studyset: {
+                cards: [],
+                categories: [],
+                createdAt: NOW,
+                description: '',
+                favorited: false,
+                labels: [],
+                lastViewed: NOW,
+                metadata: {
+                    backgroundColorVisible: false,
+                    cardCountVisible: true,
+                    contentOnly: false,
+                    customLabelTerminology: '',
+                    customTerminology: '',
+                    labelTerminology: 'Card',
+                    notesDrawerInitial: 'open',
+                    notesDrawerPosition: 'right',
+                    publiclyViewable: false,
+                    terminology: 'Term/Definition',
+                    textColorVisible: false,
+                },
+                studysetUUID: '11111111-1111-4111-8111-111111111111',
+                title: 'Untitled Studyset',
+                username: null,
+                userUUID: LOGTO_USER_ID,
+            },
         });
 
         expect(result.error?.issues).toBeUndefined();

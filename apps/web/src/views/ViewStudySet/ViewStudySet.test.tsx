@@ -84,7 +84,10 @@ vi.mock('components/ScrollToTopFab/ScrollToTopFab', () => ({
     default: () => null,
 }));
 
-const ownedSet = (studysetUUID: string) => ({
+const ownedSet = (
+    studysetUUID: string,
+    overrides: Record<string, unknown> = {}
+) => ({
     cards: [],
     categories: [],
     createdAt: NOW,
@@ -110,6 +113,7 @@ const ownedSet = (studysetUUID: string) => ({
     username: 'owner',
     userUUID: OWNER,
     uuid: studysetUUID,
+    ...overrides,
 });
 
 const json = (status: number, body: unknown) =>
@@ -387,5 +391,23 @@ describe('ViewStudySet for your own set', () => {
         );
         expect(screen.getByText('viewStudySet.backToStudySets')).toBeTruthy();
         expect(publicCalls()).toHaveLength(0);
+    });
+
+    it('credits the creator', async () => {
+        getStudyset = () => json(200, { studyset: ownedSet(ID1) });
+        renderView();
+
+        await screen.findByText('Owned set');
+        expect(screen.getByText('viewStudySet.createdBy')).toBeTruthy();
+    });
+
+    // A set made by an account without a username stores null (#226).
+    it('leaves out the credit when the set has no username', async () => {
+        getStudyset = () =>
+            json(200, { studyset: ownedSet(ID1, { username: null }) });
+        renderView();
+
+        await screen.findByText('Owned set');
+        expect(screen.queryByText('viewStudySet.createdBy')).toBeNull();
     });
 });

@@ -130,9 +130,11 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                             </motion.div>
                         </Tooltip>
                     </SpacedContainer>
-                    <Typography variant="subtitle1">
-                        {`Created by ${username}`}
-                    </Typography>
+                    {username && (
+                        <Typography variant="subtitle1">
+                            {`Created by ${username}`}
+                        </Typography>
+                    )}
                     <CardDescription title={description}>
                         {description}
                     </CardDescription>
