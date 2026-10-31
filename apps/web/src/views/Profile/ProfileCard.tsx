@@ -41,6 +41,10 @@ const ProfileCard = ({ userData }: Props) => {
 
     const avatarSrc = userData.metadata.avatar?.value;
     const hasAvatar = !!avatarSrc;
+    // Array.from keeps an emoji or other surrogate pair whole.
+    const initial = Array.from(
+        userData.username || userData.email || ''
+    )[0]?.toUpperCase();
 
     return (
         <>
@@ -61,7 +65,7 @@ const ProfileCard = ({ userData }: Props) => {
                                 />
                             ) : (
                                 <Typography variant="h3" sx={{ color: '#fff' }}>
-                                    {userData.username.charAt(0).toUpperCase()}
+                                    {initial}
                                 </Typography>
                             )}
                         </ProfilePicture>
@@ -88,7 +92,7 @@ const ProfileCard = ({ userData }: Props) => {
                                 {t('profile.username')}
                             </UserInfoHeading>
                             <Typography>
-                                {userData?.username ?? 'N/A'}
+                                {userData.username || 'N/A'}
                             </Typography>
                         </UserInfoContainer>
                         <UserInfoContainer>

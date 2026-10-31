@@ -9,9 +9,69 @@ import {
 } from 'shared/constants';
 import {
     EditableUserMetadataSchema,
+    GetAllStudysetsResponseSchema,
     GetUserResponseSchema,
     UserMetadataSchema,
 } from './schemas';
+
+// Logto user ids are 12-character strings, not UUIDs.
+const LOGTO_USER_ID = '710itwyy5r2r';
+const NOW = '2026-10-27T05:49:52.225Z';
+
+describe('stored record shapes', () => {
+    it('accepts a Logto user who signed up without a username', () => {
+        const result = GetUserResponseSchema.safeParse({
+            message: 'ok',
+            user: {
+                ...DEFAULT_USER_DATA,
+                createdAt: NOW,
+                email: 'user@example.com',
+                userUUID: LOGTO_USER_ID,
+                username: null,
+            },
+        });
+
+        expect(result.error?.issues).toBeUndefined();
+    });
+
+    it('accepts a seeded study set as get-all-studysets returns it', () => {
+        const result = GetAllStudysetsResponseSchema.safeParse({
+            studysets: [
+                {
+                    cards: [],
+                    categories: [],
+                    createdAt: NOW,
+                    description: '',
+                    favorited: false,
+                    labels: [],
+                    lastViewed: NOW,
+                    metadata: {
+                        backgroundColorVisible: false,
+                        cardCountVisible: true,
+                        contentOnly: false,
+                        customLabelTerminology: '',
+                        customTerminology: '',
+                        labelTerminology: 'Card',
+                        notesDrawerInitial: 'open',
+                        notesDrawerPosition: 'right',
+                        publiclyViewable: true,
+                        terminology: 'Term/Definition',
+                        textColorVisible: false,
+                    },
+                    publishedAt: NOW,
+                    // The seed script derives v5 ids (seedStudysetUUID).
+                    studysetUUID: '124ab08d-6292-591b-a27e-0abeed412841',
+                    subject: 'math',
+                    title: 'Cell biology',
+                    username: 'turtles',
+                    userUUID: LOGTO_USER_ID,
+                },
+            ],
+        });
+
+        expect(result.error?.issues).toBeUndefined();
+    });
+});
 
 describe('UserMetadataSchema', () => {
     // A key missing here is stripped when the user loads (#207).

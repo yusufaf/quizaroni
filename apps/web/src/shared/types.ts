@@ -29,7 +29,7 @@ export type {
 /** The client-side shape. The API's persisted record differs: it carries a
  * PK/SK key pair and `updatedAt` instead of `uuid`. */
 export type Studyset = StudysetBase & {
-    uuid: UUID;
+    uuid?: UUID;
 };
 
 // #endregion
@@ -60,7 +60,7 @@ export type User = {
         aiModel?: string;
         visibleColumns?: Record<string, boolean>;
     };
-    username: string;
+    username: string | null;
     userUUID: UUID;
 };
 

@@ -3,9 +3,10 @@ import { SUBJECT_IDS } from '@quizaroni/shared-types';
 import type { PublishError } from '@quizaroni/shared-types';
 
 // #region Base Schemas
-export const UUIDSchema = z.uuid({
-    version: 'v4',
-});
+// Any version: the Explore seed script derives v5 study set ids.
+export const UUIDSchema = z.uuid();
+// Logto's `sub`, a short random string rather than a UUID.
+export const UserIdSchema = z.string().min(1);
 export const TimestampSchema = z.iso.datetime();
 export const SignedURLSchema = z.url();
 
@@ -65,8 +66,9 @@ export const StudysetSchema = z.object({
     subject: z.enum(SUBJECT_IDS).optional(),
     title: z.string(),
     username: z.string(),
-    userUUID: UUIDSchema,
-    uuid: UUIDSchema,
+    userUUID: UserIdSchema,
+    // Client-only; the API never stores it.
+    uuid: UUIDSchema.optional(),
 });
 
 // #endregion
@@ -182,8 +184,9 @@ export const UserSchema = z.object({
     email: z.email(),
     labels: z.array(z.string()),
     metadata: UserMetadataSchema,
-    username: z.string(),
-    userUUID: UUIDSchema,
+    // Null for a Logto account created without a username.
+    username: z.string().nullable(),
+    userUUID: UserIdSchema,
 });
 
 // #endregion
