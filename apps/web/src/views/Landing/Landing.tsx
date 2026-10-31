@@ -1,21 +1,19 @@
 import { Box, useTheme } from '@mui/material';
-import { LazyMotion } from 'framer-motion';
+import { LazyMotion, domAnimation } from 'framer-motion';
 import Hero from './sections/Hero';
 import Features from './sections/Features';
 import HowItWorks from './sections/HowItWorks';
 import FooterCTA from './sections/FooterCTA';
 
-// Landing is in the entry chunk, so it renders m.* components and loads the
-// animation features separately instead of bundling all of framer-motion.
-const loadMotionFeatures = () =>
-    import('./motionFeatures').then((module) => module.default);
-
+// Landing is in the entry chunk: m.* with domAnimation leaves out drag,
+// layout and the rest of framer-motion. The features load synchronously so
+// sections that start at opacity 0 never wait on another request.
 const Landing = () => {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
 
     return (
-        <LazyMotion features={loadMotionFeatures} strict>
+        <LazyMotion features={domAnimation} strict>
             <Box
                 sx={{
                     position: 'relative',
