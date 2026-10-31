@@ -215,7 +215,8 @@
     "errors": {
         "generic": "Something went wrong",
         "notFound": "Not found",
-        "unauthorized": "Unauthorized"
+        "unauthorized": "Unauthorized",
+        "saveFailed": "Couldn't save your changes. Please try again."
     },
     "imageGallery": {
         "uploaded": "Uploaded {{date}}"
