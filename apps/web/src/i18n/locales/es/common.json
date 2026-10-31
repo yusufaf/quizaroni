@@ -681,6 +681,12 @@
         "installIosInstructions": "Toca Compartir y luego \"Agregar a pantalla de inicio\" para instalar Quizaroni.",
         "dismissInstall": "Descartar aviso de instalación"
     },
+    "errorBoundary": {
+        "title": "Algo salió mal",
+        "body": "Esta página tuvo un error. Recargar suele solucionarlo.",
+        "updateBody": "Esta página tuvo un error. Hay una versión más reciente de Quizaroni lista que puede solucionarlo.",
+        "updateAndReload": "Actualizar y recargar"
+    },
     "combineSets": {
         "goBack": "Atrás",
         "removeSet": "Eliminar {{title}} de la combinación",

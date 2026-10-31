@@ -9,6 +9,8 @@ import './i18n';
 
 import './index.css';
 import App from './App';
+import ErrorBoundary from './shared/components/ErrorBoundary/ErrorBoundary';
+import CrashFallback from './shared/components/ErrorBoundary/CrashFallback';
 
 const logtoConfig: LogtoConfig = {
     endpoint: import.meta.env.VITE_LOGTO_ENDPOINT,
@@ -26,7 +28,9 @@ root.render(
         <BrowserRouter>
             <CustomThemeProvider>
                 <CssBaseline />
-                <App />
+                <ErrorBoundary fallback={<CrashFallback />}>
+                    <App />
+                </ErrorBoundary>
             </CustomThemeProvider>
         </BrowserRouter>
     </LogtoProvider>
