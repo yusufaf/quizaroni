@@ -3,20 +3,45 @@ import { describe, it, expect, beforeEach } from 'vite-plus/test';
 import { renderHook } from '@testing-library/react';
 import useCanonical from './useCanonical';
 
+const ORIGIN = 'https://quizaroni.yusufaf.dev';
+const NOINDEX = '<meta name="robots" content="noindex" />';
+
 const canonical = () =>
     document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
         ?.href ?? null;
 
+const navigate = (from: string, to: string) => {
+    const { rerender } = renderHook(({ path }) => useCanonical(path), {
+        initialProps: { path: from },
+    });
+    rerender({ path: to });
+};
+
 describe('useCanonical', () => {
     beforeEach(() => {
-        document.head.innerHTML =
-            '<link rel="canonical" href="https://quizaroni.yusufaf.dev/" />';
+        document.head.innerHTML = `<link rel="canonical" href="${ORIGIN}/" />`;
     });
 
     it.each(['/', '/explore', '/view/abc'])('points %s at itself', (path) => {
         renderHook(() => useCanonical(path));
 
-        expect(canonical()).toBe(`${window.location.origin}${path}`);
+        expect(canonical()).toBe(`${ORIGIN}${path}`);
+    });
+
+    it('names the custom domain whichever host served the page', () => {
+        renderHook(() => useCanonical('/explore'));
+
+        expect(window.location.origin).not.toBe(ORIGIN);
+        expect(canonical()).toBe(`${ORIGIN}/explore`);
+    });
+
+    it.each([
+        ['/explore/', '/explore'],
+        ['/view/abc/', '/view/abc'],
+    ])('drops the trailing slash on %s', (path, expected) => {
+        renderHook(() => useCanonical(path));
+
+        expect(canonical()).toBe(`${ORIGIN}${expected}`);
     });
 
     it.each(['/profile', '/login', '/create/abc', '/view/abc/extra', '/nope'])(
@@ -29,32 +54,29 @@ describe('useCanonical', () => {
     );
 
     it('recreates the tag when navigating back to a public route', () => {
-        const { rerender } = renderHook(({ path }) => useCanonical(path), {
-            initialProps: { path: '/profile' },
-        });
-        expect(canonical()).toBeNull();
+        navigate('/profile', '/explore');
 
-        rerender({ path: '/explore' });
-
-        expect(canonical()).toBe(`${window.location.origin}/explore`);
+        expect(canonical()).toBe(`${ORIGIN}/explore`);
     });
 
-    it('leaves a noindex set page without a canonical', () => {
-        document.head.innerHTML = '<meta name="robots" content="noindex" />';
+    it('leaves a set served as noindex without a canonical', () => {
+        document.head.innerHTML = NOINDEX;
 
         renderHook(() => useCanonical('/view/private'));
 
         expect(canonical()).toBeNull();
     });
 
-    it('still sets a canonical on /explore after leaving a noindex set', () => {
-        document.head.innerHTML = '<meta name="robots" content="noindex" />';
-        const { rerender } = renderHook(({ path }) => useCanonical(path), {
-            initialProps: { path: '/view/private' },
-        });
+    // og-meta's noindex meta stays in the head after SPA navigation, but it
+    // only describes the page the server sent.
+    it.each(['/explore', '/view/public'])(
+        'sets a canonical on %s after leaving a noindex set',
+        (to) => {
+            document.head.innerHTML = NOINDEX;
 
-        rerender({ path: '/explore' });
+            navigate('/view/private', to);
 
-        expect(canonical()).toBe(`${window.location.origin}/explore`);
-    });
+            expect(canonical()).toBe(`${ORIGIN}${to}`);
+        }
+    );
 });

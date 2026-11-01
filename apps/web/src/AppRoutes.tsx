@@ -40,7 +40,8 @@ const RequireAuth = ({ children, authenticated }: RequireAuthProps) => {
 
 const AppRoutes = () => {
     const { isAuthenticated: authenticated } = useLogto();
-    useCanonical(useLocation().pathname);
+    const { pathname } = useLocation();
+    useCanonical(pathname);
 
     const protectedRoutes = [
         { path: '/create', element: <CreateSet /> },
