@@ -25,7 +25,8 @@ export const findPublicStudyset = async ({
     studysetUUID: string;
 }): Promise<Record<string, unknown> | undefined> => {
     // No Limit, and keep paging: copies under this SK2 can fill a page
-    // before the set's own row. The filter keeps them out of the payload.
+    // before the set's own row. No FilterExpression: DynamoDB rejects one that
+    // names SK2, the index's own sort key, so `isPubliclyListed` drops copies.
     let studyset: Record<string, unknown> | undefined;
     let lastEvaluatedKey: Record<string, unknown> | undefined;
     let pages = 0;
@@ -36,7 +37,6 @@ export const findPublicStudyset = async ({
                 TableName: table,
                 IndexName: PUBLIC_GSI_INDEX_NAME,
                 KeyConditionExpression: 'PK2 = :pk AND SK2 = :sk',
-                FilterExpression: 'SK = SK2',
                 ExpressionAttributeValues: {
                     ':pk': PUBLIC_STUDYSET_PK,
                     ':sk': publicStudysetSK(studysetUUID),

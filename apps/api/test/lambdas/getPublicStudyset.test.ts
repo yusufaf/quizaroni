@@ -181,10 +181,33 @@ describe("getPublicStudyset handler", () => {
 
         expect(res.statusCode).toBe(200);
         expect(send).toHaveBeenCalledTimes(2);
-        type QueryInput = { input: { FilterExpression?: string; ExclusiveStartKey?: unknown } };
-        const [first, second] = send.mock.calls.map(([cmd]) => cmd as unknown as QueryInput);
-        expect(first.input.FilterExpression).toBe("SK = SK2");
+        type QueryInput = { input: { ExclusiveStartKey?: unknown } };
+        const [, second] = send.mock.calls.map(([cmd]) => cmd as unknown as QueryInput);
         expect(second.input.ExclusiveStartKey).toEqual({ PK2: "x" });
+    });
+
+    // DynamoDB rejects a FilterExpression on the index's own key attributes
+    // ("Filter Expression can only contain non-primary key attributes"), which
+    // 500'd every public set. The mock never validates expressions, so pin it.
+    it("sends no FilterExpression, since SK2 is the index's sort key", async () => {
+        send.mockResolvedValueOnce({ Items: [storedItem] } as never);
+
+        await invoke();
+
+        const query = send.mock.calls[0][0] as unknown as { input: { FilterExpression?: string } };
+        expect(query.input.FilterExpression).toBeUndefined();
+    });
+
+    it("skips a copy on the first page and serves the own row from the next", async () => {
+        const copy = { ...storedItem, PK: "userUUID#someone-else", SK: "studyset#copy", title: "Copied title" };
+        send.mockResolvedValueOnce({ Items: [copy], LastEvaluatedKey: { PK2: "x" } } as never)
+            .mockResolvedValueOnce({ Items: [storedItem] } as never);
+
+        const res = await invoke();
+
+        expect(res.statusCode).toBe(200);
+        expect(send).toHaveBeenCalledTimes(2);
+        expect(JSON.parse(res.body ?? "").studyset.title).toBe("Cell biology");
     });
 
     it("404s when only a copy is left under the set's index key", async () => {
