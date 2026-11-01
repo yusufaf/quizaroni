@@ -14,7 +14,7 @@ import {
 import { CheckCircle, Cancel } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGetStudyset } from 'state/api/studysetsAPI';
-import { useStudySessionStore } from 'state/stores/studySession';
+import { isSessionFor, useStudySessionStore } from 'state/stores/studySession';
 import { Card as CardType, Studyset, StudySessionResult } from 'shared/types';
 import { STUDY_MODES, SCORING } from 'shared/constants';
 import StudyHeader from './shared/StudyHeader';
@@ -44,7 +44,7 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
     const studyset = studysetResponse?.studyset ?? ({} as Studyset);
 
     const {
-        activeSession,
+        activeSession: storedSession,
         startSession,
         endSession,
         updateCurrentCard,
@@ -53,6 +53,13 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
         incrementScore,
         updateStreak,
     } = useStudySessionStore();
+    const activeSession = isSessionFor(
+        storedSession,
+        studysetId,
+        STUDY_MODES.MULTIPLE_CHOICE
+    )
+        ? storedSession
+        : null;
 
     const { light: hapticLight, sessionComplete: hapticSessionComplete } =
         useHaptics();
@@ -542,7 +549,7 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
                                                                   'multipleChoice.optionPlaceholder',
                                                                   {
                                                                       n: option.placeholderNumber,
-                                                                  },
+                                                                  }
                                                               )
                                                             : option.text}
                                                     </Typography>

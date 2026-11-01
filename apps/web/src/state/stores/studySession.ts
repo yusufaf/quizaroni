@@ -6,6 +6,7 @@ import type {
     StudySessionResult,
     StudyStatistics,
     Achievement,
+    StudyMode,
 } from 'shared/types';
 import {
     gradeFromQuality,
@@ -38,6 +39,13 @@ type StudySessionStore = {
     recordSessionResult: (result: StudySessionResult) => void;
     unlockAchievement: (achievement: Achievement) => void;
 };
+
+export const isSessionFor = (
+    session: StudySessionState | null,
+    studysetUUID: string,
+    mode: StudyMode
+): session is StudySessionState =>
+    session?.studysetUUID === studysetUUID && session.mode === mode;
 
 export const useStudySessionStore = create<StudySessionStore>()(
     persist(

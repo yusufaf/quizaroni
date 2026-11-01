@@ -11,7 +11,7 @@ import {
 import { CheckCircle } from '@mui/icons-material';
 import { fireConfetti } from 'shared/utilities/confetti';
 import { useGetStudyset } from 'state/api/studysetsAPI';
-import { useStudySessionStore } from 'state/stores/studySession';
+import { isSessionFor, useStudySessionStore } from 'state/stores/studySession';
 import { Card as CardType, Studyset, StudySessionResult } from 'shared/types';
 import { STUDY_MODES, SCORING } from 'shared/constants';
 import StudyHeader from './shared/StudyHeader';
@@ -42,13 +42,20 @@ const MatchingStudy = ({ studysetId }: Props) => {
     const studyset = studysetResponse?.studyset ?? ({} as Studyset);
 
     const {
-        activeSession,
+        activeSession: storedSession,
         startSession,
         endSession,
         updateCardProgress,
         incrementScore,
         recordAnswer,
     } = useStudySessionStore();
+    const activeSession = isSessionFor(
+        storedSession,
+        studysetId,
+        STUDY_MODES.MATCHING
+    )
+        ? storedSession
+        : null;
 
     const { light: hapticLight, sessionComplete: hapticSessionComplete } =
         useHaptics();
