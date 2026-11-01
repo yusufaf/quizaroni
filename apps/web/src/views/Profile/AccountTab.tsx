@@ -13,31 +13,63 @@ import {
     InfoChangeContainer,
 } from './ProfileStyles';
 import { useState } from 'react';
+import { useLogto } from '@logto/react';
+import { toast } from 'react-toastify';
+import { isValidUsername } from '@quizaroni/shared-types';
 import { User } from 'shared/types';
+import { isHttpStatus } from 'state/api/awsAPI';
+import { useUpdateUsername } from 'state/api/usersAPI';
 import DownloadDataDialog from './DownloadDataDialog';
 
 type Props = {
     userData: User;
 };
+
+const USERNAME_RULE =
+    '3-32 letters, numbers or underscores, not starting with a number';
+
 // Change Password and Change Email used to live here as Amplify attribute
 // mutations — Logto's hosted pages (and its own account settings) own both
-// now, so this view is down to the fields that are actually app-local.
+// now. The username is changed through the API, which writes it to Logto.
 const AccountTab = ({ userData }: Props) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
     const [showDownloadDialog, setShowDownloadDialog] =
         useState<boolean>(false);
     const [deletePassword, setDeletePassword] = useState<string>('');
     const [enteredNewUsername, setEnteredNewUsername] = useState<string>('');
+    const { clearAccessToken } = useLogto();
+    const { mutateAsync: updateUsername, isPending } = useUpdateUsername();
+
+    const trimmedUsername = enteredNewUsername.trim();
+    const isUsernameValid = isValidUsername(trimmedUsername);
+    const showUsernameRule = trimmedUsername !== '' && !isUsernameValid;
 
     const handleDeleteAccount = async () => {
         // TODO
     };
 
-    /**
-     * Change username for authenticated user
-     */
     const handleChangeUsername = async () => {
-        // TODO
+        try {
+            const result = await updateUsername({ username: trimmedUsername });
+            // The cached token still carries the old username claim, which
+            // the API stamps on new sets; the next call mints a fresh one.
+            await clearAccessToken();
+            setEnteredNewUsername('');
+            toast.success(`Username changed to ${trimmedUsername}`);
+            if (!result.studysetsRenameComplete) {
+                toast.warning(
+                    'Some of your study sets still show your old username'
+                );
+            }
+        } catch (err) {
+            if (isHttpStatus(err, 409)) {
+                toast.error('That username is taken');
+            } else if (isHttpStatus(err, 400)) {
+                toast.error(USERNAME_RULE);
+            } else {
+                toast.error('Failed to change username');
+            }
+        }
     };
 
     const toggleDeleteDialog = () => {
@@ -63,11 +95,19 @@ const AccountTab = ({ userData }: Props) => {
                         value={enteredNewUsername}
                         onChange={(e) => setEnteredNewUsername(e.target.value)}
                         size="small"
+                        error={showUsernameRule}
+                        helperText={
+                            showUsernameRule ? USERNAME_RULE : undefined
+                        }
                     />
                     <ActionSubmitButton
                         variant="contained"
                         onClick={() => handleChangeUsername()}
-                        disabled={enteredNewUsername === ''}
+                        disabled={
+                            !isUsernameValid ||
+                            trimmedUsername === userData.username ||
+                            isPending
+                        }
                     >
                         Submit
                     </ActionSubmitButton>

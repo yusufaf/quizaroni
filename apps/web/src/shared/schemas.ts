@@ -482,4 +482,11 @@ export const UploadProfilePictureResponseSchema = z.object({
     url: z.string().url(),
 });
 
+// `user` isn't validated: ['user'] is refetched after a rename.
+export const UpdateUsernameResponseSchema = BaseResponseSchema.extend({
+    studysetsUpdated: z.number(),
+    studysetsFailed: z.number(),
+    studysetsRenameComplete: z.boolean(),
+});
+
 // #endregion

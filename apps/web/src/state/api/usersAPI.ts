@@ -9,6 +9,7 @@ import { validate } from 'shared/validation';
 import {
     BaseResponseSchema,
     GetUserResponseSchema,
+    UpdateUsernameResponseSchema,
     UploadProfilePictureResponseSchema,
 } from 'shared/schemas';
 import {
@@ -20,6 +21,7 @@ import {
     UpdateEmailRequest,
     UpdateNotificationPreferencesRequest,
     UpdateUserMetadataRequest,
+    UpdateUsernameRequest,
     UploadProfilePictureRequest,
     User,
 } from 'shared/types';
@@ -89,6 +91,39 @@ export const useUpdateUserMetadata = () => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['user'] });
+        },
+    });
+};
+
+export const useUpdateUsername = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ username }: UpdateUsernameRequest) => {
+            const data = await fetchJson(
+                `${BASE_API_URL}/users/update-username`,
+                {
+                    ...(await getCommonPostRequestProps()),
+                    body: JSON.stringify({ username }),
+                }
+            );
+            return validate({
+                schema: UpdateUsernameResponseSchema,
+                data,
+                type: 'response',
+                context: 'UpdateUsername',
+            });
+        },
+        onSuccess: () => {
+            // Every view that shows the user's name as a set's author.
+            for (const queryKey of [
+                ['user'],
+                ['studysets'],
+                ['public-studyset'],
+                ['explore-feed'],
+                ['explore-featured'],
+            ]) {
+                queryClient.invalidateQueries({ queryKey });
+            }
         },
     });
 };
