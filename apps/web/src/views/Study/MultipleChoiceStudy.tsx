@@ -549,7 +549,7 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
                                                                   'multipleChoice.optionPlaceholder',
                                                                   {
                                                                       n: option.placeholderNumber,
-                                                                  }
+                                                                  },
                                                               )
                                                             : option.text}
                                                     </Typography>
