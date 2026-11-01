@@ -6,6 +6,7 @@ import Login from 'views/Login/Login';
 import Signup from 'views/Signup/Signup';
 import Callback from 'views/Callback/Callback';
 import { useLogto } from '@logto/react';
+import useCanonical from 'shared/hooks/useCanonical';
 
 // Route-level code splitting: keep Landing eager (first paint for logged-out
 // visitors); lazy-load everything else so heavy deps (jsPDF, data-grid,
@@ -39,6 +40,8 @@ const RequireAuth = ({ children, authenticated }: RequireAuthProps) => {
 
 const AppRoutes = () => {
     const { isAuthenticated: authenticated } = useLogto();
+    const { pathname } = useLocation();
+    useCanonical(pathname);
 
     const protectedRoutes = [
         { path: '/create', element: <CreateSet /> },

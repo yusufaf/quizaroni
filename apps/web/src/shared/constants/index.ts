@@ -6,6 +6,10 @@ import type {
     User,
 } from 'shared/types';
 
+// Canonical URLs always name the custom domain, whichever host served the
+// page. Mirrors SITE_ORIGIN in netlify/lib/site.ts.
+export const SITE_ORIGIN = 'https://quizaroni.yusufaf.dev';
+
 export const LIGHT = 'light';
 export const DARK = 'dark';
 
