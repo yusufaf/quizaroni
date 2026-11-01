@@ -1,0 +1,82 @@
+# Lighthouse against the live site, after each web deploy and weekly.
+# It audits a URL rather than a build, so it doesn't care where the site is
+# hosted. Moving off Netlify only needs the commit SHA wired into
+# version.json (apps/web/vite.config.ts) and the push paths below.
+name: lighthouse
+on:
+  # Netlify only builds when apps/web changes (base directory), so only
+  # those pushes have a deploy to wait for.
+  push:
+    branches: [main]
+    paths: ['apps/web/**']
+  schedule:
+    - cron: '23 7 * * 1'
+  workflow_dispatch:
+  # Changes to the audit itself get a run against the current live site.
+  pull_request:
+    paths:
+      - '.github/workflows/lighthouse.yml'
+      - '.github/lighthouse/**'
+      - 'lighthouserc.json'
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  SITE: https://quizaroni.yusufaf.dev
+jobs:
+  # Not `build`: that's ci.yml's job, and the main ruleset requires it.
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - name: Wait for the deploy of this commit
+        env:
+          WANT: ${{ github.sha }}
+          WAIT: ${{ github.event_name == 'push' }}
+        run: |
+          deployed() {
+            curl -fsS "$SITE/version.json?t=$(date +%s)" 2>/dev/null \
+              | jq -r '.sha // empty' 2>/dev/null || true
+          }
+          if [ "$WAIT" != "true" ]; then
+            sha=$(deployed)
+            echo "Live site is on ${sha:-an unknown commit}; auditing it as is."
+            exit 0
+          fi
+          for _ in $(seq 75); do
+            sha=$(deployed)
+            if [ "$sha" = "$WANT" ]; then
+              echo "Deploy of $WANT is live."
+              exit 0
+            fi
+            sleep 20
+          done
+          echo "::error::$WANT wasn't live after 25 minutes (site is on ${sha:-unknown}). Check the Netlify deploy."
+          exit 1
+      - name: Lighthouse
+        id: lh
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          # Medical prefixes & suffixes, a seeded starter set
+          # (apps/api/scripts/seed/sets/medical-prefixes-suffixes.json).
+          urls: |
+            ${{ env.SITE }}/
+            ${{ env.SITE }}/explore
+            ${{ env.SITE }}/view/124ab08d-6292-591b-a27e-0abeed412841
+          configPath: ./lighthouserc.json
+          runs: 3
+          uploadArtifacts: true
+      - name: Summary
+        if: ${{ !cancelled() }}
+        env:
+          # The action's filesystem upload writes one manifest entry per run.
+          MANIFEST: ${{ steps.lh.outputs.resultsPath || '.lighthouseci' }}/manifest.json
+        run: |
+          if ! jq -e 'length > 0' "$MANIFEST" >/dev/null 2>&1; then
+            echo "No Lighthouse results (see the step logs above)." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          jq -r -f .github/lighthouse/summary.jq "$MANIFEST" >> "$GITHUB_STEP_SUMMARY"
