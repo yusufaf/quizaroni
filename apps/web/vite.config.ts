@@ -2,6 +2,7 @@ import { defineConfig, loadEnv, lazyPlugins } from 'vite-plus';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
+import { execSync } from 'child_process';
 
 // https://vitejs.dev/config/
 
@@ -10,6 +11,19 @@ import path from 'path';
 const apiProxyURL =
     loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '')
         .VITE_API_BASE_URL ?? 'http://localhost:3000/api';
+
+// The commit this build came from, served at /version.json so the Lighthouse
+// workflow can wait until the live site runs the commit it pushed.
+// COMMIT_REF is Netlify's; a new host needs its own variable added here.
+const buildSha = (): string => {
+    const fromEnv = process.env.COMMIT_REF ?? process.env.GITHUB_SHA;
+    if (fromEnv) return fromEnv;
+    try {
+        return execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
+    } catch {
+        return 'unknown';
+    }
+};
 
 export default defineConfig({
     // fetchJson (awsAPI.ts) is now exercised directly by a real unit test
@@ -21,6 +35,17 @@ export default defineConfig({
     },
     plugins: lazyPlugins(() => [
         react(),
+        {
+            name: 'quizaroni:version-json',
+            apply: 'build',
+            generateBundle() {
+                this.emitFile({
+                    type: 'asset',
+                    fileName: 'version.json',
+                    source: JSON.stringify({ sha: buildSha() }),
+                });
+            },
+        },
         VitePWA({
             registerType: 'prompt',
             injectRegister: null,
@@ -88,6 +113,9 @@ export default defineConfig({
                     '**/*.{js,css,html,ico,png,svg,wasm,json,woff,woff2,ttf,eot}',
                 ],
                 globIgnores: [
+                    // Changes every build; precaching it would make each
+                    // deploy a new service worker and an "update" prompt.
+                    '**/version.json',
                     '**/splash/**',
                     '**/screenshot-*.png',
                     '**/og-image.png',
