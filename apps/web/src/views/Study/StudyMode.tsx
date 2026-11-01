@@ -15,17 +15,22 @@ const StudyMode = () => {
         return <Navigate to="/" replace />;
     }
 
+    // A new set or mode remounts the view, dropping its local state.
+    const key = `${studysetId}:${mode}`;
+
     switch (mode) {
         case STUDY_MODES.FLASHCARDS:
-            return <FlashcardsStudy studysetId={studysetId} />;
+            return <FlashcardsStudy key={key} studysetId={studysetId} />;
         case STUDY_MODES.MULTIPLE_CHOICE:
-            return <MultipleChoiceStudy studysetId={studysetId} />;
+            return <MultipleChoiceStudy key={key} studysetId={studysetId} />;
         case STUDY_MODES.MATCHING:
-            return <MatchingStudy studysetId={studysetId} />;
+            return <MatchingStudy key={key} studysetId={studysetId} />;
         case STUDY_MODES.TYPE_WRITE:
-            return <TypeWriteStudy studysetId={studysetId} />;
+            return <TypeWriteStudy key={key} studysetId={studysetId} />;
         case STUDY_MODES.REVIEW:
-            return <FlashcardsStudy studysetId={studysetId} reviewMode />;
+            return (
+                <FlashcardsStudy key={key} studysetId={studysetId} reviewMode />
+            );
         default:
             return <Navigate to={`/view/${studysetId}`} replace />;
     }
