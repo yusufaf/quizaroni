@@ -112,6 +112,20 @@ describe('StudyMode session switching', () => {
         expect(await screen.findByText('Bravo one')).toBeTruthy();
     });
 
+    it('reopening the same set and mode resumes its session', async () => {
+        routeParams = { studysetId: SET_A, mode: 'flashcards' };
+        const { unmount } = render(ui());
+        await screen.findByText('Alpha one');
+        useStudySessionStore.getState().updateCurrentCard(1);
+        await screen.findByText('Alpha two');
+        const session = useStudySessionStore.getState().activeSession;
+        unmount();
+
+        render(ui());
+        expect(await screen.findByText('Alpha two')).toBeTruthy();
+        expect(useStudySessionStore.getState().activeSession).toBe(session);
+    });
+
     it("opening review for set B while a set A flashcards session is active shows B's due cards", async () => {
         dueByStudyset = { [SET_B]: ['b2'] };
         routeParams = { studysetId: SET_A, mode: 'flashcards' };
