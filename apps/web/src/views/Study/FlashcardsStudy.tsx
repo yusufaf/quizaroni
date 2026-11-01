@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import {
     Box,
     Button,
@@ -31,7 +31,7 @@ import {
 } from 'framer-motion';
 import { useGetStudyset } from 'state/api/studysetsAPI';
 import { useGetUser } from 'state/api/usersAPI';
-import { useStudySessionStore } from 'state/stores/studySession';
+import { isSessionFor, useStudySessionStore } from 'state/stores/studySession';
 import { Studyset } from 'shared/types';
 import { STUDY_MODES, DEFAULT_USER_RESPONSE } from 'shared/constants';
 import StudyHeader from './shared/StudyHeader';
@@ -70,7 +70,7 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
     const ttsVoice = userData.user?.metadata?.ttsVoice;
 
     const {
-        activeSession,
+        activeSession: storedSession,
         startSession,
         endSession,
         updateCurrentCard,
@@ -79,6 +79,12 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
         incrementScore,
         updateStreak,
     } = useStudySessionStore();
+    const sessionMode = reviewMode
+        ? STUDY_MODES.REVIEW
+        : STUDY_MODES.FLASHCARDS;
+    const activeSession = isSessionFor(storedSession, studysetId, sessionMode)
+        ? storedSession
+        : null;
 
     const [flipped, setFlipped] = useState(false);
     const [showRating, setShowRating] = useState(false);
@@ -114,22 +120,27 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
     const { light: hapticLight, sessionComplete: hapticSessionComplete } =
         useHaptics();
 
+    const sessionCards = useMemo(
+        () =>
+            reviewMode
+                ? dueCardUUIDs === null
+                    ? undefined
+                    : studyset?.cards?.filter((c) =>
+                          dueCardUUIDs.includes(c.cardUUID)
+                      )
+                : studyset?.cards,
+        [reviewMode, dueCardUUIDs, studyset?.cards]
+    );
+
     // Initialize session
     useEffect(() => {
         // In review mode, wait until due UUIDs have resolved.
         if (reviewMode && dueCardUUIDs === null) return;
 
-        const sessionCards =
-            reviewMode && dueCardUUIDs
-                ? studyset.cards.filter((c) =>
-                      dueCardUUIDs.includes(c.cardUUID)
-                  )
-                : studyset?.cards;
-
-        if (sessionCards?.length > 0 && !activeSession) {
+        if (sessionCards && sessionCards.length > 0 && !activeSession) {
             startSession({
                 studysetUUID: studysetId,
-                mode: reviewMode ? STUDY_MODES.REVIEW : STUDY_MODES.FLASHCARDS,
+                mode: sessionMode,
                 cards: sessionCards,
                 settings: {
                     shuffleCards: false,
@@ -141,7 +152,14 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
                 },
             });
         }
-    }, [studyset?.cards, studysetId, activeSession, reviewMode, dueCardUUIDs]);
+    }, [
+        sessionCards,
+        sessionMode,
+        studysetId,
+        activeSession,
+        reviewMode,
+        dueCardUUIDs,
+    ]);
 
     // In review mode, resolve which cards are due before starting the session.
     useEffect(() => {
@@ -462,8 +480,8 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
         };
         startSession({
             studysetUUID: studysetId,
-            mode: STUDY_MODES.FLASHCARDS,
-            cards: studyset.cards,
+            mode: sessionMode,
+            cards: sessionCards ?? [],
             settings: newSettings,
         });
     };
@@ -471,8 +489,8 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
     const handleSettingsSave = (newSettings) => {
         startSession({
             studysetUUID: studysetId,
-            mode: STUDY_MODES.FLASHCARDS,
-            cards: studyset.cards,
+            mode: sessionMode,
+            cards: sessionCards ?? [],
             settings: newSettings,
         });
     };
@@ -482,8 +500,8 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
         setSessionResult(null);
         startSession({
             studysetUUID: studysetId,
-            mode: STUDY_MODES.FLASHCARDS,
-            cards: studyset.cards,
+            mode: sessionMode,
+            cards: sessionCards ?? [],
             settings: {
                 shuffleCards: false,
                 timedMode: false,
