@@ -1,7 +1,9 @@
 # Lighthouse against the live site, after each web deploy and weekly.
 # It audits a URL rather than a build, so it doesn't care where the site is
-# hosted. Moving off Netlify only needs the commit SHA wired into
-# version.json (apps/web/vite.config.ts) and the push paths below.
+# hosted. A host move touches: the new host's commit-SHA variable in
+# apps/web/vite.config.ts, the push paths below (match what the host
+# rebuilds on), and SITE here plus the blocked hosts in lighthouserc.json if
+# the domain changes.
 name: lighthouse
 on:
   # Netlify only builds when apps/web changes (base directory), so only
@@ -32,6 +34,8 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - name: Wait for the deploy of this commit
         env:
           WANT: ${{ github.sha }}
@@ -46,15 +50,25 @@ jobs:
             echo "Live site is on ${sha:-an unknown commit}; auditing it as is."
             exit 0
           fi
+          # A later push can go live first (its build overtook this one);
+          # it still contains this commit, so audit it.
+          includes_want() {
+            git cat-file -e "$1^{commit}" 2>/dev/null || git fetch -q origin main 2>/dev/null || true
+            git merge-base --is-ancestor "$WANT" "$1" 2>/dev/null
+          }
           for _ in $(seq 75); do
             sha=$(deployed)
             if [ "$sha" = "$WANT" ]; then
               echo "Deploy of $WANT is live."
               exit 0
             fi
+            if [ -n "$sha" ] && includes_want "$sha"; then
+              echo "Live site is on $sha, which includes $WANT."
+              exit 0
+            fi
             sleep 20
           done
-          echo "::error::$WANT wasn't live after 25 minutes (site is on ${sha:-unknown}). Check the Netlify deploy."
+          echo "::error::$WANT wasn't live after 25 minutes (site is on ${sha:-unknown}). Check the site's latest deploy."
           exit 1
       - name: Lighthouse
         id: lh
@@ -79,4 +93,4 @@ jobs:
             echo "No Lighthouse results (see the step logs above)." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          jq -r -f .github/lighthouse/summary.jq "$MANIFEST" >> "$GITHUB_STEP_SUMMARY"
+          jq -r -f .github/lighthouse/summary.jq "$MANIFEST" | tee -a "$GITHUB_STEP_SUMMARY"

@@ -19,7 +19,10 @@ const buildSha = (): string => {
     const fromEnv = process.env.COMMIT_REF ?? process.env.GITHUB_SHA;
     if (fromEnv) return fromEnv;
     try {
-        return execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
+        return execSync('git rev-parse HEAD', {
+            encoding: 'utf8',
+            stdio: ['ignore', 'pipe', 'ignore'],
+        }).trim();
     } catch {
         return 'unknown';
     }
@@ -121,7 +124,11 @@ export default defineConfig({
                     '**/og-image.png',
                 ],
                 navigateFallback: '/index.html',
-                navigateFallbackDenylist: [/^\/api/, /^\/sitemap\.xml/],
+                navigateFallbackDenylist: [
+                    /^\/api/,
+                    /^\/sitemap\.xml/,
+                    /^\/version\.json/,
+                ],
                 runtimeCaching: [
                     {
                         urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
