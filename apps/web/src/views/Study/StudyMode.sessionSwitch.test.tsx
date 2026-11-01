@@ -149,7 +149,7 @@ describe('StudyMode session switching', () => {
 
         // The header and the bottom toolbar both have an audio toggle (#149).
         fireEvent.click(
-            screen.getAllByRole('button', { name: 'header.audioOff' })[0]
+            screen.getAllByRole('button', { name: 'header.audioOff' })[0]!
         );
 
         const session = useStudySessionStore.getState().activeSession;
