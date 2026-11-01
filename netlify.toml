@@ -120,3 +120,9 @@ Cache-Control = "public, max-age=0, must-revalidate"
 for = "/manifest.json"
 [headers.values]
 Cache-Control = "public, max-age=0, must-revalidate"
+
+# Polled by .github/workflows/lighthouse.yml to tell when a deploy is live.
+[[headers]]
+for = "/version.json"
+[headers.values]
+Cache-Control = "public, max-age=0, must-revalidate"
