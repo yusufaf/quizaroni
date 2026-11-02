@@ -23,6 +23,7 @@ import SettingsDialog from './shared/SettingsDialog';
 import { BasePage } from 'styles/AppStyles';
 import { useShortcuts } from 'shared/keyboard/useShortcuts';
 import useHaptics from 'shared/hooks/useHaptics';
+import useTimeout from 'shared/hooks/useTimeout';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -63,6 +64,7 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
 
     const { light: hapticLight, sessionComplete: hapticSessionComplete } =
         useHaptics();
+    const { schedule: scheduleAdvance } = useTimeout();
 
     const [selectedOption, setSelectedOption] = useState<number | null>(null);
     const [showFeedback, setShowFeedback] = useState(false);
@@ -214,7 +216,7 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
             });
 
             // Auto-advance after delay
-            setTimeout(() => {
+            scheduleAdvance(() => {
                 handleNext();
             }, 2000);
         },
@@ -227,6 +229,7 @@ const MultipleChoiceStudy = ({ studysetId }: Props) => {
             answerStartTime,
             activeSession,
             hapticLight,
+            scheduleAdvance,
         ]
     );
 

@@ -1,6 +1,14 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach } from 'vite-plus/test';
 import {
+    describe,
+    it,
+    expect,
+    vi,
+    beforeEach,
+    afterEach,
+} from 'vite-plus/test';
+import {
+    act,
     render,
     screen,
     waitFor,
@@ -10,9 +18,22 @@ import {
 import { useStudySessionStore } from 'state/stores/studySession';
 import StudyMode from './StudyMode';
 import { ShortcutProvider } from 'shared/keyboard/ShortcutRegistry';
+import { useGlobalKeyListener } from 'shared/keyboard/useGlobalKeyListener';
 
 const ui = () => (
     <ShortcutProvider>
+        <StudyMode />
+    </ShortcutProvider>
+);
+
+// App mounts the keydown listener that dispatches shortcuts.
+const KeyListener = () => {
+    useGlobalKeyListener();
+    return null;
+};
+const uiWithKeys = () => (
+    <ShortcutProvider>
+        <KeyListener />
         <StudyMode />
     </ShortcutProvider>
 );
@@ -86,6 +107,22 @@ vi.mock('state/local/repositories', () => ({
 vi.mock('components/ImageGallery/ImageGallery', () => ({
     default: () => null,
 }));
+// endSession() persists gamification to Dexie and syncs it to the API; keep
+// both out of jsdom.
+vi.mock('state/local/repositories/GamificationRepository', () => ({
+    gamificationRepository: {
+        getState: vi.fn(async () => undefined),
+        saveState: vi.fn(async () => undefined),
+        getCustomAchievements: vi.fn(async () => []),
+        saveCustomAchievement: vi.fn(async (a) => a),
+        deleteCustomAchievement: vi.fn(async () => undefined),
+    },
+}));
+vi.mock('state/local/sync/gamificationSync', () => ({
+    pushGamificationToServer: vi.fn(async () => null),
+    mergeGamificationFromUser: vi.fn((local) => local),
+}));
+vi.mock('shared/utilities/confetti', () => ({ fireConfetti: vi.fn() }));
 
 describe('StudyMode session switching', () => {
     beforeEach(() => {
@@ -198,4 +235,187 @@ describe('StudyMode session switching', () => {
             });
         }
     );
+});
+
+describe('StudyMode pending timers (#243)', () => {
+    beforeEach(() => {
+        cleanup();
+        useStudySessionStore.setState({ activeSession: null });
+        dueByStudyset = {};
+        // Only timeouts: RTL and Matching's clock interval stay real.
+        vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    const startOn = (mode: string, currentCardIndex: number) => {
+        useStudySessionStore.getState().startSession({
+            studysetUUID: SET_A,
+            mode,
+            cards: sets[SET_A].cards,
+            settings: {
+                shuffleCards: false,
+                timedMode: false,
+                audioEnabled: false,
+                autoAdvance: true,
+                difficulty: 'medium',
+                hideImages: false,
+            },
+            currentCardIndex,
+        } as any);
+        routeParams = { studysetId: SET_A, mode };
+    };
+
+    const totalSessions = () =>
+        useStudySessionStore.getState().statistics.totalSessions;
+
+    // Unmounts the first view, opens the next route, then lets the first
+    // view's timer come due.
+    const switchAndWait = (
+        unmount: () => void,
+        next: { studysetId: string; mode: string },
+        delay: number
+    ) => {
+        unmount();
+        routeParams = next;
+        render(ui());
+        const fresh = useStudySessionStore.getState().activeSession;
+        const sessionsBefore = totalSessions();
+        act(() => {
+            vi.advanceTimersByTime(delay);
+        });
+        return { fresh, sessionsBefore };
+    };
+
+    const expectUntouched = (fresh: unknown, sessionsBefore: number) => {
+        expect(useStudySessionStore.getState().activeSession).toBe(fresh);
+        expect(totalSessions()).toBe(sessionsBefore);
+    };
+
+    const gradeLastFlashcard = async () => {
+        startOn('flashcards', 2);
+        const view = render(ui());
+        await act(async () => {});
+        fireEvent.click(screen.getByText('Alpha three'));
+        await act(async () => {});
+        fireEvent.click(screen.getByRole('button', { name: /ratings.good/ }));
+        return view;
+    };
+
+    it('multiple-choice: answering the last card then opening flashcards leaves the new session alone', () => {
+        startOn('multiple-choice', 2);
+        const { unmount } = render(ui());
+        fireEvent.click(screen.getByText('Alpha three def'));
+        fireEvent.click(
+            screen.getByRole('button', { name: 'actions.submitAnswer' })
+        );
+
+        const { fresh, sessionsBefore } = switchAndWait(
+            unmount,
+            { studysetId: SET_A, mode: 'flashcards' },
+            2000
+        );
+        expectUntouched(fresh, sessionsBefore);
+    });
+
+    it('multiple-choice: answering a middle card then opening another set keeps its card index', () => {
+        startOn('multiple-choice', 0);
+        const { unmount } = render(ui());
+        fireEvent.click(screen.getByText('Alpha one def'));
+        fireEvent.click(
+            screen.getByRole('button', { name: 'actions.submitAnswer' })
+        );
+
+        const { fresh, sessionsBefore } = switchAndWait(
+            unmount,
+            { studysetId: SET_B, mode: 'flashcards' },
+            2000
+        );
+        expectUntouched(fresh, sessionsBefore);
+        expect(
+            useStudySessionStore.getState().activeSession?.currentCardIndex
+        ).toBe(0);
+    });
+
+    it('type-write: answering the last card then opening another set leaves the new session alone', () => {
+        startOn('type-write', 2);
+        const { unmount } = render(ui());
+        fireEvent.change(screen.getByRole('textbox'), {
+            target: { value: 'Alpha three def' },
+        });
+        fireEvent.click(
+            screen.getByRole('button', { name: 'actions.submitAnswer' })
+        );
+
+        const { fresh, sessionsBefore } = switchAndWait(
+            unmount,
+            { studysetId: SET_B, mode: 'flashcards' },
+            2500
+        );
+        expectUntouched(fresh, sessionsBefore);
+    });
+
+    it('flashcards: grading the last card then opening multiple choice leaves the new session alone', async () => {
+        const { unmount } = await gradeLastFlashcard();
+
+        const { fresh, sessionsBefore } = switchAndWait(
+            unmount,
+            { studysetId: SET_A, mode: 'multiple-choice' },
+            500
+        );
+        expectUntouched(fresh, sessionsBefore);
+    });
+
+    it('matching: finishing the game then opening flashcards leaves the new session alone', () => {
+        startOn('matching', 0);
+        const { unmount } = render(ui());
+        for (const term of ['Alpha one', 'Alpha two', 'Alpha three']) {
+            fireEvent.click(screen.getByText(term));
+            fireEvent.click(screen.getByText(`${term} def`));
+        }
+
+        const { fresh, sessionsBefore } = switchAndWait(
+            unmount,
+            { studysetId: SET_A, mode: 'flashcards' },
+            1000
+        );
+        expectUntouched(fresh, sessionsBefore);
+    });
+
+    it("type-write: pressing Enter on the last card's feedback doesn't let the timer end the next session", () => {
+        startOn('type-write', 2);
+        render(uiWithKeys());
+        fireEvent.change(screen.getByRole('textbox'), {
+            target: { value: 'Alpha three def' },
+        });
+        fireEvent.click(
+            screen.getByRole('button', { name: 'actions.submitAnswer' })
+        );
+        const sessionsBeforeEnter = totalSessions();
+        fireEvent.keyDown(document.body, { key: 'Enter' });
+
+        const fresh = useStudySessionStore.getState().activeSession;
+        const sessionsAfterEnd = totalSessions();
+        expect(sessionsAfterEnd).toBe(sessionsBeforeEnter + 1);
+        act(() => {
+            vi.advanceTimersByTime(2500);
+        });
+        expectUntouched(fresh, sessionsAfterEnd);
+    });
+
+    it("flashcards: finishing manually right after grading the last card doesn't end the next session", async () => {
+        await gradeLastFlashcard();
+        const sessionsBeforeFinish = totalSessions();
+        fireEvent.click(screen.getByRole('button', { name: 'actions.finish' }));
+
+        const fresh = useStudySessionStore.getState().activeSession;
+        const sessionsAfterEnd = totalSessions();
+        expect(sessionsAfterEnd).toBe(sessionsBeforeFinish + 1);
+        act(() => {
+            vi.advanceTimersByTime(500);
+        });
+        expectUntouched(fresh, sessionsAfterEnd);
+    });
 });
