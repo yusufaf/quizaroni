@@ -53,13 +53,15 @@ export const markStoredOwnerSignedOut = (): void => {
 export const isClaimCurrent = (): boolean =>
     claimedOwner !== null && claimedOwner === readStoredOwner();
 
+export const reloadPage = (): void => window.location.reload();
+
 // Reloads a tab once another tab claims the data for a different account, so it
 // stops showing or writing back the previous account's in-memory state. A
 // same-account sign-out doesn't reload: that could race the signing-out tab and
 // re-claim the account, and the push gate already blocks this tab.
 export function handleOwnerStorageEvent(
     event: StorageEvent,
-    reload: () => void = () => window.location.reload()
+    reload: () => void = reloadPage
 ): void {
     if (
         event.key === LOCAL_DATA_OWNER_KEY &&

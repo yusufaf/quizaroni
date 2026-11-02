@@ -2,13 +2,9 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { useGlobalStore } from 'state/stores/global';
-import {
-    claimLocalData,
-    clearLocalData,
-    hasUnsyncedLocalChanges,
-} from 'state/local/localData';
-import { setClaimedOwner } from 'state/local/owner';
-import { useLogout } from './useLogout';
+import { clearLocalData, hasUnsyncedLocalChanges } from 'state/local/localData';
+import { reloadPage } from 'state/local/owner';
+import { useLogout, useSignOut } from './useLogout';
 
 const signOut = vi.fn<(redirectUri?: string) => Promise<void>>();
 
@@ -16,8 +12,11 @@ vi.mock('@logto/react', () => ({
     useLogto: () => ({ signOut }),
 }));
 
+vi.mock('state/local/owner', () => ({
+    reloadPage: vi.fn(),
+}));
+
 vi.mock('state/local/localData', () => ({
-    claimLocalData: vi.fn(),
     clearLocalData: vi.fn(),
     hasUnsyncedLocalChanges: vi.fn(),
 }));
@@ -26,12 +25,14 @@ const logout = () => renderHook(() => useLogout()).result.current();
 
 describe('useLogout', () => {
     afterEach(() => {
-        vi.mocked(claimLocalData).mockReset();
+        vi.mocked(reloadPage).mockReset();
         vi.mocked(clearLocalData).mockReset();
-        setClaimedOwner(null);
         vi.mocked(hasUnsyncedLocalChanges).mockReset();
         signOut.mockReset();
-        useGlobalStore.setState({ logoutConfirmOpen: false });
+        useGlobalStore.setState({
+            logoutConfirmOpen: false,
+            authenticated: false,
+        });
     });
 
     it('clears local data before signing out', async () => {
@@ -84,12 +85,10 @@ describe('useLogout', () => {
         consoleError.mockRestore();
     });
 
-    it('claims local data again when signing out fails', async () => {
-        setClaimedOwner('user-A');
+    it('reloads to restore the session when signing out fails', async () => {
+        useGlobalStore.setState({ authenticated: true });
         vi.mocked(hasUnsyncedLocalChanges).mockResolvedValue(false);
-        vi.mocked(clearLocalData).mockImplementation(async () => {
-            setClaimedOwner(null);
-        });
+        vi.mocked(clearLocalData).mockResolvedValue(undefined);
         signOut.mockRejectedValue(new Error('offline'));
         const consoleError = vi
             .spyOn(console, 'error')
@@ -97,8 +96,29 @@ describe('useLogout', () => {
 
         await logout();
 
-        expect(claimLocalData).toHaveBeenCalledExactlyOnceWith('user-A');
+        expect(reloadPage).toHaveBeenCalledOnce();
+        expect(useGlobalStore.getState().authenticated).toBe(true);
         consoleError.mockRestore();
+    });
+
+    it('runs one sign-out when the confirm button is clicked twice', async () => {
+        let finishSignOut!: () => void;
+        signOut.mockReturnValue(
+            new Promise<void>((resolve) => {
+                finishSignOut = resolve;
+            })
+        );
+        vi.mocked(clearLocalData).mockResolvedValue(undefined);
+        const signOutNow = renderHook(() => useSignOut()).result.current;
+
+        const first = signOutNow();
+        const second = signOutNow();
+        await vi.waitFor(() => expect(signOut).toHaveBeenCalled());
+        finishSignOut();
+        await Promise.all([first, second]);
+
+        expect(clearLocalData).toHaveBeenCalledOnce();
+        expect(signOut).toHaveBeenCalledOnce();
     });
 
     it('ignores a second click while signing out is in progress', async () => {
