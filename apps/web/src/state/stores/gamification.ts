@@ -82,7 +82,24 @@ const applyPayload = (
     set({ state, customAchievements, syncPending });
 };
 
-const syncToServer = async (
+// Writes and pushes that haven't settled yet, so sign-out can wait for them
+// instead of wiping the data and cancelling the request.
+const inflight = new Set<Promise<unknown>>();
+
+const track = <T,>(promise: Promise<T>): Promise<T> => {
+    inflight.add(promise);
+    const done = () => {
+        inflight.delete(promise);
+    };
+    promise.then(done, done);
+    return promise;
+};
+
+export const settleGamificationSync = async (): Promise<void> => {
+    await Promise.allSettled([...inflight]);
+};
+
+const syncToServerNow = async (
     get: () => GamificationStore,
     set: (
         partial:
@@ -104,6 +121,15 @@ const syncToServer = async (
 
     set({ syncPending: true });
 };
+
+const syncToServer = (
+    get: () => GamificationStore,
+    set: (
+        partial:
+            | Partial<GamificationStore>
+            | ((state: GamificationStore) => Partial<GamificationStore>)
+    ) => void
+) => track(syncToServerNow(get, set));
 
 export const useGamificationStore = create<GamificationStore>()(
     persist(
@@ -132,24 +158,34 @@ export const useGamificationStore = create<GamificationStore>()(
                 });
             },
 
-            syncFromServer: async (user) => {
-                if (!get().hydrated) {
-                    await get().hydrateFromDb();
-                }
+            syncFromServer: (user) =>
+                track(
+                    (async () => {
+                        if (!get().hydrated) {
+                            await get().hydrateFromDb();
+                        }
 
-                const local = get();
-                const merged = mergeGamificationFromUser(
-                    {
-                        state: local.state,
-                        customAchievements: local.customAchievements,
-                    },
-                    user
-                );
+                        const local = get();
+                        const merged = mergeGamificationFromUser(
+                            {
+                                state: local.state,
+                                customAchievements: local.customAchievements,
+                            },
+                            user
+                        );
 
-                await persistToDb(merged.state, merged.customAchievements);
-                applyPayload(set, merged.state, merged.customAchievements);
-                await syncToServer(get, set);
-            },
+                        await persistToDb(
+                            merged.state,
+                            merged.customAchievements
+                        );
+                        applyPayload(
+                            set,
+                            merged.state,
+                            merged.customAchievements
+                        );
+                        await syncToServer(get, set);
+                    })()
+                ),
 
             retryPendingSync: async () => {
                 if (!get().syncPending) return;
@@ -196,8 +232,10 @@ export const useGamificationStore = create<GamificationStore>()(
                     customAchievements: updatedCustom,
                 });
 
-                void persistToDb(finalState, updatedCustom).then(() =>
-                    syncToServer(get, set)
+                void track(
+                    persistToDb(finalState, updatedCustom).then(() =>
+                        syncToServer(get, set)
+                    )
                 );
 
                 return {
@@ -218,9 +256,11 @@ export const useGamificationStore = create<GamificationStore>()(
                         newAchievement,
                     ],
                 }));
-                void gamificationRepository
-                    .saveCustomAchievement(newAchievement)
-                    .then(() => syncToServer(get, set));
+                void track(
+                    gamificationRepository
+                        .saveCustomAchievement(newAchievement)
+                        .then(() => syncToServer(get, set))
+                );
             },
 
             removeCustomAchievement: (id) => {
@@ -229,9 +269,11 @@ export const useGamificationStore = create<GamificationStore>()(
                         (a) => a.id !== id
                     ),
                 }));
-                void gamificationRepository
-                    .deleteCustomAchievement(id)
-                    .then(() => syncToServer(get, set));
+                void track(
+                    gamificationRepository
+                        .deleteCustomAchievement(id)
+                        .then(() => syncToServer(get, set))
+                );
             },
 
             getAchievementById: (id) => {

@@ -12,6 +12,14 @@ export {
     type LocalCardProgress,
 } from './db';
 
+// Local data ownership (logout / account switch)
+export {
+    clearLocalData,
+    claimLocalData,
+    hasUnsyncedLocalChanges,
+    resetLocalGamification,
+} from './localData';
+
 // Repositories
 export {
     studysetRepository,

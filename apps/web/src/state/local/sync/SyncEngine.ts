@@ -1,5 +1,6 @@
 import { pickClientEditableUserMetadata } from '@quizaroni/shared-types';
 import { getDatabase, hasPendingSync, type LocalStudyset } from '../db';
+import { isClaimCurrent } from '../owner';
 import { studysetRepository, userRepository } from '../repositories';
 import type { Studyset, UUID } from 'shared/types';
 
@@ -103,6 +104,11 @@ export class SyncEngine {
             !this.isOnline ||
             this.state.status === 'syncing'
         ) {
+            return;
+        }
+
+        // Never push data this page load hasn't claimed for the signed-in user
+        if (!isClaimCurrent()) {
             return;
         }
 
