@@ -2,10 +2,7 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { useGlobalStore } from 'state/stores/global';
-import {
-    clearLocalData,
-    hasUnsyncedLocalChanges,
-} from 'state/local/localData';
+import { clearLocalData, hasUnsyncedLocalChanges } from 'state/local/localData';
 import { useLogout } from './useLogout';
 
 const signOut = vi.fn<(redirectUri?: string) => Promise<void>>();

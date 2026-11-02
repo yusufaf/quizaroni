@@ -97,5 +97,7 @@ export async function hasUnsyncedLocalChanges({
 
     if (!settled) return true;
 
-    return useGamificationStore.getState().syncPending || (await hasPendingSync());
+    return (
+        useGamificationStore.getState().syncPending || (await hasPendingSync())
+    );
 }

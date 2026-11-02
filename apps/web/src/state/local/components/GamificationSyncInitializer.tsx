@@ -29,7 +29,10 @@ export function GamificationSyncInitializer() {
                 await useGamificationStore.getState().hydrateFromDb();
                 await useGamificationStore.getState().syncFromServer(user);
             } catch (error) {
-                console.error('Failed to prepare local data for this user:', error);
+                console.error(
+                    'Failed to prepare local data for this user:',
+                    error
+                );
             }
         })();
     }, [authenticated, userResponse?.user]);

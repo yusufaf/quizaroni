@@ -35,9 +35,9 @@ describe('GamificationSyncInitializer', () => {
     let syncFromServer: Mock<(user: User) => Promise<void>>;
 
     beforeEach(() => {
-        hydrateFromDb = vi.fn<() => Promise<void>>().mockResolvedValue(
-            undefined
-        );
+        hydrateFromDb = vi
+            .fn<() => Promise<void>>()
+            .mockResolvedValue(undefined);
         syncFromServer = vi
             .fn<(user: User) => Promise<void>>()
             .mockResolvedValue(undefined);
@@ -59,9 +59,9 @@ describe('GamificationSyncInitializer', () => {
 
         await waitFor(() => expect(syncFromServer).toHaveBeenCalledOnce());
         expect(claimLocalData).toHaveBeenCalledExactlyOnceWith('user-B');
-        expect(vi.mocked(claimLocalData).mock.invocationCallOrder[0]!).toBeLessThan(
-            syncFromServer.mock.invocationCallOrder[0]!
-        );
+        expect(
+            vi.mocked(claimLocalData).mock.invocationCallOrder[0]!
+        ).toBeLessThan(syncFromServer.mock.invocationCallOrder[0]!);
         expect(syncFromServer).toHaveBeenCalledWith(userB);
     });
 

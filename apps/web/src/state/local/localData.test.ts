@@ -1,6 +1,13 @@
 // @vitest-environment jsdom
 import 'fake-indexeddb/auto';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+} from 'vite-plus/test';
 import { DEFAULT_USER_DATA } from 'shared/constants';
 import type {
     CustomAchievement,
@@ -184,9 +191,7 @@ describe('local data ownership', () => {
             expect(count, name).toBe(0);
         }
         expect(useGamificationStore.getState().state.longestStreak).toBe(0);
-        expect(useGamificationStore.getState().customAchievements).toEqual(
-            []
-        );
+        expect(useGamificationStore.getState().customAchievements).toEqual([]);
         expect(readStoredOwner()).toBe('user-B');
     });
 

@@ -65,7 +65,10 @@ describe('SyncEngine', () => {
     });
 
     it('does not push before local data is claimed', async () => {
-        await userRepository.create({ ...DEFAULT_USER_DATA, userUUID: 'user-1' });
+        await userRepository.create({
+            ...DEFAULT_USER_DATA,
+            userUUID: 'user-1',
+        });
         const updateUserMetadata = vi.fn().mockResolvedValue({});
         const engine = new SyncEngine({
             apiClient: apiClientWith(updateUserMetadata),

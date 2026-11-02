@@ -41,9 +41,8 @@ export const useLogout = () => {
     return useCallback(async () => {
         let unsynced = false;
         try {
-            const { hasUnsyncedLocalChanges } = await import(
-                'state/local/localData'
-            );
+            const { hasUnsyncedLocalChanges } =
+                await import('state/local/localData');
             unsynced = await hasUnsyncedLocalChanges();
         } catch (error) {
             console.error('Error checking for unsynced progress:', error);

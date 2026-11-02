@@ -86,7 +86,7 @@ const applyPayload = (
 // instead of wiping the data and cancelling the request.
 const inflight = new Set<Promise<unknown>>();
 
-const track = <T,>(promise: Promise<T>): Promise<T> => {
+const track = <T>(promise: Promise<T>): Promise<T> => {
     inflight.add(promise);
     const done = () => {
         inflight.delete(promise);
