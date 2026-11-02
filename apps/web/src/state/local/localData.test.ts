@@ -184,7 +184,7 @@ describe('local data ownership', () => {
         await useGamificationStore.getState().hydrateFromDb();
 
         setClaimedOwner(null);
-        await claimLocalData('user-B');
+        expect(await claimLocalData('user-B')).toBe(true);
 
         const counts = await tableCounts();
         for (const [name, count] of Object.entries(counts)) {
@@ -200,7 +200,7 @@ describe('local data ownership', () => {
         await seedUserA();
 
         setClaimedOwner(null);
-        await claimLocalData('user-A');
+        expect(await claimLocalData('user-A')).toBe(false);
 
         expect(await cardProgressRepository.getByCard('card-A')).toBeDefined();
         expect((await gamificationRepository.getState()).longestStreak).toBe(

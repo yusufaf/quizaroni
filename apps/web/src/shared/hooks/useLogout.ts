@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { useLogto } from '@logto/react';
+import { getClaimedOwner } from 'state/local/owner';
 import { useGlobalStore } from 'state/stores/global';
 
 /**
@@ -12,6 +13,8 @@ export const useSignOut = () => {
     const setAuthenticated = useGlobalStore((state) => state.setAuthenticated);
 
     return useCallback(async () => {
+        const owner = getClaimedOwner();
+
         try {
             const { clearLocalData } = await import('state/local/localData');
             await clearLocalData();
@@ -26,9 +29,24 @@ export const useSignOut = () => {
             setAuthenticated(false);
         } catch (error) {
             console.error('Error signing out:', error);
+            // Still signed in, so take the data back; otherwise every push
+            // stays blocked until the next page load.
+            if (owner) {
+                try {
+                    const { claimLocalData } =
+                        await import('state/local/localData');
+                    await claimLocalData(owner);
+                } catch (claimError) {
+                    console.error('Error re-claiming local data:', claimError);
+                }
+            }
         }
     }, [setAuthenticated, signOut]);
 };
+
+// Shared by every useLogout caller (desktop nav, mobile drawer), so a second
+// click during the unsynced check doesn't start a second sign-out.
+let logoutInProgress = false;
 
 /**
  * Signs out, unless progress meant for the server hasn't reached it yet — then
@@ -39,20 +57,29 @@ export const useLogout = () => {
     const signOutNow = useSignOut();
 
     return useCallback(async () => {
-        let unsynced = false;
+        if (logoutInProgress) return;
+        logoutInProgress = true;
+
         try {
-            const { hasUnsyncedLocalChanges } =
-                await import('state/local/localData');
-            unsynced = await hasUnsyncedLocalChanges();
-        } catch (error) {
-            console.error('Error checking for unsynced progress:', error);
-        }
+            let unsynced: boolean;
+            try {
+                const { hasUnsyncedLocalChanges } =
+                    await import('state/local/localData');
+                unsynced = await hasUnsyncedLocalChanges();
+            } catch (error) {
+                // Can't tell, so let the user decide rather than wipe silently.
+                console.error('Error checking for unsynced progress:', error);
+                unsynced = true;
+            }
 
-        if (unsynced) {
-            useGlobalStore.getState().setLogoutConfirmOpen(true);
-            return;
-        }
+            if (unsynced) {
+                useGlobalStore.getState().setLogoutConfirmOpen(true);
+                return;
+            }
 
-        await signOutNow();
+            await signOutNow();
+        } finally {
+            logoutInProgress = false;
+        }
     }, [signOutNow]);
 };

@@ -53,7 +53,7 @@ describe('GamificationSyncInitializer', () => {
     });
 
     it('claims local data for the signed-in user before syncing gamification', async () => {
-        vi.mocked(claimLocalData).mockResolvedValue(undefined);
+        vi.mocked(claimLocalData).mockResolvedValue(true);
 
         render(<GamificationSyncInitializer />);
 
@@ -63,6 +63,16 @@ describe('GamificationSyncInitializer', () => {
             vi.mocked(claimLocalData).mock.invocationCallOrder[0]!
         ).toBeLessThan(syncFromServer.mock.invocationCallOrder[0]!);
         expect(syncFromServer).toHaveBeenCalledWith(userB);
+        expect(hydrateFromDb).toHaveBeenCalledOnce();
+    });
+
+    it('keeps in-memory state when the claim wiped nothing', async () => {
+        vi.mocked(claimLocalData).mockResolvedValue(false);
+
+        render(<GamificationSyncInitializer />);
+
+        await waitFor(() => expect(syncFromServer).toHaveBeenCalledOnce());
+        expect(hydrateFromDb).not.toHaveBeenCalled();
     });
 
     it('does not sync when claiming fails', async () => {

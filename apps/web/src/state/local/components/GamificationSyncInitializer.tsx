@@ -23,10 +23,12 @@ export function GamificationSyncInitializer() {
         const user = userResponse.user;
         void (async () => {
             try {
-                await claimLocalData(user.userUUID);
-                // Another initializer may have loaded the previous owner's
-                // state into memory before the claim wiped it.
-                await useGamificationStore.getState().hydrateFromDb();
+                const wiped = await claimLocalData(user.userUUID);
+                if (wiped) {
+                    // Another initializer may have loaded the wiped state into
+                    // memory before the claim cleared it.
+                    await useGamificationStore.getState().hydrateFromDb();
+                }
                 await useGamificationStore.getState().syncFromServer(user);
             } catch (error) {
                 console.error(

@@ -49,14 +49,17 @@ let storageListenerInstalled = false;
 /**
  * Makes the device's local data belong to `userUUID` for this page load,
  * wiping it first if it belonged to another account. Pushes to the server stay
- * blocked until this resolves.
+ * blocked until this resolves. Returns whether anything was wiped.
  */
-export async function claimLocalData(userUUID: string): Promise<void> {
+export async function claimLocalData(userUUID: string): Promise<boolean> {
     const owner = storedOwnerId();
+    let wiped = false;
     if (owner === null) {
         await resetLocalGamification();
+        wiped = true;
     } else if (owner !== userUUID) {
         await clearLocalData();
+        wiped = true;
     }
 
     writeStoredOwner(userUUID);
@@ -68,6 +71,8 @@ export async function claimLocalData(userUUID: string): Promise<void> {
             handleOwnerStorageEvent(event)
         );
     }
+
+    return wiped;
 }
 
 /**
