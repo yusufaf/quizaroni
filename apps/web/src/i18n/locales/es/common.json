@@ -745,5 +745,11 @@
         "success": "Guardado en tu biblioteca",
         "unavailable": "Este set ya no es público.",
         "error": "No se pudo guardar este set. Inténtalo de nuevo."
+    },
+    "logoutConfirm": {
+        "title": "¿Cerrar sesión con progreso sin guardar?",
+        "body": "Parte de tu progreso aún no se ha guardado en tu cuenta. Si cierras sesión ahora, se eliminará de este dispositivo.",
+        "confirm": "Cerrar sesión de todos modos",
+        "cancel": "Seguir con la sesión iniciada"
     }
 }

@@ -49,6 +49,9 @@ const GlobalConfirmDialog = lazy(
 const ManageLabelsDialog = lazy(
     () => import('shared/components/ManageLabelsDialog/ManageLabelsDialog')
 );
+const LogoutConfirmDialog = lazy(
+    () => import('shared/components/LogoutConfirmDialog/LogoutConfirmDialog')
+);
 
 const ShortcutLayer = () => {
     useGlobalKeyListener();
@@ -70,6 +73,7 @@ const App = () => {
         feedbackDialogOpen,
         confirmDialogProps,
         labelsDialogProps,
+        logoutConfirmOpen,
     } = useGlobalStore();
     const { getAccessToken, isAuthenticated } = useLogto();
 
@@ -122,6 +126,9 @@ const App = () => {
                 </MountOnFirstOpen>
                 <MountOnFirstOpen open={!!labelsDialogProps?.open}>
                     <ManageLabelsDialog />
+                </MountOnFirstOpen>
+                <MountOnFirstOpen open={logoutConfirmOpen}>
+                    <LogoutConfirmDialog />
                 </MountOnFirstOpen>
                 <ShortcutLayer />
             </ShortcutProvider>
