@@ -12,6 +12,7 @@ type GlobalState = {
     dialogOpen: boolean;
     confirmDialogProps: ConfirmDialogProps;
     feedbackDialogOpen: boolean;
+    logoutConfirmOpen: boolean;
     namedColorsDialogProps: any;
     userAuthInfo: any;
     userData: any;
@@ -30,6 +31,7 @@ type GlobalState = {
     }) => void;
     setNamedColorsDialogProps: (props: any) => void;
     setFeedbackDialogOpen: (feedbackDialogOpen: boolean) => void;
+    setLogoutConfirmOpen: (open: boolean) => void;
     setLabelsDialogProps: (props: LabelsDialogProps) => void;
     setLoadingAdd: (actionId: LoadingAction) => void;
     setLoadingRemove: (actionId: LoadingAction) => void;
@@ -40,6 +42,7 @@ export const useGlobalStore = create<GlobalState>((set, get) => ({
     dialogOpen: false,
     confirmDialogProps: { ...INITIAL_CONFIRM_DIALOG_PROPS },
     feedbackDialogOpen: false,
+    logoutConfirmOpen: false,
     namedColorsDialogProps: {},
     userAuthInfo: {},
     userData: {},
@@ -107,6 +110,7 @@ export const useGlobalStore = create<GlobalState>((set, get) => ({
     setNamedColorsDialogProps: (props) =>
         set({ namedColorsDialogProps: props }),
     setFeedbackDialogOpen: (feedbackDialogOpen) => set({ feedbackDialogOpen }),
+    setLogoutConfirmOpen: (open) => set({ logoutConfirmOpen: open }),
     setLabelsDialogProps: (props) => set({ labelsDialogProps: props }),
     setLoadingAdd: (actionId) => {
         const loadingActions = get().loadingActions;
