@@ -283,14 +283,13 @@ describe('StudyMode pending timers (#243)', () => {
         render(ui());
         const fresh = useStudySessionStore.getState().activeSession;
         const sessionsBefore = totalSessions();
-        act(() => vi.advanceTimersByTime(delay));
+        act(() => {
+            vi.advanceTimersByTime(delay);
+        });
         return { fresh, sessionsBefore };
     };
 
-    const expectUntouched = (
-        fresh: unknown,
-        sessionsBefore: number
-    ) => {
+    const expectUntouched = (fresh: unknown, sessionsBefore: number) => {
         expect(useStudySessionStore.getState().activeSession).toBe(fresh);
         expect(totalSessions()).toBe(sessionsBefore);
     };
@@ -400,7 +399,9 @@ describe('StudyMode pending timers (#243)', () => {
         const fresh = useStudySessionStore.getState().activeSession;
         const sessionsAfterEnd = totalSessions();
         expect(sessionsAfterEnd).toBe(sessionsBeforeEnter + 1);
-        act(() => vi.advanceTimersByTime(2500));
+        act(() => {
+            vi.advanceTimersByTime(2500);
+        });
         expectUntouched(fresh, sessionsAfterEnd);
     });
 
@@ -412,7 +413,9 @@ describe('StudyMode pending timers (#243)', () => {
         const fresh = useStudySessionStore.getState().activeSession;
         const sessionsAfterEnd = totalSessions();
         expect(sessionsAfterEnd).toBe(sessionsBeforeFinish + 1);
-        act(() => vi.advanceTimersByTime(500));
+        act(() => {
+            vi.advanceTimersByTime(500);
+        });
         expectUntouched(fresh, sessionsAfterEnd);
     });
 });

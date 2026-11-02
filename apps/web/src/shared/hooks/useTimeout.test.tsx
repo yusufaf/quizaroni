@@ -23,11 +23,17 @@ describe('useTimeout', () => {
         const fn = vi.fn();
         const { result } = renderHook(() => useTimeout());
 
-        act(() => result.current.schedule(fn, 500));
-        act(() => vi.advanceTimersByTime(499));
+        act(() => {
+            result.current.schedule(fn, 500);
+        });
+        act(() => {
+            vi.advanceTimersByTime(499);
+        });
         expect(fn).not.toHaveBeenCalled();
 
-        act(() => vi.advanceTimersByTime(1));
+        act(() => {
+            vi.advanceTimersByTime(1);
+        });
         expect(fn).toHaveBeenCalledTimes(1);
     });
 
@@ -35,9 +41,13 @@ describe('useTimeout', () => {
         const fn = vi.fn();
         const { result, unmount } = renderHook(() => useTimeout());
 
-        act(() => result.current.schedule(fn, 500));
+        act(() => {
+            result.current.schedule(fn, 500);
+        });
         unmount();
-        act(() => vi.advanceTimersByTime(500));
+        act(() => {
+            vi.advanceTimersByTime(500);
+        });
 
         expect(fn).not.toHaveBeenCalled();
     });
@@ -51,7 +61,9 @@ describe('useTimeout', () => {
             result.current.schedule(a, 500);
             result.current.schedule(b, 500);
         });
-        act(() => vi.advanceTimersByTime(500));
+        act(() => {
+            vi.advanceTimersByTime(500);
+        });
 
         expect(a).not.toHaveBeenCalled();
         expect(b).toHaveBeenCalledTimes(1);
@@ -65,7 +77,9 @@ describe('useTimeout', () => {
             result.current.schedule(fn, 500);
             result.current.clear();
         });
-        act(() => vi.advanceTimersByTime(500));
+        act(() => {
+            vi.advanceTimersByTime(500);
+        });
 
         expect(fn).not.toHaveBeenCalled();
     });
