@@ -52,6 +52,7 @@ import {
 import type { CardProgress, StudySessionResult } from 'shared/types';
 import { resolveSwipe, SWIPE_DISTANCE_THRESHOLD } from './swipeGesture';
 import useHaptics from 'shared/hooks/useHaptics';
+import useTimeout from 'shared/hooks/useTimeout';
 
 type Props = {
     studysetId: string;
@@ -119,6 +120,7 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
     const didDragRef = useRef(false);
     const { light: hapticLight, sessionComplete: hapticSessionComplete } =
         useHaptics();
+    const { schedule: scheduleAdvance, clear: cancelAdvance } = useTimeout();
 
     const sessionCards = useMemo(
         () =>
@@ -423,13 +425,14 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
         }
 
         if (activeSession.settings.autoAdvance) {
-            setTimeout(() => {
+            scheduleAdvance(() => {
                 handleNext();
             }, 500);
         }
     };
 
     const handleNext = () => {
+        cancelAdvance();
         if (isLastCard) {
             // End session and show results
             hapticSessionComplete();
@@ -447,6 +450,7 @@ const FlashcardsStudy = ({ studysetId, reviewMode = false }: Props) => {
     };
 
     const handlePrevious = () => {
+        cancelAdvance();
         if (!isFirstCard) {
             updateCurrentCard(activeSession.currentCardIndex - 1);
             setFlipped(false);

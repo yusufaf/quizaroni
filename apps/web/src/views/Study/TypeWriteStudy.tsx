@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useShortcuts } from 'shared/keyboard/useShortcuts';
 import { stringSimilarity } from 'shared/utilities/stringSimilarity';
 import useHaptics from 'shared/hooks/useHaptics';
+import useTimeout from 'shared/hooks/useTimeout';
 
 type Props = {
     studysetId: string;
@@ -57,6 +58,7 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
 
     const { light: hapticLight, sessionComplete: hapticSessionComplete } =
         useHaptics();
+    const { schedule: scheduleAdvance, clear: cancelAdvance } = useTimeout();
 
     const [userAnswer, setUserAnswer] = useState('');
     const [hintsUsed, setHintsUsed] = useState(0);
@@ -178,12 +180,13 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
         });
 
         // Auto-advance after delay
-        setTimeout(() => {
+        scheduleAdvance(() => {
             handleNext();
         }, 2500);
     };
 
     const handleNext = () => {
+        cancelAdvance();
         if (!activeSession) return;
 
         const isLastCard =

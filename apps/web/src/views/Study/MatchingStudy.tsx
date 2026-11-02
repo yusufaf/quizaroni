@@ -20,6 +20,7 @@ import SettingsDialog from './shared/SettingsDialog';
 import { BasePage } from 'styles/AppStyles';
 import { useShortcuts } from 'shared/keyboard/useShortcuts';
 import useHaptics from 'shared/hooks/useHaptics';
+import useTimeout from 'shared/hooks/useTimeout';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -59,6 +60,7 @@ const MatchingStudy = ({ studysetId }: Props) => {
 
     const { light: hapticLight, sessionComplete: hapticSessionComplete } =
         useHaptics();
+    const { schedule: scheduleAdvance } = useTimeout();
 
     const [termCards, setTermCards] = useState<MatchCard[]>([]);
     const [definitionCards, setDefinitionCards] = useState<MatchCard[]>([]);
@@ -186,7 +188,7 @@ const MatchingStudy = ({ studysetId }: Props) => {
 
             // Check if all matched
             if (newMatched.size === termCards.length) {
-                setTimeout(() => {
+                scheduleAdvance(() => {
                     handleGameComplete();
                 }, 1000);
 
