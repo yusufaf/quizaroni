@@ -75,11 +75,14 @@ if (isSetupComplete(db)) {
     if (admin) {
         try {
             const status = await bootstrapAdmin(db, admin, config.publicUrl);
-            console.log(
-                status === 'created'
-                    ? `Created instance admin ${admin.email} from QZ_ADMIN_EMAIL.`
-                    : 'An instance admin already exists, so setup is now marked complete. QZ_ADMIN_EMAIL and QZ_ADMIN_PASSWORD were not used; missing instance settings were taken from QZ_* settings.'
-            );
+            const messages = {
+                created: `Created instance admin ${admin.email} from QZ_ADMIN_EMAIL.`,
+                marked_complete:
+                    'An instance admin already exists, so setup is now marked complete. QZ_ADMIN_EMAIL and QZ_ADMIN_PASSWORD were not used; missing instance settings were taken from QZ_* settings.',
+                already_set_up:
+                    'Setup was completed elsewhere; ignoring QZ_ADMIN_* settings.',
+            };
+            console.log(messages[status]);
         } catch (err) {
             console.error(
                 `Could not create the instance admin: ${describeDbError(err)}`
