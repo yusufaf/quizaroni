@@ -50,7 +50,7 @@ console.log(
 console.log(`Data directory: ${config.dataDir}`);
 
 function shutdown(): void {
-    server.stop();
+    void server.stop();
     try {
         closeDatabase(sqlite);
     } finally {
