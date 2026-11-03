@@ -17,7 +17,8 @@
         "synth:api": "pnpm --filter @quizaroni/api exec cdk synth",
         "deploy:api": "pnpm --filter @quizaroni/api exec cdk deploy",
         "test": "pnpm -r test",
-        "typecheck": "pnpm --filter @quizaroni/web typecheck",
+        "typecheck": "pnpm --filter @quizaroni/web --filter @quizaroni/server typecheck",
+        "start:server": "pnpm --filter @quizaroni/server start",
         "prepare": "husky"
     },
     "devDependencies": {

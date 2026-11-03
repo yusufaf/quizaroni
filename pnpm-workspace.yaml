@@ -9,6 +9,7 @@ overrides:
     fast-uri: ^3.1.6
     undici: ^7.29.0
     postcss: ^8.5.18
+    '@esbuild-kit/core-utils>esbuild': ^0.25.4
     vite@*: 'catalog:'
 catalog:
     vite: npm:@voidzero-dev/vite-plus-core@0.3.3
