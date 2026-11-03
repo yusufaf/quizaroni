@@ -25,7 +25,13 @@ Options (each can also be set with the QZ_* environment variable shown):
   --host <address>     Address to bind to (QZ_HOST, default ${DEFAULT_HOST})
   --public-url <url>   Public origin users reach the server at (QZ_PUBLIC_URL)
   --web-dir <path>     Directory holding the built web app (QZ_WEB_DIR, default ../web/dist)
-  --help               Show this help`;
+  --help               Show this help
+
+Headless setup (env only, used only while setup is incomplete):
+  QZ_ADMIN_EMAIL        Email of the instance admin to create instead of running the setup wizard
+  QZ_ADMIN_PASSWORD     Password for that admin, 8-128 characters
+  QZ_REGISTRATION_MODE  open or invite_only (default invite_only)
+  QZ_TEACHER_POLICY     admin_approved or self_declared (default admin_approved)`;
 
 const ENV_NAMES = {
     'data-dir': 'QZ_DATA_DIR',
@@ -82,14 +88,12 @@ function parsePort({ value, source }: Setting): number {
     return port;
 }
 
-function parsePublicUrl({ value, source }: Setting): string {
+export function normalizePublicUrl(value: string): string | undefined {
     let url: URL;
     try {
         url = new URL(value);
     } catch {
-        throw new ConfigError(
-            `${source} must be an http(s) origin with no path (got "${value}")`
-        );
+        return undefined;
     }
     if (
         (url.protocol !== 'http:' && url.protocol !== 'https:') ||
@@ -97,11 +101,133 @@ function parsePublicUrl({ value, source }: Setting): string {
         url.search ||
         url.hash
     ) {
+        return undefined;
+    }
+    return url.origin;
+}
+
+function parsePublicUrl({ value, source }: Setting): string {
+    const origin = normalizePublicUrl(value);
+    if (origin === undefined) {
         throw new ConfigError(
             `${source} must be an http(s) origin with no path (got "${value}")`
         );
     }
-    return url.origin;
+    return origin;
+}
+
+export function resolvePublicUrl(o: {
+    configured?: string;
+    stored?: string;
+    host: string;
+    port: number;
+}): string {
+    return o.configured ?? o.stored ?? defaultPublicUrl(o.host, o.port);
+}
+
+export const REGISTRATION_MODES = ['open', 'invite_only'] as const;
+export const TEACHER_POLICIES = ['admin_approved', 'self_declared'] as const;
+export type RegistrationMode = (typeof REGISTRATION_MODES)[number];
+export type TeacherPolicy = (typeof TEACHER_POLICIES)[number];
+
+export function isRegistrationMode(value: string): value is RegistrationMode {
+    return (REGISTRATION_MODES as readonly string[]).includes(value);
+}
+
+export function isTeacherPolicy(value: string): value is TeacherPolicy {
+    return (TEACHER_POLICIES as readonly string[]).includes(value);
+}
+
+// zod 4's email regex (zod/v4/core/regexes.js), which Better Auth's sign-in checks
+// emails against: an address it rejects could never log in.
+const EMAIL_PATTERN =
+    /^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/;
+const EMAIL_MAX = 254;
+
+export function normalizeEmail(value: string): string | undefined {
+    const email = value.trim().toLowerCase();
+    return email.length <= EMAIL_MAX && EMAIL_PATTERN.test(email)
+        ? email
+        : undefined;
+}
+
+export const PASSWORD_MIN = 8;
+export const PASSWORD_MAX = 128;
+
+// UTF-16 code units, not code points: Better Auth rejects sign-in when
+// password.length exceeds 128.
+export function passwordLengthOk(password: string): boolean {
+    return (
+        password.length >= PASSWORD_MIN && password.length <= PASSWORD_MAX
+    );
+}
+
+export type AdminBootstrap = {
+    email: string;
+    password: string;
+    registrationMode: RegistrationMode;
+    teacherPolicy: TeacherPolicy;
+};
+
+export const ADMIN_ENV_VARS = [
+    'QZ_ADMIN_EMAIL',
+    'QZ_ADMIN_PASSWORD',
+    'QZ_REGISTRATION_MODE',
+    'QZ_TEACHER_POLICY',
+] as const;
+
+export function hasAdminEnv(env: Record<string, string | undefined>): boolean {
+    return ADMIN_ENV_VARS.some((name) => Boolean(env[name]));
+}
+
+export function parseAdminBootstrap(
+    env: Record<string, string | undefined>
+): AdminBootstrap | undefined {
+    const rawEmail = env.QZ_ADMIN_EMAIL || undefined;
+    const password = env.QZ_ADMIN_PASSWORD || undefined;
+    const mode = env.QZ_REGISTRATION_MODE || undefined;
+    const policy = env.QZ_TEACHER_POLICY || undefined;
+
+    if (rawEmail === undefined && password === undefined) {
+        if (mode !== undefined || policy !== undefined) {
+            throw new ConfigError(
+                'QZ_REGISTRATION_MODE and QZ_TEACHER_POLICY are only used with QZ_ADMIN_EMAIL/QZ_ADMIN_PASSWORD'
+            );
+        }
+        return undefined;
+    }
+    if (rawEmail === undefined || password === undefined) {
+        throw new ConfigError(
+            'QZ_ADMIN_EMAIL and QZ_ADMIN_PASSWORD must be set together'
+        );
+    }
+    const email = normalizeEmail(rawEmail);
+    if (email === undefined) {
+        throw new ConfigError(
+            `QZ_ADMIN_EMAIL must be a valid email address (got "${rawEmail}")`
+        );
+    }
+    if (!passwordLengthOk(password)) {
+        throw new ConfigError(
+            `QZ_ADMIN_PASSWORD must be ${PASSWORD_MIN}-${PASSWORD_MAX} characters`
+        );
+    }
+    if (mode !== undefined && !isRegistrationMode(mode)) {
+        throw new ConfigError(
+            `QZ_REGISTRATION_MODE must be one of ${REGISTRATION_MODES.join(', ')} (got "${mode}")`
+        );
+    }
+    if (policy !== undefined && !isTeacherPolicy(policy)) {
+        throw new ConfigError(
+            `QZ_TEACHER_POLICY must be one of ${TEACHER_POLICIES.join(', ')} (got "${policy}")`
+        );
+    }
+    return {
+        email,
+        password,
+        registrationMode: mode ?? 'invite_only',
+        teacherPolicy: policy ?? 'admin_approved',
+    };
 }
 
 export function loadConfig(
