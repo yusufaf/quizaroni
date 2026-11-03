@@ -17,6 +17,6 @@ export default defineConfig({
         sortPackageJson: false,
         // Only apps/web was ever vp-formatted; apps/api has its own
         // .prettierrc and the rest was never run through a formatter.
-        ignorePatterns: ['apps/api', 'packages', 'docs', '.github', '*.md'],
+        ignorePatterns: ['apps/api', 'apps/server/drizzle', 'packages', 'docs', '.github', '*.md'],
     },
 });
