@@ -39,7 +39,8 @@ export function tokensMatch(expected: string, candidate: string): boolean {
     const trimmed = candidate.trim();
     if (trimmed === '') return false;
     // Hashing first gives equal-length buffers, which timingSafeEqual requires.
-    const digest = (value: string) => createHash('sha256').update(value).digest();
+    const digest = (value: string) =>
+        createHash('sha256').update(value).digest();
     return timingSafeEqual(digest(expected), digest(trimmed));
 }
 
