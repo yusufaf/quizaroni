@@ -745,5 +745,11 @@
         "success": "Saved to your library",
         "unavailable": "This set is no longer public.",
         "error": "Couldn't save this set. Try again."
+    },
+    "logoutConfirm": {
+        "title": "Sign out with unsaved progress?",
+        "body": "Some of your progress hasn't been saved to your account yet. If you sign out now, it will be removed from this device.",
+        "confirm": "Sign out anyway",
+        "cancel": "Stay signed in"
     }
 }

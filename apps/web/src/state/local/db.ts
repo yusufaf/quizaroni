@@ -147,7 +147,9 @@ export function getDatabase(): QuizaroniDatabase {
     return db;
 }
 
-// Reset database (useful for logout or data reset)
+// Deletes the database (dev/test resets). Dexie closes the cached instance for
+// good, so repository singletons stop working until reload; logout uses
+// clearLocalData() instead.
 export async function resetDatabase(): Promise<void> {
     const db = getDatabase();
     await db.delete();

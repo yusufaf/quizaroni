@@ -6,16 +6,26 @@ import {
     DEFAULT_USER_DATA,
 } from 'shared/constants';
 import type { User } from 'shared/types';
-import { resetDatabase } from '../db';
+import { claimLocalData, clearLocalData } from '../localData';
+import { setClaimedOwner } from '../owner';
 import { userRepository } from '../repositories';
 import { SyncEngine } from './SyncEngine';
 
 afterEach(async () => {
-    await resetDatabase();
+    await clearLocalData();
+    localStorage.clear();
+    setClaimedOwner(null);
 });
 
-// One test only: userRepository caches its Dexie instance, which
-// resetDatabase deletes.
+const apiClientWith = (
+    updateUserMetadata: (updates: Record<string, unknown>) => Promise<unknown>
+) => ({
+    updateUserMetadata,
+    updateStudyset: vi.fn(),
+    createStudyset: vi.fn(),
+    deleteStudyset: vi.fn(),
+});
+
 describe('SyncEngine', () => {
     it('syncs a pending user without the server-managed metadata keys (#207)', async () => {
         const editable = {
@@ -41,20 +51,31 @@ describe('SyncEngine', () => {
                 notifications: DEFAULT_NOTIFICATION_PREFERENCES,
             },
         };
+        await claimLocalData('user-1');
         await userRepository.create(user);
         const updateUserMetadata = vi.fn().mockResolvedValue({});
         const engine = new SyncEngine({
-            apiClient: {
-                updateUserMetadata,
-                updateStudyset: vi.fn(),
-                createStudyset: vi.fn(),
-                deleteStudyset: vi.fn(),
-            },
+            apiClient: apiClientWith(updateUserMetadata),
         });
 
         await engine.forceSync();
 
         expect(updateUserMetadata).toHaveBeenCalledExactlyOnceWith(editable);
         expect(await userRepository.getPendingChanges()).toEqual([]);
+    });
+
+    it('does not push before local data is claimed', async () => {
+        await userRepository.create({
+            ...DEFAULT_USER_DATA,
+            userUUID: 'user-1',
+        });
+        const updateUserMetadata = vi.fn().mockResolvedValue({});
+        const engine = new SyncEngine({
+            apiClient: apiClientWith(updateUserMetadata),
+        });
+
+        await engine.forceSync();
+
+        expect(updateUserMetadata).not.toHaveBeenCalled();
     });
 });

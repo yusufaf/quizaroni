@@ -7,6 +7,7 @@ import {
     mergeCustomAchievements,
     mergeGamificationState,
 } from 'shared/utilities/gamification';
+import { isClaimCurrent } from 'state/local/owner';
 
 export type GamificationPayload = {
     state: GamificationState;
@@ -16,6 +17,7 @@ export type GamificationPayload = {
 export async function pushGamificationToServer(
     payload: GamificationPayload
 ): Promise<GamificationPayload | null> {
+    if (!isClaimCurrent()) return null;
     if (!navigator.onLine) return null;
 
     try {

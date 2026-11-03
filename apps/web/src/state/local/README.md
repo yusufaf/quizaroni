@@ -136,7 +136,13 @@ await studysetRepository.delete(studysetUUID);
 ### Database Operations
 
 ```tsx
-import { getDatabase, exportAllData, importAllData, resetDatabase } from 'state/local';
+import {
+  getDatabase,
+  exportAllData,
+  importAllData,
+  clearLocalData,
+  resetDatabase,
+} from 'state/local';
 
 // Get raw database instance
 const db = getDatabase();
@@ -152,7 +158,12 @@ await importAllData({
   cardProgress: [...],
 });
 
-// Reset (logout / clear all data)
+// Logout: wipe this account's local data. Clears every table and the
+// persisted gamification/study-session stores; repositories keep working.
+await clearLocalData();
+
+// Dev-only full reset: deletes the database and closes the cached instance
+// for good, so repository singletons stop working until a reload.
 await resetDatabase();
 ```
 
