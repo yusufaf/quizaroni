@@ -11,7 +11,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import pkg from '../package.json';
 import { createApp } from './app';
-import { closeDatabase, openDatabase } from './db';
+import { closeDatabase, type Db, openDatabase } from './db';
+import { completeSetup, SetupGate } from './setup/setup';
 
 const SHELL = '<!doctype html><title>shell</title>';
 const SENTINEL = 'QZ_SENTINEL_SECRET';
@@ -19,7 +20,15 @@ const SENTINEL = 'QZ_SENTINEL_SECRET';
 let root: string;
 let webDir: string;
 let sqlite: Database;
+let db: Db;
+let setup: SetupGate;
 let app: ReturnType<typeof createApp>;
+
+function latchedGate(database: Db): SetupGate {
+    const gate = new SetupGate(database, undefined);
+    gate.markComplete();
+    return gate;
+}
 
 beforeAll(() => {
     root = mkdtempSync(join(tmpdir(), 'qz-app-'));
@@ -30,8 +39,17 @@ beforeAll(() => {
     writeFileSync(join(webDir, 'sw.js'), 'self.skipWaiting();');
     writeFileSync(join(webDir, 'manifest.json'), '{}');
     writeFileSync(join(root, 'secret.txt'), SENTINEL);
-    sqlite = openDatabase(join(root, 'data')).sqlite;
-    app = createApp({ sqlite, webDir, version: pkg.version });
+    ({ sqlite, db } = openDatabase(join(root, 'data')));
+    completeSetup(db, {
+        name: 'Admin',
+        email: 'admin@example.com',
+        passwordHash: 'not-a-real-hash',
+        registrationMode: 'invite_only',
+        teacherPolicy: 'admin_approved',
+        publicUrl: undefined,
+    });
+    setup = new SetupGate(db, undefined);
+    app = createApp({ sqlite, db, webDir, version: pkg.version, setup });
 });
 
 afterAll(() => {
@@ -52,12 +70,14 @@ describe('/api', () => {
     test('GET /api/health returns 503 when the database is unusable', async () => {
         const dir = mkdtempSync(join(tmpdir(), 'qz-app-closed-'));
         try {
-            const closed = openDatabase(dir).sqlite;
-            closeDatabase(closed);
+            const closed = openDatabase(dir);
+            closeDatabase(closed.sqlite);
             const res = await createApp({
-                sqlite: closed,
+                sqlite: closed.sqlite,
+                db: closed.db,
                 webDir,
                 version: pkg.version,
+                setup: latchedGate(closed.db),
             }).request('/api/health');
             expect(res.status).toBe(503);
             expect(await res.json()).toEqual({
@@ -156,8 +176,10 @@ describe('web app', () => {
         mkdirSync(emptyWebDir, { recursive: true });
         const res = await createApp({
             sqlite,
+            db,
             webDir: emptyWebDir,
             version: pkg.version,
+            setup,
         }).request('/explore');
         expect(res.status).toBe(503);
     });
