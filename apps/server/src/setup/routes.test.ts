@@ -427,6 +427,25 @@ describe('finishing setup', () => {
         expect(admins(db)).toBe(1);
     });
 
+    test('an admin left without the completion marker unlocks the instance', async () => {
+        const { app, db, completions } = harness();
+        const now = new Date();
+        db.insert(user)
+            .values({
+                id: 'restored',
+                name: 'Restored',
+                email: 'restored@example.com',
+                role: 'admin',
+                createdAt: now,
+                updatedAt: now,
+            })
+            .run();
+        expect((await post(app, FULL)).status).toBe(409);
+        expect(admins(db)).toBe(1);
+        expect(completions()).toBe(1);
+        expect((await app.request('/explore')).status).toBe(200);
+    });
+
     test('two concurrent submissions create exactly one admin', async () => {
         const { app, db } = harness();
         const results = await Promise.all([
@@ -453,6 +472,17 @@ describe('request limits', () => {
             headers: { 'content-type': 'application/json' },
         });
         expect(res.status).toBe(415);
+    });
+
+    test('rejects a malformed multipart body with 400', async () => {
+        const { app } = harness();
+        const res = await app.request('/setup', {
+            method: 'POST',
+            body: 'not a multipart body',
+            headers: { 'content-type': 'multipart/form-data; boundary=x' },
+        });
+        expect(res.status).toBe(400);
+        expect(res.headers.get('cache-control')).toBe('no-store');
     });
 
     test('accepts form content types with parameters', async () => {

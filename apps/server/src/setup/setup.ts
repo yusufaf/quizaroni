@@ -75,10 +75,17 @@ export function completeSetup(
                 .from(user)
                 .where(eq(user.role, 'admin'))
                 .get();
-            if (
-                existingAdmin ||
-                getSetting(tx, SETTING.setupCompletedAt) !== undefined
-            ) {
+            if (getSetting(tx, SETTING.setupCompletedAt) !== undefined) {
+                return { status: 'already_set_up' };
+            }
+            if (existingAdmin) {
+                // An admin without the marker (e.g. a partial restore) means the
+                // instance is set up; record that instead of locking it in setup.
+                insertSettings(
+                    tx,
+                    { setupCompletedAt: String(now.getTime()) },
+                    now
+                );
                 return { status: 'already_set_up' };
             }
             const userId = crypto.randomUUID();

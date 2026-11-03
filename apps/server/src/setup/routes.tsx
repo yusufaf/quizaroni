@@ -131,7 +131,14 @@ export function setupRoutes({
                 return c.text('Unsupported media type', 415);
             }
 
-            const form = readForm(await c.req.parseBody());
+            let body: Awaited<ReturnType<typeof c.req.parseBody>>;
+            try {
+                body = await c.req.parseBody();
+            } catch {
+                setupHeaders(c);
+                return c.text('Malformed form body', 400);
+            }
+            const form = readForm(body);
             const locale = pickLocale(form.lang, headerLocale);
             const step: Step = isStep(form.step) ? form.step : 'token';
             const values = form.values;
@@ -200,6 +207,7 @@ export function setupRoutes({
                 return page(c, 500, locale, 'admin', values, {}, 'errSetupFailed');
             }
             if (result.status === 'already_set_up') {
+                gate.markComplete();
                 return renderPage(c, 409, <AlreadySetUpPage locale={locale} />);
             }
             gate.markComplete();

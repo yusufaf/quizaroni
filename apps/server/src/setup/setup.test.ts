@@ -219,6 +219,9 @@ describe('completeSetup', () => {
         const input = await makeInput();
         expect(completeSetup(db, input)).toEqual({ status: 'already_set_up' });
         expect(adminCount(db)).toBe(1);
+        // The instance already has an admin, so it must not stay locked in setup.
+        expect(isSetupComplete(db)).toBe(true);
+        expect(getSetting(db, SETTING.registrationMode)).toBeUndefined();
     });
 
     test(
