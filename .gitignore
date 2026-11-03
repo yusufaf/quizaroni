@@ -19,6 +19,9 @@ build/
 apps/api/cdk.out/
 .cdk.staging
 
+# self-host server
+apps/server/data/
+
 # agent / tooling scratch
 .agents/
 .playwright-mcp/
