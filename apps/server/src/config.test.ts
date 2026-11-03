@@ -4,6 +4,7 @@ import {
     ConfigError,
     DEFAULT_HOST,
     DEFAULT_PORT,
+    defaultPublicUrl,
     loadConfig,
     urlHost,
 } from './config';
@@ -27,7 +28,7 @@ describe('loadConfig', () => {
             dataDir: resolve(CWD, 'data'),
             port: DEFAULT_PORT,
             host: DEFAULT_HOST,
-            publicUrl: 'http://localhost:8080',
+            publicUrl: undefined,
             webDir: resolve(import.meta.dir, '../../web/dist'),
         });
     });
@@ -149,23 +150,6 @@ describe('loadConfig', () => {
         ).toBe('https://quiz.example.com');
     });
 
-    test('derives the default public URL from a non-local host', () => {
-        expect(
-            loadConfig(['--host', '192.168.1.5', '--port', '9000'], {}, CWD)
-                .publicUrl
-        ).toBe('http://192.168.1.5:9000');
-    });
-
-    test('derives the default public URL for IPv6 hosts', () => {
-        expect(
-            loadConfig(['--host', '::1', '--port', '9000'], {}, CWD).publicUrl
-        ).toBe('http://localhost:9000');
-        expect(
-            loadConfig(['--host', 'fe80::1', '--port', '9000'], {}, CWD)
-                .publicUrl
-        ).toBe('http://[fe80::1]:9000');
-    });
-
     test('names the source of an invalid value in the error message', () => {
         expect(
             configError(() => loadConfig(['--port', 'abc'], {}, CWD)).message
@@ -193,6 +177,23 @@ describe('loadConfig', () => {
         expect(
             configError(() => loadConfig(['--host='], {}, CWD)).message
         ).toContain('--host');
+    });
+});
+
+describe('defaultPublicUrl', () => {
+    test('uses localhost for loopback and wildcard hosts', () => {
+        expect(defaultPublicUrl('127.0.0.1', 8080)).toBe(
+            'http://localhost:8080'
+        );
+        expect(defaultPublicUrl('0.0.0.0', 8080)).toBe('http://localhost:8080');
+        expect(defaultPublicUrl('::1', 9000)).toBe('http://localhost:9000');
+    });
+
+    test('uses a non-local host as is, bracketing IPv6', () => {
+        expect(defaultPublicUrl('192.168.1.5', 9000)).toBe(
+            'http://192.168.1.5:9000'
+        );
+        expect(defaultPublicUrl('fe80::1', 9000)).toBe('http://[fe80::1]:9000');
     });
 });
 

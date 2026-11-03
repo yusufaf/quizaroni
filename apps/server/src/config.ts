@@ -5,7 +5,8 @@ export type ServerConfig = {
     dataDir: string;
     port: number;
     host: string;
-    publicUrl: string;
+    /** Set only when given explicitly; otherwise derive it from the bound port with `defaultPublicUrl`. */
+    publicUrl: string | undefined;
     webDir: string;
 };
 
@@ -40,6 +41,10 @@ type Setting = { value: string; source: string };
 
 export function urlHost(host: string): string {
     return host.includes(':') && !host.startsWith('[') ? `[${host}]` : host;
+}
+
+export function defaultPublicUrl(host: string, port: number): string {
+    return `http://${LOCAL_HOSTS.has(host) ? 'localhost' : urlHost(host)}:${port}`;
 }
 
 function parseFlags(argv: string[]): Partial<Record<OptionName, string>> {
@@ -124,7 +129,7 @@ export function loadConfig(
     const publicUrlSetting = setting('public-url');
     const publicUrl = publicUrlSetting
         ? parsePublicUrl(publicUrlSetting)
-        : `http://${LOCAL_HOSTS.has(host) ? 'localhost' : urlHost(host)}:${port}`;
+        : undefined;
     const webDir = setting('web-dir');
 
     return {

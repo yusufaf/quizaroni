@@ -74,10 +74,13 @@ test('serves the app and health check, keeping files inside the data dir', async
         }
     );
     try {
-        const [, url] = await readUntil(
+        const [, url, publicUrl] = await readUntil(
             proc.stdout,
-            /listening on (http:\/\/\S+)/
+            /listening on (http:\/\/\S+) \(public URL (\S+)\)/
         );
+        const boundPort = new URL(url!).port;
+        expect(boundPort).not.toBe('0');
+        expect(publicUrl).toBe(`http://localhost:${boundPort}`);
 
         const health = await fetch(`${url}/api/health`);
         expect(health.status).toBe(200);
