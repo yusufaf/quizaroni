@@ -14,7 +14,7 @@ import { join } from 'node:path';
 import { count, DrizzleQueryError, eq } from 'drizzle-orm';
 import { closeDatabase, type Db, openDatabase } from '../db';
 import { account, user } from '../db/schema';
-import { getSetting, SETTING } from '../settings';
+import { getSetting, insertSettings, SETTING } from '../settings';
 import {
     bootstrapAdmin,
     clearSetupToken,
@@ -216,12 +216,20 @@ describe('completeSetup', () => {
                 updatedAt: now,
             })
             .run();
+        insertSettings(db, { registrationMode: 'invite_only' }, now);
         const input = await makeInput();
-        expect(completeSetup(db, input)).toEqual({ status: 'already_set_up' });
+        expect(completeSetup(db, input)).toEqual({ status: 'marked_complete' });
         expect(adminCount(db)).toBe(1);
-        // The instance already has an admin, so it must not stay locked in setup.
+        expect(db.select().from(account).all()).toHaveLength(0);
+        // The instance already has an admin, so it must not stay locked in
+        // setup; missing settings come from the submission, existing ones stay.
         expect(isSetupComplete(db)).toBe(true);
-        expect(getSetting(db, SETTING.registrationMode)).toBeUndefined();
+        expect(getSetting(db, SETTING.registrationMode)).toBe('invite_only');
+        expect(getSetting(db, SETTING.teacherPolicy)).toBe('self_declared');
+        expect(getSetting(db, SETTING.publicUrl)).toBe(
+            'https://quiz.example.org'
+        );
+        expect(completeSetup(db, input)).toEqual({ status: 'already_set_up' });
     });
 
     test(
@@ -306,6 +314,35 @@ describe('SetupGate', () => {
 });
 
 describe('bootstrapAdmin', () => {
+    test('marks setup complete when an admin already exists', async () => {
+        const db = openDb(tempDir());
+        const now = new Date();
+        db.insert(user)
+            .values({
+                id: 'x',
+                name: 'X',
+                email: 'x@example.com',
+                role: 'admin',
+                createdAt: now,
+                updatedAt: now,
+            })
+            .run();
+        const result = await bootstrapAdmin(
+            db,
+            {
+                email: 'root@example.com',
+                password: 'correct-horse-1',
+                registrationMode: 'open',
+                teacherPolicy: 'admin_approved',
+            },
+            undefined
+        );
+        expect(result).toBe('marked_complete');
+        expect(adminCount(db)).toBe(1);
+        expect(isSetupComplete(db)).toBe(true);
+        expect(getSetting(db, SETTING.registrationMode)).toBe('open');
+    });
+
     test('creates the admin named after the email local part', async () => {
         const db = openDb(tempDir());
         const result = await bootstrapAdmin(

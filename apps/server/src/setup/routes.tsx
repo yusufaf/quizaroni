@@ -134,7 +134,12 @@ export function setupRoutes({
             let body: Awaited<ReturnType<typeof c.req.parseBody>>;
             try {
                 body = await c.req.parseBody();
-            } catch {
+            } catch (err) {
+                // bodyLimit has already buffered the body, so this is a parse
+                // failure or a client abort, never a size problem.
+                console.warn(
+                    `Rejected setup form body: ${(err as Error).message}`
+                );
                 setupHeaders(c);
                 return c.text('Malformed form body', 400);
             }
@@ -206,7 +211,7 @@ export function setupRoutes({
                 console.error(`Setup failed: ${describeDbError(err)}`);
                 return page(c, 500, locale, 'admin', values, {}, 'errSetupFailed');
             }
-            if (result.status === 'already_set_up') {
+            if (result.status !== 'created') {
                 gate.markComplete();
                 return renderPage(c, 409, <AlreadySetUpPage locale={locale} />);
             }

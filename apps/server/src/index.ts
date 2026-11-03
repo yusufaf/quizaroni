@@ -78,7 +78,7 @@ if (isSetupComplete(db)) {
             console.log(
                 status === 'created'
                     ? `Created instance admin ${admin.email} from QZ_ADMIN_EMAIL.`
-                    : 'An instance admin already exists; ignoring QZ_ADMIN_* settings.'
+                    : 'An instance admin already exists, so setup is now marked complete. QZ_ADMIN_EMAIL and QZ_ADMIN_PASSWORD were not used; missing instance settings were taken from QZ_* settings.'
             );
         } catch (err) {
             console.error(

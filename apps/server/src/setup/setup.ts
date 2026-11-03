@@ -9,7 +9,12 @@ import type {
 } from '../config';
 import type { Db } from '../db';
 import { account, user } from '../db/schema';
-import { getSetting, insertSettings, SETTING } from '../settings';
+import {
+    getSetting,
+    insertSettings,
+    SETTING,
+    type SettingName,
+} from '../settings';
 
 export const SETUP_TOKEN_FILENAME = 'setup-token';
 
@@ -59,6 +64,7 @@ export type SetupInput = {
 
 export type SetupResult =
     | { status: 'created'; userId: string }
+    | { status: 'marked_complete' }
     | { status: 'already_set_up' };
 
 export function completeSetup(
@@ -78,15 +84,25 @@ export function completeSetup(
             if (getSetting(tx, SETTING.setupCompletedAt) !== undefined) {
                 return { status: 'already_set_up' };
             }
+            const settings = {
+                registrationMode: input.registrationMode,
+                teacherPolicy: input.teacherPolicy,
+                publicUrl: input.publicUrl,
+                setupCompletedAt: String(now.getTime()),
+            };
             if (existingAdmin) {
                 // An admin without the marker (e.g. a partial restore) means the
-                // instance is set up; record that instead of locking it in setup.
-                insertSettings(
-                    tx,
-                    { setupCompletedAt: String(now.getTime()) },
-                    now
+                // instance is set up: record that instead of locking it in
+                // setup, filling only the settings that are missing.
+                const missing = Object.fromEntries(
+                    Object.entries(settings).filter(
+                        ([name]) =>
+                            getSetting(tx, SETTING[name as SettingName]) ===
+                            undefined
+                    )
                 );
-                return { status: 'already_set_up' };
+                insertSettings(tx, missing, now);
+                return { status: 'marked_complete' };
             }
             const userId = crypto.randomUUID();
             tx.insert(user)
@@ -111,16 +127,7 @@ export function completeSetup(
                     updatedAt: now,
                 })
                 .run();
-            insertSettings(
-                tx,
-                {
-                    registrationMode: input.registrationMode,
-                    teacherPolicy: input.teacherPolicy,
-                    publicUrl: input.publicUrl,
-                    setupCompletedAt: String(now.getTime()),
-                },
-                now
-            );
+            insertSettings(tx, settings, now);
             return { status: 'created', userId };
         },
         { behavior: 'immediate' }
