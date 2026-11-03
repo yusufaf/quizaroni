@@ -78,12 +78,16 @@ let stopping = false;
 async function shutdown(): Promise<void> {
     if (stopping) return;
     stopping = true;
+    let exitCode = 0;
     try {
         await Promise.race([server.stop(), Bun.sleep(SHUTDOWN_GRACE_MS)]);
+        void server.stop(true);
         closeDatabase(sqlite);
-    } finally {
-        process.exit(0);
+    } catch (err) {
+        console.error('Shutdown failed:', err);
+        exitCode = 1;
     }
+    process.exit(exitCode);
 }
 
 process.on('SIGINT', () => void shutdown());
