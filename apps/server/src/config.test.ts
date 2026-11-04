@@ -5,8 +5,15 @@ import {
     DEFAULT_HOST,
     DEFAULT_PORT,
     defaultPublicUrl,
+    hasAdminEnv,
     loadConfig,
+    normalizeEmail,
+    normalizePublicUrl,
+    parseAdminBootstrap,
+    passwordLengthOk,
+    resolvePublicUrl,
     urlHost,
+    USAGE,
 } from './config';
 
 const CWD = resolve('/x');
@@ -203,5 +210,191 @@ describe('urlHost', () => {
         expect(urlHost('[::1]')).toBe('[::1]');
         expect(urlHost('0.0.0.0')).toBe('0.0.0.0');
         expect(urlHost('localhost')).toBe('localhost');
+    });
+});
+
+describe('parseAdminBootstrap', () => {
+    const PASSWORD = 'correct-horse-1';
+
+    test('returns undefined when no admin var is set', () => {
+        expect(parseAdminBootstrap({})).toBeUndefined();
+        expect(
+            parseAdminBootstrap({
+                QZ_ADMIN_EMAIL: '',
+                QZ_ADMIN_PASSWORD: '',
+                QZ_REGISTRATION_MODE: '',
+                QZ_TEACHER_POLICY: '',
+            })
+        ).toBeUndefined();
+    });
+
+    test('lowercases the email and applies the secure defaults', () => {
+        expect(
+            parseAdminBootstrap({
+                QZ_ADMIN_EMAIL: ' Admin@Example.COM ',
+                QZ_ADMIN_PASSWORD: PASSWORD,
+            })
+        ).toEqual({
+            email: 'admin@example.com',
+            password: PASSWORD,
+            registrationMode: 'invite_only',
+            teacherPolicy: 'admin_approved',
+        });
+    });
+
+    test('honours an explicit registration mode and teacher policy', () => {
+        expect(
+            parseAdminBootstrap({
+                QZ_ADMIN_EMAIL: 'admin@example.com',
+                QZ_ADMIN_PASSWORD: PASSWORD,
+                QZ_REGISTRATION_MODE: 'open',
+                QZ_TEACHER_POLICY: 'self_declared',
+            })
+        ).toMatchObject({
+            registrationMode: 'open',
+            teacherPolicy: 'self_declared',
+        });
+    });
+
+    test.each([
+        [{ QZ_ADMIN_EMAIL: 'admin@example.com' }, 'must be set together'],
+        [{ QZ_ADMIN_PASSWORD: PASSWORD }, 'must be set together'],
+    ])('rejects a half-set admin %j', (env, text) => {
+        expect(configError(() => parseAdminBootstrap(env)).message).toContain(
+            text
+        );
+    });
+
+    test('rejects an invalid email, naming the var', () => {
+        const message = configError(() =>
+            parseAdminBootstrap({
+                QZ_ADMIN_EMAIL: 'josé@example.com',
+                QZ_ADMIN_PASSWORD: PASSWORD,
+            })
+        ).message;
+        expect(message).toContain('QZ_ADMIN_EMAIL');
+    });
+
+    test.each([['short'], ['x'.repeat(129)]])(
+        'rejects a password of the wrong length without echoing it',
+        (password) => {
+            const message = configError(() =>
+                parseAdminBootstrap({
+                    QZ_ADMIN_EMAIL: 'admin@example.com',
+                    QZ_ADMIN_PASSWORD: password,
+                })
+            ).message;
+            expect(message).toContain('QZ_ADMIN_PASSWORD');
+            expect(message).not.toContain(password);
+        }
+    );
+
+    test.each([
+        ['QZ_REGISTRATION_MODE', 'everyone'],
+        ['QZ_TEACHER_POLICY', 'anyone'],
+    ])('rejects an unknown %s', (name, value) => {
+        const message = configError(() =>
+            parseAdminBootstrap({
+                QZ_ADMIN_EMAIL: 'admin@example.com',
+                QZ_ADMIN_PASSWORD: PASSWORD,
+                [name]: value,
+            })
+        ).message;
+        expect(message).toContain(name);
+        expect(message).toContain(value);
+    });
+
+    test.each([['QZ_REGISTRATION_MODE', 'open'], ['QZ_TEACHER_POLICY', 'self_declared']])(
+        'rejects %s without the admin vars',
+        (name, value) => {
+            expect(
+                configError(() => parseAdminBootstrap({ [name]: value }))
+                    .message
+            ).toContain('only used with QZ_ADMIN_EMAIL/QZ_ADMIN_PASSWORD');
+        }
+    );
+});
+
+describe('hasAdminEnv', () => {
+    test('is false when every admin var is empty or missing', () => {
+        expect(hasAdminEnv({})).toBe(false);
+        expect(hasAdminEnv({ QZ_ADMIN_EMAIL: '', QZ_PORT: '1' })).toBe(false);
+    });
+
+    test('is true when any admin var is set', () => {
+        expect(hasAdminEnv({ QZ_TEACHER_POLICY: 'self_declared' })).toBe(true);
+    });
+});
+
+describe('passwordLengthOk', () => {
+    test('allows 8 to 128 UTF-16 code units', () => {
+        expect(passwordLengthOk('x'.repeat(7))).toBe(false);
+        expect(passwordLengthOk('x'.repeat(8))).toBe(true);
+        expect(passwordLengthOk('x'.repeat(128))).toBe(true);
+        expect(passwordLengthOk('x'.repeat(129))).toBe(false);
+    });
+
+    test('counts an emoji as two units, like Better Auth', () => {
+        expect(passwordLengthOk('😀'.repeat(64))).toBe(true);
+        expect(passwordLengthOk('😀'.repeat(65))).toBe(false);
+    });
+});
+
+describe('normalizeEmail', () => {
+    test('trims and lowercases a valid address', () => {
+        expect(normalizeEmail('  First.Last+tag@Example.COM ')).toBe(
+            'first.last+tag@example.com'
+        );
+    });
+
+    test.each([
+        ['josé@example.com'],
+        ['admin.@example.com'],
+        ['a!b@example.com'],
+        ['admin@my_host.example.com'],
+        ['admin@example.c0m'],
+        ['no-at-sign'],
+        [`${'a'.repeat(243)}@example.com`],
+    ])('rejects %s', (value) => {
+        expect(normalizeEmail(value)).toBeUndefined();
+    });
+});
+
+describe('normalizePublicUrl', () => {
+    test('returns the origin, dropping a trailing slash', () => {
+        expect(normalizePublicUrl('https://quiz.example.com/')).toBe(
+            'https://quiz.example.com'
+        );
+    });
+
+    test.each([['https://x/sub'], ['ftp://x'], ['garbage'], ['']])(
+        'rejects %s',
+        (value) => {
+            expect(normalizePublicUrl(value)).toBeUndefined();
+        }
+    );
+});
+
+describe('resolvePublicUrl', () => {
+    test('prefers the configured URL, then the stored one, then the default', () => {
+        const base = { host: '127.0.0.1', port: 8080 };
+        expect(
+            resolvePublicUrl({
+                ...base,
+                configured: 'https://a.example',
+                stored: 'https://b.example',
+            })
+        ).toBe('https://a.example');
+        expect(resolvePublicUrl({ ...base, stored: 'https://b.example' })).toBe(
+            'https://b.example'
+        );
+        expect(resolvePublicUrl(base)).toBe('http://localhost:8080');
+    });
+});
+
+describe('USAGE', () => {
+    test('documents the headless setup vars', () => {
+        expect(USAGE).toContain('QZ_ADMIN_EMAIL');
+        expect(USAGE).toContain('QZ_REGISTRATION_MODE');
     });
 });

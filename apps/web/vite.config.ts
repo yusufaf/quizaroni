@@ -128,6 +128,7 @@ export default defineConfig({
                     /^\/api/,
                     /^\/sitemap\.xml/,
                     /^\/version\.json/,
+                    /^\/setup(?:[/?]|$)/,
                 ],
                 runtimeCaching: [
                     {

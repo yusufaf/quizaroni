@@ -1,9 +1,19 @@
 import type { Database } from 'bun:sqlite';
 import { join } from 'node:path';
 import { serveStatic } from '@hono/bun';
-import { type Context, Hono } from 'hono';
+import { type Context, Hono, type MiddlewareHandler } from 'hono';
+import type { Db } from './db';
+import { setupRoutes } from './setup/routes';
+import type { SetupGate } from './setup/setup';
 
-export type AppDeps = { sqlite: Database; webDir: string; version: string };
+export type AppDeps = {
+    sqlite: Database;
+    db: Db;
+    webDir: string;
+    version: string;
+    setup: SetupGate;
+    configuredPublicUrl?: string;
+};
 
 const REVALIDATE = 'public, max-age=0, must-revalidate';
 const IMMUTABLE = 'public, max-age=31536000, immutable';
@@ -19,7 +29,27 @@ function isApiPath(path: string): boolean {
     return path === '/api' || path.startsWith('/api/');
 }
 
-export function createApp({ sqlite, webDir, version }: AppDeps): Hono {
+// Until an admin exists, everything except /api/health and /setup leads to the
+// wizard. API clients get JSON, since they can't follow a redirect to a page.
+function setupGuard(gate: SetupGate): MiddlewareHandler {
+    return async (c, next) => {
+        if (c.req.path === '/setup' || gate.isComplete()) return next();
+        c.header('Cache-Control', 'no-store');
+        if (isApiPath(c.req.path)) {
+            return c.json({ message: 'Setup required', setupUrl: '/setup' }, 503);
+        }
+        return c.redirect('/setup', 302);
+    };
+}
+
+export function createApp({
+    sqlite,
+    db,
+    webDir,
+    version,
+    setup,
+    configuredPublicUrl,
+}: AppDeps): Hono {
     const app = new Hono();
 
     app.get('/api/health', (c) => {
@@ -30,6 +60,10 @@ export function createApp({ sqlite, webDir, version }: AppDeps): Hono {
             return c.json({ status: 'error', version }, 503);
         }
     });
+
+    app.use('*', setupGuard(setup));
+
+    app.route('/setup', setupRoutes({ db, gate: setup, configuredPublicUrl }));
 
     app.all('/api/*', (c) => c.json({ message: 'Not found' }, 404));
 
