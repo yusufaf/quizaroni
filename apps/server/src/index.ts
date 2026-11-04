@@ -3,8 +3,10 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import pkg from '../package.json';
 import { createApp } from './app';
+import { createAuth, lazyAuth, scrubAuthEnv } from './auth/auth';
 import {
     ConfigError,
+    cookieWarning,
     hasAdminEnv,
     loadConfig,
     parseAdminBootstrap,
@@ -14,7 +16,7 @@ import {
     USAGE,
 } from './config';
 import { closeDatabase, type Db, openDatabase } from './db';
-import { getSetting, SETTING } from './settings';
+import { ensureAuthSecret, getSetting, SETTING } from './settings';
 import {
     bootstrapAdmin,
     clearSetupToken,
@@ -103,6 +105,35 @@ const setup = new SetupGate(db, setupToken, () =>
     clearSetupToken(config.dataDir)
 );
 
+const authSecret = ensureAuthSecret(db);
+for (const name of scrubAuthEnv(process.env)) {
+    console.warn(
+        `Ignoring ${name}: Quizaroni trusts only its public URL (QZ_PUBLIC_URL).`
+    );
+}
+
+let server: ReturnType<typeof Bun.serve>;
+
+// Built on the first /api request that needs it: by then the port is bound and
+// setup (which may set the public URL) is complete.
+const auth = lazyAuth(() => {
+    const authPublicUrl = resolvePublicUrl({
+        configured: config.publicUrl,
+        stored: getSetting(db, SETTING.publicUrl),
+        host: config.host,
+        port: server.port ?? config.port,
+    });
+    return {
+        publicUrl: authPublicUrl,
+        auth: createAuth({
+            db,
+            publicUrl: authPublicUrl,
+            secret: authSecret,
+            insecureCookies: config.insecureCookies,
+        }),
+    };
+});
+
 const app = createApp({
     sqlite,
     db,
@@ -110,9 +141,10 @@ const app = createApp({
     version: pkg.version,
     setup,
     configuredPublicUrl: config.publicUrl,
+    auth,
+    trustProxy: config.trustProxy,
 });
 
-let server: ReturnType<typeof Bun.serve>;
 try {
     server = Bun.serve({
         hostname: config.host,
@@ -138,6 +170,11 @@ console.log(
     `Quizaroni server v${pkg.version} listening on http://${urlHost(config.host)}:${server.port} (public URL ${publicUrl})`
 );
 console.log(`Data directory: ${config.dataDir}`);
+const warning = cookieWarning(publicUrl, config.insecureCookies);
+if (warning) console.warn(warning);
+if (config.trustProxy) {
+    console.log('Trusting X-Forwarded-For from one reverse proxy.');
+}
 if (!existsSync(join(config.webDir, 'index.html'))) {
     console.warn(
         `No web app found in ${config.webDir}; pages will return 503 until it is built (pnpm build:web) or --web-dir points at it.`

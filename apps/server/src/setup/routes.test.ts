@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { count, eq } from 'drizzle-orm';
 import { createApp } from '../app';
+import { testAuth } from '../auth/testing';
 import { closeDatabase, type Db, openDatabase } from '../db';
 import { user } from '../db/schema';
 import { getSetting, SETTING } from '../settings';
@@ -40,6 +41,8 @@ function harness(configuredPublicUrl?: string): Harness {
         version: '0.0.0-test',
         setup,
         configuredPublicUrl,
+        auth: testAuth(opened.db),
+        trustProxy: false,
     });
     return { app, db: opened.db, completions: () => completions };
 }

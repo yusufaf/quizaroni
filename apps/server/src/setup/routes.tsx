@@ -4,6 +4,7 @@ import { bodyLimit } from 'hono/body-limit';
 import { html } from 'hono/html';
 import type { HtmlEscapedString } from 'hono/utils/html';
 import type { ContentfulStatusCode } from 'hono/utils/http-status';
+import { hashPassword } from '../auth/auth';
 import { isRegistrationMode, isTeacherPolicy } from '../config';
 import type { Db } from '../db';
 import {
@@ -200,9 +201,7 @@ export function setupRoutes({
                 }
             }
 
-            const passwordHash = await Bun.password.hash(values.password, {
-                algorithm: 'argon2id',
-            });
+            const passwordHash = await hashPassword(values.password);
             let result: ReturnType<typeof completeSetup>;
             try {
                 result = completeSetup(db, toSetupInput(values, passwordHash));

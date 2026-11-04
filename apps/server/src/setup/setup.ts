@@ -7,6 +7,7 @@ import type {
     RegistrationMode,
     TeacherPolicy,
 } from '../config';
+import { hashPassword } from '../auth/auth';
 import type { Db } from '../db';
 import { describeDbError } from '../db/errors';
 import { account, user } from '../db/schema';
@@ -167,9 +168,7 @@ export async function bootstrapAdmin(
     admin: AdminBootstrap,
     publicUrl: string | undefined
 ): Promise<SetupResult['status']> {
-    const passwordHash = await Bun.password.hash(admin.password, {
-        algorithm: 'argon2id',
-    });
+    const passwordHash = await hashPassword(admin.password);
     return completeSetup(db, {
         name: admin.email.slice(0, admin.email.indexOf('@')),
         email: admin.email,

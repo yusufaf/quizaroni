@@ -11,6 +11,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import pkg from '../package.json';
 import { createApp } from './app';
+import { testAuth } from './auth/testing';
 import { closeDatabase, type Db, openDatabase } from './db';
 import { completeSetup, SetupGate } from './setup/setup';
 
@@ -49,7 +50,15 @@ beforeAll(() => {
         publicUrl: undefined,
     });
     setup = new SetupGate(db, undefined);
-    app = createApp({ sqlite, db, webDir, version: pkg.version, setup });
+    app = createApp({
+        sqlite,
+        db,
+        webDir,
+        version: pkg.version,
+        setup,
+        auth: testAuth(db),
+        trustProxy: false,
+    });
 });
 
 afterAll(() => {
@@ -78,6 +87,8 @@ describe('/api', () => {
                 webDir,
                 version: pkg.version,
                 setup: latchedGate(closed.db),
+                auth: testAuth(closed.db),
+                trustProxy: false,
             }).request('/api/health');
             expect(res.status).toBe(503);
             expect(await res.json()).toEqual({
@@ -95,10 +106,21 @@ describe('/api', () => {
         ['GET', '/api'],
         ['GET', '/api/'],
     ])('%s %s returns 404 JSON', async (method, path) => {
-        const res = await app.request(path, { method });
+        const res = await app.request(path, {
+            method,
+            headers:
+                method === 'POST'
+                    ? { 'Content-Type': 'application/json' }
+                    : undefined,
+        });
         expect(res.status).toBe(404);
         expect(res.headers.get('content-type')).toContain('application/json');
         expect(await res.json()).toEqual({ message: 'Not found' });
+    });
+
+    test('POST /api/nope without a JSON content type is refused before routing', async () => {
+        const res = await app.request('/api/nope', { method: 'POST' });
+        expect(res.status).toBe(415);
     });
 });
 
@@ -180,6 +202,8 @@ describe('web app', () => {
             webDir: emptyWebDir,
             version: pkg.version,
             setup,
+            auth: testAuth(db),
+            trustProxy: false,
         }).request('/explore');
         expect(res.status).toBe(503);
     });

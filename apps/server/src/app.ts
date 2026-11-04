@@ -2,7 +2,11 @@ import type { Database } from 'bun:sqlite';
 import { join } from 'node:path';
 import { serveStatic } from '@hono/bun';
 import { type Context, Hono, type MiddlewareHandler } from 'hono';
+import { AUTH_BASE_PATH, type AuthHandle } from './auth/auth';
+import { authRoutes } from './auth/routes';
 import type { Db } from './db';
+import { sanitizeLogArg } from './db/errors';
+import { apiRequestGuard } from './http/api-guard';
 import { setupRoutes } from './setup/routes';
 import type { SetupGate } from './setup/setup';
 
@@ -13,6 +17,8 @@ export type AppDeps = {
     version: string;
     setup: SetupGate;
     configuredPublicUrl?: string;
+    auth: AuthHandle;
+    trustProxy: boolean;
 };
 
 const REVALIDATE = 'public, max-age=0, must-revalidate';
@@ -49,6 +55,8 @@ export function createApp({
     version,
     setup,
     configuredPublicUrl,
+    auth,
+    trustProxy,
 }: AppDeps): Hono {
     const app = new Hono();
 
@@ -64,6 +72,10 @@ export function createApp({
     app.use('*', setupGuard(setup));
 
     app.route('/setup', setupRoutes({ db, gate: setup, configuredPublicUrl }));
+
+    app.use('/api/*', apiRequestGuard(() => auth().publicUrl));
+
+    app.route(AUTH_BASE_PATH, authRoutes({ auth, trustProxy }));
 
     app.all('/api/*', (c) => c.json({ message: 'Not found' }, 404));
 
@@ -81,7 +93,7 @@ export function createApp({
     });
 
     app.onError((err, c) => {
-        console.error(err);
+        console.error(sanitizeLogArg(err));
         if (isApiPath(c.req.path))
             return c.json({ message: 'Internal server error' }, 500);
         return c.text('Internal server error', 500);
