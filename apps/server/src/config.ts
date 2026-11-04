@@ -8,6 +8,8 @@ export type ServerConfig = {
     /** Set only when given explicitly; otherwise derive it from the bound port with `defaultPublicUrl`. */
     publicUrl: string | undefined;
     webDir: string;
+    trustProxy: boolean;
+    insecureCookies: boolean;
 };
 
 export class ConfigError extends Error {}
@@ -25,6 +27,8 @@ Options (each can also be set with the QZ_* environment variable shown):
   --host <address>     Address to bind to (QZ_HOST, default ${DEFAULT_HOST})
   --public-url <url>   Public origin users reach the server at (QZ_PUBLIC_URL)
   --web-dir <path>     Directory holding the built web app (QZ_WEB_DIR, default ../web/dist)
+  --trust-proxy <bool>  Trust X-Forwarded-For from one reverse proxy in front of the server (QZ_TRUST_PROXY, default false)
+  --insecure-cookies <bool>  Allow session cookies over plain HTTP, for a trusted LAN without HTTPS (QZ_INSECURE_COOKIES, default false)
   --help               Show this help
 
 Headless setup (env only, used only while setup is incomplete):
@@ -39,6 +43,8 @@ const ENV_NAMES = {
     host: 'QZ_HOST',
     'public-url': 'QZ_PUBLIC_URL',
     'web-dir': 'QZ_WEB_DIR',
+    'trust-proxy': 'QZ_TRUST_PROXY',
+    'insecure-cookies': 'QZ_INSECURE_COOKIES',
 } as const;
 
 type OptionName = keyof typeof ENV_NAMES;
@@ -65,6 +71,8 @@ function parseFlags(argv: string[]): Partial<Record<OptionName, string>> {
                 host: { type: 'string' },
                 'public-url': { type: 'string' },
                 'web-dir': { type: 'string' },
+                'trust-proxy': { type: 'string' },
+                'insecure-cookies': { type: 'string' },
                 help: { type: 'boolean' },
             },
         });
@@ -86,6 +94,30 @@ function parsePort({ value, source }: Setting): number {
         );
     }
     return port;
+}
+
+const TRUE_VALUES = new Set(['true', '1', 'yes']);
+const FALSE_VALUES = new Set(['false', '0', 'no']);
+
+function parseBoolean({ value, source }: Setting): boolean {
+    const normalized = value.trim().toLowerCase();
+    if (TRUE_VALUES.has(normalized)) return true;
+    if (FALSE_VALUES.has(normalized)) return false;
+    throw new ConfigError(`${source} must be true or false (got "${value}")`);
+}
+
+export function cookieWarning(
+    publicUrl: string,
+    insecureCookies: boolean
+): string | undefined {
+    const https = publicUrl.startsWith('https:');
+    if (!https && !insecureCookies) {
+        return `Public URL ${publicUrl} is plain HTTP, but session cookies are Secure: browsers keep them only over HTTPS (and on localhost in Chrome and Firefox). Serve Quizaroni over HTTPS, or set QZ_INSECURE_COOKIES=true on a trusted LAN.`;
+    }
+    if (https && insecureCookies) {
+        return 'QZ_INSECURE_COOKIES is set but the public URL is HTTPS; session cookies will not be marked Secure.';
+    }
+    return undefined;
 }
 
 export function normalizePublicUrl(value: string): string | undefined {
@@ -257,6 +289,8 @@ export function loadConfig(
         ? parsePublicUrl(publicUrlSetting)
         : undefined;
     const webDir = setting('web-dir');
+    const trustProxy = setting('trust-proxy');
+    const insecureCookies = setting('insecure-cookies');
 
     return {
         dataDir: resolve(cwd, setting('data-dir')?.value ?? DEFAULT_DATA_DIR),
@@ -266,5 +300,9 @@ export function loadConfig(
         webDir: webDir
             ? resolve(cwd, webDir.value)
             : resolve(import.meta.dir, '../../web/dist'),
+        trustProxy: trustProxy ? parseBoolean(trustProxy) : false,
+        insecureCookies: insecureCookies
+            ? parseBoolean(insecureCookies)
+            : false,
     };
 }

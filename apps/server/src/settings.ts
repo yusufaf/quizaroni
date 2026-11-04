@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import type { Db } from './db';
 import { instanceSettings } from './db/schema';
@@ -7,6 +8,7 @@ export const SETTING = {
     teacherPolicy: 'teacher_policy',
     publicUrl: 'public_url',
     setupCompletedAt: 'setup_completed_at',
+    authSecret: 'auth_secret',
 } as const;
 
 export type SettingName = keyof typeof SETTING;
@@ -36,4 +38,17 @@ export function insertSettings(
             : [{ key: SETTING[name as SettingName], value, updatedAt: now }]
     );
     if (rows.length > 0) tx.insert(instanceSettings).values(rows).run();
+}
+
+// Insert-if-absent, then read back: concurrent boots agree on one secret.
+export function ensureAuthSecret(db: Db): string {
+    db.insert(instanceSettings)
+        .values({
+            key: SETTING.authSecret,
+            value: randomBytes(32).toString('base64url'),
+            updatedAt: new Date(),
+        })
+        .onConflictDoNothing()
+        .run();
+    return getSetting(db, SETTING.authSecret)!;
 }
