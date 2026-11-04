@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { useLogto } from '@logto/react';
+import { useAuth } from 'shared/auth/useAuth';
 import useBrowserTitle from 'hooks/useBrowserTitle';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -15,7 +15,7 @@ import SignUpBanner from './SignUpBanner';
 const Explore = () => {
     const { t } = useTranslation('explore');
     useBrowserTitle(t('title'));
-    const { isAuthenticated, isLoading } = useLogto();
+    const { isAuthenticated, isLoading } = useAuth();
     const [searchParams] = useSearchParams();
     // While searching, the results sit right under the field: For you and
     // Featured step aside (#137).

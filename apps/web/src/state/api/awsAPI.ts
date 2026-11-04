@@ -5,7 +5,7 @@ if (!BASE_API_URL) {
     throw new Error('VITE_API_BASE_URL env var is not set');
 }
 
-// Wired up by App.tsx on mount, once useLogto() is available inside a
+// Wired up by App.tsx on mount, once useAuth() is available inside a
 // component's render tree (this module isn't one). Before that happens — or
 // if the user isn't signed in — requests simply go out unauthenticated, same
 // as today; apiAuthorizer.ts is what actually enforces auth.
