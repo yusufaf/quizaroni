@@ -1,13 +1,14 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { chmodSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { DrizzleQueryError, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import type {
     AdminBootstrap,
     RegistrationMode,
     TeacherPolicy,
 } from '../config';
 import type { Db } from '../db';
+import { describeDbError } from '../db/errors';
 import { account, user } from '../db/schema';
 import {
     getSetting,
@@ -179,12 +180,4 @@ export async function bootstrapAdmin(
     }).status;
 }
 
-// A DrizzleQueryError's message embeds the query params, which for setup
-// include the password hash and email, so only the driver's cause is shown.
-export function describeDbError(err: unknown): string {
-    if (err instanceof DrizzleQueryError) {
-        return (err.cause as Error | undefined)?.message ?? 'database error';
-    }
-    if (err instanceof Error) return err.message;
-    return String(err);
-}
+export { describeDbError };
