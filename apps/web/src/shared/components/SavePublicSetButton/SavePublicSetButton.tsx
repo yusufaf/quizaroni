@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { BookmarkAdded, BookmarkAddOutlined } from '@mui/icons-material';
 import { Button, Tooltip } from '@mui/material';
-import { useLogto } from '@logto/react';
+import { useAuth } from 'shared/auth/useAuth';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -23,7 +23,7 @@ type Props = {
  */
 const SavePublicSetButton = ({ studysetUUID, title, variant }: Props) => {
     const { t } = useTranslation();
-    const { isAuthenticated } = useLogto();
+    const { isAuthenticated } = useAuth();
     const { mutateAsync, isPending } = useCopyPublicStudyset();
     const [saved, setSaved] = useState(false);
     // isPending only flips after a render, so a fast double click would

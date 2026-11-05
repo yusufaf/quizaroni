@@ -29,6 +29,8 @@ const CLEAN_ENV = {
     QZ_ADMIN_PASSWORD: '',
     QZ_REGISTRATION_MODE: '',
     QZ_TEACHER_POLICY: '',
+    QZ_TRUST_PROXY: '',
+    QZ_INSECURE_COOKIES: '',
 };
 const LISTENING = /listening on (http:\/\/\S+) \(public URL (\S+)\)/;
 
@@ -219,6 +221,72 @@ test('headless setup from QZ_ADMIN_* never shows the wizard', async () => {
         expect(output.stdout).not.toContain(password);
         expect(output.stderr).not.toContain(password);
     }
+    expectDataDirClean(dirs);
+}, 30_000);
+
+test('the headless admin signs in and out, and cross-origin sign-in is refused', async () => {
+    const dirs = layout();
+    const password = 'correct-horse-1';
+    const server = start(dirs, {
+        QZ_ADMIN_EMAIL: 'admin@example.com',
+        QZ_ADMIN_PASSWORD: password,
+        BETTER_AUTH_TRUSTED_ORIGINS: 'https://evil.example',
+    });
+    let output: { stdout: string; stderr: string };
+    try {
+        const [, url, publicUrl] = await server.out.waitFor(LISTENING);
+        const json = (origin: string, cookie?: string) => ({
+            Origin: origin,
+            'Content-Type': 'application/json',
+            ...(cookie ? { Cookie: cookie } : {}),
+        });
+        const credentials = JSON.stringify({
+            email: 'admin@example.com',
+            password,
+        });
+
+        const signIn = await fetch(`${url}/api/auth/sign-in/email`, {
+            method: 'POST',
+            headers: json(publicUrl!),
+            body: credentials,
+        });
+        expect(signIn.status).toBe(200);
+        const cookie = signIn.headers
+            .getSetCookie()
+            .map((c) => c.split(';')[0])
+            .join('; ');
+        expect(cookie).toContain('quizaroni.session_token=');
+
+        const getSession = async () => {
+            const res = await fetch(`${url}/api/auth/get-session`, {
+                headers: { Cookie: cookie },
+            });
+            expect(res.status).toBe(200);
+            return (await res.json()) as { user: { email: string } } | null;
+        };
+        expect((await getSession())?.user.email).toBe('admin@example.com');
+
+        const signOut = await fetch(`${url}/api/auth/sign-out`, {
+            method: 'POST',
+            headers: json(publicUrl!, cookie),
+            body: '{}',
+        });
+        expect(signOut.status).toBe(200);
+        expect(await getSession()).toBeNull();
+
+        const crossOrigin = await fetch(`${url}/api/auth/sign-in/email`, {
+            method: 'POST',
+            headers: json('https://evil.example'),
+            body: credentials,
+        });
+        expect(crossOrigin.status).toBe(403);
+    } finally {
+        output = await server.stop();
+    }
+    expect(output.stderr).toContain('Ignoring BETTER_AUTH_TRUSTED_ORIGINS');
+    expect(output.stderr).toContain('QZ_INSECURE_COOKIES=true');
+    expect(output.stdout).not.toContain(password);
+    expect(output.stderr).not.toContain(password);
     expectDataDirClean(dirs);
 }, 30_000);
 

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useLogto } from '@logto/react';
+import { useAuth } from 'shared/auth/useAuth';
 import { reloadPage } from 'state/local/owner';
 import { useGlobalStore } from 'state/stores/global';
 
@@ -8,12 +8,12 @@ import { useGlobalStore } from 'state/stores/global';
 let signOutInProgress = false;
 
 /**
- * Removes this account's local data from the device, then signs out of Logto
- * and clears the (vestigial) global-store auth mirror. Local data is loaded on
+ * Removes this account's local data from the device, then signs out and
+ * clears the (vestigial) global-store auth mirror. Local data is loaded on
  * demand so Dexie stays out of the NavBar chunk.
  */
 export const useSignOut = () => {
-    const { signOut } = useLogto();
+    const { signOut } = useAuth();
     const setAuthenticated = useGlobalStore((state) => state.setAuthenticated);
 
     return useCallback(async () => {
@@ -32,7 +32,7 @@ export const useSignOut = () => {
             }
 
             try {
-                await signOut(window.location.origin);
+                await signOut();
             } catch (error) {
                 console.error('Error signing out:', error);
                 // Still signed in with the local data already cleared. A

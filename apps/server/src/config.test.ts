@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { resolve } from 'node:path';
 import {
     ConfigError,
+    cookieWarning,
     DEFAULT_HOST,
     DEFAULT_PORT,
     defaultPublicUrl,
@@ -37,6 +38,8 @@ describe('loadConfig', () => {
             host: DEFAULT_HOST,
             publicUrl: undefined,
             webDir: resolve(import.meta.dir, '../../web/dist'),
+            trustProxy: false,
+            insecureCookies: false,
         });
     });
 
@@ -58,6 +61,8 @@ describe('loadConfig', () => {
             host: '0.0.0.0',
             publicUrl: 'https://env.example.com',
             webDir: resolve(CWD, 'env-web'),
+            trustProxy: false,
+            insecureCookies: false,
         });
     });
 
@@ -90,6 +95,8 @@ describe('loadConfig', () => {
             host: '10.0.0.1',
             publicUrl: 'https://flag.example.com',
             webDir: resolve(CWD, 'flag-web'),
+            trustProxy: false,
+            insecureCookies: false,
         });
     });
 
@@ -102,6 +109,8 @@ describe('loadConfig', () => {
                 QZ_HOST: '',
                 QZ_PUBLIC_URL: '',
                 QZ_WEB_DIR: '',
+                QZ_TRUST_PROXY: '',
+                QZ_INSECURE_COOKIES: '',
             },
             CWD
         );
@@ -184,6 +193,72 @@ describe('loadConfig', () => {
         expect(
             configError(() => loadConfig(['--host='], {}, CWD)).message
         ).toContain('--host');
+    });
+});
+
+describe('proxy trust and insecure cookies', () => {
+    test('read true from env or flags, case-insensitively', () => {
+        expect(loadConfig([], { QZ_TRUST_PROXY: 'TRUE' }, CWD).trustProxy).toBe(
+            true
+        );
+        expect(loadConfig(['--trust-proxy', '1'], {}, CWD).trustProxy).toBe(
+            true
+        );
+        expect(
+            loadConfig([], { QZ_INSECURE_COOKIES: ' yes ' }, CWD)
+                .insecureCookies
+        ).toBe(true);
+    });
+
+    test('read false values', () => {
+        expect(
+            loadConfig([], { QZ_INSECURE_COOKIES: 'no' }, CWD).insecureCookies
+        ).toBe(false);
+        expect(
+            loadConfig(['--trust-proxy', 'False'], { QZ_TRUST_PROXY: '1' }, CWD)
+                .trustProxy
+        ).toBe(false);
+        expect(loadConfig([], { QZ_TRUST_PROXY: '0' }, CWD).trustProxy).toBe(
+            false
+        );
+    });
+
+    test('reject a value that is not a boolean, naming the source', () => {
+        expect(
+            configError(() => loadConfig([], { QZ_TRUST_PROXY: 'maybe' }, CWD))
+                .message
+        ).toContain('QZ_TRUST_PROXY');
+        expect(
+            configError(() =>
+                loadConfig(['--insecure-cookies', 'sure'], {}, CWD)
+            ).message
+        ).toContain('--insecure-cookies');
+    });
+
+    test('reject an empty flag', () => {
+        expect(
+            configError(() => loadConfig(['--insecure-cookies', ''], {}, CWD))
+                .message
+        ).toContain('--insecure-cookies');
+    });
+});
+
+describe('cookieWarning', () => {
+    test('warns about a plain-HTTP public URL without the opt-in', () => {
+        expect(cookieWarning('http://192.168.1.10:8080', false)).toContain(
+            'QZ_INSECURE_COOKIES'
+        );
+    });
+
+    test('warns about the opt-in on an HTTPS public URL', () => {
+        expect(cookieWarning('https://x.example', true)).toContain(
+            'QZ_INSECURE_COOKIES'
+        );
+    });
+
+    test('is silent when the cookie setting fits the URL', () => {
+        expect(cookieWarning('https://x.example', false)).toBeUndefined();
+        expect(cookieWarning('http://192.168.1.10:8080', true)).toBeUndefined();
     });
 });
 
@@ -396,5 +471,10 @@ describe('USAGE', () => {
     test('documents the headless setup vars', () => {
         expect(USAGE).toContain('QZ_ADMIN_EMAIL');
         expect(USAGE).toContain('QZ_REGISTRATION_MODE');
+    });
+
+    test('documents the proxy and cookie settings', () => {
+        expect(USAGE).toContain('QZ_TRUST_PROXY');
+        expect(USAGE).toContain('QZ_INSECURE_COOKIES');
     });
 });

@@ -12,6 +12,7 @@
     "scripts": {
         "dev:web": "pnpm --filter @quizaroni/web dev",
         "build:web": "pnpm --filter @quizaroni/web build",
+        "build:web:selfhost": "pnpm --filter @quizaroni/web build:selfhost",
         "build:api": "pnpm --filter @quizaroni/api build",
         "build": "pnpm -r build",
         "synth:api": "pnpm --filter @quizaroni/api exec cdk synth",

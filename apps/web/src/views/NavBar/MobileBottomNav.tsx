@@ -7,7 +7,7 @@ import {
     Login,
 } from '@mui/icons-material';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
-import { useLogto } from '@logto/react';
+import { useAuth } from 'shared/auth/useAuth';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from 'shared/constants';
@@ -29,7 +29,7 @@ const MobileBottomNav = () => {
     const { t } = useTranslation();
     const { pathname } = useLocation();
     const navigate = useNavigate();
-    const { isAuthenticated: authenticated } = useLogto();
+    const { isAuthenticated: authenticated } = useAuth();
     const { createAndOpen } = useCreateStudysetAction();
     const hiddenForStudy = isStudyRoute(pathname);
 

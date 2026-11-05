@@ -13,7 +13,7 @@ import {
     InfoChangeContainer,
 } from './ProfileStyles';
 import { useState } from 'react';
-import { useLogto } from '@logto/react';
+import { useAuth } from 'shared/auth/useAuth';
 import { toast } from 'react-toastify';
 import { isValidUsername } from '@quizaroni/shared-types';
 import { User } from 'shared/types';
@@ -37,7 +37,7 @@ const AccountTab = ({ userData }: Props) => {
         useState<boolean>(false);
     const [deletePassword, setDeletePassword] = useState<string>('');
     const [enteredNewUsername, setEnteredNewUsername] = useState<string>('');
-    const { clearAccessToken } = useLogto();
+    const { clearAccessToken } = useAuth();
     const { mutateAsync: updateUsername, isPending } = useUpdateUsername();
 
     const trimmedUsername = enteredNewUsername.trim();

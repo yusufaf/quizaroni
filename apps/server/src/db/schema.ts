@@ -46,3 +46,33 @@ export const account = sqliteTable(
     },
     (t) => [index('account_user_id_idx').on(t.userId)]
 );
+
+export const session = sqliteTable(
+    'session',
+    {
+        id: text('id').primaryKey(),
+        expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+        token: text('token').notNull().unique(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+        updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+        ipAddress: text('ip_address'),
+        userAgent: text('user_agent'),
+        userId: text('user_id')
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' }),
+    },
+    (t) => [index('session_user_id_idx').on(t.userId)]
+);
+
+export const verification = sqliteTable(
+    'verification',
+    {
+        id: text('id').primaryKey(),
+        identifier: text('identifier').notNull(),
+        value: text('value').notNull(),
+        expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+        updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+    },
+    (t) => [index('verification_identifier_idx').on(t.identifier)]
+);

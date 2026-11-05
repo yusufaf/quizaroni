@@ -1,13 +1,15 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { chmodSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { DrizzleQueryError, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import type {
     AdminBootstrap,
     RegistrationMode,
     TeacherPolicy,
 } from '../config';
+import { hashPassword } from '../auth/auth';
 import type { Db } from '../db';
+import { describeDbError } from '../db/errors';
 import { account, user } from '../db/schema';
 import {
     getSetting,
@@ -166,9 +168,7 @@ export async function bootstrapAdmin(
     admin: AdminBootstrap,
     publicUrl: string | undefined
 ): Promise<SetupResult['status']> {
-    const passwordHash = await Bun.password.hash(admin.password, {
-        algorithm: 'argon2id',
-    });
+    const passwordHash = await hashPassword(admin.password);
     return completeSetup(db, {
         name: admin.email.slice(0, admin.email.indexOf('@')),
         email: admin.email,
@@ -179,12 +179,4 @@ export async function bootstrapAdmin(
     }).status;
 }
 
-// A DrizzleQueryError's message embeds the query params, which for setup
-// include the password hash and email, so only the driver's cause is shown.
-export function describeDbError(err: unknown): string {
-    if (err instanceof DrizzleQueryError) {
-        return (err.cause as Error | undefined)?.message ?? 'database error';
-    }
-    if (err instanceof Error) return err.message;
-    return String(err);
-}
+export { describeDbError };

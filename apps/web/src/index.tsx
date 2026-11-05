@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { LogtoProvider, type LogtoConfig } from '@logto/react';
+import { AuthProvider } from './shared/auth/AuthProvider';
 import { CustomThemeProvider } from './shared/theme/ThemeProvider';
 import { CssBaseline } from '@mui/material';
 
@@ -12,19 +12,10 @@ import App from './App';
 import ErrorBoundary from './shared/components/ErrorBoundary/ErrorBoundary';
 import CrashFallback from './shared/components/ErrorBoundary/CrashFallback';
 
-const logtoConfig: LogtoConfig = {
-    endpoint: import.meta.env.VITE_LOGTO_ENDPOINT,
-    appId: import.meta.env.VITE_LOGTO_APP_ID,
-    // Requesting the API resource here means every access token issued to
-    // this app carries an `aud` scoped to Quizaroni's API — never a token
-    // usable against another project's API (see apiAuthorizer.ts).
-    resources: [import.meta.env.VITE_LOGTO_API_RESOURCE],
-};
-
 const domElement = document.getElementById('root') as Element;
 const root = createRoot(domElement);
 root.render(
-    <LogtoProvider config={logtoConfig}>
+    <AuthProvider>
         <BrowserRouter>
             <CustomThemeProvider>
                 <CssBaseline />
@@ -33,5 +24,5 @@ root.render(
                 </ErrorBoundary>
             </CustomThemeProvider>
         </BrowserRouter>
-    </LogtoProvider>
+    </AuthProvider>
 );

@@ -15,6 +15,13 @@
       "when": 1793690974648,
       "tag": "0001_setup_admin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793781704200,
+      "tag": "0002_auth_sessions",
+      "breakpoints": true
     }
   ]
 }

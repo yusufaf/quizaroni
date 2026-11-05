@@ -27,7 +27,7 @@ import {
     StyledNavLink,
 } from './NavStyles';
 import DarkModeToggleButton from './DarkModeToggleButton';
-import { useLogto } from '@logto/react';
+import { useAuth } from 'shared/auth/useAuth';
 import { QUERY_PARAMS } from 'shared/constants';
 import { useCreateStudysetAction } from 'hooks/useCreateStudysetAction';
 import { useLogout } from 'hooks/useLogout';
@@ -51,7 +51,7 @@ const NavBar = (props: Props) => {
     // TODO: Verify that a medium breakpoint works to handle mobile cases, can always add more breakpoints
     const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
 
-    const { isAuthenticated: authenticated } = useLogto();
+    const { isAuthenticated: authenticated } = useAuth();
 
     const navigate = useNavigate();
 

@@ -8,6 +8,7 @@
         "dev": "pnpm vite",
         "start": "pnpm vite",
         "build": "vp build",
+        "build:selfhost": "vp build --mode selfhost",
         "gen:icons": "node scripts/gen-icons.mjs",
         "preview": "vp preview",
         "test": "vp test --run",

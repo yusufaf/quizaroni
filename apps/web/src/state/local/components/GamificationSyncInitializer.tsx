@@ -1,4 +1,4 @@
-import { useLogto } from '@logto/react';
+import { useAuth } from 'shared/auth/useAuth';
 import { useEffect, useRef } from 'react';
 import { useGetUser } from 'state/api/usersAPI';
 import { useGamificationStore } from 'state/stores/gamification';
@@ -9,7 +9,7 @@ import { claimLocalData } from 'state/local/localData';
  * from the server and retries pending pushes.
  */
 export function GamificationSyncInitializer() {
-    const { isAuthenticated: authenticated } = useLogto();
+    const { isAuthenticated: authenticated } = useAuth();
     const syncedRef = useRef(false);
 
     const { data: userResponse } = useGetUser({

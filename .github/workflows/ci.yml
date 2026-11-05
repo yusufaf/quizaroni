@@ -27,6 +27,8 @@ jobs:
         run: pnpm test
       - name: Build frontend
         run: pnpm build:web
+      - name: Build frontend (self-host)
+        run: pnpm build:web:selfhost
       - name: Build backend
         run: pnpm build:api
       - name: Synthesize CDK template

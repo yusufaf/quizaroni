@@ -1,11 +1,15 @@
 import { FileMetadata, Part, UUID } from 'shared/types';
+import { isSelfHost } from 'shared/auth/backend';
 
-export const BASE_API_URL = import.meta.env.VITE_API_BASE_URL;
+// The self-host server serves the API on the app's own origin.
+export const BASE_API_URL = isSelfHost()
+    ? '/api'
+    : import.meta.env.VITE_API_BASE_URL;
 if (!BASE_API_URL) {
     throw new Error('VITE_API_BASE_URL env var is not set');
 }
 
-// Wired up by App.tsx on mount, once useLogto() is available inside a
+// Wired up by App.tsx on mount, once useAuth() is available inside a
 // component's render tree (this module isn't one). Before that happens — or
 // if the user isn't signed in — requests simply go out unauthenticated, same
 // as today; apiAuthorizer.ts is what actually enforces auth.
@@ -54,6 +58,15 @@ export const fetchJson = async <T>(
 };
 
 export const getCommonPostRequestProps = async (): Promise<RequestInit> => {
+    if (isSelfHost()) {
+        // Authenticated by the session cookie, which the server's CSRF check
+        // accepts only from the same origin.
+        return {
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            method: 'POST',
+        };
+    }
     const accessToken = await getAccessToken?.();
 
     return {
