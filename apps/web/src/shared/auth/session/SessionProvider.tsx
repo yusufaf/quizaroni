@@ -109,6 +109,7 @@ export const SessionProvider = ({ children }: { children: ReactNode }) => {
         return () => {
             cancelled = true;
             clearTimeout(timer);
+            controller.abort();
         };
     }, []);
 

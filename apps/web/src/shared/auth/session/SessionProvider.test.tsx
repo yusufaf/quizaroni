@@ -95,17 +95,48 @@ describe('SessionProvider', () => {
         expect(await screen.findByText('out')).toBeTruthy();
     });
 
+    const stallUntilAborted = () =>
+        fetchMock.mockImplementation(
+            (_url, init) =>
+                new Promise<Response>((_resolve, reject) => {
+                    init?.signal?.addEventListener('abort', () =>
+                        reject(new DOMException('Aborted', 'AbortError'))
+                    );
+                })
+        );
+
+    it('keeps a cached user when the session check stalls', async () => {
+        vi.useFakeTimers();
+        try {
+            localStorage.setItem(SESSION_CACHE_KEY, JSON.stringify(ADA));
+            stallUntilAborted();
+            renderProvider();
+            await act(async () => {
+                await vi.advanceTimersByTimeAsync(SESSION_CHECK_TIMEOUT_MS);
+            });
+            expect(screen.getByText('in:ada@example.com')).toBeTruthy();
+            expect(JSON.parse(cached()!)).toEqual(ADA);
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it('cancels the session check when unmounted', async () => {
+        let signal: AbortSignal | undefined;
+        fetchMock.mockImplementation((_url, init) => {
+            signal = init?.signal ?? undefined;
+            return new Promise<Response>(() => {});
+        });
+        const { unmount } = renderProvider();
+        await waitFor(() => expect(signal).toBeDefined());
+        unmount();
+        expect(signal!.aborted).toBe(true);
+    });
+
     it('gives up on a stalled session check and shows the signed-out app', async () => {
         vi.useFakeTimers();
         try {
-            fetchMock.mockImplementation(
-                (_url, init) =>
-                    new Promise<Response>((_resolve, reject) => {
-                        init?.signal?.addEventListener('abort', () =>
-                            reject(new DOMException('Aborted', 'AbortError'))
-                        );
-                    })
-            );
+            stallUntilAborted();
             const { container } = renderProvider();
             expect(container.textContent).toBe('');
             await act(async () => {
