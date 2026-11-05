@@ -177,6 +177,12 @@ function mergeStreakFields(
     };
 }
 
+// Keys come from clients, so a key like `constructor` must not read the
+// inherited Object member.
+function own<T>(record: Record<string, T>, key: string): T | undefined {
+    return Object.hasOwn(record, key) ? record[key] : undefined;
+}
+
 export function mergeGamificationState(
     local: GamificationState,
     remote: GamificationState
@@ -193,8 +199,8 @@ export function mergeGamificationState(
         ...remote.unlockedAtById,
     };
     for (const id of unlockedAchievementIds) {
-        const localAt = local.unlockedAtById[id];
-        const remoteAt = remote.unlockedAtById[id];
+        const localAt = own(local.unlockedAtById, id);
+        const remoteAt = own(remote.unlockedAtById, id);
         if (localAt && remoteAt) {
             unlockedAtById[id] = localAt < remoteAt ? localAt : remoteAt;
         }
@@ -204,7 +210,7 @@ export function mergeGamificationState(
     for (const [uuid, count] of Object.entries(remote.studysetSessionCounts)) {
         studysetSessionCounts[uuid] = Math.max(
             count,
-            studysetSessionCounts[uuid] ?? 0
+            own(studysetSessionCounts, uuid) ?? 0
         );
     }
 

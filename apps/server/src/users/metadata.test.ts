@@ -204,6 +204,30 @@ function achievement(
     };
 }
 
+describe('mergeGamificationState with keys named like Object members', () => {
+    test('treats them as plain keys', () => {
+        const merged = mergeGamificationState(
+            gamification(),
+            gamification({
+                unlockedAchievementIds: ['constructor'],
+                unlockedAtById: { constructor: '2026-01-01' },
+                studysetSessionCounts: { constructor: 3, toString: 2 },
+            })
+        );
+        expect(merged.studysetSessionCounts).toEqual({
+            constructor: 3,
+            toString: 2,
+        });
+        expect(merged.unlockedAtById).toEqual({ constructor: '2026-01-01' });
+        expect(
+            UpdateGamificationBodySchema.safeParse({
+                gamification: JSON.parse(JSON.stringify(merged)),
+                customAchievements: [],
+            }).success
+        ).toBe(true);
+    });
+});
+
 describe('mergeCustomAchievements', () => {
     test('merges the same id keeping the earliest times', () => {
         const merged = mergeCustomAchievements(
