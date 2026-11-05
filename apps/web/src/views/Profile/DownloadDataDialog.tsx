@@ -10,6 +10,8 @@ import { StyledDialogActions } from 'styles/AppStyles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import { DeleteDialogContent } from './ProfileStyles';
 import { useDownloadUserData } from 'state/api/usersAPI';
+import { isSelfHost } from 'shared/auth/backend';
+import { toast } from 'react-toastify';
 
 type Props = {
     open: boolean;
@@ -19,29 +21,18 @@ type Props = {
 const DownloadDataDialog = ({ open, handleClose }: Props) => {
     const [includeStudysets, setIncludeStudysets] = useState(false);
 
-    // const [
-    //     downloadUserData,
-    //     {
-    //         isLoading: isDownloadLoading,
-    //         isSuccess: isDownloadSuccess,
-    //         isError: isDownloadError,
-    //     },
-    // ] = useDownloadUserDataMutation();
+    const { mutateAsync, isPending } = useDownloadUserData();
+    const selfHost = isSelfHost();
 
-    const handleDownloadData = () => {
-        // downloadUserData({
-        //     includeStudysets,
-        // })
-        //     .unwrap()
-        //     .then(() => {
-        //         // console.log(`${event.target.name} updated successfully`);
-        //     })
-        //     .catch((error) => {
-        //         // console.error(`Failed to update ${event.target.name}:`, error);
-        //     })
-        //     .finally(() => {
-        //         // setLoadingID('');
-        //     });
+    // Only the self-host server builds an export; the AWS button stays inert.
+    const handleDownloadData = async () => {
+        if (!selfHost) return;
+        try {
+            await mutateAsync({ includeStudysets: false });
+            handleClose();
+        } catch {
+            toast.error('Failed to download your data');
+        }
     };
 
     const handleCheckboxChange = (
@@ -67,18 +58,25 @@ const DownloadDataDialog = ({ open, handleClose }: Props) => {
                     for future reference or personal use.
                 </DialogContentText>
 
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={includeStudysets}
-                            onChange={handleCheckboxChange}
-                        />
-                    }
-                    label="Include studysets in the download"
-                />
+                {/* The self-host export has no study sets until the server stores them (#257). */}
+                {!selfHost && (
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={includeStudysets}
+                                onChange={handleCheckboxChange}
+                            />
+                        }
+                        label="Include studysets in the download"
+                    />
+                )}
             </DeleteDialogContent>
             <StyledDialogActions>
-                <Button variant="contained" onClick={handleDownloadData}>
+                <Button
+                    variant="contained"
+                    onClick={handleDownloadData}
+                    disabled={isPending}
+                >
                     Download Data
                 </Button>
             </StyledDialogActions>
