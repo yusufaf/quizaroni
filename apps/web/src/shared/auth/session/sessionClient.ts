@@ -32,10 +32,11 @@ const parseRetryAfter = (value: string | null): number | undefined => {
 
 const authFetch = async (
     path: string,
-    init: { method: 'GET' | 'POST'; body?: unknown }
+    init: { method: 'GET' | 'POST'; body?: unknown; signal?: AbortSignal }
 ): Promise<unknown> => {
     const res = await fetch(`${AUTH_BASE}${path}`, {
         method: init.method,
+        signal: init.signal,
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: init.body === undefined ? undefined : JSON.stringify(init.body),
@@ -69,8 +70,12 @@ const toSessionUser = (u: unknown): SessionUser => {
 const userOf = (body: unknown): unknown =>
     (body as { user?: unknown } | null)?.user;
 
-export const getSession = async (): Promise<SessionUser | null> => {
-    const user = userOf(await authFetch('/get-session', { method: 'GET' }));
+export const getSession = async (
+    signal?: AbortSignal
+): Promise<SessionUser | null> => {
+    const user = userOf(
+        await authFetch('/get-session', { method: 'GET', signal })
+    );
     return user ? toSessionUser(user) : null;
 };
 

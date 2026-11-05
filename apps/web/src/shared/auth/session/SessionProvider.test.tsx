@@ -10,6 +10,7 @@ import {
 import { act, render, screen, waitFor } from '@testing-library/react';
 import {
     SESSION_CACHE_KEY,
+    SESSION_CHECK_TIMEOUT_MS,
     SessionProvider,
     useSession,
 } from './SessionProvider';
@@ -92,6 +93,28 @@ describe('SessionProvider', () => {
         fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
         renderProvider();
         expect(await screen.findByText('out')).toBeTruthy();
+    });
+
+    it('gives up on a stalled session check and shows the signed-out app', async () => {
+        vi.useFakeTimers();
+        try {
+            fetchMock.mockImplementation(
+                (_url, init) =>
+                    new Promise<Response>((_resolve, reject) => {
+                        init?.signal?.addEventListener('abort', () =>
+                            reject(new DOMException('Aborted', 'AbortError'))
+                        );
+                    })
+            );
+            const { container } = renderProvider();
+            expect(container.textContent).toBe('');
+            await act(async () => {
+                await vi.advanceTimersByTimeAsync(SESSION_CHECK_TIMEOUT_MS);
+            });
+            expect(screen.getByText('out')).toBeTruthy();
+        } finally {
+            vi.useRealTimers();
+        }
     });
 
     it('renders nothing until the first answer when nothing is cached', async () => {

@@ -17,6 +17,9 @@ import {
 } from './sessionClient';
 
 export const SESSION_CACHE_KEY = 'quizaroni-session-user';
+// The app renders nothing until the first answer, so a stalled server must
+// not leave the page blank.
+export const SESSION_CHECK_TIMEOUT_MS = 10_000;
 
 type SessionState = {
     status: 'loading' | 'authenticated' | 'anonymous';
@@ -78,26 +81,34 @@ export const SessionProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         let cancelled = false;
-        getSession().then(
-            (user) => {
-                if (cancelled) return;
-                writeCache(user);
-                setState(
-                    user
-                        ? { status: 'authenticated', user }
-                        : { status: 'anonymous', user: null }
-                );
-            },
-            () => {
-                // Offline or server down: trust a cached user, else signed out.
-                if (cancelled) return;
-                setState((prev) =>
-                    prev.user ? prev : { status: 'anonymous', user: null }
-                );
-            }
+        const controller = new AbortController();
+        const timer = setTimeout(
+            () => controller.abort(),
+            SESSION_CHECK_TIMEOUT_MS
         );
+        getSession(controller.signal)
+            .finally(() => clearTimeout(timer))
+            .then(
+                (user) => {
+                    if (cancelled) return;
+                    writeCache(user);
+                    setState(
+                        user
+                            ? { status: 'authenticated', user }
+                            : { status: 'anonymous', user: null }
+                    );
+                },
+                () => {
+                    // Offline or server down: trust a cached user, else signed out.
+                    if (cancelled) return;
+                    setState((prev) =>
+                        prev.user ? prev : { status: 'anonymous', user: null }
+                    );
+                }
+            );
         return () => {
             cancelled = true;
+            clearTimeout(timer);
         };
     }, []);
 
