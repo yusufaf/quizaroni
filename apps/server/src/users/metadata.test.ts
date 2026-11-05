@@ -226,6 +226,37 @@ describe('mergeGamificationState with keys named like Object members', () => {
             }).success
         ).toBe(true);
     });
+
+    test('merges them when both sides hold them', () => {
+        const merged = mergeGamificationState(
+            gamification({
+                unlockedAchievementIds: ['constructor'],
+                unlockedAtById: { constructor: '2026-01-01' },
+                studysetSessionCounts: { constructor: 7 },
+            }),
+            gamification({
+                unlockedAchievementIds: ['constructor'],
+                unlockedAtById: { constructor: '2026-02-01' },
+                studysetSessionCounts: { constructor: 3 },
+            })
+        );
+        expect(merged.studysetSessionCounts).toEqual({ constructor: 7 });
+        expect(merged.unlockedAtById).toEqual({ constructor: '2026-01-01' });
+    });
+
+    test('never sees __proto__, which the schema drops', () => {
+        const parsed = UpdateGamificationBodySchema.parse(
+            JSON.parse(
+                '{"gamification":{"currentStreak":0,"longestStreak":0,"lastStudyDate":null,"unlockedAchievementIds":[],"unlockedAtById":{"__proto__":"x"},"studiedStudysetUUIDs":[],"studysetSessionCounts":{"__proto__":5}},"customAchievements":[]}'
+            )
+        );
+        expect(
+            Object.hasOwn(parsed.gamification.studysetSessionCounts, '__proto__')
+        ).toBe(false);
+        expect(
+            Object.hasOwn(parsed.gamification.unlockedAtById, '__proto__')
+        ).toBe(false);
+    });
 });
 
 describe('mergeCustomAchievements', () => {
