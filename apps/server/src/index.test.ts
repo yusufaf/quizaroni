@@ -266,6 +266,16 @@ test('the headless admin signs in and out, and cross-origin sign-in is refused',
         };
         expect((await getSession())?.user.email).toBe('admin@example.com');
 
+        const getUser = await fetch(`${url}/api/users/get-user`, {
+            method: 'POST',
+            headers: json(publicUrl!, cookie),
+            body: '{}',
+        });
+        expect(getUser.status).toBe(200);
+        expect(
+            ((await getUser.json()) as { user: { email: string } }).user
+        ).toMatchObject({ email: 'admin@example.com', username: null });
+
         const signOut = await fetch(`${url}/api/auth/sign-out`, {
             method: 'POST',
             headers: json(publicUrl!, cookie),
