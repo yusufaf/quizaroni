@@ -1,4 +1,11 @@
-import { index, integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm';
+import {
+    index,
+    integer,
+    sqliteTable,
+    text,
+    uniqueIndex,
+} from 'drizzle-orm/sqlite-core';
 
 export const instanceSettings = sqliteTable('instance_settings', {
     key: text('key').primaryKey(),
@@ -75,4 +82,26 @@ export const verification = sqliteTable(
         updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
     },
     (t) => [index('verification_identifier_idx').on(t.identifier)]
+);
+
+// Quizaroni's own per-user data, kept out of Better Auth's `user` row. NOCASE
+// makes `Alice` and `alice` the same username; NULL (no username yet) repeats.
+export const userProfile = sqliteTable(
+    'user_profile',
+    {
+        userId: text('user_id')
+            .primaryKey()
+            .references(() => user.id, { onDelete: 'cascade' }),
+        username: text('username'),
+        metadata: text('metadata', { mode: 'json' })
+            .$type<Record<string, unknown>>()
+            .notNull(),
+        labels: text('labels', { mode: 'json' }).$type<string[]>().notNull(),
+        updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+    },
+    (t) => [
+        uniqueIndex('user_profile_username_unique').on(
+            sql`${t.username} COLLATE NOCASE`
+        ),
+    ]
 );

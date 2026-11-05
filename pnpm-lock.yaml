@@ -122,6 +122,9 @@ importers:
       '@hono/bun':
         specifier: ^1.0.1
         version: 1.0.1(hono@4.13.16)
+      '@quizaroni/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared-types
       better-auth:
         specifier: 1.7.15
         version: 1.7.15(drizzle-kit@0.31.11)(drizzle-orm@0.45.4(@types/sql.js@1.4.11)(bun-types@1.4.4)(kysely@0.29.8)(sql.js@1.14.2))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(vitest@4.1.11)
@@ -131,6 +134,9 @@ importers:
       hono:
         specifier: ^4.13.16
         version: 4.13.16
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
     devDependencies:
       '@types/bun':
         specifier: ^1.4.4

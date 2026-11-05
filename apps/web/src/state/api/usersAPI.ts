@@ -5,6 +5,8 @@ import {
     UseQueryOptions,
 } from '@tanstack/react-query';
 import { BASE_API_URL, fetchJson, getCommonPostRequestProps } from './awsAPI';
+import { isSelfHost } from 'shared/auth/backend';
+import { downloadObjectAsJSON } from 'shared/utilities/general';
 import { validate } from 'shared/validation';
 import {
     BaseResponseSchema,
@@ -173,9 +175,30 @@ export const useUpdateEmail = () => {
     });
 };
 
+// The self-host server returns the export itself; save it as a file.
+export const downloadUserData = async ({
+    includeStudysets,
+}: DownloadUserDataRequest): Promise<void> => {
+    const data = await fetchJson<object>(
+        `${BASE_API_URL}/users/download-user-data`,
+        {
+            ...(await getCommonPostRequestProps()),
+            body: JSON.stringify({ includeStudysets }),
+        }
+    );
+    downloadObjectAsJSON(
+        data,
+        `quizaroni-data-${new Date().toISOString().slice(0, 10)}.json`
+    );
+};
+
 export const useDownloadUserData = () => {
     return useMutation({
         mutationFn: async (params: DownloadUserDataRequest) => {
+            if (isSelfHost()) {
+                await downloadUserData(params);
+                return;
+            }
             const data = await fetchJson(
                 `${BASE_API_URL}/users/download-user-data`,
                 {

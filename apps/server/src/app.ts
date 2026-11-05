@@ -9,6 +9,7 @@ import { sanitizeLogArg } from './db/errors';
 import { apiRequestGuard } from './http/api-guard';
 import { setupRoutes } from './setup/routes';
 import type { SetupGate } from './setup/setup';
+import { userRoutes } from './users/routes';
 
 export type AppDeps = {
     sqlite: Database;
@@ -76,6 +77,8 @@ export function createApp({
     app.use('/api/*', apiRequestGuard(() => auth().publicUrl));
 
     app.route(AUTH_BASE_PATH, authRoutes({ auth, trustProxy }));
+
+    app.route('/api/users', userRoutes({ db, auth }));
 
     app.all('/api/*', (c) => c.json({ message: 'Not found' }, 404));
 
