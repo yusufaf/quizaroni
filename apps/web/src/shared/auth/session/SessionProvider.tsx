@@ -42,8 +42,7 @@ const readCache = (): SessionUser | null => {
         const raw = localStorage.getItem(SESSION_CACHE_KEY);
         if (!raw) return null;
         const parsed = JSON.parse(raw) as Partial<SessionUser>;
-        return typeof parsed.id === 'string' &&
-            typeof parsed.email === 'string'
+        return typeof parsed.id === 'string' && typeof parsed.email === 'string'
             ? {
                   id: parsed.id,
                   email: parsed.email,

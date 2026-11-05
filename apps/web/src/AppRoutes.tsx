@@ -5,6 +5,9 @@ import LoadingIndicator from 'shared/components/LoadingIndicator/LoadingIndicato
 import Login from 'views/Login/Login';
 import Signup from 'views/Signup/Signup';
 import Callback from 'views/Callback/Callback';
+import LoginForm from 'views/Login/LoginForm';
+import SignupForm from 'views/Signup/SignupForm';
+import { isSelfHost } from 'shared/auth/backend';
 import { useAuth } from 'shared/auth/useAuth';
 import useCanonical from 'shared/hooks/useCanonical';
 
@@ -60,9 +63,17 @@ const AppRoutes = () => {
                     path="/"
                     element={authenticated ? <Home /> : <Landing />}
                 />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signUp" element={<Signup />} />
-                <Route path="/callback" element={<Callback />} />
+                <Route
+                    path="/login"
+                    element={isSelfHost() ? <LoginForm /> : <Login />}
+                />
+                <Route
+                    path="/signUp"
+                    element={isSelfHost() ? <SignupForm /> : <Signup />}
+                />
+                {!isSelfHost() && (
+                    <Route path="/callback" element={<Callback />} />
+                )}
 
                 {/* Study set view — full owner experience when authenticated,
                     read-only public page (via the no-auth endpoint) otherwise.

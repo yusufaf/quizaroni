@@ -1,6 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 
-import { HttpError, fetchJson, isHttpStatus } from './awsAPI';
+import {
+    HttpError,
+    fetchJson,
+    getCommonPostRequestProps,
+    isHttpStatus,
+    setAccessTokenGetter,
+} from './awsAPI';
 
 const mockFetch = (response: Partial<Response> & { json?: () => unknown }) =>
     vi.stubGlobal(
@@ -73,5 +79,52 @@ describe('isHttpStatus', () => {
         [null, false],
     ])('isHttpStatus(%o, 404) is %s', (error, expected) => {
         expect(isHttpStatus(error, 404)).toBe(expected);
+    });
+});
+
+describe('getCommonPostRequestProps', () => {
+    afterEach(() => {
+        vi.unstubAllEnvs();
+        setAccessTokenGetter(async () => undefined);
+    });
+
+    it('sends a bearer token and no cookies to the AWS API', async () => {
+        setAccessTokenGetter(async () => 'tok');
+        const props = await getCommonPostRequestProps();
+        expect(props.credentials).toBe('omit');
+        expect(props.headers).toEqual({
+            'Content-Type': 'application/json',
+            authorization: 'Bearer tok',
+        });
+    });
+
+    it('sends the session cookie and no bearer token to the self-host server', async () => {
+        vi.stubEnv('VITE_BACKEND', 'selfhost');
+        setAccessTokenGetter(async () => 'tok');
+        const props = await getCommonPostRequestProps();
+        expect(props.credentials).toBe('same-origin');
+        expect(props.method).toBe('POST');
+        expect(props.headers).toEqual({ 'Content-Type': 'application/json' });
+    });
+});
+
+describe('BASE_API_URL', () => {
+    afterEach(() => {
+        vi.unstubAllEnvs();
+        vi.resetModules();
+    });
+
+    it('is the same-origin /api on the self-host backend, without an API URL', async () => {
+        vi.stubEnv('VITE_BACKEND', 'selfhost');
+        vi.stubEnv('VITE_API_BASE_URL', '');
+        vi.resetModules();
+        const { BASE_API_URL } = await import('./awsAPI');
+        expect(BASE_API_URL).toBe('/api');
+    });
+
+    it('still requires an API URL on the AWS backend', async () => {
+        vi.stubEnv('VITE_API_BASE_URL', '');
+        vi.resetModules();
+        await expect(import('./awsAPI')).rejects.toThrow('VITE_API_BASE_URL');
     });
 });
