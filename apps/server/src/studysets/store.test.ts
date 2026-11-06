@@ -399,6 +399,25 @@ describe('a set already over the size cap', () => {
         expect(() =>
             updateStudyset(db, a, SET_ID, write({ labels: ['new'] }), T2)
         ).toThrow(StudysetTooLargeError);
+        // Mixing in a view-state field doesn't exempt a growing write.
+        expect(() =>
+            updateStudyset(
+                db,
+                a,
+                SET_ID,
+                write({ favorited: false, labels: ['new'] }),
+                T2
+            )
+        ).toThrow(StudysetTooLargeError);
+        expect(() =>
+            updateStudyset(
+                db,
+                a,
+                SET_ID,
+                write({ favorited: false }, { notesSortBy: 'date' }),
+                T2
+            )
+        ).toThrow(StudysetTooLargeError);
     });
 });
 
