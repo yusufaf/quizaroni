@@ -340,6 +340,31 @@ describe('updateStudyset', () => {
     });
 });
 
+describe('a set already over the size cap', () => {
+    test('can still be edited or shrunk, but not grown', () => {
+        const db = freshDb();
+        const a = addUser(db, 'a');
+        created(createStudyset(db, a, { studysetUUID: SET_ID }, T0));
+        // As an import of a set near DynamoDB's limit could leave it.
+        db.update(studyset)
+            .set({ description: 'x'.repeat(410 * 1024) })
+            .where(eq(studyset.studysetUUID, SET_ID))
+            .run();
+        expect(
+            updateStudyset(db, a, SET_ID, write({ favorited: true }), T1)
+                .status
+        ).toBe('ok');
+        expect(() =>
+            updateStudyset(db, a, SET_ID, write({ title: 'A much longer title than the default one' }))
+        ).toThrow(StudysetTooLargeError);
+        expect(
+            updateStudyset(db, a, SET_ID, write({ description: 'short' }), T2)
+                .status
+        ).toBe('ok');
+        expect(getStudyset(db, a, SET_ID)?.description).toBe('short');
+    });
+});
+
 describe('deleteStudyset', () => {
     test('deletes own, ignores unknown and refuses others', () => {
         const db = freshDb();

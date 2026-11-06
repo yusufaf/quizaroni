@@ -73,6 +73,10 @@ function ownedRow(
         .get();
 }
 
+const viewBytes = (row: Row) => Buffer.byteLength(JSON.stringify(toView(row)));
+
+// Only a write that grows a set past the cap is refused, so a set already
+// over it (say, from an import) can still be edited and shrunk.
 function applyWrite(row: Row, write: StudysetWrite, now: Date): Row {
     const next: Row = {
         ...row,
@@ -80,9 +84,8 @@ function applyWrite(row: Row, write: StudysetWrite, now: Date): Row {
         metadata: { ...row.metadata, ...write.metadata },
         updatedAt: now,
     };
-    if (
-        Buffer.byteLength(JSON.stringify(toView(next))) > MAX_STUDYSET_BYTES
-    ) {
+    const nextBytes = viewBytes(next);
+    if (nextBytes > MAX_STUDYSET_BYTES && nextBytes > viewBytes(row)) {
         throw new StudysetTooLargeError();
     }
     return next;
