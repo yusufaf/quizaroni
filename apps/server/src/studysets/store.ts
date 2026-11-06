@@ -75,8 +75,18 @@ function ownedRow(
 
 const viewBytes = (row: Row) => Buffer.byteLength(JSON.stringify(toView(row)));
 
+const VIEW_STATE_FIELDS = new Set(['favorited', 'lastViewed']);
+
+// Toggling a favorite or recording a view changes a set by a byte at most.
+function isViewStateOnly(write: StudysetWrite): boolean {
+    return (
+        Object.keys(write.metadata).length === 0 &&
+        Object.keys(write.fields).every((key) => VIEW_STATE_FIELDS.has(key))
+    );
+}
+
 // Only a write that grows a set past the cap is refused, so a set already
-// over it (say, from an import) can still be edited and shrunk.
+// over it (say, from an import) can still be viewed, edited and shrunk.
 function applyWrite(row: Row, write: StudysetWrite, now: Date): Row {
     const next: Row = {
         ...row,
@@ -85,7 +95,11 @@ function applyWrite(row: Row, write: StudysetWrite, now: Date): Row {
         updatedAt: now,
     };
     const nextBytes = viewBytes(next);
-    if (nextBytes > MAX_STUDYSET_BYTES && nextBytes > viewBytes(row)) {
+    if (
+        nextBytes > MAX_STUDYSET_BYTES &&
+        !isViewStateOnly(write) &&
+        nextBytes > viewBytes(row)
+    ) {
         throw new StudysetTooLargeError();
     }
     return next;

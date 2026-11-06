@@ -363,6 +363,43 @@ describe('a set already over the size cap', () => {
         ).toBe('ok');
         expect(getStudyset(db, a, SET_ID)?.description).toBe('short');
     });
+
+    test('takes view-state toggles and shrinking edits while still over', () => {
+        const db = freshDb();
+        const a = addUser(db, 'a');
+        created(createStudyset(db, a, { studysetUUID: SET_ID }, T0));
+        db.update(studyset)
+            .set({ favorited: true, description: 'x'.repeat(410 * 1024) })
+            .where(eq(studyset.studysetUUID, SET_ID))
+            .run();
+        // true -> false adds a byte; it's view state, so it's allowed.
+        expect(
+            updateStudyset(db, a, SET_ID, write({ favorited: false }), T1)
+                .status
+        ).toBe('ok');
+        expect(
+            updateStudyset(
+                db,
+                a,
+                SET_ID,
+                write({ lastViewed: T2, favorited: true }),
+                T2
+            ).status
+        ).toBe('ok');
+        // Still over the cap afterwards, but smaller: allowed.
+        expect(
+            updateStudyset(
+                db,
+                a,
+                SET_ID,
+                write({ description: 'x'.repeat(405 * 1024) }),
+                T2
+            ).status
+        ).toBe('ok');
+        expect(() =>
+            updateStudyset(db, a, SET_ID, write({ labels: ['new'] }), T2)
+        ).toThrow(StudysetTooLargeError);
+    });
 });
 
 describe('deleteStudyset', () => {
