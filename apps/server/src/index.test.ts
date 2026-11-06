@@ -276,6 +276,26 @@ test('the headless admin signs in and out, and cross-origin sign-in is refused',
             ((await getUser.json()) as { user: { email: string } }).user
         ).toMatchObject({ email: 'admin@example.com', username: null });
 
+        const created = await fetch(`${url}/api/studysets/create-studyset`, {
+            method: 'POST',
+            headers: json(publicUrl!, cookie),
+            body: '{}',
+        });
+        expect(created.status).toBe(200);
+        const { studyset } = (await created.json()) as {
+            studyset: { studysetUUID: string };
+        };
+        const listed = await fetch(`${url}/api/studysets/get-all-studysets`, {
+            method: 'POST',
+            headers: json(publicUrl!, cookie),
+            body: '{}',
+        });
+        expect(listed.status).toBe(200);
+        expect(
+            ((await listed.json()) as { studysets: { studysetUUID: string }[] })
+                .studysets.map((s) => s.studysetUUID)
+        ).toEqual([studyset.studysetUUID]);
+
         const signOut = await fetch(`${url}/api/auth/sign-out`, {
             method: 'POST',
             headers: json(publicUrl!, cookie),
