@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { eq } from 'drizzle-orm';
 import { closeDatabase, type Db, openDatabase } from '../db';
 import { account, session, user, userProfile } from '../db/schema';
+import { createStudyset, getStudyset } from '../studysets/store';
 import { emptyGamification, MAX_METADATA_BYTES } from './metadata';
 import {
     buildUserDataExport,
@@ -194,6 +195,40 @@ describe('updateUsername', () => {
         });
     });
 
+    test("restamps the author on the user's sets only", () => {
+        const db = freshDb();
+        const a = addUser(db, 'a');
+        const b = addUser(db, 'b');
+        updateUsername(db, b, 'bob');
+        const sets = [createStudyset(db, a), createStudyset(db, a)].map(
+            (r) => (r.status === 'ok' ? r.studyset.studysetUUID : '')
+        );
+        const bSet = createStudyset(db, b);
+        const result = updateUsername(db, a, 'ada');
+        expect(result).toMatchObject({ status: 'ok', studysetsUpdated: 2 });
+        for (const id of sets) {
+            expect(getStudyset(db, a, id)?.username).toBe('ada');
+        }
+        if (bSet.status !== 'ok') throw new Error('create failed');
+        expect(
+            getStudyset(db, b, bSet.studyset.studysetUUID)?.username
+        ).toBe('bob');
+    });
+
+    test('a taken name leaves the author on the sets unchanged', () => {
+        const db = freshDb();
+        const a = addUser(db, 'a');
+        const b = addUser(db, 'b');
+        updateUsername(db, a, 'alice');
+        updateUsername(db, b, 'bob');
+        const set = createStudyset(db, b);
+        if (set.status !== 'ok') throw new Error('create failed');
+        expect(updateUsername(db, b, 'ALICE')).toEqual({ status: 'taken' });
+        expect(
+            getStudyset(db, b, set.studyset.studysetUUID)?.username
+        ).toBe('bob');
+    });
+
     test('allows many users without a username', () => {
         const db = freshDb();
         for (const id of ['a', 'b', 'c']) getUserView(db, addUser(db, id));
@@ -291,7 +326,7 @@ describe('buildUserDataExport', () => {
             .run();
         updateMetadata(db, id, { homeView: 'grid' });
 
-        const exported = buildUserDataExport(db, id, T1);
+        const exported = buildUserDataExport(db, id, { now: T1 });
         expect(exported).toMatchObject({
             format: 'quizaroni-user-data',
             version: 1,
@@ -303,9 +338,23 @@ describe('buildUserDataExport', () => {
                 metadata: expect.objectContaining({ homeView: 'grid' }),
             },
         });
+        expect(exported).not.toHaveProperty('studysets');
         const text = JSON.stringify(exported);
         expect(text).not.toContain('argon2');
         expect(text).not.toContain('session-token-value');
+    });
+
+    test("adds the user's own sets when asked", () => {
+        const db = freshDb();
+        const a = addUser(db, 'a');
+        const b = addUser(db, 'b');
+        const own = createStudyset(db, a);
+        createStudyset(db, b);
+        if (own.status !== 'ok') throw new Error('create failed');
+        const exported = buildUserDataExport(db, a, {
+            includeStudysets: true,
+        });
+        expect(exported.studysets).toEqual([own.studyset]);
     });
 });
 

@@ -9,6 +9,7 @@ import { sanitizeLogArg } from './db/errors';
 import { apiRequestGuard } from './http/api-guard';
 import { setupRoutes } from './setup/routes';
 import type { SetupGate } from './setup/setup';
+import { studysetRoutes } from './studysets/routes';
 import { userRoutes } from './users/routes';
 
 export type AppDeps = {
@@ -79,6 +80,8 @@ export function createApp({
     app.route(AUTH_BASE_PATH, authRoutes({ auth, trustProxy }));
 
     app.route('/api/users', userRoutes({ db, auth }));
+
+    app.route('/api/studysets', studysetRoutes({ db, auth }));
 
     app.all('/api/*', (c) => c.json({ message: 'Not found' }, 404));
 

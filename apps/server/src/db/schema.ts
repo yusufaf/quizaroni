@@ -105,3 +105,33 @@ export const userProfile = sqliteTable(
         ),
     ]
 );
+
+// Cards stay nested in the set, as in DynamoDB. The id no longer implies the
+// owner, so every query also filters on owner_id.
+export const studyset = sqliteTable(
+    'studyset',
+    {
+        studysetUUID: text('studyset_uuid').primaryKey(),
+        ownerId: text('owner_id')
+            .notNull()
+            .references(() => user.id, { onDelete: 'cascade' }),
+        username: text('username'),
+        title: text('title').notNull(),
+        description: text('description').notNull(),
+        favorited: integer('favorited', { mode: 'boolean' }).notNull(),
+        cards: text('cards', { mode: 'json' })
+            .$type<Record<string, unknown>[]>()
+            .notNull(),
+        categories: text('categories', { mode: 'json' })
+            .$type<string[]>()
+            .notNull(),
+        labels: text('labels', { mode: 'json' }).$type<string[]>().notNull(),
+        metadata: text('metadata', { mode: 'json' })
+            .$type<Record<string, unknown>>()
+            .notNull(),
+        lastViewed: integer('last_viewed', { mode: 'timestamp_ms' }).notNull(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+        updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+    },
+    (t) => [index('studyset_owner_created_idx').on(t.ownerId, t.createdAt)]
+);
