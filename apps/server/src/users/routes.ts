@@ -89,11 +89,10 @@ export function userRoutes(deps: {
         if (result.status === 'taken') {
             return c.json({ message: 'Username taken' }, 409);
         }
-        // No study sets to restamp until the server stores them (#257).
         return c.json({
             message: 'Successfully updated username',
             user: result.user,
-            studysetsUpdated: 0,
+            studysetsUpdated: result.studysetsUpdated,
             studysetsFailed: 0,
             studysetsRenameComplete: true,
         });
@@ -149,9 +148,14 @@ export function userRoutes(deps: {
         }
     });
 
-    // `includeStudysets` is ignored until the server stores sets (#257).
-    routes.post('/download-user-data', (c) => {
-        const exported = buildUserDataExport(db, c.get('userId'));
+    routes.post('/download-user-data', async (c) => {
+        const body = await readJsonBody(c);
+        if (body === INVALID_JSON) {
+            return c.json({ message: 'Invalid JSON' }, 400);
+        }
+        const exported = buildUserDataExport(db, c.get('userId'), {
+            includeStudysets: body.includeStudysets === true,
+        });
         c.header(
             'Content-Disposition',
             `attachment; filename="quizaroni-data-${exported.exportedAt.slice(0, 10)}.json"`

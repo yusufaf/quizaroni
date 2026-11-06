@@ -3,6 +3,11 @@ import type { Db } from '../db';
 import { isUniqueViolation } from '../db/errors';
 import { user, userProfile } from '../db/schema';
 import {
+    listStudysets,
+    restampAuthor,
+    type StudysetView,
+} from '../studysets/store';
+import {
     type CustomAchievement,
     CustomAchievementSchema,
     deepMerge,
@@ -35,6 +40,7 @@ export type UserDataExport = {
     version: 1;
     exportedAt: string;
     user: UserView & { name: string; role: string };
+    studysets?: StudysetView[];
 };
 
 export class MetadataTooLargeError extends Error {
@@ -230,16 +236,23 @@ export function updateUsername(
     userId: string,
     username: string,
     now = new Date()
-): { status: 'ok'; user: UserView } | { status: 'taken' } {
+):
+    | { status: 'ok'; user: UserView; studysetsUpdated: number }
+    | { status: 'taken' } {
     try {
+        // The author name on the user's sets changes in the same transaction,
+        // so a taken name rolls both back.
         const updated = writeProfile(db, userId, now, (tx) => {
             tx.update(userProfile)
                 .set({ username, updatedAt: now })
                 .where(eq(userProfile.userId, userId))
                 .run();
-            return viewAfterWrite(tx, userId);
+            return {
+                user: viewAfterWrite(tx, userId),
+                studysetsUpdated: restampAuthor(tx, userId, username),
+            };
         });
-        return { status: 'ok', user: updated };
+        return { status: 'ok', ...updated };
     } catch (err) {
         // The NOCASE unique index decides races; the transaction rolled back.
         if (isUniqueViolation(err)) return { status: 'taken' };
@@ -247,13 +260,14 @@ export function updateUsername(
     }
 }
 
-// Only the profile for now: study sets join the export once the server
-// stores them (#257). Never includes password hashes, sessions or accounts.
+// The profile, plus the user's own study sets when asked. Never includes
+// password hashes, sessions or accounts.
 export function buildUserDataExport(
     db: Db,
     userId: string,
-    now = new Date()
+    options: { includeStudysets?: boolean; now?: Date } = {}
 ): UserDataExport {
+    const now = options.now ?? new Date();
     const view = getUserView(db, userId, now);
     const { account } = selectRows(db, userId);
     return {
@@ -261,5 +275,8 @@ export function buildUserDataExport(
         version: 1,
         exportedAt: now.toISOString(),
         user: { ...view, name: account.name, role: account.role },
+        ...(options.includeStudysets
+            ? { studysets: listStudysets(db, userId) }
+            : {}),
     };
 }

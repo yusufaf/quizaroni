@@ -381,3 +381,62 @@ describe('download-user-data', () => {
         expect(text).not.toContain(token);
     });
 });
+
+describe('with study sets', () => {
+    const createSet = async (h: Harness, cookie: string) => {
+        const res = await request(h, '/api/studysets/create-studyset', {
+            cookie,
+        });
+        expect(res.status).toBe(200);
+        return ((await res.json()) as { studyset: { studysetUUID: string } })
+            .studyset.studysetUUID;
+    };
+
+    test('a new username becomes the author of the sets of the caller', async () => {
+        const h = await harness();
+        const cookie = await signUpUser(h);
+        const id = await createSet(h, cookie);
+        const res = await post(h, '/update-username', {
+            cookie,
+            body: { username: 'ada_l' },
+        });
+        expect(res.status).toBe(200);
+        expect(await res.json()).toMatchObject({
+            studysetsUpdated: 1,
+            studysetsFailed: 0,
+            studysetsRenameComplete: true,
+        });
+        const got = await request(h, '/api/studysets/get-studyset', {
+            cookie,
+            body: { studysetUUID: id },
+        });
+        expect(
+            ((await got.json()) as { studyset: { username: string } })
+                .studyset.username
+        ).toBe('ada_l');
+    });
+
+    test('download-user-data includes only the sets of the caller when asked', async () => {
+        const h = await harness();
+        const a = await signUpUser(h);
+        const b = await signUpUser(h);
+        const own = await createSet(h, a);
+        await createSet(h, b);
+
+        const withSets = await post(h, '/download-user-data', {
+            cookie: a,
+            body: { includeStudysets: true },
+        });
+        expect(withSets.status).toBe(200);
+        const exported = (await withSets.json()) as {
+            studysets: { studysetUUID: string }[];
+        };
+        expect(exported.studysets.map((s) => s.studysetUUID)).toEqual([own]);
+
+        const without = await post(h, '/download-user-data', {
+            cookie: a,
+            body: {},
+        });
+        expect(await without.json()).not.toHaveProperty('studysets');
+    });
+});
