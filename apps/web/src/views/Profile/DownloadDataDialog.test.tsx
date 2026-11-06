@@ -53,15 +53,27 @@ describe('DownloadDataDialog in a self-host build', () => {
         vi.stubEnv('VITE_BACKEND', 'selfhost');
     });
 
-    it('downloads the profile and closes', async () => {
+    it('downloads the profile alone by default and closes', async () => {
         renderDialog();
-        expect(screen.queryByLabelText(CHECKBOX_LABEL)).toBeNull();
+        expect(screen.getByLabelText(CHECKBOX_LABEL)).toBeTruthy();
 
         download();
 
         await waitFor(() => expect(mocks.handleClose).toHaveBeenCalled());
         expect(mocks.mutateAsync).toHaveBeenCalledWith({
             includeStudysets: false,
+        });
+    });
+
+    it('includes study sets when the box is ticked', async () => {
+        renderDialog();
+        fireEvent.click(screen.getByLabelText(CHECKBOX_LABEL));
+
+        download();
+
+        await waitFor(() => expect(mocks.handleClose).toHaveBeenCalled());
+        expect(mocks.mutateAsync).toHaveBeenCalledWith({
+            includeStudysets: true,
         });
     });
 

@@ -28,7 +28,7 @@ const DownloadDataDialog = ({ open, handleClose }: Props) => {
     const handleDownloadData = async () => {
         if (!selfHost) return;
         try {
-            await mutateAsync({ includeStudysets: false });
+            await mutateAsync({ includeStudysets });
             handleClose();
         } catch {
             toast.error('Failed to download your data');
@@ -58,18 +58,15 @@ const DownloadDataDialog = ({ open, handleClose }: Props) => {
                     for future reference or personal use.
                 </DialogContentText>
 
-                {/* The self-host export has no study sets until the server stores them (#257). */}
-                {!selfHost && (
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={includeStudysets}
-                                onChange={handleCheckboxChange}
-                            />
-                        }
-                        label="Include studysets in the download"
-                    />
-                )}
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={includeStudysets}
+                            onChange={handleCheckboxChange}
+                        />
+                    }
+                    label="Include studysets in the download"
+                />
             </DeleteDialogContent>
             <StyledDialogActions>
                 <Button
