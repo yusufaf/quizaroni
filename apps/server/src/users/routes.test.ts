@@ -1,21 +1,17 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import type { Database } from 'bun:sqlite';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import { eq } from 'drizzle-orm';
-import { createApp } from '../app';
-import { hashPassword } from '../auth/auth';
-import { ipEnv, nextTestIp, testAuth } from '../auth/testing';
-import { closeDatabase, type Db, openDatabase } from '../db';
-import { instanceSettings, session, userProfile } from '../db/schema';
-import { SETTING } from '../settings';
-import { completeSetup, SetupGate } from '../setup/setup';
+import { session, userProfile } from '../db/schema';
+import {
+    ADMIN_EMAIL,
+    ADMIN_PASSWORD,
+    apiRequest as request,
+    type CallOptions,
+    cookieFrom,
+    createRouteHarness,
+    type RouteHarness as Harness,
+    signUp,
+} from '../testing/route-harness';
 import { emptyGamification } from './metadata';
-
-const ADMIN_EMAIL = 'admin@example.com';
-const ADMIN_PASSWORD = 'correct-horse-1';
-const PUBLIC_URL = 'http://localhost';
 
 const USER_PATHS = [
     '/get-user',
@@ -26,109 +22,26 @@ const USER_PATHS = [
     '/download-user-data',
 ] as const;
 
-type Harness = { app: ReturnType<typeof createApp>; db: Db };
-
-let root: string | undefined;
-let sqlite: Database | undefined;
+let current: Harness | undefined;
 
 async function harness(): Promise<Harness> {
-    root = mkdtempSync(join(tmpdir(), 'qz-user-routes-'));
-    const webDir = join(root, 'web');
-    mkdirSync(webDir, { recursive: true });
-    writeFileSync(join(webDir, 'index.html'), '<!doctype html>');
-    const opened = openDatabase(join(root, 'data'));
-    sqlite = opened.sqlite;
-    completeSetup(opened.db, {
-        name: 'Admin',
-        email: ADMIN_EMAIL,
-        passwordHash: await hashPassword(ADMIN_PASSWORD),
-        registrationMode: 'open',
-        teacherPolicy: 'admin_approved',
-        publicUrl: undefined,
-    });
-    opened.db
-        .insert(instanceSettings)
-        .values({
-            key: SETTING.registrationMode,
-            value: 'open',
-            updatedAt: new Date(),
-        })
-        .onConflictDoUpdate({
-            target: instanceSettings.key,
-            set: { value: 'open' },
-        })
-        .run();
-    const app = createApp({
-        sqlite: opened.sqlite,
-        db: opened.db,
-        webDir,
-        version: '0.0.0-test',
-        setup: new SetupGate(opened.db, undefined),
-        auth: testAuth(opened.db, { publicUrl: PUBLIC_URL }),
-        trustProxy: false,
-    });
-    return { app, db: opened.db };
+    current = await createRouteHarness();
+    return current;
 }
 
 afterEach(() => {
-    if (sqlite) closeDatabase(sqlite);
-    sqlite = undefined;
-    if (root) rmSync(root, { recursive: true, force: true });
-    root = undefined;
+    current?.close();
+    current = undefined;
 });
-
-type CallOptions = {
-    body?: unknown;
-    rawBody?: string;
-    cookie?: string;
-    headers?: Record<string, string>;
-};
-
-function request(
-    h: Harness,
-    path: string,
-    o: CallOptions = {}
-): Promise<Response> {
-    const headers: Record<string, string> = {
-        Origin: PUBLIC_URL,
-        'Content-Type': 'application/json',
-        ...o.headers,
-    };
-    if (o.cookie) headers.Cookie = o.cookie;
-    return Promise.resolve(
-        h.app.request(
-            `http://localhost${path}`,
-            {
-                method: 'POST',
-                headers,
-                body: o.rawBody ?? JSON.stringify(o.body ?? {}),
-            },
-            ipEnv(nextTestIp())
-        )
-    );
-}
 
 const post = (h: Harness, path: string, o: CallOptions = {}) =>
     request(h, `/api/users${path}`, o);
 
-function cookieFrom(res: Response): string {
-    return res.headers
-        .getSetCookie()
-        .map((c) => c.split(';')[0])
-        .join('; ');
-}
-
-let signupCounter = 0;
+let lastEmail = '';
 async function signUpUser(h: Harness): Promise<string> {
-    const res = await request(h, '/api/auth/sign-up/email', {
-        body: {
-            name: 'Ada',
-            email: `ada${++signupCounter}@example.com`,
-            password: 'ada-password-1',
-        },
-    });
-    expect(res.status).toBe(200);
-    return cookieFrom(res);
+    const { cookie, email } = await signUp(h);
+    lastEmail = email;
+    return cookie;
 }
 
 type UserBody = {
@@ -459,7 +372,7 @@ describe('download-user-data', () => {
             format: 'quizaroni-user-data',
             version: 1,
             user: {
-                email: `ada${signupCounter}@example.com`,
+                email: lastEmail,
                 metadata: { homeView: 'grid' },
             },
         });
