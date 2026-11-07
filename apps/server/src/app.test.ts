@@ -1,3 +1,4 @@
+import { FileStore } from './files/store';
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import type { Database } from 'bun:sqlite';
 import {
@@ -53,6 +54,7 @@ beforeAll(() => {
     app = createApp({
         sqlite,
         db,
+        files: new FileStore(join(root, 'data')),
         webDir,
         version: pkg.version,
         setup,
@@ -84,6 +86,7 @@ describe('/api', () => {
             const res = await createApp({
                 sqlite: closed.sqlite,
                 db: closed.db,
+                files: new FileStore(dir),
                 webDir,
                 version: pkg.version,
                 setup: latchedGate(closed.db),
@@ -199,6 +202,7 @@ describe('web app', () => {
         const res = await createApp({
             sqlite,
             db,
+            files: new FileStore(join(root, 'data')),
             webDir: emptyWebDir,
             version: pkg.version,
             setup,

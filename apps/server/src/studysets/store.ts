@@ -388,6 +388,48 @@ export function deleteStudysets(
     );
 }
 
+// Adds an uploaded file to the card it was uploaded for (Lambda parity), so
+// the file is kept even if the editor never saves.
+export function attachCardFile(
+    db: Db,
+    ownerId: string,
+    studysetUUID: string,
+    cardUUID: string,
+    file: JsonObject,
+    now = new Date()
+): 'attached' | 'no_card' | 'not_found' {
+    return db.transaction(
+        (tx) => {
+            const row = ownedRow(tx, ownerId, studysetUUID);
+            if (!row) return 'not_found' as const;
+            if (!row.cards.some((card) => card.cardUUID === cardUUID)) {
+                return 'no_card' as const;
+            }
+            const cards = row.cards.map((card) =>
+                card.cardUUID === cardUUID
+                    ? {
+                          ...card,
+                          files: [
+                              ...(Array.isArray(card.files) ? card.files : []),
+                              file,
+                          ],
+                      }
+                    : card
+            );
+            const result = writeOwned(
+                tx,
+                row,
+                { fields: { cards }, metadata: {} },
+                now
+            );
+            return result.status === 'ok'
+                ? ('attached' as const)
+                : ('not_found' as const);
+        },
+        { behavior: 'immediate' }
+    );
+}
+
 // Renames the author on every set the user owns; updatedAt stays as it was.
 export function restampAuthor(
     tx: Pick<Db, 'update'>,

@@ -6,6 +6,9 @@ import { AUTH_BASE_PATH, type AuthHandle } from './auth/auth';
 import { authRoutes } from './auth/routes';
 import type { Db } from './db';
 import { sanitizeLogArg } from './db/errors';
+import { fileRoutes } from './files/routes';
+import { FileStore } from './files/store';
+import { UploadRegistry } from './files/uploads';
 import { apiRequestGuard } from './http/api-guard';
 import { setupRoutes } from './setup/routes';
 import type { SetupGate } from './setup/setup';
@@ -21,6 +24,8 @@ export type AppDeps = {
     configuredPublicUrl?: string;
     auth: AuthHandle;
     trustProxy: boolean;
+    files: FileStore;
+    uploads?: UploadRegistry;
 };
 
 const REVALIDATE = 'public, max-age=0, must-revalidate';
@@ -59,6 +64,8 @@ export function createApp({
     configuredPublicUrl,
     auth,
     trustProxy,
+    files,
+    uploads = new UploadRegistry(files),
 }: AppDeps): Hono {
     const app = new Hono();
 
@@ -82,6 +89,8 @@ export function createApp({
     app.route('/api/users', userRoutes({ db, auth }));
 
     app.route('/api/studysets', studysetRoutes({ db, auth }));
+
+    app.route('/api/files', fileRoutes({ db, auth, files, uploads }));
 
     app.all('/api/*', (c) => c.json({ message: 'Not found' }, 404));
 

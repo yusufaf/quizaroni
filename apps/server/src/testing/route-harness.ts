@@ -5,6 +5,8 @@ import { createApp } from '../app';
 import { hashPassword } from '../auth/auth';
 import { ipEnv, nextTestIp, testAuth } from '../auth/testing';
 import { closeDatabase, type Db, openDatabase } from '../db';
+import { FileStore } from '../files/store';
+import { UploadRegistry } from '../files/uploads';
 import { instanceSettings } from '../db/schema';
 import { SETTING } from '../settings';
 import { completeSetup, SetupGate } from '../setup/setup';
@@ -19,6 +21,8 @@ export const PUBLIC_URL = 'http://localhost';
 export type RouteHarness = {
     app: ReturnType<typeof createApp>;
     db: Db;
+    files: FileStore;
+    uploads: UploadRegistry;
     close(): void;
 };
 
@@ -48,9 +52,14 @@ export async function createRouteHarness(): Promise<RouteHarness> {
             set: { value: 'open' },
         })
         .run();
+    const files = new FileStore(join(root, 'data'));
+    files.resetStaging();
+    const uploads = new UploadRegistry(files);
     const app = createApp({
         sqlite: opened.sqlite,
         db: opened.db,
+        files,
+        uploads,
         webDir,
         version: '0.0.0-test',
         setup: new SetupGate(opened.db, undefined),
@@ -60,6 +69,8 @@ export async function createRouteHarness(): Promise<RouteHarness> {
     return {
         app,
         db: opened.db,
+        files,
+        uploads,
         close() {
             closeDatabase(opened.sqlite);
             rmSync(root, { recursive: true, force: true });
@@ -133,4 +144,41 @@ export async function signIn(
         throw new Error(`sign-in failed with ${res.status}`);
     }
     return cookieFrom(res);
+}
+
+export function apiGet(
+    h: RouteHarness,
+    path: string,
+    o: { cookie?: string; headers?: Record<string, string> } = {}
+): Promise<Response> {
+    const headers: Record<string, string> = { ...o.headers };
+    if (o.cookie) headers.Cookie = o.cookie;
+    return Promise.resolve(
+        h.app.request(
+            `http://localhost${path}`,
+            { method: 'GET', headers },
+            ipEnv(nextTestIp())
+        )
+    );
+}
+
+// A raw-bytes PUT, as the browser sends a part: same origin, no JSON.
+export function apiPut(
+    h: RouteHarness,
+    path: string,
+    bytes: Uint8Array,
+    o: { cookie?: string; headers?: Record<string, string> } = {}
+): Promise<Response> {
+    const headers: Record<string, string> = {
+        Origin: PUBLIC_URL,
+        ...o.headers,
+    };
+    if (o.cookie) headers.Cookie = o.cookie;
+    return Promise.resolve(
+        h.app.request(
+            `http://localhost${path}`,
+            { method: 'PUT', headers, body: bytes },
+            ipEnv(nextTestIp())
+        )
+    );
 }

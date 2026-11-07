@@ -1,3 +1,4 @@
+import { FileStore } from '../files/store';
 import { afterEach, describe, expect, spyOn, test } from 'bun:test';
 import type { Database } from 'bun:sqlite';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
@@ -57,6 +58,7 @@ async function harness(
     const app = createApp({
         sqlite: opened.sqlite,
         db: opened.db,
+        files: new FileStore(join(root, 'data')),
         webDir,
         version: '0.0.0-test',
         setup: new SetupGate(opened.db, setUp ? undefined : 'token'),
