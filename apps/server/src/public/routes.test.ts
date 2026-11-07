@@ -2,12 +2,15 @@ import { afterEach, describe, expect, test } from 'bun:test';
 import { eq } from 'drizzle-orm';
 import { session, studyset, user } from '../db/schema';
 import { PNG_BYTES, uploadCardFile } from '../testing/files';
+import { HOSTED_ORIGIN } from '../seo/pages';
 import {
     apiGet,
     createRouteHarness,
+    PUBLIC_URL,
     type RouteHarness,
     signUp,
 } from '../testing/route-harness';
+import { installFixtureShell } from '../testing/shell-fixture';
 import { createSet, okJson, studysetPost as post } from '../testing/studysets';
 
 let current: RouteHarness | undefined;
@@ -242,3 +245,79 @@ describe('explore feed', () => {
         expect((await feed(h, '?featured=1')).items).toEqual([]);
     });
 });
+
+describe('SEO pages', () => {
+    test('a published set page carries its own meta tags', async () => {
+        const h = await harness();
+        installFixtureShell(h);
+        const a = await signUp(h);
+        const id = await publish(h, a.cookie, { title: 'Cell biology' });
+        const res = await apiGet(h, `/view/${id}`);
+        expect(res.status).toBe(200);
+        expect(res.headers.get('x-robots-tag')).toBeNull();
+        const html = await res.text();
+        expect(html).toContain('<title>Cell biology · Quizaroni</title>');
+        expect(html).toContain(
+            `<meta property="og:url" content="${PUBLIC_URL}/view/${id}" />`
+        );
+        expect(html).not.toContain(HOSTED_ORIGIN);
+    });
+
+    test('a private or unknown set page is noindex and names nothing', async () => {
+        const h = await harness();
+        installFixtureShell(h);
+        const a = await signUp(h);
+        const draft = (await createSet(h, a.cookie)).studysetUUID;
+        for (const id of [draft, 'b'.repeat(32), 'not-an-id']) {
+            const res = await apiGet(h, `/view/${id}`);
+            expect(res.status).toBe(200);
+            expect(res.headers.get('x-robots-tag')).toBe('noindex');
+            const html = await res.text();
+            expect(html).toContain('name="robots" content="noindex"');
+            expect(html).not.toMatch(/property="og:/);
+            expect(html).not.toContain(HOSTED_ORIGIN);
+        }
+    });
+
+    test('other pages name this instance', async () => {
+        const h = await harness();
+        installFixtureShell(h);
+        for (const path of ['/', '/index.html', '/explore']) {
+            const html = await (await apiGet(h, path)).text();
+            expect(html).toContain(`<link rel="canonical" href="${PUBLIC_URL}/" />`);
+            expect(html).not.toContain(HOSTED_ORIGIN);
+        }
+    });
+
+    test('the sitemap lists exactly the published sets', async () => {
+        const h = await harness();
+        const a = await signUp(h);
+        const published = [
+            await publish(h, a.cookie),
+            await publish(h, a.cookie),
+        ];
+        await createSet(h, a.cookie);
+        const hidden = await publish(h, a.cookie);
+        h.db.update(studyset)
+            .set({ hiddenAt: new Date() })
+            .where(eq(studyset.studysetUUID, hidden))
+            .run();
+        const res = await apiGet(h, '/sitemap.xml');
+        expect(res.headers.get('content-type')).toContain('application/xml');
+        const locs = [...(await res.text()).matchAll(/<loc>([^<]*)<\/loc>/g)].map(
+            (m) => m[1]
+        );
+        expect(locs[0]).toBe(`${PUBLIC_URL}/`);
+        expect(locs.slice(1).sort()).toEqual(
+            published.map((id) => `${PUBLIC_URL}/view/${id}`).sort()
+        );
+    });
+
+    test('robots.txt points at this instance sitemap', async () => {
+        const h = await harness();
+        const res = await apiGet(h, '/robots.txt');
+        expect(res.headers.get('content-type')).toContain('text/plain');
+        expect(await res.text()).toContain(`Sitemap: ${PUBLIC_URL}/sitemap.xml`);
+    });
+});
+

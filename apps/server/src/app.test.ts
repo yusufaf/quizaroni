@@ -171,7 +171,14 @@ describe('web app', () => {
         );
     });
 
-    test.each([['/assets/missing.js'], ['/sitemap.xml']])(
+    test('GET /sitemap.xml lists the home page as XML', async () => {
+        const res = await app.request('/sitemap.xml');
+        expect(res.status).toBe(200);
+        expect(res.headers.get('content-type')).toContain('application/xml');
+        expect(await res.text()).toContain('<urlset');
+    });
+
+    test.each([['/assets/missing.js'], ['/favicon-missing.ico']])(
         'GET %s returns 404, not the shell',
         async (path) => {
             const res = await app.request(path);
