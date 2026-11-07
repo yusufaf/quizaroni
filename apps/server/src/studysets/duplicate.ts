@@ -48,6 +48,13 @@ export function buildDuplicate(
         lastViewed: now,
         createdAt: now,
         updatedAt: now,
+        subject: null,
+        isPublic: false,
+        publishedAt: null,
+        featuredAt: null,
+        hiddenAt: null,
+        saveCount: 0,
+        copiedFrom: null,
     };
 }
 

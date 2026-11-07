@@ -51,6 +51,13 @@ const SOURCE: Row = {
     lastViewed: T0,
     createdAt: T0,
     updatedAt: T0,
+    subject: null,
+    isPublic: false,
+    publishedAt: null,
+    featuredAt: null,
+    hiddenAt: null,
+    saveCount: 0,
+    copiedFrom: null,
 };
 
 describe('buildDuplicate', () => {
