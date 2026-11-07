@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { isSelfHost } from 'shared/auth/backend';
 import { SITE_ORIGIN } from 'shared/constants';
 
 // index.html ships one canonical naming the home page, and only /view/* is
@@ -38,6 +39,8 @@ export default function useCanonical(pathname: string) {
             link.rel = 'canonical';
             document.head.appendChild(link);
         }
-        link.href = `${SITE_ORIGIN}${path}`;
+        // A self-host instance has no fixed domain; it names itself.
+        const origin = isSelfHost() ? window.location.origin : SITE_ORIGIN;
+        link.href = `${origin}${path}`;
     }, [pathname]);
 }

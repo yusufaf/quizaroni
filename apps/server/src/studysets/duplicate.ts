@@ -48,6 +48,14 @@ export function buildDuplicate(
         lastViewed: now,
         createdAt: now,
         updatedAt: now,
+        subject: null,
+        isPublic: false,
+        publishedAt: null,
+        featuredAt: null,
+        // A takedown follows the content, so a copy can't republish it.
+        hiddenAt: s.hiddenAt,
+        saveCount: 0,
+        copiedFrom: null,
     };
 }
 

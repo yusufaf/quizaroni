@@ -12,6 +12,10 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import PublicStudySet from './PublicStudySet';
 
+afterEach(() => {
+    vi.unstubAllEnvs();
+});
+
 // #128: the public page now renders the allowlisted payload from
 // toPublicStudyset, which has no labels, owner ids or storage keys.
 
@@ -189,6 +193,16 @@ describe('PublicStudySet', () => {
 
         expect(report.getAttribute('href')).toMatch(/^mailto:/);
         expect(report.getAttribute('href')).toContain(ID);
+    });
+
+    it('has no Report link on a self-host build', async () => {
+        vi.stubEnv('VITE_BACKEND', 'selfhost');
+        response = () => json(200, { studyset: publicSet() });
+        renderView();
+
+        await screen.findByText('Cell biology');
+
+        expect(screen.queryByRole('link', { name: 'report.action' })).toBeNull();
     });
 
     it('shows the sign-up call to action by default', async () => {

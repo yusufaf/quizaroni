@@ -4,12 +4,16 @@ import {
     rmSync,
     statSync,
 } from 'node:fs';
+import { eq } from 'drizzle-orm';
 import { type Context, Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import type { AuthHandle } from '../auth/auth';
 import type { Db } from '../db';
+import { studyset } from '../db/schema';
 import { INVALID_JSON, readJsonBody } from '../http/json-body';
-import { requireSession, type SessionEnv } from '../http/session';
+import { sessionUnlessRead, type SessionEnv } from '../http/session';
+import { publicFileKeys } from '../public/views';
+import { isListed } from '../studysets/gate';
 import { message } from '../studysets/respond';
 import {
     attachCardFile,
@@ -39,11 +43,31 @@ import type { UploadRegistry, UploadSession } from './uploads';
 const JSON_BODY_LIMIT = 16 * 1024;
 const PART_NUMBER = /^\d{1,2}$/;
 
-// The one read check for card files. Today only the set's owner may read;
-// #261 adds published sets here.
-export function canReadCardFile(db: Db, userId: string, key: string): boolean {
+// The one read check for card files: the set's owner, or anyone (signed in
+// or not) for an image a listed set's card shows.
+export function canReadCardFile(
+    db: Db,
+    userId: string | undefined,
+    key: string
+): boolean {
     const setId = key.split('/')[0]!;
-    return ownedRow(db, userId, setId) !== undefined;
+    const row = db
+        .select({
+            ownerId: studyset.ownerId,
+            cards: studyset.cards,
+            isPublic: studyset.isPublic,
+            hiddenAt: studyset.hiddenAt,
+            publishedAt: studyset.publishedAt,
+        })
+        .from(studyset)
+        .where(eq(studyset.studysetUUID, setId))
+        .get();
+    if (!row) return false;
+    if (userId !== undefined && row.ownerId === userId) return true;
+    return (
+        isListed(row) &&
+        publicFileKeys({ studysetUUID: setId, cards: row.cards }).has(key)
+    );
 }
 
 export function canReadAvatar(userId: string, key: string): boolean {
@@ -69,7 +93,7 @@ export function fileRoutes(deps: Deps): Hono<SessionEnv> {
     const { db, files, uploads } = deps;
     const routes = new Hono<SessionEnv>();
 
-    routes.use('*', requireSession(deps.auth));
+    routes.use('*', sessionUnlessRead(deps.auth));
     routes.use('*', async (c, next) => {
         if (c.req.method !== 'GET' && c.req.method !== 'HEAD') {
             c.header('Cache-Control', 'no-store');
@@ -267,12 +291,16 @@ export function fileRoutes(deps: Deps): Hono<SessionEnv> {
     });
 
     const serve = async (c: Context<SessionEnv>, key: string) => {
-        const userId = c.get('userId');
+        // Unset for an anonymous read (sessionUnlessRead).
+        const userId = c.get('userId') as string | undefined;
+        if (isAvatarKey(key) && userId === undefined) {
+            return c.json({ message: 'Unauthorized' }, 401);
+        }
         const allowed: readonly string[] | undefined = isCardFileKey(key)
             ? canReadCardFile(db, userId, key)
                 ? CARD_FILE_TYPES
                 : undefined
-            : isAvatarKey(key) && canReadAvatar(userId, key)
+            : isAvatarKey(key) && canReadAvatar(userId!, key)
               ? AVATAR_TYPES
               : undefined;
         if (!allowed) return message(c, 'Not found', 404);

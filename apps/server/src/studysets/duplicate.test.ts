@@ -51,6 +51,13 @@ const SOURCE: Row = {
     lastViewed: T0,
     createdAt: T0,
     updatedAt: T0,
+    subject: null,
+    isPublic: false,
+    publishedAt: null,
+    featuredAt: null,
+    hiddenAt: null,
+    saveCount: 0,
+    copiedFrom: null,
 };
 
 describe('buildDuplicate', () => {
@@ -95,6 +102,33 @@ describe('buildDuplicate', () => {
     test('carries over only the set columns', () => {
         const withExtra = { ...SOURCE, PK2: 'leak' } as unknown as Row;
         expect(buildDuplicate(withExtra, NEW_ID, T1)).not.toHaveProperty('PK2');
+    });
+
+    test('a hidden set stays hidden in its copy, and nothing else carries over', () => {
+        const hiddenAt = new Date('2026-02-01T00:00:00.000Z');
+        const copy = buildDuplicate(
+            {
+                ...SOURCE,
+                subject: 'science',
+                isPublic: true,
+                publishedAt: T0,
+                featuredAt: T0,
+                hiddenAt,
+                saveCount: 7,
+                copiedFrom: 'b0000000-0000-4000-8000-000000000001',
+            },
+            NEW_ID,
+            T1
+        );
+        expect(copy).toMatchObject({
+            hiddenAt,
+            subject: null,
+            isPublic: false,
+            publishedAt: null,
+            featuredAt: null,
+            saveCount: 0,
+            copiedFrom: null,
+        });
     });
 
     test('copes with a set that has no cards', () => {

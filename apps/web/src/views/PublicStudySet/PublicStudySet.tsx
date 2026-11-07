@@ -19,6 +19,7 @@ import {
 import useBrowserTitle from 'hooks/useBrowserTitle';
 import ImageGallery from 'components/ImageGallery/ImageGallery';
 import { CardFileMetadata } from 'shared/types';
+import { isSelfHost } from 'shared/auth/backend';
 import { useReportHref } from 'shared/report';
 import SavePublicSetButton from 'shared/components/SavePublicSetButton/SavePublicSetButton';
 
@@ -136,14 +137,18 @@ const PublicStudySet = ({ showSignupCta = true }: Props) => {
                             title={displayTitle}
                             variant="text"
                         />
-                        <Button
-                            size="small"
-                            href={reportHref}
-                            startIcon={<OutlinedFlag />}
-                            sx={{ color: 'text.secondary' }}
-                        >
-                            {t('report.action')}
-                        </Button>
+                        {/* Reports mail the hosted team, who can't
+                            moderate a self-host instance. */}
+                        {!isSelfHost() && (
+                            <Button
+                                size="small"
+                                href={reportHref}
+                                startIcon={<OutlinedFlag />}
+                                sx={{ color: 'text.secondary' }}
+                            >
+                                {t('report.action')}
+                            </Button>
+                        )}
                     </Stack>
                 </Stack>
             </Paper>

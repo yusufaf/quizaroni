@@ -1,8 +1,14 @@
+import {
+    isSubjectId,
+    type SubjectId,
+    type UnpublishedOnSave,
+} from '@quizaroni/shared-types';
 import { and, asc, eq, inArray } from 'drizzle-orm';
 import type { Db } from '../db';
 import { withFileURLs } from '../files/keys';
 import { studyset, userProfile } from '../db/schema';
 import type { JsonObject } from '../users/metadata';
+import { cardsGateError, isListed } from './gate';
 import {
     collectCardFileKeys,
     DEFAULT_STUDYSET_METADATA,
@@ -30,6 +36,9 @@ export type StudysetView = {
     lastViewed: string;
     createdAt: string;
     updatedAt: string;
+    subject?: SubjectId;
+    publishedAt?: string;
+    copiedFrom?: { studysetUUID: string };
 };
 
 export class StudysetTooLargeError extends Error {
@@ -54,10 +63,16 @@ function storedView(row: Row): StudysetView {
         cards: row.cards,
         categories: row.categories,
         labels: row.labels,
-        metadata: row.metadata,
+        // The server owns publiclyViewable: it says whether the set is listed.
+        metadata: { ...row.metadata, publiclyViewable: isListed(row) },
         lastViewed: row.lastViewed.toISOString(),
         createdAt: row.createdAt.toISOString(),
         updatedAt: row.updatedAt.toISOString(),
+        ...(isSubjectId(row.subject) && { subject: row.subject }),
+        ...(row.publishedAt && { publishedAt: row.publishedAt.toISOString() }),
+        ...(row.copiedFrom && {
+            copiedFrom: { studysetUUID: row.copiedFrom },
+        }),
     };
 }
 
@@ -119,7 +134,12 @@ function applyWrite(row: Row, write: StudysetWrite, now: Date): Row {
 }
 
 export type WriteResult =
-    | { status: 'ok'; studyset: StudysetView; fileCopies: FileCopy[] }
+    | {
+          status: 'ok';
+          studyset: StudysetView;
+          fileCopies: FileCopy[];
+          unpublished?: UnpublishedOnSave;
+      }
     | { status: 'forbidden' };
 
 export function ownedRows(conn: Conn, ownerId: string): Row[] {
@@ -215,8 +235,20 @@ export function writeOwned(
     );
     if (resolved.status === 'forbidden') return { status: 'forbidden' };
     const next = applyWrite(row, withCards(write, resolved), now);
+    // A card save that leaves a published set below the gate takes it off
+    // the public index; the owner can publish again once it passes.
+    const gateError =
+        row.isPublic && write.fields.cards !== undefined
+            ? cardsGateError(next.cards)
+            : undefined;
+    if (gateError) {
+        next.isPublic = false;
+        next.featuredAt = null;
+    }
     tx.update(studyset)
         .set({
+            isPublic: next.isPublic,
+            featuredAt: next.featuredAt,
             title: next.title,
             description: next.description,
             favorited: next.favorited,
@@ -238,6 +270,7 @@ export function writeOwned(
         status: 'ok',
         studyset: toView(next),
         fileCopies: resolved.copies,
+        ...(gateError && { unpublished: { errors: [gateError] } }),
     };
 }
 
@@ -296,6 +329,13 @@ export function createStudyset(
                 lastViewed: now,
                 createdAt: now,
                 updatedAt: now,
+                subject: null,
+                isPublic: false,
+                publishedAt: null,
+                featuredAt: null,
+                hiddenAt: null,
+                saveCount: 0,
+                copiedFrom: null,
             };
             const resolved = resolveCardFiles(
                 tx,

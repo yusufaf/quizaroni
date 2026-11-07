@@ -23,6 +23,7 @@ export type RouteHarness = {
     db: Db;
     files: FileStore;
     uploads: UploadRegistry;
+    webDir: string;
     close(): void;
 };
 
@@ -71,6 +72,7 @@ export async function createRouteHarness(): Promise<RouteHarness> {
         db: opened.db,
         files,
         uploads,
+        webDir,
         close() {
             closeDatabase(opened.sqlite);
             rmSync(root, { recursive: true, force: true });

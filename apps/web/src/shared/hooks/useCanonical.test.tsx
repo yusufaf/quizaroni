@@ -1,5 +1,12 @@
 // @vitest-environment jsdom
-import { describe, it, expect, beforeEach } from 'vite-plus/test';
+import {
+    describe,
+    it,
+    expect,
+    beforeEach,
+    afterEach,
+    vi,
+} from 'vite-plus/test';
 import { renderHook } from '@testing-library/react';
 import useCanonical from './useCanonical';
 
@@ -20,6 +27,17 @@ const navigate = (from: string, to: string) => {
 describe('useCanonical', () => {
     beforeEach(() => {
         document.head.innerHTML = `<link rel="canonical" href="${ORIGIN}/" />`;
+    });
+
+    afterEach(() => {
+        vi.unstubAllEnvs();
+    });
+
+    it('names this instance on a self-host build', () => {
+        vi.stubEnv('VITE_BACKEND', 'selfhost');
+        renderHook(() => useCanonical('/explore'));
+
+        expect(canonical()).toBe(`${window.location.origin}/explore`);
     });
 
     it.each(['/', '/explore', '/view/abc'])('points %s at itself', (path) => {

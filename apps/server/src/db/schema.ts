@@ -132,6 +132,25 @@ export const studyset = sqliteTable(
         lastViewed: integer('last_viewed', { mode: 'timestamp_ms' }).notNull(),
         createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
         updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+        // Publishing. A set is listed publicly only when it's public, has been
+        // published and isn't hidden. publishedAt keeps the first publish time
+        // across an unpublish, so it can't be the listed flag on its own.
+        subject: text('subject'),
+        isPublic: integer('is_public', { mode: 'boolean' })
+            .notNull()
+            .default(false),
+        publishedAt: integer('published_at', { mode: 'timestamp_ms' }),
+        featuredAt: integer('featured_at', { mode: 'timestamp_ms' }),
+        hiddenAt: integer('hidden_at', { mode: 'timestamp_ms' }),
+        saveCount: integer('save_count').notNull().default(0),
+        // No FK: the source may be deleted.
+        copiedFrom: text('copied_from'),
     },
-    (t) => [index('studyset_owner_created_idx').on(t.ownerId, t.createdAt)]
+    (t) => [
+        index('studyset_owner_created_idx').on(t.ownerId, t.createdAt),
+        index('studyset_published_idx').on(t.publishedAt, t.studysetUUID),
+        index('studyset_featured_idx').on(t.featuredAt),
+        index('studyset_hidden_idx').on(t.hiddenAt),
+        index('studyset_save_count_idx').on(t.saveCount),
+    ]
 );

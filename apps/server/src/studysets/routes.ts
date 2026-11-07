@@ -12,6 +12,8 @@ import {
 } from './duplicate';
 import { addLabelRoutes } from './label-routes';
 import { addNoteRoutes } from './note-routes';
+import { copyPublicStudyset } from './copy-public';
+import { publishStudyset, unpublishStudyset } from './publishing';
 import { message } from './respond';
 import {
     createStudyset,
@@ -144,6 +146,7 @@ export function studysetRoutes(deps: {
             return c.json({
                 message: 'Successfully updated study set',
                 studyset: result.studyset,
+                ...(result.unpublished && { unpublished: result.unpublished }),
             });
         } catch (err) {
             if (err instanceof StudysetTooLargeError) {
@@ -217,6 +220,85 @@ export function studysetRoutes(deps: {
             }
             throw err;
         }
+    });
+
+    // Saving someone's public set makes the caller a private copy.
+    routes.post('/copy-public-studyset', async (c) => {
+        const body = await readJsonBody(c);
+        if (body === INVALID_JSON) return message(c, 'Invalid JSON', 400);
+        if (!isStudysetUUID(body.studysetUUID)) {
+            return message(c, 'Invalid studysetUUID', 400);
+        }
+        try {
+            const result = copyPublicStudyset(
+                db,
+                c.get('userId'),
+                body.studysetUUID
+            );
+            if (result.status === 'not_found') {
+                return message(
+                    c,
+                    'This study set is private or does not exist.',
+                    404
+                );
+            }
+            files.copyAll(result.fileCopies);
+            return c.json({
+                message: 'Successfully saved study set',
+                studyset: result.studyset,
+            });
+        } catch (err) {
+            if (err instanceof StudysetTooLargeError) {
+                return message(c, 'Study set too large', 413);
+            }
+            throw err;
+        }
+    });
+
+    routes.post('/publish-studyset', async (c) => {
+        const body = await readJsonBody(c);
+        if (body === INVALID_JSON) return message(c, 'Invalid JSON', 400);
+        if (!isStudysetUUID(body.studysetUUID)) {
+            return message(c, 'Invalid studysetUUID', 400);
+        }
+        const result = publishStudyset(
+            db,
+            c.get('userId'),
+            body.studysetUUID,
+            body.subject
+        );
+        if (result.status === 'not_found') {
+            return message(c, 'Study set not found', 404);
+        }
+        if (result.status === 'refused') {
+            return c.json(
+                {
+                    message: 'Study set cannot be published',
+                    errors: result.errors,
+                },
+                400
+            );
+        }
+        return c.json({
+            message: 'Published study set',
+            studyset: result.studyset,
+        });
+    });
+
+    routes.post('/unpublish-studyset', async (c) => {
+        const body = await readJsonBody(c);
+        if (body === INVALID_JSON) return message(c, 'Invalid JSON', 400);
+        if (!isStudysetUUID(body.studysetUUID)) {
+            return message(c, 'Invalid studysetUUID', 400);
+        }
+        const result = unpublishStudyset(db, c.get('userId'), body.studysetUUID);
+        if (result.status === 'not_found') {
+            return message(c, 'Study set not found', 404);
+        }
+        return c.json({
+            message: 'Unpublished study set',
+            studyset: result.studyset,
+        });
     });
 
     routes.post('/batch-delete-studysets', async (c) => {
