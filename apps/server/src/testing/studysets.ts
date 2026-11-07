@@ -85,6 +85,9 @@ export type StudysetJson = {
     lastViewed: string;
     createdAt: string;
     updatedAt: string;
+    subject?: string;
+    publishedAt?: string;
+    copiedFrom?: { studysetUUID: string };
 };
 
 export const studysetPost = (
