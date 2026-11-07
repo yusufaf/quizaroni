@@ -22,7 +22,9 @@ import {
     listStudysets,
     restampAuthor,
     StudysetTooLargeError,
+    toView,
     updateStudyset,
+    viewBytes,
 } from './store';
 import { DEFAULT_STUDYSET_METADATA } from './updates';
 
@@ -552,4 +554,50 @@ test('deleting the user removes their sets', () => {
     created(createStudyset(db, a, { studysetUUID: SET_ID }));
     db.delete(user).where(eq(user.id, a)).run();
     expect(rowOf(db, SET_ID)).toBeUndefined();
+});
+
+describe('card file URLs', () => {
+    const FILE_ID = '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d';
+
+    test('reads serve the stable path; the stored URL stays as sent', () => {
+        const db = freshDb();
+        const a = addUser(db, 'a');
+        const key = `${SET_ID}/${FILE_ID}`;
+        created(
+            createStudyset(db, a, {
+                studysetUUID: SET_ID,
+                write: write({
+                    cards: [
+                        { term: 't', files: [{ key, signedURL: 'https://evil.example/x' }] },
+                    ],
+                }),
+            })
+        );
+        expect(getStudyset(db, a, SET_ID)?.cards[0]?.files).toEqual([
+            { key, signedURL: `/api/files/${key}` },
+        ]);
+        expect(rowOf(db, SET_ID)?.cards[0]?.files).toEqual([
+            { key, signedURL: 'https://evil.example/x' },
+        ]);
+    });
+
+    test('the size cap counts the stored URL', () => {
+        const db = freshDb();
+        const a = addUser(db, 'a');
+        const key = `${SET_ID}/${FILE_ID}`;
+        const long = 'https://x.example/' + 'a'.repeat(2000);
+        created(
+            createStudyset(db, a, {
+                studysetUUID: SET_ID,
+                write: write({
+                    cards: [{ term: 't', files: [{ key, signedURL: long }] }],
+                }),
+            })
+        );
+        const row = rowOf(db, SET_ID)!;
+        const served = Buffer.byteLength(JSON.stringify(toView(row)));
+        expect(viewBytes(row) - served).toBe(
+            long.length - `/api/files/${key}`.length
+        );
+    });
 });

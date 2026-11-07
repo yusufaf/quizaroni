@@ -8,7 +8,13 @@ export const UUIDSchema = z.uuid();
 // Logto's `sub`, a short random string rather than a UUID.
 export const UserIdSchema = z.string().min(1);
 export const TimestampSchema = z.iso.datetime();
-export const SignedURLSchema = z.url();
+// A self-host server serves files from its own origin at /api/files/…; the
+// AWS build hands out absolute signed URLs.
+export const FileURLSchema = z.union([
+    z.url(),
+    z.string().regex(/^\/api\/files\/[^?#\s]+$/),
+]);
+export const SignedURLSchema = FileURLSchema;
 
 // #endregion
 
@@ -80,7 +86,7 @@ export const NamedColorSchema = z.object({
 
 export const AvatarMetadataSchema = z.object({
     type: z.enum(['dicebear', 'upload']),
-    value: z.string().url(),
+    value: FileURLSchema,
 });
 
 export const EmailNotificationSettingsSchema = z.object({
@@ -479,7 +485,7 @@ export const UploadProfilePictureRequestSchema = z.object({
 
 export const UploadProfilePictureResponseSchema = z.object({
     message: z.string(),
-    url: z.string().url(),
+    url: FileURLSchema,
 });
 
 // `user` isn't validated: ['user'] is refetched after a rename.

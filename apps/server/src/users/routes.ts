@@ -3,6 +3,8 @@ import { type Context, Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import type { AuthHandle } from '../auth/auth';
 import type { Db } from '../db';
+import { uploadAvatar } from '../files/avatars';
+import type { FileStore } from '../files/store';
 import { INVALID_JSON, readJsonBody } from '../http/json-body';
 import { noStore, requireSession, type SessionEnv } from '../http/session';
 import {
@@ -21,6 +23,7 @@ import {
 } from './profile';
 
 const BODY_LIMIT_BYTES = 256 * 1024;
+const AVATAR_BODY_LIMIT_BYTES = 3 * 1024 * 1024;
 
 const tooLarge = (c: Context) =>
     c.json({ message: 'Metadata too large' }, 413);
@@ -30,19 +33,49 @@ const tooLarge = (c: Context) =>
 export function userRoutes(deps: {
     db: Db;
     auth: AuthHandle;
+    files: FileStore;
 }): Hono<SessionEnv> {
-    const { db } = deps;
+    const { db, files } = deps;
     const routes = new Hono<SessionEnv>();
 
     routes.use('*', noStore());
     routes.use('*', requireSession(deps.auth));
 
-    routes.use(
-        '*',
+    // A profile picture arrives as base64 JSON, so its route has a larger
+    // limit of its own.
+    const generalLimit = bodyLimit({
+        maxSize: BODY_LIMIT_BYTES,
+        onError: (c) => c.json({ message: 'Payload too large' }, 413),
+    });
+    routes.use('*', (c, next) =>
+        c.req.path.endsWith('/upload-profile-picture')
+            ? next()
+            : generalLimit(c, next)
+    );
+
+    routes.post(
+        '/upload-profile-picture',
         bodyLimit({
-            maxSize: BODY_LIMIT_BYTES,
+            maxSize: AVATAR_BODY_LIMIT_BYTES,
             onError: (c) => c.json({ message: 'Payload too large' }, 413),
-        })
+        }),
+        async (c) => {
+            const body = await readJsonBody(c);
+            if (body === INVALID_JSON) {
+                return c.json({ message: 'Invalid JSON' }, 400);
+            }
+            const result = uploadAvatar(
+                db,
+                files,
+                c.get('userId'),
+                body.imageData
+            );
+            if (!result.ok) return c.json({ message: result.message }, 400);
+            return c.json({
+                message: 'Profile picture uploaded successfully',
+                url: result.url,
+            });
+        }
     );
 
     routes.post('/get-user', (c) =>

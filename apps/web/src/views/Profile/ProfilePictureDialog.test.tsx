@@ -31,14 +31,14 @@ const renderDialog = () =>
     );
 
 describe('ProfilePictureDialog', () => {
-    it('hides the upload section in a self-host build', () => {
+    it('offers the upload in a self-host build', () => {
         vi.stubEnv('VITE_BACKEND', 'selfhost');
         renderDialog();
         expect(screen.getByText('Preset Avatars')).toBeTruthy();
-        expect(screen.queryByText('Upload Custom Image')).toBeNull();
+        expect(screen.getByText('Upload Custom Image')).toBeTruthy();
         expect(
-            screen.queryByRole('button', { name: 'Choose File' })
-        ).toBeNull();
+            screen.getByRole('button', { name: 'Choose File' })
+        ).toBeTruthy();
     });
 
     it('offers the upload in the AWS build', () => {

@@ -16,6 +16,7 @@ import {
     USAGE,
 } from './config';
 import { closeDatabase, type Db, openDatabase } from './db';
+import { FileStore } from './files/store';
 import { ensureAuthSecret, getSetting, SETTING } from './settings';
 import {
     bootstrapAdmin,
@@ -134,9 +135,13 @@ const auth = lazyAuth(() => {
     };
 });
 
+const files = new FileStore(config.dataDir);
+files.resetStaging();
+
 const app = createApp({
     sqlite,
     db,
+    files,
     webDir: config.webDir,
     version: pkg.version,
     setup,

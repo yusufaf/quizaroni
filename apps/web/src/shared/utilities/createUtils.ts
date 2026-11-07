@@ -1,4 +1,4 @@
-import type { TODO, Card } from 'shared/types';
+import type { TODO, Card, CardFileMetadata, UUID } from 'shared/types';
 import { EMPTY_CARD } from '../constants';
 import { Dispatch, SetStateAction } from 'react';
 
@@ -167,3 +167,16 @@ export const addCard = ({
 };
 
 /* ==== Actions Stack ==== */
+
+// A functional update by card id, so several uploads finishing at once each
+// land on the latest cards instead of a stale copy.
+export const addFileToCard = (
+    cards: Card[],
+    cardUUID: UUID,
+    file: CardFileMetadata
+): Card[] =>
+    cards.map((card) =>
+        card.cardUUID === cardUUID
+            ? { ...card, files: [...(card.files ?? []), file] }
+            : card
+    );

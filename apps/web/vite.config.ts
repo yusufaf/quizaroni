@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 import { execSync } from 'child_process';
+import { FILES_CACHE_NAME } from './src/state/local/pwa/cacheNames';
 
 // https://vitejs.dev/config/
 
@@ -131,6 +132,20 @@ export default defineConfig({
                     /^\/setup(?:[/?]|$)/,
                 ],
                 runtimeCaching: [
+                    // Self-host card files and avatars, same origin only.
+                    // A key never gets new bytes, so cache-first is safe.
+                    {
+                        urlPattern: /\/api\/files\//,
+                        handler: 'CacheFirst',
+                        options: {
+                            cacheName: FILES_CACHE_NAME,
+                            expiration: {
+                                maxEntries: 1000,
+                                maxAgeSeconds: 60 * 60 * 24 * 365,
+                            },
+                            cacheableResponse: { statuses: [200] },
+                        },
+                    },
                     {
                         urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
                         handler: 'CacheFirst',

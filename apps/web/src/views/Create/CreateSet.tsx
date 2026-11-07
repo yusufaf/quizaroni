@@ -73,8 +73,15 @@ const CreateSet = (props: Props) => {
         { studysetUUID: studysetUUID ?? '' },
         // /create has no :id — don't fire the fetch at all rather than send
         // studysetUUID: '' (the API 404s on that, which would put /create in
-        // an error state for nothing).
-        { enabled: !!studysetUUID }
+        // an error state for nothing). A refetch on focus or reconnect that
+        // brings back a changed set (an upload attaches its file server-side)
+        // would re-seed the editor and drop unsaved edits; mount still
+        // fetches when the set is stale.
+        {
+            enabled: !!studysetUUID,
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+        }
     );
     const selectedStudyset = studysetResponse?.studyset ?? ({} as Studyset);
 

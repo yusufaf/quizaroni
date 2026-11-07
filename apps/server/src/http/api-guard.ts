@@ -42,6 +42,10 @@ export function apiRequestGuard(trustedOrigin: () => string): MiddlewareHandler 
             return blocked(c);
         }
 
+        // File parts are PUT as raw bytes. PUT is never a CORS-simple method,
+        // so a cross-site PUT always preflights, and that is never granted.
+        if (c.req.method === 'PUT') return next();
+
         const mediaType = (c.req.header('content-type') ?? '')
             .split(';')[0]!
             .trim()

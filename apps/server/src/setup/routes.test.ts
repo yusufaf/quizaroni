@@ -1,3 +1,4 @@
+import { FileStore } from '../files/store';
 import { afterEach, describe, expect, test } from 'bun:test';
 import type { Database } from 'bun:sqlite';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
@@ -37,6 +38,7 @@ function harness(configuredPublicUrl?: string): Harness {
     const app = createApp({
         sqlite: opened.sqlite,
         db: opened.db,
+        files: new FileStore(join(root, 'data')),
         webDir,
         version: '0.0.0-test',
         setup,

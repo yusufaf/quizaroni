@@ -131,6 +131,35 @@ describe('apiRequestGuard', () => {
         }
     });
 
+    test('lets a same-origin PUT of raw bytes through', async () => {
+        const res = await send(
+            { Origin: TRUSTED, 'Content-Type': 'application/octet-stream' },
+            'PUT'
+        );
+        expect(res.status).toBe(200);
+        expect((await send({ Origin: TRUSTED }, 'PUT')).status).toBe(200);
+    });
+
+    test('still blocks a cross-site PUT', async () => {
+        expect((await send({ Origin: EVIL }, 'PUT')).status).toBe(403);
+        expect(
+            (await send({ 'Sec-Fetch-Site': 'cross-site' }, 'PUT')).status
+        ).toBe(403);
+    });
+
+    test('still needs JSON for PATCH, DELETE and POST', async () => {
+        for (const method of ['PATCH', 'DELETE', 'POST']) {
+            expect(
+                (
+                    await send(
+                        { Origin: TRUSTED, 'Content-Type': 'text/plain' },
+                        method
+                    )
+                ).status
+            ).toBe(415);
+        }
+    });
+
     test('warns once per origin for each guard instance', async () => {
         const app = makeApp();
         await send({ Origin: EVIL, ...JSON_TYPE }, 'POST', app);

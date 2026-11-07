@@ -349,3 +349,22 @@ describe('local data ownership', () => {
         expect(await hasUnsyncedLocalChanges({ timeoutMs: 2000 })).toBe(true);
     });
 });
+
+describe('clearLocalData and the files cache', () => {
+    afterEach(() => {
+        vi.unstubAllGlobals();
+    });
+
+    it('drops the cached card files', async () => {
+        const del = vi.fn().mockResolvedValue(true);
+        vi.stubGlobal('caches', { delete: del });
+        await clearLocalData();
+        expect(del).toHaveBeenCalledWith('quizaroni-files');
+    });
+
+    it('copes without the Cache API', async () => {
+        vi.stubGlobal('caches', undefined);
+        Reflect.deleteProperty(globalThis, 'caches');
+        await expect(clearLocalData()).resolves.toBeUndefined();
+    });
+});

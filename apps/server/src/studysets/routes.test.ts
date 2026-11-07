@@ -514,3 +514,21 @@ describe('Combine', () => {
         expect((await getSet(h, b.cookie, bSet.studysetUUID)).cards).toEqual([]);
     });
 });
+
+describe('card file URLs on read', () => {
+    test('get-all-studysets serves the stable file path', async () => {
+        const h = await harness();
+        const { cookie } = await signUp(h);
+        const key = `${CLIENT_ID}/1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d`;
+        await createSet(h, cookie, {
+            studyset: {
+                ...LOCAL_SET,
+                cards: [{ ...CARD, files: [{ key, signedURL: 'https://evil.example/x' }] }],
+            },
+        });
+        const [set] = await listSets(h, cookie);
+        expect(set?.cards[0]?.files).toEqual([
+            { key, signedURL: `/api/files/${key}` },
+        ]);
+    });
+});

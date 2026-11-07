@@ -17,7 +17,8 @@ import { SETUP_TOKEN_FILENAME } from './setup/setup';
 const ENTRY = resolve(import.meta.dir, 'index.ts');
 const SHELL = '<!doctype html><title>shell</title>';
 const DB_FILES = [DB_FILENAME, `${DB_FILENAME}-wal`, `${DB_FILENAME}-shm`];
-const DATA_FILES = [...DB_FILES, SETUP_TOKEN_FILENAME];
+// files/ holds uploads; tmp/ holds parts being uploaded.
+const DATA_FILES = [...DB_FILES, SETUP_TOKEN_FILENAME, 'files', 'tmp'];
 const CLEAN_ENV = {
     ...process.env,
     QZ_PORT: '',
