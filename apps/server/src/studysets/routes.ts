@@ -12,6 +12,7 @@ import {
 } from './duplicate';
 import { addLabelRoutes } from './label-routes';
 import { addNoteRoutes } from './note-routes';
+import { copyPublicStudyset } from './copy-public';
 import { publishStudyset, unpublishStudyset } from './publishing';
 import { message } from './respond';
 import {
@@ -212,6 +213,39 @@ export function studysetRoutes(deps: {
             return c.json({
                 message: 'Successfully duplicated study sets',
                 studysetUUIDs: result.studysets.map((s) => s.studysetUUID),
+            });
+        } catch (err) {
+            if (err instanceof StudysetTooLargeError) {
+                return message(c, 'Study set too large', 413);
+            }
+            throw err;
+        }
+    });
+
+    // Saving someone's public set makes the caller a private copy.
+    routes.post('/copy-public-studyset', async (c) => {
+        const body = await readJsonBody(c);
+        if (body === INVALID_JSON) return message(c, 'Invalid JSON', 400);
+        if (!isStudysetUUID(body.studysetUUID)) {
+            return message(c, 'Invalid studysetUUID', 400);
+        }
+        try {
+            const result = copyPublicStudyset(
+                db,
+                c.get('userId'),
+                body.studysetUUID
+            );
+            if (result.status === 'not_found') {
+                return message(
+                    c,
+                    'This study set is private or does not exist.',
+                    404
+                );
+            }
+            files.copyAll(result.fileCopies);
+            return c.json({
+                message: 'Successfully saved study set',
+                studyset: result.studyset,
             });
         } catch (err) {
             if (err instanceof StudysetTooLargeError) {
