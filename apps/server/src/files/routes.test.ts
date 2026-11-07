@@ -124,7 +124,7 @@ describe('upload and view', () => {
             (await apiGet(h, file.signedURL, { cookie: b.cookie, headers }))
                 .status
         ).toBe(404);
-        expect((await apiGet(h, file.signedURL, { headers })).status).toBe(401);
+        expect((await apiGet(h, file.signedURL, { headers })).status).toBe(404);
     });
 
     test('a file with no matching card is still stored and served', async () => {
@@ -406,7 +406,7 @@ describe('traversal and access', () => {
         expect(
             (await apiGet(h, file.signedURL, { cookie: b.cookie })).status
         ).toBe(404);
-        expect((await apiGet(h, file.signedURL)).status).toBe(401);
+        expect((await apiGet(h, file.signedURL)).status).toBe(404);
         const init = await apiRequest(h, '/api/files/initiate-multipart-upload', {
             cookie: b.cookie,
             body: { studysetUUID: set, fileName: 'f', contentType: 'image/png' },
