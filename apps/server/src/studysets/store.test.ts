@@ -1,83 +1,42 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import type { Database } from 'bun:sqlite';
-import { mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import { eq } from 'drizzle-orm';
-import { closeDatabase, type Db, openDatabase } from '../db';
-import { studyset, user, userProfile } from '../db/schema';
+import type { Db } from '../db';
+import { studyset, user } from '../db/schema';
+import {
+    addUser,
+    fileCard,
+    OTHER_ID,
+    openTestDb,
+    rowOf,
+    SET_ID,
+    T0,
+    T1,
+    T2,
+    write,
+} from '../testing/studysets';
 import {
     createStudyset,
     deleteStudyset,
+    deleteStudysets,
     getStudyset,
     listStudysets,
     restampAuthor,
     StudysetTooLargeError,
     updateStudyset,
 } from './store';
-import { DEFAULT_STUDYSET_METADATA, type StudysetWrite } from './updates';
+import { DEFAULT_STUDYSET_METADATA } from './updates';
 
-let root: string | undefined;
-let sqlite: Database | undefined;
+let current: ReturnType<typeof openTestDb> | undefined;
 
 function freshDb(): Db {
-    root = mkdtempSync(join(tmpdir(), 'qz-studysets-'));
-    const opened = openDatabase(root);
-    sqlite = opened.sqlite;
-    return opened.db;
+    current = openTestDb();
+    return current.db;
 }
 
 afterEach(() => {
-    if (sqlite) closeDatabase(sqlite);
-    sqlite = undefined;
-    if (root) rmSync(root, { recursive: true, force: true });
-    root = undefined;
+    current?.close();
+    current = undefined;
 });
-
-const T0 = new Date('2026-11-01T10:00:00.000Z');
-const T1 = new Date('2026-11-02T10:00:00.000Z');
-const T2 = new Date('2026-11-03T10:00:00.000Z');
-const SET_ID = '0b9f4c1e-8f3a-4d2b-9c7e-1a2b3c4d5e6f';
-const OTHER_ID = '7d1e2f3a-4b5c-4d6e-8f70-8192a3b4c5d6';
-
-function addUser(db: Db, id: string, username?: string): string {
-    db.insert(user)
-        .values({
-            id,
-            name: id,
-            email: `${id}@example.com`,
-            createdAt: T0,
-            updatedAt: T0,
-        })
-        .run();
-    if (username !== undefined) {
-        db.insert(userProfile)
-            .values({
-                userId: id,
-                username,
-                metadata: {},
-                labels: [],
-                updatedAt: T0,
-            })
-            .run();
-    }
-    return id;
-}
-
-const write = (
-    fields: StudysetWrite['fields'] = {},
-    metadata: StudysetWrite['metadata'] = {}
-): StudysetWrite => ({ fields, metadata });
-
-const fileCard = (key: string) => ({ term: 't', files: [{ key }] });
-
-function rowOf(db: Db, id: string) {
-    return db
-        .select()
-        .from(studyset)
-        .where(eq(studyset.studysetUUID, id))
-        .get();
-}
 
 function created(result: ReturnType<typeof createStudyset>) {
     if (result.status !== 'ok') throw new Error(result.status);
@@ -240,6 +199,7 @@ describe('updateStudyset', () => {
         expect(result).toEqual({
             status: 'ok',
             studyset: { ...set, favorited: true, updatedAt: T1.toISOString() },
+            fileCopies: [],
         });
         expect(getStudyset(db, a, SET_ID)).toEqual(
             result.status === 'ok' ? result.studyset : null
@@ -340,6 +300,117 @@ describe('updateStudyset', () => {
     });
 });
 
+describe("card files from the caller's own sets (Combine)", () => {
+    const A_SET = 'a0000000-0000-4000-8000-000000000001';
+    const A_SET2 = 'a0000000-0000-4000-8000-000000000002';
+    const B_SET = 'b0000000-0000-4000-8000-000000000001';
+
+    function setup() {
+        const db = freshDb();
+        const a = addUser(db, 'a');
+        const b = addUser(db, 'b');
+        created(createStudyset(db, a, { studysetUUID: A_SET }, T0));
+        created(createStudyset(db, a, { studysetUUID: A_SET2 }, T0));
+        created(createStudyset(db, b, { studysetUUID: B_SET }, T0));
+        // No upload route exists yet, so files are put in place directly.
+        db.update(studyset)
+            .set({ cards: [fileCard(`${A_SET}/f`)] })
+            .where(eq(studyset.studysetUUID, A_SET))
+            .run();
+        db.update(studyset)
+            .set({ cards: [fileCard(`${B_SET}/g`)] })
+            .where(eq(studyset.studysetUUID, B_SET))
+            .run();
+        return { db, a, b };
+    }
+
+    const storedKeys = (db: Db, id: string) =>
+        (rowOf(db, id)?.cards ?? []).flatMap((c) =>
+            (c.files as { key: string }[]).map((f) => f.key)
+        );
+
+    test('a key under another own set is re-keyed and its copy listed', () => {
+        const { db, a } = setup();
+        const result = updateStudyset(
+            db,
+            a,
+            A_SET2,
+            write({ cards: [fileCard(`${A_SET}/f`)] }),
+            T1
+        );
+        if (result.status !== 'ok') throw new Error(result.status);
+        const key = storedKeys(db, A_SET2)[0]!;
+        expect(key).toStartWith(`${A_SET2}/`);
+        expect(result.fileCopies).toEqual([{ from: `${A_SET}/f`, to: key }]);
+        expect(storedKeys(db, A_SET)).toEqual([`${A_SET}/f`]);
+    });
+
+    test("a key under another user's set is refused", () => {
+        const { db, a } = setup();
+        const before = rowOf(db, A_SET2);
+        expect(
+            updateStudyset(
+                db,
+                a,
+                A_SET2,
+                write({ cards: [fileCard(`${B_SET}/g`)] })
+            )
+        ).toEqual({ status: 'forbidden' });
+        expect(rowOf(db, A_SET2)).toEqual(before);
+    });
+
+    test('a foreign-prefix key one of the own sets already holds is re-keyed', () => {
+        const { db, a } = setup();
+        db.update(studyset)
+            .set({ cards: [fileCard(`${OTHER_ID}/legacy`)] })
+            .where(eq(studyset.studysetUUID, A_SET))
+            .run();
+        const result = updateStudyset(
+            db,
+            a,
+            A_SET2,
+            write({ cards: [fileCard(`${OTHER_ID}/legacy`)] })
+        );
+        expect(result.status).toBe('ok');
+        expect(storedKeys(db, A_SET2)[0]).toStartWith(`${A_SET2}/`);
+    });
+
+    test('unknown, unsafe and non-UUID keys are refused', () => {
+        const { db, a } = setup();
+        for (const key of [
+            `${OTHER_ID}/f`,
+            'not-a-set/f',
+            `${A_SET}/../${B_SET}/g`,
+            `${A_SET2}/../x`,
+        ]) {
+            const before = rowOf(db, A_SET2);
+            expect(
+                updateStudyset(db, a, A_SET2, write({ cards: [fileCard(key)] }))
+            ).toEqual({ status: 'forbidden' });
+            expect(rowOf(db, A_SET2)).toEqual(before);
+        }
+    });
+
+    test('a create with a client id re-keys own-set keys too', () => {
+        const { db, a } = setup();
+        const result = createStudyset(db, a, {
+            studysetUUID: SET_ID,
+            write: write({ cards: [fileCard(`${A_SET}/f`)] }),
+        });
+        if (result.status !== 'ok') throw new Error(result.status);
+        expect(storedKeys(db, SET_ID)[0]).toStartWith(`${SET_ID}/`);
+        expect(result.fileCopies).toHaveLength(1);
+    });
+
+    test('a write without cards keeps the stored cards', () => {
+        const { db, a } = setup();
+        const result = updateStudyset(db, a, A_SET, write({ title: 'T' }));
+        if (result.status !== 'ok') throw new Error(result.status);
+        expect(result.studyset.cards).toEqual([fileCard(`${A_SET}/f`)]);
+        expect(result.fileCopies).toEqual([]);
+    });
+});
+
 describe('a set already over the size cap', () => {
     test('can still be edited or shrunk, but not grown', () => {
         const db = freshDb();
@@ -432,6 +503,23 @@ describe('deleteStudyset', () => {
         expect(deleteStudyset(db, a, SET_ID)).toBe('deleted');
         expect(rowOf(db, SET_ID)).toBeUndefined();
         expect(deleteStudyset(db, a, SET_ID)).toBe('absent');
+    });
+});
+
+describe('deleteStudysets', () => {
+    test("deletes the caller's ids only", () => {
+        const db = freshDb();
+        const a = addUser(db, 'a');
+        const b = addUser(db, 'b');
+        const a1 = created(createStudyset(db, a)).studysetUUID;
+        const a2 = created(createStudyset(db, a)).studysetUUID;
+        const b1 = created(createStudyset(db, b)).studysetUUID;
+        expect(
+            deleteStudysets(db, a, [a1, b1, OTHER_ID, a2]).sort()
+        ).toEqual([a1, a2].sort());
+        expect(rowOf(db, b1)).toBeDefined();
+        expect(listStudysets(db, a)).toEqual([]);
+        expect(deleteStudysets(db, a, [])).toEqual([]);
     });
 });
 

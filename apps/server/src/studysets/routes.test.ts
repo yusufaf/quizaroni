@@ -1,13 +1,20 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { session } from '../db/schema';
+import { eq } from 'drizzle-orm';
+import { session, studyset } from '../db/schema';
 import {
-    apiRequest,
-    type CallOptions,
     createRouteHarness,
     type RouteHarness,
     signIn,
     signUp,
 } from '../testing/route-harness';
+import {
+    createSet,
+    getSet,
+    listSets,
+    okJson,
+    studysetPost as post,
+    type StudysetJson as Studyset,
+} from '../testing/studysets';
 
 const PATHS = [
     '/get-all-studysets',
@@ -16,22 +23,6 @@ const PATHS = [
     '/update-studyset',
     '/delete-studyset',
 ] as const;
-
-type Studyset = {
-    studysetUUID: string;
-    userUUID: string;
-    username: string | null;
-    title: string;
-    description: string;
-    favorited: boolean;
-    cards: Record<string, unknown>[];
-    categories: string[];
-    labels: string[];
-    metadata: Record<string, unknown>;
-    lastViewed: string;
-    createdAt: string;
-    updatedAt: string;
-};
 
 let current: RouteHarness | undefined;
 
@@ -44,47 +35,6 @@ afterEach(() => {
     current?.close();
     current = undefined;
 });
-
-const post = (h: RouteHarness, path: string, o: CallOptions = {}) =>
-    apiRequest(h, `/api/studysets${path}`, o);
-
-async function okJson<T>(res: Promise<Response>): Promise<T> {
-    const r = await res;
-    expect(r.status).toBe(200);
-    return (await r.json()) as T;
-}
-
-async function createSet(
-    h: RouteHarness,
-    cookie: string,
-    body: unknown = {}
-): Promise<Studyset> {
-    return (
-        await okJson<{ studyset: Studyset }>(
-            post(h, '/create-studyset', { cookie, body })
-        )
-    ).studyset;
-}
-
-async function getSet(
-    h: RouteHarness,
-    cookie: string,
-    studysetUUID: string
-): Promise<Studyset> {
-    return (
-        await okJson<{ studyset: Studyset }>(
-            post(h, '/get-studyset', { cookie, body: { studysetUUID } })
-        )
-    ).studyset;
-}
-
-async function listSets(h: RouteHarness, cookie: string): Promise<Studyset[]> {
-    return (
-        await okJson<{ studysets: Studyset[] }>(
-            post(h, '/get-all-studysets', { cookie })
-        )
-    ).studysets;
-}
 
 const CLIENT_ID = '3f2a1b0c-9d8e-4f7a-8b6c-5d4e3f2a1b0c';
 const OTHER_SET_ID = '7d1e2f3a-4b5c-4d6e-8f70-8192a3b4c5d6';
@@ -525,4 +475,42 @@ describe('body handling', () => {
             }
         }
     );
+});
+
+describe('Combine', () => {
+    test("cards with files from another own set are re-keyed; another user's are refused", async () => {
+        const h = await harness();
+        const a = await signUp(h);
+        const b = await signUp(h);
+        const s1 = await createSet(h, a.cookie);
+        const file = { key: `${s1.studysetUUID}/f`, name: 'f.png' };
+        // No upload route exists yet, so the file is put in place directly.
+        h.db.update(studyset)
+            .set({ cards: [{ ...CARD, files: [file] }] })
+            .where(eq(studyset.studysetUUID, s1.studysetUUID))
+            .run();
+        const s2 = await createSet(h, a.cookie);
+        const { studyset: combined } = await okJson<{ studyset: Studyset }>(
+            post(h, '/update-studyset', {
+                cookie: a.cookie,
+                body: {
+                    studysetUUID: s2.studysetUUID,
+                    updates: { cards: [{ ...CARD, files: [file] }] },
+                },
+            })
+        );
+        const files = combined.cards[0]?.files as { key: string }[];
+        expect(files[0]?.key).toStartWith(`${s2.studysetUUID}/`);
+
+        const bSet = await createSet(h, b.cookie);
+        const res = await post(h, '/update-studyset', {
+            cookie: b.cookie,
+            body: {
+                studysetUUID: bSet.studysetUUID,
+                updates: { cards: [{ ...CARD, files: [file] }] },
+            },
+        });
+        expect(res.status).toBe(403);
+        expect((await getSet(h, b.cookie, bSet.studysetUUID)).cards).toEqual([]);
+    });
 });

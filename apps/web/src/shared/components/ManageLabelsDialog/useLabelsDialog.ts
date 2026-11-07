@@ -53,6 +53,13 @@ export const useLabelsDialog = () => {
         string[]
     >([]);
     const [assignLabels, setAssignLabels] = useState<string[]>([]);
+    // The rename the cascade preview was opened for, so confirming sends
+    // exactly that even if the label list refetches meanwhile.
+    const [pendingEdit, setPendingEdit] = useState<{
+        index: number;
+        oldLabel: string;
+        newLabel: string;
+    } | null>(null);
 
     const { mutate: createLabel, isLoading: isCreatingLabel } =
         useCustomMutation({
@@ -70,6 +77,7 @@ export const useLabelsDialog = () => {
         errorMessage: 'Error editing label',
         onSuccess: () => {
             setEditIndex(null);
+            setPendingEdit(null);
             setShowCascadePreview(false);
         },
     });
@@ -151,13 +159,14 @@ export const useLabelsDialog = () => {
     const handleEdit = useCallback(
         (index: number, newName: string) => {
             const oldLabel = labels[index];
-            if (!oldLabel || newName === oldLabel) {
+            if (!oldLabel || newName.trim() === oldLabel) {
                 setEditIndex(null);
                 return;
             }
 
             const affectedStudysets = getAffectedStudysetsForLabel(oldLabel);
             if (affectedStudysets.length > 0) {
+                setPendingEdit({ index, oldLabel, newLabel: newName.trim() });
                 setCascadeAction('edit');
                 setShowCascadePreview(true);
             } else {
@@ -170,19 +179,6 @@ export const useLabelsDialog = () => {
         },
         [labels, getAffectedStudysetsForLabel, editLabel]
     );
-
-    const confirmEdit = useCallback(() => {
-        if (editIndex === null) return;
-        const oldLabel = labels[editIndex];
-        if (oldLabel === undefined) return;
-
-        const newLabel = ''; // This will be passed from the form
-        editLabel({
-            index: editIndex,
-            oldLabel,
-            newLabel,
-        });
-    }, [editIndex, labels, editLabel]);
 
     const handleDelete = useCallback(() => {
         const affectedStudysets = getAffectedStudysetsForDelete();
@@ -223,14 +219,16 @@ export const useLabelsDialog = () => {
     const handleCloseCascadePreview = useCallback(() => {
         setShowCascadePreview(false);
         setCascadeAction(null);
+        setPendingEdit(null);
     }, []);
 
     const handleConfirmCascade = useCallback(() => {
         if (cascadeAction === 'delete') {
             confirmDelete();
+        } else if (cascadeAction === 'edit' && pendingEdit) {
+            editLabel(pendingEdit);
         }
-        // Edit will be handled differently since we need the new name
-    }, [cascadeAction, confirmDelete]);
+    }, [cascadeAction, confirmDelete, pendingEdit, editLabel]);
 
     const handleAssignLabel = useCallback(() => {
         if (!assignLabels.length || selectedStudysetUUIDs.length === 0) {
@@ -254,6 +252,7 @@ export const useLabelsDialog = () => {
             open: false,
         });
         setEditIndex(null);
+        setPendingEdit(null);
         setDeleteIndices([]);
         setShowCascadePreview(false);
         setSelectedTab('MANAGE');
@@ -271,19 +270,15 @@ export const useLabelsDialog = () => {
     );
 
     const affectedItems = useMemo(() => {
-        if (cascadeAction === 'edit' && editIndex !== null) {
-            const label = labels[editIndex];
-            return label === undefined
-                ? []
-                : getAffectedStudysetsForLabel(label);
+        if (cascadeAction === 'edit' && pendingEdit) {
+            return getAffectedStudysetsForLabel(pendingEdit.oldLabel);
         } else if (cascadeAction === 'delete') {
             return getAffectedStudysetsForDelete();
         }
         return [];
     }, [
         cascadeAction,
-        editIndex,
-        labels,
+        pendingEdit,
         getAffectedStudysetsForLabel,
         getAffectedStudysetsForDelete,
     ]);
