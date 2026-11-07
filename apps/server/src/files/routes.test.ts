@@ -270,6 +270,21 @@ describe('parts', () => {
     });
 });
 
+test('part URLs can only be issued once per upload', async () => {
+    const h = await harness();
+    const { cookie } = await signUp(h);
+    const set = await setWithCard(h, cookie);
+    const upload = await startUpload(h, cookie, set);
+    await partURLs(h, cookie, upload, 2);
+    const again = await apiRequest(
+        h,
+        '/api/files/get-multipart-signed-upload-urls',
+        { cookie, body: { ...upload, numParts: 1 } }
+    );
+    expect(again.status).toBe(409);
+    expect(h.uploads.get(upload.uploadId, userIdOf(h))?.numParts).toBe(2);
+});
+
 describe('disguised files', () => {
     test.each([
         ['svg', SVG_BYTES],

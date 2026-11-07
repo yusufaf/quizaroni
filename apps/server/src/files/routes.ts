@@ -116,6 +116,10 @@ export function fileRoutes(deps: Deps): Hono<SessionEnv> {
         if (!session || session.key !== body.key) {
             return message(c, 'Upload not found', 404);
         }
+        // A second call would leave parts recorded under the old count.
+        if (session.numParts !== undefined) {
+            return message(c, 'Upload already started', 409);
+        }
         const numParts = body.numParts;
         if (
             typeof numParts !== 'number' ||
