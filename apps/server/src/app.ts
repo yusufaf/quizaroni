@@ -1,12 +1,17 @@
 import type { Database } from 'bun:sqlite';
 import { join } from 'node:path';
 import { serveStatic } from '@hono/bun';
+import { and, desc, eq } from 'drizzle-orm';
 import { type Context, Hono, type MiddlewareHandler } from 'hono';
 import { AUTH_BASE_PATH, type AuthHandle } from './auth/auth';
 import { authRoutes } from './auth/routes';
 import type { Db } from './db';
 import { sanitizeLogArg } from './db/errors';
+import { studyset } from './db/schema';
 import { fileRoutes } from './files/routes';
+import { FileStore } from './files/store';
+import { UploadRegistry } from './files/uploads';
+import { apiRequestGuard } from './http/api-guard';
 import { publicRoutes } from './public/routes';
 import { toPublicStudyset } from './public/views';
 import {
@@ -16,16 +21,11 @@ import {
     SITEMAP_MAX_SETS,
     sitemapXml,
 } from './seo/pages';
-import { and, desc, eq } from 'drizzle-orm';
-import { studyset } from './db/schema';
-import { LISTED } from './studysets/gate';
-import { isStudysetUUID } from './studysets/updates';
-import { FileStore } from './files/store';
-import { UploadRegistry } from './files/uploads';
-import { apiRequestGuard } from './http/api-guard';
 import { setupRoutes } from './setup/routes';
 import type { SetupGate } from './setup/setup';
+import { LISTED } from './studysets/gate';
 import { studysetRoutes } from './studysets/routes';
+import { isStudysetUUID } from './studysets/updates';
 import { userRoutes } from './users/routes';
 
 export type AppDeps = {
