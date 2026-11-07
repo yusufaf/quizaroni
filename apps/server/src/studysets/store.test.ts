@@ -1,11 +1,19 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import type { Database } from 'bun:sqlite';
-import { mkdtempSync, rmSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import { eq } from 'drizzle-orm';
-import { closeDatabase, type Db, openDatabase } from '../db';
-import { studyset, user, userProfile } from '../db/schema';
+import type { Db } from '../db';
+import { studyset, user } from '../db/schema';
+import {
+    addUser,
+    fileCard,
+    OTHER_ID,
+    openTestDb,
+    rowOf,
+    SET_ID,
+    T0,
+    T1,
+    T2,
+    write,
+} from '../testing/studysets';
 import {
     createStudyset,
     deleteStudyset,
@@ -15,69 +23,19 @@ import {
     StudysetTooLargeError,
     updateStudyset,
 } from './store';
-import { DEFAULT_STUDYSET_METADATA, type StudysetWrite } from './updates';
+import { DEFAULT_STUDYSET_METADATA } from './updates';
 
-let root: string | undefined;
-let sqlite: Database | undefined;
+let current: ReturnType<typeof openTestDb> | undefined;
 
 function freshDb(): Db {
-    root = mkdtempSync(join(tmpdir(), 'qz-studysets-'));
-    const opened = openDatabase(root);
-    sqlite = opened.sqlite;
-    return opened.db;
+    current = openTestDb();
+    return current.db;
 }
 
 afterEach(() => {
-    if (sqlite) closeDatabase(sqlite);
-    sqlite = undefined;
-    if (root) rmSync(root, { recursive: true, force: true });
-    root = undefined;
+    current?.close();
+    current = undefined;
 });
-
-const T0 = new Date('2026-11-01T10:00:00.000Z');
-const T1 = new Date('2026-11-02T10:00:00.000Z');
-const T2 = new Date('2026-11-03T10:00:00.000Z');
-const SET_ID = '0b9f4c1e-8f3a-4d2b-9c7e-1a2b3c4d5e6f';
-const OTHER_ID = '7d1e2f3a-4b5c-4d6e-8f70-8192a3b4c5d6';
-
-function addUser(db: Db, id: string, username?: string): string {
-    db.insert(user)
-        .values({
-            id,
-            name: id,
-            email: `${id}@example.com`,
-            createdAt: T0,
-            updatedAt: T0,
-        })
-        .run();
-    if (username !== undefined) {
-        db.insert(userProfile)
-            .values({
-                userId: id,
-                username,
-                metadata: {},
-                labels: [],
-                updatedAt: T0,
-            })
-            .run();
-    }
-    return id;
-}
-
-const write = (
-    fields: StudysetWrite['fields'] = {},
-    metadata: StudysetWrite['metadata'] = {}
-): StudysetWrite => ({ fields, metadata });
-
-const fileCard = (key: string) => ({ term: 't', files: [{ key }] });
-
-function rowOf(db: Db, id: string) {
-    return db
-        .select()
-        .from(studyset)
-        .where(eq(studyset.studysetUUID, id))
-        .get();
-}
 
 function created(result: ReturnType<typeof createStudyset>) {
     if (result.status !== 'ok') throw new Error(result.status);
