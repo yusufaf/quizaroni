@@ -4,6 +4,7 @@ import {
     disallowedCardFileKeys,
     isStudysetUUID,
     parseStudysetUpdates,
+    parseStudysetUUIDList,
     planCardFileCopies,
     studysetUUIDOfKey,
 } from './updates';
@@ -385,5 +386,37 @@ describe('planCardFileCopies', () => {
         expect(planned.copies[0]?.to).toMatch(
             new RegExp(`^${SET_ID}/[0-9a-f-]{36}$`)
         );
+    });
+});
+
+describe('parseStudysetUUIDList', () => {
+    test('accepts unique lowercase ids up to the limit', () => {
+        expect(parseStudysetUUIDList([SET_ID, OTHER_ID], 2)).toEqual({
+            ok: true,
+            value: [SET_ID, OTHER_ID],
+        });
+        expect(parseStudysetUUIDList([], 2)).toEqual({ ok: true, value: [] });
+    });
+
+    test.each([
+        ['x'],
+        [[1]],
+        [['abc']],
+        [[SET_ID.toUpperCase()]],
+        [[SET_ID, SET_ID]],
+    ])('rejects %p', (value) => {
+        expect(parseStudysetUUIDList(value, 5)).toEqual({
+            ok: false,
+            status: 400,
+            message: 'Invalid studysetUUIDs',
+        });
+    });
+
+    test('rejects more than the limit', () => {
+        expect(parseStudysetUUIDList([SET_ID, OTHER_ID], 1)).toEqual({
+            ok: false,
+            status: 400,
+            message: 'Too many study sets',
+        });
     });
 });

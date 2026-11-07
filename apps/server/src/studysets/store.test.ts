@@ -17,6 +17,7 @@ import {
 import {
     createStudyset,
     deleteStudyset,
+    deleteStudysets,
     getStudyset,
     listStudysets,
     restampAuthor,
@@ -502,6 +503,23 @@ describe('deleteStudyset', () => {
         expect(deleteStudyset(db, a, SET_ID)).toBe('deleted');
         expect(rowOf(db, SET_ID)).toBeUndefined();
         expect(deleteStudyset(db, a, SET_ID)).toBe('absent');
+    });
+});
+
+describe('deleteStudysets', () => {
+    test("deletes the caller's ids only", () => {
+        const db = freshDb();
+        const a = addUser(db, 'a');
+        const b = addUser(db, 'b');
+        const a1 = created(createStudyset(db, a)).studysetUUID;
+        const a2 = created(createStudyset(db, a)).studysetUUID;
+        const b1 = created(createStudyset(db, b)).studysetUUID;
+        expect(
+            deleteStudysets(db, a, [a1, b1, OTHER_ID, a2]).sort()
+        ).toEqual([a1, a2].sort());
+        expect(rowOf(db, b1)).toBeDefined();
+        expect(listStudysets(db, a)).toEqual([]);
+        expect(deleteStudysets(db, a, [])).toEqual([]);
     });
 });
 

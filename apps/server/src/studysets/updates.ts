@@ -47,6 +47,23 @@ export function isStudysetUUID(value: unknown): value is string {
     );
 }
 
+export const MAX_BATCH_STUDYSETS = 500;
+
+export function parseStudysetUUIDList(
+    value: unknown,
+    max: number
+): ParseResult<string[]> {
+    if (
+        !Array.isArray(value) ||
+        !value.every(isStudysetUUID) ||
+        new Set(value).size !== value.length
+    ) {
+        return invalid('Invalid studysetUUIDs');
+    }
+    if (value.length > max) return invalid('Too many study sets');
+    return { ok: true, value };
+}
+
 export type StudysetFields = {
     title?: string;
     description?: string;

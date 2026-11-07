@@ -1,4 +1,4 @@
-import { type Context, Hono } from 'hono';
+import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import type { AuthHandle } from '../auth/auth';
 import type { Db } from '../db';
@@ -6,20 +6,28 @@ import { INVALID_JSON, readJsonBody } from '../http/json-body';
 import { noStore, requireSession, type SessionEnv } from '../http/session';
 import { isPlainObject } from '../users/metadata';
 import {
+    duplicateStudysets,
+    MAX_BATCH_DUPLICATES,
+} from './duplicate';
+import { message } from './respond';
+import {
     createStudyset,
     deleteStudyset,
+    deleteStudysets,
     getStudyset,
     listStudysets,
     StudysetTooLargeError,
     updateStudyset,
 } from './store';
-import { isStudysetUUID, parseStudysetUpdates } from './updates';
+import {
+    isStudysetUUID,
+    MAX_BATCH_STUDYSETS,
+    parseStudysetUpdates,
+    parseStudysetUUIDList,
+} from './updates';
 
 // Room for a set at its 400 KB cap plus the request wrapping.
 const BODY_LIMIT_BYTES = 512 * 1024;
-
-const message = (c: Context, text: string, status: 400 | 403 | 404 | 413) =>
-    c.json({ message: text }, status);
 
 // Same paths and response shapes as the Lambdas, so the web client and its
 // SyncEngine are unchanged.
@@ -147,6 +155,75 @@ export function studysetRoutes(deps: {
             return message(c, 'Study set not found', 404);
         }
         return c.json({ message: 'Successfully deleted study set' });
+    });
+
+    // `fileCopies` from duplicates are for the file store (#259) too.
+    routes.post('/duplicate-studyset', async (c) => {
+        const body = await readJsonBody(c);
+        if (body === INVALID_JSON) return message(c, 'Invalid JSON', 400);
+        if (!isStudysetUUID(body.studysetUUID)) {
+            return message(c, 'Invalid studysetUUID', 400);
+        }
+        try {
+            const result = duplicateStudysets(db, c.get('userId'), [
+                body.studysetUUID,
+            ]);
+            if (result.status === 'not_found') {
+                return message(c, 'Study set not found', 404);
+            }
+            return c.json({
+                message: 'Successfully duplicated study set',
+                studyset: result.studysets[0],
+            });
+        } catch (err) {
+            if (err instanceof StudysetTooLargeError) {
+                return message(c, 'Study set too large', 413);
+            }
+            throw err;
+        }
+    });
+
+    routes.post('/batch-duplicate-studysets', async (c) => {
+        const body = await readJsonBody(c);
+        if (body === INVALID_JSON) return message(c, 'Invalid JSON', 400);
+        const ids = parseStudysetUUIDList(
+            body.studysetUUIDs,
+            MAX_BATCH_DUPLICATES
+        );
+        if (!ids.ok) return message(c, ids.message, ids.status);
+        try {
+            const result = duplicateStudysets(db, c.get('userId'), ids.value);
+            if (result.status === 'not_found') {
+                return message(c, 'Study set not found', 404);
+            }
+            return c.json({
+                message: 'Successfully duplicated study sets',
+                studysetUUIDs: result.studysets.map((s) => s.studysetUUID),
+            });
+        } catch (err) {
+            if (err instanceof StudysetTooLargeError) {
+                return message(c, 'Study set too large', 413);
+            }
+            throw err;
+        }
+    });
+
+    routes.post('/batch-delete-studysets', async (c) => {
+        const body = await readJsonBody(c);
+        if (body === INVALID_JSON) return message(c, 'Invalid JSON', 400);
+        const ids = parseStudysetUUIDList(
+            body.studysetUUIDs,
+            MAX_BATCH_STUDYSETS
+        );
+        if (!ids.ok) return message(c, ids.message, ids.status);
+        return c.json({
+            message: 'Successfully deleted study sets',
+            deletedStudysetUUIDs: deleteStudysets(
+                db,
+                c.get('userId'),
+                ids.value
+            ),
+        });
     });
 
     return routes;

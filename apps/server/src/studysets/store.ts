@@ -355,6 +355,30 @@ export function deleteStudyset(
     );
 }
 
+// Ids the caller doesn't own are skipped, not refused.
+export function deleteStudysets(
+    db: Db,
+    ownerId: string,
+    studysetUUIDs: string[]
+): string[] {
+    if (studysetUUIDs.length === 0) return [];
+    return db.transaction(
+        (tx) =>
+            tx
+                .delete(studyset)
+                .where(
+                    and(
+                        eq(studyset.ownerId, ownerId),
+                        inArray(studyset.studysetUUID, studysetUUIDs)
+                    )
+                )
+                .returning({ id: studyset.studysetUUID })
+                .all()
+                .map((r) => r.id),
+        { behavior: 'immediate' }
+    );
+}
+
 // Renames the author on every set the user owns; updatedAt stays as it was.
 export function restampAuthor(
     tx: Pick<Db, 'update'>,
