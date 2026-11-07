@@ -9,6 +9,7 @@ import {
     duplicateStudysets,
     MAX_BATCH_DUPLICATES,
 } from './duplicate';
+import { addNoteRoutes } from './note-routes';
 import { message } from './respond';
 import {
     createStudyset,
@@ -47,6 +48,8 @@ export function studysetRoutes(deps: {
             onError: (c) => c.json({ message: 'Payload too large' }, 413),
         })
     );
+
+    addNoteRoutes(routes, db);
 
     routes.post('/get-all-studysets', (c) =>
         c.json({ studysets: listStudysets(db, c.get('userId')) })
