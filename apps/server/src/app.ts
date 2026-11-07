@@ -88,7 +88,7 @@ export function createApp({
 
     app.route('/api/users', userRoutes({ db, auth }));
 
-    app.route('/api/studysets', studysetRoutes({ db, auth }));
+    app.route('/api/studysets', studysetRoutes({ db, auth, files }));
 
     app.route('/api/files', fileRoutes({ db, auth, files, uploads }));
 

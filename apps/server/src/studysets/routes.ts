@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import type { AuthHandle } from '../auth/auth';
 import type { Db } from '../db';
+import type { FileStore } from '../files/store';
 import { INVALID_JSON, readJsonBody } from '../http/json-body';
 import { noStore, requireSession, type SessionEnv } from '../http/session';
 import { isPlainObject } from '../users/metadata';
@@ -36,8 +37,9 @@ const BODY_LIMIT_BYTES = 512 * 1024;
 export function studysetRoutes(deps: {
     db: Db;
     auth: AuthHandle;
+    files: FileStore;
 }): Hono<SessionEnv> {
-    const { db } = deps;
+    const { db, files } = deps;
     const routes = new Hono<SessionEnv>();
 
     routes.use('*', noStore());
@@ -99,6 +101,7 @@ export function studysetRoutes(deps: {
             if (result.status === 'forbidden') {
                 return message(c, 'Forbidden', 403);
             }
+            files.copyAll(result.fileCopies);
             return c.json({
                 message: 'Successfully created study set',
                 studyset: result.studyset,
@@ -111,8 +114,8 @@ export function studysetRoutes(deps: {
         }
     });
 
-    // `fileCopies` from create and update are for the file store (#259) to
-    // perform; no card file exists before it.
+    // Card files combined from another set get their own copies, made after
+    // the set is saved.
     routes.post('/update-studyset', async (c) => {
         const body = await readJsonBody(c);
         if (body === INVALID_JSON) return message(c, 'Invalid JSON', 400);
@@ -137,6 +140,7 @@ export function studysetRoutes(deps: {
             if (result.status === 'forbidden') {
                 return message(c, 'Forbidden', 403);
             }
+            files.copyAll(result.fileCopies);
             return c.json({
                 message: 'Successfully updated study set',
                 studyset: result.studyset,
@@ -159,10 +163,10 @@ export function studysetRoutes(deps: {
         if (result === 'not_owner') {
             return message(c, 'Study set not found', 404);
         }
+        if (result === 'deleted') files.deleteStudysetFiles([body.studysetUUID]);
         return c.json({ message: 'Successfully deleted study set' });
     });
 
-    // `fileCopies` from duplicates are for the file store (#259) too.
     routes.post('/duplicate-studyset', async (c) => {
         const body = await readJsonBody(c);
         if (body === INVALID_JSON) return message(c, 'Invalid JSON', 400);
@@ -176,6 +180,7 @@ export function studysetRoutes(deps: {
             if (result.status === 'not_found') {
                 return message(c, 'Study set not found', 404);
             }
+            files.copyAll(result.fileCopies);
             return c.json({
                 message: 'Successfully duplicated study set',
                 studyset: result.studysets[0],
@@ -201,6 +206,7 @@ export function studysetRoutes(deps: {
             if (result.status === 'not_found') {
                 return message(c, 'Study set not found', 404);
             }
+            files.copyAll(result.fileCopies);
             return c.json({
                 message: 'Successfully duplicated study sets',
                 studysetUUIDs: result.studysets.map((s) => s.studysetUUID),
@@ -221,13 +227,11 @@ export function studysetRoutes(deps: {
             MAX_BATCH_STUDYSETS
         );
         if (!ids.ok) return message(c, ids.message, ids.status);
+        const deleted = deleteStudysets(db, c.get('userId'), ids.value);
+        files.deleteStudysetFiles(deleted);
         return c.json({
             message: 'Successfully deleted study sets',
-            deletedStudysetUUIDs: deleteStudysets(
-                db,
-                c.get('userId'),
-                ids.value
-            ),
+            deletedStudysetUUIDs: deleted,
         });
     });
 
