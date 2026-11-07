@@ -1,4 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
+import { eq } from 'drizzle-orm';
+import { studyset } from '../db/schema';
 import {
     createRouteHarness,
     type RouteHarness,
@@ -43,6 +45,30 @@ async function setWithCards(h: RouteHarness, cookie: string, n: number) {
     );
     return set.studysetUUID;
 }
+
+describe('a duplicate of a hidden set', () => {
+    test("can't be published", async () => {
+        const h = await harness();
+        const { cookie } = await signUp(h);
+        const id = await setWithCards(h, cookie, 4);
+        h.db.update(studyset)
+            .set({ hiddenAt: new Date() })
+            .where(eq(studyset.studysetUUID, id))
+            .run();
+        const { studyset: copy } = await okJson<{
+            studyset: { studysetUUID: string };
+        }>(post(h, '/duplicate-studyset', { cookie, body: { studysetUUID: id } }));
+        const res = await post(h, '/publish-studyset', {
+            cookie,
+            body: { studysetUUID: copy.studysetUUID, subject: 'science' },
+        });
+        expect(res.status).toBe(400);
+        expect(await res.json()).toEqual({
+            message: 'Study set cannot be published',
+            errors: [{ code: 'hidden' }],
+        });
+    });
+});
 
 describe('publish-studyset', () => {
     test('needs a session and a valid id', async () => {

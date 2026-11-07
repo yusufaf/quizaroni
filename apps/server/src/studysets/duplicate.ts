@@ -52,7 +52,8 @@ export function buildDuplicate(
         isPublic: false,
         publishedAt: null,
         featuredAt: null,
-        hiddenAt: null,
+        // A takedown follows the content, so a copy can't republish it.
+        hiddenAt: s.hiddenAt,
         saveCount: 0,
         copiedFrom: null,
     };
