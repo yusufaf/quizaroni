@@ -7,6 +7,7 @@ import { authRoutes } from './auth/routes';
 import type { Db } from './db';
 import { sanitizeLogArg } from './db/errors';
 import { fileRoutes } from './files/routes';
+import { publicRoutes } from './public/routes';
 import { FileStore } from './files/store';
 import { UploadRegistry } from './files/uploads';
 import { apiRequestGuard } from './http/api-guard';
@@ -91,6 +92,8 @@ export function createApp({
     app.route('/api/studysets', studysetRoutes({ db, auth, files }));
 
     app.route('/api/files', fileRoutes({ db, auth, files, uploads }));
+
+    app.route('/api/public', publicRoutes({ db }));
 
     app.all('/api/*', (c) => c.json({ message: 'Not found' }, 404));
 
