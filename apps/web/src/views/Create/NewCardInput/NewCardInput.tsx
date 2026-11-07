@@ -1,6 +1,6 @@
 import { Add, DragIndicator, AddPhotoAlternate } from '@mui/icons-material';
 import FileUpload from 'components/FileUpload/FileUpload';
-import type { Card, TODO } from 'shared/types';
+import type { Card, CardFileMetadata, TODO } from 'shared/types';
 import {
     Dispatch,
     DragEvent,
@@ -24,7 +24,7 @@ import {
 } from '../CreateSetStyles';
 import useFileUpload from 'hooks/useFileUpload';
 import NewCardHeader from './NewCardHeader';
-import { addCard } from 'shared/utilities/createUtils';
+import { addCard, addFileToCard } from 'shared/utilities/createUtils';
 import { useParams } from 'react-router-dom';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -90,9 +90,16 @@ const NewCardInput = ({
 
     const setStateCallback = setCreatedSetCards;
 
+    const onFileUploaded = useCallback(
+        (file: CardFileMetadata) =>
+            setCreatedSetCards((cards) => addFileToCard(cards, cardUUID, file)),
+        [cardUUID, setCreatedSetCards]
+    );
+
     const { uploadFile } = useFileUpload({
         cardUUID,
         studysetUUID,
+        onFileUploaded,
     });
 
     const termFileInputRef = useRef<HTMLInputElement>(null);

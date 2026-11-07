@@ -25,7 +25,6 @@ import {
     type AvatarPreset,
 } from 'utilities/avatarUtils';
 import { toast } from 'react-toastify';
-import { isSelfHost } from 'shared/auth/backend';
 
 type Props = {
     open: boolean;
@@ -220,74 +219,68 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
                     </Grid>
                 </Box>
 
-                {/* Uploads need file storage, which the self-host server adds in #259. */}
-                {!isSelfHost() && (
-                    <>
-                        <Typography variant="h6" gutterBottom>
-                            Upload Custom Image
-                        </Typography>
+                <Typography variant="h6" gutterBottom>
+                    Upload Custom Image
+                </Typography>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: 2,
+                        alignItems: 'center',
+                    }}
+                >
+                    <Button
+                        variant="outlined"
+                        startIcon={
+                            uploading ? (
+                                <CircularProgress size={20} />
+                            ) : (
+                                <UploadIcon />
+                            )
+                        }
+                        onClick={handleUploadClick}
+                        disabled={uploading}
+                    >
+                        {uploading ? 'Uploading...' : 'Choose File'}
+                    </Button>
+                    {selectedAvatar?.type === 'upload' && (
                         <Box
                             sx={{
-                                display: 'flex',
-                                gap: 2,
-                                alignItems: 'center',
+                                width: '5rem',
+                                height: '5rem',
+                                borderRadius: '50%',
+                                overflow: 'hidden',
+                                border: '2px solid',
+                                borderColor: 'primary.main',
                             }}
                         >
-                            <Button
-                                variant="outlined"
-                                startIcon={
-                                    uploading ? (
-                                        <CircularProgress size={20} />
-                                    ) : (
-                                        <UploadIcon />
-                                    )
-                                }
-                                onClick={handleUploadClick}
-                                disabled={uploading}
-                            >
-                                {uploading ? 'Uploading...' : 'Choose File'}
-                            </Button>
-                            {selectedAvatar?.type === 'upload' && (
-                                <Box
-                                    sx={{
-                                        width: '5rem',
-                                        height: '5rem',
-                                        borderRadius: '50%',
-                                        overflow: 'hidden',
-                                        border: '2px solid',
-                                        borderColor: 'primary.main',
-                                    }}
-                                >
-                                    <img
-                                        src={selectedAvatar.value}
-                                        alt="Selected"
-                                        style={{
-                                            width: '100%',
-                                            height: '100%',
-                                            objectFit: 'cover',
-                                        }}
-                                    />
-                                </Box>
-                            )}
+                            <img
+                                src={selectedAvatar.value}
+                                alt="Selected"
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                }}
+                            />
                         </Box>
-                        <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ mt: 1, display: 'block' }}
-                        >
-                            Max 2MB. PNG, JPEG, or WebP. Will be resized to
-                            512x512px.
-                        </Typography>
+                    )}
+                </Box>
+                <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ mt: 1, display: 'block' }}
+                >
+                    Max 2MB. PNG, JPEG, or WebP. Will be resized to 512x512px.
+                </Typography>
 
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/png,image/jpeg,image/webp"
-                            onChange={handleFileSelect}
-                            style={{ display: 'none' }}
-                        />
-                    </>
-                )}
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={handleFileSelect}
+                    style={{ display: 'none' }}
+                />
             </DialogContent>
             <StyledDialogActions>
                 <Button onClick={onClose} color="secondary">

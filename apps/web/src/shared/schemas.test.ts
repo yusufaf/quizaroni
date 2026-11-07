@@ -8,6 +8,8 @@ import {
     DEFAULT_USER_DATA,
 } from 'shared/constants';
 import {
+    AvatarMetadataSchema,
+    CardFileMetadataSchema,
     CreateStudysetResponseSchema,
     EditableUserMetadataSchema,
     GetAllStudysetsResponseSchema,
@@ -178,6 +180,42 @@ describe('EditableUserMetadataSchema', () => {
         expect(
             EditableUserMetadataSchema.safeParse({ defaultTheme: 'light' })
                 .success
+        ).toBe(true);
+    });
+});
+
+describe('self-host file URLs', () => {
+    const file = (signedURL: string) => ({
+        association: 'term',
+        key: 'k',
+        name: 'n',
+        signedURL,
+        size: 1,
+    });
+    const id = '1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d';
+
+    it('accepts the server path and absolute URLs', () => {
+        for (const url of [`/api/files/${id}/${id}`, 'https://x.example/a']) {
+            expect(CardFileMetadataSchema.safeParse(file(url)).success).toBe(
+                true
+            );
+        }
+    });
+
+    it('rejects other relative paths', () => {
+        for (const url of ['api/files/x', '/other/x', '/api/files/a b']) {
+            expect(CardFileMetadataSchema.safeParse(file(url)).success).toBe(
+                false
+            );
+        }
+    });
+
+    it('accepts an uploaded avatar path', () => {
+        expect(
+            AvatarMetadataSchema.safeParse({
+                type: 'upload',
+                value: `/api/files/avatars/u/${id}`,
+            }).success
         ).toBe(true);
     });
 });

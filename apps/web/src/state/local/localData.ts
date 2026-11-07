@@ -4,6 +4,7 @@ import {
 } from 'state/stores/gamification';
 import { useStudySessionStore } from 'state/stores/studySession';
 import { getDatabase, hasPendingSync } from './db';
+import { FILES_CACHE_NAME } from './pwa/cacheNames';
 import {
     handleOwnerStorageEvent,
     markStoredOwnerSignedOut,
@@ -29,6 +30,11 @@ export async function clearLocalData(): Promise<void> {
 
     useGamificationStore.setState(useGamificationStore.getInitialState(), true);
     useStudySessionStore.setState(useStudySessionStore.getInitialState(), true);
+
+    // Another user on this browser must not get these files offline.
+    if ('caches' in globalThis) {
+        await caches.delete(FILES_CACHE_NAME).catch(() => false);
+    }
 }
 
 /**
