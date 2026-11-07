@@ -159,3 +159,25 @@ describe('publish-studyset', () => {
         expect(set).not.toHaveProperty('copiedFrom');
     });
 });
+
+test('update-studyset reports an unpublish caused by the save', async () => {
+    const h = await harness();
+    const { cookie } = await signUp(h);
+    const id = await setWithCards(h, cookie, 4);
+    await okJson(
+        post(h, '/publish-studyset', {
+            cookie,
+            body: { studysetUUID: id, subject: 'science' },
+        })
+    );
+    const res = await okJson<{ unpublished?: unknown }>(
+        post(h, '/update-studyset', {
+            cookie,
+            body: { studysetUUID: id, updates: { cards: cards(2) } },
+        })
+    );
+    expect(res.unpublished).toEqual({
+        errors: [{ code: 'notEnoughCards', required: 4, actual: 2 }],
+    });
+    expect((await getSet(h, cookie, id)).metadata.publiclyViewable).toBe(false);
+});

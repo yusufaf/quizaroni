@@ -3,8 +3,12 @@ import type { Db } from '../db';
 import { withFileURLs } from '../files/keys';
 import { studyset, userProfile } from '../db/schema';
 import type { JsonObject } from '../users/metadata';
-import { isSubjectId, type SubjectId } from '@quizaroni/shared-types';
-import { isListed } from './gate';
+import {
+    isSubjectId,
+    type SubjectId,
+    type UnpublishedOnSave,
+} from '@quizaroni/shared-types';
+import { cardsGateError, isListed } from './gate';
 import {
     collectCardFileKeys,
     DEFAULT_STUDYSET_METADATA,
@@ -130,7 +134,12 @@ function applyWrite(row: Row, write: StudysetWrite, now: Date): Row {
 }
 
 export type WriteResult =
-    | { status: 'ok'; studyset: StudysetView; fileCopies: FileCopy[] }
+    | {
+          status: 'ok';
+          studyset: StudysetView;
+          fileCopies: FileCopy[];
+          unpublished?: UnpublishedOnSave;
+      }
     | { status: 'forbidden' };
 
 export function ownedRows(conn: Conn, ownerId: string): Row[] {
@@ -226,8 +235,20 @@ export function writeOwned(
     );
     if (resolved.status === 'forbidden') return { status: 'forbidden' };
     const next = applyWrite(row, withCards(write, resolved), now);
+    // A card save that leaves a published set below the gate takes it off
+    // the public index; the owner can publish again once it passes.
+    const gateError =
+        row.isPublic && write.fields.cards !== undefined
+            ? cardsGateError(next.cards)
+            : undefined;
+    if (gateError) {
+        next.isPublic = false;
+        next.featuredAt = null;
+    }
     tx.update(studyset)
         .set({
+            isPublic: next.isPublic,
+            featuredAt: next.featuredAt,
             title: next.title,
             description: next.description,
             favorited: next.favorited,
@@ -249,6 +270,7 @@ export function writeOwned(
         status: 'ok',
         studyset: toView(next),
         fileCopies: resolved.copies,
+        ...(gateError && { unpublished: { errors: [gateError] } }),
     };
 }
 

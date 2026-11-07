@@ -145,6 +145,7 @@ export function studysetRoutes(deps: {
             return c.json({
                 message: 'Successfully updated study set',
                 studyset: result.studyset,
+                ...(result.unpublished && { unpublished: result.unpublished }),
             });
         } catch (err) {
             if (err instanceof StudysetTooLargeError) {
