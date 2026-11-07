@@ -95,6 +95,15 @@ describe('useLabelsDialog rename', () => {
         });
     });
 
+    it('treats a name that only adds spaces as no change', () => {
+        const { result } = renderHook(() => useLabelsDialog());
+
+        act(() => result.current.handleEdit(0, 'Old '));
+
+        expect(result.current.showCascadePreview).toBe(false);
+        expect(mutations.edit).not.toHaveBeenCalled();
+    });
+
     it('sends nothing once the preview is closed', () => {
         const { result } = renderHook(() => useLabelsDialog());
 

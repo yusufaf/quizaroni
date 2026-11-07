@@ -159,7 +159,7 @@ export const useLabelsDialog = () => {
     const handleEdit = useCallback(
         (index: number, newName: string) => {
             const oldLabel = labels[index];
-            if (!oldLabel || newName === oldLabel) {
+            if (!oldLabel || newName.trim() === oldLabel) {
                 setEditIndex(null);
                 return;
             }
