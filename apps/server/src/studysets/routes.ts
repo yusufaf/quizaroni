@@ -98,6 +98,8 @@ export function studysetRoutes(deps: {
         }
     });
 
+    // `fileCopies` from create and update are for the file store (#259) to
+    // perform; no card file exists before it.
     routes.post('/update-studyset', async (c) => {
         const body = await readJsonBody(c);
         if (body === INVALID_JSON) return message(c, 'Invalid JSON', 400);

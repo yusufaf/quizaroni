@@ -4,6 +4,7 @@ import {
     disallowedCardFileKeys,
     isStudysetUUID,
     parseStudysetUpdates,
+    planCardFileCopies,
     studysetUUIDOfKey,
 } from './updates';
 
@@ -304,6 +305,19 @@ describe('card file keys', () => {
         expect(studysetUUIDOfKey('f1')).toBeUndefined();
     });
 
+    test('a key that could leave its folder names no set', () => {
+        const backslash = String.fromCharCode(92);
+        for (const key of [
+            `${SET_ID}/../${OTHER_ID}/f`,
+            `${SET_ID}/./f`,
+            `${SET_ID}/a${backslash}b`,
+            `${SET_ID}/..`,
+            `${SET_ID}/f${String.fromCharCode(0)}`,
+        ]) {
+            expect(studysetUUIDOfKey(key)).toBeUndefined();
+        }
+    });
+
     test('allows own keys and already-stored foreign keys only', () => {
         const stored = [card(`${OTHER_ID}/kept`)];
         expect(
@@ -320,5 +334,56 @@ describe('card file keys', () => {
                 stored
             )
         ).toEqual([`${OTHER_ID}/new`, `${SET_ID.toUpperCase()}/shouty`]);
+    });
+});
+
+describe('planCardFileCopies', () => {
+    const counter = () => {
+        let n = 0;
+        return () => `${SET_ID}/new${++n}`;
+    };
+    const card = (...keys: string[]) => ({
+        term: 't',
+        files: keys.map((key) => ({ key, name: 'n' })),
+    });
+
+    test('re-keys every file under the set, once per shared key', () => {
+        const cards = [
+            card(`${OTHER_ID}/a`, `${OTHER_ID}/b`),
+            card(`${OTHER_ID}/a`),
+            { term: 'no files' },
+        ];
+        const before = structuredClone(cards);
+        const planned = planCardFileCopies(cards, SET_ID, () => true, counter());
+        expect(planned.cards).toEqual([
+            card(`${SET_ID}/new1`, `${SET_ID}/new2`),
+            card(`${SET_ID}/new1`),
+            { term: 'no files' },
+        ]);
+        expect(planned.copies).toEqual([
+            { from: `${OTHER_ID}/a`, to: `${SET_ID}/new1` },
+            { from: `${OTHER_ID}/b`, to: `${SET_ID}/new2` },
+        ]);
+        expect(cards).toEqual(before);
+    });
+
+    test('leaves keys it is told to keep', () => {
+        const planned = planCardFileCopies(
+            [card(`${SET_ID}/mine`, `${OTHER_ID}/theirs`)],
+            SET_ID,
+            (key) => key.startsWith(OTHER_ID),
+            counter()
+        );
+        expect(planned.cards).toEqual([
+            card(`${SET_ID}/mine`, `${SET_ID}/new1`),
+        ]);
+        expect(planned.copies).toHaveLength(1);
+    });
+
+    test('defaults to a new opaque key under the set', () => {
+        const planned = planCardFileCopies([card(`${OTHER_ID}/a`)], SET_ID);
+        expect(planned.copies[0]?.to).toMatch(
+            new RegExp(`^${SET_ID}/[0-9a-f-]{36}$`)
+        );
     });
 });

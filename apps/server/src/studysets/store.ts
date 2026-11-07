@@ -1,10 +1,14 @@
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, eq, inArray } from 'drizzle-orm';
 import type { Db } from '../db';
 import { studyset, userProfile } from '../db/schema';
 import type { JsonObject } from '../users/metadata';
 import {
+    collectCardFileKeys,
     DEFAULT_STUDYSET_METADATA,
     disallowedCardFileKeys,
+    type FileCopy,
+    planCardFileCopies,
+    studysetUUIDOfKey,
     EMPTY_WRITE,
     MAX_STUDYSET_BYTES,
     type StudysetWrite,
@@ -34,10 +38,10 @@ export class StudysetTooLargeError extends Error {
     }
 }
 
-type Conn = Pick<Db, 'select' | 'insert' | 'update' | 'delete'>;
-type Row = typeof studyset.$inferSelect;
+export type Conn = Pick<Db, 'select' | 'insert' | 'update' | 'delete'>;
+export type Row = typeof studyset.$inferSelect;
 
-function toView(row: Row): StudysetView {
+export function toView(row: Row): StudysetView {
     return {
         studysetUUID: row.studysetUUID,
         userUUID: row.ownerId,
@@ -56,7 +60,7 @@ function toView(row: Row): StudysetView {
 }
 
 // The id is a global key; ownership is checked on every read and write.
-function ownedRow(
+export function ownedRow(
     conn: Conn,
     ownerId: string,
     studysetUUID: string
@@ -73,7 +77,7 @@ function ownedRow(
         .get();
 }
 
-const viewBytes = (row: Row) => Buffer.byteLength(JSON.stringify(toView(row)));
+export const viewBytes = (row: Row) => Buffer.byteLength(JSON.stringify(toView(row)));
 
 const VIEW_STATE_FIELDS = new Set(['favorited', 'lastViewed']);
 
@@ -105,27 +109,103 @@ function applyWrite(row: Row, write: StudysetWrite, now: Date): Row {
     return next;
 }
 
-type WriteResult =
-    | { status: 'ok'; studyset: StudysetView }
+export type WriteResult =
+    | { status: 'ok'; studyset: StudysetView; fileCopies: FileCopy[] }
     | { status: 'forbidden' };
 
+export function ownedRows(conn: Conn, ownerId: string): Row[] {
+    return conn
+        .select()
+        .from(studyset)
+        .where(eq(studyset.ownerId, ownerId))
+        .orderBy(asc(studyset.createdAt), asc(studyset.studysetUUID))
+        .all();
+}
+
+type ResolvedCards =
+    | { status: 'ok'; cards?: JsonObject[]; copies: FileCopy[] }
+    | { status: 'forbidden' };
+
+// Card file keys the set can't hold as they are must come from the caller's
+// own sets (Combine): those are re-keyed under this set, and the copies are
+// handed back for the file store (#259) to perform.
+function resolveCardFiles(
+    tx: Conn,
+    ownerId: string,
+    studysetUUID: string,
+    storedCards: JsonObject[],
+    cards: JsonObject[] | undefined
+): ResolvedCards {
+    if (cards === undefined) return { status: 'ok', copies: [] };
+    const foreign = disallowedCardFileKeys(cards, studysetUUID, storedCards);
+    if (foreign.length === 0) return { status: 'ok', cards, copies: [] };
+
+    const sourceSets = new Set<string>();
+    for (const key of foreign) {
+        const source = studysetUUIDOfKey(key);
+        if (source === undefined) return { status: 'forbidden' };
+        sourceSets.add(source);
+    }
+    const owned = new Set(
+        tx
+            .select({ id: studyset.studysetUUID })
+            .from(studyset)
+            .where(
+                and(
+                    eq(studyset.ownerId, ownerId),
+                    inArray(studyset.studysetUUID, [...sourceSets])
+                )
+            )
+            .all()
+            .map((r) => r.id)
+    );
+    const unowned = foreign.filter((key) => !owned.has(studysetUUIDOfKey(key)!));
+    if (unowned.length > 0) {
+        // A key under a set the caller doesn't own is fine only if one of
+        // their other sets already holds it (an earlier copy).
+        const held = collectCardFileKeys(
+            ownedRows(tx, ownerId)
+                .filter((r) => r.studysetUUID !== studysetUUID)
+                .flatMap((r) => r.cards)
+        ).keys;
+        if (unowned.some((key) => !held.has(key))) {
+            return { status: 'forbidden' };
+        }
+    }
+    const foreignSet = new Set(foreign);
+    const planned = planCardFileCopies(cards, studysetUUID, (key) =>
+        foreignSet.has(key)
+    );
+    return { status: 'ok', cards: planned.cards, copies: planned.copies };
+}
+
+// Only a write that carries cards gets its cards replaced.
+function withCards(
+    write: StudysetWrite,
+    resolved: { cards?: JsonObject[] }
+): StudysetWrite {
+    if (write.fields.cards === undefined || resolved.cards === undefined) {
+        return write;
+    }
+    return { ...write, fields: { ...write.fields, cards: resolved.cards } };
+}
+
 // Shared by update and a repeated create of the caller's own set.
-function writeOwned(
+export function writeOwned(
     tx: Conn,
     row: Row,
     write: StudysetWrite,
     now: Date
 ): WriteResult {
-    if (
-        disallowedCardFileKeys(
-            write.fields.cards ?? [],
-            row.studysetUUID,
-            row.cards
-        ).length > 0
-    ) {
-        return { status: 'forbidden' };
-    }
-    const next = applyWrite(row, write, now);
+    const resolved = resolveCardFiles(
+        tx,
+        row.ownerId,
+        row.studysetUUID,
+        row.cards,
+        write.fields.cards
+    );
+    if (resolved.status === 'forbidden') return { status: 'forbidden' };
+    const next = applyWrite(row, withCards(write, resolved), now);
     tx.update(studyset)
         .set({
             title: next.title,
@@ -145,17 +225,15 @@ function writeOwned(
             )
         )
         .run();
-    return { status: 'ok', studyset: toView(next) };
+    return {
+        status: 'ok',
+        studyset: toView(next),
+        fileCopies: resolved.copies,
+    };
 }
 
 export function listStudysets(db: Db, ownerId: string): StudysetView[] {
-    return db
-        .select()
-        .from(studyset)
-        .where(eq(studyset.ownerId, ownerId))
-        .orderBy(asc(studyset.createdAt), asc(studyset.studysetUUID))
-        .all()
-        .map(toView);
+    return ownedRows(db, ownerId).map(toView);
 }
 
 export function getStudyset(
@@ -210,15 +288,21 @@ export function createStudyset(
                 createdAt: now,
                 updatedAt: now,
             };
-            if (
-                disallowedCardFileKeys(write.fields.cards ?? [], id, [])
-                    .length > 0
-            ) {
-                return { status: 'forbidden' };
-            }
-            const row = applyWrite(base, write, now);
+            const resolved = resolveCardFiles(
+                tx,
+                ownerId,
+                id,
+                [],
+                write.fields.cards
+            );
+            if (resolved.status === 'forbidden') return { status: 'forbidden' };
+            const row = applyWrite(base, withCards(write, resolved), now);
             tx.insert(studyset).values(row).run();
-            return { status: 'ok', studyset: toView(row) };
+            return {
+                status: 'ok',
+                studyset: toView(row),
+                fileCopies: resolved.copies,
+            };
         },
         { behavior: 'immediate' }
     );

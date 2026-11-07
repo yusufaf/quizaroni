@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { session } from '../db/schema';
+import { eq } from 'drizzle-orm';
+import { session, studyset } from '../db/schema';
 import {
     createRouteHarness,
     type RouteHarness,
@@ -474,4 +475,42 @@ describe('body handling', () => {
             }
         }
     );
+});
+
+describe('Combine', () => {
+    test("cards with files from another own set are re-keyed; another user's are refused", async () => {
+        const h = await harness();
+        const a = await signUp(h);
+        const b = await signUp(h);
+        const s1 = await createSet(h, a.cookie);
+        const file = { key: `${s1.studysetUUID}/f`, name: 'f.png' };
+        // No upload route exists yet, so the file is put in place directly.
+        h.db.update(studyset)
+            .set({ cards: [{ ...CARD, files: [file] }] })
+            .where(eq(studyset.studysetUUID, s1.studysetUUID))
+            .run();
+        const s2 = await createSet(h, a.cookie);
+        const { studyset: combined } = await okJson<{ studyset: Studyset }>(
+            post(h, '/update-studyset', {
+                cookie: a.cookie,
+                body: {
+                    studysetUUID: s2.studysetUUID,
+                    updates: { cards: [{ ...CARD, files: [file] }] },
+                },
+            })
+        );
+        const files = combined.cards[0]?.files as { key: string }[];
+        expect(files[0]?.key).toStartWith(`${s2.studysetUUID}/`);
+
+        const bSet = await createSet(h, b.cookie);
+        const res = await post(h, '/update-studyset', {
+            cookie: b.cookie,
+            body: {
+                studysetUUID: bSet.studysetUUID,
+                updates: { cards: [{ ...CARD, files: [file] }] },
+            },
+        });
+        expect(res.status).toBe(403);
+        expect((await getSet(h, b.cookie, bSet.studysetUUID)).cards).toEqual([]);
+    });
 });

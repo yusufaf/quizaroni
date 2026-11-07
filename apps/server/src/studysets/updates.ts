@@ -163,16 +163,23 @@ export function collectCardFileKeys(cards: unknown): {
     return { keys, malformed };
 }
 
+const UNSAFE_SEGMENTS = new Set(['', '.', '..']);
+
 // A card file's set is the first segment of its key, in both the opaque
-// (`set/file`) and the legacy (`set/user/name`) layouts.
+// (`set/file`) and the legacy (`set/user/name`) layouts. A key is later joined
+// into a storage path (#259), so one that could leave its folder names none.
 export function studysetUUIDOfKey(key: unknown): string | undefined {
     if (typeof key !== 'string') return undefined;
+    if (/[\\\0]/.test(key)) return undefined;
     const parts = key.split('/');
-    if (parts.length < 2 || parts.some((part) => part === '')) return undefined;
+    if (parts.length < 2 || parts.some((part) => UNSAFE_SEGMENTS.has(part))) {
+        return undefined;
+    }
     return isStudysetUUID(parts[0]) ? parts[0] : undefined;
 }
 
-// A key may point at this set's files, or at a file the set already holds.
+// The keys this write can't store as they are: neither under this set nor
+// already held by it.
 export function disallowedCardFileKeys(
     cards: JsonObject[],
     studysetUUID: string,
@@ -182,4 +189,42 @@ export function disallowedCardFileKeys(
     return [...collectCardFileKeys(cards).keys].filter(
         (key) => studysetUUIDOfKey(key) !== studysetUUID && !stored.has(key)
     );
+}
+
+export type FileCopy = { from: string; to: string };
+
+// Gives the chosen card files new keys under this set, and lists the copies
+// that makes necessary. A key shared by several cards maps to one new key.
+export function planCardFileCopies(
+    cards: JsonObject[],
+    studysetUUID: string,
+    shouldRekey: (key: string) => boolean = () => true,
+    newFileKey: () => string = () => `${studysetUUID}/${crypto.randomUUID()}`
+): { cards: JsonObject[]; copies: FileCopy[] } {
+    const newKeys = new Map<string, string>();
+    const rekey = (oldKey: string) => {
+        let newKey = newKeys.get(oldKey);
+        if (!newKey) {
+            newKey = newFileKey();
+            newKeys.set(oldKey, newKey);
+        }
+        return newKey;
+    };
+    const rekeyed = cards.map((card) => {
+        if (!Array.isArray(card.files)) return card;
+        return {
+            ...card,
+            files: card.files.map((file: unknown) => {
+                if (!isPlainObject(file)) return file;
+                const { key } = file;
+                return typeof key === 'string' && key !== '' && shouldRekey(key)
+                    ? { ...file, key: rekey(key) }
+                    : file;
+            }),
+        };
+    });
+    return {
+        cards: rekeyed,
+        copies: [...newKeys].map(([from, to]) => ({ from, to })),
+    };
 }
