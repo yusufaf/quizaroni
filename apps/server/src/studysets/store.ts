@@ -1,5 +1,6 @@
 import { and, asc, eq, inArray } from 'drizzle-orm';
 import type { Db } from '../db';
+import { withFileURLs } from '../files/keys';
 import { studyset, userProfile } from '../db/schema';
 import type { JsonObject } from '../users/metadata';
 import {
@@ -41,7 +42,8 @@ export class StudysetTooLargeError extends Error {
 export type Conn = Pick<Db, 'select' | 'insert' | 'update' | 'delete'>;
 export type Row = typeof studyset.$inferSelect;
 
-export function toView(row: Row): StudysetView {
+// The row as stored, with each card file's URL exactly as the client sent it.
+function storedView(row: Row): StudysetView {
     return {
         studysetUUID: row.studysetUUID,
         userUUID: row.ownerId,
@@ -57,6 +59,11 @@ export function toView(row: Row): StudysetView {
         createdAt: row.createdAt.toISOString(),
         updatedAt: row.updatedAt.toISOString(),
     };
+}
+
+// Card files are always served from the stable, session-checked path.
+export function toView(row: Row): StudysetView {
+    return { ...storedView(row), cards: withFileURLs(row.cards) };
 }
 
 // The id is a global key; ownership is checked on every read and write.
@@ -77,7 +84,9 @@ export function ownedRow(
         .get();
 }
 
-export const viewBytes = (row: Row) => Buffer.byteLength(JSON.stringify(toView(row)));
+// Measures what's stored, so the cap counts each stored URL as sent.
+export const viewBytes = (row: Row) =>
+    Buffer.byteLength(JSON.stringify(storedView(row)));
 
 const VIEW_STATE_FIELDS = new Set(['favorited', 'lastViewed']);
 
