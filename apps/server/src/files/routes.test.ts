@@ -270,6 +270,20 @@ describe('parts', () => {
     });
 });
 
+test('a retried get-urls with the same count gets the same URLs', async () => {
+    const h = await harness();
+    const { cookie } = await signUp(h);
+    const set = await setWithCard(h, cookie);
+    const upload = await startUpload(h, cookie, set);
+    const first = await partURLs(h, cookie, upload, 1);
+    const part = await apiPut(h, first[0]!, PNG_BYTES, { cookie });
+    expect(await partURLs(h, cookie, upload, 1)).toEqual(first);
+    const done = await completeUpload(h, cookie, upload, [
+        { PartNumber: 1, ETag: part.headers.get('ETag')! },
+    ]);
+    expect(done.status).toBe(200);
+});
+
 test('part URLs can only be issued once per upload', async () => {
     const h = await harness();
     const { cookie } = await signUp(h);

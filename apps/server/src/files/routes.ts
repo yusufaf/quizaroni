@@ -116,11 +116,22 @@ export function fileRoutes(deps: Deps): Hono<SessionEnv> {
         if (!session || session.key !== body.key) {
             return message(c, 'Upload not found', 404);
         }
-        // A second call would leave parts recorded under the old count.
-        if (session.numParts !== undefined) {
-            return message(c, 'Upload already started', 409);
-        }
         const numParts = body.numParts;
+        const partURLs = (count: number) => {
+            const signedURLs: Record<string, string> = {};
+            for (let i = 0; i < count; i++) {
+                signedURLs[String(i)] =
+                    `/api/files/upload-part/${session.uploadId}/${i + 1}`;
+            }
+            return c.json({ signedURLs });
+        };
+        // A retry after a lost response gets the same URLs; a different count
+        // would leave parts recorded under the old one.
+        if (session.numParts !== undefined) {
+            return numParts === session.numParts
+                ? partURLs(numParts)
+                : message(c, 'Upload already started', 409);
+        }
         if (
             typeof numParts !== 'number' ||
             !Number.isInteger(numParts) ||
@@ -132,12 +143,7 @@ export function fileRoutes(deps: Deps): Hono<SessionEnv> {
             return message(c, 'Invalid numParts', 400);
         }
         session.numParts = numParts;
-        const signedURLs: Record<string, string> = {};
-        for (let i = 0; i < numParts; i++) {
-            signedURLs[String(i)] =
-                `/api/files/upload-part/${session.uploadId}/${i + 1}`;
-        }
-        return c.json({ signedURLs });
+        return partURLs(numParts);
     });
 
     // Parts are streamed to disk and counted chunk by chunk. Each chunk is
