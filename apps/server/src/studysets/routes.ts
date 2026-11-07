@@ -9,6 +9,7 @@ import {
     duplicateStudysets,
     MAX_BATCH_DUPLICATES,
 } from './duplicate';
+import { addLabelRoutes } from './label-routes';
 import { addNoteRoutes } from './note-routes';
 import { message } from './respond';
 import {
@@ -50,6 +51,7 @@ export function studysetRoutes(deps: {
     );
 
     addNoteRoutes(routes, db);
+    addLabelRoutes(routes, db);
 
     routes.post('/get-all-studysets', (c) =>
         c.json({ studysets: listStudysets(db, c.get('userId')) })
