@@ -86,7 +86,7 @@ export function createApp({
 
     app.route(AUTH_BASE_PATH, authRoutes({ auth, trustProxy }));
 
-    app.route('/api/users', userRoutes({ db, auth }));
+    app.route('/api/users', userRoutes({ db, auth, files }));
 
     app.route('/api/studysets', studysetRoutes({ db, auth, files }));
 
