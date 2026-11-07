@@ -3,6 +3,8 @@ import type { Db } from '../db';
 import { withFileURLs } from '../files/keys';
 import { studyset, userProfile } from '../db/schema';
 import type { JsonObject } from '../users/metadata';
+import { isSubjectId, type SubjectId } from '@quizaroni/shared-types';
+import { isListed } from './gate';
 import {
     collectCardFileKeys,
     DEFAULT_STUDYSET_METADATA,
@@ -30,6 +32,9 @@ export type StudysetView = {
     lastViewed: string;
     createdAt: string;
     updatedAt: string;
+    subject?: SubjectId;
+    publishedAt?: string;
+    copiedFrom?: { studysetUUID: string };
 };
 
 export class StudysetTooLargeError extends Error {
@@ -54,10 +59,16 @@ function storedView(row: Row): StudysetView {
         cards: row.cards,
         categories: row.categories,
         labels: row.labels,
-        metadata: row.metadata,
+        // The server owns publiclyViewable: it says whether the set is listed.
+        metadata: { ...row.metadata, publiclyViewable: isListed(row) },
         lastViewed: row.lastViewed.toISOString(),
         createdAt: row.createdAt.toISOString(),
         updatedAt: row.updatedAt.toISOString(),
+        ...(isSubjectId(row.subject) && { subject: row.subject }),
+        ...(row.publishedAt && { publishedAt: row.publishedAt.toISOString() }),
+        ...(row.copiedFrom && {
+            copiedFrom: { studysetUUID: row.copiedFrom },
+        }),
     };
 }
 

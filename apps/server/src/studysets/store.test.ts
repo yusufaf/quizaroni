@@ -208,7 +208,7 @@ describe('updateStudyset', () => {
         );
     });
 
-    test('merges metadata and keeps a stored publiclyViewable', () => {
+    test('merges metadata; publiclyViewable reports whether it is listed', () => {
         const db = freshDb();
         const a = addUser(db, 'a');
         created(createStudyset(db, a, { studysetUUID: SET_ID }, T0));
@@ -221,9 +221,40 @@ describe('updateStudyset', () => {
         updateStudyset(db, a, SET_ID, write({}, { notesSortBy: 'date' }), T1);
         expect(getStudyset(db, a, SET_ID)?.metadata).toMatchObject({
             notesSortBy: 'date',
-            publiclyViewable: true,
+            publiclyViewable: false,
             terminology: 'Term/Definition',
         });
+        expect(rowOf(db, SET_ID)?.metadata.publiclyViewable).toBe(true);
+    });
+
+    test('the view shows publication state from the columns', () => {
+        const db = freshDb();
+        const a = addUser(db, 'a');
+        created(createStudyset(db, a, { studysetUUID: SET_ID }, T0));
+        const fresh = getStudyset(db, a, SET_ID)!;
+        expect(fresh).not.toHaveProperty('subject');
+        expect(fresh).not.toHaveProperty('publishedAt');
+        expect(fresh).not.toHaveProperty('copiedFrom');
+        expect(fresh.metadata.publiclyViewable).toBe(false);
+
+        db.update(studyset)
+            .set({ isPublic: true, publishedAt: T1, subject: 'science' })
+            .where(eq(studyset.studysetUUID, SET_ID))
+            .run();
+        expect(getStudyset(db, a, SET_ID)).toMatchObject({
+            subject: 'science',
+            publishedAt: T1.toISOString(),
+            metadata: { publiclyViewable: true },
+        });
+
+        db.update(studyset)
+            .set({ hiddenAt: T2, subject: 'retired-x', copiedFrom: OTHER_ID })
+            .where(eq(studyset.studysetUUID, SET_ID))
+            .run();
+        const hidden = getStudyset(db, a, SET_ID)!;
+        expect(hidden.metadata.publiclyViewable).toBe(false);
+        expect(hidden).not.toHaveProperty('subject');
+        expect(hidden.copiedFrom).toEqual({ studysetUUID: OTHER_ID });
     });
 
     test('an empty write still bumps updatedAt', () => {
