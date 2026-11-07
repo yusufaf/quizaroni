@@ -7,6 +7,8 @@ import { ensureProfile } from '../users/profile';
 import { type Conn, ownedRow, ownedRows, type Row, writeOwned } from './store';
 import { isStudysetUUID, MAX_BATCH_STUDYSETS } from './updates';
 
+export const labelListSchema = z.array(z.string());
+
 export const MAX_LABEL_LENGTH = 100;
 export const MAX_PROFILE_LABELS = 500;
 
@@ -139,7 +141,8 @@ export function deleteLabels(
 }
 
 // Partial, like the Lambda: ids the caller doesn't own are reported and the
-// rest still update. Every assign writes, so updatedAt always moves.
+// rest still update. Every assign writes, so updatedAt always moves, and each
+// label is stored once.
 export function setStudysetLabels(
     db: Db,
     ownerId: string,
@@ -155,14 +158,12 @@ export function setStudysetLabels(
                 notFound.push(id);
                 continue;
             }
-            setLabels(tx, row, labels, now);
+            setLabels(tx, row, dedupe(labels), now);
             updated.push(id);
         }
         return { updated, notFound };
     }, immediate);
 }
-
-const labelListSchema = z.array(z.string());
 
 export function parseLabelAssignments(
     value: unknown
@@ -173,6 +174,9 @@ export function parseLabelAssignments(
         message: 'Invalid studysetUpdates',
     } as const;
     if (!Array.isArray(value)) return invalid;
+    if (value.length > MAX_BATCH_STUDYSETS) {
+        return { ok: false, status: 400, message: 'Too many study sets' };
+    }
     const seen = new Set<string>();
     for (const item of value) {
         if (
@@ -186,10 +190,6 @@ export function parseLabelAssignments(
         }
         seen.add(item[0]);
     }
-    if (value.length > MAX_BATCH_STUDYSETS) {
-        return { ok: false, status: 400, message: 'Too many study sets' };
-    }
     return { ok: true, value: value as [string, string[]][] };
 }
 
-export { labelListSchema };

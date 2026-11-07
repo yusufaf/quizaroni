@@ -188,7 +188,24 @@ describe('setStudysetLabels', () => {
     });
 });
 
+describe('setStudysetLabels duplicates', () => {
+    test('stores each label once, in first-seen order', () => {
+        const { db, a } = setup();
+        setStudysetLabels(db, a, [[A1, ['b', 'a', 'b', 'a']]]);
+        expect(rowOf(db, A1)?.labels).toEqual(['b', 'a']);
+    });
+});
+
 describe('parseLabelAssignments', () => {
+    test('rejects an oversized batch before checking its items', () => {
+        const big = Array.from({ length: 501 }, () => ['abc', 'not a list']);
+        expect(parseLabelAssignments(big)).toEqual({
+            ok: false,
+            status: 400,
+            message: 'Too many study sets',
+        });
+    });
+
     test.each([
         ['x'],
         [[['abc', []]]],
