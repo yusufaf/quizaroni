@@ -33,7 +33,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version-file: apps/web/.node-version
           cache: pnpm
 
       # Strict, unlike ci.yml: a manifest/lockfile mismatch here means the tree

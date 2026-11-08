@@ -5,8 +5,8 @@ workspaces: `apps/web` (React frontend) and `apps/api` (AWS CDK backend).
 
 ## Prerequisites
 
-- Node.js 24.11+ (matches `apps/web/.node-version`) or 22.18+. Node 20.19+ still
-  works but is end-of-life.
+- Node.js 24.11+ (matches `apps/web/.node-version`) or 22.18+. The test runner
+  (Vitest 5, bundled in Vite+ 1.x) does not support Node 20.
 - pnpm >= 10 (`npm i -g pnpm`)
 - For backend work: an AWS account + the AWS CLI configured, and the AWS CDK.
 
