@@ -42,10 +42,10 @@ jobs:
 
       # `--fix` exits 0 whether or not it wrote anything (verified on 10.34.5),
       # so a non-zero exit here is a registry or network failure and must stop
-      # the run before anything is classified. On 10.34.5 it writes the new
-      # selector overrides into package.json `pnpm.overrides` because that is
-      # where the existing block lives; add-paths below covers
-      # pnpm-workspace.yaml too in case a later pnpm moves them there.
+      # the run before anything is classified. pnpm writes the new selector
+      # overrides wherever the existing block lives, which is
+      # pnpm-workspace.yaml `overrides` here; add-paths below also covers
+      # package.json in case that ever changes.
       - name: Write overrides for open advisories
         run: pnpm audit --fix
 
