@@ -53,13 +53,15 @@ jobs:
             console.error("::error::pnpm audit did not produce a JSON report (registry or network failure?):", error.message);
             process.exit(1);
           }
-          if (!report.metadata?.vulnerabilities) {
-            console.error("::error::pnpm audit report has no metadata.vulnerabilities:", JSON.stringify(report).slice(0, 500));
+          // A clean report still carries an empty `advisories` object, so a
+          // missing one means pnpm did not finish the audit.
+          if (!report.metadata?.vulnerabilities || typeof report.advisories !== "object" || report.advisories === null) {
+            console.error("::error::pnpm audit report is missing metadata.vulnerabilities or advisories:", JSON.stringify(report).slice(0, 500));
             process.exit(1);
           }
           // `advisories` excludes auditConfig.ignoreGhsas entries;
           // metadata.vulnerabilities still counts them.
-          const advisories = Object.values(report.advisories ?? {});
+          const advisories = Object.values(report.advisories);
           if (advisories.length === 0) {
             console.log("No advisories outside auditConfig.ignoreGhsas.");
             process.exit(0);
@@ -68,7 +70,7 @@ jobs:
             const head = `${advisory.module_name} ${advisory.github_advisory_id} (${advisory.severity}), vulnerable ${advisory.vulnerable_versions}`;
             const action = advisory.patched_versions === "<0.0.0"
               ? "No patched release exists: replace the parent, or accept it in auditConfig.ignoreGhsas."
-              : `Bump the parent, or add an override to pnpm-workspace.yaml: '${advisory.module_name}@${advisory.vulnerable_versions}': '${advisory.patched_versions}'`;
+              : `Bump the parent, or override it in pnpm-workspace.yaml. Starting point (what --fix would write): '${advisory.module_name}@${advisory.vulnerable_versions}': '${advisory.patched_versions}'. Narrow it if that forces a new major onto a parent that pins an older one.`;
             console.log(`::error::${head}. ${action}`);
           }
           process.exit(1);
