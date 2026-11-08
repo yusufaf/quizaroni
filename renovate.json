@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>yusufaf/renovate-config"],
+  "packageRules": [
+    {
+      "description": "vite-plus and its vite-plus-core catalog alias must move together, and upgrades can need vp migrate",
+      "matchPackageNames": ["vite-plus", "@voidzero-dev/vite-plus-core"],
+      "groupName": "vite-plus",
+      "automerge": false
+    },
+    {
+      "description": "CDK bumps change deployed infrastructure",
+      "matchPackageNames": ["aws-cdk", "aws-cdk-lib", "constructs"],
+      "groupName": "aws-cdk",
+      "automerge": false
+    }
+  ]
+}
