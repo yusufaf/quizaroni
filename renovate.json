@@ -10,7 +10,7 @@
     },
     {
       "description": "CDK bumps change deployed infrastructure",
-      "matchPackageNames": ["aws-cdk", "aws-cdk-lib", "constructs"],
+      "matchPackageNames": ["aws-cdk", "aws-cdk-lib", "constructs", "@aws-cdk/**"],
       "groupName": "aws-cdk",
       "automerge": false
     }
