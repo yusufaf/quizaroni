@@ -75,7 +75,7 @@ jobs:
             process.exit(1);
           }
           // Count from `advisories`, not `metadata.vulnerabilities`: pnpm applies
-          // `pnpm.auditConfig.ignoreGhsas` / `ignoreCves` only to the former, so
+          // `auditConfig.ignoreGhsas` / `ignoreCves` (pnpm-workspace.yaml) only to the former, so
           // this is what lets an ignore entry actually silence the weekly failure.
           const advisories = Object.values(report.advisories ?? {});
           const remaining = advisories.length;
