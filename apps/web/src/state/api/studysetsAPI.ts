@@ -40,8 +40,6 @@ import { toast } from 'react-toastify';
     router.post("/api/studysets/copy-public-studyset", copyPublicStudyset);
     router.post("/api/studysets/batch-duplicate-studysets", batchDuplicateStudysets);
     router.post("/api/studysets/update-studyset", updateStudyset);
-    router.post("/api/studysets/batch-update-studysets", batchUpdateStudysets);
-    router.post("/api/studysets/editCategory", editCategory);
     router.post("/api/studysets/publish-studyset", publishStudyset);
     router.post("/api/studysets/unpublish-studyset", unpublishStudyset);
     
@@ -60,7 +58,6 @@ import { toast } from 'react-toastify';
 import {
     UUID,
     Studyset,
-    EditCategoryRequest,
     DeleteStudysetRequest,
     GetAllStudysetsRequest,
     GetStudysetRequest,
@@ -77,7 +74,6 @@ import {
     GetAllStudysetsResponse,
     GetStudysetResponse,
     CreateStudysetResponse,
-    BatchUpdateStudysetsRequest,
     CreateNoteResponse,
     UpdateStudysetResponse,
     BatchDeleteStudysetsResponse,
@@ -584,68 +580,6 @@ export const useUnpublishStudyset = () => {
             });
         },
         onSuccess,
-    });
-};
-
-export const useBatchUpdateStudysets = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: async ({
-            studysetUpdates,
-        }: BatchUpdateStudysetsRequest) => {
-            const data = await fetchJson(
-                `${BASE_API_URL}/studysets/batch-update-studysets`,
-                {
-                    ...(await getCommonPostRequestProps()),
-                    body: JSON.stringify({ studysetUpdates }),
-                }
-            );
-            return validate({
-                schema: BaseResponseSchema,
-                data,
-                type: 'response',
-                context: 'BatchUpdateStudysets',
-            });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['studysets'] });
-        },
-    });
-};
-
-export const useEditCategory = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: async ({
-            studysetUUID,
-            index,
-            newCategory,
-            oldCategory,
-        }: EditCategoryRequest) => {
-            const data = await fetchJson(
-                `${BASE_API_URL}/studysets/editCategory`,
-                {
-                    ...(await getCommonPostRequestProps()),
-                    body: JSON.stringify({
-                        studysetUUID,
-                        index,
-                        newCategory,
-                        oldCategory,
-                    }),
-                }
-            );
-            return validate({
-                schema: BaseResponseSchema,
-                data,
-                type: 'response',
-                context: 'EditCategory',
-            });
-        },
-        onSuccess: (_data, variables) => {
-            queryClient.invalidateQueries({
-                queryKey: ['studysets', variables.studysetUUID],
-            });
-        },
     });
 };
 

@@ -10,7 +10,6 @@ const defaultApiClient: SyncOptions["apiClient"] = {
   createStudyset: syncApiClient.createStudyset,
   deleteStudyset: syncApiClient.deleteStudyset,
   updateUserMetadata: syncApiClient.updateUserMetadata,
-  bulkUpdateStudysets: syncApiClient.bulkUpdateStudysets,
 };
 
 interface GlobalSyncInitializerProps {

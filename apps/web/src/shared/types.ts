@@ -312,11 +312,6 @@ export type UpdateStudysetResponse = BaseResponse & {
     unpublished?: UnpublishedOnSave;
 };
 
-type StudysetUpdatesMap = [UUID, Updates][];
-export type BatchUpdateStudysetsRequest = {
-    studysetUpdates: StudysetUpdatesMap;
-};
-
 export type FavoriteStudysetRequest = StudysetUUIDPayload & {
     favorited: boolean;
 };
@@ -325,11 +320,6 @@ export type FavoriteStudysetRequest = StudysetUUIDPayload & {
 export type GetUserRequest = {};
 export type GetUserResponse = {
     user: User;
-};
-
-export type CreateUserRequest = {
-    email: string;
-    username: string;
 };
 
 export type UpdateUserMetadataRequest = {
@@ -355,24 +345,8 @@ export type UpdateGamificationResponse = {
     customAchievements: CustomAchievement[];
 };
 
-export type UpdateDefaultThemeRequest = {
-    uuid: UUID;
-    newTheme: 'light' | 'dark';
-};
-
-export type UpdateEmailRequest = {
-    username: string;
-    newEmail: string;
-};
-
 export type DownloadUserDataRequest = {
     includeStudysets: boolean;
-};
-
-export type EditCategoryRequest = StudysetUUIDPayload & {
-    index: number;
-    newCategory: string;
-    oldCategory: string;
 };
 
 export type CreateNoteResponse = {
@@ -461,14 +435,6 @@ export type CompleteMultipartUploadRequest = {
     parts: Part[];
     studysetUUID?: UUID;
     uploadId: string;
-};
-
-export type DeleteFileRequest = {
-    key: string;
-};
-
-export type SendFeedbackRequest = {
-    key: string;
 };
 
 export type UploadProfilePictureRequest = {

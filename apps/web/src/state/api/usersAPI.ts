@@ -15,12 +15,9 @@ import {
     UploadProfilePictureResponseSchema,
 } from 'shared/schemas';
 import {
-    CreateUserRequest,
     DownloadUserDataRequest,
     GetUserRequest,
     GetUserResponse,
-    UpdateDefaultThemeRequest,
-    UpdateEmailRequest,
     UpdateNotificationPreferencesRequest,
     UpdateUserMetadataRequest,
     UpdateUsernameRequest,
@@ -29,11 +26,8 @@ import {
 } from 'shared/types';
 
 /* Endpoints
-    router.post("/api/users/create", createUser);
     router.get("/api/users/get", getUser);
-    router.post("/api/users/updateDefaultTheme", updateDefaultTheme);
     router.post("/api/users/updateUserMetadata", updateUserMetadata);
-    router.post("/api/users/updateEmail", updateUserEmail);
 */
 
 export const useGetUser = (
@@ -53,23 +47,6 @@ export const useGetUser = (
             });
         },
         ...options,
-    });
-};
-
-export const useCreateUser = () => {
-    return useMutation({
-        mutationFn: async ({ email, username }: CreateUserRequest) => {
-            const data = await fetchJson(`${BASE_API_URL}/users/create`, {
-                ...(await getCommonPostRequestProps()),
-                body: JSON.stringify({ email, username }),
-            });
-            return validate({
-                schema: BaseResponseSchema,
-                data,
-                type: 'response',
-                context: 'CreateUser',
-            });
-        },
     });
 };
 
@@ -126,51 +103,6 @@ export const useUpdateUsername = () => {
             ]) {
                 queryClient.invalidateQueries({ queryKey });
             }
-        },
-    });
-};
-
-export const useUpdateDefaultTheme = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: async ({ newTheme, uuid }: UpdateDefaultThemeRequest) => {
-            const data = await fetchJson(
-                `${BASE_API_URL}/users/updateDefaultTheme`,
-                {
-                    ...(await getCommonPostRequestProps()),
-                    body: JSON.stringify({ uuid, newTheme }),
-                }
-            );
-            return validate({
-                schema: BaseResponseSchema,
-                data,
-                type: 'response',
-                context: 'UpdateDefaultTheme',
-            });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['user'] });
-        },
-    });
-};
-
-export const useUpdateEmail = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: async ({ username, newEmail }: UpdateEmailRequest) => {
-            const data = await fetchJson(`${BASE_API_URL}/users/updateEmail`, {
-                ...(await getCommonPostRequestProps()),
-                body: JSON.stringify({ username, newEmail }),
-            });
-            return validate({
-                schema: BaseResponseSchema,
-                data,
-                type: 'response',
-                context: 'UpdateEmail',
-            });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['user'] });
         },
     });
 };

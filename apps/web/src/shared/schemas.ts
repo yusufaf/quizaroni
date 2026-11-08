@@ -324,10 +324,6 @@ export const UpdateStudysetResponseSchema = StudysetResponseSchema.extend({
 
 export const PublishStudysetResponseSchema = StudysetResponseSchema;
 
-export const BatchUpdateStudysetsRequestSchema = z.object({
-    studysetUpdates: z.array(z.tuple([UUIDSchema, UpdatesSchema])),
-});
-
 // Notes
 export const CreateNoteRequestSchema = StudysetUUIDPayloadSchema.extend({
     cardUUID: UUIDSchema,
@@ -379,35 +375,13 @@ export const BatchUpdateStudysetLabelsRequestSchema = z.object({
     studysetUpdates: z.array(z.tuple([UUIDSchema, z.array(z.string())])),
 });
 
-// Categories
-export const EditCategoryRequestSchema = StudysetUUIDPayloadSchema.extend({
-    index: z.number(),
-    newCategory: z.string(),
-    oldCategory: z.string(),
-});
-
 // Users
 export const GetUserResponseSchema = z.object({
     user: UserSchema,
 });
 
-export const CreateUserRequestSchema = z.object({
-    email: z.email(),
-    username: z.string(),
-});
-
 export const UpdateUserMetadataRequestSchema = z.object({
     updates: UpdatesSchema,
-});
-
-export const UpdateDefaultThemeRequestSchema = z.object({
-    newTheme: z.enum(['light', 'dark']),
-    uuid: UUIDSchema,
-});
-
-export const UpdateEmailRequestSchema = z.object({
-    username: z.string(),
-    newEmail: z.email(),
 });
 
 export const DownloadUserDataRequestSchema = z.object({
@@ -467,14 +441,6 @@ export const CompleteMultipartUploadRequestSchema = z.object({
     parts: z.array(PartSchema),
     studysetUUID: UUIDSchema.optional(),
     uploadId: z.string(),
-});
-
-export const DeleteFileRequestSchema = z.object({
-    key: z.string(),
-});
-
-export const SendFeedbackRequestSchema = z.object({
-    key: z.string(),
 });
 
 export const UploadProfilePictureRequestSchema = z.object({
