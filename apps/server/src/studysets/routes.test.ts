@@ -95,7 +95,7 @@ describe('authentication', () => {
         );
     });
 
-    test('batch-update-studysets does not exist, so the SyncEngine falls back', async () => {
+    test('an unknown studysets path is 404 with a session and 401 without', async () => {
         const h = await harness();
         const { cookie } = await signUp(h);
         expect((await post(h, '/batch-update-studysets', { cookie })).status).toBe(

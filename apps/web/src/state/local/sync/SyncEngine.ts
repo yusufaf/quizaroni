@@ -29,10 +29,6 @@ export interface SyncOptions {
         updateUserMetadata: (
             updates: Record<string, unknown>
         ) => Promise<unknown>;
-        // Bulk operations
-        bulkUpdateStudysets?: (
-            updates: [UUID, Record<string, unknown>][]
-        ) => Promise<unknown>;
     } | null;
     // Polling interval in ms (default: 30000 = 30s)
     pollInterval: number;
@@ -277,38 +273,7 @@ export class SyncEngine {
             }
         }
 
-        // Process updates (bulk if available)
-        if (this.options.apiClient.bulkUpdateStudysets && updates.length > 1) {
-            try {
-                const bulkUpdates = updates.map((s) => {
-                    const {
-                        _syncStatus,
-                        _lastModified,
-                        _localOnly,
-                        ...cleanStudyset
-                    } = s;
-                    return [s.studysetUUID, cleanStudyset] as [
-                        UUID,
-                        Record<string, unknown>,
-                    ];
-                });
-                await this.options.apiClient.bulkUpdateStudysets(bulkUpdates);
-
-                for (const studyset of updates) {
-                    await studysetRepository.markAsSynced(
-                        studyset.studysetUUID
-                    );
-                }
-            } catch (error) {
-                console.error(
-                    'Bulk update failed, falling back to individual updates:',
-                    error
-                );
-                // Fall through to individual updates
-            }
-        }
-
-        // Individual updates (fallback or if no bulk endpoint)
+        // Process updates
         for (const studyset of updates) {
             try {
                 const {

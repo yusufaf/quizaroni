@@ -2,7 +2,6 @@ import { useMutation } from '@tanstack/react-query';
 import { BASE_API_URL, fetchJson, getCommonPostRequestProps } from './awsAPI';
 import { validate } from 'shared/validation';
 import {
-    BaseResponseSchema,
     InitiateMultipartUploadResponseSchema,
     GetMultipartSignedUploadUrlsResponseSchema,
     FileMetadataSchema,
@@ -14,8 +13,6 @@ import {
     GetMultipartSignedUploadUrlsRequest,
     GetMultipartSignedUploadUrlsResponse,
     CompleteMultipartUploadRequest,
-    DeleteFileRequest,
-    SendFeedbackRequest,
 } from 'shared/types';
 
 /* Endpoints
@@ -23,10 +20,6 @@ import {
     router.post("/api/files/initiate-multipart-upload", initiateMultipartUpload);
     router.post("/api/files/get-multipart-signed-upload-urls", getMultipartSignedUploadUrls);
     router.post("/api/files/complete-multipart-upload", completeMultipartUpload);
-    
-    File Management
-    router.post("/api/files/delete-file", deleteFile);
-    router.post("/api/files/sendFeedback", sendFeedback);
 */
 
 export const useInitiateMultipartUpload = () => {
@@ -112,40 +105,6 @@ export const useCompleteMultipartUpload = () => {
                 data,
                 type: 'response',
                 context: 'CompleteMultipartUpload',
-            });
-        },
-    });
-};
-
-export const useDeleteFile = () => {
-    return useMutation({
-        mutationFn: async ({ key }: DeleteFileRequest) => {
-            const data = await fetchJson(`${BASE_API_URL}/files/delete-file`, {
-                ...(await getCommonPostRequestProps()),
-                body: JSON.stringify({ key }),
-            });
-            return validate({
-                schema: BaseResponseSchema,
-                data,
-                type: 'response',
-                context: 'DeleteFile',
-            });
-        },
-    });
-};
-
-export const useSendFeedback = () => {
-    return useMutation({
-        mutationFn: async ({ key }: SendFeedbackRequest) => {
-            const data = await fetchJson(`${BASE_API_URL}/files/sendFeedback`, {
-                ...(await getCommonPostRequestProps()),
-                body: JSON.stringify({ key }),
-            });
-            return validate({
-                schema: BaseResponseSchema,
-                data,
-                type: 'response',
-                context: 'SendFeedback',
             });
         },
     });

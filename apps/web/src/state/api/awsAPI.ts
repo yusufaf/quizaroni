@@ -156,25 +156,3 @@ export const completeMultipartUpload = async ({
         ...(await getCommonPostRequestProps()),
     });
 };
-
-type DeleteFileProps = {
-    key: string;
-};
-export const deleteFile = async ({ key }: DeleteFileProps) => {
-    const url = `${BASE_API_URL}/files/delete-file`;
-    return await fetchJson(url, {
-        body: JSON.stringify({ key }),
-        ...(await getCommonPostRequestProps()),
-    });
-};
-
-type SendFeedbackProps = {
-    key: string;
-};
-export const sendFeedback = async ({ key }: SendFeedbackProps) => {
-    const url = `${BASE_API_URL}/files/sendFeedback`;
-    return await fetchJson(url, {
-        body: JSON.stringify({ key }),
-        ...(await getCommonPostRequestProps()),
-    });
-};

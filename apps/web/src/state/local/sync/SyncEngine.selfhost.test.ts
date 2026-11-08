@@ -129,4 +129,35 @@ describe('SyncEngine against a self-host server', () => {
             isMetadataUpdate: false,
         });
     });
+
+    // The whole client, so a bulk method added back to it is caught (#264).
+    it('syncs several edited sets with one update-studyset call each (#264)', async () => {
+        loaded = await load();
+        await loaded.claimLocalData('user-1');
+        const second = {
+            ...LOCAL_SET,
+            studysetUUID: '7b1c2d3e-4f5a-4b6c-8d7e-9f0a1b2c3d4e',
+            title: 'Second',
+        } as Studyset;
+        await loaded.studysetRepository.create(LOCAL_SET);
+        await loaded.studysetRepository.create(second);
+        const engine = new loaded.SyncEngine({
+            apiClient: loaded.syncApiClient,
+        });
+
+        await engine.forceSync();
+        fetchMock.mockClear();
+
+        for (const set of [LOCAL_SET, second]) {
+            await loaded.studysetRepository.update(set.studysetUUID, {
+                title: `${set.title} edited`,
+            });
+        }
+        await engine.forceSync();
+
+        expect(fetchMock.mock.calls.map((call) => call[0])).toEqual([
+            '/api/studysets/update-studyset',
+            '/api/studysets/update-studyset',
+        ]);
+    });
 });

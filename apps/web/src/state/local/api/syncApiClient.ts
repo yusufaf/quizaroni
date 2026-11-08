@@ -83,32 +83,6 @@ export const syncApiClient = {
     },
 
     /**
-     * Bulk update multiple studysets on the server
-     */
-    async bulkUpdateStudysets(
-        updates: [UUID, Record<string, unknown>][]
-    ): Promise<unknown> {
-        const studysetUpdates = updates.map(([uuid, changes]) => ({
-            studysetUUID: uuid,
-            updates: changes,
-        }));
-
-        const data = await fetchJson(
-            `${BASE_API_URL}/studysets/batch-update-studysets`,
-            {
-                ...(await getCommonPostRequestProps()),
-                body: JSON.stringify({ studysetUpdates }),
-            }
-        );
-        return validate({
-            schema: BaseResponseSchema,
-            data,
-            type: 'response',
-            context: 'SyncBatchUpdateStudysets',
-        });
-    },
-
-    /**
      * Fetch all studysets from the server (for initial sync)
      */
     async getAllStudysets(): Promise<Studyset[]> {
