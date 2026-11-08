@@ -19,3 +19,16 @@ peerDependencyRules:
         - vite
     allowedVersions:
         vite: '*'
+# Hold new releases for 3 days before pnpm will resolve them, including
+# transitive ones. Non-strict (pnpm's default), so when an override floor
+# demands a version younger than this, pnpm still installs it.
+minimumReleaseAge: 4320
+auditConfig:
+    # No in-range fix, and none of these reach a production dependency
+    # (`pnpm why --prod` is empty); they only run in build and test tooling.
+    # The matching Dependabot alerts are dismissed as tolerable risk. Drop an
+    # entry once its parent (jest, workbox-build) moves to a fixed major.
+    ignoreGhsas:
+        - GHSA-gcqx-w48m-w2h4 # deepmerge: no patched release exists
+        - GHSA-3g3m-2fjr-6pw4 # glob: fix is 14.x, jest 30 and workbox pin 10/11
+        - GHSA-g3hv-75wg-m249 # minimatch: fix is 11.x, parents pin 3/5/9/10
