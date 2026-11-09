@@ -81,5 +81,5 @@
         "vite-plus": "catalog:",
         "workbox-window": "^7.4.1"
     },
-    "packageManager": "pnpm@10.34.5"
+    "packageManager": "pnpm@10.34.9"
 }
