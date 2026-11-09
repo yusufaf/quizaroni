@@ -218,7 +218,7 @@ importers:
         version: 2.8.6
       dexie:
         specifier: ^4.4.6
-        version: 4.4.6
+        version: 4.4.7
       dotenv:
         specifier: ^16.0.0
         version: 16.6.1
@@ -4109,8 +4109,8 @@ packages:
     resolution: {integrity: sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==}
     engines: {node: '>=8'}
 
-  dexie@4.4.6:
-    resolution: {integrity: sha512-hJP/BO6mjB+tX6hToIO1kmxYLNmun90wYbfcoAoLpKEyDYal/k33dg0TAfoUe2TDsbbLoVIzljJ3BN2UbR5EOg==}
+  dexie@4.4.7:
+    resolution: {integrity: sha512-wemFiCl3DTCnfzyqepUTX1ugbYbkTrw3aEZOG7YjAOUoEQB5g5PrEywPzk5JpbX/SxqQ9IvjUpxCDIEjoOWEfA==}
 
   diff-sequences@29.6.3:
     resolution: {integrity: sha512-EjePK1srD3P08o2j4f0ExnylqRs5B9tJjcp9t1krH2qRi8CCdsYfwe9JgSLurFBWwq4uOlipzfk5fHNvwFKr8Q==}
@@ -10168,7 +10168,7 @@ snapshots:
 
   detect-newline@3.1.0: {}
 
-  dexie@4.4.6: {}
+  dexie@4.4.7: {}
 
   diff-sequences@29.6.3: {}
 
