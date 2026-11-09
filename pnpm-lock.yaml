@@ -197,7 +197,7 @@ importers:
         version: 2.12.0(react@18.3.1)
       '@tanstack/react-query':
         specifier: ^5.103.1
-        version: 5.103.1(react@18.3.1)
+        version: 5.106.1(@types/react@18.3.31)(react@18.3.1)
       '@types/node':
         specifier: ^20.4.1
         version: 20.19.41
@@ -3040,13 +3040,17 @@ packages:
       typescript:
         optional: true
 
-  '@tanstack/query-core@5.103.1':
-    resolution: {integrity: sha512-rms8HqTGp6zA00dM+cUQ2eBcgzNJefuu5CAMB37i/6MiGT1zulPOytCFu2a0qjLqVR2n1jENPj9woqFQNuCzWA==}
+  '@tanstack/query-core@5.106.1':
+    resolution: {integrity: sha512-erYv/UACddcdgjOL2ixmFdK6tO/AVBeUcTCOtX2N51yZpDQ2U7KJ+xgB/bCNfsF3uoCDTqGHEEbDiFsIO9YUmQ==}
 
-  '@tanstack/react-query@5.103.1':
-    resolution: {integrity: sha512-rmAPPApNEK17VXRJhtE1rja53n23VV5w30C0saCgJhhX+EpdUnVqMGV/s5nnzV43X75KTHKzuoiuxSzGTBIkag==}
+  '@tanstack/react-query@5.106.1':
+    resolution: {integrity: sha512-ORDvJG/DSfmlFL9lQ8GDkE0VjtQbLeRDY7BL8xjKkQFGLfjFGfNWNuteWgPqA2gPJgLLuWfQ7IX0FlsHCJriyg==}
     peerDependencies:
+      '@types/react': ^18 || ^19
       react: ^18 || ^19
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   '@testing-library/dom@10.4.2':
     resolution: {integrity: sha512-yzr2S9HyAIdhz2/6qHgbs665Q7PKVcDF05vsOlHPxG1mo36gKVesdYVeDLnXgfjJ03CrKRk08knc6+E/9m8v2Q==}
@@ -9170,12 +9174,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tanstack/query-core@5.103.1': {}
+  '@tanstack/query-core@5.106.1': {}
 
-  '@tanstack/react-query@5.103.1(react@18.3.1)':
+  '@tanstack/react-query@5.106.1(@types/react@18.3.31)(react@18.3.1)':
     dependencies:
-      '@tanstack/query-core': 5.103.1
+      '@tanstack/query-core': 5.106.1
       react: 18.3.1
+    optionalDependencies:
+      '@types/react': 18.3.31
 
   '@testing-library/dom@10.4.2':
     dependencies:
