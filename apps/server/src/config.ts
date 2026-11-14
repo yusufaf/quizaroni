@@ -35,7 +35,15 @@ Headless setup (env only, used only while setup is incomplete):
   QZ_ADMIN_EMAIL        Email of the instance admin to create instead of running the setup wizard
   QZ_ADMIN_PASSWORD     Password for that admin, 8-128 characters
   QZ_REGISTRATION_MODE  open or invite_only (default invite_only)
-  QZ_TEACHER_POLICY     admin_approved or self_declared (default admin_approved)`;
+  QZ_TEACHER_POLICY     admin_approved or self_declared (default admin_approved)
+
+Email (env only, optional; without it, reset and invite messages go to the admin outbox):
+  QZ_SMTP_HOST          SMTP server hostname or IP address (no URL, no port)
+  QZ_SMTP_PORT          SMTP port (default 465 for tls, 587 for starttls, 25 for none)
+  QZ_SMTP_SECURITY      tls, starttls or none (default tls on port 465, otherwise starttls)
+  QZ_SMTP_USER          SMTP user name, set together with QZ_SMTP_PASSWORD
+  QZ_SMTP_PASSWORD      SMTP password
+  QZ_SMTP_FROM          Sender address, as address or "Name <address>"`;
 
 const ENV_NAMES = {
     'data-dir': 'QZ_DATA_DIR',
