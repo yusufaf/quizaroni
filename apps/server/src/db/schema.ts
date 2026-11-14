@@ -154,3 +154,42 @@ export const studyset = sqliteTable(
         index('studyset_save_count_idx').on(t.saveCount),
     ]
 );
+
+// Only a hash of the link token is stored, so the table can't hand out links.
+// An invite locked to an email is single-use; one without an email may allow
+// several sign-ups up to max_uses.
+export const registrationInvite = sqliteTable(
+    'registration_invite',
+    {
+        id: text('id').primaryKey(),
+        tokenHash: text('token_hash').notNull().unique(),
+        email: text('email'),
+        maxUses: integer('max_uses').notNull().default(1),
+        uses: integer('uses').notNull().default(0),
+        createdBy: text('created_by').references(() => user.id, {
+            onDelete: 'set null',
+        }),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+        expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+        revokedAt: integer('revoked_at', { mode: 'timestamp_ms' }),
+    },
+    (t) => [index('registration_invite_created_idx').on(t.createdAt)]
+);
+
+// Messages the server couldn't send (no SMTP, or the send failed), for the
+// admin to copy links from. Successful sends are not stored.
+export const mailOutbox = sqliteTable(
+    'mail_outbox',
+    {
+        id: text('id').primaryKey(),
+        kind: text('kind').$type<'password_reset' | 'invite'>().notNull(),
+        recipient: text('recipient').notNull(),
+        subject: text('subject').notNull(),
+        body: text('body').notNull(),
+        link: text('link').notNull(),
+        delivery: text('delivery').$type<'outbox' | 'failed'>().notNull(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+        expiresAt: integer('expires_at', { mode: 'timestamp_ms' }).notNull(),
+    },
+    (t) => [index('mail_outbox_expires_idx').on(t.expiresAt)]
+);
