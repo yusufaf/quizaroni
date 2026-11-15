@@ -35,7 +35,11 @@ describe('buildSystemPrompt', () => {
 
     test('treats a missing description as empty', () => {
         expect(
-            buildSystemPrompt('chat', { title: 'T', description: null, cards: [] })
+            buildSystemPrompt('chat', {
+                title: 'T',
+                description: null,
+                cards: [],
+            })
         ).toContain('**Description:** \n');
     });
 });

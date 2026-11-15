@@ -35,7 +35,9 @@ const TABS = {
 
 const tabsFor = (aiEnabled: boolean | undefined) =>
     new Set<string>(
-        Object.values(TABS).filter((tab) => tab !== TABS.AI || aiEnabled === true)
+        Object.values(TABS).filter(
+            (tab) => tab !== TABS.AI || aiEnabled === true
+        )
     );
 
 type Props = {};
@@ -108,7 +110,10 @@ const Profile = (props: Props) => {
                                 value={TABS.ACCOUNT}
                             />
                             {aiEnabled === true && (
-                                <ProfileTab label="AI Settings" value={TABS.AI} />
+                                <ProfileTab
+                                    label="AI Settings"
+                                    value={TABS.AI}
+                                />
                             )}
                             <ProfileTab
                                 label={t('profile.json')}

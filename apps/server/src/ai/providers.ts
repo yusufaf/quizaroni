@@ -40,11 +40,7 @@ function authHeaders(
     }
 }
 
-function upstreamUrl(
-    provider: AiProvider,
-    path: string,
-    search = ''
-): URL {
+function upstreamUrl(provider: AiProvider, path: string, search = ''): URL {
     const url = new URL(path + search, ORIGINS[provider]);
     if (
         url.origin !== ORIGINS[provider] ||
@@ -147,7 +143,10 @@ export function readChatReply(
     let text: unknown;
     switch (provider) {
         case 'openai':
-            text = field(field(first(field(json, 'choices')), 'message'), 'content');
+            text = field(
+                field(first(field(json, 'choices')), 'message'),
+                'content'
+            );
             break;
         case 'anthropic':
             text = field(first(field(json, 'content')), 'text');
@@ -155,7 +154,10 @@ export function readChatReply(
         case 'google':
             text = field(
                 first(
-                    field(field(first(field(json, 'candidates')), 'content'), 'parts')
+                    field(
+                        field(first(field(json, 'candidates')), 'content'),
+                        'parts'
+                    )
                 ),
                 'text'
             );

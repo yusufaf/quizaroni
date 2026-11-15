@@ -31,10 +31,15 @@ describe('AIChatPanel', () => {
         ).toBeTruthy();
     });
 
-    it.each([false, undefined])('renders nothing when the status is %s', (value) => {
-        ai.enabled.mockReturnValue(value);
-        renderPanel();
-        expect(screen.queryByRole('button', { name: 'aiChat.openPanel' })).toBeNull();
-        expect(screen.queryByText('drawer')).toBeNull();
-    });
+    it.each([false, undefined])(
+        'renders nothing when the status is %s',
+        (value) => {
+            ai.enabled.mockReturnValue(value);
+            renderPanel();
+            expect(
+                screen.queryByRole('button', { name: 'aiChat.openPanel' })
+            ).toBeNull();
+            expect(screen.queryByText('drawer')).toBeNull();
+        }
+    );
 });

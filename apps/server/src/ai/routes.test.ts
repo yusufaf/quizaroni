@@ -113,9 +113,9 @@ describe('access', () => {
                 path === '/api/ai/chat'
                     ? chatBody()
                     : { provider: 'google', apiKey: PROVIDER_FIXTURE };
-            expect(
-                (await apiRequest(h, path, { cookie, body })).status
-            ).toBe(404);
+            expect((await apiRequest(h, path, { cookie, body })).status).toBe(
+                404
+            );
             expect((await apiRequest(h, path, { body })).status).toBe(404);
         }
         expect(upstream.calls).toHaveLength(0);

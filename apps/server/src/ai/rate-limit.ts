@@ -1,4 +1,6 @@
-export type TakeResult = { ok: true } | { ok: false; retryAfterSeconds: number };
+export type TakeResult =
+    | { ok: true }
+    | { ok: false; retryAfterSeconds: number };
 
 type Window = { start: number; count: number };
 

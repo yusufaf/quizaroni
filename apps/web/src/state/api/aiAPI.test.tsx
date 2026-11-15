@@ -40,7 +40,9 @@ describe('useAIChatEnabled', () => {
     });
 
     it('is undefined while the status loads, then follows the server', async () => {
-        const fetch = vi.fn().mockResolvedValue(respond(200, { enabled: true }));
+        const fetch = vi
+            .fn()
+            .mockResolvedValue(respond(200, { enabled: true }));
         vi.stubGlobal('fetch', fetch);
         const { result } = render();
         expect(result.current).toBeUndefined();
@@ -69,7 +71,9 @@ describe('useAIChatEnabled', () => {
 
     it('keeps the last answer when a later refetch fails', async () => {
         vi.spyOn(console, 'error').mockImplementation(() => {});
-        const fetch = vi.fn().mockResolvedValue(respond(200, { enabled: true }));
+        const fetch = vi
+            .fn()
+            .mockResolvedValue(respond(200, { enabled: true }));
         vi.stubGlobal('fetch', fetch);
         const { result, client } = render();
         await waitFor(() => expect(result.current).toBe(true));

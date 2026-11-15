@@ -38,7 +38,9 @@ const AIChatPanel = ({ selectedStudyset, notesDrawerPosition }: Props) => {
                     <Fab
                         color="primary"
                         onClick={togglePanel}
-                        aria-label={t('aiChat.openPanel') || 'Open AI Assistant'}
+                        aria-label={
+                            t('aiChat.openPanel') || 'Open AI Assistant'
+                        }
                         sx={{
                             position: 'fixed',
                             top: '25rem',

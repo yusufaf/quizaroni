@@ -128,7 +128,9 @@ describe('modelsRequest', () => {
 describe('readChatReply', () => {
     test('reads each provider shape', () => {
         expect(
-            readChatReply('openai', { choices: [{ message: { content: 'a' } }] })
+            readChatReply('openai', {
+                choices: [{ message: { content: 'a' } }],
+            })
         ).toBe('a');
         expect(readChatReply('anthropic', { content: [{ text: 'b' }] })).toBe(
             'b'
@@ -226,7 +228,9 @@ describe('readModels', () => {
     });
 
     test('caps the list at 200 and tolerates unexpected shapes', () => {
-        const data = Array.from({ length: 250 }, (_, i) => ({ id: `gpt-${i}` }));
+        const data = Array.from({ length: 250 }, (_, i) => ({
+            id: `gpt-${i}`,
+        }));
         expect(readModels('openai', { data })).toHaveLength(200);
         expect(readModels('openai', {})).toEqual([]);
         expect(readModels('google', { models: 'x' })).toEqual([]);

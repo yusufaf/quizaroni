@@ -88,7 +88,12 @@ const ModelsBody = z.strictObject({ provider: Provider, apiKey: ApiKey });
 
 type UpstreamResult =
     | { ok: true; json: unknown }
-    | { ok: false; status: 502 | 504; message: string; providerStatus?: number };
+    | {
+          ok: false;
+          status: 502 | 504;
+          message: string;
+          providerStatus?: number;
+      };
 
 // Never logs or returns the key, the prompt, the URL or the provider's body:
 // a provider's error text can echo any of them.
@@ -115,7 +120,11 @@ async function callProvider(
         );
         return timedOut
             ? { ok: false, status: 504, message: 'The AI provider timed out' }
-            : { ok: false, status: 502, message: 'Could not reach the AI provider' };
+            : {
+                  ok: false,
+                  status: 502,
+                  message: 'Could not reach the AI provider',
+              };
     }
     if (!res.ok) {
         await res.body?.cancel().catch(() => {});
@@ -178,7 +187,8 @@ export function aiRoutes(
 
     routes.post('/chat', ...guarded, async (c) => {
         const body = await readJsonBody(c);
-        const parsed = body === INVALID_JSON ? undefined : ChatBody.safeParse(body);
+        const parsed =
+            body === INVALID_JSON ? undefined : ChatBody.safeParse(body);
         if (!parsed?.success) {
             return c.json({ message: 'Invalid request' }, 400);
         }
@@ -209,7 +219,10 @@ export function aiRoutes(
         );
         if (!result.ok) {
             return c.json(
-                { message: result.message, providerStatus: result.providerStatus },
+                {
+                    message: result.message,
+                    providerStatus: result.providerStatus,
+                },
                 result.status
             );
         }
@@ -242,7 +255,10 @@ export function aiRoutes(
         );
         if (!result.ok) {
             return c.json(
-                { message: result.message, providerStatus: result.providerStatus },
+                {
+                    message: result.message,
+                    providerStatus: result.providerStatus,
+                },
                 result.status
             );
         }

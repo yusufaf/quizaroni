@@ -1,5 +1,12 @@
 // @vitest-environment jsdom
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vite-plus/test';
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+} from 'vite-plus/test';
 import { cleanup, render, screen } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -37,7 +44,9 @@ vi.mock('@dnd-kit/sortable', () => ({
         isDragging: false,
     }),
 }));
-vi.mock('components/ImageGallery/ImageGallery', () => ({ default: () => null }));
+vi.mock('components/ImageGallery/ImageGallery', () => ({
+    default: () => null,
+}));
 vi.mock('./CategoriesPopover', () => ({ default: () => null }));
 
 const studyset = {

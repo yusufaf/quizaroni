@@ -11,11 +11,7 @@ import {
 } from './aiService';
 import type { AIMessage } from './providers';
 
-const msg = (
-    role: AIMessage['role'],
-    content: string,
-    i = 0
-): AIMessage => ({
+const msg = (role: AIMessage['role'], content: string, i = 0): AIMessage => ({
     id: `m${i}`,
     role,
     content,

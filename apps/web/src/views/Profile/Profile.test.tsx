@@ -72,9 +72,7 @@ describe('Profile AI tab', () => {
 
         ai.enabled.mockReturnValue(true);
         rerender(tree());
-        await waitFor(() =>
-            expect(screen.getByText('ai panel')).toBeTruthy()
-        );
+        await waitFor(() => expect(screen.getByText('ai panel')).toBeTruthy());
         expect(search()).toBe('?tab=AI');
     });
 });
