@@ -1,4 +1,5 @@
 import type { Db } from '../db';
+import { type MailTransport, Mailer } from '../mail/mailer';
 import { ensureAuthSecret } from '../settings';
 import { type AuthHandle, createAuth, lazyAuth } from './auth';
 
@@ -6,9 +7,10 @@ import { type AuthHandle, createAuth, lazyAuth } from './auth';
 
 export function testAuth(
     db: Db,
-    o: { publicUrl?: string; insecureCookies?: boolean } = {}
+    o: { publicUrl?: string; insecureCookies?: boolean; mailer?: Mailer } = {}
 ): AuthHandle {
     const publicUrl = o.publicUrl ?? 'http://localhost';
+    const mailer = o.mailer ?? new Mailer(db, undefined);
     return lazyAuth(() => ({
         publicUrl,
         auth: createAuth({
@@ -16,6 +18,7 @@ export function testAuth(
             publicUrl,
             secret: ensureAuthSecret(db),
             insecureCookies: o.insecureCookies ?? false,
+            mailer,
         }),
     }));
 }
@@ -39,6 +42,21 @@ export function ipEnv(ip: string) {
             return req === first
                 ? { address: ip, family: 'IPv4', port: 40000 }
                 : null;
+        },
+    };
+}
+
+export function fakeTransport(): {
+    transport: MailTransport;
+    sent: { to: string; subject: string; text: string }[];
+} {
+    const sent: { to: string; subject: string; text: string }[] = [];
+    return {
+        sent,
+        transport: {
+            send: async (m) => {
+                sent.push(m);
+            },
         },
     };
 }

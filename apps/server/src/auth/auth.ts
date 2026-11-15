@@ -1,10 +1,13 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { APIError, createAuthMiddleware } from 'better-auth/api';
-import { PASSWORD_MAX, PASSWORD_MIN } from '../config';
+import { normalizeEmail, PASSWORD_MAX, PASSWORD_MIN } from '../config';
 import type { Db } from '../db';
 import { sanitizeLogArg } from '../db/errors';
 import { account, session, user, verification } from '../db/schema';
+import { claimInvite, findUsableInvite } from '../invites/invites';
+import type { Mailer } from '../mail/mailer';
+import { passwordResetMessage } from '../mail/messages';
 import { getSetting, SETTING } from '../settings';
 
 export const AUTH_BASE_PATH = '/api/auth';
@@ -15,14 +18,35 @@ export const COOKIE_PREFIX = 'quizaroni';
 export const RATE_LIMITS = {
     signIn: { window: 60, max: 10 },
     signUp: { window: 600, max: 5 },
+    resetRequest: { window: 900, max: 5 },
+    resetPassword: { window: 600, max: 10 },
 };
+export const RESET_TOKEN_TTL_SECONDS = 3600;
 const NAME_MAX = 100;
+const SIGN_UP_PATH = '/sign-up/email';
+
+function inviteInvalid(): APIError {
+    return APIError.from('FORBIDDEN', {
+        code: 'INVITE_INVALID',
+        message: 'This invite link is invalid or has expired.',
+    });
+}
+
+function inviteTokenOf(body: unknown): string {
+    const token = (body as { inviteToken?: unknown } | undefined)?.inviteToken;
+    return typeof token === 'string' ? token : '';
+}
+
+function registrationOpen(db: Db): boolean {
+    return getSetting(db, SETTING.registrationMode) === 'open';
+}
 
 export type AuthConfig = {
     db: Db;
     publicUrl: string;
     secret: string;
     insecureCookies: boolean;
+    mailer: Mailer;
 };
 
 export function hashPassword(password: string): Promise<string> {
@@ -45,12 +69,26 @@ export async function verifyPassword({
 
 function registrationGate(db: Db) {
     return createAuthMiddleware(async (ctx) => {
-        if (ctx.path !== '/sign-up/email') return;
-        if (getSetting(db, SETTING.registrationMode) !== 'open') {
-            throw APIError.from('FORBIDDEN', {
-                code: 'REGISTRATION_CLOSED',
-                message: 'Registration on this server is invite-only.',
-            });
+        if (ctx.path !== SIGN_UP_PATH) return;
+        // Checked before Better Auth looks the email up, so an outsider can't
+        // learn which emails have accounts. The invite is claimed later, in
+        // the user-create hook, so a failed sign-up doesn't use it up.
+        if (!registrationOpen(db)) {
+            const token = inviteTokenOf(ctx.body);
+            if (!token) {
+                throw APIError.from('FORBIDDEN', {
+                    code: 'REGISTRATION_CLOSED',
+                    message: 'Registration on this server is invite-only.',
+                });
+            }
+            const invite = findUsableInvite(db, token);
+            if (!invite) throw inviteInvalid();
+            if (
+                invite.email !== null &&
+                normalizeEmail(String(ctx.body?.email ?? '')) !== invite.email
+            ) {
+                throw inviteInvalid();
+            }
         }
         const name: unknown = ctx.body?.name;
         const trimmed = typeof name === 'string' ? name.trim() : '';
@@ -99,7 +137,28 @@ export function createAuth(cfg: AuthConfig) {
             minPasswordLength: PASSWORD_MIN,
             maxPasswordLength: PASSWORD_MAX,
             password: { hash: hashPassword, verify: verifyPassword },
+            resetPasswordTokenExpiresIn: RESET_TOKEN_TTL_SECONDS,
+            revokeSessionsOnPasswordReset: true,
+            // Queued, not awaited, so a known email answers as fast as an
+            // unknown one.
+            sendResetPassword: async ({ user: u, token }) => {
+                cfg.mailer.enqueue(
+                    passwordResetMessage({
+                        to: u.email,
+                        name: u.name,
+                        link: `${cfg.publicUrl}/reset-password?token=${encodeURIComponent(token)}`,
+                        publicUrl: cfg.publicUrl,
+                        expiresAt: new Date(
+                            Date.now() + RESET_TOKEN_TTL_SECONDS * 1000
+                        ),
+                    })
+                );
+            },
+            onPasswordReset: async ({ user: u }) => {
+                cfg.mailer.clearOutbox('password_reset', u.email);
+            },
         },
+        verification: { storeIdentifier: 'hashed' },
         user: {
             additionalFields: {
                 role: {
@@ -115,9 +174,22 @@ export function createAuth(cfg: AuthConfig) {
                 create: {
                     // Sign-up stores any client-sent `image`; avatars come with
                     // the profile work.
-                    before: async (u) => ({
-                        data: { ...u, name: u.name.trim(), image: null },
-                    }),
+                    before: async (u, ctx) => {
+                        if (!registrationOpen(cfg.db)) {
+                            // Fail closed: without the endpoint context there
+                            // is no invite to claim.
+                            if (!ctx) throw inviteInvalid();
+                            if (
+                                ctx.path === SIGN_UP_PATH &&
+                                !claimInvite(cfg.db, inviteTokenOf(ctx.body))
+                            ) {
+                                throw inviteInvalid();
+                            }
+                        }
+                        return {
+                            data: { ...u, name: u.name.trim(), image: null },
+                        };
+                    },
                 },
             },
         },
@@ -136,6 +208,8 @@ export function createAuth(cfg: AuthConfig) {
             customRules: {
                 '/sign-in/email': RATE_LIMITS.signIn,
                 '/sign-up/email': RATE_LIMITS.signUp,
+                '/request-password-reset': RATE_LIMITS.resetRequest,
+                '/reset-password': RATE_LIMITS.resetPassword,
             },
         },
         hooks: { before: registrationGate(cfg.db) },

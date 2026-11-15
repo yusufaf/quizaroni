@@ -13,6 +13,7 @@ import { join } from 'node:path';
 import pkg from '../package.json';
 import { createApp } from './app';
 import { testAuth } from './auth/testing';
+import { Mailer } from './mail/mailer';
 import { closeDatabase, type Db, openDatabase } from './db';
 import { completeSetup, SetupGate } from './setup/setup';
 
@@ -60,6 +61,7 @@ beforeAll(() => {
         setup,
         auth: testAuth(db),
         trustProxy: false,
+        mailer: new Mailer(db, undefined),
     });
 });
 
@@ -92,6 +94,7 @@ describe('/api', () => {
                 setup: latchedGate(closed.db),
                 auth: testAuth(closed.db),
                 trustProxy: false,
+                mailer: new Mailer(closed.db, undefined),
             }).request('/api/health');
             expect(res.status).toBe(503);
             expect(await res.json()).toEqual({
@@ -215,6 +218,7 @@ describe('web app', () => {
             setup,
             auth: testAuth(db),
             trustProxy: false,
+            mailer: new Mailer(db, undefined),
         }).request('/explore');
         expect(res.status).toBe(503);
     });

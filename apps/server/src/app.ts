@@ -12,6 +12,7 @@ import { fileRoutes } from './files/routes';
 import { FileStore } from './files/store';
 import { UploadRegistry } from './files/uploads';
 import { apiRequestGuard } from './http/api-guard';
+import type { Mailer } from './mail/mailer';
 import { publicRoutes } from './public/routes';
 import { toPublicStudyset } from './public/views';
 import {
@@ -39,6 +40,7 @@ export type AppDeps = {
     trustProxy: boolean;
     files: FileStore;
     uploads?: UploadRegistry;
+    mailer: Mailer;
 };
 
 const REVALIDATE = 'public, max-age=0, must-revalidate';

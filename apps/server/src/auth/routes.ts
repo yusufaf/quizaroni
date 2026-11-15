@@ -3,13 +3,17 @@ import { bodyLimit } from 'hono/body-limit';
 import { type AuthHandle, CLIENT_IP_HEADER } from './auth';
 import { pickClientIp, socketIp } from './client-ip';
 
-// Only the endpoints this slice needs; everything else under /api/auth falls
+// Only the endpoints the web app uses; everything else under /api/auth falls
 // through to the /api 404 so endpoints like update-user stay unreachable.
+// Reset links point at the web app, so Better Auth's GET /reset-password/:token
+// redirect isn't needed.
 export const AUTH_ROUTES = [
     ['GET', '/get-session'],
     ['POST', '/sign-in/email'],
     ['POST', '/sign-up/email'],
     ['POST', '/sign-out'],
+    ['POST', '/request-password-reset'],
+    ['POST', '/reset-password'],
 ] as const;
 
 const BODY_LIMIT_BYTES = 16 * 1024;
