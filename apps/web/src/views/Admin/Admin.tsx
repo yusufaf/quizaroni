@@ -52,6 +52,7 @@ const CopyableLink = ({ link, label }: { link: string; label: string }) => {
             />
             <Button
                 variant="outlined"
+                sx={{ flexShrink: 0, whiteSpace: 'nowrap' }}
                 onClick={() => copy(link, field.current)}
                 aria-label={t('copyLinkFor', { label })}
             >
@@ -143,7 +144,11 @@ const InviteForm = () => {
                     </Button>
                 </Box>
                 {created && (
-                    <Alert severity="success" role="status">
+                    <Alert
+                        severity="success"
+                        role="status"
+                        sx={{ '& .MuiAlert-message': { flexGrow: 1 } }}
+                    >
                         <Stack spacing={1}>
                             <span>
                                 {created.delivery
