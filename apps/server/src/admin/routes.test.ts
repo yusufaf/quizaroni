@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { eq } from 'drizzle-orm';
-import { instanceSettings } from '../db/schema';
+import { instanceSettings, mailOutbox } from '../db/schema';
 import { SETTING } from '../settings';
 import {
     ADMIN_EMAIL,
@@ -210,6 +210,37 @@ describe('admin routes', () => {
             cookie: admin,
         });
         expect(await outboxTo()).toEqual(['pending@example.com']);
+    });
+
+    test('an invite message whose link has no readable token stays listed', async () => {
+        const { h, admin } = await setup();
+        const now = new Date();
+        for (const [id, link] of [
+            ['bad-url', 'not a url'],
+            ['no-token', 'http://localhost/signUp'],
+        ] as const) {
+            h.db
+                .insert(mailOutbox)
+                .values({
+                    id,
+                    kind: 'invite',
+                    recipient: `${id}@example.com`,
+                    subject: 's',
+                    body: 'b',
+                    link,
+                    delivery: 'outbox',
+                    createdAt: now,
+                    expiresAt: new Date(now.getTime() + 3600_000),
+                })
+                .run();
+        }
+        const res = await apiGet(h, '/api/admin/outbox', { cookie: admin });
+        expect(res.status).toBe(200);
+        const body = (await res.json()) as { messages: { id: string }[] };
+        expect(body.messages.map((m) => m.id).sort()).toEqual([
+            'bad-url',
+            'no-token',
+        ]);
     });
 
     test('revoking an unknown invite is a 404', async () => {

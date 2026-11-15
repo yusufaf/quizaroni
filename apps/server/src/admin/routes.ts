@@ -95,16 +95,22 @@ export function adminRoutes(deps: {
         return c.json({ invite });
     });
 
-    // An invite's message is dropped once the invite is used, revoked or
-    // expired, so the outbox lists only links that still work.
+    // Hides an invite's message once the invite is used, revoked or expired;
+    // the row itself goes when it expires. A link that can't be read stays.
+    const inviteStillUsable = (link: string): boolean => {
+        let token: string | null;
+        try {
+            token = new URL(link).searchParams.get('invite');
+        } catch {
+            return true;
+        }
+        return !token || findUsableInvite(db, token) !== undefined;
+    };
+
     routes.get('/outbox', (c) => {
-        const messages = mailer.listOutbox().filter((m) => {
-            if (m.kind !== 'invite') return true;
-            const token = new URL(m.link).searchParams.get('invite') ?? '';
-            if (findUsableInvite(db, token)) return true;
-            mailer.deleteOutbox(m.id);
-            return false;
-        });
+        const messages = mailer
+            .listOutbox()
+            .filter((m) => m.kind !== 'invite' || inviteStillUsable(m.link));
         return c.json({ smtp: mailer.smtpEnabled, messages });
     });
 

@@ -141,10 +141,6 @@ export class Mailer {
             .run();
     }
 
-    deleteOutbox(id: string): void {
-        this.db.delete(mailOutbox).where(eq(mailOutbox.id, id)).run();
-    }
-
     private store(
         msg: MailMessage,
         delivery: 'outbox' | 'failed',
