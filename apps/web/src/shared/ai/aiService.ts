@@ -1,6 +1,11 @@
 import { BASE_API_URL, getCommonPostRequestProps } from 'state/api/awsAPI';
 import { AIChatMode, AIMessage, AIProvider } from './providers';
 
+// A little over the server's own upstream timeouts (60 s chat, 15 s models),
+// so the server's 504 arrives before the browser gives up.
+const KEY_CHECK_TIMEOUT_MS = 65_000;
+const MODELS_TIMEOUT_MS = 20_000;
+
 // Mirrors the server's limits, so normal use never gets a 400 or 413.
 export const AI_LIMITS = {
     title: 500,
@@ -144,10 +149,9 @@ export const testAPIKey = async (
     model: string,
     apiKey: string
 ): Promise<boolean> => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), KEY_CHECK_TIMEOUT_MS);
     try {
-        const controller = new AbortController();
-        setTimeout(() => controller.abort(), 10000);
-
         const response = await fetch(`${BASE_API_URL}/ai/chat`, {
             ...(await getCommonPostRequestProps()),
             body: JSON.stringify({
@@ -171,6 +175,8 @@ export const testAPIKey = async (
         return response.ok;
     } catch (err) {
         return false;
+    } finally {
+        clearTimeout(timer);
     }
 };
 
@@ -178,10 +184,9 @@ export const fetchModels = async (
     provider: AIProvider,
     apiKey: string
 ): Promise<{ id: string; name: string }[]> => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), MODELS_TIMEOUT_MS);
     try {
-        const controller = new AbortController();
-        setTimeout(() => controller.abort(), 15000);
-
         const response = await fetch(`${BASE_API_URL}/ai/models`, {
             ...(await getCommonPostRequestProps()),
             body: JSON.stringify({ provider, apiKey }),
@@ -197,5 +202,7 @@ export const fetchModels = async (
     } catch (err) {
         console.error('Error fetching models:', err);
         return [];
+    } finally {
+        clearTimeout(timer);
     }
 };

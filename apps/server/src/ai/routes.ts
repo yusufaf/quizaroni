@@ -114,10 +114,14 @@ async function callProvider(
             ]),
         });
     } catch (err) {
-        const timedOut = (err as { name?: unknown })?.name === 'TimeoutError';
-        console.warn(
-            `AI provider request failed: ${provider} ${timedOut ? 'timeout' : 'network'}`
-        );
+        const name = (err as { name?: unknown })?.name;
+        const timedOut = name === 'TimeoutError';
+        const kind = timedOut
+            ? 'timeout'
+            : name === 'AbortError'
+              ? 'aborted by the client'
+              : 'network';
+        console.warn(`AI provider request failed: ${provider} ${kind}`);
         return timedOut
             ? { ok: false, status: 504, message: 'The AI provider timed out' }
             : {

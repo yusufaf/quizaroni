@@ -435,6 +435,23 @@ describe('idle timeout', () => {
     });
 });
 
+describe('client abort', () => {
+    test('is logged as an abort, not a network failure', async () => {
+        const upstream = fakeFetch(() => {
+            throw new DOMException('gone', 'AbortError');
+        });
+        const { h, cookie } = await setup({
+            enabled: true,
+            fetch: upstream.fetch,
+        });
+        const lines = captureConsole();
+        await apiRequest(h, '/api/ai/chat', { cookie, body: chatBody() });
+        expect(lines).toEqual([
+            'AI provider request failed: google aborted by the client',
+        ]);
+    });
+});
+
 describe('rate limit', () => {
     test('limits each user and says when to retry', async () => {
         const upstream = fakeFetch(() => googleReply('hi'));
