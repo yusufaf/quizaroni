@@ -157,6 +157,7 @@ const app = createApp({
     auth,
     trustProxy: config.trustProxy,
     mailer,
+    ai: { enabled: config.aiChat },
 });
 
 try {
@@ -186,6 +187,11 @@ console.log(
 console.log(`Data directory: ${config.dataDir}`);
 console.log(describeSmtp(smtp));
 if (smtp) void mailer.verify();
+console.log(
+    config.aiChat
+        ? 'AI chat is on: users can chat with their own provider key (QZ_AI_CHAT).'
+        : 'AI chat is off (QZ_AI_CHAT=false).'
+);
 const warning = cookieWarning(publicUrl, config.insecureCookies);
 if (warning) console.warn(warning);
 if (config.trustProxy) {

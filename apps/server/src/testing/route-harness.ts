@@ -1,6 +1,7 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import type { AiDeps, UpstreamFetch } from '../ai/routes';
 import { createApp } from '../app';
 import { hashPassword } from '../auth/auth';
 import { ipEnv, nextTestIp, testAuth } from '../auth/testing';
@@ -29,7 +30,13 @@ export type RouteHarness = {
     close(): void;
 };
 
-export async function createRouteHarness(): Promise<RouteHarness> {
+// Fails any test that reaches for a real AI provider.
+export const refuseFetch: UpstreamFetch = () =>
+    Promise.reject(new Error('unexpected upstream call'));
+
+export async function createRouteHarness(
+    o: { ai?: AiDeps } = {}
+): Promise<RouteHarness> {
     const root = mkdtempSync(join(tmpdir(), 'qz-routes-'));
     const webDir = join(root, 'web');
     mkdirSync(webDir, { recursive: true });
@@ -70,6 +77,7 @@ export async function createRouteHarness(): Promise<RouteHarness> {
         auth: testAuth(opened.db, { publicUrl: PUBLIC_URL, mailer }),
         trustProxy: false,
         mailer,
+        ai: o.ai ?? { enabled: true, fetch: refuseFetch },
     });
     return {
         app,
