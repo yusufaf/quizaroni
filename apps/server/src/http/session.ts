@@ -24,6 +24,20 @@ export function requireSession(
     };
 }
 
+export function requireAdmin(auth: AuthHandle): MiddlewareHandler<SessionEnv> {
+    return async (c, next) => {
+        const found = await auth().auth.api.getSession({
+            headers: c.req.raw.headers,
+        });
+        if (!found) return c.json({ message: 'Unauthorized' }, 401);
+        if (found.user.role !== 'admin') {
+            return c.json({ message: 'Forbidden' }, 403);
+        }
+        c.set('userId', found.user.id);
+        return next();
+    };
+}
+
 // File reads may be anonymous (published sets); every other method still
 // needs a session, so a route added later is closed by default.
 export function sessionUnlessRead(

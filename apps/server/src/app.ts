@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { serveStatic } from '@hono/bun';
 import { and, desc, eq } from 'drizzle-orm';
 import { type Context, Hono, type MiddlewareHandler } from 'hono';
+import { adminRoutes } from './admin/routes';
 import { AUTH_BASE_PATH, type AuthHandle } from './auth/auth';
 import { authRoutes } from './auth/routes';
 import type { Db } from './db';
@@ -81,6 +82,7 @@ export function createApp({
     trustProxy,
     files,
     uploads = new UploadRegistry(files),
+    mailer,
 }: AppDeps): Hono {
     const app = new Hono();
 
@@ -108,6 +110,8 @@ export function createApp({
     app.route('/api/files', fileRoutes({ db, auth, files, uploads }));
 
     app.route('/api/public', publicRoutes({ db }));
+
+    app.route('/api/admin', adminRoutes({ db, auth, mailer }));
 
     app.all('/api/*', (c) => c.json({ message: 'Not found' }, 404));
 
