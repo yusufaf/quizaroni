@@ -506,3 +506,7 @@ export const OutboxResponseSchema = z.object({
 });
 
 // #endregion
+
+// #region Self-host AI Schemas
+export const AIStatusResponseSchema = z.object({ enabled: z.boolean() });
+// #endregion
