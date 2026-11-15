@@ -1,7 +1,87 @@
+import { BASE_API_URL, getCommonPostRequestProps } from 'state/api/awsAPI';
 import { AIChatMode, AIMessage, AIProvider } from './providers';
 
-const getApiBaseUrl = () => {
-    return import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Mirrors the server's limits, so normal use never gets a 400 or 413.
+export const AI_LIMITS = {
+    title: 500,
+    description: 5_000,
+    message: 32_000,
+    cardField: 2_000,
+    cards: 50,
+    history: 40,
+    bodyBytes: 900_000,
+} as const;
+
+type ChatTurn = { role: 'user' | 'assistant'; content: string };
+
+type StudysetContext = {
+    title: string;
+    description?: string;
+    cards: { term: string; definition: string }[];
+};
+
+const dropLeadingAssistant = (turns: ChatTurn[]): ChatTurn[] => {
+    const firstUser = turns.findIndex((t) => t.role === 'user');
+    return firstUser === -1 ? [] : turns.slice(firstUser);
+};
+
+export const toChatHistory = (messages: AIMessage[]): ChatTurn[] => {
+    const turns = messages.flatMap((m): ChatTurn[] =>
+        m.role === 'system' || m.content === ''
+            ? []
+            : [{ role: m.role, content: m.content.slice(0, AI_LIMITS.message) }]
+    );
+    return dropLeadingAssistant(turns.slice(-AI_LIMITS.history));
+};
+
+export const buildChatBody = (input: {
+    provider: AIProvider;
+    model: string;
+    apiKey: string;
+    messages: AIMessage[];
+    studysetContext: StudysetContext;
+    mode: AIChatMode;
+}): string => {
+    const { studysetContext: ctx } = input;
+    const studysetContext = {
+        title: ctx.title.slice(0, AI_LIMITS.title),
+        description: ctx.description?.slice(0, AI_LIMITS.description),
+        cards: ctx.cards.slice(0, AI_LIMITS.cards).map((c) => ({
+            term: c.term.slice(0, AI_LIMITS.cardField),
+            definition: c.definition.slice(0, AI_LIMITS.cardField),
+        })),
+    };
+    const encoder = new TextEncoder();
+    let messages = toChatHistory(input.messages);
+    const serialise = () =>
+        JSON.stringify({
+            provider: input.provider,
+            model: input.model,
+            apiKey: input.apiKey,
+            messages,
+            studysetContext,
+            mode: input.mode,
+        });
+    let body = serialise();
+    while (
+        encoder.encode(body).length > AI_LIMITS.bodyBytes &&
+        messages.length > 1
+    ) {
+        messages = dropLeadingAssistant(messages.slice(1));
+        body = serialise();
+    }
+    return body;
+};
+
+const errorFrom = async (response: Response): Promise<Error> => {
+    const body: unknown = await response.json().catch(() => undefined);
+    const message =
+        typeof body === 'object' &&
+        body !== null &&
+        typeof (body as { message?: unknown }).message === 'string'
+            ? (body as { message: string }).message
+            : `AI request failed (${response.status})`;
+    return new Error(message);
 };
 
 type StreamAIChatParams = {
@@ -9,11 +89,7 @@ type StreamAIChatParams = {
     model: string;
     apiKey: string;
     messages: AIMessage[];
-    studysetContext: {
-        title: string;
-        description?: string;
-        cards: { term: string; definition: string }[];
-    };
+    studysetContext: StudysetContext;
     mode: AIChatMode;
     onChunk: (chunk: string) => void;
     onDone: () => void;
@@ -34,29 +110,20 @@ export const streamAIChat = async ({
     signal,
 }: StreamAIChatParams) => {
     try {
-        const response = await fetch(`${getApiBaseUrl()}/ai/chat`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
+        const response = await fetch(`${BASE_API_URL}/ai/chat`, {
+            ...(await getCommonPostRequestProps()),
+            body: buildChatBody({
                 provider,
                 model,
                 apiKey,
-                messages: messages.map((m) => ({
-                    role: m.role,
-                    content: m.content,
-                })),
+                messages,
                 studysetContext,
                 mode,
             }),
             signal,
         });
 
-        if (!response.ok) {
-            const errBody = await response.text();
-            throw new Error(`API error: ${response.status} - ${errBody}`);
-        }
+        if (!response.ok) throw await errorFrom(response);
 
         // For now, non-streaming parsing (as proxy sends json back)
         const data = await response.json();
@@ -81,11 +148,8 @@ export const testAPIKey = async (
         const controller = new AbortController();
         setTimeout(() => controller.abort(), 10000);
 
-        const response = await fetch(`${getApiBaseUrl()}/ai/chat`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+        const response = await fetch(`${BASE_API_URL}/ai/chat`, {
+            ...(await getCommonPostRequestProps()),
             body: JSON.stringify({
                 provider,
                 model,
@@ -118,16 +182,9 @@ export const fetchModels = async (
         const controller = new AbortController();
         setTimeout(() => controller.abort(), 15000);
 
-        const response = await fetch(`${getApiBaseUrl()}/ai/chat`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                provider,
-                apiKey,
-                action: 'fetchModels',
-            }),
+        const response = await fetch(`${BASE_API_URL}/ai/models`, {
+            ...(await getCommonPostRequestProps()),
+            body: JSON.stringify({ provider, apiKey }),
             signal: controller.signal,
         });
 
