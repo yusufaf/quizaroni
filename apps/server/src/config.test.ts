@@ -40,6 +40,7 @@ describe('loadConfig', () => {
             webDir: resolve(import.meta.dir, '../../web/dist'),
             trustProxy: false,
             insecureCookies: false,
+            aiChat: true,
         });
     });
 
@@ -63,6 +64,7 @@ describe('loadConfig', () => {
             webDir: resolve(CWD, 'env-web'),
             trustProxy: false,
             insecureCookies: false,
+            aiChat: true,
         });
     });
 
@@ -97,6 +99,7 @@ describe('loadConfig', () => {
             webDir: resolve(CWD, 'flag-web'),
             trustProxy: false,
             insecureCookies: false,
+            aiChat: true,
         });
     });
 
@@ -111,6 +114,7 @@ describe('loadConfig', () => {
                 QZ_WEB_DIR: '',
                 QZ_TRUST_PROXY: '',
                 QZ_INSECURE_COOKIES: '',
+                QZ_AI_CHAT: '',
             },
             CWD
         );
@@ -467,6 +471,27 @@ describe('resolvePublicUrl', () => {
     });
 });
 
+describe('AI chat toggle', () => {
+    test('is on by default', () => {
+        expect(loadConfig([], {}, CWD).aiChat).toBe(true);
+    });
+
+    test('can be turned off from env or flags', () => {
+        expect(loadConfig([], { QZ_AI_CHAT: 'no' }, CWD).aiChat).toBe(false);
+        expect(loadConfig(['--ai-chat', 'false'], {}, CWD).aiChat).toBe(false);
+        expect(
+            loadConfig(['--ai-chat', 'true'], { QZ_AI_CHAT: '0' }, CWD).aiChat
+        ).toBe(true);
+    });
+
+    test('rejects a value that is not a boolean, naming the source', () => {
+        expect(
+            configError(() => loadConfig([], { QZ_AI_CHAT: 'maybe' }, CWD))
+                .message
+        ).toContain('QZ_AI_CHAT');
+    });
+});
+
 describe('USAGE', () => {
     test('documents the headless setup vars', () => {
         expect(USAGE).toContain('QZ_ADMIN_EMAIL');
@@ -476,5 +501,9 @@ describe('USAGE', () => {
     test('documents the proxy and cookie settings', () => {
         expect(USAGE).toContain('QZ_TRUST_PROXY');
         expect(USAGE).toContain('QZ_INSECURE_COOKIES');
+    });
+
+    test('documents the AI chat toggle', () => {
+        expect(USAGE).toContain('QZ_AI_CHAT');
     });
 });
