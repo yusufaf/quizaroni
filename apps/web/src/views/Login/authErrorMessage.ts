@@ -4,6 +4,8 @@ type Translate = (key: string, options?: Record<string, unknown>) => string;
 
 const BY_CODE: Record<string, string> = {
     REGISTRATION_CLOSED: 'errors.registrationClosed',
+    INVITE_INVALID: 'errors.inviteInvalid',
+    INVALID_TOKEN: 'errors.resetLinkInvalid',
     USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: 'errors.emailTaken',
     INVALID_EMAIL: 'errors.invalidEmail',
     INVALID_NAME: 'errors.nameRequired',

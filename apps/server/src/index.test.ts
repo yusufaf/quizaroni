@@ -8,6 +8,7 @@ import {
     rmSync,
     writeFileSync,
 } from 'node:fs';
+import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import pkg from '../package.json';
@@ -32,6 +33,12 @@ const CLEAN_ENV = {
     QZ_TEACHER_POLICY: '',
     QZ_TRUST_PROXY: '',
     QZ_INSECURE_COOKIES: '',
+    QZ_SMTP_HOST: '',
+    QZ_SMTP_PORT: '',
+    QZ_SMTP_SECURITY: '',
+    QZ_SMTP_USER: '',
+    QZ_SMTP_PASSWORD: '',
+    QZ_SMTP_FROM: '',
 };
 const LISTENING = /listening on (http:\/\/\S+) \(public URL (\S+)\)/;
 
@@ -339,4 +346,89 @@ test('exits with code 1 and names the flag on invalid config', async () => {
     expect(await proc.exited).toBe(1);
     expect(await new Response(proc.stderr).text()).toContain('--port');
     expect(readdirSync(root)).toEqual([]);
+}, 20_000);
+
+const SMTP_USER = 'smtp-user-xyz';
+// Built at runtime so secret scanners don't flag this fake test password.
+const SMTP_PASSWORD = ['s3cret', 'PASS', 'xyz'].join('-');
+
+async function closedPort(): Promise<number> {
+    const server = createServer();
+    await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));
+    const address = server.address();
+    if (address === null || typeof address === 'string')
+        throw new Error('no port');
+    await new Promise<void>((done) => server.close(() => done()));
+    return address.port;
+}
+
+function expectNoSmtpCredentials(output: { stdout: string; stderr: string }) {
+    for (const text of [output.stdout, output.stderr]) {
+        expect(text).not.toContain(SMTP_USER);
+        expect(text).not.toContain(SMTP_PASSWORD);
+    }
+}
+
+test('says email goes to the outbox when SMTP is not set', async () => {
+    const dirs = layout();
+    const server = start(dirs);
+    try {
+        await server.out.waitFor(/Email: SMTP is not configured/);
+    } finally {
+        await server.stop();
+    }
+}, 20_000);
+
+test('with SMTP set, names the server and logs a failed check without credentials', async () => {
+    const dirs = layout();
+    const port = await closedPort();
+    const server = start(dirs, {
+        QZ_ADMIN_EMAIL: 'admin@example.com',
+        QZ_ADMIN_PASSWORD: 'correct-horse-1',
+        QZ_SMTP_HOST: '127.0.0.1',
+        QZ_SMTP_PORT: String(port),
+        QZ_SMTP_SECURITY: 'none',
+        QZ_SMTP_USER: SMTP_USER,
+        QZ_SMTP_PASSWORD: SMTP_PASSWORD,
+        QZ_SMTP_FROM: 'qz@example.org',
+    });
+    let output: { stdout: string; stderr: string };
+    try {
+        await server.out.waitFor(
+            new RegExp(
+                `Email: sending through SMTP at 127\\.0\\.0\\.1:${port} \\(none\\)`
+            )
+        );
+        await server.err.waitFor(/SMTP check failed \(\w+\)/, 15_000);
+    } finally {
+        output = await server.stop();
+    }
+    expectNoSmtpCredentials(output);
+}, 30_000);
+
+test('exits with code 1 when QZ_SMTP_USER has no password, without echoing it', async () => {
+    const dirs = layout();
+    const server = start(dirs, {
+        QZ_SMTP_HOST: '127.0.0.1',
+        QZ_SMTP_FROM: 'qz@example.org',
+        QZ_SMTP_USER: SMTP_USER,
+    });
+    expect(await server.proc.exited).toBe(1);
+    const stderr = await server.err.done;
+    expect(stderr).toContain(
+        'QZ_SMTP_USER and QZ_SMTP_PASSWORD must be set together'
+    );
+    expectNoSmtpCredentials({ stdout: await server.out.done, stderr });
+}, 20_000);
+
+test('exits with code 1 on a URL-style QZ_SMTP_HOST, without echoing it', async () => {
+    const dirs = layout();
+    const server = start(dirs, {
+        QZ_SMTP_HOST: `smtp://${SMTP_USER}:${SMTP_PASSWORD}@mail.example`,
+        QZ_SMTP_FROM: 'qz@example.org',
+    });
+    expect(await server.proc.exited).toBe(1);
+    const stderr = await server.err.done;
+    expect(stderr).toContain('QZ_SMTP_HOST must be a hostname or IP address');
+    expectNoSmtpCredentials({ stdout: await server.out.done, stderr });
 }, 20_000);

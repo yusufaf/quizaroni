@@ -14,13 +14,21 @@ const netlifyToml = readFileSync(
     'utf8'
 );
 
+// Routes mounted only in the self-host build, which Netlify never serves.
+const SELF_HOST_ONLY = new Set([
+    '/forgot-password',
+    '/reset-password',
+    '/admin',
+]);
+
 // Matches both `<Route path="/login">` and `{ path: '/create', ... }`. "/" is
 // index.html itself and "*" is the NotFound route, so neither needs a rule.
 const routePaths = [
     ...appRoutesSource.matchAll(/\bpath(?:=|:\s*)["']([^"']+)["']/g),
 ]
     .map(([, path]) => path)
-    .filter((path): path is string => !!path && path !== '/' && path !== '*');
+    .filter((path): path is string => !!path && path !== '/' && path !== '*')
+    .filter((path) => !SELF_HOST_ONLY.has(path));
 
 const redirects = netlifyToml
     .split(/^\[\[redirects\]\]\s*$/m)

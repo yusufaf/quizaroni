@@ -8,6 +8,7 @@ import { closeDatabase, type Db, openDatabase } from '../db';
 import { FileStore } from '../files/store';
 import { UploadRegistry } from '../files/uploads';
 import { instanceSettings } from '../db/schema';
+import { Mailer } from '../mail/mailer';
 import { SETTING } from '../settings';
 import { completeSetup, SetupGate } from '../setup/setup';
 
@@ -24,6 +25,7 @@ export type RouteHarness = {
     files: FileStore;
     uploads: UploadRegistry;
     webDir: string;
+    mailer: Mailer;
     close(): void;
 };
 
@@ -56,6 +58,7 @@ export async function createRouteHarness(): Promise<RouteHarness> {
     const files = new FileStore(join(root, 'data'));
     files.resetStaging();
     const uploads = new UploadRegistry(files);
+    const mailer = new Mailer(opened.db, undefined);
     const app = createApp({
         sqlite: opened.sqlite,
         db: opened.db,
@@ -64,8 +67,9 @@ export async function createRouteHarness(): Promise<RouteHarness> {
         webDir,
         version: '0.0.0-test',
         setup: new SetupGate(opened.db, undefined),
-        auth: testAuth(opened.db, { publicUrl: PUBLIC_URL }),
+        auth: testAuth(opened.db, { publicUrl: PUBLIC_URL, mailer }),
         trustProxy: false,
+        mailer,
     });
     return {
         app,
@@ -73,6 +77,7 @@ export async function createRouteHarness(): Promise<RouteHarness> {
         files,
         uploads,
         webDir,
+        mailer,
         close() {
             closeDatabase(opened.sqlite);
             rmSync(root, { recursive: true, force: true });

@@ -17,6 +17,9 @@ import {
 } from './config';
 import { closeDatabase, type Db, openDatabase } from './db';
 import { FileStore } from './files/store';
+import { describeSmtp, parseSmtpConfig, type SmtpConfig } from './mail/config';
+import { Mailer } from './mail/mailer';
+import { smtpTransport } from './mail/smtp';
 import { ensureAuthSecret, getSetting, SETTING } from './settings';
 import {
     bootstrapAdmin,
@@ -38,8 +41,10 @@ if (argv.includes('--help')) {
 }
 
 let config: ServerConfig;
+let smtp: SmtpConfig | undefined;
 try {
     config = loadConfig(argv, process.env, process.cwd());
+    smtp = parseSmtpConfig(process.env);
 } catch (err) {
     if (!(err instanceof ConfigError)) throw err;
     console.error(err.message);
@@ -106,6 +111,8 @@ const setup = new SetupGate(db, setupToken, () =>
     clearSetupToken(config.dataDir)
 );
 
+const mailer = new Mailer(db, smtp ? smtpTransport(smtp) : undefined);
+
 const authSecret = ensureAuthSecret(db);
 for (const name of scrubAuthEnv(process.env)) {
     console.warn(
@@ -131,6 +138,7 @@ const auth = lazyAuth(() => {
             publicUrl: authPublicUrl,
             secret: authSecret,
             insecureCookies: config.insecureCookies,
+            mailer,
         }),
     };
 });
@@ -148,6 +156,7 @@ const app = createApp({
     configuredPublicUrl: config.publicUrl,
     auth,
     trustProxy: config.trustProxy,
+    mailer,
 });
 
 try {
@@ -175,6 +184,8 @@ console.log(
     `Quizaroni server v${pkg.version} listening on http://${urlHost(config.host)}:${server.port} (public URL ${publicUrl})`
 );
 console.log(`Data directory: ${config.dataDir}`);
+console.log(describeSmtp(smtp));
+if (smtp) void mailer.verify();
 const warning = cookieWarning(publicUrl, config.insecureCookies);
 if (warning) console.warn(warning);
 if (config.trustProxy) {
@@ -201,7 +212,10 @@ async function shutdown(): Promise<void> {
     stopping = true;
     let exitCode = 0;
     try {
-        await Promise.race([server.stop(), Bun.sleep(SHUTDOWN_GRACE_MS)]);
+        await Promise.race([
+            Promise.all([server.stop(), mailer.flush()]),
+            Bun.sleep(SHUTDOWN_GRACE_MS),
+        ]);
         void server.stop(true);
         closeDatabase(sqlite);
     } catch (err) {

@@ -53,4 +53,18 @@ describe('AppRoutes on the self-host backend', () => {
         expect(await screen.findByText('not found')).toBeTruthy();
         expect(screen.queryByText('callback page')).toBeNull();
     });
+
+    it('serves the forgot-password form', async () => {
+        await renderSelfHostAt('/forgot-password');
+        expect(
+            await screen.findByRole('button', { name: 'forgot.submit' })
+        ).toBeTruthy();
+    });
+
+    it('serves the reset-password form', async () => {
+        await renderSelfHostAt('/reset-password?token=abc');
+        expect(
+            await screen.findByRole('button', { name: 'reset.submit' })
+        ).toBeTruthy();
+    });
 });

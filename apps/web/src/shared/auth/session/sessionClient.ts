@@ -1,7 +1,13 @@
 // A small client for the self-host server's Better Auth endpoints. Kept
 // hand-written so the server library stays out of the web bundle.
 
-export type SessionUser = { id: string; email: string; name: string };
+// `role` is 'admin' for the instance admin, otherwise 'user'.
+export type SessionUser = {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+};
 
 export class AuthRequestError extends Error {
     status: number;
@@ -63,8 +69,13 @@ const authFetch = async (
 };
 
 const toSessionUser = (u: unknown): SessionUser => {
-    const { id, email, name } = u as Record<string, unknown>;
-    return { id: String(id), email: String(email), name: String(name ?? '') };
+    const { id, email, name, role } = u as Record<string, unknown>;
+    return {
+        id: String(id),
+        email: String(email),
+        name: String(name ?? ''),
+        role: typeof role === 'string' ? role : 'user',
+    };
 };
 
 const userOf = (body: unknown): unknown =>
@@ -93,6 +104,7 @@ export const signUpEmail = async (input: {
     name: string;
     email: string;
     password: string;
+    inviteToken?: string;
 }): Promise<SessionUser> =>
     toSessionUser(
         userOf(
@@ -102,4 +114,19 @@ export const signUpEmail = async (input: {
 
 export const signOutSession = async (): Promise<void> => {
     await authFetch('/sign-out', { method: 'POST', body: {} });
+};
+
+// The server answers the same whether or not the email has an account.
+export const requestPasswordReset = async (email: string): Promise<void> => {
+    await authFetch('/request-password-reset', {
+        method: 'POST',
+        body: { email },
+    });
+};
+
+export const resetPassword = async (input: {
+    token: string;
+    newPassword: string;
+}): Promise<void> => {
+    await authFetch('/reset-password', { method: 'POST', body: input });
 };

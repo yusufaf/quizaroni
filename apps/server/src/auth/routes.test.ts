@@ -7,11 +7,21 @@ import { join } from 'node:path';
 import { count, eq } from 'drizzle-orm';
 import { createApp } from '../app';
 import { closeDatabase, type Db, openDatabase } from '../db';
-import { account, instanceSettings, session, user } from '../db/schema';
+import {
+    account,
+    instanceSettings,
+    mailOutbox,
+    registrationInvite,
+    session,
+    user,
+    verification,
+} from '../db/schema';
+import { createInvite, revokeInvite } from '../invites/invites';
+import { type MailTransport, Mailer } from '../mail/mailer';
 import { SETTING } from '../settings';
 import { completeSetup, SetupGate } from '../setup/setup';
 import { hashPassword } from './auth';
-import { ipEnv, nextTestIp, testAuth } from './testing';
+import { fakeTransport, ipEnv, nextTestIp, testAuth } from './testing';
 
 const ADMIN_EMAIL = 'admin@example.com';
 const ADMIN_PASSWORD = 'correct-horse-1';
@@ -24,6 +34,7 @@ type Harness = {
     db: Db;
     sqlite: Database;
     publicUrl: string;
+    mailer: Mailer;
 };
 
 let root: string | undefined;
@@ -35,6 +46,7 @@ async function harness(
         insecureCookies?: boolean;
         trustProxy?: boolean;
         setUp?: boolean;
+        transport?: MailTransport;
     } = {}
 ): Promise<Harness> {
     root = mkdtempSync(join(tmpdir(), 'qz-auth-routes-'));
@@ -55,6 +67,7 @@ async function harness(
         });
     }
     const publicUrl = o.publicUrl ?? 'http://localhost';
+    const mailer = new Mailer(opened.db, o.transport);
     const app = createApp({
         sqlite: opened.sqlite,
         db: opened.db,
@@ -65,10 +78,12 @@ async function harness(
         auth: testAuth(opened.db, {
             publicUrl,
             insecureCookies: o.insecureCookies,
+            mailer,
         }),
         trustProxy: o.trustProxy ?? false,
+        mailer,
     });
-    return { app, db: opened.db, sqlite: opened.sqlite, publicUrl };
+    return { app, db: opened.db, sqlite: opened.sqlite, publicUrl, mailer };
 }
 
 afterEach(() => {
@@ -563,6 +578,9 @@ describe('routing', () => {
         const h = await harness();
         expect((await call(h, '/update-user', { body: {} })).status).toBe(404);
         expect((await call(h, '/ok', { method: 'GET' })).status).toBe(404);
+        expect(
+            (await call(h, '/reset-password/abc', { method: 'GET' })).status
+        ).toBe(404);
     });
 
     test('rejects a body over 16 KB', async () => {
@@ -613,5 +631,255 @@ describe('errors', () => {
             for (const spy of spies) spy.mockRestore();
             h.sqlite.run('DROP TRIGGER fail_account');
         }
+    });
+});
+
+function adminId(db: Db): string {
+    return db.select().from(user).where(eq(user.email, ADMIN_EMAIL)).get()!.id;
+}
+
+function inviteUses(db: Db, id: string): number {
+    return db
+        .select()
+        .from(registrationInvite)
+        .where(eq(registrationInvite.id, id))
+        .get()!.uses;
+}
+
+function userCount(db: Db): number {
+    return db.select({ n: count() }).from(user).get()!.n;
+}
+
+async function errorCode(res: Response): Promise<string> {
+    return ((await res.json()) as { code: string }).code;
+}
+
+describe('invite-only sign up', () => {
+    test('a valid invite creates the user and uses the invite', async () => {
+        const h = await harness();
+        const { invite, token } = createInvite(h.db, {
+            createdBy: adminId(h.db),
+        });
+        const res = await signUp(h, {
+            email: 'invited@example.com',
+            inviteToken: token,
+        });
+        expect(res.status).toBe(200);
+        expect(inviteUses(h.db, invite.id)).toBe(1);
+        const again = await signUp(h, { inviteToken: token });
+        expect(again.status).toBe(403);
+        expect(await errorCode(again)).toBe('INVITE_INVALID');
+    });
+
+    test('expired, revoked and unknown invites are refused', async () => {
+        const h = await harness();
+        const admin = adminId(h.db);
+        const expired = createInvite(
+            h.db,
+            { createdBy: admin, days: 1 },
+            new Date(Date.now() - 2 * 86_400_000)
+        );
+        const revoked = createInvite(h.db, { createdBy: admin });
+        revokeInvite(h.db, revoked.invite.id);
+        const before = userCount(h.db);
+        for (const token of [
+            expired.token,
+            revoked.token,
+            'not-a-real-invite',
+        ]) {
+            const res = await signUp(h, { inviteToken: token });
+            expect(res.status).toBe(403);
+            expect(await errorCode(res)).toBe('INVITE_INVALID');
+        }
+        expect(userCount(h.db)).toBe(before);
+    });
+
+    test('an email-locked invite accepts only that email', async () => {
+        const h = await harness();
+        const { token } = createInvite(h.db, {
+            createdBy: adminId(h.db),
+            email: 'locked@example.com',
+        });
+        const other = await signUp(h, {
+            email: 'other@example.com',
+            inviteToken: token,
+        });
+        expect(other.status).toBe(403);
+        expect(await errorCode(other)).toBe('INVITE_INVALID');
+        const match = await signUp(h, {
+            email: 'Locked@Example.com',
+            inviteToken: token,
+        });
+        expect(match.status).toBe(200);
+    });
+
+    test('an invalid invite with a taken email gets 403, not 422', async () => {
+        const h = await harness();
+        const res = await signUp(h, {
+            email: ADMIN_EMAIL,
+            inviteToken: 'nope',
+        });
+        expect(res.status).toBe(403);
+        expect(await errorCode(res)).toBe('INVITE_INVALID');
+    });
+
+    test('a failed sign-up does not use up the invite', async () => {
+        const h = await harness();
+        const { invite, token } = createInvite(h.db, {
+            createdBy: adminId(h.db),
+        });
+        expect(
+            (await signUp(h, { password: 'short', inviteToken: token })).status
+        ).toBe(400);
+        expect(
+            (await signUp(h, { email: ADMIN_EMAIL, inviteToken: token })).status
+        ).toBe(422);
+        expect(inviteUses(h.db, invite.id)).toBe(0);
+    });
+
+    test('two sign-ups racing for a single-use invite: only one wins', async () => {
+        const h = await harness();
+        const { invite, token } = createInvite(h.db, {
+            createdBy: adminId(h.db),
+        });
+        const before = userCount(h.db);
+        const results = await Promise.all([
+            signUp(h, { email: 'race1@example.com', inviteToken: token }),
+            signUp(h, { email: 'race2@example.com', inviteToken: token }),
+        ]);
+        expect(results.map((r) => r.status).sort()).toEqual([200, 403]);
+        expect(userCount(h.db)).toBe(before + 1);
+        expect(inviteUses(h.db, invite.id)).toBe(1);
+    });
+
+    test('open registration ignores an invite', async () => {
+        const h = await harness();
+        setRegistrationMode(h.db, 'open');
+        const { invite, token } = createInvite(h.db, {
+            createdBy: adminId(h.db),
+        });
+        expect((await signUp(h, { inviteToken: token })).status).toBe(200);
+        expect(inviteUses(h.db, invite.id)).toBe(0);
+    });
+});
+
+const requestReset = (h: Harness, email: string) =>
+    call(h, '/request-password-reset', { body: { email } });
+
+function onlyOutboxLink(h: Harness): string {
+    const rows = h.db.select().from(mailOutbox).all();
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.kind).toBe('password_reset');
+    return rows[0]!.link;
+}
+
+function tokenOf(link: string): string {
+    return new URL(link).searchParams.get('token')!;
+}
+
+describe('password reset', () => {
+    test('without SMTP, the link goes to the outbox and resets the password', async () => {
+        const h = await harness();
+        const oldCookie = cookieFrom(await signIn(h));
+        const res = await requestReset(h, ADMIN_EMAIL);
+        expect(res.status).toBe(200);
+        await h.mailer.flush();
+        const link = onlyOutboxLink(h);
+        expect(link).toMatch(/^http:\/\/localhost\/reset-password\?token=/);
+        const token = tokenOf(link);
+
+        const identifiers = h.db
+            .select()
+            .from(verification)
+            .all()
+            .map((v) => v.identifier);
+        expect(identifiers).toHaveLength(1);
+        expect(identifiers[0]).not.toContain(token);
+
+        const reset = await call(h, '/reset-password', {
+            body: { token, newPassword: 'new-horse-battery-2' },
+        });
+        expect(reset.status).toBe(200);
+        expect((await signIn(h)).status).toBe(401);
+        expect(
+            (
+                await signIn(h, {
+                    body: {
+                        email: ADMIN_EMAIL,
+                        password: 'new-horse-battery-2',
+                    },
+                })
+            ).status
+        ).toBe(200);
+        expect(await getSession(h, oldCookie)).toBeNull();
+        expect(h.db.select().from(mailOutbox).all()).toHaveLength(0);
+
+        const reuse = await call(h, '/reset-password', {
+            body: { token, newPassword: 'another-horse-3' },
+        });
+        expect(reuse.status).toBe(400);
+        expect(await errorCode(reuse)).toBe('INVALID_TOKEN');
+    });
+
+    test('an unknown email gets the same answer and no message', async () => {
+        const h = await harness();
+        const known = await requestReset(h, ADMIN_EMAIL);
+        const unknown = await requestReset(h, 'nobody@example.com');
+        expect(unknown.status).toBe(known.status);
+        expect(await unknown.json()).toEqual(await known.json());
+        await h.mailer.flush();
+        expect(
+            h.db
+                .select()
+                .from(mailOutbox)
+                .all()
+                .map((r) => r.recipient)
+        ).toEqual([ADMIN_EMAIL]);
+    });
+
+    test('with SMTP, the link is sent and nothing is stored', async () => {
+        const { transport, sent } = fakeTransport();
+        const h = await harness({ transport });
+        expect((await requestReset(h, ADMIN_EMAIL)).status).toBe(200);
+        await h.mailer.flush();
+        expect(sent).toHaveLength(1);
+        expect(sent[0]?.to).toBe(ADMIN_EMAIL);
+        expect(sent[0]?.text).toMatch(
+            /http:\/\/localhost\/reset-password\?token=\S+/
+        );
+        expect(h.db.select().from(mailOutbox).all()).toHaveLength(0);
+    });
+
+    test('an expired link is refused', async () => {
+        const h = await harness();
+        await requestReset(h, ADMIN_EMAIL);
+        await h.mailer.flush();
+        const token = tokenOf(onlyOutboxLink(h));
+        h.db
+            .update(verification)
+            .set({ expiresAt: new Date(Date.now() - 1000) })
+            .run();
+        const res = await call(h, '/reset-password', {
+            body: { token, newPassword: 'new-horse-battery-2' },
+        });
+        expect(res.status).toBe(400);
+        expect(await errorCode(res)).toBe('INVALID_TOKEN');
+    });
+
+    test('the 6th reset request from one IP within 15 minutes gets 429', async () => {
+        const h = await harness();
+        const ip = nextTestIp();
+        for (let i = 0; i < 5; i++) {
+            const res = await call(h, '/request-password-reset', {
+                body: { email: `x${i}@example.com` },
+                ip,
+            });
+            expect(res.status).toBe(200);
+        }
+        const res = await call(h, '/request-password-reset', {
+            body: { email: 'x5@example.com' },
+            ip,
+        });
+        expect(res.status).toBe(429);
     });
 });

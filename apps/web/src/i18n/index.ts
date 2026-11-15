@@ -9,6 +9,7 @@ import enStudy from './locales/en/study.json';
 import enProfile from './locales/en/profile.json';
 import enAi from './locales/en/ai.json';
 import enExplore from './locales/en/explore.json';
+import enAdmin from './locales/en/admin.json';
 
 import esCommon from './locales/es/common.json';
 import esAuth from './locales/es/auth.json';
@@ -16,6 +17,7 @@ import esStudy from './locales/es/study.json';
 import esProfile from './locales/es/profile.json';
 import esAi from './locales/es/ai.json';
 import esExplore from './locales/es/explore.json';
+import esAdmin from './locales/es/admin.json';
 
 export const SUPPORTED_LANGUAGES = {
     en: { nativeName: 'English' },
@@ -35,6 +37,7 @@ i18n.use(LanguageDetector)
                 profile: enProfile,
                 ai: enAi,
                 explore: enExplore,
+                admin: enAdmin,
             },
             es: {
                 common: esCommon,
@@ -43,11 +46,12 @@ i18n.use(LanguageDetector)
                 profile: esProfile,
                 ai: esAi,
                 explore: esExplore,
+                admin: esAdmin,
             },
         },
         fallbackLng: 'en',
         defaultNS: 'common',
-        ns: ['common', 'auth', 'study', 'profile', 'ai', 'explore'],
+        ns: ['common', 'auth', 'study', 'profile', 'ai', 'explore', 'admin'],
         interpolation: {
             escapeValue: false, // React already escapes
         },

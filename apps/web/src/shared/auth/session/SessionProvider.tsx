@@ -34,6 +34,7 @@ export type SessionContextValue = {
         name: string;
         email: string;
         password: string;
+        inviteToken?: string;
     }) => Promise<void>;
     signOut: () => Promise<void>;
 };
@@ -50,6 +51,7 @@ const readCache = (): SessionUser | null => {
                   id: parsed.id,
                   email: parsed.email,
                   name: String(parsed.name ?? ''),
+                  role: typeof parsed.role === 'string' ? parsed.role : 'user',
               }
             : null;
     } catch {
@@ -161,6 +163,10 @@ export const useSession = (): SessionContextValue => {
     }
     return context;
 };
+
+// For components shared with the AWS build, where there is no provider.
+export const useOptionalSession = (): SessionContextValue | null =>
+    useContext(SessionContext);
 
 export const useSessionAuth = (): AuthApi => {
     const { isAuthenticated, signOut } = useSession();

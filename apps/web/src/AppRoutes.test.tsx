@@ -61,4 +61,12 @@ describe('AppRoutes', () => {
         expect(await screen.findByText('login page')).toBeTruthy();
         expect(screen.queryByText('profile page')).toBeNull();
     });
+
+    it.each([['/forgot-password'], ['/reset-password?token=abc'], ['/admin']])(
+        'has no self-host-only page at %s',
+        async (path) => {
+            renderAt(path);
+            expect(await screen.findByText('not found')).toBeTruthy();
+        }
+    );
 });
