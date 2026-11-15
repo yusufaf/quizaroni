@@ -45,6 +45,9 @@ export const PAGE_TITLES = {
     LOGIN: 'Login',
     SIGN_UP: 'Sign Up',
     PROFILE: 'Profile',
+    FORGOT_PASSWORD: 'Forgot Password',
+    RESET_PASSWORD: 'Reset Password',
+    ADMIN: 'Admin',
 };
 
 export const DELETE_ACCOUNT_MSG = `We're sad to see you go, but if you're certain you want to delete your account, 

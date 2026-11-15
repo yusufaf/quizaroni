@@ -115,4 +115,23 @@ describe('LoginForm', () => {
         submit('ada@example.com');
         expect((await screen.findByRole('alert')).textContent).toBe(message);
     });
+
+    it('links to the forgot-password page', async () => {
+        await renderLogin();
+        expect(
+            screen.getByRole('link', { name: 'login.forgotLink' }).getAttribute('href')
+        ).toBe('/forgot-password');
+    });
+
+    it('confirms a password reset', async () => {
+        await renderLogin({ notice: 'passwordReset' });
+        expect(screen.getByRole('status').textContent).toBe(
+            'login.passwordResetNotice'
+        );
+    });
+
+    it('shows no notice by default', async () => {
+        await renderLogin();
+        expect(screen.queryByRole('status')).toBeNull();
+    });
 });

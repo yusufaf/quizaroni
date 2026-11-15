@@ -58,6 +58,11 @@ const LoginForm = () => {
                     <LoginTitle variant="h5" as="h1">
                         {t('login.title')}
                     </LoginTitle>
+                    {location.state?.notice === 'passwordReset' && (
+                        <Alert severity="success" role="status" sx={{ mt: 2 }}>
+                            {t('login.passwordResetNotice')}
+                        </Alert>
+                    )}
                     <Box
                         component="form"
                         noValidate
@@ -94,6 +99,11 @@ const LoginForm = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
+                        <Typography variant="body2">
+                            <Link component={RouterLink} to="/forgot-password">
+                                {t('login.forgotLink')}
+                            </Link>
+                        </Typography>
                         <Button
                             type="submit"
                             variant="contained"

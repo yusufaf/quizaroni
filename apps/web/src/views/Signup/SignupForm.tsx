@@ -4,6 +4,7 @@ import {
     Navigate,
     useLocation,
     useNavigate,
+    useSearchParams,
 } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -25,10 +26,8 @@ import {
     LoginPageContainer as SignupPageContainer,
     LoginTitle as SignupTitle,
 } from 'views/Login/LoginStyles';
+import { passwordLengthOk } from 'views/Login/passwordRules';
 
-// Better Auth's limits, measured in UTF-16 code units like the server.
-const PASSWORD_MIN = 8;
-const PASSWORD_MAX = 128;
 const NAME_MAX = 100;
 
 type FieldErrors = Partial<Record<'name' | 'password' | 'confirm', string>>;
@@ -40,6 +39,8 @@ const SignupForm = () => {
     const { isAuthenticated, signUp } = useSession();
     const location = useLocation();
     const navigate = useNavigate();
+    const [params] = useSearchParams();
+    const inviteToken = params.get('invite') || undefined;
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -56,7 +57,7 @@ const SignupForm = () => {
         if (trimmed.length < 1 || trimmed.length > NAME_MAX) {
             errors.name = t('errors.nameRequired');
         }
-        if (password.length < PASSWORD_MIN || password.length > PASSWORD_MAX) {
+        if (!passwordLengthOk(password)) {
             errors.password = t('errors.passwordLength');
         }
         if (confirm !== password) errors.confirm = t('errors.passwordMismatch');
@@ -71,7 +72,12 @@ const SignupForm = () => {
         if (Object.keys(errors).length > 0) return;
         setPending(true);
         try {
-            await signUp({ name: name.trim(), email: email.trim(), password });
+            await signUp({
+                name: name.trim(),
+                email: email.trim(),
+                password,
+                ...(inviteToken ? { inviteToken } : {}),
+            });
             navigate(toReturnPath(location.state?.from) ?? '/', {
                 replace: true,
             });
@@ -100,6 +106,11 @@ const SignupForm = () => {
                             minWidth: { sm: 360 },
                         }}
                     >
+                        {inviteToken && (
+                            <Alert severity="info">
+                                {t('signup.inviteNotice')}
+                            </Alert>
+                        )}
                         {error && (
                             <Alert severity="error" role="alert">
                                 {error}

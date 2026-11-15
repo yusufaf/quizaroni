@@ -26,11 +26,11 @@ const fetchMock = vi.fn<typeof fetch>();
 
 const Where = () => <p>at:{useLocation().pathname}</p>;
 
-const renderSignup = async () => {
+const renderSignup = async (search = '') => {
     render(
         <MemoryRouter
             initialEntries={[
-                { pathname: '/signUp', state: { from: '/create' } },
+                { pathname: '/signUp', search, state: { from: '/create' } },
             ]}
         >
             <SessionProvider>
@@ -131,10 +131,36 @@ describe('SignupForm', () => {
             json({ code: 'USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL' }, 422),
             'errors.emailTaken',
         ],
+        [json({ code: 'INVITE_INVALID' }, 403), 'errors.inviteInvalid'],
     ])('shows a readable server error (%#)', async (response, message) => {
         await renderSignup();
         fetchMock.mockResolvedValueOnce(response);
         fill({});
         expect((await screen.findByRole('alert')).textContent).toBe(message);
+    });
+
+    it('sends the invite from the link and says so', async () => {
+        await renderSignup('?invite=tok-123');
+        expect(screen.getByText('signup.inviteNotice')).toBeTruthy();
+        fetchMock.mockResolvedValueOnce(
+            json({
+                token: 't',
+                user: { id: 'u1', email: 'ada@example.com', name: 'Ada' },
+            })
+        );
+        fill({});
+        expect(await screen.findByText('at:/create')).toBeTruthy();
+        const [, init] = fetchMock.mock.calls[1]!;
+        expect(JSON.parse(String(init?.body))).toEqual({
+            name: 'Ada',
+            email: 'ada@example.com',
+            password: 'pw-123456',
+            inviteToken: 'tok-123',
+        });
+    });
+
+    it('shows no invite notice without an invite', async () => {
+        await renderSignup();
+        expect(screen.queryByText('signup.inviteNotice')).toBeNull();
     });
 });

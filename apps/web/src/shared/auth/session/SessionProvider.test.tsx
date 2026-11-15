@@ -20,7 +20,12 @@ import {
     type SessionUser,
 } from './sessionClient';
 
-const ADA: SessionUser = { id: 'u1', email: 'ada@example.com', name: 'Ada' };
+const ADA: SessionUser = {
+    id: 'u1',
+    email: 'ada@example.com',
+    name: 'Ada',
+    role: 'user',
+};
 
 const jsonResponse = (
     body: unknown,

@@ -7,6 +7,8 @@ import Signup from 'views/Signup/Signup';
 import Callback from 'views/Callback/Callback';
 import LoginForm from 'views/Login/LoginForm';
 import SignupForm from 'views/Signup/SignupForm';
+import ForgotPasswordForm from 'views/ForgotPassword/ForgotPasswordForm';
+import ResetPasswordForm from 'views/ResetPassword/ResetPasswordForm';
 import { isSelfHost } from 'shared/auth/backend';
 import { useAuth } from 'shared/auth/useAuth';
 import useCanonical from 'shared/hooks/useCanonical';
@@ -73,6 +75,18 @@ const AppRoutes = () => {
                 />
                 {!isSelfHost() && (
                     <Route path="/callback" element={<Callback />} />
+                )}
+                {isSelfHost() && (
+                    <Route
+                        path="/forgot-password"
+                        element={<ForgotPasswordForm />}
+                    />
+                )}
+                {isSelfHost() && (
+                    <Route
+                        path="/reset-password"
+                        element={<ResetPasswordForm />}
+                    />
                 )}
 
                 {/* Study set view — full owner experience when authenticated,
