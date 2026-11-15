@@ -175,6 +175,43 @@ describe('admin routes', () => {
         );
     });
 
+    test('the outbox drops an invite once it is used or revoked', async () => {
+        const { h, admin } = await setup();
+        const create = async (email: string) =>
+            (await (
+                await apiRequest(h, '/api/admin/invites', {
+                    cookie: admin,
+                    body: { email },
+                })
+            ).json()) as CreateResponse;
+        const outboxTo = async () =>
+            (
+                (await (
+                    await apiGet(h, '/api/admin/outbox', { cookie: admin })
+                ).json()) as { messages: { to: string }[] }
+            ).messages
+                .map((m) => m.to)
+                .sort();
+        const used = await create('used@example.com');
+        const revoked = await create('revoked@example.com');
+        await create('pending@example.com');
+        expect(await outboxTo()).toEqual([
+            'pending@example.com',
+            'revoked@example.com',
+            'used@example.com',
+        ]);
+
+        inviteOnly(h);
+        const token = new URL(used.link).searchParams.get('invite')!;
+        expect((await signUpWith(h, token, 'used@example.com')).status).toBe(
+            200
+        );
+        await apiRequest(h, `/api/admin/invites/${revoked.invite.id}/revoke`, {
+            cookie: admin,
+        });
+        expect(await outboxTo()).toEqual(['pending@example.com']);
+    });
+
     test('revoking an unknown invite is a 404', async () => {
         const { h, admin } = await setup();
         const res = await apiRequest(h, '/api/admin/invites/missing/revoke', {

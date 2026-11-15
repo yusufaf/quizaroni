@@ -177,6 +177,64 @@ describe('Mailer.listOutbox', () => {
     });
 });
 
+describe('reset messages', () => {
+    test('a newer reset link replaces the earlier one for that person', async () => {
+        const db = freshDb();
+        const mailer = new Mailer(db, undefined);
+        const far = new Date(T0.getTime() + 86_400_000);
+        await mailer.deliver(
+            message({ link: 'http://localhost/r?token=1', expiresAt: far }),
+            T0
+        );
+        await mailer.deliver(
+            message({ to: 'bob@example.com', expiresAt: far }),
+            T0
+        );
+        await mailer.deliver(message({ kind: 'invite', expiresAt: far }), T0);
+        await mailer.deliver(
+            message({ link: 'http://localhost/r?token=2', expiresAt: far }),
+            new Date(T0.getTime() + 1)
+        );
+        expect(
+            mailer
+                .listOutbox(T0)
+                .map((m) => `${m.kind}:${m.to}:${m.link}`)
+                .sort()
+        ).toEqual([
+            'invite:ada@example.com:http://localhost/reset-password?token=abc',
+            'password_reset:ada@example.com:http://localhost/r?token=2',
+            'password_reset:bob@example.com:http://localhost/reset-password?token=abc',
+        ]);
+    });
+
+    test('a later successful send clears an earlier failed one', async () => {
+        const db = freshDb();
+        let fail = true;
+        const mailer = new Mailer(db, {
+            send: async () => {
+                if (fail)
+                    throw Object.assign(new Error('x'), {
+                        code: 'ECONNECTION',
+                    });
+            },
+        });
+        const far = new Date(T0.getTime() + 86_400_000);
+        const output = captureConsole();
+        try {
+            expect(await mailer.deliver(message({ expiresAt: far }), T0)).toBe(
+                'failed'
+            );
+        } finally {
+            output.restore();
+        }
+        fail = false;
+        expect(await mailer.deliver(message({ expiresAt: far }), T0)).toBe(
+            'sent'
+        );
+        expect(mailer.listOutbox(T0)).toEqual([]);
+    });
+});
+
 test('clearOutbox removes only the matching kind and recipient', async () => {
     const db = freshDb();
     const mailer = new Mailer(db, undefined);

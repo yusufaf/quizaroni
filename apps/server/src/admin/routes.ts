@@ -8,6 +8,7 @@ import { INVALID_JSON, readJsonBody } from '../http/json-body';
 import { noStore, requireAdmin, type SessionEnv } from '../http/session';
 import {
     createInvite,
+    findUsableInvite,
     INVITE_DAYS_MAX,
     INVITE_USES_MAX,
     inviteLink,
@@ -94,9 +95,18 @@ export function adminRoutes(deps: {
         return c.json({ invite });
     });
 
-    routes.get('/outbox', (c) =>
-        c.json({ smtp: mailer.smtpEnabled, messages: mailer.listOutbox() })
-    );
+    // An invite's message is dropped once the invite is used, revoked or
+    // expired, so the outbox lists only links that still work.
+    routes.get('/outbox', (c) => {
+        const messages = mailer.listOutbox().filter((m) => {
+            if (m.kind !== 'invite') return true;
+            const token = new URL(m.link).searchParams.get('invite') ?? '';
+            if (findUsableInvite(db, token)) return true;
+            mailer.deleteOutbox(m.id);
+            return false;
+        });
+        return c.json({ smtp: mailer.smtpEnabled, messages });
+    });
 
     return routes;
 }

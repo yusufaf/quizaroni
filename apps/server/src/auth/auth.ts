@@ -175,16 +175,14 @@ export function createAuth(cfg: AuthConfig) {
                     // Sign-up stores any client-sent `image`; avatars come with
                     // the profile work.
                     before: async (u, ctx) => {
-                        if (!registrationOpen(cfg.db)) {
-                            // Fail closed: without the endpoint context there
-                            // is no invite to claim.
-                            if (!ctx) throw inviteInvalid();
-                            if (
-                                ctx.path === SIGN_UP_PATH &&
-                                !claimInvite(cfg.db, inviteTokenOf(ctx.body))
-                            ) {
-                                throw inviteInvalid();
-                            }
+                        // Fail closed: on an invite-only server, only email
+                        // sign-up with an invite it can claim creates users.
+                        if (
+                            !registrationOpen(cfg.db) &&
+                            (ctx?.path !== SIGN_UP_PATH ||
+                                !claimInvite(cfg.db, inviteTokenOf(ctx.body)))
+                        ) {
+                            throw inviteInvalid();
                         }
                         return {
                             data: { ...u, name: u.name.trim(), image: null },

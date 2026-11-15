@@ -60,7 +60,11 @@ export class Mailer {
     }
 
     async deliver(msg: MailMessage, now = new Date()): Promise<Delivery> {
+        // Only the newest reset link per person is kept, so reset requests
+        // can't flood the outbox and push invite links out of it.
+        const replacesEarlier = msg.kind === 'password_reset';
         if (!this.transport) {
+            if (replacesEarlier) this.clearOutbox(msg.kind, msg.to);
             this.store(msg, 'outbox', now);
             return 'outbox';
         }
@@ -70,11 +74,13 @@ export class Mailer {
                 subject: msg.subject,
                 text: msg.text,
             });
+            if (replacesEarlier) this.clearOutbox(msg.kind, msg.to);
             return 'sent';
         } catch (err) {
             console.error(
                 `Could not send ${msg.kind} email over SMTP (${mailFailureCode(err)}); it is in the admin outbox.`
             );
+            if (replacesEarlier) this.clearOutbox(msg.kind, msg.to);
             this.store(msg, 'failed', now);
             return 'failed';
         }
@@ -133,6 +139,10 @@ export class Mailer {
                 )
             )
             .run();
+    }
+
+    deleteOutbox(id: string): void {
+        this.db.delete(mailOutbox).where(eq(mailOutbox.id, id)).run();
     }
 
     private store(
