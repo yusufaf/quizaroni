@@ -119,7 +119,9 @@ describe('LoginForm', () => {
     it('links to the forgot-password page', async () => {
         await renderLogin();
         expect(
-            screen.getByRole('link', { name: 'login.forgotLink' }).getAttribute('href')
+            screen
+                .getByRole('link', { name: 'login.forgotLink' })
+                .getAttribute('href')
         ).toBe('/forgot-password');
     });
 

@@ -4,7 +4,11 @@ import type { Db } from '../db';
 import { mailOutbox } from '../db/schema';
 import { openTestDb } from '../testing/studysets';
 import type { SmtpConfig } from './config';
-import { decodeQuotedPrintable, type FakeSmtp, startFakeSmtp } from './fake-smtp';
+import {
+    decodeQuotedPrintable,
+    type FakeSmtp,
+    startFakeSmtp,
+} from './fake-smtp';
 import { Mailer } from './mailer';
 import { passwordResetMessage } from './messages';
 import { smtpTransport } from './smtp';
@@ -77,9 +81,12 @@ function expectNoCredentials(text: string) {
 
 async function closedPort(): Promise<number> {
     const server = createServer();
-    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+    await new Promise<void>((resolve) =>
+        server.listen(0, '127.0.0.1', resolve)
+    );
     const address = server.address();
-    if (address === null || typeof address === 'string') throw new Error('no port');
+    if (address === null || typeof address === 'string')
+        throw new Error('no port');
     await new Promise<void>((resolve) => server.close(() => resolve()));
     return address.port;
 }
@@ -111,16 +118,23 @@ describe('smtpTransport (nodemailer under Bun)', () => {
         }
         expect(delivery).toBe('failed');
         expect(fake.messages).toHaveLength(0);
-        expect(db.select().from(mailOutbox).all().map((r) => r.delivery)).toEqual([
-            'failed',
-        ]);
+        expect(
+            db
+                .select()
+                .from(mailOutbox)
+                .all()
+                .map((r) => r.delivery)
+        ).toEqual(['failed']);
         const text = output.text();
         expect(text).toContain('EAUTH 535');
         expectNoCredentials(text);
     });
 
     test('verify against a closed port logs only the error code', async () => {
-        const mailer = new Mailer(freshDb(), smtpTransport(config(await closedPort())));
+        const mailer = new Mailer(
+            freshDb(),
+            smtpTransport(config(await closedPort()))
+        );
         const output = captureConsole();
         try {
             await mailer.verify();

@@ -83,7 +83,10 @@ export function listInvites(db: Db, now = new Date()): InviteView[] {
     return db
         .select()
         .from(registrationInvite)
-        .orderBy(desc(registrationInvite.createdAt), desc(registrationInvite.id))
+        .orderBy(
+            desc(registrationInvite.createdAt),
+            desc(registrationInvite.id)
+        )
         .limit(LIST_MAX)
         .all()
         .map((row) => toView(row, now));
@@ -97,7 +100,10 @@ export function revokeInvite(
     db.update(registrationInvite)
         .set({ revokedAt: now })
         .where(
-            and(eq(registrationInvite.id, id), isNull(registrationInvite.revokedAt))
+            and(
+                eq(registrationInvite.id, id),
+                isNull(registrationInvite.revokedAt)
+            )
         )
         .run();
     const row = db

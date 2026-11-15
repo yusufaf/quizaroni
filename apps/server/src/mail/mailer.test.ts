@@ -95,7 +95,9 @@ describe('Mailer.deliver', () => {
         const mailer = new Mailer(db, {
             send: async () => {
                 throw Object.assign(
-                    new Error('535 auth failed for smtp-user-xyz s3cret-PASS-xyz'),
+                    new Error(
+                        '535 auth failed for smtp-user-xyz s3cret-PASS-xyz'
+                    ),
                     { code: 'EAUTH', responseCode: 535 }
                 );
             },
@@ -120,9 +122,7 @@ describe('Mailer.enqueue', () => {
     test('delivers in the background; flush waits for it', async () => {
         const db = freshDb();
         const mailer = new Mailer(db, undefined);
-        mailer.enqueue(
-            message({ expiresAt: new Date(Date.now() + 3600_000) })
-        );
+        mailer.enqueue(message({ expiresAt: new Date(Date.now() + 3600_000) }));
         await mailer.flush();
         expect(db.select().from(mailOutbox).all()).toHaveLength(1);
     });
@@ -133,11 +133,17 @@ describe('Mailer.listOutbox', () => {
         const db = freshDb();
         const mailer = new Mailer(db, undefined);
         await mailer.deliver(
-            message({ to: 'old@example.com', expiresAt: new Date(T0.getTime() + 60_000) }),
+            message({
+                to: 'old@example.com',
+                expiresAt: new Date(T0.getTime() + 60_000),
+            }),
             T0
         );
         await mailer.deliver(
-            message({ to: 'new@example.com', expiresAt: new Date(LATER.getTime() + 3600_000) }),
+            message({
+                to: 'new@example.com',
+                expiresAt: new Date(LATER.getTime() + 3600_000),
+            }),
             new Date(T0.getTime() + 1000)
         );
         expect(mailer.listOutbox(T0).map((m) => m.to)).toEqual([
@@ -209,7 +215,11 @@ describe('Mailer.verify', () => {
 });
 
 test('mailFailureCode reads only code and responseCode', () => {
-    expect(mailFailureCode(Object.assign(new Error('x'), { code: 'EAUTH', responseCode: 535 }))).toBe('EAUTH 535');
+    expect(
+        mailFailureCode(
+            Object.assign(new Error('x'), { code: 'EAUTH', responseCode: 535 })
+        )
+    ).toBe('EAUTH 535');
     expect(mailFailureCode(new Error('secret'))).toBe('unknown');
     expect(mailFailureCode('secret')).toBe('unknown');
     expect(mailFailureCode({ code: { nested: 'secret' } })).toBe('unknown');

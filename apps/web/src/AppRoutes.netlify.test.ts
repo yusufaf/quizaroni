@@ -15,7 +15,11 @@ const netlifyToml = readFileSync(
 );
 
 // Routes mounted only in the self-host build, which Netlify never serves.
-const SELF_HOST_ONLY = new Set(['/forgot-password', '/reset-password', '/admin']);
+const SELF_HOST_ONLY = new Set([
+    '/forgot-password',
+    '/reset-password',
+    '/admin',
+]);
 
 // Matches both `<Route path="/login">` and `{ path: '/create', ... }`. "/" is
 // index.html itself and "*" is the NotFound route, so neither needs a rule.

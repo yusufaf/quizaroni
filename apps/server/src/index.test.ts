@@ -355,7 +355,8 @@ async function closedPort(): Promise<number> {
     const server = createServer();
     await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));
     const address = server.address();
-    if (address === null || typeof address === 'string') throw new Error('no port');
+    if (address === null || typeof address === 'string')
+        throw new Error('no port');
     await new Promise<void>((done) => server.close(() => done()));
     return address.port;
 }
@@ -393,7 +394,9 @@ test('with SMTP set, names the server and logs a failed check without credential
     let output: { stdout: string; stderr: string };
     try {
         await server.out.waitFor(
-            new RegExp(`Email: sending through SMTP at 127\\.0\\.0\\.1:${port} \\(none\\)`)
+            new RegExp(
+                `Email: sending through SMTP at 127\\.0\\.0\\.1:${port} \\(none\\)`
+            )
         );
         await server.err.waitFor(/SMTP check failed \(\w+\)/, 15_000);
     } finally {
@@ -411,7 +414,9 @@ test('exits with code 1 when QZ_SMTP_USER has no password, without echoing it', 
     });
     expect(await server.proc.exited).toBe(1);
     const stderr = await server.err.done;
-    expect(stderr).toContain('QZ_SMTP_USER and QZ_SMTP_PASSWORD must be set together');
+    expect(stderr).toContain(
+        'QZ_SMTP_USER and QZ_SMTP_PASSWORD must be set together'
+    );
     expectNoSmtpCredentials({ stdout: await server.out.done, stderr });
 }, 20_000);
 

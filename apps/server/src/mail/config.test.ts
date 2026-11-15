@@ -5,7 +5,10 @@ import { describeSmtp, parseSmtpConfig, SMTP_ENV_VARS } from './config';
 const USER = 'smtp-user-xyz';
 const PASSWORD = 's3cret-PASS-xyz';
 
-const base = { QZ_SMTP_HOST: 'mail.example.org', QZ_SMTP_FROM: 'qz@example.org' };
+const base = {
+    QZ_SMTP_HOST: 'mail.example.org',
+    QZ_SMTP_FROM: 'qz@example.org',
+};
 
 function configError(env: Record<string, string | undefined>): ConfigError {
     try {
@@ -37,10 +40,12 @@ describe('parseSmtpConfig', () => {
     });
 
     test('port 465 defaults to TLS', () => {
-        expect(parseSmtpConfig({ ...base, QZ_SMTP_PORT: '465' })).toMatchObject({
-            port: 465,
-            security: 'tls',
-        });
+        expect(parseSmtpConfig({ ...base, QZ_SMTP_PORT: '465' })).toMatchObject(
+            {
+                port: 465,
+                security: 'tls',
+            }
+        );
     });
 
     test('tls defaults to port 465 and none to port 25', () => {
@@ -54,9 +59,9 @@ describe('parseSmtpConfig', () => {
 
     test('accepts hostnames and IP literals', () => {
         for (const host of ['mail.example.org', '10.0.0.5', '::1']) {
-            expect(
-                parseSmtpConfig({ ...base, QZ_SMTP_HOST: host })?.host
-            ).toBe(host);
+            expect(parseSmtpConfig({ ...base, QZ_SMTP_HOST: host })?.host).toBe(
+                host
+            );
         }
     });
 
@@ -75,8 +80,10 @@ describe('parseSmtpConfig', () => {
 
     test('accepts a from with a display name', () => {
         expect(
-            parseSmtpConfig({ ...base, QZ_SMTP_FROM: 'Quizaroni <QZ@Example.org>' })
-                ?.from
+            parseSmtpConfig({
+                ...base,
+                QZ_SMTP_FROM: 'Quizaroni <QZ@Example.org>',
+            })?.from
         ).toBe('Quizaroni <qz@example.org>');
     });
 

@@ -657,8 +657,13 @@ async function errorCode(res: Response): Promise<string> {
 describe('invite-only sign up', () => {
     test('a valid invite creates the user and uses the invite', async () => {
         const h = await harness();
-        const { invite, token } = createInvite(h.db, { createdBy: adminId(h.db) });
-        const res = await signUp(h, { email: 'invited@example.com', inviteToken: token });
+        const { invite, token } = createInvite(h.db, {
+            createdBy: adminId(h.db),
+        });
+        const res = await signUp(h, {
+            email: 'invited@example.com',
+            inviteToken: token,
+        });
         expect(res.status).toBe(200);
         expect(inviteUses(h.db, invite.id)).toBe(1);
         const again = await signUp(h, { inviteToken: token });
@@ -677,7 +682,11 @@ describe('invite-only sign up', () => {
         const revoked = createInvite(h.db, { createdBy: admin });
         revokeInvite(h.db, revoked.invite.id);
         const before = userCount(h.db);
-        for (const token of [expired.token, revoked.token, 'not-a-real-invite']) {
+        for (const token of [
+            expired.token,
+            revoked.token,
+            'not-a-real-invite',
+        ]) {
             const res = await signUp(h, { inviteToken: token });
             expect(res.status).toBe(403);
             expect(await errorCode(res)).toBe('INVITE_INVALID');
@@ -691,31 +700,48 @@ describe('invite-only sign up', () => {
             createdBy: adminId(h.db),
             email: 'locked@example.com',
         });
-        const other = await signUp(h, { email: 'other@example.com', inviteToken: token });
+        const other = await signUp(h, {
+            email: 'other@example.com',
+            inviteToken: token,
+        });
         expect(other.status).toBe(403);
         expect(await errorCode(other)).toBe('INVITE_INVALID');
-        const match = await signUp(h, { email: 'Locked@Example.com', inviteToken: token });
+        const match = await signUp(h, {
+            email: 'Locked@Example.com',
+            inviteToken: token,
+        });
         expect(match.status).toBe(200);
     });
 
     test('an invalid invite with a taken email gets 403, not 422', async () => {
         const h = await harness();
-        const res = await signUp(h, { email: ADMIN_EMAIL, inviteToken: 'nope' });
+        const res = await signUp(h, {
+            email: ADMIN_EMAIL,
+            inviteToken: 'nope',
+        });
         expect(res.status).toBe(403);
         expect(await errorCode(res)).toBe('INVITE_INVALID');
     });
 
     test('a failed sign-up does not use up the invite', async () => {
         const h = await harness();
-        const { invite, token } = createInvite(h.db, { createdBy: adminId(h.db) });
-        expect((await signUp(h, { password: 'short', inviteToken: token })).status).toBe(400);
-        expect((await signUp(h, { email: ADMIN_EMAIL, inviteToken: token })).status).toBe(422);
+        const { invite, token } = createInvite(h.db, {
+            createdBy: adminId(h.db),
+        });
+        expect(
+            (await signUp(h, { password: 'short', inviteToken: token })).status
+        ).toBe(400);
+        expect(
+            (await signUp(h, { email: ADMIN_EMAIL, inviteToken: token })).status
+        ).toBe(422);
         expect(inviteUses(h.db, invite.id)).toBe(0);
     });
 
     test('two sign-ups racing for a single-use invite: only one wins', async () => {
         const h = await harness();
-        const { invite, token } = createInvite(h.db, { createdBy: adminId(h.db) });
+        const { invite, token } = createInvite(h.db, {
+            createdBy: adminId(h.db),
+        });
         const before = userCount(h.db);
         const results = await Promise.all([
             signUp(h, { email: 'race1@example.com', inviteToken: token }),
@@ -729,7 +755,9 @@ describe('invite-only sign up', () => {
     test('open registration ignores an invite', async () => {
         const h = await harness();
         setRegistrationMode(h.db, 'open');
-        const { invite, token } = createInvite(h.db, { createdBy: adminId(h.db) });
+        const { invite, token } = createInvite(h.db, {
+            createdBy: adminId(h.db),
+        });
         expect((await signUp(h, { inviteToken: token })).status).toBe(200);
         expect(inviteUses(h.db, invite.id)).toBe(0);
     });
@@ -760,7 +788,11 @@ describe('password reset', () => {
         expect(link).toMatch(/^http:\/\/localhost\/reset-password\?token=/);
         const token = tokenOf(link);
 
-        const identifiers = h.db.select().from(verification).all().map((v) => v.identifier);
+        const identifiers = h.db
+            .select()
+            .from(verification)
+            .all()
+            .map((v) => v.identifier);
         expect(identifiers).toHaveLength(1);
         expect(identifiers[0]).not.toContain(token);
 
@@ -772,7 +804,10 @@ describe('password reset', () => {
         expect(
             (
                 await signIn(h, {
-                    body: { email: ADMIN_EMAIL, password: 'new-horse-battery-2' },
+                    body: {
+                        email: ADMIN_EMAIL,
+                        password: 'new-horse-battery-2',
+                    },
                 })
             ).status
         ).toBe(200);
@@ -793,9 +828,13 @@ describe('password reset', () => {
         expect(unknown.status).toBe(known.status);
         expect(await unknown.json()).toEqual(await known.json());
         await h.mailer.flush();
-        expect(h.db.select().from(mailOutbox).all().map((r) => r.recipient)).toEqual([
-            ADMIN_EMAIL,
-        ]);
+        expect(
+            h.db
+                .select()
+                .from(mailOutbox)
+                .all()
+                .map((r) => r.recipient)
+        ).toEqual([ADMIN_EMAIL]);
     });
 
     test('with SMTP, the link is sent and nothing is stored', async () => {
@@ -805,7 +844,9 @@ describe('password reset', () => {
         await h.mailer.flush();
         expect(sent).toHaveLength(1);
         expect(sent[0]?.to).toBe(ADMIN_EMAIL);
-        expect(sent[0]?.text).toMatch(/http:\/\/localhost\/reset-password\?token=\S+/);
+        expect(sent[0]?.text).toMatch(
+            /http:\/\/localhost\/reset-password\?token=\S+/
+        );
         expect(h.db.select().from(mailOutbox).all()).toHaveLength(0);
     });
 
@@ -814,7 +855,10 @@ describe('password reset', () => {
         await requestReset(h, ADMIN_EMAIL);
         await h.mailer.flush();
         const token = tokenOf(onlyOutboxLink(h));
-        h.db.update(verification).set({ expiresAt: new Date(Date.now() - 1000) }).run();
+        h.db
+            .update(verification)
+            .set({ expiresAt: new Date(Date.now() - 1000) })
+            .run();
         const res = await call(h, '/reset-password', {
             body: { token, newPassword: 'new-horse-battery-2' },
         });

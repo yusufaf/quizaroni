@@ -57,7 +57,8 @@ export function adminRoutes(deps: {
         const { days, maxUses } = parsed.data;
         // A blank email field means "anyone".
         const rawEmail = parsed.data.email?.trim() || undefined;
-        const email = rawEmail === undefined ? undefined : normalizeEmail(rawEmail);
+        const email =
+            rawEmail === undefined ? undefined : normalizeEmail(rawEmail);
         if (rawEmail !== undefined && email === undefined) {
             return c.json({ message: 'Invalid email' }, 400);
         }

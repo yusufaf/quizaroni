@@ -122,7 +122,10 @@ const InviteForm = () => {
                             setMaxUses(
                                 Math.min(
                                     USES_MAX,
-                                    Math.max(1, Math.trunc(Number(e.target.value)) || 1)
+                                    Math.max(
+                                        1,
+                                        Math.trunc(Number(e.target.value)) || 1
+                                    )
                                 )
                             )
                         }
@@ -205,7 +208,9 @@ const InvitesTable = () => {
                                     }
                                 />
                             </TableCell>
-                            <TableCell>{formatDate(invite.expiresAt)}</TableCell>
+                            <TableCell>
+                                {formatDate(invite.expiresAt)}
+                            </TableCell>
                             <TableCell align="right">
                                 {invite.status === 'active' && (
                                     <Button
@@ -239,7 +244,11 @@ const OutboxItem = ({ message }: { message: OutboxMessage }) => {
                         {t(`kinds.${message.kind}`)} · {message.to}
                     </Typography>
                     {message.delivery === 'failed' && (
-                        <Chip size="small" color="warning" label={t('deliveryFailed')} />
+                        <Chip
+                            size="small"
+                            color="warning"
+                            label={t('deliveryFailed')}
+                        />
                     )}
                 </Stack>
                 <Typography variant="body2" color="text.secondary">
@@ -274,7 +283,11 @@ const Outbox = () => {
             {outbox.data.messages.length === 0 ? (
                 <Typography>{t('outboxEmpty')}</Typography>
             ) : (
-                <Stack component="ul" spacing={2} sx={{ listStyle: 'none', p: 0, m: 0 }}>
+                <Stack
+                    component="ul"
+                    spacing={2}
+                    sx={{ listStyle: 'none', p: 0, m: 0 }}
+                >
                     {outbox.data.messages.map((message) => (
                         <OutboxItem key={message.id} message={message} />
                     ))}
@@ -304,7 +317,11 @@ const Admin = () => {
                 <Typography variant="h4" component="h1">
                     {t('title')}
                 </Typography>
-                <Stack spacing={2} component="section" aria-labelledby="admin-invites">
+                <Stack
+                    spacing={2}
+                    component="section"
+                    aria-labelledby="admin-invites"
+                >
                     <Typography variant="h5" component="h2" id="admin-invites">
                         {t('invitesTitle')}
                     </Typography>
@@ -312,7 +329,11 @@ const Admin = () => {
                     <InviteForm />
                     <InvitesTable />
                 </Stack>
-                <Stack spacing={2} component="section" aria-labelledby="admin-outbox">
+                <Stack
+                    spacing={2}
+                    component="section"
+                    aria-labelledby="admin-outbox"
+                >
                     <Typography variant="h5" component="h2" id="admin-outbox">
                         {t('outboxTitle')}
                     </Typography>

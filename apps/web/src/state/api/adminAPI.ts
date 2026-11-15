@@ -11,8 +11,12 @@ import {
 
 // Self-host only: the instance admin's invites and mail outbox.
 
-export type Invite = z.infer<typeof ListInvitesResponseSchema>['invites'][number];
-export type OutboxMessage = z.infer<typeof OutboxResponseSchema>['messages'][number];
+export type Invite = z.infer<
+    typeof ListInvitesResponseSchema
+>['invites'][number];
+export type OutboxMessage = z.infer<
+    typeof OutboxResponseSchema
+>['messages'][number];
 export type CreateInviteResponse = z.infer<typeof CreateInviteResponseSchema>;
 
 export type CreateInviteInput = {

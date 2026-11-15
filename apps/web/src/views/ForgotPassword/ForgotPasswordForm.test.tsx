@@ -67,7 +67,9 @@ describe('ForgotPasswordForm', () => {
         expect(JSON.parse(String(init?.body))).toEqual({
             email: 'ada@example.com',
         });
-        expect(screen.getByRole('link', { name: 'forgot.backToLogin' })).toBeTruthy();
+        expect(
+            screen.getByRole('link', { name: 'forgot.backToLogin' })
+        ).toBeTruthy();
     });
 
     it('shows the rate-limit message', async () => {
@@ -79,6 +81,8 @@ describe('ForgotPasswordForm', () => {
         expect((await screen.findByRole('alert')).textContent).toBe(
             'errors.rateLimited:{"seconds":30}'
         );
-        expect(screen.getByRole('button', { name: 'forgot.submit' })).toBeTruthy();
+        expect(
+            screen.getByRole('button', { name: 'forgot.submit' })
+        ).toBeTruthy();
     });
 });

@@ -54,7 +54,12 @@ export async function startFakeSmtp(
                             ? '235 Authentication succeeded'
                             : '535 Authentication failed'
                     );
-                } else if (verb === 'MAIL' || verb === 'RCPT' || verb === 'RSET' || verb === 'NOOP') {
+                } else if (
+                    verb === 'MAIL' ||
+                    verb === 'RCPT' ||
+                    verb === 'RSET' ||
+                    verb === 'NOOP'
+                ) {
                     reply('250 OK');
                 } else if (verb === 'DATA') {
                     data = [];
@@ -69,7 +74,9 @@ export async function startFakeSmtp(
         });
     });
 
-    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+    await new Promise<void>((resolve) =>
+        server.listen(0, '127.0.0.1', resolve)
+    );
     const address = server.address();
     if (address === null || typeof address === 'string') {
         throw new Error('fake SMTP server has no port');

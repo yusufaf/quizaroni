@@ -49,7 +49,9 @@ describe('ProfileDropdown', () => {
         session = { user: { role: 'admin' } };
         renderMenu();
         expect(
-            screen.getByRole('menuitem', { name: 'menuItem' }).getAttribute('href')
+            screen
+                .getByRole('menuitem', { name: 'menuItem' })
+                .getAttribute('href')
         ).toBe('/admin');
     });
 

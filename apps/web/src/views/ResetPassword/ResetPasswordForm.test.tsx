@@ -68,7 +68,9 @@ describe('ResetPasswordForm', () => {
             'errors.resetLinkInvalid'
         );
         expect(
-            screen.getByRole('link', { name: 'reset.requestNew' }).getAttribute('href')
+            screen
+                .getByRole('link', { name: 'reset.requestNew' })
+                .getAttribute('href')
         ).toBe('/forgot-password');
         expect(screen.queryByRole('button')).toBeNull();
     });
@@ -102,6 +104,8 @@ describe('ResetPasswordForm', () => {
         expect((await screen.findByRole('alert')).textContent).toBe(
             'errors.resetLinkInvalid'
         );
-        expect(screen.getByRole('link', { name: 'reset.requestNew' })).toBeTruthy();
+        expect(
+            screen.getByRole('link', { name: 'reset.requestNew' })
+        ).toBeTruthy();
     });
 });

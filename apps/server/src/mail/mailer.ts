@@ -127,7 +127,10 @@ export class Mailer {
         this.db
             .delete(mailOutbox)
             .where(
-                and(eq(mailOutbox.kind, kind), eq(mailOutbox.recipient, recipient))
+                and(
+                    eq(mailOutbox.kind, kind),
+                    eq(mailOutbox.recipient, recipient)
+                )
             )
             .run();
     }

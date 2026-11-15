@@ -7,7 +7,13 @@ import {
     it,
     vi,
 } from 'vite-plus/test';
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import {
+    fireEvent,
+    render,
+    screen,
+    waitFor,
+    within,
+} from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import Admin from './Admin';
@@ -22,7 +28,14 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('shared/auth/backend', () => ({ isSelfHost: () => true }));
 
-const session = { user: { id: 'a1', email: 'admin@example.com', name: 'Admin', role: 'admin' } };
+const session = {
+    user: {
+        id: 'a1',
+        email: 'admin@example.com',
+        name: 'Admin',
+        role: 'admin',
+    },
+};
 vi.mock('shared/auth/session/SessionProvider', () => ({
     useSession: () => session,
 }));
@@ -83,7 +96,9 @@ const routeFetch = (o: { invites?: unknown[]; messages?: unknown[] } = {}) =>
             return json({ invites: o.invites ?? [INVITE] });
         }
         if (url.endsWith('/revoke')) {
-            return json({ invite: { ...INVITE, status: 'revoked', revokedAt: NOW } });
+            return json({
+                invite: { ...INVITE, status: 'revoked', revokedAt: NOW },
+            });
         }
         if (url === '/api/admin/outbox') {
             return json({ smtp: false, messages: o.messages ?? [MESSAGE] });
@@ -94,7 +109,11 @@ const routeFetch = (o: { invites?: unknown[]; messages?: unknown[] } = {}) =>
 const renderAdmin = () =>
     render(
         <QueryClientProvider
-            client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}
+            client={
+                new QueryClient({
+                    defaultOptions: { queries: { retry: false } },
+                })
+            }
         >
             <Admin />
         </QueryClientProvider>
@@ -102,7 +121,9 @@ const renderAdmin = () =>
 
 const postBodies = (path: string) =>
     fetchMock.mock.calls
-        .filter(([url, init]) => String(url) === path && init?.method === 'POST')
+        .filter(
+            ([url, init]) => String(url) === path && init?.method === 'POST'
+        )
         .map(([, init]) => JSON.parse(String(init?.body)));
 
 beforeEach(() => {
@@ -129,11 +150,15 @@ describe('Admin', () => {
     it('lists invites and outbox messages', async () => {
         routeFetch();
         renderAdmin();
-        const table = await screen.findByRole('table', { name: 'invitesTitle' });
+        const table = await screen.findByRole('table', {
+            name: 'invitesTitle',
+        });
         expect(within(table).getByText('anyone')).toBeTruthy();
         expect(within(table).getByText('2/5')).toBeTruthy();
         expect(within(table).getByText('statuses.active')).toBeTruthy();
-        expect(await screen.findByText('kinds.password_reset · bea@example.com')).toBeTruthy();
+        expect(
+            await screen.findByText('kinds.password_reset · bea@example.com')
+        ).toBeTruthy();
         expect(screen.getByText('deliveryFailed')).toBeTruthy();
         expect(screen.getByText('smtpOff')).toBeTruthy();
         expect(screen.getByDisplayValue(MESSAGE.link)).toBeTruthy();
@@ -145,7 +170,9 @@ describe('Admin', () => {
         fireEvent.click(screen.getByRole('button', { name: 'createInvite' }));
         expect(await screen.findByDisplayValue(LINK)).toBeTruthy();
         expect(screen.getByText('linkShownOnce')).toBeTruthy();
-        expect(postBodies('/api/admin/invites')).toEqual([{ days: 7, maxUses: 1 }]);
+        expect(postBodies('/api/admin/invites')).toEqual([
+            { days: 7, maxUses: 1 },
+        ]);
     });
 
     it('sends an email invite without max uses', async () => {
@@ -154,7 +181,9 @@ describe('Admin', () => {
         fireEvent.change(screen.getByLabelText(/inviteEmail/), {
             target: { value: ' bea@example.com ' },
         });
-        expect((screen.getByLabelText(/maxUses/) as HTMLInputElement).disabled).toBe(true);
+        expect(
+            (screen.getByLabelText(/maxUses/) as HTMLInputElement).disabled
+        ).toBe(true);
         fireEvent.click(screen.getByRole('button', { name: 'createInvite' }));
         await screen.findByDisplayValue(LINK);
         expect(postBodies('/api/admin/invites')).toEqual([
@@ -171,7 +200,9 @@ describe('Admin', () => {
             name: 'copyLinkFor:{"label":"link"}',
         });
         fireEvent.click(button);
-        await waitFor(() => expect(writeText).toHaveBeenCalledWith(MESSAGE.link));
+        await waitFor(() =>
+            expect(writeText).toHaveBeenCalledWith(MESSAGE.link)
+        );
         expect(toast.success).toHaveBeenCalledWith('copied', expect.anything());
     });
 
@@ -184,9 +215,14 @@ describe('Admin', () => {
         });
         fireEvent.click(button);
         await waitFor(() =>
-            expect(toast.error).toHaveBeenCalledWith('copyManually', expect.anything())
+            expect(toast.error).toHaveBeenCalledWith(
+                'copyManually',
+                expect.anything()
+            )
         );
-        const field = screen.getByDisplayValue(MESSAGE.link) as HTMLInputElement;
+        const field = screen.getByDisplayValue(
+            MESSAGE.link
+        ) as HTMLInputElement;
         expect(document.activeElement).toBe(field);
         expect(field.selectionStart).toBe(0);
         expect(field.selectionEnd).toBe(MESSAGE.link.length);

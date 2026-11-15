@@ -26,7 +26,12 @@ async function setup() {
 }
 
 type CreateResponse = {
-    invite: { id: string; email: string | null; maxUses: number; status: string };
+    invite: {
+        id: string;
+        email: string | null;
+        maxUses: number;
+        status: string;
+    };
     link: string;
     delivery?: string;
 };
@@ -39,7 +44,11 @@ function inviteOnly(harness: RouteHarness) {
         .run();
 }
 
-const signUpWith = (harness: RouteHarness, inviteToken: string, email: string) =>
+const signUpWith = (
+    harness: RouteHarness,
+    inviteToken: string,
+    email: string
+) =>
     apiRequest(harness, '/api/auth/sign-up/email', {
         body: { name: 'Bea', email, password: 'bea-password-1', inviteToken },
     });
@@ -54,12 +63,17 @@ describe('admin routes', () => {
             apiRequest(h, '/api/admin/invites/x/revoke', { cookie }),
             apiGet(h, '/api/admin/outbox', { cookie }),
         ];
-        for (const res of await Promise.all(calls())) expect(res.status).toBe(401);
+        for (const res of await Promise.all(calls()))
+            expect(res.status).toBe(401);
         for (const res of await Promise.all(calls(user.cookie))) {
             expect(res.status).toBe(403);
         }
-        expect((await apiGet(h, '/api/admin/invites', { cookie: admin })).status).toBe(200);
-        expect((await apiGet(h, '/api/admin/outbox', { cookie: admin })).status).toBe(200);
+        expect(
+            (await apiGet(h, '/api/admin/invites', { cookie: admin })).status
+        ).toBe(200);
+        expect(
+            (await apiGet(h, '/api/admin/outbox', { cookie: admin })).status
+        ).toBe(200);
     });
 
     test('responses are not cached', async () => {
@@ -78,7 +92,11 @@ describe('admin routes', () => {
         const created = (await res.json()) as CreateResponse;
         expect(created.link).toStartWith('http://localhost/signUp?invite=');
         expect(created.delivery).toBeUndefined();
-        expect(created.invite).toMatchObject({ email: null, maxUses: 5, status: 'active' });
+        expect(created.invite).toMatchObject({
+            email: null,
+            maxUses: 5,
+            status: 'active',
+        });
         const outbox = (await (
             await apiGet(h, '/api/admin/outbox', { cookie: admin })
         ).json()) as { smtp: boolean; messages: unknown[] };
@@ -110,7 +128,10 @@ describe('admin routes', () => {
         expect(res.status).toBe(201);
         const created = (await res.json()) as CreateResponse;
         expect(created.delivery).toBe('outbox');
-        expect(created.invite).toMatchObject({ email: 'bea@example.com', maxUses: 1 });
+        expect(created.invite).toMatchObject({
+            email: 'bea@example.com',
+            maxUses: 1,
+        });
         const outbox = (await (
             await apiGet(h, '/api/admin/outbox', { cookie: admin })
         ).json()) as { messages: { kind: string; to: string; link: string }[] };
@@ -123,13 +144,18 @@ describe('admin routes', () => {
 
         inviteOnly(h);
         const token = new URL(created.link).searchParams.get('invite')!;
-        expect((await signUpWith(h, token, 'bea@example.com')).status).toBe(200);
+        expect((await signUpWith(h, token, 'bea@example.com')).status).toBe(
+            200
+        );
     });
 
     test('a revoked invite no longer signs anyone up', async () => {
         const { h, admin } = await setup();
         const created = (await (
-            await apiRequest(h, '/api/admin/invites', { cookie: admin, body: {} })
+            await apiRequest(h, '/api/admin/invites', {
+                cookie: admin,
+                body: {},
+            })
         ).json()) as CreateResponse;
         const revoke = await apiRequest(
             h,
@@ -137,12 +163,16 @@ describe('admin routes', () => {
             { cookie: admin }
         );
         expect(revoke.status).toBe(200);
-        expect(((await revoke.json()) as CreateResponse).invite.status).toBe('revoked');
+        expect(((await revoke.json()) as CreateResponse).invite.status).toBe(
+            'revoked'
+        );
         inviteOnly(h);
         const token = new URL(created.link).searchParams.get('invite')!;
         const res = await signUpWith(h, token, 'late@example.com');
         expect(res.status).toBe(403);
-        expect(((await res.json()) as { code: string }).code).toBe('INVITE_INVALID');
+        expect(((await res.json()) as { code: string }).code).toBe(
+            'INVITE_INVALID'
+        );
     });
 
     test('revoking an unknown invite is a 404', async () => {
@@ -164,7 +194,10 @@ describe('admin routes', () => {
         [{ days: '7' }],
     ])('rejects %p', async (body) => {
         const { h, admin } = await setup();
-        const res = await apiRequest(h, '/api/admin/invites', { cookie: admin, body });
+        const res = await apiRequest(h, '/api/admin/invites', {
+            cookie: admin,
+            body,
+        });
         expect(res.status).toBe(400);
     });
 

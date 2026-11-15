@@ -51,7 +51,9 @@ describe('createInvite', () => {
             status: 'active',
             revokedAt: null,
             createdAt: NOW.toISOString(),
-            expiresAt: new Date(NOW.getTime() + INVITE_DAYS_DEFAULT * DAY).toISOString(),
+            expiresAt: new Date(
+                NOW.getTime() + INVITE_DAYS_DEFAULT * DAY
+            ).toISOString(),
         });
     });
 
@@ -76,14 +78,20 @@ test('inviteLink points at the sign-up page', () => {
 describe('findUsableInvite', () => {
     test('finds an active invite and nothing else', () => {
         const { db, admin } = setup();
-        const active = createInvite(db, { createdBy: admin, email: 'ada@example.com' }, NOW);
+        const active = createInvite(
+            db,
+            { createdBy: admin, email: 'ada@example.com' },
+            NOW
+        );
         expect(findUsableInvite(db, active.token, NOW)).toEqual({
             id: active.invite.id,
             email: 'ada@example.com',
         });
 
         const expired = createInvite(db, { createdBy: admin, days: 1 }, NOW);
-        expect(findUsableInvite(db, expired.token, new Date(NOW.getTime() + DAY))).toBeUndefined();
+        expect(
+            findUsableInvite(db, expired.token, new Date(NOW.getTime() + DAY))
+        ).toBeUndefined();
 
         const revoked = createInvite(db, { createdBy: admin }, NOW);
         revokeInvite(db, revoked.invite.id, NOW);
@@ -101,17 +109,25 @@ describe('findUsableInvite', () => {
 describe('claimInvite', () => {
     test('stops at maxUses', () => {
         const { db, admin } = setup();
-        const { invite, token } = createInvite(db, { createdBy: admin, maxUses: 2 }, NOW);
+        const { invite, token } = createInvite(
+            db,
+            { createdBy: admin, maxUses: 2 },
+            NOW
+        );
         expect(claimInvite(db, token, NOW)).toBe(true);
         expect(claimInvite(db, token, NOW)).toBe(true);
         expect(claimInvite(db, token, NOW)).toBe(false);
-        expect(listInvites(db, NOW).find((i) => i.id === invite.id)?.uses).toBe(2);
+        expect(listInvites(db, NOW).find((i) => i.id === invite.id)?.uses).toBe(
+            2
+        );
     });
 
     test('refuses expired, revoked and unknown tokens', () => {
         const { db, admin } = setup();
         const expired = createInvite(db, { createdBy: admin, days: 1 }, NOW);
-        expect(claimInvite(db, expired.token, new Date(NOW.getTime() + DAY))).toBe(false);
+        expect(
+            claimInvite(db, expired.token, new Date(NOW.getTime() + DAY))
+        ).toBe(false);
         const revoked = createInvite(db, { createdBy: admin }, NOW);
         revokeInvite(db, revoked.invite.id, NOW);
         expect(claimInvite(db, revoked.token, NOW)).toBe(false);
@@ -124,10 +140,22 @@ describe('listInvites', () => {
     test('lists newest first with a status for each', () => {
         const { db, admin } = setup();
         const active = createInvite(db, { createdBy: admin }, NOW);
-        const used = createInvite(db, { createdBy: admin }, new Date(NOW.getTime() + 1));
+        const used = createInvite(
+            db,
+            { createdBy: admin },
+            new Date(NOW.getTime() + 1)
+        );
         claimInvite(db, used.token, NOW);
-        const expired = createInvite(db, { createdBy: admin, days: 1 }, new Date(NOW.getTime() - DAY - 2));
-        const revoked = createInvite(db, { createdBy: admin }, new Date(NOW.getTime() + 2));
+        const expired = createInvite(
+            db,
+            { createdBy: admin, days: 1 },
+            new Date(NOW.getTime() - DAY - 2)
+        );
+        const revoked = createInvite(
+            db,
+            { createdBy: admin },
+            new Date(NOW.getTime() + 2)
+        );
         revokeInvite(db, revoked.invite.id, NOW);
         claimInvite(db, revoked.token, NOW);
 
@@ -152,7 +180,11 @@ describe('revokeInvite', () => {
         const { db, admin } = setup();
         const { invite } = createInvite(db, { createdBy: admin }, NOW);
         revokeInvite(db, invite.id, NOW);
-        const again = revokeInvite(db, invite.id, new Date(NOW.getTime() + DAY));
+        const again = revokeInvite(
+            db,
+            invite.id,
+            new Date(NOW.getTime() + DAY)
+        );
         expect(again?.revokedAt).toBe(NOW.toISOString());
     });
 });
