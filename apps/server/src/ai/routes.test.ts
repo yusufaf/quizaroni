@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, mock, spyOn, test } from 'bun:test';
+import { ipEnv, nextTestIp } from '../auth/testing';
 import {
+    PUBLIC_URL,
     apiGet,
     apiRequest,
     createRouteHarness,
@@ -436,8 +438,10 @@ describe('idle timeout', () => {
 });
 
 describe('client abort', () => {
-    test('is logged as an abort, not a network failure', async () => {
+    test('is logged as an abort when the browser went away', async () => {
+        const client = new AbortController();
         const upstream = fakeFetch(() => {
+            client.abort();
             throw new DOMException('gone', 'AbortError');
         });
         const { h, cookie } = await setup({
@@ -445,10 +449,41 @@ describe('client abort', () => {
             fetch: upstream.fetch,
         });
         const lines = captureConsole();
-        await apiRequest(h, '/api/ai/chat', { cookie, body: chatBody() });
+        await h.app.request(
+            new Request('http://localhost/api/ai/chat', {
+                method: 'POST',
+                headers: {
+                    Origin: PUBLIC_URL,
+                    'Content-Type': 'application/json',
+                    Cookie: cookie,
+                },
+                body: JSON.stringify(chatBody()),
+                signal: client.signal,
+            }),
+            undefined,
+            ipEnv(nextTestIp())
+        );
+        expect(upstream.calls[0]!.init.signal!.aborted).toBe(true);
         expect(lines).toEqual([
             'AI provider request failed: google aborted by the client',
         ]);
+    });
+
+    test('an abort the browser did not ask for is a network failure', async () => {
+        const upstream = fakeFetch(() => {
+            throw new DOMException('reset', 'AbortError');
+        });
+        const { h, cookie } = await setup({
+            enabled: true,
+            fetch: upstream.fetch,
+        });
+        const lines = captureConsole();
+        const res = await apiRequest(h, '/api/ai/chat', {
+            cookie,
+            body: chatBody(),
+        });
+        expect(res.status).toBe(502);
+        expect(lines).toEqual(['AI provider request failed: google network']);
     });
 });
 

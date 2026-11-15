@@ -114,11 +114,10 @@ async function callProvider(
             ]),
         });
     } catch (err) {
-        const name = (err as { name?: unknown })?.name;
-        const timedOut = name === 'TimeoutError';
+        const timedOut = (err as { name?: unknown })?.name === 'TimeoutError';
         const kind = timedOut
             ? 'timeout'
-            : name === 'AbortError'
+            : clientSignal.aborted
               ? 'aborted by the client'
               : 'network';
         console.warn(`AI provider request failed: ${provider} ${kind}`);
