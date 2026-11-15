@@ -462,3 +462,47 @@ export const UpdateUsernameResponseSchema = BaseResponseSchema.extend({
 });
 
 // #endregion
+
+// #region Self-host admin Schemas
+export const InviteSchema = z.object({
+    id: z.string(),
+    email: z.string().nullable(),
+    maxUses: z.number().int(),
+    uses: z.number().int(),
+    status: z.enum(['active', 'used', 'expired', 'revoked']),
+    createdAt: TimestampSchema,
+    expiresAt: TimestampSchema,
+    revokedAt: TimestampSchema.nullable(),
+});
+
+export const DeliverySchema = z.enum(['sent', 'outbox', 'failed']);
+
+export const ListInvitesResponseSchema = z.object({
+    invites: z.array(InviteSchema),
+});
+
+export const CreateInviteResponseSchema = z.object({
+    invite: InviteSchema,
+    link: z.string(),
+    delivery: DeliverySchema.optional(),
+});
+
+export const RevokeInviteResponseSchema = z.object({ invite: InviteSchema });
+
+export const OutboxMessageSchema = z.object({
+    id: z.string(),
+    kind: z.enum(['password_reset', 'invite']),
+    to: z.string(),
+    subject: z.string(),
+    link: z.string(),
+    delivery: z.enum(['outbox', 'failed']),
+    createdAt: TimestampSchema,
+    expiresAt: TimestampSchema,
+});
+
+export const OutboxResponseSchema = z.object({
+    smtp: z.boolean(),
+    messages: z.array(OutboxMessageSchema),
+});
+
+// #endregion

@@ -27,6 +27,7 @@ const StudyMode = lazy(() => import('views/Study/StudyMode'));
 const PublicStudySet = lazy(
     () => import('views/PublicStudySet/PublicStudySet')
 );
+const Admin = lazy(() => import('views/Admin/Admin'));
 
 type RequireAuthProps = {
     children: ReactNode;
@@ -55,6 +56,7 @@ const AppRoutes = () => {
         { path: '/combine/:id', element: <CombineSets /> },
         { path: '/edit/:id', element: <CreateSet /> },
         { path: '/study/:studysetId/:mode', element: <StudyMode /> },
+        ...(isSelfHost() ? [{ path: '/admin', element: <Admin /> }] : []),
     ];
 
     return (
