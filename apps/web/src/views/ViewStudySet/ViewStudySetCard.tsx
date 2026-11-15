@@ -32,6 +32,7 @@ import {
 } from './styles';
 import CategoriesPopover from './CategoriesPopover';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
+import { useAIChatEnabled } from 'state/api/aiAPI';
 import ImageGallery from 'components/ImageGallery/ImageGallery';
 
 type Props = {
@@ -44,6 +45,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
     const { muiTheme } = useTheme();
     const { t } = useTranslation('ai');
     const { setOpen, setMode, setQueuedPrompt } = useAIChatStore();
+    const aiEnabled = useAIChatEnabled();
     const { cancel } = useSpeechSynthesis();
     const { data: userData = DEFAULT_USER_RESPONSE } = useGetUser();
     const ttsVoice = userData.user?.metadata?.ttsVoice;
@@ -231,14 +233,16 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                                 <VolumeUp />
                             </IconButton>
                         </Tooltip>
-                        <Tooltip
-                            title={t('aiChat.actions.explainCard')}
-                            placement="top"
-                        >
-                            <IconButton onClick={explainWithAI}>
-                                <AutoAwesome />
-                            </IconButton>
-                        </Tooltip>
+                        {aiEnabled === true && (
+                            <Tooltip
+                                title={t('aiChat.actions.explainCard')}
+                                placement="top"
+                            >
+                                <IconButton onClick={explainWithAI}>
+                                    <AutoAwesome />
+                                </IconButton>
+                            </Tooltip>
+                        )}
                         <Tooltip title="Mark as important" placement="top">
                             <IconButton onClick={markCardAsImportant}>
                                 {card.important ? (

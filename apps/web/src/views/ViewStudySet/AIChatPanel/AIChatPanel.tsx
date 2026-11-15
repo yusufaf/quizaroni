@@ -6,6 +6,7 @@ import { useAIChatStore } from 'state/stores/aiChat';
 import { AIChatStyledDrawer } from './styles';
 import AIChatDrawer from './AIChatDrawer';
 import { AI_PANEL_POSITIONS } from 'shared/constants';
+import { useAIChatEnabled } from 'state/api/aiAPI';
 
 type Props = {
     selectedStudyset: Studyset;
@@ -15,6 +16,7 @@ type Props = {
 const AIChatPanel = ({ selectedStudyset, notesDrawerPosition }: Props) => {
     const { t } = useTranslation('ai');
     const { isOpen, togglePanel } = useAIChatStore();
+    const enabled = useAIChatEnabled();
 
     const aiPanelPosition =
         notesDrawerPosition === 'right'
@@ -23,6 +25,8 @@ const AIChatPanel = ({ selectedStudyset, notesDrawerPosition }: Props) => {
 
     const fabPosition =
         aiPanelPosition === 'left' ? { left: '1.5rem' } : { right: '1.5rem' };
+
+    if (enabled !== true) return null;
 
     return (
         <>
@@ -34,6 +38,7 @@ const AIChatPanel = ({ selectedStudyset, notesDrawerPosition }: Props) => {
                     <Fab
                         color="primary"
                         onClick={togglePanel}
+                        aria-label={t('aiChat.openPanel') || 'Open AI Assistant'}
                         sx={{
                             position: 'fixed',
                             top: '25rem',
