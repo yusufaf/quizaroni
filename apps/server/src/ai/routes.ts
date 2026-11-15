@@ -1,4 +1,4 @@
-import { Hono, type MiddlewareHandler } from 'hono';
+import { type Context, Hono, type MiddlewareHandler } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { z } from 'zod';
 import type { AuthHandle } from '../auth/auth';
@@ -34,6 +34,17 @@ export type AiDeps = {
 const BODY_LIMIT_BYTES = 1024 * 1024;
 const CHAT_TIMEOUT_MS = 60_000;
 const MODELS_TIMEOUT_MS = 15_000;
+
+type BunServerEnv = { timeout?: (req: Request, seconds: number) => void };
+
+// Bun.serve closes a request after 10 idle seconds by default; give this one
+// room for the upstream timeout plus a margin. Absent outside Bun.serve.
+function allowSlowReply(c: Context<SessionEnv>, timeoutMs: number): void {
+    (c.env as BunServerEnv | undefined)?.timeout?.(
+        c.req.raw,
+        Math.ceil(timeoutMs / 1000) + 5
+    );
+}
 
 const Provider = z.enum(AI_PROVIDERS);
 const ApiKey = z
@@ -171,6 +182,7 @@ export function aiRoutes(
         if (!parsed?.success) {
             return c.json({ message: 'Invalid request' }, 400);
         }
+        allowSlowReply(c, CHAT_TIMEOUT_MS);
         const { provider, model, apiKey, isTest, mode } = parsed.data;
         const input = isTest
             ? {
@@ -219,6 +231,7 @@ export function aiRoutes(
         if (!parsed?.success) {
             return c.json({ message: 'Invalid request' }, 400);
         }
+        allowSlowReply(c, MODELS_TIMEOUT_MS);
         const { provider, apiKey } = parsed.data;
         const result = await callProvider(
             provider,

@@ -165,20 +165,29 @@ export function readChatReply(
 }
 
 const OPENAI_CHAT_MODEL = /gpt|o1|o3|o4/;
+const NON_CHAT_MODEL =
+    /image|audio|realtime|transcribe|tts|embedding|moderation/;
 
 function toModel(provider: AiProvider, entry: unknown): ModelInfo | undefined {
     if (provider === 'google') {
         const name = field(entry, 'name');
         if (typeof name !== 'string' || !name.startsWith('models/')) return;
         const id = name.slice('models/'.length);
-        if (!id.includes('gemini')) return;
+        if (!id.includes('gemini') || NON_CHAT_MODEL.test(id)) return;
+        // Without the field, keep the model rather than empty the list.
+        const methods = field(entry, 'supportedGenerationMethods');
+        if (Array.isArray(methods) && !methods.includes('generateContent')) {
+            return;
+        }
         const displayName = field(entry, 'displayName');
         return { id, name: typeof displayName === 'string' ? displayName : id };
     }
     const id = field(entry, 'id');
     if (typeof id !== 'string') return;
     if (provider === 'openai') {
-        return OPENAI_CHAT_MODEL.test(id) ? { id, name: id } : undefined;
+        return OPENAI_CHAT_MODEL.test(id) && !NON_CHAT_MODEL.test(id)
+            ? { id, name: id }
+            : undefined;
     }
     const displayName = field(entry, 'display_name');
     return { id, name: typeof displayName === 'string' ? displayName : id };

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, spyOn, test } from 'bun:test';
+import { afterEach, describe, expect, mock, spyOn, test } from 'bun:test';
 import {
     apiGet,
     apiRequest,
@@ -384,6 +384,54 @@ describe('provider failures', () => {
         expect(await res.json()).toEqual({
             message: 'The AI provider timed out',
         });
+    });
+});
+
+describe('idle timeout', () => {
+    test('gives chat and model requests room past the 10 second idle default', async () => {
+        const upstream = fakeFetch(() =>
+            json({
+                candidates: [{ content: { parts: [{ text: 'hi' }] } }],
+                models: [],
+            })
+        );
+        const { h, cookie } = await setup({
+            enabled: true,
+            fetch: upstream.fetch,
+        });
+        const chatTimeout = mock(() => {});
+        const chat = await apiRequest(h, '/api/ai/chat', {
+            cookie,
+            body: chatBody(),
+            env: { timeout: chatTimeout },
+        });
+        expect(chat.status).toBe(200);
+        expect(chatTimeout).toHaveBeenCalledTimes(1);
+        expect(chatTimeout).toHaveBeenCalledWith(expect.any(Request), 65);
+
+        const modelsTimeout = mock(() => {});
+        const models = await apiRequest(h, '/api/ai/models', {
+            cookie,
+            body: { provider: 'google', apiKey: PROVIDER_FIXTURE },
+            env: { timeout: modelsTimeout },
+        });
+        expect(models.status).toBe(200);
+        expect(modelsTimeout).toHaveBeenCalledWith(expect.any(Request), 20);
+    });
+
+    test('leaves an invalid request on the default', async () => {
+        const { h, cookie } = await setup({
+            enabled: true,
+            fetch: fakeFetch(() => json({})).fetch,
+        });
+        const timeout = mock(() => {});
+        const res = await apiRequest(h, '/api/ai/chat', {
+            cookie,
+            body: chatBody({ provider: 'azure' }),
+            env: { timeout },
+        });
+        expect(res.status).toBe(400);
+        expect(timeout).not.toHaveBeenCalled();
     });
 });
 

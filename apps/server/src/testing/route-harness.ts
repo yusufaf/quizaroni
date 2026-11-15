@@ -98,6 +98,7 @@ export type CallOptions = {
     rawBody?: string;
     cookie?: string;
     headers?: Record<string, string>;
+    env?: Record<string, unknown>;
 };
 
 export function apiRequest(
@@ -119,7 +120,7 @@ export function apiRequest(
                 headers,
                 body: o.rawBody ?? JSON.stringify(o.body ?? {}),
             },
-            ipEnv(nextTestIp())
+            { ...ipEnv(nextTestIp()), ...o.env }
         )
     );
 }

@@ -163,6 +163,11 @@ describe('readModels', () => {
                     { id: 'text-embedding-3-small' },
                     { id: 42 },
                     { id: 'gpt-x/../y' },
+                    { id: 'gpt-image-1' },
+                    { id: 'gpt-4o-transcribe' },
+                    { id: 'gpt-4o-mini-tts' },
+                    { id: 'gpt-realtime' },
+                    { id: 'gpt-audio' },
                 ],
             })
         ).toEqual([
@@ -195,11 +200,28 @@ describe('readModels', () => {
                     { name: 'models/embedding-001' },
                     { name: 'gemini-no-prefix' },
                     { name: 'models/gemini-pro' },
+                    {
+                        name: 'models/gemini-embedding-001',
+                        supportedGenerationMethods: ['embedContent'],
+                    },
+                    {
+                        name: 'models/gemini-live-x',
+                        supportedGenerationMethods: ['bidiGenerateContent'],
+                    },
+                    {
+                        name: 'models/gemini-2.5-flash-preview-tts',
+                        supportedGenerationMethods: ['generateContent'],
+                    },
+                    {
+                        name: 'models/gemini-2.5-flash',
+                        supportedGenerationMethods: ['generateContent'],
+                    },
                 ],
             })
         ).toEqual([
             { id: 'gemini-3.5-flash', name: 'G' },
             { id: 'gemini-pro', name: 'gemini-pro' },
+            { id: 'gemini-2.5-flash', name: 'gemini-2.5-flash' },
         ]);
     });
 
