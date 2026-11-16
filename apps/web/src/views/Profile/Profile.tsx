@@ -22,6 +22,7 @@ import {
 } from 'shared/constants';
 import useBrowserTitle from 'hooks/useBrowserTitle';
 import { useTranslation } from 'react-i18next';
+import { useAIChatEnabled } from 'state/api/aiAPI';
 
 const TABS = {
     CUSTOMIZATION: 'Customization',
@@ -32,7 +33,12 @@ const TABS = {
     AI: 'AI',
 };
 
-const VALID_TABS = new Set<string>(Object.values(TABS));
+const tabsFor = (aiEnabled: boolean | undefined) =>
+    new Set<string>(
+        Object.values(TABS).filter(
+            (tab) => tab !== TABS.AI || aiEnabled === true
+        )
+    );
 
 type Props = {};
 
@@ -45,15 +51,19 @@ const Profile = (props: Props) => {
     } = useGetUser();
 
     useBrowserTitle(PAGE_TITLES.PROFILE);
+    const aiEnabled = useAIChatEnabled();
+    const validTabs = tabsFor(aiEnabled);
 
     const [searchParams, setSearchParams] = useSearchParams();
     const urlTab = searchParams.get(QUERY_PARAMS.PROFILE_TAB);
     const selectedProfileTab =
-        urlTab && VALID_TABS.has(urlTab) ? urlTab : TABS.CUSTOMIZATION;
+        urlTab && validTabs.has(urlTab) ? urlTab : TABS.CUSTOMIZATION;
 
     // Backfill URL param on first load so the tab is reflected in the URL.
+    // Waits for the AI status, so a fresh load of ?tab=AI keeps its tab.
     useEffect(() => {
-        if (!urlTab || !VALID_TABS.has(urlTab)) {
+        if (aiEnabled === undefined) return;
+        if (!urlTab || !validTabs.has(urlTab)) {
             setSearchParams(
                 (prev) => {
                     const next = new URLSearchParams(prev);
@@ -63,7 +73,7 @@ const Profile = (props: Props) => {
                 { replace: true }
             );
         }
-    }, []);
+    }, [aiEnabled]);
 
     const onTabChange = (_e: SyntheticEvent, newTab: string) => {
         setSearchParams(
@@ -99,7 +109,12 @@ const Profile = (props: Props) => {
                                 label={t('profile.account')}
                                 value={TABS.ACCOUNT}
                             />
-                            <ProfileTab label="AI Settings" value={TABS.AI} />
+                            {aiEnabled === true && (
+                                <ProfileTab
+                                    label="AI Settings"
+                                    value={TABS.AI}
+                                />
+                            )}
                             <ProfileTab
                                 label={t('profile.json')}
                                 value={TABS.JSON}

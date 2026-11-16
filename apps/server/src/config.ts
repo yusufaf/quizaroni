@@ -10,6 +10,7 @@ export type ServerConfig = {
     webDir: string;
     trustProxy: boolean;
     insecureCookies: boolean;
+    aiChat: boolean;
 };
 
 export class ConfigError extends Error {}
@@ -29,6 +30,7 @@ Options (each can also be set with the QZ_* environment variable shown):
   --web-dir <path>     Directory holding the built web app (QZ_WEB_DIR, default ../web/dist)
   --trust-proxy <bool>  Trust X-Forwarded-For from one reverse proxy in front of the server (QZ_TRUST_PROXY, default false)
   --insecure-cookies <bool>  Allow session cookies over plain HTTP, for a trusted LAN without HTTPS (QZ_INSECURE_COOKIES, default false)
+  --ai-chat <bool>     Let signed-in users chat with an AI provider through this server, using their own API key (QZ_AI_CHAT, default true)
   --help               Show this help
 
 Headless setup (env only, used only while setup is incomplete):
@@ -53,6 +55,7 @@ const ENV_NAMES = {
     'web-dir': 'QZ_WEB_DIR',
     'trust-proxy': 'QZ_TRUST_PROXY',
     'insecure-cookies': 'QZ_INSECURE_COOKIES',
+    'ai-chat': 'QZ_AI_CHAT',
 } as const;
 
 type OptionName = keyof typeof ENV_NAMES;
@@ -81,6 +84,7 @@ function parseFlags(argv: string[]): Partial<Record<OptionName, string>> {
                 'web-dir': { type: 'string' },
                 'trust-proxy': { type: 'string' },
                 'insecure-cookies': { type: 'string' },
+                'ai-chat': { type: 'string' },
                 help: { type: 'boolean' },
             },
         });
@@ -299,6 +303,7 @@ export function loadConfig(
     const webDir = setting('web-dir');
     const trustProxy = setting('trust-proxy');
     const insecureCookies = setting('insecure-cookies');
+    const aiChat = setting('ai-chat');
 
     return {
         dataDir: resolve(cwd, setting('data-dir')?.value ?? DEFAULT_DATA_DIR),
@@ -312,5 +317,6 @@ export function loadConfig(
         insecureCookies: insecureCookies
             ? parseBoolean(insecureCookies)
             : false,
+        aiChat: aiChat ? parseBoolean(aiChat) : true,
     };
 }

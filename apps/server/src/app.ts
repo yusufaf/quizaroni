@@ -4,6 +4,7 @@ import { serveStatic } from '@hono/bun';
 import { and, desc, eq } from 'drizzle-orm';
 import { type Context, Hono, type MiddlewareHandler } from 'hono';
 import { adminRoutes } from './admin/routes';
+import { type AiDeps, aiRoutes } from './ai/routes';
 import { AUTH_BASE_PATH, type AuthHandle } from './auth/auth';
 import { authRoutes } from './auth/routes';
 import type { Db } from './db';
@@ -42,6 +43,8 @@ export type AppDeps = {
     files: FileStore;
     uploads?: UploadRegistry;
     mailer: Mailer;
+    /** Omitted means AI chat is off. */
+    ai?: AiDeps;
 };
 
 const REVALIDATE = 'public, max-age=0, must-revalidate';
@@ -83,6 +86,7 @@ export function createApp({
     files,
     uploads = new UploadRegistry(files),
     mailer,
+    ai = { enabled: false },
 }: AppDeps): Hono {
     const app = new Hono();
 
@@ -112,6 +116,8 @@ export function createApp({
     app.route('/api/public', publicRoutes({ db }));
 
     app.route('/api/admin', adminRoutes({ db, auth, mailer }));
+
+    app.route('/api/ai', aiRoutes({ auth, ...ai }));
 
     app.all('/api/*', (c) => c.json({ message: 'Not found' }, 404));
 

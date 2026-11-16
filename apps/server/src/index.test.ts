@@ -33,6 +33,7 @@ const CLEAN_ENV = {
     QZ_TEACHER_POLICY: '',
     QZ_TRUST_PROXY: '',
     QZ_INSECURE_COOKIES: '',
+    QZ_AI_CHAT: '',
     QZ_SMTP_HOST: '',
     QZ_SMTP_PORT: '',
     QZ_SMTP_SECURITY: '',
