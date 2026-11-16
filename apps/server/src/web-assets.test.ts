@@ -27,4 +27,16 @@ describe('readShell', () => {
         writeFileSync(index, 'two');
         expect(await web.readShell()).toBe('one');
     });
+
+    test('is null when nothing is embedded', async () => {
+        expect(await embeddedWebAssets(new Map()).readShell()).toBeNull();
+    });
+
+    test('does not keep a failed embedded read', async () => {
+        const late = join(root, 'late.html');
+        const web = embeddedWebAssets(new Map([['/index.html', late]]));
+        await expect(web.readShell()).rejects.toThrow();
+        writeFileSync(late, 'late');
+        expect(await web.readShell()).toBe('late');
+    });
 });

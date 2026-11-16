@@ -26,14 +26,19 @@ export function embeddedWebAssets(
     files: ReadonlyMap<string, string>
 ): WebAssets {
     const index = files.get('/index.html');
-    // Embedded files never change, so the shell is read once.
+    // Embedded files never change, so the shell is read once (a failed read is retried).
     let shell: Promise<string | null> | undefined;
     return {
         readShell: () =>
             (shell ??=
                 index === undefined
                     ? Promise.resolve(null)
-                    : Bun.file(index).text()),
+                    : Bun.file(index)
+                          .text()
+                          .catch((err: unknown) => {
+                              shell = undefined;
+                              throw err;
+                          })),
         serveStatic: (onFound) =>
             serveStatic({
                 root: '/',

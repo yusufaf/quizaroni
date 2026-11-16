@@ -27,9 +27,7 @@ jobs:
         run: pnpm test
       - name: Build frontend
         run: pnpm build:web
-      - name: Build frontend (self-host)
-        run: pnpm build:web:selfhost
-      - name: Build standalone binary (linux-x64)
+      - name: Build frontend (self-host) and standalone binary (linux-x64)
         run: pnpm build:binary --targets linux-x64
       - name: Test standalone binary
         working-directory: apps/server
