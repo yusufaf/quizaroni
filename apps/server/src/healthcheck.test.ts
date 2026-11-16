@@ -23,7 +23,7 @@ describe('healthcheckUrl', () => {
         ['0.0.0.0', 8080, 'http://127.0.0.1:8080/api/health'],
         ['127.0.0.1', 8080, 'http://127.0.0.1:8080/api/health'],
         ['localhost', 1, 'http://127.0.0.1:1/api/health'],
-        ['::', 80, 'http://[::1]:80/api/health'],
+        ['::', 80, 'http://127.0.0.1:80/api/health'],
         ['::1', 80, 'http://[::1]:80/api/health'],
         ['192.168.1.5', 8080, 'http://192.168.1.5:8080/api/health'],
         ['fe80::1', 8080, 'http://[fe80::1]:8080/api/health'],
@@ -105,6 +105,27 @@ describe('runHealthcheck', () => {
                 ).toBe(1);
             }
         );
+    });
+
+    test('connects directly even when a proxy is configured', async () => {
+        const saved = { ...process.env };
+        // A proxy nobody listens on: going through it would fail the probe.
+        process.env.HTTP_PROXY = 'http://127.0.0.1:1';
+        process.env.ALL_PROXY = 'http://127.0.0.1:1';
+        try {
+            await withServer(
+                () => Response.json({ status: 'ok' }),
+                async (port) => {
+                    expect(
+                        await runHealthcheck(['--port', String(port)], {}, tmp)
+                    ).toBe(0);
+                }
+            );
+        } finally {
+            delete process.env.HTTP_PROXY;
+            delete process.env.ALL_PROXY;
+            Object.assign(process.env, saved);
+        }
     });
 
     test('reads the port from QZ_PORT', async () => {

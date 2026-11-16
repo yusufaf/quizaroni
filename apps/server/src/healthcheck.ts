@@ -2,15 +2,11 @@ import { ConfigError, loadConfig, urlHost } from './config';
 
 export const HEALTHCHECK_TIMEOUT_MS = 4000;
 
-const IPV4_LOOPBACK_FOR = new Set(['0.0.0.0', '127.0.0.1', 'localhost']);
-const IPV6_LOOPBACK_FOR = new Set(['::', '::1']);
+// `::` is dual-stack, and IPv4 loopback works even where IPv6 is disabled.
+const IPV4_LOOPBACK_FOR = new Set(['0.0.0.0', '::', '127.0.0.1', 'localhost']);
 
 export function healthcheckUrl(host: string, port: number): string {
-    const h = IPV4_LOOPBACK_FOR.has(host)
-        ? '127.0.0.1'
-        : IPV6_LOOPBACK_FOR.has(host)
-          ? '[::1]'
-          : urlHost(host);
+    const h = IPV4_LOOPBACK_FOR.has(host) ? '127.0.0.1' : urlHost(host);
     return `http://${h}:${port}/api/health`;
 }
 
@@ -39,6 +35,8 @@ export async function runHealthcheck(
     try {
         const res = await fetch(url, {
             signal: AbortSignal.timeout(timeoutMs),
+            // The probe is local, so a proxy from HTTP_PROXY/ALL_PROXY must not apply.
+            proxy: false,
         });
         if (res.status !== 200) {
             console.error(`unhealthy: ${url} returned ${res.status}`);
