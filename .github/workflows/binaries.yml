@@ -1,0 +1,150 @@
+# Builds the five standalone binaries, smoke-tests each on its own OS and
+# architecture, and runs the Docker image through docker compose on amd64 and
+# arm64. Called by ci.yml for every PR and by release.yml before publishing, so
+# a release ships exactly what CI tested.
+name: binaries
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: Git ref to build (default the triggering ref)
+        type: string
+        required: false
+        default: ''
+permissions:
+  contents: read
+jobs:
+  build-linux-windows:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: apps/web/.node-version
+          cache: pnpm
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+      - run: pnpm install --frozen-lockfile
+      - name: Build binaries (linux-x64, linux-arm64, windows-x64)
+        run: pnpm build:binary --targets linux-x64,linux-arm64,windows-x64
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: binaries-linux-windows
+          path: apps/server/dist/quizaroni-*
+          if-no-files-found: error
+          retention-days: 7
+
+  build-darwin:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: apps/web/.node-version
+          cache: pnpm
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+      - run: pnpm install --frozen-lockfile
+      - name: Build binaries (darwin-x64, darwin-arm64)
+        run: pnpm build:binary --targets darwin-x64,darwin-arm64
+      # Ad-hoc signature only: arm64 macOS refuses to run unsigned code, and
+      # notarization is out of scope for now.
+      - name: Ad-hoc codesign
+        run: |
+          for f in apps/server/dist/quizaroni-darwin-*; do
+            codesign --force --sign - "$f"
+            codesign --verify --strict --verbose=2 "$f"
+          done
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: binaries-darwin
+          path: apps/server/dist/quizaroni-*
+          if-no-files-found: error
+          retention-days: 7
+
+  smoke:
+    name: smoke (${{ matrix.binary }})
+    needs: [build-linux-windows, build-darwin]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            binary: quizaroni-linux-x64
+          - os: ubuntu-24.04-arm
+            binary: quizaroni-linux-arm64
+          - os: windows-latest
+            binary: quizaroni-windows-x64.exe
+          - os: macos-latest
+            binary: quizaroni-darwin-arm64
+          - os: macos-15-intel
+            binary: quizaroni-darwin-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: binaries-*
+          merge-multiple: true
+          path: apps/server/dist
+      # Artifacts don't keep the exec bit.
+      - if: runner.os != 'Windows'
+        run: chmod +x apps/server/dist/quizaroni-*
+      # binary.test.ts imports nothing from node_modules, so no install is needed.
+      - name: Test standalone binary
+        working-directory: apps/server
+        run: bun test scripts/binary.test.ts
+        env:
+          QZ_BINARY: dist/${{ matrix.binary }}
+
+  docker:
+    name: docker (${{ matrix.arch }})
+    needs: build-linux-windows
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: amd64
+          - os: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: binaries-linux-windows
+          path: apps/server/dist
+      # Tagged as the compose file's image, so compose runs this build.
+      - name: Build image
+        run: docker build -f apps/server/Dockerfile -t ghcr.io/yusufaf/quizaroni:latest apps/server/dist
+      - name: Run the entrypoint
+        run: docker run --rm ghcr.io/yusufaf/quizaroni:latest --help
+      - name: docker compose up
+        run: docker compose up -d --wait --wait-timeout 120 --pull never
+      - name: Check the running container
+        run: |
+          curl -fsS http://localhost:8080/api/health | jq -e '.status == "ok"'
+          docker compose logs quizaroni | grep -F 'Data directory: /data'
+          owner=$(docker run --rm -v quizaroni_quizaroni-data:/data busybox:1.37@sha256:a7dbc319b1438115a207e11930dc4bb3e643dcb3ec0bdd694bb36cd8fad289ec stat -c %u /data/quizaroni.db)
+          test "$owner" = 65532 || { echo "::error::/data/quizaroni.db is owned by uid $owner, expected 65532"; exit 1; }
+      - name: Logs and teardown
+        if: always()
+        run: |
+          docker compose logs
+          docker compose down -v

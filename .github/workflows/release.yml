@@ -1,0 +1,82 @@
+# Runs when a GitHub Release is published (release-please, or by hand):
+# builds and smoke-tests the binaries for the release's tag, attaches them and
+# SHA256SUMS to the release, and pushes the multi-arch image to GHCR.
+# Use workflow_dispatch to rebuild and re-upload the assets of an existing tag.
+name: release
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to rebuild and re-upload assets for
+        type: string
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    uses: ./.github/workflows/binaries.yml
+    with:
+      ref: ${{ github.event.release.tag_name || inputs.tag }}
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+      ACTOR: ${{ github.actor }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: binaries-*
+          merge-multiple: true
+          path: apps/server/dist
+      # Prerelease tags (v1.2.3-x) are pipeline tests, so they skip the check.
+      - name: Check the tag matches the server version
+        run: |
+          if [[ "$TAG" != *-* ]]; then
+            version="v$(jq -r .version apps/server/package.json)"
+            if [[ "$version" != "$TAG" ]]; then
+              echo "::error::Tag $TAG does not match apps/server/package.json version $version"
+              exit 1
+            fi
+          fi
+      - name: Upload binaries to the release
+        run: |
+          (cd apps/server/dist && sha256sum quizaroni-* > SHA256SUMS)
+          cat apps/server/dist/SHA256SUMS
+          gh release upload "$TAG" apps/server/dist/quizaroni-* apps/server/dist/SHA256SUMS --clobber
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Log in to GHCR
+        run: echo "$GH_TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
+      # X.Y.Z always; X.Y and latest only for the repo's latest release, so
+      # prereleases and rebuilds of older tags never move latest.
+      - name: Build and push the image
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          version="${TAG#v}"
+          tags=(-t "$image:$version")
+          latest=$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" -q .tag_name)
+          if [[ "$latest" == "$TAG" ]]; then
+            tags+=(-t "$image:${version%.*}" -t "$image:latest")
+          fi
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -f apps/server/Dockerfile \
+            --label "org.opencontainers.image.version=$version" \
+            --label "org.opencontainers.image.revision=$(git rev-parse HEAD)" \
+            "${tags[@]}" \
+            --push \
+            apps/server/dist
+          docker buildx imagetools inspect "$image:$version"
