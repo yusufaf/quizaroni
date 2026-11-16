@@ -30,7 +30,7 @@ jobs:
       - name: Build frontend (self-host)
         run: pnpm build:web:selfhost
       - name: Build standalone binary (linux-x64)
-        run: pnpm build:binary --skip-web --targets linux-x64
+        run: pnpm build:binary --targets linux-x64
       - name: Test standalone binary
         working-directory: apps/server
         run: bun test scripts/binary.test.ts

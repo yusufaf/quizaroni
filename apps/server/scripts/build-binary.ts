@@ -72,6 +72,10 @@ writeFileSync(
 console.log(`Embedding ${webFiles.length} web files from ${webDist}`);
 
 mkdirSync(outDir, { recursive: true });
+// Maps left by an interrupted earlier build would fail the check below.
+for (const file of readdirSync(outDir)) {
+    if (file.endsWith('.map')) rmSync(join(outDir, file), { force: true });
+}
 for (const target of targets) {
     const result = await Bun.build({
         entrypoints: [entry],

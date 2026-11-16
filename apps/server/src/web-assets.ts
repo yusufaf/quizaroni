@@ -25,11 +25,15 @@ export function diskWebAssets(dir: string): WebAssets {
 export function embeddedWebAssets(
     files: ReadonlyMap<string, string>
 ): WebAssets {
+    const index = files.get('/index.html');
+    // Embedded files never change, so the shell is read once.
+    let shell: Promise<string | null> | undefined;
     return {
-        readShell: async () => {
-            const index = files.get('/index.html');
-            return index === undefined ? null : Bun.file(index).text();
-        },
+        readShell: () =>
+            (shell ??=
+                index === undefined
+                    ? Promise.resolve(null)
+                    : Bun.file(index).text()),
         serveStatic: (onFound) =>
             serveStatic({
                 root: '/',
