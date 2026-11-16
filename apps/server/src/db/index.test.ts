@@ -15,6 +15,7 @@ import {
     DEFAULT_MIGRATIONS_FOLDER,
     openDatabase,
 } from './index';
+import { readMigrationsFolder } from './migrations';
 import { instanceSettings } from './schema';
 
 const DB_FILES = [DB_FILENAME, `${DB_FILENAME}-wal`, `${DB_FILENAME}-shm`];
@@ -114,6 +115,29 @@ describe('openDatabase', () => {
         closeDatabase(first.sqlite);
         const { sqlite } = track(openDatabase(dataDir));
         expect(migrationRows(sqlite)).toBe(before);
+    });
+
+    test('applies an in-memory migration list to a fresh DB', () => {
+        const all = readMigrationsFolder(DEFAULT_MIGRATIONS_FOLDER);
+        const { sqlite } = track(openDatabase(tempRoot(), all));
+        expect(migrationRows(sqlite)).toBe(all.length);
+    });
+
+    test('upgrades a DB created with an older migration list', () => {
+        const all = readMigrationsFolder(DEFAULT_MIGRATIONS_FOLDER);
+        const dataDir = tempRoot();
+        const old = openDatabase(dataDir, all.slice(0, 3));
+        expect(migrationRows(old.sqlite)).toBe(3);
+        closeDatabase(old.sqlite);
+        const { sqlite } = track(openDatabase(dataDir));
+        expect(migrationRows(sqlite)).toBe(all.length);
+        expect(
+            sqlite
+                .query(
+                    "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'registration_invite'"
+                )
+                .get()
+        ).toEqual({ name: 'registration_invite' });
     });
 
     test('keeps every file it creates inside the data dir', () => {

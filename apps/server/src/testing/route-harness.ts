@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { AiDeps, UpstreamFetch } from '../ai/routes';
 import { createApp } from '../app';
+import { diskWebAssets } from '../web-assets';
 import { hashPassword } from '../auth/auth';
 import { ipEnv, nextTestIp, testAuth } from '../auth/testing';
 import { closeDatabase, type Db, openDatabase } from '../db';
@@ -71,7 +72,7 @@ export async function createRouteHarness(
         db: opened.db,
         files,
         uploads,
-        webDir,
+        web: diskWebAssets(webDir),
         version: '0.0.0-test',
         setup: new SetupGate(opened.db, undefined),
         auth: testAuth(opened.db, { publicUrl: PUBLIC_URL, mailer }),

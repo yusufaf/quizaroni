@@ -16,6 +16,7 @@ import { testAuth } from './auth/testing';
 import { Mailer } from './mail/mailer';
 import { closeDatabase, type Db, openDatabase } from './db';
 import { completeSetup, SetupGate } from './setup/setup';
+import { diskWebAssets, embeddedWebAssets } from './web-assets';
 
 const SHELL = '<!doctype html><title>shell</title>';
 const SENTINEL = 'QZ_SENTINEL_SECRET';
@@ -56,7 +57,7 @@ beforeAll(() => {
         sqlite,
         db,
         files: new FileStore(join(root, 'data')),
-        webDir,
+        web: diskWebAssets(webDir),
         version: pkg.version,
         setup,
         auth: testAuth(db),
@@ -89,7 +90,7 @@ describe('/api', () => {
                 sqlite: closed.sqlite,
                 db: closed.db,
                 files: new FileStore(dir),
-                webDir,
+                web: diskWebAssets(webDir),
                 version: pkg.version,
                 setup: latchedGate(closed.db),
                 auth: testAuth(closed.db),
@@ -213,13 +214,92 @@ describe('web app', () => {
             sqlite,
             db,
             files: new FileStore(join(root, 'data')),
-            webDir: emptyWebDir,
+            web: diskWebAssets(emptyWebDir),
             version: pkg.version,
             setup,
             auth: testAuth(db),
             trustProxy: false,
             mailer: new Mailer(db, undefined),
         }).request('/explore');
+        expect(res.status).toBe(503);
+    });
+});
+
+describe('embedded web app', () => {
+    let embedded: ReturnType<typeof createApp>;
+
+    const build = (files: ReadonlyMap<string, string>) =>
+        createApp({
+            sqlite,
+            db,
+            files: new FileStore(join(root, 'data')),
+            web: embeddedWebAssets(files),
+            version: pkg.version,
+            setup,
+            auth: testAuth(db),
+            trustProxy: false,
+            mailer: new Mailer(db, undefined),
+        });
+
+    beforeAll(() => {
+        embedded = build(
+            new Map([
+                ['/index.html', join(webDir, 'index.html')],
+                [
+                    '/assets/app-abc123.js',
+                    join(webDir, 'assets', 'app-abc123.js'),
+                ],
+                ['/sw.js', join(webDir, 'sw.js')],
+                ['/manifest.json', join(webDir, 'manifest.json')],
+            ])
+        );
+    });
+
+    test.each([['/'], ['/explore']])(
+        'GET %s serves the shell',
+        async (path) => {
+            const res = await embedded.request(path);
+            expect(res.status).toBe(200);
+            expect(res.headers.get('content-type')).toContain('text/html');
+            expect(await res.text()).toBe(SHELL);
+        }
+    );
+
+    test('serves hashed assets as immutable', async () => {
+        const res = await embedded.request('/assets/app-abc123.js');
+        expect(res.status).toBe(200);
+        expect(res.headers.get('content-type')).toContain('javascript');
+        expect(res.headers.get('cache-control')).toBe(
+            'public, max-age=31536000, immutable'
+        );
+    });
+
+    test('serves the service worker with revalidation', async () => {
+        const res = await embedded.request('/sw.js');
+        expect(res.status).toBe(200);
+        expect(res.headers.get('cache-control')).toBe(
+            'public, max-age=0, must-revalidate'
+        );
+    });
+
+    test('GET /assets/missing.js returns 404, not the shell', async () => {
+        const res = await embedded.request('/assets/missing.js');
+        expect(res.status).toBe(404);
+        expect(await res.text()).not.toBe(SHELL);
+    });
+
+    test.each([
+        ['/..%2fsecret.txt'],
+        ['/..%5csecret.txt'],
+        ['/assets/..%2f..%2fsecret.txt'],
+    ])('GET %s does not escape the embedded files', async (path) => {
+        const res = await embedded.request(path);
+        expect(res.status).not.toBe(200);
+        expect(await res.text()).not.toContain(SENTINEL);
+    });
+
+    test('returns 503 when nothing is embedded', async () => {
+        const res = await build(new Map()).request('/explore');
         expect(res.status).toBe(503);
     });
 });

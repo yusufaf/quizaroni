@@ -1,6 +1,4 @@
 import type { Database } from 'bun:sqlite';
-import { join } from 'node:path';
-import { serveStatic } from '@hono/bun';
 import { and, desc, eq } from 'drizzle-orm';
 import { type Context, Hono, type MiddlewareHandler } from 'hono';
 import { adminRoutes } from './admin/routes';
@@ -30,11 +28,12 @@ import { LISTED } from './studysets/gate';
 import { studysetRoutes } from './studysets/routes';
 import { isStudysetUUID } from './studysets/updates';
 import { userRoutes } from './users/routes';
+import type { WebAssets } from './web-assets';
 
 export type AppDeps = {
     sqlite: Database;
     db: Db;
-    webDir: string;
+    web: WebAssets;
     version: string;
     setup: SetupGate;
     configuredPublicUrl?: string;
@@ -77,7 +76,7 @@ function setupGuard(gate: SetupGate): MiddlewareHandler {
 export function createApp({
     sqlite,
     db,
-    webDir,
+    web,
     version,
     setup,
     configuredPublicUrl,
@@ -121,10 +120,7 @@ export function createApp({
 
     app.all('/api/*', (c) => c.json({ message: 'Not found' }, 404));
 
-    const readShell = async (): Promise<string | null> => {
-        const index = Bun.file(join(webDir, 'index.html'));
-        return (await index.exists()) ? index.text() : null;
-    };
+    const readShell = web.readShell;
     const sendShell = (
         c: Context,
         html: string,
@@ -195,7 +191,7 @@ export function createApp({
         );
     });
 
-    app.use('*', serveStatic({ root: webDir, onFound: setCacheHeaders }));
+    app.use('*', web.serveStatic(setCacheHeaders));
 
     app.get('*', async (c) => {
         const lastSegment = c.req.path.slice(c.req.path.lastIndexOf('/') + 1);

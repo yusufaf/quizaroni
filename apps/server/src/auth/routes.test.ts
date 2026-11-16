@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { count, eq } from 'drizzle-orm';
 import { createApp } from '../app';
+import { diskWebAssets } from '../web-assets';
 import { closeDatabase, type Db, openDatabase } from '../db';
 import {
     account,
@@ -72,7 +73,7 @@ async function harness(
         sqlite: opened.sqlite,
         db: opened.db,
         files: new FileStore(join(root, 'data')),
-        webDir,
+        web: diskWebAssets(webDir),
         version: '0.0.0-test',
         setup: new SetupGate(opened.db, setUp ? undefined : 'token'),
         auth: testAuth(opened.db, {

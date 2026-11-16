@@ -27,8 +27,13 @@ jobs:
         run: pnpm test
       - name: Build frontend
         run: pnpm build:web
-      - name: Build frontend (self-host)
-        run: pnpm build:web:selfhost
+      - name: Build frontend (self-host) and standalone binary (linux-x64)
+        run: pnpm build:binary --targets linux-x64
+      - name: Test standalone binary
+        working-directory: apps/server
+        run: bun test scripts/binary.test.ts
+        env:
+          QZ_BINARY: dist/quizaroni-linux-x64
       - name: Build backend
         run: pnpm build:api
       - name: Synthesize CDK template

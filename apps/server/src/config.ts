@@ -7,10 +7,19 @@ export type ServerConfig = {
     host: string;
     /** Set only when given explicitly; otherwise derive it from the bound port with `defaultPublicUrl`. */
     publicUrl: string | undefined;
-    webDir: string;
+    /** undefined: serve the web app embedded in the standalone binary. */
+    webDir: string | undefined;
     trustProxy: boolean;
     insecureCookies: boolean;
     aiChat: boolean;
+    openBrowser: boolean;
+};
+
+/** Defaults that differ between running from source and the standalone binary. */
+export type ConfigDefaults = {
+    dataDir: string;
+    webDir: string | undefined;
+    openBrowser: boolean;
 };
 
 export class ConfigError extends Error {}
@@ -18,19 +27,25 @@ export class ConfigError extends Error {}
 export const DEFAULT_PORT = 8080;
 export const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_DATA_DIR = 'data';
+const DEV_DEFAULTS: ConfigDefaults = {
+    dataDir: DEFAULT_DATA_DIR,
+    webDir: resolve(import.meta.dir, '../../web/dist'),
+    openBrowser: false,
+};
 const LOCAL_HOSTS = new Set(['127.0.0.1', '0.0.0.0', '::', '::1', 'localhost']);
 
 export const USAGE = `Usage: quizaroni-server [options]
 
 Options (each can also be set with the QZ_* environment variable shown):
-  --data-dir <path>    Directory for the database and all stored files (QZ_DATA_DIR, default ./data)
+  --data-dir <path>    Directory for the database and all stored files (QZ_DATA_DIR, default ./data; the standalone binary uses a quizaroni-data folder next to it if one exists, else the OS app-data folder)
   --port <number>      Port to listen on, 0 for any free port (QZ_PORT, default ${DEFAULT_PORT})
   --host <address>     Address to bind to (QZ_HOST, default ${DEFAULT_HOST})
   --public-url <url>   Public origin users reach the server at (QZ_PUBLIC_URL)
-  --web-dir <path>     Directory holding the built web app (QZ_WEB_DIR, default ../web/dist)
+  --web-dir <path>     Directory holding the built web app (QZ_WEB_DIR, default: the app built into the binary, else ../web/dist)
   --trust-proxy <bool>  Trust X-Forwarded-For from one reverse proxy in front of the server (QZ_TRUST_PROXY, default false)
   --insecure-cookies <bool>  Allow session cookies over plain HTTP, for a trusted LAN without HTTPS (QZ_INSECURE_COOKIES, default false)
   --ai-chat <bool>     Let signed-in users chat with an AI provider through this server, using their own API key (QZ_AI_CHAT, default true)
+  --open-browser <bool>  Open the app in a browser once started (QZ_OPEN_BROWSER, default true for the standalone binary on a desktop, else false)
   --help               Show this help
 
 Headless setup (env only, used only while setup is incomplete):
@@ -56,6 +71,7 @@ const ENV_NAMES = {
     'trust-proxy': 'QZ_TRUST_PROXY',
     'insecure-cookies': 'QZ_INSECURE_COOKIES',
     'ai-chat': 'QZ_AI_CHAT',
+    'open-browser': 'QZ_OPEN_BROWSER',
 } as const;
 
 type OptionName = keyof typeof ENV_NAMES;
@@ -85,6 +101,7 @@ function parseFlags(argv: string[]): Partial<Record<OptionName, string>> {
                 'trust-proxy': { type: 'string' },
                 'insecure-cookies': { type: 'string' },
                 'ai-chat': { type: 'string' },
+                'open-browser': { type: 'string' },
                 help: { type: 'boolean' },
             },
         });
@@ -277,7 +294,8 @@ export function parseAdminBootstrap(
 export function loadConfig(
     argv: string[],
     env: Record<string, string | undefined>,
-    cwd: string
+    cwd: string,
+    defaults: ConfigDefaults = DEV_DEFAULTS
 ): ServerConfig {
     const flags = parseFlags(argv);
 
@@ -304,19 +322,21 @@ export function loadConfig(
     const trustProxy = setting('trust-proxy');
     const insecureCookies = setting('insecure-cookies');
     const aiChat = setting('ai-chat');
+    const openBrowser = setting('open-browser');
 
     return {
-        dataDir: resolve(cwd, setting('data-dir')?.value ?? DEFAULT_DATA_DIR),
+        dataDir: resolve(cwd, setting('data-dir')?.value ?? defaults.dataDir),
         port,
         host,
         publicUrl,
-        webDir: webDir
-            ? resolve(cwd, webDir.value)
-            : resolve(import.meta.dir, '../../web/dist'),
+        webDir: webDir ? resolve(cwd, webDir.value) : defaults.webDir,
         trustProxy: trustProxy ? parseBoolean(trustProxy) : false,
         insecureCookies: insecureCookies
             ? parseBoolean(insecureCookies)
             : false,
         aiChat: aiChat ? parseBoolean(aiChat) : true,
+        openBrowser: openBrowser
+            ? parseBoolean(openBrowser)
+            : defaults.openBrowser,
     };
 }

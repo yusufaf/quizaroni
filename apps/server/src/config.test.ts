@@ -41,6 +41,7 @@ describe('loadConfig', () => {
             trustProxy: false,
             insecureCookies: false,
             aiChat: true,
+            openBrowser: false,
         });
     });
 
@@ -65,6 +66,7 @@ describe('loadConfig', () => {
             trustProxy: false,
             insecureCookies: false,
             aiChat: true,
+            openBrowser: false,
         });
     });
 
@@ -100,6 +102,7 @@ describe('loadConfig', () => {
             trustProxy: false,
             insecureCookies: false,
             aiChat: true,
+            openBrowser: false,
         });
     });
 
@@ -115,6 +118,7 @@ describe('loadConfig', () => {
                 QZ_TRUST_PROXY: '',
                 QZ_INSECURE_COOKIES: '',
                 QZ_AI_CHAT: '',
+                QZ_OPEN_BROWSER: '',
             },
             CWD
         );
@@ -492,6 +496,58 @@ describe('AI chat toggle', () => {
     });
 });
 
+describe('binary defaults', () => {
+    const binary = {
+        dataDir: resolve('/app/data'),
+        webDir: undefined,
+        openBrowser: true,
+    };
+
+    test('apply when nothing is set', () => {
+        const config = loadConfig([], {}, CWD, binary);
+        expect(config.dataDir).toBe(resolve('/app/data'));
+        expect(config.webDir).toBeUndefined();
+        expect(config.openBrowser).toBe(true);
+    });
+
+    test('give way to flags, resolved against cwd', () => {
+        const config = loadConfig(
+            ['--web-dir', 'w', '--data-dir', 'd'],
+            {},
+            CWD,
+            binary
+        );
+        expect(config.webDir).toBe(resolve(CWD, 'w'));
+        expect(config.dataDir).toBe(resolve(CWD, 'd'));
+    });
+});
+
+describe('browser launch', () => {
+    test('is off by default outside the binary', () => {
+        expect(loadConfig([], {}, CWD).openBrowser).toBe(false);
+    });
+
+    test('can be set from env or flags', () => {
+        const binary = { dataDir: CWD, webDir: undefined, openBrowser: true };
+        expect(
+            loadConfig(['--open-browser', 'false'], {}, CWD, binary).openBrowser
+        ).toBe(false);
+        expect(
+            loadConfig([], { QZ_OPEN_BROWSER: 'no' }, CWD, binary).openBrowser
+        ).toBe(false);
+        expect(
+            loadConfig(['--open-browser', 'true'], {}, CWD).openBrowser
+        ).toBe(true);
+    });
+
+    test('rejects a value that is not a boolean, naming the source', () => {
+        expect(
+            configError(() => loadConfig(['--open-browser', 'maybe'], {}, CWD))
+                .message
+        ).toContain('--open-browser');
+    });
+});
+
 describe('USAGE', () => {
     test('documents the headless setup vars', () => {
         expect(USAGE).toContain('QZ_ADMIN_EMAIL');
@@ -505,5 +561,10 @@ describe('USAGE', () => {
 
     test('documents the AI chat toggle', () => {
         expect(USAGE).toContain('QZ_AI_CHAT');
+    });
+
+    test('documents the browser launch setting', () => {
+        expect(USAGE).toContain('--open-browser');
+        expect(USAGE).toContain('QZ_OPEN_BROWSER');
     });
 });

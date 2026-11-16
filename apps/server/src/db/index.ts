@@ -2,8 +2,14 @@ import { Database } from 'bun:sqlite';
 import { mkdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { type BunSQLiteDatabase, drizzle } from 'drizzle-orm/bun-sqlite';
-import { migrate } from 'drizzle-orm/bun-sqlite/migrator';
+import {
+    applyMigrations,
+    type Migration,
+    readMigrationsFolder,
+} from './migrations';
 import * as schema from './schema';
+
+export type { Migration } from './migrations';
 
 export const DB_FILENAME = 'quizaroni.db';
 export const DEFAULT_MIGRATIONS_FOLDER = resolve(
@@ -15,7 +21,9 @@ export type Db = BunSQLiteDatabase<typeof schema>;
 
 export function openDatabase(
     dataDir: string,
-    migrationsFolder = DEFAULT_MIGRATIONS_FOLDER
+    migrations: readonly Migration[] = readMigrationsFolder(
+        DEFAULT_MIGRATIONS_FOLDER
+    )
 ): { sqlite: Database; db: Db } {
     mkdirSync(dataDir, { recursive: true });
     const sqlite = new Database(join(dataDir, DB_FILENAME), {
@@ -28,7 +36,7 @@ export function openDatabase(
         sqlite.run('PRAGMA foreign_keys = ON');
         sqlite.run('PRAGMA synchronous = NORMAL');
         const db = drizzle({ client: sqlite, schema });
-        migrate(db, { migrationsFolder });
+        applyMigrations(db, migrations);
         return { sqlite, db };
     } catch (err) {
         try {
