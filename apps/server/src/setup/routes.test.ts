@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { count, eq } from 'drizzle-orm';
 import { createApp } from '../app';
+import { diskWebAssets } from '../web-assets';
 import { Mailer } from '../mail/mailer';
 import { testAuth } from '../auth/testing';
 import { closeDatabase, type Db, openDatabase } from '../db';
@@ -40,7 +41,7 @@ function harness(configuredPublicUrl?: string): Harness {
         sqlite: opened.sqlite,
         db: opened.db,
         files: new FileStore(join(root, 'data')),
-        webDir,
+        web: diskWebAssets(webDir),
         version: '0.0.0-test',
         setup,
         configuredPublicUrl,

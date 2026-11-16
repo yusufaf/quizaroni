@@ -30,6 +30,7 @@ import {
     SETUP_TOKEN_FILENAME,
     SetupGate,
 } from './setup/setup';
+import { diskWebAssets } from './web-assets';
 
 const SHUTDOWN_GRACE_MS = 5000;
 
@@ -150,7 +151,7 @@ const app = createApp({
     sqlite,
     db,
     files,
-    webDir: config.webDir,
+    web: diskWebAssets(config.webDir),
     version: pkg.version,
     setup,
     configuredPublicUrl: config.publicUrl,
