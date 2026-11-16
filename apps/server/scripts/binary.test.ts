@@ -58,7 +58,9 @@ function migrationRows(dbFile: string): number {
     const db = new Database(dbFile, { readonly: true });
     try {
         return (
-            db.query('SELECT count(*) AS n FROM __drizzle_migrations').get() as {
+            db
+                .query('SELECT count(*) AS n FROM __drizzle_migrations')
+                .get() as {
                 n: number;
             }
         ).n;
@@ -234,7 +236,9 @@ describe.skipIf(!BINARY)('standalone binary', () => {
             const server = run(['--open-browser', 'false']);
             try {
                 await server.waitFor(LISTENING);
-                expect(server.output()).toContain(`Data directory: ${portable}`);
+                expect(server.output()).toContain(
+                    `Data directory: ${portable}`
+                );
             } finally {
                 await server.stop();
             }

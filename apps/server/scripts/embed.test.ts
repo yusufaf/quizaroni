@@ -85,17 +85,17 @@ describe('importSpecifier', () => {
         expect(importSpecifier(resolve('/r'), resolve('/r/x.ts'))).toBe(
             './x.ts'
         );
-        expect(importSpecifier(resolve('/r'), resolve('/r/.well-known/a'))).toBe(
-            './.well-known/a'
-        );
+        expect(
+            importSpecifier(resolve('/r'), resolve('/r/.well-known/a'))
+        ).toBe('./.well-known/a');
     });
 
     test.if(process.platform === 'win32')(
         'refuses a file on another drive',
         () => {
-            expect(() => importSpecifier('C:\\r\\build', 'D:\\r\\x.ts')).toThrow(
-                /different drive/
-            );
+            expect(() =>
+                importSpecifier('C:\\r\\build', 'D:\\r\\x.ts')
+            ).toThrow(/different drive/);
         }
     );
 });

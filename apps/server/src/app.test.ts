@@ -245,19 +245,25 @@ describe('embedded web app', () => {
         embedded = build(
             new Map([
                 ['/index.html', join(webDir, 'index.html')],
-                ['/assets/app-abc123.js', join(webDir, 'assets', 'app-abc123.js')],
+                [
+                    '/assets/app-abc123.js',
+                    join(webDir, 'assets', 'app-abc123.js'),
+                ],
                 ['/sw.js', join(webDir, 'sw.js')],
                 ['/manifest.json', join(webDir, 'manifest.json')],
             ])
         );
     });
 
-    test.each([['/'], ['/explore']])('GET %s serves the shell', async (path) => {
-        const res = await embedded.request(path);
-        expect(res.status).toBe(200);
-        expect(res.headers.get('content-type')).toContain('text/html');
-        expect(await res.text()).toBe(SHELL);
-    });
+    test.each([['/'], ['/explore']])(
+        'GET %s serves the shell',
+        async (path) => {
+            const res = await embedded.request(path);
+            expect(res.status).toBe(200);
+            expect(res.headers.get('content-type')).toContain('text/html');
+            expect(await res.text()).toBe(SHELL);
+        }
+    );
 
     test('serves hashed assets as immutable', async () => {
         const res = await embedded.request('/assets/app-abc123.js');

@@ -32,9 +32,9 @@ describe('appDataDir', () => {
     });
 
     test('uses an absolute XDG_DATA_HOME on Linux', () => {
-        expect(appDataDir('linux', { XDG_DATA_HOME: '/xdg' }, '/home/ada')).toBe(
-            '/xdg/quizaroni'
-        );
+        expect(
+            appDataDir('linux', { XDG_DATA_HOME: '/xdg' }, '/home/ada')
+        ).toBe('/xdg/quizaroni');
     });
 
     test('ignores a relative XDG_DATA_HOME', () => {
@@ -56,9 +56,9 @@ describe('binaryDataDir', () => {
     };
 
     test('prefers a quizaroni-data folder next to the binary', () => {
-        expect(
-            binaryDataDir({ ...base, exists: (p) => p === portable })
-        ).toBe(portable);
+        expect(binaryDataDir({ ...base, exists: (p) => p === portable })).toBe(
+            portable
+        );
     });
 
     test('otherwise uses the app-data folder', () => {

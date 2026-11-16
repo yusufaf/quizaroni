@@ -1,6 +1,12 @@
 // Builds standalone Quizaroni server executables with the web app and the
 // migrations embedded: pnpm build:binary [--targets linux-x64,...] [--skip-web]
-import { mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import {
+    mkdirSync,
+    readdirSync,
+    rmSync,
+    statSync,
+    writeFileSync,
+} from 'node:fs';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { readJournal } from '../src/db/migrations';
@@ -45,7 +51,10 @@ const entry = join(buildDir, 'entry.ts');
 writeFileSync(
     entry,
     renderEntry({
-        registry: importSpecifier(buildDir, join(serverRoot, 'src', 'embedded.ts')),
+        registry: importSpecifier(
+            buildDir,
+            join(serverRoot, 'src', 'embedded.ts')
+        ),
         main: importSpecifier(buildDir, join(serverRoot, 'src', 'index.ts')),
         webFiles: webFiles.map((file) => ({
             url: `/${file}`,
@@ -53,7 +62,10 @@ writeFileSync(
         })),
         migrations: readJournal(migrationsDir).map((m) => ({
             ...m,
-            specifier: importSpecifier(buildDir, join(migrationsDir, `${m.tag}.sql`)),
+            specifier: importSpecifier(
+                buildDir,
+                join(migrationsDir, `${m.tag}.sql`)
+            ),
         })),
     })
 );
@@ -102,5 +114,7 @@ if (missing.length > 0 || maps.length > 0) {
 }
 for (const target of targets) {
     const file = join(outDir, binaryFilename(target));
-    console.log(`${file}  ${(statSync(file).size / 1024 / 1024).toFixed(1)} MB`);
+    console.log(
+        `${file}  ${(statSync(file).size / 1024 / 1024).toFixed(1)} MB`
+    );
 }

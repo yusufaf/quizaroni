@@ -21,7 +21,9 @@ export function appDataDir(
     }
     const xdg = env.XDG_DATA_HOME;
     return posix.join(
-        xdg && posix.isAbsolute(xdg) ? xdg : posix.join(home, '.local', 'share'),
+        xdg && posix.isAbsolute(xdg)
+            ? xdg
+            : posix.join(home, '.local', 'share'),
         'quizaroni'
     );
 }
@@ -36,7 +38,9 @@ export function binaryDataDir(o: {
 }): string {
     const path = o.platform === 'win32' ? win32 : posix;
     const portable = path.join(path.dirname(o.execPath), PORTABLE_DATA_DIRNAME);
-    return o.exists(portable) ? portable : appDataDir(o.platform, o.env, o.home);
+    return o.exists(portable)
+        ? portable
+        : appDataDir(o.platform, o.env, o.home);
 }
 
 export function browserCommand(
@@ -45,7 +49,8 @@ export function browserCommand(
     url: string
 ): string[] | undefined {
     // rundll32 takes the URL as one argument, so no shell quoting is involved.
-    if (platform === 'win32') return ['rundll32', 'url.dll,FileProtocolHandler', url];
+    if (platform === 'win32')
+        return ['rundll32', 'url.dll,FileProtocolHandler', url];
     if (env.SSH_CONNECTION || env.SSH_TTY) return undefined;
     if (platform === 'darwin') return ['open', url];
     return env.DISPLAY || env.WAYLAND_DISPLAY ? ['xdg-open', url] : undefined;

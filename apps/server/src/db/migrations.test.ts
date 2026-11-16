@@ -26,9 +26,9 @@ describe('migrations', () => {
             expect(journal[i]!.when).toBeGreaterThan(journal[i - 1]!.when);
         }
         for (const { tag } of journal) {
-            expect(existsSync(join(DEFAULT_MIGRATIONS_FOLDER, `${tag}.sql`))).toBe(
-                true
-            );
+            expect(
+                existsSync(join(DEFAULT_MIGRATIONS_FOLDER, `${tag}.sql`))
+            ).toBe(true);
         }
     });
 

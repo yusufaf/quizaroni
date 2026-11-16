@@ -535,9 +535,9 @@ describe('browser launch', () => {
         expect(
             loadConfig([], { QZ_OPEN_BROWSER: 'no' }, CWD, binary).openBrowser
         ).toBe(false);
-        expect(loadConfig(['--open-browser', 'true'], {}, CWD).openBrowser).toBe(
-            true
-        );
+        expect(
+            loadConfig(['--open-browser', 'true'], {}, CWD).openBrowser
+        ).toBe(true);
     });
 
     test('rejects a value that is not a boolean, naming the source', () => {
