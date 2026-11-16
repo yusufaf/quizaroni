@@ -1,0 +1,24 @@
+# Run Quizaroni with Docker:
+#   docker compose up -d
+#   docker compose logs quizaroni   # shows the setup token to finish setup at http://localhost:8080/setup
+# Upgrade with: docker compose pull && docker compose up -d
+name: quizaroni
+services:
+    quizaroni:
+        image: ghcr.io/yusufaf/quizaroni:latest
+        restart: unless-stopped
+        ports:
+            - '8080:8080'
+        volumes:
+            - quizaroni-data:/data
+        # environment:
+        #     QZ_PUBLIC_URL: https://quiz.example.org # the URL users open; needed behind a domain or HTTPS proxy
+        #     QZ_TRUST_PROXY: 'true' # when a reverse proxy sits in front
+        healthcheck:
+            test: ['CMD', '/usr/local/bin/quizaroni', 'healthcheck']
+            interval: 15s
+            timeout: 5s
+            start_period: 30s
+            retries: 3
+volumes:
+    quizaroni-data:
