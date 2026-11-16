@@ -34,6 +34,7 @@ const CLEAN_ENV = {
     QZ_TRUST_PROXY: '',
     QZ_INSECURE_COOKIES: '',
     QZ_AI_CHAT: '',
+    QZ_OPEN_BROWSER: '',
     QZ_SMTP_HOST: '',
     QZ_SMTP_PORT: '',
     QZ_SMTP_SECURITY: '',
@@ -187,6 +188,24 @@ test('a fresh instance requires the setup token, then serves the app', async () 
     } finally {
         await server.stop();
     }
+    expectDataDirClean(dirs);
+}, 30_000);
+
+test('accepts a data dir with spaces and does not open a browser', async () => {
+    const dirs = layout();
+    dirs.dataDir = join(root!, 'data dir with spaces');
+    const server = start(dirs);
+    let output: { stdout: string; stderr: string };
+    try {
+        const [, url] = await server.out.waitFor(LISTENING);
+        await server.out.waitFor(/setup token: /);
+        expect(server.out.text()).toContain(`Data directory: ${dirs.dataDir}`);
+        expect(existsSync(join(dirs.dataDir, DB_FILENAME))).toBe(true);
+        expect((await fetch(`${url}/api/health`)).status).toBe(200);
+    } finally {
+        output = await server.stop();
+    }
+    expect(output.stdout).not.toContain('Opening');
     expectDataDirClean(dirs);
 }, 30_000);
 

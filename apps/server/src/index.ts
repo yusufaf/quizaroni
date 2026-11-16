@@ -1,5 +1,6 @@
 import type { Database } from 'bun:sqlite';
 import { existsSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { join } from 'node:path';
 import pkg from '../package.json';
 import { createApp } from './app';
@@ -16,7 +17,9 @@ import {
     USAGE,
 } from './config';
 import { closeDatabase, type Db, openDatabase } from './db';
+import { embeddedBundle } from './embedded';
 import { FileStore } from './files/store';
+import { binaryDataDir, openBrowser } from './launcher';
 import { describeSmtp, parseSmtpConfig, type SmtpConfig } from './mail/config';
 import { Mailer } from './mail/mailer';
 import { smtpTransport } from './mail/smtp';
@@ -30,7 +33,7 @@ import {
     SETUP_TOKEN_FILENAME,
     SetupGate,
 } from './setup/setup';
-import { diskWebAssets } from './web-assets';
+import { diskWebAssets, embeddedWebAssets } from './web-assets';
 
 const SHUTDOWN_GRACE_MS = 5000;
 
@@ -41,10 +44,29 @@ if (argv.includes('--help')) {
     process.exit(0);
 }
 
+const bundle = embeddedBundle();
+
 let config: ServerConfig;
 let smtp: SmtpConfig | undefined;
 try {
-    config = loadConfig(argv, process.env, process.cwd());
+    config = loadConfig(
+        argv,
+        process.env,
+        process.cwd(),
+        bundle
+            ? {
+                  dataDir: binaryDataDir({
+                      execPath: process.execPath,
+                      platform: process.platform,
+                      env: process.env,
+                      home: homedir(),
+                      exists: existsSync,
+                  }),
+                  webDir: undefined,
+                  openBrowser: true,
+              }
+            : undefined
+    );
     smtp = parseSmtpConfig(process.env);
 } catch (err) {
     if (!(err instanceof ConfigError)) throw err;
@@ -56,7 +78,7 @@ try {
 let sqlite: Database;
 let db: Db;
 try {
-    ({ sqlite, db } = openDatabase(config.dataDir));
+    ({ sqlite, db } = openDatabase(config.dataDir, bundle?.migrations));
 } catch (err) {
     console.error(
         `Could not open the database in ${config.dataDir}: ${(err as Error).message}`
@@ -151,7 +173,10 @@ const app = createApp({
     sqlite,
     db,
     files,
-    web: diskWebAssets(config.webDir),
+    web:
+        config.webDir === undefined && bundle
+            ? embeddedWebAssets(bundle.webFiles)
+            : diskWebAssets(config.webDir ?? '.'),
     version: pkg.version,
     setup,
     configuredPublicUrl: config.publicUrl,
@@ -198,7 +223,10 @@ if (warning) console.warn(warning);
 if (config.trustProxy) {
     console.log('Trusting X-Forwarded-For from one reverse proxy.');
 }
-if (!existsSync(join(config.webDir, 'index.html'))) {
+if (
+    config.webDir !== undefined &&
+    !existsSync(join(config.webDir, 'index.html'))
+) {
     console.warn(
         `No web app found in ${config.webDir}; pages will return 503 until it is built (pnpm build:web) or --web-dir points at it.`
     );
@@ -211,6 +239,7 @@ if (setupToken) {
         `The token is also in ${join(config.dataDir, SETUP_TOKEN_FILENAME)} and changes on every restart until setup is done.`
     );
 }
+if (config.openBrowser) openBrowser(publicUrl);
 
 let stopping = false;
 
