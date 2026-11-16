@@ -108,10 +108,21 @@ describe('runHealthcheck', () => {
     });
 
     test('connects directly even when a proxy is configured', async () => {
-        const saved = { ...process.env };
-        // A proxy nobody listens on: going through it would fail the probe.
-        process.env.HTTP_PROXY = 'http://127.0.0.1:1';
-        process.env.ALL_PROXY = 'http://127.0.0.1:1';
+        const names = [
+            'HTTP_PROXY',
+            'http_proxy',
+            'ALL_PROXY',
+            'all_proxy',
+            'NO_PROXY',
+            'no_proxy',
+        ];
+        const saved = names.map((name) => [name, process.env[name]] as const);
+        // A proxy nobody listens on, with no NO_PROXY escape: going through it would fail the probe.
+        for (const name of names) {
+            process.env[name] = name.toLowerCase().startsWith('no_')
+                ? ''
+                : 'http://127.0.0.1:1';
+        }
         try {
             await withServer(
                 () => Response.json({ status: 'ok' }),
@@ -122,9 +133,10 @@ describe('runHealthcheck', () => {
                 }
             );
         } finally {
-            delete process.env.HTTP_PROXY;
-            delete process.env.ALL_PROXY;
-            Object.assign(process.env, saved);
+            for (const [name, value] of saved) {
+                if (value === undefined) delete process.env[name];
+                else process.env[name] = value;
+            }
         }
     });
 
