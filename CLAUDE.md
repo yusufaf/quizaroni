@@ -1,10 +1,10 @@
 # Release & Issue Tracking
 
-Versioning is per-package via release-please (`release-please-config.json`, `.release-please-manifest.json`) — `apps/web` and `apps/api` version independently. There is no single repo-wide version number.
+Versioning is one repo-wide line via release-please (`release-please-config.json`, `.release-please-manifest.json`): a single `quizaroni` component at the root, tagged `vX.Y.Z`. The release PR also bumps the `apps/web`, `apps/server` and `apps/api` package.json versions. Publishing a release runs `.github/workflows/release.yml`, which attaches the five binaries and pushes `ghcr.io/yusufaf/quizaroni`. The `web-v*`/`api-v*` tags are history from before the switch.
 
 ## Milestones
 
-- One GitHub milestone per package release, named to match the tag: `web v0.4.0`, `api v0.2.0`.
+- One GitHub milestone per release, named to match the tag: `v0.4.0`.
 - Milestones = "which release". Labels (`bug`, `enhancement`, ...) = "what kind". Don't use milestones as a kanban/status board.
 - Only put issues in a milestone once they're actually committed to that release — an untargeted issue (like a large audit-sized item) stays milestone-less until it's scoped down into something a release can carry.
 - Close a milestone once its release is tagged.
