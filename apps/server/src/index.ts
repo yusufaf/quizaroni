@@ -19,6 +19,7 @@ import {
 import { closeDatabase, type Db, openDatabase } from './db';
 import { embeddedBundle } from './embedded';
 import { FileStore } from './files/store';
+import { runHealthcheck } from './healthcheck';
 import { binaryDataDir, openBrowser } from './launcher';
 import { describeSmtp, parseSmtpConfig, type SmtpConfig } from './mail/config';
 import { Mailer } from './mail/mailer';
@@ -38,6 +39,12 @@ import { diskWebAssets, embeddedWebAssets } from './web-assets';
 const SHUTDOWN_GRACE_MS = 5000;
 
 const argv = Bun.argv.slice(2);
+
+if (argv[0] === 'healthcheck') {
+    process.exit(
+        await runHealthcheck(argv.slice(1), process.env, process.cwd())
+    );
+}
 
 if (argv.includes('--help')) {
     console.log(USAGE);

@@ -34,7 +34,10 @@ const DEV_DEFAULTS: ConfigDefaults = {
 };
 const LOCAL_HOSTS = new Set(['127.0.0.1', '0.0.0.0', '::', '::1', 'localhost']);
 
-export const USAGE = `Usage: quizaroni-server [options]
+export const USAGE = `Usage: quizaroni-server [command] [options]
+
+Commands:
+  healthcheck          Exit 0 if the server on --host/--port (QZ_HOST/QZ_PORT) reports healthy, else 1
 
 Options (each can also be set with the QZ_* environment variable shown):
   --data-dir <path>    Directory for the database and all stored files (QZ_DATA_DIR, default ./data; the standalone binary uses a quizaroni-data folder next to it if one exists, else the OS app-data folder)
