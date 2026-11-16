@@ -4,6 +4,8 @@ on:
     branches: [main]
   push:
     branches: [main]
+permissions:
+  contents: read
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,13 +29,6 @@ jobs:
         run: pnpm test
       - name: Build frontend
         run: pnpm build:web
-      - name: Build frontend (self-host) and standalone binary (linux-x64)
-        run: pnpm build:binary --targets linux-x64
-      - name: Test standalone binary
-        working-directory: apps/server
-        run: bun test scripts/binary.test.ts
-        env:
-          QZ_BINARY: dist/quizaroni-linux-x64
       - name: Build backend
         run: pnpm build:api
       - name: Synthesize CDK template
@@ -43,3 +38,6 @@ jobs:
           region: us-west-2
           appName: quizaroni
           deploymentType: development
+  # All five binaries, smoke-tested per OS, plus docker compose on amd64 and arm64.
+  binaries:
+    uses: ./.github/workflows/binaries.yml

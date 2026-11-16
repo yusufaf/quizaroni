@@ -567,4 +567,8 @@ describe('USAGE', () => {
         expect(USAGE).toContain('--open-browser');
         expect(USAGE).toContain('QZ_OPEN_BROWSER');
     });
+
+    test('documents the healthcheck command', () => {
+        expect(USAGE).toContain('healthcheck');
+    });
 });

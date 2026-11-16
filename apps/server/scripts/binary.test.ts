@@ -213,6 +213,26 @@ describe.skipIf(!BINARY)('standalone binary', () => {
         expect(readdirSync(cwd)).toEqual([]);
     }, 60_000);
 
+    test('healthcheck subcommand reports the running server', async () => {
+        const healthcheck = (port: string) =>
+            Bun.spawn([binary, 'healthcheck', '--port', port], {
+                cwd,
+                env,
+                stdout: 'ignore',
+                stderr: 'ignore',
+            }).exited;
+        const server = run(['--open-browser', 'false']);
+        let port: string;
+        try {
+            const [, url] = await server.waitFor(LISTENING);
+            port = new URL(url ?? '').port;
+            expect(await healthcheck(port)).toBe(0);
+        } finally {
+            await server.stop();
+        }
+        expect(await healthcheck(port)).toBe(1);
+    }, 60_000);
+
     test('upgrades an existing DB', async () => {
         const dataDir = join(tmp, 'old db dir');
         mkdirSync(dataDir);
