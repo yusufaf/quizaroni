@@ -11,8 +11,12 @@ import {
 import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { eq } from 'drizzle-orm';
 import pkg from '../package.json';
-import { DB_FILENAME } from './db';
+import { closeDatabase, DB_FILENAME, openDatabase } from './db';
+import { studyset } from './db/schema';
+import { createStudyset } from './studysets/store';
+import { addUser } from './testing/studysets';
 import { SETUP_TOKEN_FILENAME } from './setup/setup';
 
 const ENTRY = resolve(import.meta.dir, 'index.ts');
@@ -365,6 +369,87 @@ test('exits with code 1 and names the flag on invalid config', async () => {
     });
     expect(await proc.exited).toBe(1);
     expect(await new Response(proc.stderr).text()).toContain('--port');
+    expect(readdirSync(root)).toEqual([]);
+}, 20_000);
+
+async function runCli(args: string[], cwd: string) {
+    const proc = Bun.spawn([process.execPath, ENTRY, ...args], {
+        cwd,
+        stdout: 'pipe',
+        stderr: 'pipe',
+        env: CLEAN_ENV,
+    });
+    const [code, stdout, stderr] = await Promise.all([
+        proc.exited,
+        new Response(proc.stdout).text(),
+        new Response(proc.stderr).text(),
+    ]);
+    return { code, stdout, stderr };
+}
+
+test('moderation commands change Explore on a running server', async () => {
+    const dirs = layout();
+    const server = start(dirs, {
+        QZ_ADMIN_EMAIL: 'admin@example.com',
+        QZ_ADMIN_PASSWORD: 'correct-horse-1',
+    });
+    try {
+        const [, url] = await server.out.waitFor(LISTENING);
+        const opened = openDatabase(dirs.dataDir);
+        let id: string;
+        try {
+            const owner = addUser(opened.db, 'owner');
+            const created = createStudyset(opened.db, owner, {});
+            if (created.status !== 'ok') throw new Error(created.status);
+            id = created.studyset.studysetUUID;
+            opened.db
+                .update(studyset)
+                .set({
+                    title: 'Cells',
+                    isPublic: true,
+                    publishedAt: new Date(),
+                    subject: 'science',
+                })
+                .where(eq(studyset.studysetUUID, id))
+                .run();
+        } finally {
+            closeDatabase(opened.sqlite);
+        }
+        const ids = async (query = '') =>
+            (
+                (await (
+                    await fetch(`${url}/api/public/explore${query}`)
+                ).json()) as { items: { studysetUUID: string }[] }
+            ).items.map((i) => i.studysetUUID);
+
+        const feature = await runCli(
+            ['feature', id, '--data-dir', dirs.dataDir],
+            dirs.cwd
+        );
+        expect(feature.code).toBe(0);
+        expect(feature.stdout).toContain('Featured');
+        expect(await ids('?featured=1')).toContain(id);
+
+        const hide = await runCli(
+            ['hide', id, '--data-dir', dirs.dataDir],
+            dirs.cwd
+        );
+        expect(hide.code).toBe(0);
+        expect(await ids()).not.toContain(id);
+    } finally {
+        await server.stop();
+    }
+}, 30_000);
+
+test('help lists the moderation commands', async () => {
+    root = mkdtempSync(join(tmpdir(), 'qz-e2e-'));
+    const sub = await runCli(['hide', '--help'], root);
+    expect(sub.code).toBe(0);
+    expect(sub.stdout).toContain('Usage');
+    expect(sub.stdout).toContain('--clear');
+    const main = await runCli(['--help'], root);
+    expect(main.code).toBe(0);
+    expect(main.stdout).toContain('unpublish');
     expect(readdirSync(root)).toEqual([]);
 }, 20_000);
 
