@@ -1,19 +1,23 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import type { Database } from 'bun:sqlite';
+import { Database } from 'bun:sqlite';
 import {
     existsSync,
+    mkdirSync,
     mkdtempSync,
     readdirSync,
     readFileSync,
     rmSync,
+    statSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
     closeDatabase,
+    DatabaseStateError,
     DB_FILENAME,
     DEFAULT_MIGRATIONS_FOLDER,
     openDatabase,
+    openExistingDatabase,
 } from './index';
 import { readMigrationsFolder } from './migrations';
 import { instanceSettings } from './schema';
@@ -165,5 +169,89 @@ describe('closeDatabase', () => {
             rmSync(dataDir, { recursive: true, force: true })
         ).not.toThrow();
         expect(() => sqlite.query('SELECT 1').get()).toThrow();
+    });
+});
+
+describe('openExistingDatabase', () => {
+    const all = readMigrationsFolder(DEFAULT_MIGRATIONS_FOLDER);
+
+    function refusal(fn: () => unknown): DatabaseStateError {
+        try {
+            fn();
+        } catch (err) {
+            expect(err).toBeInstanceOf(DatabaseStateError);
+            return err as DatabaseStateError;
+        }
+        throw new Error('expected a DatabaseStateError');
+    }
+
+    test('refuses a missing data dir without creating it', () => {
+        const dataDir = join(tempRoot(), 'missing');
+        expect(refusal(() => openExistingDatabase(dataDir)).message).toContain(
+            'No Quizaroni database'
+        );
+        expect(existsSync(dataDir)).toBe(false);
+    });
+
+    test('refuses a data dir with no DB file without creating one', () => {
+        const dataDir = join(tempRoot(), 'empty');
+        mkdirSync(dataDir);
+        refusal(() => openExistingDatabase(dataDir));
+        expect(readdirSync(dataDir)).toEqual([]);
+    });
+
+    test('opens a current DB with the server PRAGMAs and no migrations', () => {
+        const dataDir = join(tempRoot(), 'data');
+        closeDatabase(openDatabase(dataDir).sqlite);
+        const { sqlite } = track(openExistingDatabase(dataDir));
+        expect(
+            (sqlite.query('PRAGMA busy_timeout').get() as { timeout: number })
+                .timeout
+        ).toBe(5000);
+        expect(
+            (
+                sqlite.query('PRAGMA foreign_keys').get() as {
+                    foreign_keys: number;
+                }
+            ).foreign_keys
+        ).toBe(1);
+        expect(migrationRows(sqlite)).toBe(all.length);
+    });
+
+    test('refuses a DB that is behind and leaves it unmigrated', () => {
+        const dataDir = join(tempRoot(), 'data');
+        closeDatabase(openDatabase(dataDir, all.slice(0, 3)).sqlite);
+        expect(
+            refusal(() => openExistingDatabase(dataDir, all)).message
+        ).toContain('older');
+        const sqlite = new Database(join(dataDir, DB_FILENAME), {
+            readonly: true,
+        });
+        try {
+            expect(migrationRows(sqlite)).toBe(3);
+        } finally {
+            sqlite.close();
+        }
+    });
+
+    test('refuses a DB a newer version upgraded', () => {
+        const dataDir = join(tempRoot(), 'data');
+        closeDatabase(openDatabase(dataDir, all).sqlite);
+        expect(
+            refusal(() => openExistingDatabase(dataDir, all.slice(0, 3)))
+                .message
+        ).toContain('newer');
+    });
+
+    test('refuses an empty SQLite file without writing to it', () => {
+        const dataDir = join(tempRoot(), 'data');
+        mkdirSync(dataDir);
+        const file = join(dataDir, DB_FILENAME);
+        new Database(file, { create: true }).close();
+        expect(refusal(() => openExistingDatabase(dataDir)).message).toContain(
+            'no Quizaroni schema'
+        );
+        expect(statSync(file).size).toBe(0);
+        expect(existsSync(`${file}-wal`)).toBe(false);
     });
 });
