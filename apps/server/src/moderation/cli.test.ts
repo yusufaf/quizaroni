@@ -156,6 +156,15 @@ describe('data dir', () => {
         expect(r.err).not.toContain(MODERATION_USAGE);
     });
 
+    test('--data-dir wins over QZ_DATA_DIR', () => {
+        const flagDir = join(tempRoot(), 'flag');
+        dbIn(flagDir);
+        const r = run('feature', [UNKNOWN_ID, '--data-dir', flagDir], {
+            env: { QZ_DATA_DIR: join(flagDir, '..', 'env') },
+        });
+        expect(r.err).toContain(`No study set ${UNKNOWN_ID} in ${flagDir}`);
+    });
+
     test('a relative --data-dir resolves against cwd', () => {
         const cwd = tempRoot();
         dbIn(join(cwd, 'rel'));
