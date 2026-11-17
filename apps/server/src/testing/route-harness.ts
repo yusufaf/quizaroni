@@ -27,6 +27,7 @@ export type RouteHarness = {
     files: FileStore;
     uploads: UploadRegistry;
     webDir: string;
+    dataDir: string;
     mailer: Mailer;
     close(): void;
 };
@@ -42,7 +43,8 @@ export async function createRouteHarness(
     const webDir = join(root, 'web');
     mkdirSync(webDir, { recursive: true });
     writeFileSync(join(webDir, 'index.html'), '<!doctype html>');
-    const opened = openDatabase(join(root, 'data'));
+    const dataDir = join(root, 'data');
+    const opened = openDatabase(dataDir);
     completeSetup(opened.db, {
         name: 'Admin',
         email: ADMIN_EMAIL,
@@ -63,7 +65,7 @@ export async function createRouteHarness(
             set: { value: 'open' },
         })
         .run();
-    const files = new FileStore(join(root, 'data'));
+    const files = new FileStore(dataDir);
     files.resetStaging();
     const uploads = new UploadRegistry(files);
     const mailer = new Mailer(opened.db, undefined);
@@ -86,6 +88,7 @@ export async function createRouteHarness(
         files,
         uploads,
         webDir,
+        dataDir,
         mailer,
         close() {
             closeDatabase(opened.sqlite);
