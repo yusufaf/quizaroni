@@ -24,8 +24,8 @@ import { runHealthcheck } from './healthcheck';
 import { binaryDataDir, openBrowser } from './launcher';
 import { describeSmtp, parseSmtpConfig, type SmtpConfig } from './mail/config';
 import { Mailer } from './mail/mailer';
-import { isModerationCommand, runModeration } from './moderation/cli';
 import { smtpTransport } from './mail/smtp';
+import { isModerationCommand, runModeration } from './moderation/cli';
 import { ensureAuthSecret, getSetting, SETTING } from './settings';
 import {
     bootstrapAdmin,

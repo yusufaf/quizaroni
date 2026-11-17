@@ -142,6 +142,20 @@ describe('data dir', () => {
         expect(r.err).toContain(`No study set ${UNKNOWN_ID} in ${dataDir}`);
     });
 
+    test('an unrelated bad QZ_* setting does not block moderation', () => {
+        const dataDir = join(tempRoot(), 'env');
+        dbIn(dataDir);
+        const r = run('feature', [UNKNOWN_ID], {
+            env: {
+                QZ_DATA_DIR: dataDir,
+                QZ_PORT: 'abc',
+                QZ_PUBLIC_URL: 'not a url',
+            },
+        });
+        expect(r.err).toContain(`No study set ${UNKNOWN_ID} in ${dataDir}`);
+        expect(r.err).not.toContain(MODERATION_USAGE);
+    });
+
     test('a relative --data-dir resolves against cwd', () => {
         const cwd = tempRoot();
         dbIn(join(cwd, 'rel'));

@@ -298,6 +298,18 @@ export function parseAdminBootstrap(
     };
 }
 
+// The one rule for where the data lives (flag > QZ_DATA_DIR > default), shared by
+// the server and the tools that open its DB without needing the rest of the config.
+export function resolveDataDir(
+    flag: string | undefined,
+    env: Record<string, string | undefined>,
+    cwd: string,
+    defaults: ConfigDefaults = DEV_DEFAULTS
+): string {
+    if (flag === '') throw new ConfigError('--data-dir must not be empty');
+    return resolve(cwd, flag ?? (env[ENV_NAMES['data-dir']] || defaults.dataDir));
+}
+
 export function loadConfig(
     argv: string[],
     env: Record<string, string | undefined>,
@@ -332,7 +344,7 @@ export function loadConfig(
     const openBrowser = setting('open-browser');
 
     return {
-        dataDir: resolve(cwd, setting('data-dir')?.value ?? defaults.dataDir),
+        dataDir: resolveDataDir(flags['data-dir'], env, cwd, defaults),
         port,
         host,
         publicUrl,

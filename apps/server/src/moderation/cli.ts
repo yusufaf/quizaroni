@@ -1,6 +1,6 @@
 import { parseArgs } from 'node:util';
 import { normalizeText, truncateText } from '@quizaroni/shared-types';
-import { type ConfigDefaults, ConfigError, loadConfig } from '../config';
+import { type ConfigDefaults, ConfigError, resolveDataDir } from '../config';
 import {
     closeDatabase,
     DatabaseStateError,
@@ -74,10 +74,11 @@ export function printable(text: string, maxChars = 60): string {
 
 type Operation = (db: Db, id: string, now: Date) => ModerationResult;
 
-const OPERATIONS: Record<ModerationCommand, [Operation, Operation | undefined]> = {
+// [apply, undo with --clear]; unpublish has no undo because the owner republishes.
+const OPERATIONS: Record<ModerationCommand, [Operation, Operation?]> = {
     feature: [featureSet, (db, id) => unfeatureSet(db, id)],
     hide: [hideSet, unhideSet],
-    unpublish: [unpublishSet, undefined],
+    unpublish: [unpublishSet],
 };
 
 function messages(
@@ -90,7 +91,10 @@ function messages(
     if (command === 'feature') {
         return clear
             ? { changed: `Unfeatured ${set}.`, unchanged: `${set} was not featured; nothing changed.` }
-            : { changed: `Featured ${set} at the front of Explore's Featured row.`, unchanged: '' };
+            : {
+                  changed: `Featured ${set} at the front of Explore's Featured row.`,
+                  unchanged: `${set} is already featured; nothing changed.`,
+              };
     }
     if (command === 'hide') {
         return clear
@@ -150,9 +154,11 @@ export function runModeration(
         return 0;
     }
     const clear = values.clear === true;
-    if (command === 'unpublish' && clear) {
+    const [apply, undo] = OPERATIONS[command];
+    const operation = clear ? undo : apply;
+    if (!operation) {
         return usageError(
-            'unpublish has no --clear; the owner can publish the set again'
+            `${command} has no --clear; the owner can publish the set again`
         );
     }
     if (positionals.length !== 1) {
@@ -167,12 +173,7 @@ export function runModeration(
     const flag = values['data-dir'];
     let dataDir: string;
     try {
-        dataDir = loadConfig(
-            flag === undefined ? [] : ['--data-dir', flag],
-            env,
-            cwd,
-            o.defaults
-        ).dataDir;
+        dataDir = resolveDataDir(flag, env, cwd, o.defaults);
     } catch (err) {
         if (!(err instanceof ConfigError)) throw err;
         return usageError(err.message);
@@ -191,9 +192,6 @@ export function runModeration(
     }
 
     try {
-        const [apply, undo] = OPERATIONS[command];
-        const operation = clear ? undo : apply;
-        if (!operation) return 1;
         const result = operation(opened.db, id, o.now ?? new Date());
         if (result.status === 'not_found') {
             out.error(`No study set ${id} in ${dataDir}.`);
