@@ -13,6 +13,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { eq } from 'drizzle-orm';
 import pkg from '../package.json';
+import { LOCK_FILENAME } from './data-dir-lock';
 import { closeDatabase, DB_FILENAME, openDatabase } from './db';
 import { studyset } from './db/schema';
 import { createStudyset } from './studysets/store';
@@ -23,7 +24,13 @@ const ENTRY = resolve(import.meta.dir, 'index.ts');
 const SHELL = '<!doctype html><title>shell</title>';
 const DB_FILES = [DB_FILENAME, `${DB_FILENAME}-wal`, `${DB_FILENAME}-shm`];
 // files/ holds uploads; tmp/ holds parts being uploaded.
-const DATA_FILES = [...DB_FILES, SETUP_TOKEN_FILENAME, 'files', 'tmp'];
+const DATA_FILES = [
+    ...DB_FILES,
+    SETUP_TOKEN_FILENAME,
+    LOCK_FILENAME,
+    'files',
+    'tmp',
+];
 const CLEAN_ENV = {
     ...process.env,
     QZ_PORT: '',
@@ -350,6 +357,21 @@ test('the headless admin signs in and out, and cross-origin sign-in is refused',
     expect(output.stdout).not.toContain(password);
     expect(output.stderr).not.toContain(password);
     expectDataDirClean(dirs);
+}, 30_000);
+
+test('a second server on the same data dir exits 1', async () => {
+    const dirs = layout();
+    const first = start(dirs);
+    try {
+        await first.out.waitFor(LISTENING);
+        const second = start(dirs);
+        expect(await second.proc.exited).toBe(1);
+        expect(await second.err.done).toContain(
+            `Another Quizaroni server or import is using ${dirs.dataDir}`
+        );
+    } finally {
+        await first.stop();
+    }
 }, 30_000);
 
 test('exits with code 1 when only QZ_ADMIN_EMAIL is set on a fresh instance', async () => {

@@ -17,6 +17,11 @@ import {
     urlHost,
     USAGE,
 } from './config';
+import {
+    acquireDataDirLock,
+    type DataDirLock,
+    DataDirLockedError,
+} from './data-dir-lock';
 import { closeDatabase, type Db, openDatabase } from './db';
 import { embeddedBundle } from './embedded';
 import { FileStore } from './files/store';
@@ -86,6 +91,16 @@ try {
     if (!(err instanceof ConfigError)) throw err;
     console.error(err.message);
     console.error(USAGE);
+    process.exit(1);
+}
+
+// Module-level so the handle stays reachable: a collected handle drops the lock.
+let dataDirLock: DataDirLock;
+try {
+    dataDirLock = acquireDataDirLock(config.dataDir);
+} catch (err) {
+    if (!(err instanceof DataDirLockedError)) throw err;
+    console.error(err.message);
     process.exit(1);
 }
 
@@ -268,6 +283,7 @@ async function shutdown(): Promise<void> {
         ]);
         void server.stop(true);
         closeDatabase(sqlite);
+        dataDirLock.release();
     } catch (err) {
         console.error('Shutdown failed:', err);
         exitCode = 1;
