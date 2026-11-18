@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { APIError, createAuthMiddleware } from 'better-auth/api';
+import { and, eq } from 'drizzle-orm';
 import { normalizeEmail, PASSWORD_MAX, PASSWORD_MIN } from '../config';
 import type { Db } from '../db';
 import { sanitizeLogArg } from '../db/errors';
@@ -48,6 +49,13 @@ export type AuthConfig = {
     insecureCookies: boolean;
     mailer: Mailer;
 };
+
+// What hashPassword produces today (Bun's argon2id defaults).
+export const CURRENT_HASH_PREFIX = '$argon2id$v=19$m=65536,t=2,p=1$';
+
+export function needsRehash(hash: string): boolean {
+    return !hash.startsWith(CURRENT_HASH_PREFIX);
+}
 
 export function hashPassword(password: string): Promise<string> {
     return Bun.password.hash(password, { algorithm: 'argon2id' });
@@ -101,6 +109,38 @@ function registrationGate(db: Db) {
     });
 }
 
+/**
+ * Verifies a password and, when it matches a hash from an older scheme (Logto's
+ * argon2i after an import), stores a current hash. Keyed by the old hash, so a
+ * concurrent password change is never overwritten. A failed upgrade only logs.
+ */
+export function verifyAndUpgrade(
+    db: Db
+): (i: { hash: string; password: string }) => Promise<boolean> {
+    return async ({ hash, password }) => {
+        if (!(await verifyPassword({ hash, password }))) return false;
+        if (!needsRehash(hash)) return true;
+        try {
+            const next = await hashPassword(password);
+            db.update(account)
+                .set({ password: next, updatedAt: new Date() })
+                .where(
+                    and(
+                        eq(account.providerId, 'credential'),
+                        eq(account.password, hash)
+                    )
+                )
+                .run();
+        } catch (err) {
+            console.error(
+                '[auth] Could not upgrade a password hash:',
+                sanitizeLogArg(err)
+            );
+        }
+        return true;
+    };
+}
+
 const authLogger = {
     level: 'error' as const,
     log: (
@@ -136,7 +176,7 @@ export function createAuth(cfg: AuthConfig) {
             autoSignIn: true,
             minPasswordLength: PASSWORD_MIN,
             maxPasswordLength: PASSWORD_MAX,
-            password: { hash: hashPassword, verify: verifyPassword },
+            password: { hash: hashPassword, verify: verifyAndUpgrade(cfg.db) },
             resetPasswordTokenExpiresIn: RESET_TOKEN_TTL_SECONDS,
             revokeSessionsOnPasswordReset: true,
             // Queued, not awaited, so a known email answers as fast as an
