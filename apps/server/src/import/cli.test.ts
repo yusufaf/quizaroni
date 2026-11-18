@@ -264,7 +264,7 @@ describe('dry run', () => {
         const r = await run([...f.argv, '--dry-run']);
         expect(r.code).toBe(0);
         expect(r.out).toContain('imported_users: 2');
-        expect(r.out).toContain('Dry run: nothing was written');
+        expect(r.out).toContain('Dry run: nothing was imported');
         expect(existsSync(f.dataDir)).toBe(false);
     });
 
@@ -302,6 +302,14 @@ describe('dry run', () => {
             closeDatabase(sqlite);
         }
     });
+});
+
+test('an unwritable --report fails before the data dir is touched', async () => {
+    const f = fixture();
+    const r = await run([...f.argv, '--report', join(f.root, 'no', 'such', 'dir', 'r.json')]);
+    expect(r.code).toBe(1);
+    expect(r.err).toContain('Could not write the report');
+    expect(existsSync(f.dataDir)).toBe(false);
 });
 
 test('missing inputs are a usage error', async () => {

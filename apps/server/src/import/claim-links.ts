@@ -24,7 +24,8 @@ export const CLAIM_USAGE = `Usage:
 
 Makes a password reset link for every account without a password (imported
 accounts whose hosted password couldn't be carried over). Send each user their
-link; it sets a password and signs them in. Rerunning makes new links.
+link; it lets them set a password. Rerunning makes new links; earlier ones
+stay valid until they expire, so keep old output files as safe as new ones.
 
   --csv                 Print CSV (email,name,username,link,expires_at) instead of
                         "email<TAB>link" lines

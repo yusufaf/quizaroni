@@ -153,6 +153,34 @@ describe('readDynamoExports', () => {
         expect(() => readDynamoExports(r)).toThrow(/full export/);
     });
 
+    test('a summary that names FULL_EXPORT is accepted', () => {
+        const r = tempRoot();
+        const dir = writeDynamoExport(r, MAIN, []);
+        writeFileSync(
+            join(dir, 'manifest-summary.json'),
+            JSON.stringify({
+                tableArn: `arn:aws:dynamodb:us-west-2:0:table/${MAIN}`,
+                itemCount: 0,
+                outputFormat: 'DYNAMODB_JSON',
+                exportType: 'FULL_EXPORT',
+            })
+        );
+        writeDynamoExport(r, USERS, []);
+        expect(readDynamoExports(r).main).toEqual([]);
+    });
+
+    test.each([
+        ['a corrupt gzip', (dir: string) => writeFileSync(join(dir, 'data', 'part-0.json.gz'), 'not gzip')],
+        ['a bad manifest line', (dir: string) => writeFileSync(join(dir, 'manifest-files.json'), '{oops\n')],
+        ['a bad data line', (dir: string) => writeFileSync(join(dir, 'data', 'part-0.json.gz'), gzipSync('{oops\n'))],
+        ['a line with no Item', (dir: string) => writeFileSync(join(dir, 'data', 'part-0.json.gz'), gzipSync('{}\n'))],
+    ])('%s is an input error', (_name, corrupt) => {
+        const r = tempRoot();
+        corrupt(writeDynamoExport(r, MAIN, [{ PK: 'p', SK: 's' }]));
+        writeDynamoExport(r, USERS, []);
+        expect(() => readDynamoExports(r)).toThrow(ImportInputError);
+    });
+
     test('two main exports are refused', () => {
         const r = tempRoot();
         writeDynamoExport(r, MAIN, [], { exportId: 'one' });

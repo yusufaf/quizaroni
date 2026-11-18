@@ -20,6 +20,7 @@ import {
 import type { DynamoItem } from './dynamodb';
 import { ImportInputError } from './errors';
 import { credentialOf, type LogtoUser, socialAccountsOf } from './logto';
+import { isUnsafeS3Key } from './s3';
 
 export type Probe = (
     s3Key: string
@@ -77,14 +78,6 @@ const strings = (value: unknown): string[] =>
     Array.isArray(value)
         ? [...new Set(value.filter((v): v is string => typeof v === 'string'))]
         : [];
-
-// A key that could leave the sync folder or isn't a plain relative path.
-function isUnsafeS3Key(key: string): boolean {
-    return (
-        /[\\\0]/.test(key) ||
-        key.split('/').some((part) => part === '' || part === '.' || part === '..')
-    );
-}
 
 export type PublishState = {
     isPublic: boolean;
@@ -181,11 +174,23 @@ export function planImport(
     c.count('logto_only_users', src.logto.length - candidates.length);
 
     const emailOf = new Map<string, string | undefined>();
+    const skipOf = new Map<string, string | undefined>();
     const byEmail = new Map<string, string[]>();
     for (const u of candidates) {
         const email = u.primary_email ? normalizeEmail(u.primary_email) : undefined;
         emailOf.set(u.id, email);
-        if (email) byEmail.set(email, [...(byEmail.get(email) ?? []), u.id]);
+        const skip = !USER_ID.test(u.id)
+            ? 'invalid_user_id'
+            : u.is_suspended
+              ? 'suspended_user'
+              : !u.primary_email
+                ? 'no_email'
+                : !email
+                  ? 'invalid_email'
+                  : undefined;
+        skipOf.set(u.id, skip);
+        // Only users that would otherwise be imported can collide on an email.
+        if (email && !skip) byEmail.set(email, [...(byEmail.get(email) ?? []), u.id]);
     }
 
     const skipped = new Set<string>();
@@ -197,17 +202,8 @@ export function planImport(
     for (const u of candidates) {
         const email = emailOf.get(u.id);
         const group = email ? (byEmail.get(email) ?? []) : [];
-        const skip = !USER_ID.test(u.id)
-            ? 'invalid_user_id'
-            : u.is_suspended
-              ? 'suspended_user'
-              : !u.primary_email
-                ? 'no_email'
-                : !email
-                  ? 'invalid_email'
-                  : group.length > 1
-                    ? 'duplicate_email'
-                    : undefined;
+        const skip =
+            skipOf.get(u.id) ?? (group.length > 1 ? 'duplicate_email' : undefined);
         if (skip) {
             skipped.add(u.id);
             c.count(`skipped_users.${skip}`);

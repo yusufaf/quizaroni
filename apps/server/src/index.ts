@@ -119,8 +119,11 @@ let dataDirLock: DataDirLock;
 try {
     dataDirLock = acquireDataDirLock(config.dataDir);
 } catch (err) {
-    if (!(err instanceof DataDirLockedError)) throw err;
-    console.error(err.message);
+    console.error(
+        err instanceof DataDirLockedError
+            ? err.message
+            : `Could not lock ${config.dataDir}: ${(err as Error).message}`
+    );
     process.exit(1);
 }
 

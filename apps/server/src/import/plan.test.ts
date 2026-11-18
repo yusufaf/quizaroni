@@ -111,6 +111,15 @@ describe('users', () => {
         expect(p.report.counts.skipped_user_set).toBe(2);
     });
 
+    test('a skipped user does not make its email a duplicate', () => {
+        const p = plan([
+            logto({ id: 'a', primary_email: 'a@x.com', is_suspended: true }),
+            logto({ id: 'b', primary_email: 'A@x.com' }),
+        ]);
+        expect(p.users.map((u) => u.user.id)).toEqual(['b']);
+        expect(kinds(p)).toEqual(['suspended_user']);
+    });
+
     test('a NOCASE duplicate username is dropped from the later user', () => {
         const p = plan([
             logto({ id: 'a', username: 'Ann', created_at: '2026-01-01T00:00:00Z' }),

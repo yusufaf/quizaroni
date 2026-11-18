@@ -3,11 +3,18 @@ import { join, relative, resolve, sep } from 'node:path';
 import { SNIFF_BYTES } from '../files/sniff';
 import type { Probe } from './plan';
 
+/** A key that could leave the sync folder, or isn't a plain relative path. */
+export function isUnsafeS3Key(key: string): boolean {
+    return (
+        /[\\\0]/.test(key) ||
+        key.split('/').some((p) => p === '' || p === '.' || p === '..')
+    );
+}
+
 /** The local path of an S3 key inside an `aws s3 sync` folder, if it stays inside. */
 export function syncPath(root: string, key: string): string | undefined {
-    if (/[\\\0]/.test(key)) return undefined;
+    if (isUnsafeS3Key(key)) return undefined;
     const parts = key.split('/');
-    if (parts.some((p) => p === '' || p === '.' || p === '..')) return undefined;
     const base = resolve(root);
     const full = resolve(base, ...parts);
     return full.startsWith(base + sep) ? full : undefined;

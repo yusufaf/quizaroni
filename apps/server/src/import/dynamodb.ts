@@ -85,6 +85,18 @@ function readJson(file: string): Record<string, unknown> {
     }
 }
 
+function parseLine(file: string, line: string): Record<string, unknown> {
+    try {
+        const value: unknown = JSON.parse(line);
+        if (value !== null && typeof value === 'object') {
+            return value as Record<string, unknown>;
+        }
+    } catch {
+        // reported below
+    }
+    throw new ImportInputError(`${file}: not a JSON object line`);
+}
+
 function jsonLines(text: string): string[] {
     return text.split('\n').filter((line) => line.trim() !== '');
 }
@@ -100,7 +112,10 @@ export function readDynamoExports(root: string): DynamoExports {
     for (const summaryFile of findSummaries(root)) {
         const dir = join(summaryFile, '..');
         const summary = readJson(summaryFile);
-        if (summary.exportType !== undefined) {
+        if (
+            summary.exportType !== undefined &&
+            summary.exportType !== 'FULL_EXPORT'
+        ) {
             throw new ImportInputError(
                 `${summaryFile}: only a full export can be imported (got ${String(summary.exportType)})`
             );
@@ -124,26 +139,47 @@ export function readDynamoExports(root: string): DynamoExports {
             throw new ImportInputError(`${manifestFile} is missing`);
         }
         for (const line of jsonLines(readFileSync(manifestFile, 'utf8'))) {
-            const entry = JSON.parse(line) as {
-                itemCount: number;
-                dataFileS3Key: string;
+            const entry = parseLine(manifestFile, line) as {
+                itemCount?: unknown;
+                dataFileS3Key?: unknown;
             };
+            if (
+                typeof entry.itemCount !== 'number' ||
+                typeof entry.dataFileS3Key !== 'string'
+            ) {
+                throw new ImportInputError(`${manifestFile}: not a manifest line`);
+            }
             const dataFile = join(dir, 'data', basename(entry.dataFileS3Key));
             if (!existsSync(dataFile)) {
                 throw new ImportInputError(`Data file ${dataFile} is missing`);
             }
             // AWS writes an empty file for an empty partition, which gunzip rejects.
-            const lines =
-                statSync(dataFile).size === 0
-                    ? []
-                    : jsonLines(gunzipSync(readFileSync(dataFile)).toString('utf8'));
+            let lines: string[] = [];
+            if (statSync(dataFile).size > 0) {
+                try {
+                    lines = jsonLines(
+                        gunzipSync(readFileSync(dataFile)).toString('utf8')
+                    );
+                } catch (err) {
+                    throw new ImportInputError(
+                        `${dataFile}: ${(err as Error).message}`
+                    );
+                }
+            }
             if (lines.length !== entry.itemCount) {
                 throw new ImportInputError(
                     `${dataFile}: item count ${lines.length} does not match the manifest's ${entry.itemCount}`
                 );
             }
             for (const l of lines) {
-                const parsed = JSON.parse(l) as { Item?: unknown };
+                const parsed = parseLine(dataFile, l) as { Item?: unknown };
+                if (
+                    parsed.Item === null ||
+                    typeof parsed.Item !== 'object' ||
+                    Array.isArray(parsed.Item)
+                ) {
+                    throw new ImportInputError(`${dataFile}: a line has no Item`);
+                }
                 items.push(fromDynamoMap(parsed.Item, ctx));
             }
         }

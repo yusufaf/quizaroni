@@ -136,13 +136,21 @@ export async function runImport(
         return 1;
     }
 
+    // Written now, so a bad path fails before anything is imported.
+    const reportFile = path('report');
+    if (reportFile) {
+        try {
+            writeFileSync(reportFile, JSON.stringify(plan.report, null, 2));
+        } catch (err) {
+            out.error(
+                `Could not write the report to ${reportFile}: ${(err as Error).message}`
+            );
+            return 1;
+        }
+    }
     const printReport = () => {
         for (const line of formatReport(plan.report)) out.log(line);
-        const reportFile = path('report');
-        if (reportFile) {
-            writeFileSync(reportFile, JSON.stringify(plan.report, null, 2));
-            out.log(`Full report written to ${reportFile}`);
-        }
+        if (reportFile) out.log(`Full report written to ${reportFile}`);
     };
 
     if (dryRun) {
@@ -157,7 +165,7 @@ export async function runImport(
         }
         printReport();
         out.log(
-            `Dry run: nothing was written. ${plan.users.length} users and ${plan.studysets.length} sets would be imported.`
+            `Dry run: nothing was imported. ${plan.users.length} users and ${plan.studysets.length} sets would be imported.`
         );
         return 0;
     }
@@ -180,9 +188,10 @@ export async function runImport(
     try {
         lock = acquireDataDirLock(dataDir);
     } catch (err) {
-        if (!(err instanceof DataDirLockedError)) throw err;
         out.error(
-            `Quizaroni is running on ${dataDir} (or another import is); stop it first.`
+            err instanceof DataDirLockedError
+                ? `Quizaroni is running on ${dataDir} (or another import is); stop it first.`
+                : `Could not lock ${dataDir}: ${(err as Error).message}`
         );
         return 1;
     }
