@@ -19,7 +19,7 @@ export const MAX_UPDATES_BYTES = 128 * 1024;
 export const MAX_METADATA_BYTES = 400 * 1024;
 export const MAX_VALUE_DEPTH = 16;
 
-const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+export const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 
 export function isPlainObject(value: unknown): value is JsonObject {
     if (value === null || typeof value !== 'object' || Array.isArray(value)) {
