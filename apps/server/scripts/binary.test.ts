@@ -10,9 +10,11 @@ import {
     readdirSync,
     realpathSync,
     rmSync,
+    writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
+import { gzipSync } from 'node:zlib';
 import {
     readJournal,
     readMigrationsFolder,
@@ -306,6 +308,99 @@ describe.skipIf(!BINARY)('standalone binary', () => {
         } finally {
             await server.stop();
         }
+    }, 60_000);
+
+    test('import is refused while the server runs, and a dry run reports', async () => {
+        // Inputs built inline: this file must not import from node_modules.
+        const inputs = join(tmp, 'import inputs');
+        const set = '0b9f4c1e-8f3a-4d2b-9c7e-1a2b3c4d5e6f';
+        mkdirSync(join(inputs, 's3'), { recursive: true });
+        const hash = await Bun.password.hash('old-password-1', {
+            algorithm: 'argon2i',
+            memoryCost: 8192,
+            timeCost: 8,
+        });
+        writeFileSync(
+            join(inputs, 'logto.jsonl'),
+            JSON.stringify({
+                tenant_id: 'default',
+                id: 'ann',
+                primary_email: 'ann@example.com',
+                password_encrypted: hash,
+                password_encryption_method: 'Argon2i',
+            }) + '\n'
+        );
+        const exportTable = (table: string, item: Record<string, unknown>) => {
+            const dir = join(inputs, 'dynamo', 'AWSDynamoDB', table);
+            mkdirSync(join(dir, 'data'), { recursive: true });
+            writeFileSync(
+                join(dir, 'data', 'part.json.gz'),
+                gzipSync(JSON.stringify({ Item: item }) + '\n')
+            );
+            writeFileSync(
+                join(dir, 'manifest-files.json'),
+                JSON.stringify({ itemCount: 1, dataFileS3Key: 'x/data/part.json.gz' }) + '\n'
+            );
+            writeFileSync(
+                join(dir, 'manifest-summary.json'),
+                JSON.stringify({
+                    tableArn: `arn:aws:dynamodb:us-west-2:0:table/${table}`,
+                    itemCount: 1,
+                    outputFormat: 'DYNAMODB_JSON',
+                })
+            );
+        };
+        exportTable('quizaroni-prod-users', {
+            PK: { S: 'user#ann' },
+            SK: { S: 'userData' },
+        });
+        exportTable('quizaroni-prod-main', {
+            PK: { S: 'userUUID#ann' },
+            SK: { S: `studyset#${set}` },
+            studysetUUID: { S: set },
+            title: { S: 'Cells' },
+            createdAt: { S: '2026-01-01T00:00:00.000Z' },
+        });
+        const args = [
+            'import',
+            '--logto-users',
+            join(inputs, 'logto.jsonl'),
+            '--dynamodb',
+            join(inputs, 'dynamo'),
+            '--s3',
+            join(inputs, 's3'),
+        ];
+        const importCli = async (extra: string[]) => {
+            const proc = Bun.spawn([binary, ...args, ...extra], {
+                cwd,
+                env,
+                stdout: 'pipe',
+                stderr: 'pipe',
+            });
+            const [code, stdout, stderr] = await Promise.all([
+                proc.exited,
+                new Response(proc.stdout).text(),
+                new Response(proc.stderr).text(),
+            ]);
+            return { code, stdout, stderr };
+        };
+
+        const dataDir = join(tmp, 'import data');
+        const server = run(['--open-browser', 'false', '--data-dir', dataDir]);
+        try {
+            await server.waitFor(LISTENING);
+            const refused = await importCli(['--data-dir', dataDir]);
+            expect(refused.code).toBe(1);
+            expect(refused.stderr).toContain('is running on');
+        } finally {
+            await server.stop();
+        }
+
+        const dry = await importCli(['--dry-run']);
+        expect(dry.stderr).toBe('');
+        expect(dry.code).toBe(0);
+        expect(dry.stdout).toContain('imported_users: 1');
+        expect(dry.stdout).toContain('1 users and 1 sets would be imported');
     }, 60_000);
 
     test('upgrades an existing DB', async () => {

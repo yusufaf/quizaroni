@@ -26,6 +26,8 @@ import { closeDatabase, type Db, openDatabase } from './db';
 import { embeddedBundle } from './embedded';
 import { FileStore } from './files/store';
 import { runHealthcheck } from './healthcheck';
+import { runClaimLinks } from './import/claim-links';
+import { runImport } from './import/cli';
 import { binaryDataDir, openBrowser } from './launcher';
 import { describeSmtp, parseSmtpConfig, type SmtpConfig } from './mail/config';
 import { Mailer } from './mail/mailer';
@@ -67,6 +69,24 @@ const defaults: ConfigDefaults | undefined = bundle
           openBrowser: true,
       }
     : undefined;
+
+if (argv[0] === 'import') {
+    process.exit(
+        await runImport(argv.slice(1), process.env, process.cwd(), {
+            defaults,
+            migrations: bundle?.migrations,
+        })
+    );
+}
+
+if (argv[0] === 'claim-links') {
+    process.exit(
+        runClaimLinks(argv.slice(1), process.env, process.cwd(), {
+            defaults,
+            migrations: bundle?.migrations,
+        })
+    );
+}
 
 if (isModerationCommand(argv[0])) {
     process.exit(
