@@ -1,5 +1,11 @@
-import { existsSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import {
+    existsSync,
+    readdirSync,
+    rmSync,
+    statSync,
+    writeFileSync,
+} from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { type ConfigDefaults, ConfigError, resolveDataDir } from '../config';
 import { acquireDataDirLock, DataDirLockedError } from '../data-dir-lock';
@@ -47,6 +53,14 @@ const CONSOLE: Output = {
     log: (line) => console.log(line),
     error: (line) => console.error(line),
 };
+
+function isDirectory(dir: string): boolean {
+    try {
+        return statSync(dir).isDirectory();
+    } catch {
+        return false;
+    }
+}
 
 function filesDirEmpty(dir: string): boolean {
     return !existsSync(dir) || readdirSync(dir).length === 0;
@@ -136,21 +150,27 @@ export async function runImport(
         return 1;
     }
 
-    // Written now, so a bad path fails before anything is imported.
+    // Checked now so a bad path fails before anything is imported, but written
+    // only once the run succeeds, so a report never describes a refused or
+    // undone import (or overwrites the report of an earlier one).
     const reportFile = path('report');
-    if (reportFile) {
+    if (reportFile && !isDirectory(dirname(reportFile))) {
+        out.error(
+            `Could not write the report to ${reportFile}: ${dirname(reportFile)} is not a folder`
+        );
+        return 1;
+    }
+    const printReport = () => {
+        for (const line of formatReport(plan.report)) out.log(line);
+        if (!reportFile) return;
         try {
             writeFileSync(reportFile, JSON.stringify(plan.report, null, 2));
+            out.log(`Full report written to ${reportFile}`);
         } catch (err) {
             out.error(
                 `Could not write the report to ${reportFile}: ${(err as Error).message}`
             );
-            return 1;
         }
-    }
-    const printReport = () => {
-        for (const line of formatReport(plan.report)) out.log(line);
-        if (reportFile) out.log(`Full report written to ${reportFile}`);
     };
 
     if (dryRun) {

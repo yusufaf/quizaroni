@@ -85,20 +85,29 @@ function readJson(file: string): Record<string, unknown> {
     }
 }
 
-function parseLine(file: string, line: string): Record<string, unknown> {
+type Line = { n: number; text: string };
+
+function parseLine(file: string, line: Line): Record<string, unknown> {
+    let value: unknown;
     try {
-        const value: unknown = JSON.parse(line);
-        if (value !== null && typeof value === 'object') {
-            return value as Record<string, unknown>;
-        }
-    } catch {
-        // reported below
+        value = JSON.parse(line.text);
+    } catch (err) {
+        throw new ImportInputError(
+            `${file} line ${line.n}: ${(err as Error).message}`
+        );
     }
-    throw new ImportInputError(`${file}: not a JSON object line`);
+    if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+        throw new ImportInputError(`${file} line ${line.n}: not a JSON object`);
+    }
+    return value as Record<string, unknown>;
 }
 
-function jsonLines(text: string): string[] {
-    return text.split('\n').filter((line) => line.trim() !== '');
+// Non-blank lines with their 1-based line numbers, for error messages.
+function jsonLines(text: string): Line[] {
+    return text
+        .split('\n')
+        .map((t, i) => ({ n: i + 1, text: t }))
+        .filter((line) => line.text.trim() !== '');
 }
 
 /** Reads the full exports of the main and users tables found under root. */
@@ -147,14 +156,16 @@ export function readDynamoExports(root: string): DynamoExports {
                 typeof entry.itemCount !== 'number' ||
                 typeof entry.dataFileS3Key !== 'string'
             ) {
-                throw new ImportInputError(`${manifestFile}: not a manifest line`);
+                throw new ImportInputError(
+                    `${manifestFile} line ${line.n}: not a manifest line`
+                );
             }
             const dataFile = join(dir, 'data', basename(entry.dataFileS3Key));
             if (!existsSync(dataFile)) {
                 throw new ImportInputError(`Data file ${dataFile} is missing`);
             }
             // AWS writes an empty file for an empty partition, which gunzip rejects.
-            let lines: string[] = [];
+            let lines: Line[] = [];
             if (statSync(dataFile).size > 0) {
                 try {
                     lines = jsonLines(
@@ -178,7 +189,7 @@ export function readDynamoExports(root: string): DynamoExports {
                     typeof parsed.Item !== 'object' ||
                     Array.isArray(parsed.Item)
                 ) {
-                    throw new ImportInputError(`${dataFile}: a line has no Item`);
+                    throw new ImportInputError(`${dataFile} line ${l.n}: no Item`);
                 }
                 items.push(fromDynamoMap(parsed.Item, ctx));
             }

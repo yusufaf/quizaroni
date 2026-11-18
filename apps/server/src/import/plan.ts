@@ -20,7 +20,7 @@ import {
 import type { DynamoItem } from './dynamodb';
 import { ImportInputError } from './errors';
 import { credentialOf, type LogtoUser, socialAccountsOf } from './logto';
-import { isUnsafeS3Key } from './s3';
+import { isUnsafeS3Key } from './keys';
 
 export type Probe = (
     s3Key: string
@@ -176,6 +176,7 @@ export function planImport(
     const emailOf = new Map<string, string | undefined>();
     const skipOf = new Map<string, string | undefined>();
     const byEmail = new Map<string, string[]>();
+    const skippedByEmail = new Map<string, string[]>();
     for (const u of candidates) {
         const email = u.primary_email ? normalizeEmail(u.primary_email) : undefined;
         emailOf.set(u.id, email);
@@ -191,6 +192,7 @@ export function planImport(
         skipOf.set(u.id, skip);
         // Only users that would otherwise be imported can collide on an email.
         if (email && !skip) byEmail.set(email, [...(byEmail.get(email) ?? []), u.id]);
+        else if (email) skippedByEmail.set(email, [...(skippedByEmail.get(email) ?? []), u.id]);
     }
 
     const skipped = new Set<string>();
@@ -216,6 +218,9 @@ export function planImport(
             );
             continue;
         }
+        // Imported, but a skipped account also had this email: worth a look.
+        const shared = email ? skippedByEmail.get(email) : undefined;
+        if (shared) c.flag('email_shared_with_skipped_user', u.id, shared.join(', '));
         const row = dynamoUsers.get(u.id) ?? {};
         const created = parseDate(u.created_at) ?? now;
         const updated = parseDate(u.updated_at) ?? created;

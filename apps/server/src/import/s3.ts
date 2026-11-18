@@ -1,15 +1,8 @@
 import { closeSync, openSync, readdirSync, readSync, statSync } from 'node:fs';
 import { join, relative, resolve, sep } from 'node:path';
 import { SNIFF_BYTES } from '../files/sniff';
+import { isUnsafeS3Key } from './keys';
 import type { Probe } from './plan';
-
-/** A key that could leave the sync folder, or isn't a plain relative path. */
-export function isUnsafeS3Key(key: string): boolean {
-    return (
-        /[\\\0]/.test(key) ||
-        key.split('/').some((p) => p === '' || p === '.' || p === '..')
-    );
-}
 
 /** The local path of an S3 key inside an `aws s3 sync` folder, if it stays inside. */
 export function syncPath(root: string, key: string): string | undefined {

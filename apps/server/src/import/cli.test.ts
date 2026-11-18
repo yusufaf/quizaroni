@@ -4,6 +4,7 @@ import {
     mkdirSync,
     mkdtempSync,
     readdirSync,
+    readFileSync,
     rmSync,
     writeFileSync,
 } from 'node:fs';
@@ -310,6 +311,16 @@ test('an unwritable --report fails before the data dir is touched', async () => 
     expect(r.code).toBe(1);
     expect(r.err).toContain('Could not write the report');
     expect(existsSync(f.dataDir)).toBe(false);
+});
+
+test('a refused run does not overwrite an earlier report', async () => {
+    const f = fixture();
+    const report = join(f.root, 'report.json');
+    expect((await run([...f.argv, '--report', report])).code).toBe(0);
+    writeFileSync(report, 'earlier');
+    const again = await run([...f.argv, '--report', report]);
+    expect(again.code).toBe(1);
+    expect(readFileSync(report, 'utf8')).toBe('earlier');
 });
 
 test('missing inputs are a usage error', async () => {

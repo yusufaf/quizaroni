@@ -117,7 +117,11 @@ describe('users', () => {
             logto({ id: 'b', primary_email: 'A@x.com' }),
         ]);
         expect(p.users.map((u) => u.user.id)).toEqual(['b']);
-        expect(kinds(p)).toEqual(['suspended_user']);
+        expect(p.report.anomalies).toContainEqual({
+            kind: 'email_shared_with_skipped_user',
+            id: 'b',
+            detail: 'a',
+        });
     });
 
     test('a NOCASE duplicate username is dropped from the later user', () => {

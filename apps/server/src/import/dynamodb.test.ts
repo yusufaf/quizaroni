@@ -181,6 +181,16 @@ describe('readDynamoExports', () => {
         expect(() => readDynamoExports(r)).toThrow(ImportInputError);
     });
 
+    test('a bad data line is reported with its line number', () => {
+        const r = tempRoot();
+        const dir = writeDynamoExport(r, MAIN, [], {
+            lines: ['{"Item":{"PK":{"S":"a"}}}', '{oops'],
+        });
+        writeDynamoExport(r, USERS, []);
+        expect(() => readDynamoExports(r)).toThrow(/line 2/);
+        expect(dir).toBeDefined();
+    });
+
     test('two main exports are refused', () => {
         const r = tempRoot();
         writeDynamoExport(r, MAIN, [], { exportId: 'one' });
