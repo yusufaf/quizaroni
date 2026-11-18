@@ -343,6 +343,14 @@ test('a refused run does not overwrite an earlier report', async () => {
     expect(readFileSync(report, 'utf8')).toBe('earlier');
 });
 
+test('a --report path that is a folder fails before the data dir is touched', async () => {
+    const f = fixture();
+    const r = await run([...f.argv, '--report', f.root]);
+    expect(r.code).toBe(1);
+    expect(r.err).toContain('it is a folder');
+    expect(existsSync(f.dataDir)).toBe(false);
+});
+
 test('missing inputs are a usage error', async () => {
     const r = await run(['--dry-run']);
     expect(r.code).toBe(1);

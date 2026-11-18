@@ -1,4 +1,6 @@
 import {
+    accessSync,
+    constants,
     existsSync,
     readdirSync,
     rmSync,
@@ -54,11 +56,20 @@ const CONSOLE: Output = {
     error: (line) => console.error(line),
 };
 
-function isDirectory(dir: string): boolean {
+// Why the report can't be written there, checked without creating or touching it.
+function unwritable(file: string): string | undefined {
     try {
-        return statSync(dir).isDirectory();
-    } catch {
-        return false;
+        if (!statSync(dirname(file)).isDirectory()) {
+            return `${dirname(file)} is not a folder`;
+        }
+        accessSync(dirname(file), constants.W_OK);
+        if (existsSync(file)) {
+            if (statSync(file).isDirectory()) return 'it is a folder';
+            accessSync(file, constants.W_OK);
+        }
+        return undefined;
+    } catch (err) {
+        return (err as Error).message;
     }
 }
 
@@ -156,9 +167,10 @@ export async function runImport(
     // only once the run succeeds, so a report never describes a refused or
     // undone import (or overwrites the report of an earlier one).
     const reportFile = path('report');
-    if (reportFile && !isDirectory(dirname(reportFile))) {
+    const reportProblem = reportFile ? unwritable(reportFile) : undefined;
+    if (reportFile && reportProblem) {
         out.error(
-            `Could not write the report to ${reportFile}: ${dirname(reportFile)} is not a folder`
+            `Could not write the report to ${reportFile}: ${reportProblem}`
         );
         return 1;
     }
@@ -170,7 +182,7 @@ export async function runImport(
             out.log(`Full report written to ${reportFile}`);
         } catch (err) {
             out.error(
-                `Could not write the report to ${reportFile}: ${(err as Error).message}`
+                `Could not write the report to ${reportFile}: ${(err as Error).message}. Rerun with --dry-run --report <file> and the same inputs to get it.`
             );
         }
     };

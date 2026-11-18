@@ -126,6 +126,10 @@ describe('users', () => {
             logto({ id: 'b', primary_email: 'A@x.com' }),
         ]);
         expect(p.users.map((u) => u.user.id)).toEqual(['b']);
+        expect(kinds(p).sort()).toEqual([
+            'email_shared_with_skipped_user',
+            'suspended_user',
+        ]);
         expect(p.report.anomalies).toContainEqual({
             kind: 'email_shared_with_skipped_user',
             id: 'b',
