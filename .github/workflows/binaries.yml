@@ -143,6 +143,15 @@ jobs:
           docker compose logs quizaroni | grep -F 'Data directory: /data'
           owner=$(docker run --rm -v quizaroni_quizaroni-data:/data busybox:1.37@sha256:a7dbc319b1438115a207e11930dc4bb3e643dcb3ec0bdd694bb36cd8fad289ec stat -c %u /data/quizaroni.db)
           test "$owner" = 65532 || { echo "::error::/data/quizaroni.db is owned by uid $owner, expected 65532"; exit 1; }
+      # Moderation runs via exec against the server's own /data DB. An unknown id
+      # proves the exec path, QZ_DATA_DIR and the embedded schema check without
+      # changing anything; the binary smoke test covers real writes.
+      - name: Run a moderation command in the container
+        run: |
+          if out=$(docker compose exec -T quizaroni /usr/local/bin/quizaroni unpublish 00000000-0000-4000-8000-000000000000 2>&1); then
+            echo "::error::expected exit 1"; echo "$out"; exit 1
+          fi
+          echo "$out" | grep -F 'No study set 00000000-0000-4000-8000-000000000000 in /data'
       - name: Logs and teardown
         if: always()
         run: |

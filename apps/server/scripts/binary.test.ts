@@ -233,6 +233,81 @@ describe.skipIf(!BINARY)('standalone binary', () => {
         expect(await healthcheck(port)).toBe(1);
     }, 60_000);
 
+    test('moderation subcommands run alongside the server', async () => {
+        const dataDir = join(tmp, 'moderation data');
+        const email = 'admin@example.com';
+        const password = 'correct-horse-1';
+        const server = run(['--open-browser', 'false', '--data-dir', dataDir], {
+            QZ_ADMIN_EMAIL: email,
+            QZ_ADMIN_PASSWORD: password,
+        });
+        try {
+            const [, url, publicUrl] = await server.waitFor(LISTENING);
+            let cookie = '';
+            const post = async (path: string, body: unknown) => {
+                const res = await fetch(`${url}${path}`, {
+                    method: 'POST',
+                    headers: {
+                        Origin: publicUrl ?? '',
+                        'Content-Type': 'application/json',
+                        ...(cookie ? { Cookie: cookie } : {}),
+                    },
+                    body: JSON.stringify(body),
+                });
+                expect(res.status).toBe(200);
+                return res;
+            };
+            const signIn = await post('/api/auth/sign-in/email', {
+                email,
+                password,
+            });
+            cookie = signIn.headers
+                .getSetCookie()
+                .map((c) => c.split(';')[0])
+                .join('; ');
+            const created = (await (
+                await post('/api/studysets/create-studyset', {})
+            ).json()) as { studyset: { studysetUUID: string } };
+            const id = created.studyset.studysetUUID;
+            await post('/api/studysets/update-studyset', {
+                studysetUUID: id,
+                updates: {
+                    title: 'Cells',
+                    cards: Array.from({ length: 4 }, (_, i) => ({
+                        cardUUID: `c${i}`,
+                        term: `term ${i}`,
+                        definition: `definition ${i}`,
+                    })),
+                },
+            });
+            await post('/api/studysets/publish-studyset', {
+                studysetUUID: id,
+                subject: 'science',
+            });
+
+            const moderate = (command: string) =>
+                Bun.spawn([binary, command, id, '--data-dir', dataDir], {
+                    cwd,
+                    env,
+                    stdout: 'ignore',
+                    stderr: 'ignore',
+                }).exited;
+            const ids = async (query = '') =>
+                (
+                    (await (
+                        await fetch(`${url}/api/public/explore${query}`)
+                    ).json()) as { items: { studysetUUID: string }[] }
+                ).items.map((i) => i.studysetUUID);
+
+            expect(await moderate('feature')).toBe(0);
+            expect(await ids('?featured=1')).toContain(id);
+            expect(await moderate('unpublish')).toBe(0);
+            expect(await ids()).not.toContain(id);
+        } finally {
+            await server.stop();
+        }
+    }, 60_000);
+
     test('upgrades an existing DB', async () => {
         const dataDir = join(tmp, 'old db dir');
         mkdirSync(dataDir);

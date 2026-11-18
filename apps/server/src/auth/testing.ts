@@ -26,10 +26,12 @@ export function testAuth(
 // Better Auth's memory rate-limit store is shared by the whole process, so
 // each test needs its own client IP.
 let ipCounter = 0;
+// 198.18.0.0/15 (RFC 2544, reserved for testing) holds 131,072 addresses, so the
+// whole suite never reuses one; it also stays clear of the TEST-NET addresses the
+// client-IP tests write by hand.
 export function nextTestIp(): string {
     ipCounter++;
-    const block = ipCounter <= 250 ? '203.0.113' : '198.51.100';
-    return `${block}.${(ipCounter % 250) + 1}`;
+    return `198.${18 + (ipCounter >> 16)}.${(ipCounter >> 8) & 255}.${ipCounter & 255}`;
 }
 
 // A Bun server env for app.request(). Like Bun, it knows the address only for

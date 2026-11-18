@@ -6,6 +6,7 @@ import pkg from '../package.json';
 import { createApp } from './app';
 import { createAuth, lazyAuth, scrubAuthEnv } from './auth/auth';
 import {
+    type ConfigDefaults,
     ConfigError,
     cookieWarning,
     hasAdminEnv,
@@ -24,6 +25,7 @@ import { binaryDataDir, openBrowser } from './launcher';
 import { describeSmtp, parseSmtpConfig, type SmtpConfig } from './mail/config';
 import { Mailer } from './mail/mailer';
 import { smtpTransport } from './mail/smtp';
+import { isModerationCommand, runModeration } from './moderation/cli';
 import { ensureAuthSecret, getSetting, SETTING } from './settings';
 import {
     bootstrapAdmin,
@@ -46,34 +48,39 @@ if (argv[0] === 'healthcheck') {
     );
 }
 
+const bundle = embeddedBundle();
+const defaults: ConfigDefaults | undefined = bundle
+    ? {
+          dataDir: binaryDataDir({
+              execPath: process.execPath,
+              platform: process.platform,
+              env: process.env,
+              home: homedir(),
+              exists: existsSync,
+          }),
+          webDir: undefined,
+          openBrowser: true,
+      }
+    : undefined;
+
+if (isModerationCommand(argv[0])) {
+    process.exit(
+        runModeration(argv[0], argv.slice(1), process.env, process.cwd(), {
+            defaults,
+            migrations: bundle?.migrations,
+        })
+    );
+}
+
 if (argv.includes('--help')) {
     console.log(USAGE);
     process.exit(0);
 }
 
-const bundle = embeddedBundle();
-
 let config: ServerConfig;
 let smtp: SmtpConfig | undefined;
 try {
-    config = loadConfig(
-        argv,
-        process.env,
-        process.cwd(),
-        bundle
-            ? {
-                  dataDir: binaryDataDir({
-                      execPath: process.execPath,
-                      platform: process.platform,
-                      env: process.env,
-                      home: homedir(),
-                      exists: existsSync,
-                  }),
-                  webDir: undefined,
-                  openBrowser: true,
-              }
-            : undefined
-    );
+    config = loadConfig(argv, process.env, process.cwd(), defaults);
     smtp = parseSmtpConfig(process.env);
 } catch (err) {
     if (!(err instanceof ConfigError)) throw err;

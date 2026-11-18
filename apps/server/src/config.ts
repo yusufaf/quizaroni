@@ -38,6 +38,10 @@ export const USAGE = `Usage: quizaroni-server [command] [options]
 
 Commands:
   healthcheck          Exit 0 if the server on --host/--port (QZ_HOST/QZ_PORT) reports healthy, else 1
+  feature <set>        Feature a public set on Explore (--clear to unfeature)
+  hide <set>           Take a set down: off Explore and its link, and its owner can't republish it (--clear to undo)
+  unpublish <set>      Take a set off Explore; its owner can publish it again
+                       <set> is a study set id or its /view/ link; run "<command> --help" for details
 
 Options (each can also be set with the QZ_* environment variable shown):
   --data-dir <path>    Directory for the database and all stored files (QZ_DATA_DIR, default ./data; the standalone binary uses a quizaroni-data folder next to it if one exists, else the OS app-data folder)
@@ -294,6 +298,18 @@ export function parseAdminBootstrap(
     };
 }
 
+// The one rule for where the data lives (flag > QZ_DATA_DIR > default), shared by
+// the server and the tools that open its DB without needing the rest of the config.
+export function resolveDataDir(
+    flag: string | undefined,
+    env: Record<string, string | undefined>,
+    cwd: string,
+    defaults: ConfigDefaults = DEV_DEFAULTS
+): string {
+    if (flag === '') throw new ConfigError('--data-dir must not be empty');
+    return resolve(cwd, flag ?? (env[ENV_NAMES['data-dir']] || defaults.dataDir));
+}
+
 export function loadConfig(
     argv: string[],
     env: Record<string, string | undefined>,
@@ -328,7 +344,7 @@ export function loadConfig(
     const openBrowser = setting('open-browser');
 
     return {
-        dataDir: resolve(cwd, setting('data-dir')?.value ?? defaults.dataDir),
+        dataDir: resolveDataDir(flags['data-dir'], env, cwd, defaults),
         port,
         host,
         publicUrl,
