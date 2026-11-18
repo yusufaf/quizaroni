@@ -124,6 +124,19 @@ export function openExistingDatabase(
     }
 }
 
+/** A migrated, throwaway DB: what a dry run writes into to hit the real constraints. */
+export function openMemoryDatabase(
+    migrations: readonly Migration[] = readMigrationsFolder(
+        DEFAULT_MIGRATIONS_FOLDER
+    )
+): { sqlite: Database; db: Db } {
+    const sqlite = new Database(':memory:', { strict: true });
+    sqlite.run('PRAGMA foreign_keys = ON');
+    const db = drizzle({ client: sqlite, schema });
+    applyMigrations(db, migrations);
+    return { sqlite, db };
+}
+
 // A plain close() leaves the file handle open on Windows once Drizzle has prepared
 // statements, so the data dir can't be removed; close(true) finalizes them first.
 export function closeDatabase(sqlite: Database): void {
