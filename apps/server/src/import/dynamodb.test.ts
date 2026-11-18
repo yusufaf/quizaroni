@@ -170,10 +170,32 @@ describe('readDynamoExports', () => {
     });
 
     test.each([
-        ['a corrupt gzip', (dir: string) => writeFileSync(join(dir, 'data', 'part-0.json.gz'), 'not gzip')],
-        ['a bad manifest line', (dir: string) => writeFileSync(join(dir, 'manifest-files.json'), '{oops\n')],
-        ['a bad data line', (dir: string) => writeFileSync(join(dir, 'data', 'part-0.json.gz'), gzipSync('{oops\n'))],
-        ['a line with no Item', (dir: string) => writeFileSync(join(dir, 'data', 'part-0.json.gz'), gzipSync('{}\n'))],
+        [
+            'a corrupt gzip',
+            (dir: string) =>
+                writeFileSync(join(dir, 'data', 'part-0.json.gz'), 'not gzip'),
+        ],
+        [
+            'a bad manifest line',
+            (dir: string) =>
+                writeFileSync(join(dir, 'manifest-files.json'), '{oops\n'),
+        ],
+        [
+            'a bad data line',
+            (dir: string) =>
+                writeFileSync(
+                    join(dir, 'data', 'part-0.json.gz'),
+                    gzipSync('{oops\n')
+                ),
+        ],
+        [
+            'a line with no Item',
+            (dir: string) =>
+                writeFileSync(
+                    join(dir, 'data', 'part-0.json.gz'),
+                    gzipSync('{}\n')
+                ),
+        ],
     ])('%s is an input error', (_name, corrupt) => {
         const r = tempRoot();
         corrupt(writeDynamoExport(r, MAIN, [{ PK: 'p', SK: 's' }]));

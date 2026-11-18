@@ -164,7 +164,9 @@ export function runClaimLinks(
     const daysText = typeof values.days === 'string' ? values.days : '7';
     const days = /^\d+$/.test(daysText) ? Number(daysText) : Number.NaN;
     if (!(days >= 1 && days <= 30)) {
-        return usageError(`--days must be a whole number from 1 to 30 (got "${daysText}")`);
+        return usageError(
+            `--days must be a whole number from 1 to 30 (got "${daysText}")`
+        );
     }
 
     let dataDir: string;
@@ -207,12 +209,23 @@ export function runClaimLinks(
             );
             return 1;
         }
-        const links = claimLinks(opened.db, publicUrl, o.now ?? new Date(), days);
+        const links = claimLinks(
+            opened.db,
+            publicUrl,
+            o.now ?? new Date(),
+            days
+        );
         if (values.csv) {
             out.log('email,name,username,link,expires_at');
             for (const l of links) {
                 out.log(
-                    [l.email, l.name, l.username, l.link, l.expiresAt.toISOString()]
+                    [
+                        l.email,
+                        l.name,
+                        l.username,
+                        l.link,
+                        l.expiresAt.toISOString(),
+                    ]
                         .map(csvCell)
                         .join(',')
                 );

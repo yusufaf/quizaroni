@@ -43,7 +43,8 @@ export function listSyncKeys(root: string): string[] {
         for (const entry of readdirSync(dir, { withFileTypes: true })) {
             const full = join(dir, entry.name);
             if (entry.isDirectory()) walk(full);
-            else if (entry.isFile()) out.push(relative(base, full).split(sep).join('/'));
+            else if (entry.isFile())
+                out.push(relative(base, full).split(sep).join('/'));
         }
     };
     walk(base);

@@ -34,7 +34,11 @@ function probeOf(files: Record<string, Uint8Array>): Probe {
     return (key) => {
         const bytes = files[key];
         return bytes
-            ? { path: `/s3/${key}`, size: bytes.length, head: bytes.slice(0, 16) }
+            ? {
+                  path: `/s3/${key}`,
+                  size: bytes.length,
+                  head: bytes.slice(0, 16),
+              }
             : undefined;
     };
 }
@@ -61,7 +65,8 @@ function plan(
         {
             probe: probeOf(o.files ?? {}),
             admin: o.admin,
-            newId: () => `00000000-0000-4000-8000-${String(++counter).padStart(12, '0')}`,
+            newId: () =>
+                `00000000-0000-4000-8000-${String(++counter).padStart(12, '0')}`,
         }
     );
 }
@@ -105,9 +110,13 @@ describe('users', () => {
             { main: [set('a'), set('b', OTHER)] }
         );
         expect(p.users).toEqual([]);
-        const dup = p.report.anomalies.filter((a) => a.kind === 'duplicate_email');
+        const dup = p.report.anomalies.filter(
+            (a) => a.kind === 'duplicate_email'
+        );
         expect(dup.map((a) => a.id).sort()).toEqual(['a', 'b']);
-        expect(dup.find((a) => a.id === 'a')?.detail).toContain('same email as b');
+        expect(dup.find((a) => a.id === 'a')?.detail).toContain(
+            'same email as b'
+        );
         expect(p.report.counts.skipped_user_set).toBe(2);
     });
 
@@ -126,8 +135,16 @@ describe('users', () => {
 
     test('a NOCASE duplicate username is dropped from the later user', () => {
         const p = plan([
-            logto({ id: 'a', username: 'Ann', created_at: '2026-01-01T00:00:00Z' }),
-            logto({ id: 'b', username: 'ann', created_at: '2026-01-02T00:00:00Z' }),
+            logto({
+                id: 'a',
+                username: 'Ann',
+                created_at: '2026-01-01T00:00:00Z',
+            }),
+            logto({
+                id: 'b',
+                username: 'ann',
+                created_at: '2026-01-02T00:00:00Z',
+            }),
         ]);
         expect(p.users.map((u) => u.profile.username)).toEqual(['Ann', null]);
         expect(kinds(p)).toContain('duplicate_username');
@@ -145,7 +162,13 @@ describe('users', () => {
             logto({ id: 'b' }),
         ]);
         const a = p.users.find((u) => u.user.id === 'a');
-        expect(a?.accounts.map((x) => [x.providerId, x.accountId, x.password ?? null])).toEqual([
+        expect(
+            a?.accounts.map((x) => [
+                x.providerId,
+                x.accountId,
+                x.password ?? null,
+            ])
+        ).toEqual([
             ['credential', 'a', ARGON2I],
             ['google', 'g1', null],
         ]);
@@ -155,7 +178,9 @@ describe('users', () => {
     });
 
     test('--admin promotes one user; an unknown admin is an input error', () => {
-        const p = plan([logto({ id: 'a' }), logto({ id: 'b' })], { admin: 'B@x.com' });
+        const p = plan([logto({ id: 'a' }), logto({ id: 'b' })], {
+            admin: 'B@x.com',
+        });
         expect(p.users.map((u) => [u.user.id, u.user.role])).toEqual([
             ['a', 'user'],
             ['b', 'admin'],
@@ -171,14 +196,19 @@ describe('users', () => {
         const p = plan([logto({ id: 'a' })], {
             dynamoUsers: [dynamoUser('a', { metadata: deep })],
         });
-        expect(p.users[0]?.profile.metadata).toMatchObject({ defaultTheme: 'dark' });
+        expect(p.users[0]?.profile.metadata).toMatchObject({
+            defaultTheme: 'dark',
+        });
         expect(kinds(p)).toContain('bad_user_metadata');
     });
 
     describe('avatars', () => {
         const url = (key: string) =>
             `https://bucket.s3.amazonaws.com/${key}?X-Amz-Signature=x`;
-        const withAvatar = (value: unknown, files: Record<string, Uint8Array>) =>
+        const withAvatar = (
+            value: unknown,
+            files: Record<string, Uint8Array>
+        ) =>
             plan([logto({ id: 'a' })], {
                 dynamoUsers: [dynamoUser('a', { metadata: { avatar: value } })],
                 files,
@@ -189,27 +219,46 @@ describe('users', () => {
                 { type: 'upload', value: url('profile-pictures/a/1.png') },
                 { 'profile-pictures/a/1.png': PNG_BYTES }
             );
-            const avatar = p.users[0]?.profile.metadata as { avatar: { value: string } };
+            const avatar = p.users[0]?.profile.metadata as {
+                avatar: { value: string };
+            };
             expect(avatar.avatar.value).toMatch(/^\/api\/files\/avatars\/a\//);
             expect(p.copies).toEqual([
-                { from: '/s3/profile-pictures/a/1.png', to: expect.stringMatching(/^avatars\/a\//) },
+                {
+                    from: '/s3/profile-pictures/a/1.png',
+                    to: expect.stringMatching(/^avatars\/a\//),
+                },
             ]);
         });
 
         test.each([
-            ['a file that is not an image', 'profile-pictures/a/1.png', new Uint8Array([1, 2, 3])],
+            [
+                'a file that is not an image',
+                'profile-pictures/a/1.png',
+                new Uint8Array([1, 2, 3]),
+            ],
             ["another user's key", 'profile-pictures/b/1.png', PNG_BYTES],
         ])('drops %s', (_name, key, bytes) => {
-            const p = withAvatar({ type: 'upload', value: url(key) }, { [key]: bytes });
-            expect((p.users[0]?.profile.metadata as JsonLike).avatar).toBeUndefined();
+            const p = withAvatar(
+                { type: 'upload', value: url(key) },
+                { [key]: bytes }
+            );
+            expect(
+                (p.users[0]?.profile.metadata as JsonLike).avatar
+            ).toBeUndefined();
             expect(kinds(p)).toContain('avatar_dropped');
             expect(p.copies).toEqual([]);
         });
 
         test('a preset avatar is kept', () => {
-            const value = { type: 'dicebear', value: 'data:image/svg+xml;base64,PHN2Zy8+' };
+            const value = {
+                type: 'dicebear',
+                value: 'data:image/svg+xml;base64,PHN2Zy8+',
+            };
             const p = withAvatar(value, {});
-            expect((p.users[0]?.profile.metadata as JsonLike).avatar).toEqual(value);
+            expect((p.users[0]?.profile.metadata as JsonLike).avatar).toEqual(
+                value
+            );
         });
     });
 });
@@ -219,11 +268,34 @@ type JsonLike = Record<string, unknown>;
 describe('mapPublishState', () => {
     const at = new Date(T);
     test.each([
-        ['listed', { SK2: 'studyset#x', metadata: { publiclyViewable: true }, publishedAt: T }, { isPublic: true, hiddenAt: null }],
-        ['unpublished', { metadata: { publiclyViewable: true }, publishedAt: T }, { isPublic: false }],
-        ['hidden', { SK2: 'studyset#x', metadata: { publiclyViewable: true }, publishedAt: T, moderation: { hiddenAt: T } }, { isPublic: false, hiddenAt: at }],
+        [
+            'listed',
+            {
+                SK2: 'studyset#x',
+                metadata: { publiclyViewable: true },
+                publishedAt: T,
+            },
+            { isPublic: true, hiddenAt: null },
+        ],
+        [
+            'unpublished',
+            { metadata: { publiclyViewable: true }, publishedAt: T },
+            { isPublic: false },
+        ],
+        [
+            'hidden',
+            {
+                SK2: 'studyset#x',
+                metadata: { publiclyViewable: true },
+                publishedAt: T,
+                moderation: { hiddenAt: T },
+            },
+            { isPublic: false, hiddenAt: at },
+        ],
     ])('%s', (_name, extra, expected) => {
-        expect(mapPublishState({ SK: 'studyset#x', ...extra }, at)).toMatchObject(expected);
+        expect(
+            mapPublishState({ SK: 'studyset#x', ...extra }, at)
+        ).toMatchObject(expected);
     });
 
     test('featured but not listed drops featuredAt', () => {
@@ -234,7 +306,11 @@ describe('mapPublishState', () => {
 
     test('a listed set with no publishedAt uses updatedAt', () => {
         const s = mapPublishState(
-            { SK: 'studyset#x', SK2: 'studyset#x', metadata: { publiclyViewable: true } },
+            {
+                SK: 'studyset#x',
+                SK2: 'studyset#x',
+                metadata: { publiclyViewable: true },
+            },
             at
         );
         expect(s.publishedAt).toEqual(at);
@@ -243,7 +319,13 @@ describe('mapPublishState', () => {
 
     test('a featured listed set keeps featuredAt', () => {
         const s = mapPublishState(
-            { SK: 'studyset#x', SK2: 'studyset#x', metadata: { publiclyViewable: true }, publishedAt: T, featuredAt: T },
+            {
+                SK: 'studyset#x',
+                SK2: 'studyset#x',
+                metadata: { publiclyViewable: true },
+                publishedAt: T,
+                featuredAt: T,
+            },
             at
         );
         expect(s.featuredAt).toEqual(at);
@@ -282,7 +364,9 @@ describe('sets', () => {
         ['a non-array files', [{ files: 'x' }]],
         ['a numeric key', [{ files: [{ key: 1 }] }]],
     ])('%s gives no cards', (_name, cards) => {
-        const p = plan([logto({ id: 'a' })], { main: [set('a', SET, { cards })] });
+        const p = plan([logto({ id: 'a' })], {
+            main: [set('a', SET, { cards })],
+        });
         expect(p.studysets[0]?.cards).toEqual([]);
         expect(kinds(p)).toContain('bad_cards');
     });
@@ -321,17 +405,29 @@ describe('sets', () => {
     });
 
     describe('card files', () => {
-        const withFiles = (cards: unknown[], files: Record<string, Uint8Array>) =>
-            plan([logto({ id: 'a' })], { main: [set('a', SET, { cards })], files });
+        const withFiles = (
+            cards: unknown[],
+            files: Record<string, Uint8Array>
+        ) =>
+            plan([logto({ id: 'a' })], {
+                main: [set('a', SET, { cards })],
+                files,
+            });
         const keys = (p: ReturnType<typeof plan>) =>
-            (p.studysets[0]?.cards as { files: { key: string; signedURL: string }[] }[]).map(
-                (c) => c.files[0]
-            );
+            (
+                p.studysets[0]?.cards as {
+                    files: { key: string; signedURL: string }[];
+                }[]
+            ).map((c) => c.files[0]);
 
         test('an own key is kept and copied', () => {
             const own = `${SET}/${FILE}`;
-            const p = withFiles([{ files: [{ key: own }] }], { [own]: PNG_BYTES });
-            expect(keys(p)).toEqual([{ key: own, signedURL: `/api/files/${SET}/${FILE}` }]);
+            const p = withFiles([{ files: [{ key: own }] }], {
+                [own]: PNG_BYTES,
+            });
+            expect(keys(p)).toEqual([
+                { key: own, signedURL: `/api/files/${SET}/${FILE}` },
+            ]);
             expect(p.copies).toEqual([{ from: `/s3/${own}`, to: own }]);
         });
 
@@ -339,11 +435,15 @@ describe('sets', () => {
             ['legacy', `${SET}/user/photo.png`],
             ['foreign', `${OTHER}/${FILE}`],
         ])('a %s key is rekeyed under the set', (_name, oldKey) => {
-            const p = withFiles([{ files: [{ key: oldKey }] }], { [oldKey]: PNG_BYTES });
+            const p = withFiles([{ files: [{ key: oldKey }] }], {
+                [oldKey]: PNG_BYTES,
+            });
             const [file] = keys(p);
             expect(file?.key.startsWith(`${SET}/`)).toBe(true);
             expect(file?.key).not.toBe(oldKey);
-            expect(p.copies).toEqual([{ from: `/s3/${oldKey}`, to: file?.key ?? "" }]);
+            expect(p.copies).toEqual([
+                { from: `/s3/${oldKey}`, to: file?.key ?? '' },
+            ]);
             expect(p.report.counts.files_rekeyed).toBe(1);
         });
 
@@ -362,7 +462,11 @@ describe('sets', () => {
                     logto: [logto({ id: 'a' })],
                     dynamo: {
                         users: [dynamoUser('a')],
-                        main: [set('a', SET, { cards: [{ files: [{ key: `${SET}/../x` }] }] })],
+                        main: [
+                            set('a', SET, {
+                                cards: [{ files: [{ key: `${SET}/../x` }] }],
+                            }),
+                        ],
                     },
                 },
                 {
@@ -373,17 +477,18 @@ describe('sets', () => {
                 }
             );
             expect(probed).toBe(false);
-            expect(p.report.anomalies.map((a) => a.kind)).toEqual(['unsafe_file_key']);
+            expect(p.report.anomalies.map((a) => a.kind)).toEqual([
+                'unsafe_file_key',
+            ]);
         });
 
         test.each([
             ['own', `${SET}/${FILE}`],
             ['legacy', `${SET}/user/photo.png`],
         ])('two cards sharing one %s key give one copy', (_name, key) => {
-            const p = withFiles(
-                [{ files: [{ key }] }, { files: [{ key }] }],
-                { [key]: PNG_BYTES }
-            );
+            const p = withFiles([{ files: [{ key }] }, { files: [{ key }] }], {
+                [key]: PNG_BYTES,
+            });
             const [a, b] = keys(p);
             expect(a).toEqual(b);
             expect(p.copies).toHaveLength(1);
@@ -391,7 +496,10 @@ describe('sets', () => {
 
         test('two cards sharing a missing key give one anomaly', () => {
             const key = `${SET}/user/gone.png`;
-            const p = withFiles([{ files: [{ key }] }, { files: [{ key }] }], {});
+            const p = withFiles(
+                [{ files: [{ key }] }, { files: [{ key }] }],
+                {}
+            );
             expect(kinds(p)).toEqual(['missing_file']);
         });
     });

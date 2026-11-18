@@ -63,13 +63,16 @@ class Collector {
         this.counts[key] = (this.counts[key] ?? 0) + by;
     }
     flag(kind: string, id: string, detail?: string): void {
-        this.anomalies.push(detail === undefined ? { kind, id } : { kind, id, detail });
+        this.anomalies.push(
+            detail === undefined ? { kind, id } : { kind, id, detail }
+        );
         this.count(`anomaly.${kind}`);
     }
 }
 
 function parseDate(value: unknown): Date | undefined {
-    if (typeof value !== 'string' && typeof value !== 'number') return undefined;
+    if (typeof value !== 'string' && typeof value !== 'number')
+        return undefined;
     const d = new Date(value);
     return Number.isNaN(d.getTime()) ? undefined : d;
 }
@@ -90,11 +93,15 @@ export type PublishState = {
 
 // The hosted listed rule (isPubliclyListed) is SK === SK2 && publiclyViewable &&
 // not hidden. Self-host keeps the same facts as isPublic/publishedAt/hiddenAt.
-export function mapPublishState(item: DynamoItem, updatedAt: Date): PublishState {
+export function mapPublishState(
+    item: DynamoItem,
+    updatedAt: Date
+): PublishState {
     const anomalies: string[] = [];
     const moderation = isPlainObject(item.moderation) ? item.moderation : {};
     const hiddenAt = parseDate(moderation.hiddenAt) ?? null;
-    if (moderation.reason !== undefined) anomalies.push('moderation_reason_dropped');
+    if (moderation.reason !== undefined)
+        anomalies.push('moderation_reason_dropped');
     const metadata = isPlainObject(item.metadata) ? item.metadata : {};
     const viewable = metadata.publiclyViewable === true;
     const indexed = typeof item.SK2 === 'string' && item.SK2 === item.SK;
@@ -133,7 +140,10 @@ function avatarS3Key(value: unknown): string | undefined {
 }
 
 export function planImport(
-    src: { logto: LogtoUser[]; dynamo: { main: DynamoItem[]; users: DynamoItem[] } },
+    src: {
+        logto: LogtoUser[];
+        dynamo: { main: DynamoItem[]; users: DynamoItem[] };
+    },
     o: { admin?: string; probe: Probe; newId?: () => string; now?: Date }
 ): ImportPlan {
     const c = new Collector();
@@ -155,7 +165,10 @@ export function planImport(
     const setCount = new Map<string, number>();
     for (const item of src.dynamo.main) {
         const pk = typeof item.PK === 'string' ? item.PK : '';
-        if (pk.startsWith('userUUID#') && String(item.SK).startsWith('studyset#')) {
+        if (
+            pk.startsWith('userUUID#') &&
+            String(item.SK).startsWith('studyset#')
+        ) {
             const owner = pk.slice('userUUID#'.length);
             setCount.set(owner, (setCount.get(owner) ?? 0) + 1);
         }
@@ -165,11 +178,14 @@ export function planImport(
     c.count('logto_users', src.logto.length);
     const logtoIds = new Set(src.logto.map((u) => u.id));
     for (const id of dynamoUsers.keys()) {
-        if (!logtoIds.has(id)) c.flag('dynamo_user_without_logto', id, sets(id));
+        if (!logtoIds.has(id))
+            c.flag('dynamo_user_without_logto', id, sets(id));
     }
     const candidates = src.logto
         .filter((u) => dynamoUsers.has(u.id))
-        .sort((a, b) => String(a.created_at).localeCompare(String(b.created_at)));
+        .sort((a, b) =>
+            String(a.created_at).localeCompare(String(b.created_at))
+        );
     c.count('quizaroni_users', candidates.length);
     c.count('logto_only_users', src.logto.length - candidates.length);
 
@@ -178,7 +194,9 @@ export function planImport(
     const byEmail = new Map<string, string[]>();
     const skippedByEmail = new Map<string, string[]>();
     for (const u of candidates) {
-        const email = u.primary_email ? normalizeEmail(u.primary_email) : undefined;
+        const email = u.primary_email
+            ? normalizeEmail(u.primary_email)
+            : undefined;
         emailOf.set(u.id, email);
         const skip = !USER_ID.test(u.id)
             ? 'invalid_user_id'
@@ -191,21 +209,30 @@ export function planImport(
                   : undefined;
         skipOf.set(u.id, skip);
         // Only users that would otherwise be imported can collide on an email.
-        if (email && !skip) byEmail.set(email, [...(byEmail.get(email) ?? []), u.id]);
-        else if (email) skippedByEmail.set(email, [...(skippedByEmail.get(email) ?? []), u.id]);
+        if (email && !skip)
+            byEmail.set(email, [...(byEmail.get(email) ?? []), u.id]);
+        else if (email)
+            skippedByEmail.set(email, [
+                ...(skippedByEmail.get(email) ?? []),
+                u.id,
+            ]);
     }
 
     const skipped = new Set<string>();
     const imported = new Map<string, ImportedUser>();
     const usernames = new Set<string>();
     const admin = o.admin ? normalizeEmail(o.admin) : undefined;
-    if (o.admin && !admin) throw new ImportInputError(`--admin ${o.admin} is not an email address`);
+    if (o.admin && !admin)
+        throw new ImportInputError(
+            `--admin ${o.admin} is not an email address`
+        );
 
     for (const u of candidates) {
         const email = emailOf.get(u.id);
         const group = email ? (byEmail.get(email) ?? []) : [];
         const skip =
-            skipOf.get(u.id) ?? (group.length > 1 ? 'duplicate_email' : undefined);
+            skipOf.get(u.id) ??
+            (group.length > 1 ? 'duplicate_email' : undefined);
         if (skip) {
             skipped.add(u.id);
             c.count(`skipped_users.${skip}`);
@@ -220,14 +247,16 @@ export function planImport(
         }
         // Imported, but a skipped account also had this email: worth a look.
         const shared = email ? skippedByEmail.get(email) : undefined;
-        if (shared) c.flag('email_shared_with_skipped_user', u.id, shared.join(', '));
+        if (shared)
+            c.flag('email_shared_with_skipped_user', u.id, shared.join(', '));
         const row = dynamoUsers.get(u.id) ?? {};
         const created = parseDate(u.created_at) ?? now;
         const updated = parseDate(u.updated_at) ?? created;
 
         let username: string | null = u.username ?? null;
         if (username !== null) {
-            if (!isValidUsername(username)) c.flag('invalid_username', u.id, username);
+            if (!isValidUsername(username))
+                c.flag('invalid_username', u.id, username);
             if (usernames.has(username.toLowerCase())) {
                 c.flag('duplicate_username', u.id, username);
                 username = null;
@@ -241,18 +270,23 @@ export function planImport(
             if (
                 isPlainObject(row.metadata) &&
                 isStorableValue(row.metadata) &&
-                Buffer.byteLength(JSON.stringify(row.metadata)) <= MAX_METADATA_BYTES
+                Buffer.byteLength(JSON.stringify(row.metadata)) <=
+                    MAX_METADATA_BYTES
             ) {
                 metadata = { ...row.metadata };
             } else {
                 c.flag('bad_user_metadata', u.id);
             }
         }
-        const avatar = isPlainObject(metadata.avatar) ? metadata.avatar : undefined;
+        const avatar = isPlainObject(metadata.avatar)
+            ? metadata.avatar
+            : undefined;
         if (avatar?.type === 'upload') {
             const key = avatarS3Key(avatar.value);
             const found =
-                key && !isUnsafeS3Key(key) && key.startsWith(`profile-pictures/${u.id}/`)
+                key &&
+                !isUnsafeS3Key(key) &&
+                key.startsWith(`profile-pictures/${u.id}/`)
                     ? o.probe(key)
                     : undefined;
             const type = found ? sniffContentType(found.head) : undefined;
@@ -353,7 +387,10 @@ export function planImport(
         }
         // An upsert stub (hosted isRealStudysetItem): no cards, no title.
         if (item.studysetUUID !== id) {
-            c.flag(item.labels !== undefined ? 'stub_set_labeled' : 'stub_set', id);
+            c.flag(
+                item.labels !== undefined ? 'stub_set_labeled' : 'stub_set',
+                id
+            );
             continue;
         }
         if (skipped.has(ownerId)) {
@@ -379,7 +416,8 @@ export function planImport(
         }
         const later = (field: string) => {
             const d = parseDate(item[field]);
-            if (!d && item[field] !== undefined) c.flag('bad_timestamp', id, field);
+            if (!d && item[field] !== undefined)
+                c.flag('bad_timestamp', id, field);
             return d ?? createdAt;
         };
         const updatedAt = later('updatedAt');
@@ -390,7 +428,10 @@ export function planImport(
 
         let metadata: JsonObject = { ...DEFAULT_STUDYSET_METADATA };
         if (item.metadata !== undefined) {
-            if (isPlainObject(item.metadata) && isStorableValue(item.metadata)) {
+            if (
+                isPlainObject(item.metadata) &&
+                isStorableValue(item.metadata)
+            ) {
                 metadata = { ...item.metadata };
             } else {
                 c.flag('bad_set_metadata', id);
@@ -428,8 +469,12 @@ export function planImport(
             studysetUUID: id,
             ownerId,
             username: owner.profile.username ?? null,
-            title: typeof item.title === 'string' ? item.title : 'Untitled Studyset',
-            description: typeof item.description === 'string' ? item.description : '',
+            title:
+                typeof item.title === 'string'
+                    ? item.title
+                    : 'Untitled Studyset',
+            description:
+                typeof item.description === 'string' ? item.description : '',
             favorited: item.favorited === true,
             cards,
             categories: strings(item.categories),
@@ -447,13 +492,20 @@ export function planImport(
             copiedFrom: isStudysetUUID(copiedFrom) ? copiedFrom : null,
         });
         c.count('sets_imported');
-        const listed = state.isPublic && state.publishedAt !== null && state.hiddenAt === null;
+        const listed =
+            state.isPublic &&
+            state.publishedAt !== null &&
+            state.hiddenAt === null;
         if (listed) c.count('sets_listed');
         if (state.featuredAt) c.count('sets_featured');
         if (state.hiddenAt) c.count('sets_hidden');
-        if (!state.isPublic && state.publishedAt && !state.hiddenAt) c.count('sets_published_unlisted');
+        if (!state.isPublic && state.publishedAt && !state.hiddenAt)
+            c.count('sets_published_unlisted');
     }
-    c.count('users_without_sets', [...imported.keys()].filter((id) => !owners.has(id)).length);
+    c.count(
+        'users_without_sets',
+        [...imported.keys()].filter((id) => !owners.has(id)).length
+    );
 
     return {
         users: [...imported.values()],
@@ -477,10 +529,13 @@ function planCardFiles(
     const planned = planCardFileCopies(
         cards,
         studysetUUID,
-        (key) => !(isCardFileKey(key) && studysetUUIDOfKey(key) === studysetUUID),
+        (key) =>
+            !(isCardFileKey(key) && studysetUUIDOfKey(key) === studysetUUID),
         () => `${studysetUUID}/${newId()}`
     );
-    const sourceOf = new Map(planned.copies.map((copy) => [copy.to, copy.from]));
+    const sourceOf = new Map(
+        planned.copies.map((copy) => [copy.to, copy.from])
+    );
     const resolved = new Map<string, { key: string; url: string }>();
     const resolve = (key: string) => {
         let hit = resolved.get(key);

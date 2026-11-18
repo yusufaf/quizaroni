@@ -34,7 +34,15 @@ const CARDS = Array.from({ length: 4 }, (_, i) => ({
     cardUUID: `c${i}`,
     term: `term ${i}`,
     definition: `definition ${i}`,
-    files: i === 0 ? [{ key: `${LISTED}/user/photo.png`, signedURL: 'https://s3/x?X-Amz-Credential=AKIA' }] : [],
+    files:
+        i === 0
+            ? [
+                  {
+                      key: `${LISTED}/user/photo.png`,
+                      signedURL: 'https://s3/x?X-Amz-Credential=AKIA',
+                  },
+              ]
+            : [],
 }));
 
 let h: RouteHarness | undefined;
@@ -72,7 +80,13 @@ test('an imported instance behaves like the hosted one', async () => {
             },
         },
     ]);
-    const base = { PK: 'userUUID#ann', title: 'Cells', createdAt: T, updatedAt: T, cards: CARDS };
+    const base = {
+        PK: 'userUUID#ann',
+        title: 'Cells',
+        createdAt: T,
+        updatedAt: T,
+        cards: CARDS,
+    };
     writeDynamoExport(dynamo, 'quizaroni-prod-main', [
         {
             ...base,
@@ -141,10 +155,15 @@ test('an imported instance behaves like the hosted one', async () => {
         ).items.map((i) => i.studysetUUID);
     expect(await feed()).toEqual([LISTED]);
     expect(await feed('?featured=1')).toEqual([LISTED]);
-    expect((await apiGet(h, `/api/public/studyset/${HIDDEN}`)).status).toBe(404);
+    expect((await apiGet(h, `/api/public/studyset/${HIDDEN}`)).status).toBe(
+        404
+    );
 
     const me = await okJson<{
-        user: { labels: string[]; metadata: { avatar?: { value: string }; defaultTheme: string } };
+        user: {
+            labels: string[];
+            metadata: { avatar?: { value: string }; defaultTheme: string };
+        };
     }>(apiRequest(h, '/api/users/get-user', { cookie }));
     expect(me.user.labels).toEqual(['bio', 'chem']);
     expect(me.user.metadata.defaultTheme).toBe('light');

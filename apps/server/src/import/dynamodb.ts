@@ -12,7 +12,9 @@ export function fromDynamoJson(
     ctx: { unsafeKeys: number }
 ): unknown {
     if (attr === null || typeof attr !== 'object' || Array.isArray(attr)) {
-        throw new ImportInputError(`Not a DynamoDB attribute: ${JSON.stringify(attr)}`);
+        throw new ImportInputError(
+            `Not a DynamoDB attribute: ${JSON.stringify(attr)}`
+        );
     }
     const [type, value] = Object.entries(attr)[0] ?? [];
     switch (type) {
@@ -43,7 +45,10 @@ export function fromDynamoJson(
 
 // defineProperty, never assignment: assigning a "__proto__" key would set the
 // object's prototype instead of a property.
-function fromDynamoMap(value: unknown, ctx: { unsafeKeys: number }): DynamoItem {
+function fromDynamoMap(
+    value: unknown,
+    ctx: { unsafeKeys: number }
+): DynamoItem {
     const out: DynamoItem = {};
     if (value === null || typeof value !== 'object') return out;
     for (const [key, attr] of Object.entries(value)) {
@@ -79,7 +84,10 @@ function findSummaries(dir: string, out: string[] = []): string[] {
 
 function readJson(file: string): Record<string, unknown> {
     try {
-        return JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>;
+        return JSON.parse(readFileSync(file, 'utf8')) as Record<
+            string,
+            unknown
+        >;
     } catch (err) {
         throw new ImportInputError(`${file}: ${(err as Error).message}`);
     }
@@ -134,7 +142,10 @@ export function readDynamoExports(root: string): DynamoExports {
                 `${summaryFile}: outputFormat must be DYNAMODB_JSON`
             );
         }
-        const tableName = String(summary.tableArn ?? '').split('/').pop() ?? '';
+        const tableName =
+            String(summary.tableArn ?? '')
+                .split('/')
+                .pop() ?? '';
         const kind = tableName.endsWith('-main')
             ? 'main'
             : tableName.endsWith('-users')
@@ -189,7 +200,9 @@ export function readDynamoExports(root: string): DynamoExports {
                     typeof parsed.Item !== 'object' ||
                     Array.isArray(parsed.Item)
                 ) {
-                    throw new ImportInputError(`${dataFile} line ${l.n}: no Item`);
+                    throw new ImportInputError(
+                        `${dataFile} line ${l.n}: no Item`
+                    );
                 }
                 items.push(fromDynamoMap(parsed.Item, ctx));
             }

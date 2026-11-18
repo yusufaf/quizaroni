@@ -44,7 +44,13 @@ describe('csvCell', () => {
 test('a claim link sets a password and signs the user in', async () => {
     h = await createRouteHarness();
     addUser(h.db, 'imported');
-    const r = run(['--csv', '--data-dir', h.dataDir, '--public-url', 'http://localhost']);
+    const r = run([
+        '--csv',
+        '--data-dir',
+        h.dataDir,
+        '--public-url',
+        'http://localhost',
+    ]);
     expect(r.code).toBe(0);
     expect(r.out[0]).toBe('email,name,username,link,expires_at');
     // The harness admin has a password; only the imported user gets a link.
@@ -63,7 +69,12 @@ test('a claim link sets a password and signs the user in', async () => {
         h.db
             .select()
             .from(account)
-            .where(and(eq(account.userId, 'imported'), eq(account.providerId, 'credential')))
+            .where(
+                and(
+                    eq(account.userId, 'imported'),
+                    eq(account.providerId, 'credential')
+                )
+            )
             .all()
     ).toHaveLength(1);
 
@@ -76,16 +87,29 @@ test('a claim link sets a password and signs the user in', async () => {
 test('plain output is email<TAB>link and uses the stored public URL', async () => {
     h = await createRouteHarness();
     addUser(h.db, 'imported');
-    const r = run(['--data-dir', h.dataDir], { QZ_PUBLIC_URL: 'https://quiz.example.org' });
+    const r = run(['--data-dir', h.dataDir], {
+        QZ_PUBLIC_URL: 'https://quiz.example.org',
+    });
     expect(r.code).toBe(0);
     expect(r.out).toEqual([
-        expect.stringMatching(/^imported@example\.com\thttps:\/\/quiz\.example\.org\/reset-password\?token=/),
+        expect.stringMatching(
+            /^imported@example\.com\thttps:\/\/quiz\.example\.org\/reset-password\?token=/
+        ),
     ]);
 });
 
 test.each([['0'], ['31'], ['x']])('--days %s is refused', async (days) => {
     h = await createRouteHarness();
-    expect(run(['--days', days, '--data-dir', h.dataDir, '--public-url', 'http://localhost']).code).toBe(1);
+    expect(
+        run([
+            '--days',
+            days,
+            '--data-dir',
+            h.dataDir,
+            '--public-url',
+            'http://localhost',
+        ]).code
+    ).toBe(1);
 });
 
 test('no public URL is refused', async () => {

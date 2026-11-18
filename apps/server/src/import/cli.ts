@@ -117,7 +117,9 @@ export async function runImport(
     const dynamoDir = path('dynamodb');
     const s3Dir = path('s3');
     if (!logtoFile || !dynamoDir || !s3Dir) {
-        return usageError('--logto-users, --dynamodb and --s3 are all required');
+        return usageError(
+            '--logto-users, --dynamodb and --s3 are all required'
+        );
     }
     const dryRun = values['dry-run'] === true;
     const admin = typeof values.admin === 'string' ? values.admin : undefined;

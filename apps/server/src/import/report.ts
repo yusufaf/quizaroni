@@ -31,7 +31,9 @@ export function formatReport(r: ImportReport): string[] {
             lines.push(`    ${printable(a.id, 80)}${detail}`);
         }
         if (!all && list.length > EXAMPLES) {
-            lines.push(`    … and ${list.length - EXAMPLES} more (see --report)`);
+            lines.push(
+                `    … and ${list.length - EXAMPLES} more (see --report)`
+            );
         }
     }
     return lines;

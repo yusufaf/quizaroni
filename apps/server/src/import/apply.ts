@@ -38,9 +38,11 @@ export function applyImport(
                 for (const u of plan.users) {
                     tx.insert(user).values(u.user).run();
                     tx.insert(userProfile).values(u.profile).run();
-                    for (const a of u.accounts) tx.insert(account).values(a).run();
+                    for (const a of u.accounts)
+                        tx.insert(account).values(a).run();
                 }
-                for (const s of plan.studysets) tx.insert(studyset).values(s).run();
+                for (const s of plan.studysets)
+                    tx.insert(studyset).values(s).run();
             },
             { behavior: 'immediate' }
         );

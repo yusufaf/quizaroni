@@ -85,7 +85,8 @@ describe('signing in with an imported hash', () => {
         const h = (current = await createRouteHarness());
         const id = addUser(h.db, 'imported');
         const now = new Date();
-        h.db.insert(account)
+        h.db
+            .insert(account)
             .values({
                 id: crypto.randomUUID(),
                 accountId: id,

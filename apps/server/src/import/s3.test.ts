@@ -11,12 +11,21 @@ afterEach(() => {
     root = undefined;
 });
 
-const KEY = '0b9f4c1e-8f3a-4d2b-9c7e-1a2b3c4d5e6f/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
+const KEY =
+    '0b9f4c1e-8f3a-4d2b-9c7e-1a2b3c4d5e6f/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
 
 test('syncPath keeps keys inside the sync folder', () => {
     const r = '/sync';
     expect(syncPath(r, KEY)).toBe(resolve('/sync', ...KEY.split('/')));
-    for (const bad of ['a/../b', '../a', 'a//b', 'a\\b', 'a\0b', '/a', 'a/./b']) {
+    for (const bad of [
+        'a/../b',
+        '../a',
+        'a//b',
+        'a\\b',
+        'a\0b',
+        '/a',
+        'a/./b',
+    ]) {
         expect(syncPath(r, bad)).toBeUndefined();
     }
 });

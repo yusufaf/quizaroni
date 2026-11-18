@@ -65,7 +65,11 @@ function fixture(
     writeDynamoExport(
         dynamo,
         'quizaroni-prod-users',
-        users.map((u) => ({ PK: `user#${u.id}`, SK: 'userData', labels: ['bio'] }))
+        users.map((u) => ({
+            PK: `user#${u.id}`,
+            SK: 'userData',
+            labels: ['bio'],
+        }))
     );
     writeDynamoExport(
         dynamo,
@@ -80,8 +84,18 @@ function fixture(
                 updatedAt: T,
                 labels: ['bio'],
                 cards: [
-                    { cardUUID: 'c1', term: 't', definition: 'd', files: [{ key: `${SET}/${FILE}` }] },
-                    { cardUUID: 'c2', term: 't', definition: 'd', files: [{ key: `${SET}/${FILE}` }] },
+                    {
+                        cardUUID: 'c1',
+                        term: 't',
+                        definition: 'd',
+                        files: [{ key: `${SET}/${FILE}` }],
+                    },
+                    {
+                        cardUUID: 'c2',
+                        term: 't',
+                        definition: 'd',
+                        files: [{ key: `${SET}/${FILE}` }],
+                    },
                 ],
             },
         ]
@@ -296,7 +310,9 @@ describe('dry run', () => {
             ],
             report: { counts: {}, anomalies: [] },
         };
-        const { sqlite, db } = openDatabase(mkdtempSync(join(tmpdir(), 'qz-dup-')));
+        const { sqlite, db } = openDatabase(
+            mkdtempSync(join(tmpdir(), 'qz-dup-'))
+        );
         try {
             expect(() => applyImport(db, undefined, plan)).toThrow(/Two files/);
         } finally {
@@ -307,7 +323,11 @@ describe('dry run', () => {
 
 test('an unwritable --report fails before the data dir is touched', async () => {
     const f = fixture();
-    const r = await run([...f.argv, '--report', join(f.root, 'no', 'such', 'dir', 'r.json')]);
+    const r = await run([
+        ...f.argv,
+        '--report',
+        join(f.root, 'no', 'such', 'dir', 'r.json'),
+    ]);
     expect(r.code).toBe(1);
     expect(r.err).toContain('Could not write the report');
     expect(existsSync(f.dataDir)).toBe(false);
