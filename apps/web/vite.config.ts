@@ -4,6 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 import { execSync } from 'child_process';
 import { FILES_CACHE_NAME } from './src/state/local/pwa/cacheNames';
+import { umamiPlugin } from './src/analytics/umami';
 
 // https://vitejs.dev/config/
 
@@ -50,6 +51,7 @@ export default defineConfig({
                 });
             },
         },
+        umamiPlugin(),
         VitePWA({
             registerType: 'prompt',
             injectRegister: null,
