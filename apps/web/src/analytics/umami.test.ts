@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import { loadEnv } from 'vite-plus';
 import { describe, expect, test } from 'vite-plus/test';
-import { umamiScriptTag } from './umami';
+import { umamiPlugin, umamiScriptTag } from './umami';
 
 const HOSTED_ID = '883ce165-bace-46c2-93df-994219b0f916';
 
@@ -62,6 +62,10 @@ describe('umamiScriptTag', () => {
             /VITE_UMAMI_WEBSITE_ID/
         );
     });
+});
+
+test('the plugin runs in builds only, so dev and vitest never load the tag', () => {
+    expect(umamiPlugin().apply).toBe('build');
 });
 
 describe('build env files', () => {
