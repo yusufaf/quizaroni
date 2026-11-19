@@ -41,7 +41,10 @@ Commands:
   feature <set>        Feature a public set on Explore (--clear to unfeature)
   hide <set>           Take a set down: off Explore and its link, and its owner can't republish it (--clear to undo)
   unpublish <set>      Take a set off Explore; its owner can publish it again
-                       <set> is a study set id or its /view/ link; run "<command> --help" for details
+                       <set> is a study set id or its /view/ link
+  import ...           Move the hosted Quizaroni into an empty data directory (server stopped)
+  claim-links          Make password reset links for accounts without a password
+                       Run "<command> --help" for a command's options
 
 Options (each can also be set with the QZ_* environment variable shown):
   --data-dir <path>    Directory for the database and all stored files (QZ_DATA_DIR, default ./data; the standalone binary uses a quizaroni-data folder next to it if one exists, else the OS app-data folder)

@@ -17,10 +17,17 @@ import {
     urlHost,
     USAGE,
 } from './config';
+import {
+    acquireDataDirLock,
+    type DataDirLock,
+    DataDirLockedError,
+} from './data-dir-lock';
 import { closeDatabase, type Db, openDatabase } from './db';
 import { embeddedBundle } from './embedded';
 import { FileStore } from './files/store';
 import { runHealthcheck } from './healthcheck';
+import { runClaimLinks } from './import/claim-links';
+import { runImport } from './import/cli';
 import { binaryDataDir, openBrowser } from './launcher';
 import { describeSmtp, parseSmtpConfig, type SmtpConfig } from './mail/config';
 import { Mailer } from './mail/mailer';
@@ -63,6 +70,24 @@ const defaults: ConfigDefaults | undefined = bundle
       }
     : undefined;
 
+if (argv[0] === 'import') {
+    process.exit(
+        await runImport(argv.slice(1), process.env, process.cwd(), {
+            defaults,
+            migrations: bundle?.migrations,
+        })
+    );
+}
+
+if (argv[0] === 'claim-links') {
+    process.exit(
+        runClaimLinks(argv.slice(1), process.env, process.cwd(), {
+            defaults,
+            migrations: bundle?.migrations,
+        })
+    );
+}
+
 if (isModerationCommand(argv[0])) {
     process.exit(
         runModeration(argv[0], argv.slice(1), process.env, process.cwd(), {
@@ -86,6 +111,19 @@ try {
     if (!(err instanceof ConfigError)) throw err;
     console.error(err.message);
     console.error(USAGE);
+    process.exit(1);
+}
+
+// Module-level so the handle stays reachable: a collected handle drops the lock.
+let dataDirLock: DataDirLock;
+try {
+    dataDirLock = acquireDataDirLock(config.dataDir);
+} catch (err) {
+    console.error(
+        err instanceof DataDirLockedError
+            ? err.message
+            : `Could not lock ${config.dataDir}: ${(err as Error).message}`
+    );
     process.exit(1);
 }
 
@@ -268,6 +306,7 @@ async function shutdown(): Promise<void> {
         ]);
         void server.stop(true);
         closeDatabase(sqlite);
+        dataDirLock.release();
     } catch (err) {
         console.error('Shutdown failed:', err);
         exitCode = 1;
