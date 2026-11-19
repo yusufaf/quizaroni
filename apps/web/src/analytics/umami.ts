@@ -39,6 +39,9 @@ export function umamiPlugin(): Plugin {
     let tag: HtmlTagDescriptor | null = null;
     return {
         name: 'quizaroni:umami',
+        // Builds only: dev and vitest never load the tag, and a half-set env
+        // can't break them.
+        apply: 'build',
         configResolved(config) {
             tag = umamiScriptTag(config.env);
         },
