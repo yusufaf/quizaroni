@@ -193,3 +193,17 @@ export const mailOutbox = sqliteTable(
     },
     (t) => [index('mail_outbox_expires_idx').on(t.expiresAt)]
 );
+
+// One row per reset email sent or attempted, for the per-recipient limit.
+// Rows older than the window are pruned on every check.
+export const resetEmailLog = sqliteTable(
+    'reset_email_log',
+    {
+        id: text('id').primaryKey(),
+        recipient: text('recipient').notNull(),
+        createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+    },
+    (t) => [
+        index('reset_email_log_recipient_idx').on(t.recipient, t.createdAt),
+    ]
+);
