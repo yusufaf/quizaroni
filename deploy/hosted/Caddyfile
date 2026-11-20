@@ -1,0 +1,14 @@
+{$SITE_ADDRESS:quizaroni.yusufaf.dev} {
+	encode zstd gzip
+
+	# Umami, proxied same-origin as netlify.toml does today (#301), so the
+	# server never sees these paths.
+	@umami path /s.js /api/e
+	handle @umami {
+		reverse_proxy https://analytics.yusufaf.dev
+	}
+
+	handle {
+		reverse_proxy quizaroni:8080
+	}
+}

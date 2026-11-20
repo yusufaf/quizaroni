@@ -38,6 +38,16 @@ jobs:
           region: us-west-2
           appName: quizaroni
           deploymentType: development
+  # The hosted instance's compose file and Caddyfile (deploy/hosted). Caddy is
+  # validated through compose so its pinned digest lives in one place.
+  hosted-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Validate compose file
+        run: docker compose -f deploy/hosted/compose.yaml config -q
+      - name: Validate Caddyfile
+        run: docker compose -f deploy/hosted/compose.yaml run --rm --no-deps caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
   # All five binaries, smoke-tested per OS, plus docker compose on amd64 and arm64.
   binaries:
     uses: ./.github/workflows/binaries.yml

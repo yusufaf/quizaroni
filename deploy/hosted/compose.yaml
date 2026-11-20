@@ -1,0 +1,61 @@
+# The hosted instance at https://quizaroni.yusufaf.dev (#269).
+# Runs on a Hetzner Cloud VPS in Hillsboro, OR (US-West, near the old
+# us-west-2 stack): the smallest shared x86 plan with at least 2 GB RAM, with
+# Hetzner backups on. Caddy in front serves HTTPS and proxies Umami (#301).
+#
+# First deploy, from this directory with .env written from .env.example:
+#   docker compose pull
+#   docker compose run --rm --no-deps -v ~/cutover:/import:ro quizaroni import ...
+#     Run the import before any `up`. Booting with the QZ_ADMIN_* block set
+#     before the import creates that admin, and the import then refuses.
+#   docker compose up -d quizaroni
+#     Start Caddy only once DNS points here: it asks Let's Encrypt for the
+#     certificate as soon as it starts.
+#   docker compose up -d caddy
+# Claim links: docker compose exec -T quizaroni quizaroni claim-links --csv
+# Upgrade: bump QUIZARONI_IMAGE in .env, then docker compose pull && docker compose up -d
+name: quizaroni-hosted
+services:
+    quizaroni:
+        image: ${QUIZARONI_IMAGE:-ghcr.io/yusufaf/quizaroni-hosted:latest}
+        restart: unless-stopped
+        env_file:
+            - path: .env
+              required: false
+        environment:
+            QZ_PUBLIC_URL: ${QZ_PUBLIC_URL:-https://quizaroni.yusufaf.dev}
+            QZ_TRUST_PROXY: 'true'
+        volumes:
+            - quizaroni-data:/data
+        logging: &logging
+            driver: json-file
+            options:
+                max-size: 10m
+                max-file: '3'
+        healthcheck:
+            test: ['CMD', '/usr/local/bin/quizaroni', 'healthcheck']
+            interval: 15s
+            timeout: 5s
+            start_period: 30s
+            retries: 3
+    caddy:
+        image: caddy:2.11.9@sha256:4851e54a46b206517c574821bb5cc67f170d2156041e9fbc4c9193b45e84a75b
+        restart: unless-stopped
+        depends_on:
+            quizaroni:
+                condition: service_healthy
+        ports:
+            - '80:80'
+            - '443:443'
+            - '443:443/udp'
+        environment:
+            SITE_ADDRESS: ${SITE_ADDRESS:-quizaroni.yusufaf.dev}
+        volumes:
+            - ./Caddyfile:/etc/caddy/Caddyfile:ro
+            - caddy-data:/data
+            - caddy-config:/config
+        logging: *logging
+volumes:
+    quizaroni-data:
+    caddy-data:
+    caddy-config:
