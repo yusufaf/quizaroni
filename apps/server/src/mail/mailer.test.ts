@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, spyOn, test } from 'bun:test';
+import { sql } from 'drizzle-orm';
 import type { Db } from '../db';
-import { mailOutbox } from '../db/schema';
+import { mailOutbox, resetEmailLog } from '../db/schema';
 import { openTestDb } from '../testing/studysets';
 import {
     type MailMessage,
@@ -8,6 +9,7 @@ import {
     Mailer,
     mailFailureCode,
     OUTBOX_MAX_ROWS,
+    RESET_EMAIL_LIMIT,
 } from './mailer';
 
 const T0 = new Date('2026-11-01T10:00:00.000Z');
@@ -118,6 +120,111 @@ describe('Mailer.deliver', () => {
     });
 });
 
+describe('reset email limit', () => {
+    const at = (ms: number) => new Date(T0.getTime() + ms);
+
+    test('sends at most RESET_EMAIL_LIMIT.max reset emails per recipient within the window', async () => {
+        const { transport, sent } = okTransport();
+        const mailer = new Mailer(freshDb(), transport);
+        for (let i = 0; i < RESET_EMAIL_LIMIT.max; i++) {
+            expect(await mailer.deliver(message(), at(i * 1000))).toBe('sent');
+        }
+        expect(
+            await mailer.deliver(message(), at(RESET_EMAIL_LIMIT.max * 1000))
+        ).toBe('throttled');
+        expect(sent).toHaveLength(RESET_EMAIL_LIMIT.max);
+    });
+
+    test('allows another once the oldest leaves the window', async () => {
+        const { transport, sent } = okTransport();
+        const mailer = new Mailer(freshDb(), transport);
+        for (let i = 0; i < RESET_EMAIL_LIMIT.max; i++) {
+            expect(await mailer.deliver(message(), at(i * 1000))).toBe('sent');
+        }
+        expect(
+            await mailer.deliver(message(), at(RESET_EMAIL_LIMIT.windowMs))
+        ).toBe('sent');
+        expect(sent).toHaveLength(RESET_EMAIL_LIMIT.max + 1);
+    });
+
+    test('other recipients and invites are not limited', async () => {
+        const { transport } = okTransport();
+        const mailer = new Mailer(freshDb(), transport);
+        for (let i = 0; i <= RESET_EMAIL_LIMIT.max; i++) {
+            await mailer.deliver(message(), at(i));
+        }
+        expect(await mailer.deliver(message(), at(10))).toBe('throttled');
+        expect(
+            await mailer.deliver(message({ to: 'bob@example.com' }), at(10))
+        ).toBe('sent');
+        expect(await mailer.deliver(message({ kind: 'invite' }), at(10))).toBe(
+            'sent'
+        );
+    });
+
+    test('a throttled reset leaves the earlier outbox link in place', async () => {
+        const db = freshDb();
+        const mailer = new Mailer(db, undefined);
+        const reset = (n: number) => {
+            const link = `http://localhost/reset-password?token=${n}`;
+            return message({ link, text: `Open ${link}` });
+        };
+        for (let n = 1; n <= RESET_EMAIL_LIMIT.max; n++) {
+            expect(await mailer.deliver(reset(n), at(n))).toBe('outbox');
+        }
+        expect(
+            await mailer.deliver(reset(RESET_EMAIL_LIMIT.max + 1), at(100))
+        ).toBe('throttled');
+        expect(mailer.listOutbox(T0).map((m) => m.link)).toEqual([
+            `http://localhost/reset-password?token=${RESET_EMAIL_LIMIT.max}`,
+        ]);
+    });
+
+    test('failed sends count toward the limit', async () => {
+        const mailer = new Mailer(freshDb(), {
+            send: async () => {
+                throw Object.assign(new Error('down'), { code: 'ECONNREFUSED' });
+            },
+        });
+        const output = captureConsole();
+        try {
+            for (let i = 0; i < RESET_EMAIL_LIMIT.max; i++) {
+                expect(await mailer.deliver(message(), at(i))).toBe('failed');
+            }
+            expect(await mailer.deliver(message(), at(10))).toBe('throttled');
+        } finally {
+            output.restore();
+        }
+    });
+
+    test('the count lives in the database, so a restart keeps it', async () => {
+        const db = freshDb();
+        const { transport } = okTransport();
+        const first = new Mailer(db, transport);
+        for (let i = 0; i < RESET_EMAIL_LIMIT.max; i++) {
+            await first.deliver(message(), at(i));
+        }
+        const restarted = new Mailer(db, transport);
+        expect(await restarted.deliver(message(), at(10))).toBe('throttled');
+    });
+
+    test('if the check fails, it logs without the recipient and sends anyway', async () => {
+        const db = freshDb();
+        db.run(sql`DROP TABLE reset_email_log`);
+        const { transport, sent } = okTransport();
+        const mailer = new Mailer(db, transport);
+        const output = captureConsole();
+        try {
+            expect(await mailer.deliver(message(), T0)).toBe('sent');
+        } finally {
+            output.restore();
+        }
+        expect(sent).toHaveLength(1);
+        expect(output.text()).toContain('reset email limit');
+        expect(output.text()).not.toContain('ada@example.com');
+    });
+});
+
 describe('Mailer.enqueue', () => {
     test('delivers in the background; flush waits for it', async () => {
         const db = freshDb();
@@ -125,6 +232,17 @@ describe('Mailer.enqueue', () => {
         mailer.enqueue(message({ expiresAt: new Date(Date.now() + 3600_000) }));
         await mailer.flush();
         expect(db.select().from(mailOutbox).all()).toHaveLength(1);
+    });
+
+    test("does no mail work before the caller's turn ends", async () => {
+        const db = freshDb();
+        const mailer = new Mailer(db, undefined);
+        mailer.enqueue(message({ expiresAt: new Date(Date.now() + 3600_000) }));
+        expect(db.select().from(mailOutbox).all()).toHaveLength(0);
+        expect(db.select().from(resetEmailLog).all()).toHaveLength(0);
+        await mailer.flush();
+        expect(db.select().from(mailOutbox).all()).toHaveLength(1);
+        expect(db.select().from(resetEmailLog).all()).toHaveLength(1);
     });
 });
 

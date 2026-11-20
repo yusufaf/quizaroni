@@ -83,16 +83,20 @@ describe('openDatabase', () => {
         });
     });
 
-    test('creates the invite and mail outbox tables', () => {
+    test('creates the invite, mail outbox and reset email log tables', () => {
         const { sqlite } = track(openDatabase(tempRoot()));
         const names = (
             sqlite
                 .query(
-                    "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('registration_invite', 'mail_outbox') ORDER BY name"
+                    "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('registration_invite', 'mail_outbox', 'reset_email_log') ORDER BY name"
                 )
                 .all() as { name: string }[]
         ).map((r) => r.name);
-        expect(names).toEqual(['mail_outbox', 'registration_invite']);
+        expect(names).toEqual([
+            'mail_outbox',
+            'registration_invite',
+            'reset_email_log',
+        ]);
     });
 
     test('runs every migration on boot', () => {

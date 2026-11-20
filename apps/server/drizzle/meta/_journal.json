@@ -50,6 +50,13 @@
       "when": 1794700408812,
       "tag": "0006_selfhost_mail_invites",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1795158269693,
+      "tag": "0007_reset_email_log",
+      "breakpoints": true
     }
   ]
 }
