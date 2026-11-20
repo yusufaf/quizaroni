@@ -180,7 +180,8 @@ export function createAuth(cfg: AuthConfig) {
             resetPasswordTokenExpiresIn: RESET_TOKEN_TTL_SECONDS,
             revokeSessionsOnPasswordReset: true,
             // Queued, not awaited, so a known email answers as fast as an
-            // unknown one.
+            // unknown one, and a request over the per-recipient limit
+            // (applied by the mailer) as fast as any other.
             sendResetPassword: async ({ user: u, token }) => {
                 cfg.mailer.enqueue(
                     passwordResetMessage({

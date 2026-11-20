@@ -1,13 +1,22 @@
 import { describe, expect, test } from 'bun:test';
 import { DrizzleQueryError } from 'drizzle-orm';
 import { sanitizeLogArg } from '../db/errors';
+import { RESET_EMAIL_LIMIT } from '../mail/mailer';
 import {
     hashPassword,
     lazyAuth,
+    RESET_TOKEN_TTL_SECONDS,
     scrubAuthEnv,
     verifyPassword,
     type AuthContext,
 } from './auth';
+
+test('the reset email window is no longer than a reset link lives', () => {
+    // So someone who is throttled still has a working link from an earlier email.
+    expect(RESET_EMAIL_LIMIT.windowMs).toBeLessThanOrEqual(
+        RESET_TOKEN_TTL_SECONDS * 1000
+    );
+});
 
 describe('verifyPassword', () => {
     test('accepts the password a hash was made from', async () => {

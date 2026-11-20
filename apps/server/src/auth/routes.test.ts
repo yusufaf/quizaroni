@@ -18,7 +18,7 @@ import {
     verification,
 } from '../db/schema';
 import { createInvite, revokeInvite } from '../invites/invites';
-import { type MailTransport, Mailer } from '../mail/mailer';
+import { type MailTransport, Mailer, RESET_EMAIL_LIMIT } from '../mail/mailer';
 import { SETTING } from '../settings';
 import { completeSetup, SetupGate } from '../setup/setup';
 import { hashPassword } from './auth';
@@ -849,6 +849,38 @@ describe('password reset', () => {
             /http:\/\/localhost\/reset-password\?token=\S+/
         );
         expect(h.db.select().from(mailOutbox).all()).toHaveLength(0);
+    });
+
+    test('a burst for one email from many IPs sends at most RESET_EMAIL_LIMIT.max emails, and every answer is the same', async () => {
+        const { transport, sent } = fakeTransport();
+        const h = await harness({ transport });
+        const answers = [];
+        for (let i = 0; i < RESET_EMAIL_LIMIT.max + 2; i++) {
+            const res = await requestReset(h, ADMIN_EMAIL);
+            answers.push({ status: res.status, body: await res.json() });
+        }
+        for (const a of answers) expect(a).toEqual(answers[0]!);
+        expect(answers[0]?.status).toBe(200);
+        await h.mailer.flush();
+        expect(sent).toHaveLength(RESET_EMAIL_LIMIT.max);
+        expect(sent.every((m) => m.to === ADMIN_EMAIL)).toBe(true);
+    });
+
+    test('throttling one address leaves others unaffected', async () => {
+        const { transport, sent } = fakeTransport();
+        const h = await harness({ transport });
+        for (let i = 0; i <= RESET_EMAIL_LIMIT.max; i++) {
+            await requestReset(h, ADMIN_EMAIL);
+        }
+        setRegistrationMode(h.db, 'open');
+        expect((await signUp(h, { email: 'other@example.com' })).status).toBe(
+            200
+        );
+        await requestReset(h, 'other@example.com');
+        await h.mailer.flush();
+        expect(sent.filter((m) => m.to === 'other@example.com')).toHaveLength(
+            1
+        );
     });
 
     test('an expired link is refused', async () => {
