@@ -1,7 +1,7 @@
-import { and, desc, eq, lte, notInArray } from 'drizzle-orm';
+import { and, count, desc, eq, lte, notInArray } from 'drizzle-orm';
 import type { Db } from '../db';
 import { describeDbError } from '../db/errors';
-import { mailOutbox } from '../db/schema';
+import { mailOutbox, resetEmailLog } from '../db/schema';
 
 export type MailKind = 'password_reset' | 'invite';
 
@@ -14,7 +14,7 @@ export type MailMessage = {
     expiresAt: Date;
 };
 
-export type Delivery = 'sent' | 'outbox' | 'failed';
+export type Delivery = 'sent' | 'outbox' | 'failed' | 'throttled';
 
 export type MailTransport = {
     send(m: { to: string; subject: string; text: string }): Promise<void>;
@@ -33,6 +33,10 @@ export type OutboxView = {
 };
 
 export const OUTBOX_MAX_ROWS = 500;
+
+// The window matches the reset link lifetime (RESET_TOKEN_TTL_SECONDS), so
+// someone who is throttled still has a working link from an earlier email.
+export const RESET_EMAIL_LIMIT = { max: 3, windowMs: 60 * 60 * 1000 };
 
 // Only the error's code fields: SMTP error messages can echo the server's
 // reply, which may include the user name.
@@ -60,6 +64,12 @@ export class Mailer {
     }
 
     async deliver(msg: MailMessage, now = new Date()): Promise<Delivery> {
+        if (
+            msg.kind === 'password_reset' &&
+            !this.resetAllowed(msg.to, now)
+        ) {
+            return 'throttled';
+        }
         // Only the newest reset link per person is kept, so reset requests
         // can't flood the outbox and push invite links out of it.
         const replacesEarlier = msg.kind === 'password_reset';
@@ -86,9 +96,12 @@ export class Mailer {
         }
     }
 
-    // Fire-and-forget, so the caller's response time doesn't depend on SMTP.
+    // Started after the request's own work, so the response doesn't depend
+    // on whether this message is sent, stored or throttled.
     enqueue(msg: MailMessage): void {
-        const job = this.deliver(msg).finally(() => this.pending.delete(job));
+        const job = new Promise<void>((resolve) => setImmediate(resolve))
+            .then(() => this.deliver(msg))
+            .finally(() => this.pending.delete(job));
         this.pending.add(job);
     }
 
@@ -139,6 +152,41 @@ export class Mailer {
                 )
             )
             .run();
+    }
+
+    // Fails open: a reset email that can't be counted is still sent.
+    private resetAllowed(recipient: string, now: Date): boolean {
+        try {
+            return this.claimResetSlot(recipient, now);
+        } catch (err) {
+            console.error(
+                `Could not check the reset email limit (${describeDbError(err)}); sending anyway.`
+            );
+            return true;
+        }
+    }
+
+    // A sliding log: at most RESET_EMAIL_LIMIT.max sends in any window. Every
+    // statement is synchronous, so concurrent requests can't both take the
+    // last slot.
+    private claimResetSlot(recipient: string, now: Date): boolean {
+        const cutoff = new Date(now.getTime() - RESET_EMAIL_LIMIT.windowMs);
+        this.db
+            .delete(resetEmailLog)
+            .where(lte(resetEmailLog.createdAt, cutoff))
+            .run();
+        const recent =
+            this.db
+                .select({ n: count() })
+                .from(resetEmailLog)
+                .where(eq(resetEmailLog.recipient, recipient))
+                .get()?.n ?? 0;
+        if (recent >= RESET_EMAIL_LIMIT.max) return false;
+        this.db
+            .insert(resetEmailLog)
+            .values({ id: crypto.randomUUID(), recipient, createdAt: now })
+            .run();
+        return true;
     }
 
     private store(
