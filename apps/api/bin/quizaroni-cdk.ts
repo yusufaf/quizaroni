@@ -7,6 +7,7 @@ import "dotenv/config";
 import "source-map-support/register";
 import { App } from "aws-cdk-lib";
 import { QuizaroniStack } from '../service/quizaroni-stack';
+import { parseReadOnly } from '../utilities/readOnly';
 
 const app = new App();
 
@@ -22,4 +23,5 @@ new QuizaroniStack(app, `${appName}-${deploymentType}-stack`, {
     env,
     appName,
     deploymentType,
+    readOnly: parseReadOnly(process.env.readOnly),
 });
