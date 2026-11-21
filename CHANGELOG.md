@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.5.0](https://github.com/yusufaf/quizaroni/compare/v0.4.0...v0.5.0) (2026-11-21)
+
+
+### Features
+
+* add the read-only API mode and hosted deploy config for the cutover ([#348](https://github.com/yusufaf/quizaroni/issues/348)) ([2de86e6](https://github.com/yusufaf/quizaroni/commit/2de86e6015a303021744d2ea061a91a32aaf3b80))
+* **server:** feature, hide and unpublish moderation subcommands ([#343](https://github.com/yusufaf/quizaroni/issues/343)) ([73e3627](https://github.com/yusufaf/quizaroni/commit/73e36279259c83cdeb3d027b35340fba6d929e0a))
+* **server:** import the hosted instance and make claim links for self-host ([#345](https://github.com/yusufaf/quizaroni/issues/345)) ([d66eca8](https://github.com/yusufaf/quizaroni/commit/d66eca8639982b81b89c9e71922a0a31dc45c531))
+* **server:** limit password reset emails per recipient ([#347](https://github.com/yusufaf/quizaroni/issues/347)) ([c4f6780](https://github.com/yusufaf/quizaroni/commit/c4f678022d39313302f95844edba42e84cd4ab31))
+
+
+### Bug Fixes
+
+* **web:** emit the Umami tag only in builds that configure it ([#346](https://github.com/yusufaf/quizaroni/issues/346)) ([fc8eed3](https://github.com/yusufaf/quizaroni/commit/fc8eed35a9da5225487410af974c13b2ecb1ba33))
+* **web:** settle deleted sets and keep syncing past failed ones ([#349](https://github.com/yusufaf/quizaroni/issues/349)) ([3c667ef](https://github.com/yusufaf/quizaroni/commit/3c667efc2d0b9a343d6e1a191ae94fcb6e4f4dc3))
+
 ## [0.4.0](https://github.com/yusufaf/quizaroni/compare/v0.3.0...v0.4.0) (2026-11-16)
 
 
