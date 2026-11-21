@@ -1,6 +1,12 @@
 import { getDatabase, type LocalStudyset } from '../db';
 import type { Studyset, UUID } from 'shared/types';
 
+// A local edit makes a synced or server-rejected set pending again.
+const nextStatusAfterEdit = (
+    status: LocalStudyset['_syncStatus']
+): LocalStudyset['_syncStatus'] =>
+    status === 'synced' || status === 'failed' ? 'pending' : status;
+
 // Repository for studyset CRUD operations - always hits local Dexie DB
 // The sync layer handles pushing changes to backend
 export class StudysetRepository {
@@ -70,11 +76,10 @@ export class StudysetRepository {
             ...existing,
             ...updates,
             studysetUUID, // ensure ID doesn't change
-            _syncStatus:
-                existing._syncStatus === 'synced'
-                    ? 'pending'
-                    : existing._syncStatus,
+            _syncStatus: nextStatusAfterEdit(existing._syncStatus),
             _lastModified: Date.now(),
+            // New content: earlier rejections no longer apply (#303).
+            _syncAttempts: 0,
         };
 
         await this.db.studysets.put(updated);
@@ -145,10 +150,9 @@ export class StudysetRepository {
                     ...current,
                     ...update.changes,
                     studysetUUID: update.studysetUUID,
-                    _syncStatus: (current._syncStatus === 'synced'
-                        ? 'pending'
-                        : current._syncStatus) as LocalStudyset['_syncStatus'],
+                    _syncStatus: nextStatusAfterEdit(current._syncStatus),
                     _lastModified: now,
+                    _syncAttempts: 0,
                 };
             })
             .filter(Boolean) as LocalStudyset[];
@@ -212,6 +216,28 @@ export class StudysetRepository {
         await this.db.studysets.update(studysetUUID, {
             _syncStatus: 'synced',
             _localOnly: false,
+            _syncAttempts: 0,
+        });
+    }
+
+    // Counts a permanent rejection (a 4xx that retrying can't fix). Once the
+    // server has rejected the set more than maxRetries times it becomes
+    // 'failed' and stops being sent until it's edited again (#303).
+    async recordRejection(
+        studysetUUID: UUID,
+        maxRetries: number
+    ): Promise<void> {
+        // One transaction, so a concurrent update() can't be overwritten.
+        await this.db.transaction('rw', this.db.studysets, async () => {
+            const row = await this.db.studysets.get(studysetUUID);
+            if (!row) return;
+            const attempts = row._syncAttempts ?? 0;
+            await this.db.studysets.update(
+                studysetUUID,
+                attempts >= maxRetries
+                    ? { _syncStatus: 'failed', _syncAttempts: attempts + 1 }
+                    : { _syncAttempts: attempts + 1 }
+            );
         });
     }
 

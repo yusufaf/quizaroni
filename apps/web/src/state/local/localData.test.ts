@@ -22,7 +22,7 @@ import {
     useGamificationStore,
 } from 'state/stores/gamification';
 import { useStudySessionStore } from 'state/stores/studySession';
-import { getDatabase } from './db';
+import { getDatabase, type LocalStudyset } from './db';
 import {
     claimLocalData,
     clearLocalData,
@@ -345,6 +345,19 @@ describe('local data ownership', () => {
         );
 
         useGamificationStore.getState().processSessionEnd(session, stats);
+
+        expect(await hasUnsyncedLocalChanges({ timeoutMs: 2000 })).toBe(true);
+    });
+
+    it('a study set the server rejected counts as unsynced', async () => {
+        await claimLocalData('user-A');
+        await getDatabase().studysets.put({
+            studysetUUID: 'rejected',
+            userUUID: 'user-A',
+            title: 'Rejected',
+            _syncStatus: 'failed',
+            _lastModified: Date.now(),
+        } as unknown as LocalStudyset);
 
         expect(await hasUnsyncedLocalChanges({ timeoutMs: 2000 })).toBe(true);
     });

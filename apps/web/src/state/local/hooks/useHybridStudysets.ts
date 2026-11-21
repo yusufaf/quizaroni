@@ -13,7 +13,7 @@ import type {
     GetAllStudysetsResponse,
     GetStudysetResponse,
 } from 'shared/types';
-import type { LocalStudyset } from '../db';
+import { stripLocalMetadata } from '../db';
 
 // Configuration for hybrid mode
 const HYBRID_MODE = {
@@ -293,13 +293,6 @@ export function useHybridImportFromServer() {
 }
 
 // ============== UTILITIES ==============
-
-function stripLocalMetadata(localStudyset: LocalStudyset): Studyset {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { _syncStatus, _lastModified, _localOnly, ...cleanStudyset } =
-        localStudyset;
-    return cleanStudyset as Studyset;
-}
 
 /**
  * Hook to get pending changes count for UI indicators

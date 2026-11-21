@@ -13,9 +13,10 @@ import { migrateProgressToFsrs } from 'shared/utilities/srs';
 // Local-first versions of types with sync metadata
 export interface LocalStudyset extends Studyset {
     // Sync metadata
-    _syncStatus: 'synced' | 'pending' | 'conflict';
+    _syncStatus: 'synced' | 'pending' | 'conflict' | 'failed';
     _lastModified: number; // timestamp for sync
     _localOnly?: boolean; // true if created while offline
+    _syncAttempts?: number; // permanent rejections since the last successful push or local edit
 }
 
 export interface LocalUser extends User {
@@ -243,6 +244,26 @@ export async function importAllData(data: {
 export async function getPendingSyncCount(): Promise<number> {
     const db = getDatabase();
     return await db.syncQueue.count();
+}
+
+// Utility: Whether the server permanently rejected a study set (#303)
+export async function hasFailedSync(): Promise<boolean> {
+    const db = getDatabase();
+    return (
+        (await db.studysets.where('_syncStatus').equals('failed').count()) > 0
+    );
+}
+
+export function stripLocalMetadata(localStudyset: LocalStudyset): Studyset {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const {
+        _syncStatus,
+        _lastModified,
+        _localOnly,
+        _syncAttempts,
+        ...cleanStudyset
+    } = localStudyset;
+    return cleanStudyset as Studyset;
 }
 
 // Utility: Check if any data needs sync
