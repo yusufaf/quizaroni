@@ -271,8 +271,25 @@ export class SyncEngine {
                 // Transient failures (offline, 5xx, auth) don't use up retries.
                 if (!isRetryableSyncError(error)) {
                     if (item.retryCount >= this.options.maxRetries) {
-                        // Give up and remove from queue
-                        await db.syncQueue.delete(item.id);
+                        // Give up and remove from queue. A set whose delete
+                        // the server refused becomes 'failed' rather than
+                        // staying pending, which would send it as an update.
+                        await db.transaction(
+                            'rw',
+                            db.syncQueue,
+                            db.studysets,
+                            async () => {
+                                await db.syncQueue.delete(item.id);
+                                if (
+                                    item.entityType === 'studyset' &&
+                                    item.operation === 'delete'
+                                ) {
+                                    await db.studysets.update(item.entityId, {
+                                        _syncStatus: 'failed',
+                                    });
+                                }
+                            }
+                        );
                         console.error(
                             `Failed to sync after ${this.options.maxRetries} retries:`,
                             item

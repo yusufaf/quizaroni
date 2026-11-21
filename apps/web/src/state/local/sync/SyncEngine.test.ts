@@ -138,6 +138,25 @@ describe('SyncEngine', () => {
             expect(await getDatabase().syncQueue.count()).toBe(0);
         });
 
+        it('never sends a set as an update after the server refused its delete', async () => {
+            await claimLocalData('user-1');
+            await studysetRepository.importFromServer([set('a')]);
+            await studysetRepository.delete('a' as UUID);
+            const api = fakeApi();
+            api.deleteStudyset.mockRejectedValue(new HttpError(409, 'no'));
+            const engine = new SyncEngine({ apiClient: api, maxRetries: 3 });
+
+            for (let pass = 0; pass < 6; pass++) await engine.forceSync();
+
+            expect(api.deleteStudyset).toHaveBeenCalledTimes(4);
+            expect(api.updateStudyset).not.toHaveBeenCalled();
+            expect(
+                (await studysetRepository.getById('a' as UUID))?._syncStatus
+            ).toBe('failed');
+            expect(await getDatabase().syncQueue.count()).toBe(0);
+            expect(engine.getState().failedCount).toBe(1);
+        });
+
         it('treats a 404 on a queued delete as already deleted', async () => {
             await claimLocalData('user-1');
             await studysetRepository.importFromServer([set('a')]);
