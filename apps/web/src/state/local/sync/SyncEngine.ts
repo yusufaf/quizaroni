@@ -3,6 +3,7 @@ import { getDatabase, hasPendingSync, type LocalStudyset } from '../db';
 import { isClaimCurrent } from '../owner';
 import { studysetRepository, userRepository } from '../repositories';
 import type { Studyset, UUID } from 'shared/types';
+import { isHttpStatus } from 'state/api/awsAPI';
 
 // Sync status events for UI feedback
 type SyncStatus = 'idle' | 'syncing' | 'error' | 'offline';
@@ -200,19 +201,29 @@ export class SyncEngine {
             if (!this.options.apiClient) continue;
 
             try {
-                switch (item.entityType) {
-                    case 'studyset': {
-                        if (item.operation === 'delete') {
-                            await this.options.apiClient.deleteStudyset(
-                                item.entityId
-                            );
-                        }
-                        break;
+                const isStudysetDelete =
+                    item.entityType === 'studyset' &&
+                    item.operation === 'delete';
+                if (isStudysetDelete) {
+                    try {
+                        await this.options.apiClient.deleteStudyset(
+                            item.entityId
+                        );
+                    } catch (error) {
+                        // Already gone on the server: the delete is done.
+                        if (!isHttpStatus(error, 404)) throw error;
                     }
                 }
 
-                // Remove from queue on success
-                await db.syncQueue.delete(item.id);
+                // The local row stays pending until its delete succeeds
+                // (#296); drop it with the queue item so it isn't then sent
+                // as an update.
+                await db.transaction('rw', db.syncQueue, db.studysets, async () => {
+                    await db.syncQueue.delete(item.id);
+                    if (isStudysetDelete) {
+                        await db.studysets.delete(item.entityId);
+                    }
+                });
             } catch (error) {
                 // Increment retry count
                 if (item.retryCount >= this.options.maxRetries) {
