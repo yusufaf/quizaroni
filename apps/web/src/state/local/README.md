@@ -227,11 +227,14 @@ Use the traditional hooks from `state/api/*` - they still work as before.
 
 ```tsx
 type LocalStudyset = Studyset & {
-    _syncStatus: 'synced' | 'pending' | 'conflict';
+    _syncStatus: 'synced' | 'pending' | 'conflict' | 'failed';
     _lastModified: number;
     _localOnly?: boolean;
+    _syncAttempts?: number;
 };
 ```
+
+A set the server keeps rejecting (a 4xx other than 401, 403, 408 or 429) becomes `failed` after `maxRetries` attempts and stops being sent; a local edit makes it `pending` again. Network errors and 5xx responses never count toward the limit.
 
 ### Sync Queue
 

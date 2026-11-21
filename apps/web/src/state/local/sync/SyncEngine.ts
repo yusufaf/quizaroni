@@ -1,9 +1,14 @@
 import { pickClientEditableUserMetadata } from '@quizaroni/shared-types';
-import { getDatabase, hasPendingSync, type LocalStudyset } from '../db';
+import {
+    getDatabase,
+    hasPendingSync,
+    stripLocalMetadata,
+    type LocalStudyset,
+} from '../db';
 import { isClaimCurrent } from '../owner';
 import { studysetRepository, userRepository } from '../repositories';
 import type { Studyset, UUID } from 'shared/types';
-import { isHttpStatus } from 'state/api/awsAPI';
+import { HttpError, isHttpStatus } from 'state/api/awsAPI';
 
 // Sync status events for UI feedback
 type SyncStatus = 'idle' | 'syncing' | 'error' | 'offline';
@@ -12,7 +17,19 @@ interface SyncState {
     status: SyncStatus;
     lastSyncAt: number | null;
     pendingCount: number;
+    // Study sets the server kept rejecting; they wait for a local edit.
+    failedCount: number;
     error: string | null;
+}
+
+// Whether a failed push may succeed later without a local change, so it
+// shouldn't count toward the retry limit. 403 is included because the hosted
+// API's authorizer answers an expired or invalid token with 403, and a
+// read-only freeze answers 503: neither should retire an edit.
+export function isRetryableSyncError(error: unknown): boolean {
+    if (!(error instanceof HttpError)) return true;
+    if (error.status >= 500) return true;
+    return [401, 403, 408, 429].includes(error.status);
 }
 
 type SyncListener = (state: SyncState) => void;
@@ -53,6 +70,7 @@ export class SyncEngine {
         status: 'idle',
         lastSyncAt: null,
         pendingCount: 0,
+        failedCount: 0,
         error: null,
     };
     private pollTimer: ReturnType<typeof setInterval> | null = null;
@@ -117,27 +135,42 @@ export class SyncEngine {
 
         const hasPending = await hasPendingSync();
         if (!hasPending) {
-            this.setState({ status: 'idle', pendingCount: 0 });
+            // Keeps failedCount current between passes.
+            await this.updatePendingCount();
+            this.setState({ status: 'idle' });
             return;
         }
 
         this.setState({ status: 'syncing' });
 
-        try {
-            await this.processSyncQueue();
-            await this.syncPendingStudysets();
-            await this.syncPendingUsers();
+        // Each phase records its failures and carries on, so one bad item
+        // doesn't hold back the rest of the pass (#303).
+        const errors: unknown[] = [];
+        const phases = [
+            () => this.processSyncQueue(errors),
+            () => this.syncPendingStudysets(errors),
+            () => this.syncPendingUsers(errors),
+            () => this.updatePendingCount(),
+        ];
+        for (const phase of phases) {
+            try {
+                await phase();
+            } catch (error) {
+                errors.push(error);
+            }
+        }
 
+        if (errors.length === 0) {
             this.setState({
                 status: 'idle',
                 lastSyncAt: Date.now(),
-                pendingCount: 0,
                 error: null,
             });
-        } catch (error) {
+        } else {
+            const [first] = errors;
             this.setState({
                 status: 'error',
-                error: error instanceof Error ? error.message : 'Sync failed',
+                error: first instanceof Error ? first.message : 'Sync failed',
             });
         }
     }
@@ -171,12 +204,16 @@ export class SyncEngine {
 
     private async updatePendingCount(): Promise<void> {
         const db = getDatabase();
-        const [studysets, users, queue] = await Promise.all([
+        const [studysets, users, queue, failed] = await Promise.all([
             db.studysets.where('_syncStatus').equals('pending').count(),
             db.users.where('_syncStatus').equals('pending').count(),
             db.syncQueue.count(),
+            db.studysets.where('_syncStatus').equals('failed').count(),
         ]);
-        this.setState({ pendingCount: studysets + users + queue });
+        this.setState({
+            pendingCount: studysets + users + queue,
+            failedCount: failed,
+        });
     }
 
     private setupNetworkListeners(): void {
@@ -193,7 +230,7 @@ export class SyncEngine {
     }
 
     // Process the sync queue (delete operations, etc.)
-    private async processSyncQueue(): Promise<void> {
+    private async processSyncQueue(errors: unknown[]): Promise<void> {
         const db = getDatabase();
         const queue = await db.syncQueue.orderBy('createdAt').toArray();
 
@@ -218,42 +255,62 @@ export class SyncEngine {
                 // The local row stays pending until its delete succeeds
                 // (#296); drop it with the queue item so it isn't then sent
                 // as an update.
-                await db.transaction('rw', db.syncQueue, db.studysets, async () => {
-                    await db.syncQueue.delete(item.id);
-                    if (isStudysetDelete) {
-                        await db.studysets.delete(item.entityId);
+                await db.transaction(
+                    'rw',
+                    db.syncQueue,
+                    db.studysets,
+                    async () => {
+                        await db.syncQueue.delete(item.id);
+                        if (isStudysetDelete) {
+                            await db.studysets.delete(item.entityId);
+                        }
                     }
-                });
+                );
             } catch (error) {
-                // Increment retry count
-                if (item.retryCount >= this.options.maxRetries) {
-                    // Give up and remove from queue
-                    await db.syncQueue.delete(item.id);
-                    console.error(
-                        `Failed to sync after ${this.options.maxRetries} retries:`,
-                        item
-                    );
-                } else {
-                    await db.syncQueue.update(item.id, {
-                        retryCount: item.retryCount + 1,
-                    });
+                errors.push(error);
+                // Transient failures (offline, 5xx, auth) don't use up retries.
+                if (!isRetryableSyncError(error)) {
+                    if (item.retryCount >= this.options.maxRetries) {
+                        // Give up and remove from queue
+                        await db.syncQueue.delete(item.id);
+                        console.error(
+                            `Failed to sync after ${this.options.maxRetries} retries:`,
+                            item
+                        );
+                    } else {
+                        await db.syncQueue.update(item.id, {
+                            retryCount: item.retryCount + 1,
+                        });
+                    }
                 }
-                throw error; // Propagate to stop sync
             }
         }
     }
 
     // Sync pending studyset changes
-    private async syncPendingStudysets(): Promise<void> {
+    private async syncPendingStudysets(errors: unknown[]): Promise<void> {
         const pending = await studysetRepository.getPendingChanges();
         if (pending.length === 0) return;
         if (!this.options.apiClient) return;
+
+        // A set whose delete is still queued must not be sent as an update.
+        const queuedDeletes = new Set(
+            (
+                await getDatabase()
+                    .syncQueue.where('entityType')
+                    .equals('studyset')
+                    .toArray()
+            )
+                .filter((item) => item.operation === 'delete')
+                .map((item) => item.entityId)
+        );
 
         // Separate creates from updates
         const creates: LocalStudyset[] = [];
         const updates: LocalStudyset[] = [];
 
         for (const studyset of pending) {
+            if (queuedDeletes.has(studyset.studysetUUID)) continue;
             if (studyset._localOnly) {
                 creates.push(studyset);
             } else {
@@ -264,14 +321,8 @@ export class SyncEngine {
         // Process creates
         for (const studyset of creates) {
             try {
-                const {
-                    _syncStatus,
-                    _lastModified,
-                    _localOnly,
-                    ...cleanStudyset
-                } = studyset;
                 await this.options.apiClient.createStudyset(
-                    cleanStudyset as Studyset
+                    stripLocalMetadata(studyset)
                 );
                 await studysetRepository.markAsSynced(studyset.studysetUUID);
             } catch (error) {
@@ -280,22 +331,16 @@ export class SyncEngine {
                     studyset.studysetUUID,
                     error
                 );
-                throw error;
+                await this.recordStudysetFailure(studyset, error, errors);
             }
         }
 
         // Process updates
         for (const studyset of updates) {
             try {
-                const {
-                    _syncStatus,
-                    _lastModified,
-                    _localOnly,
-                    ...cleanUpdates
-                } = studyset;
                 await this.options.apiClient.updateStudyset(
                     studyset.studysetUUID,
-                    cleanUpdates
+                    stripLocalMetadata(studyset)
                 );
                 await studysetRepository.markAsSynced(studyset.studysetUUID);
             } catch (error) {
@@ -304,13 +349,27 @@ export class SyncEngine {
                     studyset.studysetUUID,
                     error
                 );
-                throw error;
+                await this.recordStudysetFailure(studyset, error, errors);
             }
         }
     }
 
+    private async recordStudysetFailure(
+        studyset: LocalStudyset,
+        error: unknown,
+        errors: unknown[]
+    ): Promise<void> {
+        errors.push(error);
+        if (!isRetryableSyncError(error)) {
+            await studysetRepository.recordRejection(
+                studyset.studysetUUID,
+                this.options.maxRetries
+            );
+        }
+    }
+
     // Sync pending user changes
-    private async syncPendingUsers(): Promise<void> {
+    private async syncPendingUsers(errors: unknown[]): Promise<void> {
         const pending = await userRepository.getPendingChanges();
         if (pending.length === 0) return;
         if (!this.options.apiClient) return;
@@ -328,7 +387,7 @@ export class SyncEngine {
                 await userRepository.markAsSynced(user.userUUID);
             } catch (error) {
                 console.error('Failed to update user:', user.userUUID, error);
-                throw error;
+                errors.push(error);
             }
         }
     }

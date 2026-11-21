@@ -3,7 +3,7 @@ import {
     useGamificationStore,
 } from 'state/stores/gamification';
 import { useStudySessionStore } from 'state/stores/studySession';
-import { getDatabase, hasPendingSync } from './db';
+import { getDatabase, hasFailedSync, hasPendingSync } from './db';
 import { FILES_CACHE_NAME } from './pwa/cacheNames';
 import {
     handleOwnerStorageEvent,
@@ -109,6 +109,8 @@ export async function hasUnsyncedLocalChanges({
     if (!settled) return true;
 
     return (
-        useGamificationStore.getState().syncPending || (await hasPendingSync())
+        useGamificationStore.getState().syncPending ||
+        (await hasPendingSync()) ||
+        (await hasFailedSync())
     );
 }
