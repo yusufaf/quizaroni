@@ -29,6 +29,8 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { LogGroup, LogRetention, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { DEFAULT_ALLOWED_ORIGINS } from '../../constants';
 import apiAuthorizer from '../lambdas/apiAuthorizer/index';
+import readOnly from '../lambdas/readOnly/index';
+import { READ_ONLY_ALLOWED_LAMBDAS } from '../../utilities/readOnly';
 
 const LOG_RETENTION = RetentionDays.ONE_MONTH;
 
@@ -47,6 +49,8 @@ export class QuizaroniAPI extends Construct {
     prefix: string;
     // Stages that carry per-route throttling for the public routes.
     publicRouteStages: CfnStage[] = [];
+    // Set only in read-only mode (#269); write routes integrate with it.
+    readOnlyLambda?: LambdaFunction;
 
     constructor(scope: Construct, id: string, props: ExtendedStackProps) {
         super(scope, id);
@@ -149,6 +153,11 @@ export class QuizaroniAPI extends Construct {
             construct: this,
             props,
         };
+
+        if (props.readOnly) {
+            this.readOnlyLambda = readOnly({ ...lambdaProps });
+            this.setLambdaLogRetention(this.readOnlyLambda, 'readOnly');
+        }
 
         const authorizerNameAndID = `${this.prefix}-authorizer`;
         const apiAuthorizerLambda = apiAuthorizer({ ...lambdaProps });
@@ -513,12 +522,19 @@ export class QuizaroniAPI extends Construct {
         const lambda = lambdaFunction({ ...lambdaProps });
         this.setLambdaLogRetention(lambda, lambdaName);
 
+        // The write lambdas stay deployed in read-only mode and only the
+        // integration moves, so turning it off doesn't recreate functions.
+        const target =
+            this.readOnlyLambda && !READ_ONLY_ALLOWED_LAMBDAS.has(lambdaName)
+                ? this.readOnlyLambda
+                : lambda;
+
         const routes = api.addRoutes({
             path,
             methods,
             integration: new HttpLambdaIntegration(
                 `${this.deploymentType}-${lambdaName}-integration`,
-                lambda,
+                target,
                 {}
             ),
             authorizer,

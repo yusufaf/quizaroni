@@ -1,0 +1,97 @@
+# Runs when a GitHub Release is published: builds the hosted instance's image
+# (quizaroni.yusufaf.dev, #269) with the Umami tag baked in and pushes it to
+# ghcr.io/<repo>-hosted. The stock image from release.yml carries no tag.
+# Use workflow_dispatch to rebuild an existing tag.
+name: hosted-image
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to rebuild the hosted image for
+        type: string
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: hosted-image-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # A job-level block replaces the workflow's, so contents: read is repeated.
+    permissions:
+      contents: read
+      packages: write
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+      ACTOR: ${{ github.actor }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: apps/web/.node-version
+          cache: pnpm
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.4
+      - run: pnpm install --frozen-lockfile
+      # The hosted instance's Umami values (#301). Caddy proxies /s.js and
+      # /api/e to Umami, see deploy/hosted/Caddyfile.
+      - name: Build the Linux binaries with analytics
+        run: pnpm build:binary --targets linux-x64,linux-arm64
+        env:
+          VITE_UMAMI_WEBSITE_ID: 883ce165-bace-46c2-93df-994219b0f916
+          VITE_UMAMI_SRC: /s.js
+          VITE_UMAMI_HOST_URL: /
+      - name: Check the Umami tag is in the build
+        run: grep -F 'data-website-id="883ce165-bace-46c2-93df-994219b0f916"' apps/web/dist/index.html
+      # A throwaway admin completes setup on boot; without one, / redirects to
+      # the server-rendered /setup page, which has no Umami tag.
+      - name: Smoke-test the image
+        run: |
+          docker build -f apps/server/Dockerfile -t quizaroni-hosted:smoke apps/server/dist
+          docker run -d --name qz -p 8080:8080 \
+            -e QZ_ADMIN_EMAIL=smoke@example.com \
+            -e QZ_ADMIN_PASSWORD=smoke-only-admin \
+            quizaroni-hosted:smoke
+          for _ in $(seq 30); do
+            curl -fsS http://localhost:8080/api/health && break
+            sleep 1
+          done
+          curl -fsS http://localhost:8080/api/health
+          curl -fsS http://localhost:8080/ | grep -F 'data-website-id="883ce165-bace-46c2-93df-994219b0f916"'
+      - name: Smoke-test logs
+        if: always()
+        run: |
+          docker logs qz || true
+          docker rm -f qz || true
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Log in to GHCR
+        run: echo "$GH_TOKEN" | docker login ghcr.io -u "$ACTOR" --password-stdin
+      # X.Y.Z always; X.Y and latest only for the repo's latest release, as in
+      # release.yml.
+      - name: Build and push the image
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}-hosted"
+          version="${TAG#v}"
+          tags=(-t "$image:$version")
+          latest=$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" -q .tag_name)
+          if [[ "$latest" == "$TAG" ]]; then
+            tags+=(-t "$image:${version%.*}" -t "$image:latest")
+          fi
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -f apps/server/Dockerfile \
+            --label "org.opencontainers.image.version=$version" \
+            --label "org.opencontainers.image.revision=$(git rev-parse HEAD)" \
+            --label "org.opencontainers.image.description=Quizaroni hosted instance (with analytics)" \
+            "${tags[@]}" \
+            --push \
+            apps/server/dist
+          docker buildx imagetools inspect "$image:$version"

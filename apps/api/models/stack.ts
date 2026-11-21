@@ -4,6 +4,7 @@ import { Construct } from 'constructs';
 export interface ExtendedStackProps extends StackProps {
     appName?: string;
     deploymentType?: string;  
+    readOnly?: boolean;
 }
 
 export interface StackConstructsProps {
