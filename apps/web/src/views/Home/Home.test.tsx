@@ -4,6 +4,7 @@ import {
     it,
     expect,
     vi,
+    beforeAll,
     beforeEach,
     afterEach,
 } from 'vite-plus/test';
@@ -11,7 +12,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
-import 'i18n';
+import i18n from 'i18n';
 import Home from './Home';
 
 const muiTheme = createTheme();
@@ -122,6 +123,10 @@ const renderHome = () => {
 };
 
 describe('Home', () => {
+    beforeAll(async () => {
+        await i18n.changeLanguage('en');
+    });
+
     beforeEach(() => {
         studysets = [validSet, stub];
         fetchMock.mockClear();
