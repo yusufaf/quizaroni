@@ -52,6 +52,10 @@ const CLEAN_ENV = {
     QZ_SMTP_USER: '',
     QZ_SMTP_PASSWORD: '',
     QZ_SMTP_FROM: '',
+    QZ_GOOGLE_CLIENT_ID: '',
+    QZ_GOOGLE_CLIENT_SECRET: '',
+    QZ_GITHUB_CLIENT_ID: '',
+    QZ_GITHUB_CLIENT_SECRET: '',
 };
 const LISTENING = /listening on (http:\/\/\S+) \(public URL (\S+)\)/;
 
