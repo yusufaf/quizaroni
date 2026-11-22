@@ -748,5 +748,10 @@
         "body": "Some of your progress hasn't been saved to your account yet. If you sign out now, it will be removed from this device.",
         "confirm": "Sign out anyway",
         "cancel": "Stay signed in"
+    },
+    "notFound": {
+        "title": "Page not found",
+        "body": "We couldn't find the page you were looking for. It may have moved or the link may be wrong.",
+        "home": "Back to home"
     }
 }

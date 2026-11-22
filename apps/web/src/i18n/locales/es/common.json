@@ -748,5 +748,10 @@
         "body": "Parte de tu progreso aún no se ha guardado en tu cuenta. Si cierras sesión ahora, se eliminará de este dispositivo.",
         "confirm": "Cerrar sesión de todos modos",
         "cancel": "Seguir con la sesión iniciada"
+    },
+    "notFound": {
+        "title": "Página no encontrada",
+        "body": "No encontramos la página que buscabas. Puede que se haya movido o que el enlace sea incorrecto.",
+        "home": "Volver al inicio"
     }
 }
