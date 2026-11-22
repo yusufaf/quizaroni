@@ -76,9 +76,15 @@ function storedView(row: Row): StudysetView {
     };
 }
 
-// Card files are always served from the stable, session-checked path.
+// Card files are always served from the stable, session-checked path, and
+// settings an old or imported row never stored come back as their defaults.
 export function toView(row: Row): StudysetView {
-    return { ...storedView(row), cards: withFileURLs(row.cards) };
+    const view = storedView(row);
+    return {
+        ...view,
+        cards: withFileURLs(row.cards),
+        metadata: { ...DEFAULT_STUDYSET_METADATA, ...view.metadata },
+    };
 }
 
 // The id is a global key; ownership is checked on every read and write.
