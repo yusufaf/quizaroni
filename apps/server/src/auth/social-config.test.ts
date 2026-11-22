@@ -136,9 +136,7 @@ describe('socialUrlWarning', () => {
         expect(socialUrlWarning(cfg, 'http://localhost:8080')).toBeUndefined();
         expect(socialUrlWarning(cfg, 'http://127.0.0.1:8080')).toBeUndefined();
         expect(socialUrlWarning(cfg, 'http://[::1]:8080')).toBeUndefined();
-        expect(
-            socialUrlWarning({}, 'http://quiz.example.org')
-        ).toBeUndefined();
+        expect(socialUrlWarning({}, 'http://quiz.example.org')).toBeUndefined();
     });
 });
 
