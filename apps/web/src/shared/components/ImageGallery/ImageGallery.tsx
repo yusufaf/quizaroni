@@ -114,7 +114,7 @@ interface ImageGalleryProps {
     onLightboxChange?: (isOpen: boolean) => void;
 }
 
-const formatUploadDate = (isoDate: string, locale: string): string => {
+const formatUploadDate = (isoDate: string, locale?: string): string => {
     const date = new Date(isoDate);
     return date.toLocaleDateString(dateLocale(locale), {
         month: 'short',
