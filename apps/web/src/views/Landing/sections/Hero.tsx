@@ -52,7 +52,7 @@ const Hero = () => {
                                 letterSpacing: '-0.02em',
                                 // Japanese has no spaces, so without this the
                                 // browser may break mid-word (学 | び).
-                                wordBreak: 'auto-phrase',
+                                wordBreak: 'auto-phrase',
                                 marginBottom: '1.5rem',
                                 color: isDark
                                     ? '#ffffff'

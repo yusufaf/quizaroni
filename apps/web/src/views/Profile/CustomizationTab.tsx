@@ -33,7 +33,6 @@ import {
     currentLanguage,
     LANGUAGE_OPTIONS,
     SUPPORTED_LANGUAGES,
-    type SupportedLanguage,
 } from 'i18n/languages';
 import {
     DARK,
@@ -307,7 +306,7 @@ const CustomizationTab = ({ userData }: Props) => {
                         value={currentLanguage(i18n.resolvedLanguage)}
                         onChange={handleLanguageChange}
                         renderValue={(code) =>
-                            SUPPORTED_LANGUAGES[code as SupportedLanguage]
+                            SUPPORTED_LANGUAGES[currentLanguage(String(code))]
                                 .nativeName
                         }
                         sx={{
