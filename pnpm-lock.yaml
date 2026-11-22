@@ -9963,7 +9963,7 @@ snapshots:
       pathe: 2.0.3
       sirv: 3.0.2
       tinyrainbow: 3.2.0
-      vitest: 5.1.0(@types/node@20.19.43)(@vitest/browser-preview@5.1.0)(@vitest/ui@5.1.0(vitest@5.1.0))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@20.19.43)(esbuild@0.28.2)(jiti@2.6.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3))(jsdom@29.1.1(@noble/hashes@2.4.0))
+      vitest: 5.1.0(@types/node@25.9.9)(@vitest/browser-preview@5.1.0)(@vitest/ui@5.1.0(vitest@5.1.0))(@voidzero-dev/vite-plus-core@1.5.0(@types/node@25.9.9)(esbuild@0.28.2)(jiti@2.6.1)(terser@5.51.2)(tsx@4.23.15)(typescript@5.9.3))(jsdom@29.1.1(@noble/hashes@2.4.0))
 
   '@vitest/utils@5.1.0':
     dependencies:

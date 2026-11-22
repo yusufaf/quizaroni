@@ -255,7 +255,7 @@ const ImageGallery = ({
                                         {t('imageGallery.uploaded', {
                                             date: formatUploadDate(
                                                 selectedImage.uploadedAt,
-                                                i18n.language
+                                                i18n.resolvedLanguage
                                             ),
                                         })}
                                     </Typography>
