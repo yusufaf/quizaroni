@@ -1,0 +1,78 @@
+{
+    "title": "Entdecken",
+    "forYou": {
+        "heading": "Für dich",
+        "loading": "Deine Lernsets werden geladen…",
+        "error": "Deine Lernsets konnten nicht geladen werden.",
+        "retry": "Erneut versuchen"
+    },
+    "tile": {
+        "jumpBackIn": "Weitermachen",
+        "favorite": "Favorit",
+        "revisit": "Wiederholen",
+        "previews": "Begriffe in diesem Lernset",
+        "untitled": "Unbenanntes Lernset",
+        "cardCount_one": "{{count}} Karte",
+        "cardCount_other": "{{count}} Karten",
+        "due": {
+            "eyebrow": "Zur Wiederholung fällig",
+            "title_one": "{{count}} Karte in {{sets}} fällig",
+            "title_other": "{{count}} Karten in {{sets}} fällig",
+            "sets_one": "{{count}} Lernset",
+            "sets_other": "{{count}} Lernsets",
+            "local": "Auf diesem Gerät",
+            "review": "Wiederholen"
+        },
+        "streak": {
+            "eyebrow": "Serie",
+            "title_one": "{{count}}-Tage-Serie",
+            "title_other": "{{count}}-Tage-Serie",
+            "atRisk_one": "Lerne heute, um deine {{count}}-Tage-Serie zu halten",
+            "atRisk_other": "Lerne heute, um deine {{count}}-Tage-Serie zu halten",
+            "studiedToday": "Du hast heute gelernt",
+            "lastStudiedYesterday": "Zuletzt gestern gelernt"
+        }
+    },
+    "empty": {
+        "heading": "Noch keine Lernsets",
+        "body": "Erstelle dein erstes Lernset und es erscheint hier.",
+        "createSet": "Lernset erstellen"
+    },
+    "signUpBanner": {
+        "heading": "Mach diese Lernsets zu deinen eigenen",
+        "body": "Registriere dich kostenlos, um öffentliche Lernsets zu speichern, mit verteiltem Lernen zu üben und deinen Fortschritt zu verfolgen.",
+        "cta": "Kostenlos registrieren"
+    },
+    "featured": {
+        "heading": "Empfohlen"
+    },
+    "community": {
+        "heading": "Community",
+        "loading": "Öffentliche Lernsets werden geladen…",
+        "error": "Öffentliche Lernsets konnten nicht geladen werden.",
+        "retry": "Erneut versuchen",
+        "empty": "Noch keine öffentlichen Lernsets.",
+        "emptySubject": "Noch keine öffentlichen Lernsets in {{subject}}.",
+        "loadMore": "Mehr laden",
+        "loadMoreError": "Weitere Lernsets konnten nicht geladen werden.",
+        "showing": "{{shown}} angezeigt",
+        "showingOf": "{{shown}} von {{total}} angezeigt",
+        "showingSubject": "{{shown}} in {{subject}} angezeigt",
+        "showingSubjectOf": "{{shown}} von {{total}} in {{subject}} angezeigt",
+        "subjectFilter": "Nach Fachgebiet filtern",
+        "allSubjects": "Alle",
+        "anonymous": "Anonym",
+        "termCount_one": "{{count}} Begriff",
+        "termCount_other": "{{count}} Begriffe",
+        "showingQuery": "{{shown}} für „{{query}}“ angezeigt",
+        "showingQueryOf": "{{shown}} von {{total}} für „{{query}}“ angezeigt",
+        "showingSubjectQuery": "{{shown}} in {{subject}} für „{{query}}“ angezeigt",
+        "showingSubjectQueryOf": "{{shown}} von {{total}} in {{subject}} für „{{query}}“ angezeigt",
+        "emptyQuery": "Keine öffentlichen Lernsets passen zu „{{query}}“.",
+        "emptySubjectQuery": "Keine öffentlichen Lernsets in {{subject}} passen zu „{{query}}“."
+    },
+    "search": {
+        "label": "Öffentliche Lernsets durchsuchen",
+        "clear": "Suche löschen"
+    }
+}

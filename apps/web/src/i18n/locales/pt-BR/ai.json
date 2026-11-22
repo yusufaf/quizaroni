@@ -1,0 +1,81 @@
+{
+    "aiChat": {
+        "title": "Assistente de Estudo com IA",
+        "openPanel": "Abrir Assistente de IA",
+        "closePanel": "Fechar Assistente de IA",
+        "modes": {
+            "chat": "Chat",
+            "quiz": "Me Teste",
+            "explain": "Explicar",
+            "keyConcepts": "Conceitos-Chave",
+            "suggestCards": "Sugerir Cartões"
+        },
+        "modeDescriptions": {
+            "chat": "Faça perguntas sobre seu material de estudo",
+            "quiz": "Teste seus conhecimentos com perguntas geradas por IA",
+            "explain": "Receba explicações detalhadas sobre os conceitos",
+            "keyConcepts": "Descubra os pontos mais importantes",
+            "suggestCards": "Gere novos flashcards semelhantes a estes"
+        },
+        "actions": {
+            "explainCard": "Explicar com IA",
+            "generateKeyConcepts": "Gerar Conceitos-Chave",
+            "generateCards": "Gerar Cartões",
+            "addToSet": "Adicionar {{count}} ao conjunto",
+            "exportChat": "Exportar conversa"
+        },
+        "suggestedCards": {
+            "title": "Flashcards sugeridos",
+            "added": "{{count}} cartão(ões) adicionado(s) ao seu conjunto",
+            "addedShort": "Adicionado ao conjunto"
+        },
+        "input": {
+            "placeholder": "Faça uma pergunta...",
+            "send": "Enviar",
+            "stop": "Parar geração"
+        },
+        "messages": {
+            "welcome": "Olá! Sou seu assistente de estudo com IA. Tenho acesso a todos os cartões deste conjunto de estudo. Como posso ajudar você a estudar?",
+            "quizWelcome": "Vamos testar seus conhecimentos! Vou fazer perguntas com base nos seus flashcards. Pronto?",
+            "explainWelcome": "Posso explicar em detalhes qualquer conceito do seu conjunto de estudo. O que você gostaria de entender melhor?",
+            "keyConceptsWelcome": "Vou analisar seu conjunto de estudo e identificar os conceitos-chave...",
+            "suggestCardsWelcome": "Posso gerar novos flashcards que combinam com este conjunto. Toque em Gerar Cartões para começar.",
+            "emptyState": "Inicie uma conversa para receber ajuda nos estudos",
+            "error": "Algo deu errado. Tente novamente.",
+            "clearChat": "Limpar conversa",
+            "clearChatConfirm": "Tem certeza de que deseja limpar esta conversa?"
+        },
+        "setup": {
+            "title": "Configurar Recursos de IA",
+            "description": "Configure seu provedor de IA e sua chave de API para começar a usar os recursos de estudo com IA.",
+            "goToSettings": "Ir para Configurações de IA",
+            "noApiKey": "Nenhuma chave de API configurada"
+        }
+    },
+    "aiSettings": {
+        "title": "Integração com IA",
+        "description": "Configure seu provedor de IA para ativar os recursos de estudo com IA. Sua chave de API é armazenada criptografada no seu dispositivo e nunca é salva em nossos servidores.",
+        "provider": "Provedor de IA",
+        "providerDescription": "Selecione seu provedor de IA preferido",
+        "model": "Modelo",
+        "modelDescription": "Escolha qual modelo de IA usar",
+        "apiKey": "Chave de API",
+        "apiKeyDescription": "Digite a chave de API do seu provedor",
+        "apiKeyPlaceholder": "Cole sua chave de API aqui",
+        "apiKeySaved": "Chave de API salva com segurança",
+        "apiKeyMasked": "Chave configurada",
+        "saveKey": "Salvar Chave",
+        "deleteKey": "Excluir Chave",
+        "testConnection": "Testar Conexão",
+        "testSuccess": "Conexão bem-sucedida!",
+        "testError": "Falha na conexão. Verifique sua chave de API.",
+        "getApiKey": "Obter uma chave de API",
+        "recommended": "Recomendado",
+        "securityNote": "Sua chave de API é criptografada e armazenada apenas neste dispositivo. Ela é transmitida com segurança a cada solicitação, mas nunca é armazenada em nossos servidores.",
+        "providerOptions": {
+            "openai": "OpenAI",
+            "anthropic": "Anthropic",
+            "google": "Google Gemini"
+        }
+    }
+}

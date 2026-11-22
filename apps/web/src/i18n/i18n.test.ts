@@ -31,6 +31,28 @@ describe('i18n runtime', () => {
         );
     });
 
+    it.each([
+        ['de-AT', 'de'],
+        ['pt', 'pt-BR'],
+        ['pt-PT', 'pt-BR'],
+        ['ja-JP', 'ja'],
+    ])('resolves %s to %s', async (requested, resolved) => {
+        await i18n.changeLanguage(requested);
+        expect(i18n.resolvedLanguage).toBe(resolved);
+        expect(document.documentElement.lang).toBe(resolved);
+    });
+
+    it('uses Japanese plurals, which have only an "other" form', async () => {
+        await i18n.changeLanguage('ja');
+        expect(new Intl.PluralRules('ja').select(1)).toBe('other');
+        expect(
+            i18n.getResource('ja', 'study', 'review.dueCount_one')
+        ).toBeUndefined();
+        expect(i18n.t('study:review.dueCount', { count: 1 })).toBe(
+            '復習対象: 1枚'
+        );
+    });
+
     it('falls back to English for an unsupported language', async () => {
         await i18n.changeLanguage('xx');
         expect(i18n.resolvedLanguage).toBe('en');

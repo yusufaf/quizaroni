@@ -1,0 +1,78 @@
+{
+    "title": "Explorar",
+    "forYou": {
+        "heading": "Para você",
+        "loading": "Carregando seus conjuntos…",
+        "error": "Não foi possível carregar seus conjuntos.",
+        "retry": "Tentar novamente"
+    },
+    "tile": {
+        "jumpBackIn": "Continue de onde parou",
+        "favorite": "Favorito",
+        "revisit": "Para revisar",
+        "previews": "Termos neste conjunto",
+        "untitled": "Conjunto sem título",
+        "cardCount_one": "{{count}} cartão",
+        "cardCount_other": "{{count}} cartões",
+        "due": {
+            "eyebrow": "Revisão pendente",
+            "title_one": "{{count}} cartão pendente em {{sets}}",
+            "title_other": "{{count}} cartões pendentes em {{sets}}",
+            "sets_one": "{{count}} conjunto",
+            "sets_other": "{{count}} conjuntos",
+            "local": "Neste dispositivo",
+            "review": "Revisar"
+        },
+        "streak": {
+            "eyebrow": "Sequência",
+            "title_one": "Sequência de {{count}} dia",
+            "title_other": "Sequência de {{count}} dias",
+            "atRisk_one": "Estude hoje para manter sua sequência de {{count}} dia",
+            "atRisk_other": "Estude hoje para manter sua sequência de {{count}} dias",
+            "studiedToday": "Você já estudou hoje",
+            "lastStudiedYesterday": "Último estudo ontem"
+        }
+    },
+    "empty": {
+        "heading": "Nenhum conjunto de estudo ainda",
+        "body": "Crie seu primeiro conjunto e ele aparecerá aqui.",
+        "createSet": "Criar conjunto"
+    },
+    "signUpBanner": {
+        "heading": "Torne estes conjuntos seus",
+        "body": "Cadastre-se grátis para salvar conjuntos públicos, estudar com repetição espaçada e acompanhar seu progresso.",
+        "cta": "Cadastre-se grátis"
+    },
+    "featured": {
+        "heading": "Em destaque"
+    },
+    "community": {
+        "heading": "Comunidade",
+        "loading": "Carregando conjuntos públicos…",
+        "error": "Não foi possível carregar os conjuntos públicos.",
+        "retry": "Tentar novamente",
+        "empty": "Nenhum conjunto público ainda.",
+        "emptySubject": "Nenhum conjunto público em {{subject}} ainda.",
+        "loadMore": "Carregar mais",
+        "loadMoreError": "Não foi possível carregar mais conjuntos.",
+        "showing": "Mostrando {{shown}}",
+        "showingOf": "Mostrando {{shown}} de {{total}}",
+        "showingSubject": "Mostrando {{shown}} em {{subject}}",
+        "showingSubjectOf": "Mostrando {{shown}} de {{total}} em {{subject}}",
+        "subjectFilter": "Filtrar por assunto",
+        "allSubjects": "Todos",
+        "anonymous": "Anônimo",
+        "termCount_one": "{{count}} termo",
+        "termCount_other": "{{count}} termos",
+        "showingQuery": "Mostrando {{shown}} para “{{query}}”",
+        "showingQueryOf": "Mostrando {{shown}} de {{total}} para “{{query}}”",
+        "showingSubjectQuery": "Mostrando {{shown}} em {{subject}} para “{{query}}”",
+        "showingSubjectQueryOf": "Mostrando {{shown}} de {{total}} em {{subject}} para “{{query}}”",
+        "emptyQuery": "Nenhum conjunto público corresponde a “{{query}}”.",
+        "emptySubjectQuery": "Nenhum conjunto público em {{subject}} corresponde a “{{query}}”."
+    },
+    "search": {
+        "label": "Buscar conjuntos públicos",
+        "clear": "Limpar busca"
+    }
+}

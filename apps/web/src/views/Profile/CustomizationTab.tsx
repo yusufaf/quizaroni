@@ -15,6 +15,7 @@ import {
 } from '@mui/icons-material';
 import {
     Button,
+    Chip,
     CircularProgress,
     MenuItem,
     Select,
@@ -28,7 +29,11 @@ import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
 import useSpeechVoices from 'shared/hooks/useSpeechVoices';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { currentLanguage, LANGUAGE_OPTIONS } from 'i18n/languages';
+import {
+    currentLanguage,
+    LANGUAGE_OPTIONS,
+    SUPPORTED_LANGUAGES,
+} from 'i18n/languages';
 import {
     DARK,
     DATE_FORMATS,
@@ -300,16 +305,34 @@ const CustomizationTab = ({ userData }: Props) => {
                     <SimpleSelect
                         value={currentLanguage(i18n.resolvedLanguage)}
                         onChange={handleLanguageChange}
+                        renderValue={(code) =>
+                            SUPPORTED_LANGUAGES[currentLanguage(String(code))]
+                                .nativeName
+                        }
                         sx={{
                             height: '2.5rem',
-                            width: '10rem',
+                            width: '12rem',
                         }}
                     >
-                        {LANGUAGE_OPTIONS.map(({ code, nativeName }) => (
-                            <MenuItem key={code} value={code} lang={code}>
-                                {nativeName}
-                            </MenuItem>
-                        ))}
+                        {LANGUAGE_OPTIONS.map(
+                            ({ code, nativeName, status }) => (
+                                <MenuItem
+                                    key={code}
+                                    value={code}
+                                    lang={code}
+                                    sx={{ gap: '0.5rem' }}
+                                >
+                                    {nativeName}
+                                    {status === 'beta' && (
+                                        <Chip
+                                            label={t('profile.betaLanguage')}
+                                            size="small"
+                                            variant="outlined"
+                                        />
+                                    )}
+                                </MenuItem>
+                            )
+                        )}
                     </SimpleSelect>
                 </SimpleFlexContainer>
             </ActionColumn>

@@ -1,0 +1,81 @@
+{
+    "aiChat": {
+        "title": "Assistant d'étude IA",
+        "openPanel": "Ouvrir l'assistant IA",
+        "closePanel": "Fermer l'assistant IA",
+        "modes": {
+            "chat": "Discussion",
+            "quiz": "Quiz",
+            "explain": "Expliquer",
+            "keyConcepts": "Concepts clés",
+            "suggestCards": "Suggérer des cartes"
+        },
+        "modeDescriptions": {
+            "chat": "Posez des questions sur votre support d'étude",
+            "quiz": "Testez vos connaissances avec des questions générées par l'IA",
+            "explain": "Obtenez des explications détaillées sur les concepts",
+            "keyConcepts": "Découvrez les points essentiels à retenir",
+            "suggestCards": "Générez de nouvelles flashcards similaires à celles-ci"
+        },
+        "actions": {
+            "explainCard": "Expliquer avec l'IA",
+            "generateKeyConcepts": "Générer les concepts clés",
+            "generateCards": "Générer des cartes",
+            "addToSet": "Ajouter {{count}} à la liste",
+            "exportChat": "Exporter la conversation"
+        },
+        "suggestedCards": {
+            "title": "Flashcards suggérées",
+            "added": "{{count}} carte(s) ajoutée(s) à votre liste",
+            "addedShort": "Ajoutées à la liste"
+        },
+        "input": {
+            "placeholder": "Posez une question...",
+            "send": "Envoyer",
+            "stop": "Arrêter la génération"
+        },
+        "messages": {
+            "welcome": "Bonjour ! Je suis votre assistant d'étude IA. J'ai accès à toutes les cartes de cette liste d'étude. Comment puis-je vous aider à réviser ?",
+            "quizWelcome": "Testons vos connaissances ! Je vais vous poser des questions basées sur vos flashcards. Prêt ?",
+            "explainWelcome": "Je peux expliquer en détail n'importe quel concept de votre liste d'étude. Que souhaitez-vous mieux comprendre ?",
+            "keyConceptsWelcome": "Laissez-moi analyser votre liste d'étude et identifier les concepts clés...",
+            "suggestCardsWelcome": "Je peux générer de nouvelles flashcards adaptées à cette liste. Appuyez sur Générer des cartes pour commencer.",
+            "emptyState": "Démarrez une conversation pour obtenir de l'aide dans vos révisions",
+            "error": "Une erreur s'est produite. Veuillez réessayer.",
+            "clearChat": "Effacer la conversation",
+            "clearChatConfirm": "Voulez-vous vraiment effacer cette conversation ?"
+        },
+        "setup": {
+            "title": "Configurer les fonctionnalités IA",
+            "description": "Configurez votre fournisseur d'IA et votre clé API pour commencer à utiliser les fonctionnalités d'étude assistées par l'IA.",
+            "goToSettings": "Aller aux paramètres IA",
+            "noApiKey": "Aucune clé API configurée"
+        }
+    },
+    "aiSettings": {
+        "title": "Intégration IA",
+        "description": "Configurez votre fournisseur d'IA pour activer les fonctionnalités d'étude assistées par l'IA. Votre clé API est stockée de manière chiffrée sur votre appareil et n'est jamais enregistrée sur nos serveurs.",
+        "provider": "Fournisseur d'IA",
+        "providerDescription": "Sélectionnez votre fournisseur d'IA préféré",
+        "model": "Modèle",
+        "modelDescription": "Choisissez le modèle d'IA à utiliser",
+        "apiKey": "Clé API",
+        "apiKeyDescription": "Saisissez la clé API fournie par votre fournisseur",
+        "apiKeyPlaceholder": "Collez votre clé API ici",
+        "apiKeySaved": "Clé API enregistrée en toute sécurité",
+        "apiKeyMasked": "Clé configurée",
+        "saveKey": "Enregistrer la clé",
+        "deleteKey": "Supprimer la clé",
+        "testConnection": "Tester la connexion",
+        "testSuccess": "Connexion réussie !",
+        "testError": "Échec de la connexion. Veuillez vérifier votre clé API.",
+        "getApiKey": "Obtenir une clé API",
+        "recommended": "Recommandé",
+        "securityNote": "Votre clé API est chiffrée et stockée uniquement sur cet appareil. Elle est transmise de manière sécurisée à chaque requête mais n'est jamais conservée sur nos serveurs.",
+        "providerOptions": {
+            "openai": "OpenAI",
+            "anthropic": "Anthropic",
+            "google": "Google Gemini"
+        }
+    }
+}

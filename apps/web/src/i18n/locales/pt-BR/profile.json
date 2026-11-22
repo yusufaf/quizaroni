@@ -1,0 +1,142 @@
+{
+    "tabs": {
+        "overview": "Visão Geral",
+        "studySets": "Conjuntos de Estudo",
+        "statistics": "Estatísticas",
+        "customization": "Personalização",
+        "settings": "Configurações"
+    },
+    "customization": {
+        "title": "Personalização",
+        "theme": {
+            "title": "Tema",
+            "light": "Claro",
+            "dark": "Escuro"
+        },
+        "language": {
+            "title": "Idioma da Interface",
+            "description": "Selecione seu idioma preferido"
+        },
+        "fontSize": {
+            "title": "Tamanho da Fonte",
+            "small": "Pequeno",
+            "medium": "Médio",
+            "large": "Grande",
+            "extraLarge": "Extra Grande"
+        },
+        "dateFormat": {
+            "title": "Formato de Data"
+        },
+        "timeFormat": {
+            "title": "Formato de Hora",
+            "twelveHour": "12 horas",
+            "twentyFourHour": "24 horas"
+        },
+        "showSeconds": {
+            "title": "Mostrar Segundos"
+        },
+        "homeView": {
+            "title": "Visualização Inicial Padrão",
+            "table": "Tabela",
+            "grid": "Grade"
+        },
+        "downloadFormat": {
+            "title": "Formato Padrão de Download"
+        }
+    },
+    "deleteAccountDialog": {
+        "title": "Excluir Conta",
+        "passwordLabel": "Senha",
+        "passwordPlaceholder": "Digite sua senha",
+        "confirmButton": "Excluir Conta"
+    },
+    "settings": {
+        "title": "Configurações",
+        "account": "Configurações da Conta",
+        "changePassword": "Alterar Senha",
+        "deleteAccount": "Excluir Conta",
+        "notifications": "Notificações",
+        "emailNotifications": "Notificações por E-mail",
+        "studyReminders": "Lembretes de Estudo"
+    },
+    "statistics": {
+        "title": "Estatísticas",
+        "totalSets": "Total de Conjuntos de Estudo",
+        "totalCards": "Total de Cartões",
+        "studyTime": "Tempo de Estudo",
+        "averageAccuracy": "Precisão Média",
+        "currentStreak": "Sequência Atual",
+        "longestStreak": "Maior Sequência"
+    },
+    "achievements": {
+        "streakTitle": "Sequência de Estudos",
+        "currentStreak": "Sequência Atual",
+        "longestStreak": "Maior Sequência",
+        "streakTooltip_one": "Sequência de {{count}} dia de estudo",
+        "streakTooltip_other": "Sequência de {{count}} dias de estudo",
+        "presetTitle": "Conquistas Predefinidas",
+        "customTitle": "Metas Personalizadas",
+        "createCustom": "Criar Meta",
+        "noCustom": "Nenhuma meta personalizada ainda. Crie uma para acompanhar um objetivo pessoal!",
+        "unlocked": "Desbloqueada",
+        "deleteCustom": "Excluir meta personalizada",
+        "customProgress": "Meta: {{target}}",
+        "form": {
+            "title": "Título da Meta",
+            "description": "Descrição",
+            "icon": "Ícone (emoji)",
+            "metric": "Acompanhar",
+            "threshold": "Meta",
+            "cancel": "Cancelar",
+            "save": "Salvar Meta"
+        },
+        "metrics": {
+            "total_sessions": "Sessões de estudo concluídas",
+            "total_cards": "Cartões estudados",
+            "daily_streak": "Sequência diária de estudo",
+            "studyset_sessions": "Sessões em um conjunto de estudo"
+        },
+        "presets": {
+            "firstStudy": {
+                "title": "Primeiros Passos",
+                "description": "Conclua sua primeira sessão de estudo"
+            },
+            "perfectScore": {
+                "title": "Pontuação Perfeita",
+                "description": "Alcance 100% de precisão em uma sessão"
+            },
+            "streak3": {
+                "title": "No Ritmo",
+                "description": "Estude por 3 dias seguidos"
+            },
+            "streak7": {
+                "title": "Guerreiro da Semana",
+                "description": "Estude por 7 dias seguidos"
+            },
+            "streak30": {
+                "title": "Mestre do Mês",
+                "description": "Estude por 30 dias seguidos"
+            },
+            "sessionStreak10": {
+                "title": "Sequência Imbatível",
+                "description": "Acerte 10 cartões seguidos"
+            },
+            "sessions10": {
+                "title": "Estudante Dedicado",
+                "description": "Conclua 10 sessões de estudo"
+            },
+            "sessions50": {
+                "title": "Maratona de Estudos",
+                "description": "Conclua 50 sessões de estudo"
+            },
+            "cards100": {
+                "title": "Centurião do Saber",
+                "description": "Estude 100 cartões no total"
+            },
+            "cards500": {
+                "title": "Campeão do Conhecimento",
+                "description": "Estude 500 cartões no total"
+            }
+        }
+    }
+}

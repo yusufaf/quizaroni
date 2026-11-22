@@ -1,0 +1,142 @@
+{
+    "tabs": {
+        "overview": "Übersicht",
+        "studySets": "Lernsets",
+        "statistics": "Statistiken",
+        "customization": "Anpassung",
+        "settings": "Einstellungen"
+    },
+    "customization": {
+        "title": "Anpassung",
+        "theme": {
+            "title": "Design",
+            "light": "Hell",
+            "dark": "Dunkel"
+        },
+        "language": {
+            "title": "Sprache der Oberfläche",
+            "description": "Wähle deine bevorzugte Sprache"
+        },
+        "fontSize": {
+            "title": "Schriftgröße",
+            "small": "Klein",
+            "medium": "Mittel",
+            "large": "Groß",
+            "extraLarge": "Sehr groß"
+        },
+        "dateFormat": {
+            "title": "Datumsformat"
+        },
+        "timeFormat": {
+            "title": "Zeitformat",
+            "twelveHour": "12-Stunden",
+            "twentyFourHour": "24-Stunden"
+        },
+        "showSeconds": {
+            "title": "Sekunden anzeigen"
+        },
+        "homeView": {
+            "title": "Standardansicht Startseite",
+            "table": "Tabelle",
+            "grid": "Raster"
+        },
+        "downloadFormat": {
+            "title": "Standard-Downloadformat"
+        }
+    },
+    "deleteAccountDialog": {
+        "title": "Konto löschen",
+        "passwordLabel": "Passwort",
+        "passwordPlaceholder": "Passwort eingeben",
+        "confirmButton": "Konto löschen"
+    },
+    "settings": {
+        "title": "Einstellungen",
+        "account": "Kontoeinstellungen",
+        "changePassword": "Passwort ändern",
+        "deleteAccount": "Konto löschen",
+        "notifications": "Benachrichtigungen",
+        "emailNotifications": "E-Mail-Benachrichtigungen",
+        "studyReminders": "Lernerinnerungen"
+    },
+    "statistics": {
+        "title": "Statistiken",
+        "totalSets": "Lernsets gesamt",
+        "totalCards": "Karten gesamt",
+        "studyTime": "Lernzeit",
+        "averageAccuracy": "Durchschnittliche Genauigkeit",
+        "currentStreak": "Aktuelle Serie",
+        "longestStreak": "Längste Serie"
+    },
+    "achievements": {
+        "streakTitle": "Lernserie",
+        "currentStreak": "Aktuelle Serie",
+        "longestStreak": "Längste Serie",
+        "streakTooltip_one": "{{count}} Tag Lernserie",
+        "streakTooltip_other": "{{count}} Tage Lernserie",
+        "presetTitle": "Erfolge",
+        "customTitle": "Eigene Ziele",
+        "createCustom": "Ziel erstellen",
+        "noCustom": "Noch keine eigenen Ziele. Erstelle eines, um deinen persönlichen Meilenstein zu verfolgen!",
+        "unlocked": "Freigeschaltet",
+        "deleteCustom": "Eigenes Ziel löschen",
+        "customProgress": "Ziel: {{target}}",
+        "form": {
+            "title": "Zieltitel",
+            "description": "Beschreibung",
+            "icon": "Symbol (Emoji)",
+            "metric": "Messwert",
+            "threshold": "Zielwert",
+            "cancel": "Abbrechen",
+            "save": "Ziel speichern"
+        },
+        "metrics": {
+            "total_sessions": "Abgeschlossene Lernsitzungen",
+            "total_cards": "Gelernte Karten",
+            "daily_streak": "Tägliche Lernserie",
+            "studyset_sessions": "Sitzungen für ein Lernset"
+        },
+        "presets": {
+            "firstStudy": {
+                "title": "Erste Schritte",
+                "description": "Schließe deine erste Lernsitzung ab"
+            },
+            "perfectScore": {
+                "title": "Volle Punktzahl",
+                "description": "Erreiche 100 % Genauigkeit in einer Sitzung"
+            },
+            "streak3": {
+                "title": "Am Ball bleiben",
+                "description": "Lerne 3 Tage hintereinander"
+            },
+            "streak7": {
+                "title": "Wochenheld",
+                "description": "Lerne 7 Tage hintereinander"
+            },
+            "streak30": {
+                "title": "Monatsmeister",
+                "description": "Lerne 30 Tage hintereinander"
+            },
+            "sessionStreak10": {
+                "title": "Erfolgsserie",
+                "description": "Beantworte 10 Karten hintereinander richtig"
+            },
+            "sessions10": {
+                "title": "Fleißig dabei",
+                "description": "Schließe 10 Lernsitzungen ab"
+            },
+            "sessions50": {
+                "title": "Lernmarathon",
+                "description": "Schließe 50 Lernsitzungen ab"
+            },
+            "cards100": {
+                "title": "Hunderter-Club",
+                "description": "Lerne insgesamt 100 Karten"
+            },
+            "cards500": {
+                "title": "Wissenschampion",
+                "description": "Lerne insgesamt 500 Karten"
+            }
+        }
+    }
+}

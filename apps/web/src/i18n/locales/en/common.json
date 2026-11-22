@@ -405,6 +405,7 @@
         "switchToLight": "Switch default to Light mode",
         "switchToDark": "Switch default to Dark mode",
         "interfaceLanguage": "Interface Language",
+        "betaLanguage": "Beta",
         "labels": "Labels",
         "manageLabels": "Manage Labels",
         "namedColors": "Named Colors",

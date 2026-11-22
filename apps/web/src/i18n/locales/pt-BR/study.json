@@ -1,0 +1,163 @@
+{
+    "modes": {
+        "flashcards": {
+            "title": "Flashcards",
+            "description": "Cartões clássicos - aprenda no seu próprio ritmo",
+            "features": {
+                "selfPaced": "No seu ritmo",
+                "audioSupport": "Suporte a áudio",
+                "progressTracking": "Acompanhamento de progresso"
+            }
+        },
+        "multipleChoice": {
+            "title": "Múltipla Escolha",
+            "description": "Teste seus conhecimentos com perguntas estilo quiz",
+            "features": {
+                "timedMode": "Modo cronometrado",
+                "instantFeedback": "Feedback instantâneo",
+                "scoreTracking": "Acompanhamento de pontuação"
+            }
+        },
+        "matching": {
+            "title": "Jogo de Combinação",
+            "description": "Combine termos com definições",
+            "features": {
+                "interactive": "Interativo",
+                "timeChallenge": "Desafio de tempo",
+                "visualFeedback": "Feedback visual"
+            }
+        },
+        "typeWrite": {
+            "title": "Digite e Escreva",
+            "description": "Pratique digitando as respostas",
+            "features": {
+                "activeRecall": "Recordação ativa",
+                "hintSystem": "Sistema de dicas",
+                "smartMatching": "Verificação inteligente"
+            }
+        },
+        "review": {
+            "title": "Revisão Pendente",
+            "description": "Estude apenas os cartões pendentes de hoje",
+            "features": {
+                "spacedRepetition": "Repetição espaçada",
+                "dueCardsOnly": "Apenas cartões pendentes",
+                "optimizedRetention": "Retenção otimizada"
+            }
+        }
+    },
+    "actions": {
+        "startStudying": "Começar a Estudar",
+        "continueStudying": "Continuar Estudando",
+        "restartSession": "Reiniciar Sessão",
+        "viewResults": "Ver Resultados",
+        "flipCard": "Virar Cartão",
+        "nextCard": "Próximo Cartão",
+        "previousCard": "Cartão Anterior",
+        "finish": "Finalizar",
+        "shuffle": "Embaralhar",
+        "showHint": "Mostrar Dica",
+        "submitAnswer": "Enviar Resposta"
+    },
+    "progress": {
+        "cardsStudied": "Cartões Estudados",
+        "accuracy": "Precisão",
+        "timeSpent": "Tempo Gasto",
+        "streak": "Sequência",
+        "score": "Pontuação"
+    },
+    "feedback": {
+        "correct": "Correto!",
+        "incorrect": "Incorreto",
+        "tryAgain": "Tente Novamente",
+        "wellDone": "Muito Bem!",
+        "keepGoing": "Continue Assim!",
+        "perfectScore": "Pontuação Perfeita!"
+    },
+    "ratings": {
+        "again": "De novo",
+        "hard": "Difícil",
+        "good": "Bom",
+        "easy": "Fácil"
+    },
+    "review": {
+        "due": "Revisão Pendente",
+        "dueCount_one": "{{count}} cartão pendente",
+        "dueCount_other": "{{count}} cartões pendentes",
+        "caughtUp": "Tudo em dia!",
+        "caughtUpSubtitle": "Não há cartões pendentes para revisão no momento.",
+        "ratePrompt": "Quão bem você se lembrou disso?"
+    },
+    "addCardsToUnlock": "Adicione cartões para desbloquear este modo",
+    "loading": "Carregando...",
+    "typeWriteStudy": {
+        "typeDefinitionBelow": "Digite a definição abaixo:",
+        "answerPlaceholder": "Digite sua resposta...",
+        "useHint": "Usar Dica ({{remaining}} restantes)",
+        "hintPenaltySuffix": "({{points}} pts)",
+        "hint1FirstLetter": "Dica 1: A primeira letra é \"{{letter}}\"",
+        "hint2FirstThree": "Dica 2: As 3 primeiras letras são \"{{letters}}\"",
+        "hint3Length": "Dica 3: O tamanho é de {{count}} caracteres",
+        "difficultyLine": "Dificuldade: {{level}} | Pressione Enter para enviar",
+        "difficultyEasy": "fácil",
+        "difficultyMedium": "média",
+        "difficultyHard": "difícil",
+        "feedbackCorrect": "✓ Correto!",
+        "feedbackIncorrect": "✗ Incorreto. A resposta correta é: \"{{answer}}\""
+    },
+    "results": {
+        "outstanding": "Sensacional! 🌟",
+        "greatJob": "Ótimo Trabalho! 🎉",
+        "goodWork": "Bom Trabalho! 👍",
+        "keepPracticing": "Continue Praticando! 💪",
+        "totalScore": "Pontuação Total",
+        "correct": "Acertos",
+        "accuracy": "Precisão",
+        "time": "Tempo",
+        "bestStreak": "Melhor Sequência",
+        "newAchievements": "🎉 Novas Conquistas Desbloqueadas!",
+        "backToSet": "Voltar ao Conjunto",
+        "studyAgain": "Estudar Novamente"
+    },
+    "header": {
+        "backToStudySet": "Voltar ao Conjunto de Estudo",
+        "streak": "Sequência: {{count}}",
+        "score": "Pontos: {{score}}",
+        "progress": "Cartão {{current}} de {{total}}",
+        "audioOn": "Áudio Ligado",
+        "audioOff": "Áudio Desligado",
+        "settings": "Configurações"
+    },
+    "matching": {
+        "time": "Tempo: {{time}}",
+        "matched": "Combinados: {{matched}}/{{total}}",
+        "terms": "Termos",
+        "definitions": "Definições"
+    },
+    "multipleChoice": {
+        "correctFeedback": "✓ Correto! Ótimo trabalho!",
+        "incorrectFeedback": "✗ Incorreto. A resposta correta era: \"{{answer}}\"",
+        "optionPlaceholder": "Opção {{n}}"
+    },
+    "settings": {
+        "title": "Configurações de Estudo",
+        "cardSection": "Configurações dos Cartões",
+        "shuffleCards": "Embaralhar Cartões",
+        "autoAdvance": "Avançar Automaticamente para o Próximo Cartão",
+        "hideImages": "Ocultar Imagens dos Cartões",
+        "audioSection": "Configurações de Áudio",
+        "tts": "Ativar Leitura em Voz Alta (TTS)",
+        "timerSection": "Configurações do Cronômetro",
+        "timedMode": "Ativar Modo Cronometrado",
+        "timePerCard": "Tempo por Cartão: {{seconds}} segundos",
+        "difficultySection": "Nível de Dificuldade",
+        "difficultyEasy": "Fácil",
+        "difficultyMedium": "Média",
+        "difficultyHard": "Difícil",
+        "difficultyEasyDesc": "Verificação de respostas mais flexível, mais dicas disponíveis",
+        "difficultyMediumDesc": "Equilíbrio entre verificação de respostas e dicas disponíveis",
+        "difficultyHardDesc": "Verificação de respostas rigorosa, menos dicas disponíveis",
+        "saveSettings": "Salvar Configurações",
+        "secondsShort": "{{seconds}}s"
+    }
+}

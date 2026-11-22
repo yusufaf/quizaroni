@@ -1,0 +1,81 @@
+{
+    "aiChat": {
+        "title": "AI学習アシスタント",
+        "openPanel": "AIアシスタントを開く",
+        "closePanel": "AIアシスタントを閉じる",
+        "modes": {
+            "chat": "チャット",
+            "quiz": "クイズ出題",
+            "explain": "解説",
+            "keyConcepts": "重要ポイント",
+            "suggestCards": "カード提案"
+        },
+        "modeDescriptions": {
+            "chat": "学習内容について質問できます",
+            "quiz": "AIが生成した問題で知識をテストします",
+            "explain": "概念の詳しい解説を確認できます",
+            "keyConcepts": "最も重要なポイントを見つけます",
+            "suggestCards": "現在のカードに似た新しいフラッシュカードを生成します"
+        },
+        "actions": {
+            "explainCard": "AIで解説",
+            "generateKeyConcepts": "重要ポイントを生成",
+            "generateCards": "カードを生成",
+            "addToSet": "{{count}}枚をセットに追加",
+            "exportChat": "会話をエクスポート"
+        },
+        "suggestedCards": {
+            "title": "提案されたフラッシュカード",
+            "added": "{{count}}枚のカードを学習セットに追加しました",
+            "addedShort": "セットに追加済み"
+        },
+        "input": {
+            "placeholder": "質問を入力...",
+            "send": "送信",
+            "stop": "生成を停止"
+        },
+        "messages": {
+            "welcome": "こんにちは！AI学習アシスタントです。この学習セットのすべてのカードを参照できます。今日はどのような学習をお手伝いしましょうか？",
+            "quizWelcome": "知識をテストしましょう！フラッシュカードをもとに質問を出題します。準備はいいですか？",
+            "explainWelcome": "学習セット内のあらゆる概念を詳しく解説します。どの内容について詳しく知りたいですか？",
+            "keyConceptsWelcome": "学習セットを分析して重要ポイントを抽出しています...",
+            "suggestCardsWelcome": "この学習セットに合った新しいフラッシュカードを生成できます。「カードを生成」をタップして始めましょう。",
+            "emptyState": "会話を始めて学習のサポートを受けましょう",
+            "error": "問題が発生しました。もう一度お試しください。",
+            "clearChat": "チャットをクリア",
+            "clearChatConfirm": "この会話をクリアしてもよろしいですか？"
+        },
+        "setup": {
+            "title": "AI機能の設定",
+            "description": "AIプロバイダーとAPIキーを設定して、AIを活用した学習機能を使い始めましょう。",
+            "goToSettings": "AI設定へ移動",
+            "noApiKey": "APIキーが設定されていません"
+        }
+    },
+    "aiSettings": {
+        "title": "AI連携",
+        "description": "AIを活用した学習機能を有効にするには、AIプロバイダーを設定してください。APIキーはお使いのデバイス上に暗号化して保存され、サーバーには一切保存されません。",
+        "provider": "AIプロバイダー",
+        "providerDescription": "使用するAIプロバイダーを選択してください",
+        "model": "モデル",
+        "modelDescription": "使用するAIモデルを選択してください",
+        "apiKey": "APIキー",
+        "apiKeyDescription": "プロバイダーから取得したAPIキーを入力してください",
+        "apiKeyPlaceholder": "ここにAPIキーを貼り付け",
+        "apiKeySaved": "APIキーを安全に保存しました",
+        "apiKeyMasked": "キー設定済み",
+        "saveKey": "キーを保存",
+        "deleteKey": "キーを削除",
+        "testConnection": "接続テスト",
+        "testSuccess": "接続に成功しました！",
+        "testError": "接続に失敗しました。APIキーを確認してください。",
+        "getApiKey": "APIキーを取得",
+        "recommended": "推奨",
+        "securityNote": "APIキーは暗号化され、このデバイスにのみ保存されます。リクエストごとに安全に送信されますが、サーバーに保存されることはありません。",
+        "providerOptions": {
+            "openai": "OpenAI",
+            "anthropic": "Anthropic",
+            "google": "Google Gemini"
+        }
+    }
+}

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vite-plus/test';
-import { LANGUAGE_OPTIONS, NAMESPACES } from './languages';
+import {
+    LANGUAGE_OPTIONS,
+    NAMESPACES,
+    SUPPORTED_LANGUAGES,
+    type SupportedLanguage,
+} from './languages';
 import {
     type PluralCategory,
     requiredCategories,
@@ -93,12 +98,16 @@ describe('locale files', () => {
         });
     });
 
-    describe.each(targets)('%s matches en', (lng) => {
+    describe.each(targets)('%s matches en', (lng: SupportedLanguage) => {
+        const complete = SUPPORTED_LANGUAGES[lng].status === 'complete';
+
         it.each([...NAMESPACES])('%s: same keys', (ns) => {
             const en = familiesOf(locales.en![ns]!);
             const target = familiesOf(locales[lng]![ns]!);
             expect({
-                missing: [...en.keys()].filter((base) => !target.has(base)),
+                missing: complete
+                    ? [...en.keys()].filter((base) => !target.has(base))
+                    : [],
                 extra: [...target.keys()].filter((base) => !en.has(base)),
                 pluralMismatch: [...en.keys()].filter(
                     (base) =>

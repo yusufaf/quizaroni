@@ -1,0 +1,141 @@
+{
+    "tabs": {
+        "overview": "概要",
+        "studySets": "学習セット",
+        "statistics": "統計",
+        "customization": "カスタマイズ",
+        "settings": "設定"
+    },
+    "customization": {
+        "title": "カスタマイズ",
+        "theme": {
+            "title": "テーマ",
+            "light": "ライト",
+            "dark": "ダーク"
+        },
+        "language": {
+            "title": "表示言語",
+            "description": "使用する言語を選択してください"
+        },
+        "fontSize": {
+            "title": "フォントサイズ",
+            "small": "小",
+            "medium": "中",
+            "large": "大",
+            "extraLarge": "特大"
+        },
+        "dateFormat": {
+            "title": "日付形式"
+        },
+        "timeFormat": {
+            "title": "時刻形式",
+            "twelveHour": "12時間表記",
+            "twentyFourHour": "24時間表記"
+        },
+        "showSeconds": {
+            "title": "秒を表示"
+        },
+        "homeView": {
+            "title": "デフォルトのホーム表示",
+            "table": "テーブル",
+            "grid": "グリッド"
+        },
+        "downloadFormat": {
+            "title": "デフォルトのダウンロード形式"
+        }
+    },
+    "deleteAccountDialog": {
+        "title": "アカウントを削除",
+        "passwordLabel": "パスワード",
+        "passwordPlaceholder": "パスワードを入力",
+        "confirmButton": "アカウントを削除"
+    },
+    "settings": {
+        "title": "設定",
+        "account": "アカウント設定",
+        "changePassword": "パスワードを変更",
+        "deleteAccount": "アカウントを削除",
+        "notifications": "通知",
+        "emailNotifications": "メール通知",
+        "studyReminders": "学習リマインダー"
+    },
+    "statistics": {
+        "title": "統計",
+        "totalSets": "総学習セット数",
+        "totalCards": "総カード枚数",
+        "studyTime": "学習時間",
+        "averageAccuracy": "平均正答率",
+        "currentStreak": "現在の連続学習日数",
+        "longestStreak": "最長連続学習日数"
+    },
+    "achievements": {
+        "streakTitle": "連続学習",
+        "currentStreak": "現在の連続学習日数",
+        "longestStreak": "最長連続学習日数",
+        "streakTooltip_other": "{{count}}日連続学習",
+        "presetTitle": "プリセット実績",
+        "customTitle": "カスタム目標",
+        "createCustom": "目標を作成",
+        "noCustom": "カスタム目標はまだありません。作成して個人の目標を記録しましょう！",
+        "unlocked": "達成済み",
+        "deleteCustom": "カスタム目標を削除",
+        "customProgress": "目標: {{target}}",
+        "form": {
+            "title": "目標のタイトル",
+            "description": "説明",
+            "icon": "アイコン（絵文字）",
+            "metric": "記録項目",
+            "threshold": "目標値",
+            "cancel": "キャンセル",
+            "save": "目標を保存"
+        },
+        "metrics": {
+            "total_sessions": "完了した学習セッション数",
+            "total_cards": "学習したカード枚数",
+            "daily_streak": "連続学習日数",
+            "studyset_sessions": "1つの学習セットのセッション数"
+        },
+        "presets": {
+            "firstStudy": {
+                "title": "はじめの一歩",
+                "description": "最初の学習セッションを完了する"
+            },
+            "perfectScore": {
+                "title": "満点達成",
+                "description": "1回のセッションで正答率100%を達成する"
+            },
+            "streak3": {
+                "title": "順調な滑り出し",
+                "description": "3日連続で学習する"
+            },
+            "streak7": {
+                "title": "1週間達成",
+                "description": "7日連続で学習する"
+            },
+            "streak30": {
+                "title": "マンスリーマスター",
+                "description": "30日連続で学習する"
+            },
+            "sessionStreak10": {
+                "title": "連続正解ストリーム",
+                "description": "カードに10枚連続で正解する"
+            },
+            "sessions10": {
+                "title": "熱心な学習者",
+                "description": "学習セッションを10回完了する"
+            },
+            "sessions50": {
+                "title": "学習マラソン",
+                "description": "学習セッションを50回完了する"
+            },
+            "cards100": {
+                "title": "カード100枚達成",
+                "description": "合計100枚のカードを学習する"
+            },
+            "cards500": {
+                "title": "知識のチャンピオン",
+                "description": "合計500枚のカードを学習する"
+            }
+        }
+    }
+}
