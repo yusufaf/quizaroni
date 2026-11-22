@@ -50,7 +50,7 @@ const DownloadDataDialog = ({ open, handleClose }: Props) => {
                 onClose={handleClose}
             />
             <DeleteDialogContent>
-                <DialogContentText paragraph>
+                <DialogContentText sx={{ mb: 2 }}>
                     {t('downloadDataDialog.intro')}
                 </DialogContentText>
                 <DialogContentText>
