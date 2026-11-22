@@ -98,21 +98,21 @@ export const DEFAULT_NOTIFICATION_PREFERENCES: Readonly<JsonObject> =
     Object.freeze({
         enabled: false,
         mode: 'regular',
-        email: {
+        email: Object.freeze({
             enabled: true,
             studyReminders: true,
             streakAlerts: true,
             weeklyDigest: true,
             inactivityNudges: false,
             digestDay: 0,
-        },
-        quietHours: {
+        }),
+        quietHours: Object.freeze({
             enabled: false,
             start: '22:00',
             end: '08:00',
             timezone: 'UTC',
-        },
-        studysetPrefs: [],
+        }),
+        studysetPrefs: Object.freeze([]),
     });
 
 // For responses only: fills what old or imported rows never stored, without
