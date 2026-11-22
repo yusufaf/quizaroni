@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { Studyset } from 'shared/types';
+import { dateLocale } from 'i18n/languages';
 
 type Props = {
     labels: string[];
@@ -37,7 +38,7 @@ export const LabelsAssignTab = ({
 }: Props) => {
     const formatDate = (timestamp: string) => {
         try {
-            return new Date(timestamp).toLocaleDateString('en-US', {
+            return new Date(timestamp).toLocaleDateString(dateLocale(), {
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric',

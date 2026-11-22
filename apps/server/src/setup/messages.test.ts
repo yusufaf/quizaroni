@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'bun:test';
-import { en, es, pickLocale } from './messages';
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
+import { en, es, LOCALES, pickLocale } from './messages';
 
 describe('pickLocale', () => {
     test.each([
@@ -24,5 +26,14 @@ describe('messages', () => {
             expect(typeof value).toBe('string');
             expect(value.trim()).not.toBe('');
         }
+    });
+});
+
+describe('LOCALES', () => {
+    test('only offers languages the web app also ships', () => {
+        const webLocales = readdirSync(
+            join(import.meta.dir, '../../../web/src/i18n/locales')
+        );
+        for (const locale of LOCALES) expect(webLocales).toContain(locale);
     });
 });
