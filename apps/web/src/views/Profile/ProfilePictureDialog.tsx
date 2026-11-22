@@ -25,6 +25,7 @@ import {
     type AvatarPreset,
 } from 'utilities/avatarUtils';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     open: boolean;
@@ -33,6 +34,7 @@ type Props = {
 };
 
 const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
+    const { t } = useTranslation(['profile', 'common']);
     const [selectedAvatar, setSelectedAvatar] = useState<AvatarMetadata | null>(
         null
     );
@@ -63,13 +65,13 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
         // Validate file type
         const allowedTypes = ['image/png', 'image/jpeg', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
-            setError('Please select a PNG, JPEG, or WebP image');
+            setError(t('profilePictureDialog.invalidType'));
             return;
         }
 
         // Validate file size (before compression)
         if (file.size > 10 * 1024 * 1024) {
-            setError('File size must be less than 10MB');
+            setError(t('profilePictureDialog.fileTooLarge'));
             return;
         }
 
@@ -94,11 +96,11 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
                 value: result.url,
             });
 
-            toast.success('Image uploaded successfully!');
+            toast.success(t('profilePictureDialog.uploadSuccess'));
         } catch (err: any) {
             console.error('Upload error:', err);
-            setError(err?.message || 'Failed to upload image');
-            toast.error('Failed to upload image');
+            setError(err?.message || t('profilePictureDialog.uploadFailed'));
+            toast.error(t('profilePictureDialog.uploadFailed'));
         } finally {
             setUploading(false);
         }
@@ -106,7 +108,7 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
 
     const handleSave = async () => {
         if (!selectedAvatar) {
-            setError('Please select an avatar');
+            setError(t('profilePictureDialog.selectAvatar'));
             return;
         }
 
@@ -114,12 +116,12 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
             await updateMetadataMutation.mutateAsync({
                 updates: { avatar: selectedAvatar },
             });
-            toast.success('Profile picture updated!');
+            toast.success(t('profilePictureDialog.updated'));
             onClose();
         } catch (err: any) {
             console.error('Save error:', err);
-            setError(err?.message || 'Failed to save avatar');
-            toast.error('Failed to save avatar');
+            setError(err?.message || t('profilePictureDialog.saveFailed'));
+            toast.error(t('profilePictureDialog.saveFailed'));
         }
     };
 
@@ -130,7 +132,7 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
             <StandardDialogTitle
-                title="Choose Profile Picture"
+                title={t('profilePictureDialog.title')}
                 onClose={onClose}
             />
             <DialogContent>
@@ -141,7 +143,7 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
                 )}
 
                 <Typography variant="h6" gutterBottom>
-                    Preset Avatars
+                    {t('profilePictureDialog.presetAvatars')}
                 </Typography>
                 <Box
                     sx={{
@@ -220,7 +222,7 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
                 </Box>
 
                 <Typography variant="h6" gutterBottom>
-                    Upload Custom Image
+                    {t('profilePictureDialog.uploadCustomImage')}
                 </Typography>
                 <Box
                     sx={{
@@ -241,7 +243,9 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
                         onClick={handleUploadClick}
                         disabled={uploading}
                     >
-                        {uploading ? 'Uploading...' : 'Choose File'}
+                        {uploading
+                            ? t('profilePictureDialog.uploading')
+                            : t('profilePictureDialog.chooseFile')}
                     </Button>
                     {selectedAvatar?.type === 'upload' && (
                         <Box
@@ -256,7 +260,7 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
                         >
                             <img
                                 src={selectedAvatar.value}
-                                alt="Selected"
+                                alt={t('profilePictureDialog.selectedAlt')}
                                 style={{
                                     width: '100%',
                                     height: '100%',
@@ -271,7 +275,7 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
                     color="text.secondary"
                     sx={{ mt: 1, display: 'block' }}
                 >
-                    Max 2MB. PNG, JPEG, or WebP. Will be resized to 512x512px.
+                    {t('profilePictureDialog.uploadHint')}
                 </Typography>
 
                 <input
@@ -284,7 +288,7 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
             </DialogContent>
             <StyledDialogActions>
                 <Button onClick={onClose} color="secondary">
-                    Cancel
+                    {t('common:buttons.cancel')}
                 </Button>
                 <Button
                     onClick={handleSave}
@@ -294,7 +298,9 @@ const ProfilePictureDialog = ({ open, onClose, userData }: Props) => {
                         !selectedAvatar || updateMetadataMutation.isPending
                     }
                 >
-                    {updateMetadataMutation.isPending ? 'Saving...' : 'Save'}
+                    {updateMetadataMutation.isPending
+                        ? t('profilePictureDialog.saving')
+                        : t('common:buttons.save')}
                 </Button>
             </StyledDialogActions>
         </Dialog>

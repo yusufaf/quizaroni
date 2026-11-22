@@ -59,13 +59,16 @@ const renderTab = () =>
         </ThemeProvider>
     );
 
-const input = () => screen.getByLabelText('Username') as HTMLInputElement;
+const input = () =>
+    screen.getByLabelText('account.usernameLabel') as HTMLInputElement;
 const submit = () =>
-    screen.getByRole('button', { name: 'Submit' }) as HTMLButtonElement;
+    screen.getByRole('button', {
+        name: 'common:buttons.submit',
+    }) as HTMLButtonElement;
 const enter = (value: string) =>
     fireEvent.change(input(), { target: { value } });
 
-const RULE = '3-32 letters, numbers or underscores, not starting with a number';
+const RULE = 'account.usernameRule';
 
 describe('AccountTab change username', () => {
     it('submits the entered username', async () => {
@@ -126,7 +129,7 @@ describe('AccountTab change username', () => {
 
         await waitFor(() =>
             expect(mocks.toast.error).toHaveBeenCalledWith(
-                'That username is taken'
+                'account.usernameTaken'
             )
         );
         expect(input().value).toBe('new_name');
@@ -154,7 +157,7 @@ describe('AccountTab change username', () => {
 
         await waitFor(() =>
             expect(mocks.toast.error).toHaveBeenCalledWith(
-                'Failed to change username'
+                'account.usernameChangeFailed'
             )
         );
         expect(input().value).toBe('new_name');

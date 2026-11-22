@@ -20,18 +20,17 @@ import { User } from 'shared/types';
 import { isHttpStatus } from 'state/api/awsAPI';
 import { useUpdateUsername } from 'state/api/usersAPI';
 import DownloadDataDialog from './DownloadDataDialog';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     userData: User;
 };
 
-const USERNAME_RULE =
-    '3-32 letters, numbers or underscores, not starting with a number';
-
 // Change Password and Change Email used to live here as Amplify attribute
 // mutations — Logto's hosted pages (and its own account settings) own both
 // now. The username is changed through the API, which writes it to Logto.
 const AccountTab = ({ userData }: Props) => {
+    const { t } = useTranslation(['profile', 'common']);
     const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
     const [showDownloadDialog, setShowDownloadDialog] =
         useState<boolean>(false);
@@ -55,19 +54,19 @@ const AccountTab = ({ userData }: Props) => {
             // the API stamps on new sets; the next call mints a fresh one.
             await clearAccessToken();
             setEnteredNewUsername('');
-            toast.success(`Username changed to ${trimmedUsername}`);
+            toast.success(
+                t('account.usernameChanged', { username: trimmedUsername })
+            );
             if (!result.studysetsRenameComplete) {
-                toast.warning(
-                    'Some of your study sets still show your old username'
-                );
+                toast.warning(t('account.oldUsernameRemains'));
             }
         } catch (err) {
             if (isHttpStatus(err, 409)) {
-                toast.error('That username is taken');
+                toast.error(t('account.usernameTaken'));
             } else if (isHttpStatus(err, 400)) {
-                toast.error(USERNAME_RULE);
+                toast.error(t('account.usernameRule'));
             } else {
-                toast.error('Failed to change username');
+                toast.error(t('account.usernameChangeFailed'));
             }
         }
     };
@@ -85,19 +84,23 @@ const AccountTab = ({ userData }: Props) => {
             <ActionSection>
                 <ActionHeader>
                     <Person />
-                    <Typography variant="h6">Change Username</Typography>
+                    <Typography variant="h6">
+                        {t('account.changeUsername')}
+                    </Typography>
                 </ActionHeader>
                 <InfoChangeContainer>
                     <TextField
                         variant="standard"
-                        label="Username"
-                        placeholder="Enter new username"
+                        label={t('account.usernameLabel')}
+                        placeholder={t('account.usernamePlaceholder')}
                         value={enteredNewUsername}
                         onChange={(e) => setEnteredNewUsername(e.target.value)}
                         size="small"
                         error={showUsernameRule}
                         helperText={
-                            showUsernameRule ? USERNAME_RULE : undefined
+                            showUsernameRule
+                                ? t('account.usernameRule')
+                                : undefined
                         }
                     />
                     <ActionSubmitButton
@@ -109,14 +112,16 @@ const AccountTab = ({ userData }: Props) => {
                             isPending
                         }
                     >
-                        Submit
+                        {t('common:buttons.submit')}
                     </ActionSubmitButton>
                 </InfoChangeContainer>
             </ActionSection>
             <ActionSection>
                 <ActionHeader>
                     <RemoveCircleOutline />
-                    <Typography variant="h6">Delete Account</Typography>
+                    <Typography variant="h6">
+                        {t('account.deleteAccount')}
+                    </Typography>
                 </ActionHeader>
                 <ActionSubmitButton
                     variant="text"
@@ -130,7 +135,7 @@ const AccountTab = ({ userData }: Props) => {
                         },
                     }}
                 >
-                    Delete Account
+                    {t('account.deleteAccount')}
                 </ActionSubmitButton>
                 <DeleteAccountDialog
                     open={showDeleteDialog}
@@ -142,14 +147,16 @@ const AccountTab = ({ userData }: Props) => {
             <ActionSection>
                 <ActionHeader>
                     <DataUsageRounded />
-                    <Typography variant="h6">Download Data</Typography>
+                    <Typography variant="h6">
+                        {t('account.downloadData')}
+                    </Typography>
                 </ActionHeader>
                 <ActionSubmitButton
                     variant="outlined"
                     onClick={toggleDownloadDataDialog}
                     fullWidth
                 >
-                    Download Data
+                    {t('account.downloadData')}
                 </ActionSubmitButton>
                 <DownloadDataDialog
                     open={showDownloadDialog}

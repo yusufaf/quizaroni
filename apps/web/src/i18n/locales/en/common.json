@@ -31,6 +31,8 @@
         "openMenu": "Open menu",
         "menu": "Menu",
         "darkMode": "Dark mode",
+        "switchToLight": "Switch to light mode",
+        "switchToDark": "Switch to dark mode",
         "feedback": "Feedback"
     },
     "pageTitles": {

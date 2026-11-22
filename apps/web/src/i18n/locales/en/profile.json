@@ -138,5 +138,42 @@
                 "description": "Study 500 cards total"
             }
         }
+    },
+    "account": {
+        "changeUsername": "Change Username",
+        "usernameLabel": "Username",
+        "usernamePlaceholder": "Enter new username",
+        "usernameRule": "3-32 letters, numbers or underscores, not starting with a number",
+        "usernameChanged": "Username changed to {{username}}",
+        "oldUsernameRemains": "Some of your study sets still show your old username",
+        "usernameTaken": "That username is taken",
+        "usernameChangeFailed": "Failed to change username",
+        "deleteAccount": "Delete Account",
+        "downloadData": "Download Data"
+    },
+    "downloadDataDialog": {
+        "title": "Download Data",
+        "intro": "You can download a copy of your data by clicking the \"Download Data\" button below. This will generate a file containing your personal information, saved settings, and other relevant data.",
+        "note": "Please note that depending on the amount of data stored, the download process may take a few moments to complete. Once the download begins, you can save the file to your device for future reference or personal use.",
+        "includeStudysets": "Include studysets in the download",
+        "confirmButton": "Download Data",
+        "downloadFailed": "Failed to download your data"
+    },
+    "profilePictureDialog": {
+        "title": "Choose Profile Picture",
+        "presetAvatars": "Preset Avatars",
+        "uploadCustomImage": "Upload Custom Image",
+        "chooseFile": "Choose File",
+        "uploading": "Uploading...",
+        "selectedAlt": "Selected",
+        "uploadHint": "Max 2MB. PNG, JPEG, or WebP. Will be resized to 512x512px.",
+        "invalidType": "Please select a PNG, JPEG, or WebP image",
+        "fileTooLarge": "File size must be less than 10MB",
+        "uploadSuccess": "Image uploaded successfully!",
+        "uploadFailed": "Failed to upload image",
+        "selectAvatar": "Please select an avatar",
+        "saving": "Saving...",
+        "updated": "Profile picture updated!",
+        "saveFailed": "Failed to save avatar"
     }
 }
