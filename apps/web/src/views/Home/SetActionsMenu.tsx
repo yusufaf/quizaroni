@@ -15,6 +15,7 @@ import {
     OpenInNewRounded,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Studyset } from 'shared/types';
 import { STUDYSET_CONFIRM_DIALOGS } from 'shared/constants';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
@@ -43,6 +44,7 @@ const SetActionsMenu = ({
 
     const { mutate: updateStudyset } = useUpdateStudyset();
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const { showConfirmDialog } = useGlobalStore();
 
@@ -95,7 +97,7 @@ const SetActionsMenu = ({
                 <ListItemIcon>
                     <EditIcon />
                 </ListItemIcon>
-                <ListItemText>Edit</ListItemText>
+                <ListItemText>{t('buttons.edit')}</ListItemText>
             </MenuItem>
             <MenuItem
                 onClick={(e) =>
@@ -105,7 +107,7 @@ const SetActionsMenu = ({
                 <ListItemIcon>
                     <CopyIcon />
                 </ListItemIcon>
-                <ListItemText>Duplicate</ListItemText>
+                <ListItemText>{t('buttons.duplicate')}</ListItemText>
             </MenuItem>
             <MenuItem
                 onClick={(e) =>
@@ -115,7 +117,7 @@ const SetActionsMenu = ({
                 <ListItemIcon>
                     <DeleteIcon color="error" />
                 </ListItemIcon>
-                <ListItemText>Delete</ListItemText>
+                <ListItemText>{t('buttons.delete')}</ListItemText>
             </MenuItem>
             <MenuItem onClick={handleFavoriteAction}>
                 <ListItemIcon>
@@ -126,20 +128,20 @@ const SetActionsMenu = ({
                     )}
                 </ListItemIcon>
                 <ListItemText>
-                    {favorited ? 'Unfavorite' : 'Favorite'}
+                    {favorited ? t('home.unfavorite') : t('home.favorite')}
                 </ListItemText>
             </MenuItem>
             <MenuItem onClick={handleViewInNewTab}>
                 <ListItemIcon>
                     <OpenInNewRounded />
                 </ListItemIcon>
-                <ListItemText>View in new tab</ListItemText>
+                <ListItemText>{t('home.viewInNewTab')}</ListItemText>
             </MenuItem>
             <MenuItem onClick={handleEditInNewTab}>
                 <ListItemIcon>
                     <OpenInNewRounded />
                 </ListItemIcon>
-                <ListItemText>Edit in new tab</ListItemText>
+                <ListItemText>{t('home.editInNewTab')}</ListItemText>
             </MenuItem>
         </Menu>
     );

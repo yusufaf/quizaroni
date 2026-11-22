@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Popover, Typography } from '@mui/material/';
+import { useTranslation } from 'react-i18next';
 import { CategoryChip } from './styles';
 
 type Props = {
@@ -7,6 +8,7 @@ type Props = {
 };
 
 const CategoriesPopover = ({ categories = [] }: Props) => {
+    const { t } = useTranslation();
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
     const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -25,7 +27,9 @@ const CategoriesPopover = ({ categories = [] }: Props) => {
                 aria-haspopup="true"
                 onMouseEnter={handlePopoverOpen}
                 onMouseLeave={handlePopoverClose}
-                label={`View ${categories.length} Categories`}
+                label={t('viewStudySet.viewCategories', {
+                    count: categories.length,
+                })}
                 variant="outlined"
             />
             <Popover

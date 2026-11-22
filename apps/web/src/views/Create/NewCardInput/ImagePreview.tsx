@@ -7,6 +7,7 @@ import { CircularProgress, IconButton, Typography } from '@mui/material';
 import { CardFileMetadata } from 'shared/types';
 import { formatBytes } from 'utilities/general';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 // `@mui/material/styles` rather than `@mui/system`: only the former's Theme
 // carries `shadows`, which the hover style below reads.
 import { styled } from '@mui/material/styles';
@@ -109,6 +110,7 @@ const ImagePreview = ({
     onReplace,
     isDeleting = false,
 }: ImagePreviewProps) => {
+    const { t } = useTranslation();
     const [imageError, setImageError] = useState(false);
 
     const handleDelete = (e: React.MouseEvent) => {
@@ -128,7 +130,9 @@ const ImagePreview = ({
             {imageError ? (
                 <BrokenImageContainer>
                     <BrokenImage fontSize="large" />
-                    <Typography variant="caption">Failed to load</Typography>
+                    <Typography variant="caption">
+                        {t('create.imageLoadFailed')}
+                    </Typography>
                 </BrokenImageContainer>
             ) : (
                 <>
@@ -144,8 +148,8 @@ const ImagePreview = ({
                                 onClick={handleDelete}
                                 size="small"
                                 sx={{ color: 'white' }}
-                                title="Delete image"
-                                aria-label="Delete image"
+                                title={t('create.deleteImage')}
+                                aria-label={t('create.deleteImage')}
                             >
                                 <DeleteIcon />
                             </IconButton>
@@ -154,8 +158,8 @@ const ImagePreview = ({
                                     onClick={handleReplace}
                                     size="small"
                                     sx={{ color: 'white' }}
-                                    title="Replace image"
-                                    aria-label="Replace image"
+                                    title={t('create.replaceImage')}
+                                    aria-label={t('create.replaceImage')}
                                 >
                                     <SwapIcon />
                                 </IconButton>

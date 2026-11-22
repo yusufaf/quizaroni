@@ -228,7 +228,10 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                                 <DragIndicator />
                             </IconButton>
                         </Tooltip>
-                        <Tooltip title="Play TTS" placement="top">
+                        <Tooltip
+                            title={t('common:viewStudySet.playTts')}
+                            placement="top"
+                        >
                             <IconButton onClick={handleAudioPlayback}>
                                 <VolumeUp />
                             </IconButton>
@@ -243,7 +246,10 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                                 </IconButton>
                             </Tooltip>
                         )}
-                        <Tooltip title="Mark as important" placement="top">
+                        <Tooltip
+                            title={t('common:viewStudySet.markImportant')}
+                            placement="top"
+                        >
                             <IconButton onClick={markCardAsImportant}>
                                 {card.important ? (
                                     <Star
@@ -264,7 +270,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                 <ViewCardInfo>
                     {!contentOnly && (
                         <Typography variant="h6" color="primary">
-                            {terminology1 ?? 'Term'}
+                            {terminology1 ?? t('common:create.term')}
                         </Typography>
                     )}
                     <Typography
@@ -290,7 +296,7 @@ const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
                 <ViewCardInfo>
                     {!contentOnly && (
                         <Typography variant="h6" color="primary">
-                            {terminology2 ?? 'Definition'}
+                            {terminology2 ?? t('common:create.definition')}
                         </Typography>
                     )}
                     <Typography

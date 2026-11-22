@@ -18,6 +18,10 @@ const mocks = vi.hoisted(() => ({
     toast: { error: vi.fn() },
 }));
 
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (k: string) => k }),
+}));
+
 vi.mock('react-toastify', () => ({ toast: mocks.toast }));
 
 vi.mock('state/api/usersAPI', () => ({
@@ -44,9 +48,11 @@ const renderDialog = () =>
     );
 
 const download = () =>
-    fireEvent.click(screen.getByRole('button', { name: 'Download Data' }));
+    fireEvent.click(
+        screen.getByRole('button', { name: 'downloadDataDialog.confirmButton' })
+    );
 
-const CHECKBOX_LABEL = 'Include studysets in the download';
+const CHECKBOX_LABEL = 'downloadDataDialog.includeStudysets';
 
 describe('DownloadDataDialog in a self-host build', () => {
     beforeEach(() => {
@@ -85,7 +91,7 @@ describe('DownloadDataDialog in a self-host build', () => {
 
         await waitFor(() =>
             expect(mocks.toast.error).toHaveBeenCalledWith(
-                'Failed to download your data'
+                'downloadDataDialog.downloadFailed'
             )
         );
         expect(mocks.handleClose).not.toHaveBeenCalled();

@@ -18,9 +18,6 @@ export const SUCCESS_U = 'Success';
 export const ERROR = 'error';
 export const ERROR_U = 'Error';
 
-export const DISABLED = 'Disabled';
-export const ENABLED = 'Enabled';
-
 export const ROUTES = {
     LOGIN: '/login',
     SIGNUP: '/signup',
@@ -492,16 +489,6 @@ export const DEFAULT_USER_DATA: User = {
 export const DEFAULT_USER_RESPONSE: { user: User } = {
     user: DEFAULT_USER_DATA,
 };
-
-export const HTML_TABLE_HEADERS = [
-    'Title',
-    'Description',
-    'Created',
-    'Last Viewed',
-    '# of Cards',
-    'Label',
-    'Favorited',
-];
 
 export const LOADING_ACTIONS = {
     CREATE_STUDYSET: 'CREATE_STUDYSET',

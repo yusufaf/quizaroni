@@ -1,9 +1,18 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vite-plus/test';
+import {
+    describe,
+    it,
+    expect,
+    vi,
+    beforeAll,
+    beforeEach,
+    afterEach,
+} from 'vite-plus/test';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
+import i18n from 'i18n';
 import Home from './Home';
 
 const muiTheme = createTheme();
@@ -12,10 +21,6 @@ const ID = '11111111-1111-4111-8111-111111111111';
 const ID_B = '22222222-2222-4222-8222-222222222222';
 const OWNER = '33333333-3333-4333-8333-333333333333';
 const NOW = '2026-10-01T12:00:00.000Z';
-
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (k: string) => k }),
-}));
 
 // Mocked like the other component tests until #102 moves them to MemoryRouter.
 vi.mock('react-router-dom', () => {
@@ -118,6 +123,10 @@ const renderHome = () => {
 };
 
 describe('Home', () => {
+    beforeAll(async () => {
+        await i18n.changeLanguage('en');
+    });
+
     beforeEach(() => {
         studysets = [validSet, stub];
         fetchMock.mockClear();

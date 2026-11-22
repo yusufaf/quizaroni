@@ -152,7 +152,7 @@ const renderGrid = () => {
 };
 
 const starButtons = () =>
-    screen.findAllByRole('button', { name: 'Mark as important' });
+    screen.findAllByRole('button', { name: 'viewStudySet.markImportant' });
 
 beforeEach(() => {
     server = { ...ownedSet(ID), cards: [cardA, cardB] };

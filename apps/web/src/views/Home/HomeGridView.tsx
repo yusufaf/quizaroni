@@ -6,6 +6,7 @@ import { Studyset } from 'shared/types';
 import HomeStudySetCard from './HomeStudySetCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     studysets: Studyset[];
@@ -16,6 +17,7 @@ const cardsPerPage = 6;
 
 const HomeGridView = ({ studysets, isLoading = false }: Props) => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [page, setPage] = useState<number>(1);
 
     const onPageChange = (
@@ -63,15 +65,14 @@ const HomeGridView = ({ studysets, isLoading = false }: Props) => {
             >
                 <SearchOff sx={{ fontSize: '4rem', opacity: 0.3 }} />
                 <Typography variant="h6" color="text.secondary">
-                    No study sets yet
+                    {t('home.noStudySetsTitle')}
                 </Typography>
                 <Typography
                     variant="body2"
                     color="text.secondary"
                     sx={{ maxWidth: '30rem', textAlign: 'center' }}
                 >
-                    Get started by creating your first study set! Add
-                    flashcards, organize them, and start learning.
+                    {t('home.noStudySetsBody')}
                 </Typography>
                 <Button
                     variant="contained"
@@ -79,7 +80,7 @@ const HomeGridView = ({ studysets, isLoading = false }: Props) => {
                     onClick={() => navigate('/create')}
                     size="large"
                 >
-                    Create Your First Study Set
+                    {t('home.createFirstStudySet')}
                 </Button>
             </Box>
         );
@@ -99,10 +100,10 @@ const HomeGridView = ({ studysets, isLoading = false }: Props) => {
             >
                 <SearchOff sx={{ fontSize: '3rem', opacity: 0.3 }} />
                 <Typography variant="h6" color="text.secondary">
-                    No results found
+                    {t('home.noResultsTitle')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                    Try adjusting your search or filters
+                    {t('home.noResultsBody')}
                 </Typography>
             </Box>
         );

@@ -31,7 +31,10 @@
         "openMenu": "Open menu",
         "menu": "Menu",
         "darkMode": "Dark mode",
-        "feedback": "Feedback"
+        "switchToLight": "Switch to light mode",
+        "switchToDark": "Switch to dark mode",
+        "feedback": "Feedback",
+        "logoAlt": "Quizaroni logo"
     },
     "pageTitles": {
         "create": "Create",
@@ -144,7 +147,11 @@
             "cardsToPrint": "Cards to Print",
             "generatingPdf": "Generating PDF...",
             "downloadPdf": "Download PDF",
-            "failedToGenerate": "Failed to generate PDF. Please try again."
+            "failedToGenerate": "Failed to generate PDF. Please try again.",
+            "loadFailed": "Unable to load studyset data.",
+            "noCards": "No cards to print.",
+            "noCardsImportantOnly": "No cards to print. Try disabling the \"Important Only\" filter.",
+            "notesLabel": "Notes:"
         },
         "download": {
             "title": "Download Study Set",
@@ -287,7 +294,12 @@
             "filtersDialogTitle": "Search and sort",
             "done": "Done",
             "sortBy": "Sort by",
-            "sortDirection": "Sort direction"
+            "sortDirection": "Sort direction",
+            "assignLabels": "Assign Labels",
+            "viewToggle": "Home view",
+            "tableView": "Table View",
+            "gridView": "Grid View",
+            "htmlView": "HTML Table View"
         },
         "saveTablePreferences": "Save Table Preferences",
         "saveColumnsAndDensity": "Save visible columns and density",
@@ -302,7 +314,21 @@
             "labels": "Labels"
         },
         "noLabels": "None",
-        "rowsPerPage": "Rows per page"
+        "rowsPerPage": "Rows per page",
+        "noStudySetsTitle": "No study sets yet",
+        "noStudySetsBody": "Get started by creating your first study set! Add flashcards, organize them, and start learning.",
+        "createFirstStudySet": "Create Your First Study Set",
+        "noResultsTitle": "No results found",
+        "noResultsBody": "Try adjusting your search or filters",
+        "untitledSet": "Untitled Set",
+        "favorite": "Favorite",
+        "unfavorite": "Unfavorite",
+        "moreActions": "More actions",
+        "noLabelsOnSet": "No labels",
+        "cardCount_one": "{{count}} Card",
+        "cardCount_other": "{{count}} Cards",
+        "viewInNewTab": "View in new tab",
+        "editInNewTab": "Edit in new tab"
     },
     "categories": {
         "manageCategories": "Manage Categories",
@@ -477,7 +503,18 @@
         "listView": "List View",
         "gridView": "Grid View",
         "all": "All",
-        "important": "Important"
+        "important": "Important",
+        "viewCategories_one": "View {{count}} Category",
+        "viewCategories_other": "View {{count}} Categories",
+        "playTts": "Play TTS",
+        "markImportant": "Mark as important",
+        "textColor": "Text Color",
+        "backgroundColor": "Background Color",
+        "contentOnly": "Content Only",
+        "textColorDescription": "If enabled, text color for the term/definition will be applied/visible.",
+        "backgroundColorDescription": "If enabled, background color for cards will be applied/visible.",
+        "contentOnlyDescription": "If enabled, buttons and labels on all cards will be hidden.",
+        "settingStatus": "{{label}}: {{status}}"
     },
     "publicView": {
         "createdBy": "Created by {{username}}",
@@ -610,7 +647,16 @@
         "imageUploaded_other": "{{count}} images uploaded successfully",
         "imageUploadFailed": "Failed to upload image",
         "deleteImageTitle": "Delete Image",
-        "deleteImageMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone."
+        "deleteImageMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone.",
+        "cardNumber": "Card {{number}}",
+        "changeTextColor": "Change card text color",
+        "changeBackgroundColor": "Change card background color",
+        "swapTermDefinition": "Swap term and definition",
+        "duplicateCard": "Duplicate card",
+        "deleteCard": "Delete this card",
+        "imageLoadFailed": "Failed to load",
+        "deleteImage": "Delete image",
+        "replaceImage": "Replace image"
     },
     "footer": {
         "socials": "Socials",
@@ -687,7 +733,27 @@
     "combineSets": {
         "goBack": "Go back",
         "removeSet": "Remove {{title}} from combination",
-        "addSet": "Add {{title}} to combination"
+        "addSet": "Add {{title}} to combination",
+        "pageTitle": "Combine Sets",
+        "title": "Combine sets",
+        "summary": "Currently Combining — {{sets}} • {{cards}}",
+        "setCount_one": "{{count}} set",
+        "setCount_other": "{{count}} sets",
+        "cardCount_one": "{{count}} card",
+        "cardCount_other": "{{count}} cards",
+        "combineAndGo": "Combine & Go",
+        "currentlyCombining": "Currently Combining",
+        "combineOptions": "Combine Options",
+        "titleLabel": "Combined Set Title",
+        "shuffleCards": "Shuffle cards",
+        "keepCategories": "Keep card categories",
+        "keepImportant": "Keep important stars",
+        "yourSets": "Your Sets",
+        "searchPlaceholder": "Search sets...",
+        "noMatches": "No sets found matching \"{{searchTerm}}\"",
+        "defaultTitle": "Combined Studyset",
+        "defaultTitleFromSets": "Combined: {{titles}}",
+        "defaultDescription": "A combination of: {{titles}}"
     },
     "subjects": {
         "languages": "Languages",
@@ -748,5 +814,45 @@
         "body": "Some of your progress hasn't been saved to your account yet. If you sign out now, it will be removed from this device.",
         "confirm": "Sign out anyway",
         "cancel": "Stay signed in"
+    },
+    "notFound": {
+        "title": "Page not found",
+        "body": "We couldn't find the page you were looking for. It may have moved or the link may be wrong.",
+        "home": "Back to home"
+    },
+    "feedbackDialog": {
+        "title": "Submit Feedback",
+        "body": "Submit any feedback you have about your experience with Quizaroni.",
+        "label": "Feedback"
+    },
+    "cascadePreview": {
+        "title": {
+            "edit": "Confirm edit of {{item}}",
+            "delete": "Confirm delete of {{item}}",
+            "deleteUnused": "Confirm delete of unused {{item}}"
+        },
+        "confirm": {
+            "edit": "Confirm edit",
+            "delete": "Confirm delete",
+            "deleteUnused": "Confirm delete unused"
+        },
+        "items": {
+            "label": "label",
+            "category": "category",
+            "color": "color"
+        },
+        "affectedLabel_one": "This action will affect {{count}} study set",
+        "affectedLabel_other": "This action will affect {{count}} study sets",
+        "affectedCategory_one": "This action will affect {{count}} card",
+        "affectedCategory_other": "This action will affect {{count}} cards",
+        "affectedColor_one": "This action will affect {{count}} usage",
+        "affectedColor_other": "This action will affect {{count}} usages",
+        "affectedItems": "Affected Items:",
+        "andMore": "... and {{count}} more",
+        "understand": "I understand this action cannot be undone"
+    },
+    "metadataDialogs": {
+        "itemsSelected_one": "{{count}} item selected",
+        "itemsSelected_other": "{{count}} items selected"
     }
 }

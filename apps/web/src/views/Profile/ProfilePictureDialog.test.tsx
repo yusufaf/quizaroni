@@ -6,6 +6,10 @@ import { createLightTheme } from 'shared/theme/themes';
 import { DEFAULT_USER_DATA } from 'shared/constants';
 import ProfilePictureDialog from './ProfilePictureDialog';
 
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (k: string) => k }),
+}));
+
 vi.mock('react-toastify', () => ({
     toast: { success: vi.fn(), error: vi.fn() },
 }));
@@ -34,18 +38,28 @@ describe('ProfilePictureDialog', () => {
     it('offers the upload in a self-host build', () => {
         vi.stubEnv('VITE_BACKEND', 'selfhost');
         renderDialog();
-        expect(screen.getByText('Preset Avatars')).toBeTruthy();
-        expect(screen.getByText('Upload Custom Image')).toBeTruthy();
         expect(
-            screen.getByRole('button', { name: 'Choose File' })
+            screen.getByText('profilePictureDialog.presetAvatars')
+        ).toBeTruthy();
+        expect(
+            screen.getByText('profilePictureDialog.uploadCustomImage')
+        ).toBeTruthy();
+        expect(
+            screen.getByRole('button', {
+                name: 'profilePictureDialog.chooseFile',
+            })
         ).toBeTruthy();
     });
 
     it('offers the upload in the AWS build', () => {
         renderDialog();
-        expect(screen.getByText('Upload Custom Image')).toBeTruthy();
         expect(
-            screen.getByRole('button', { name: 'Choose File' })
+            screen.getByText('profilePictureDialog.uploadCustomImage')
+        ).toBeTruthy();
+        expect(
+            screen.getByRole('button', {
+                name: 'profilePictureDialog.chooseFile',
+            })
         ).toBeTruthy();
     });
 });

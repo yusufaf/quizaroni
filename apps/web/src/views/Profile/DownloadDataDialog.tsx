@@ -12,6 +12,7 @@ import { DeleteDialogContent } from './ProfileStyles';
 import { useDownloadUserData } from 'state/api/usersAPI';
 import { isSelfHost } from 'shared/auth/backend';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
     open: boolean;
@@ -19,6 +20,7 @@ type Props = {
 };
 
 const DownloadDataDialog = ({ open, handleClose }: Props) => {
+    const { t } = useTranslation('profile');
     const [includeStudysets, setIncludeStudysets] = useState(false);
 
     const { mutateAsync, isPending } = useDownloadUserData();
@@ -31,7 +33,7 @@ const DownloadDataDialog = ({ open, handleClose }: Props) => {
             await mutateAsync({ includeStudysets });
             handleClose();
         } catch {
-            toast.error('Failed to download your data');
+            toast.error(t('downloadDataDialog.downloadFailed'));
         }
     };
 
@@ -43,19 +45,16 @@ const DownloadDataDialog = ({ open, handleClose }: Props) => {
 
     return (
         <Dialog open={open} onClose={handleClose}>
-            <StandardDialogTitle title="Download Data" onClose={handleClose} />
+            <StandardDialogTitle
+                title={t('downloadDataDialog.title')}
+                onClose={handleClose}
+            />
             <DeleteDialogContent>
                 <DialogContentText>
-                    You can download a copy of your data by clicking the
-                    "Download Data" button below. This will generate a file
-                    containing your personal information, saved settings, and
-                    other relevant data.
+                    {t('downloadDataDialog.intro')}
                     <br />
                     <br />
-                    Please note that depending on the amount of data stored, the
-                    download process may take a few moments to complete. Once
-                    the download begins, you can save the file to your device
-                    for future reference or personal use.
+                    {t('downloadDataDialog.note')}
                 </DialogContentText>
 
                 <FormControlLabel
@@ -65,7 +64,7 @@ const DownloadDataDialog = ({ open, handleClose }: Props) => {
                             onChange={handleCheckboxChange}
                         />
                     }
-                    label="Include studysets in the download"
+                    label={t('downloadDataDialog.includeStudysets')}
                 />
             </DeleteDialogContent>
             <StyledDialogActions>
@@ -74,7 +73,7 @@ const DownloadDataDialog = ({ open, handleClose }: Props) => {
                     onClick={handleDownloadData}
                     disabled={isPending}
                 >
-                    Download Data
+                    {t('downloadDataDialog.confirmButton')}
                 </Button>
             </StyledDialogActions>
         </Dialog>

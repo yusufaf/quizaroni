@@ -16,6 +16,7 @@ import {
 import { CenterActions, RightActions } from '../CreateSetStyles';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { useTheme } from 'theme/useTheme';
+import { useTranslation } from 'react-i18next';
 import { ColorPickerType, TODO } from 'shared/types';
 
 type Props = {
@@ -52,6 +53,7 @@ const NewCardHeader = ({
     setStateCallback,
     updateCardValue,
 }: Props) => {
+    const { t } = useTranslation();
     const { muiTheme } = useTheme();
     const textColorButtonRef = useRef(null);
     const backgroundColorButtonRef = useRef(null);
@@ -117,14 +119,14 @@ const NewCardHeader = ({
     return (
         <SpacedFlexContainer>
             <BoldTypography variant="h6" color="primary">
-                Card {index + 1}
+                {t('create.cardNumber', { number: index + 1 })}
             </BoldTypography>
             <CenterActions>
-                <Tooltip title="Change card text color" placement="top">
+                <Tooltip title={t('create.changeTextColor')} placement="top">
                     <IconButton
                         ref={textColorButtonRef}
                         onClick={toggleTextColorPicker}
-                        aria-label="Change card text color"
+                        aria-label={t('create.changeTextColor')}
                         sx={showTextColorPicker ? colorPickerActiveStyling : {}}
                     >
                         <FormatColorText fontSize="medium" />
@@ -141,11 +143,14 @@ const NewCardHeader = ({
                         onApplyColor={() => toggleApplyColor('textColor')}
                     />
                 )}
-                <Tooltip title="Change card background color" placement="top">
+                <Tooltip
+                    title={t('create.changeBackgroundColor')}
+                    placement="top"
+                >
                     <IconButton
                         ref={backgroundColorButtonRef}
                         onClick={toggleBackgroundColorPicker}
-                        aria-label="Change card background color"
+                        aria-label={t('create.changeBackgroundColor')}
                         sx={
                             showBackgroundColorPicker
                                 ? colorPickerActiveStyling
@@ -171,7 +176,7 @@ const NewCardHeader = ({
                         }}
                     />
                 )}
-                <Tooltip title="Swap term and definition" placement="top">
+                <Tooltip title={t('create.swapTermDefinition')} placement="top">
                     <IconButton
                         onClick={() =>
                             swapCard({
@@ -180,12 +185,12 @@ const NewCardHeader = ({
                                 setStateCallback,
                             })
                         }
-                        aria-label="Swap term and definition"
+                        aria-label={t('create.swapTermDefinition')}
                     >
                         <SwapHoriz fontSize="medium" />
                     </IconButton>
                 </Tooltip>
-                <Tooltip title="Duplicate" placement="top">
+                <Tooltip title={t('buttons.duplicate')} placement="top">
                     <IconButton
                         onClick={() =>
                             duplicateCard({
@@ -194,14 +199,14 @@ const NewCardHeader = ({
                                 setStateCallback,
                             })
                         }
-                        aria-label="Duplicate card"
+                        aria-label={t('create.duplicateCard')}
                     >
                         <ContentCopy />
                     </IconButton>
                 </Tooltip>
             </CenterActions>
             <RightActions>
-                <Tooltip title="Delete this card" placement="top">
+                <Tooltip title={t('create.deleteCard')} placement="top">
                     <IconButton
                         onClick={() =>
                             deleteCard({
@@ -212,7 +217,7 @@ const NewCardHeader = ({
                                 setActionsStack,
                             })
                         }
-                        aria-label="Delete this card"
+                        aria-label={t('create.deleteCard')}
                     >
                         <Delete fontSize="medium" color="error" />
                     </IconButton>

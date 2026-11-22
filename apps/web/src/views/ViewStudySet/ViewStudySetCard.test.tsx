@@ -118,6 +118,8 @@ describe('ViewStudySetCard explain button', () => {
         expect(
             screen.queryByRole('button', { name: 'aiChat.actions.explainCard' })
         ).toBeNull();
-        expect(screen.getByRole('button', { name: 'Play TTS' })).toBeTruthy();
+        expect(
+            screen.getByRole('button', { name: 'common:viewStudySet.playTts' })
+        ).toBeTruthy();
     });
 });

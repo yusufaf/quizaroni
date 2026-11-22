@@ -5,6 +5,7 @@ import { Card, Studyset } from 'shared/types';
 import { useGetUser } from 'state/api/usersAPI';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from 'theme/useTheme';
 import { DEFAULT_TERMINOLOGY, FORMAT_TERMINOLOGIES } from 'shared/constants';
 import { ViewGridCard, GridCardContent, GridCardSection } from './styles';
@@ -18,6 +19,7 @@ type Props = {
 };
 
 const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
+    const { t } = useTranslation();
     const { muiTheme } = useTheme();
     const { speak, cancel } = useSpeechSynthesis();
     const { data: userData = DEFAULT_USER_RESPONSE } = useGetUser();
@@ -93,7 +95,7 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
                             color="primary"
                             fontWeight={600}
                         >
-                            {terminology1 ?? 'Term'}
+                            {terminology1 ?? t('create.term')}
                         </Typography>
                     )}
                     <Typography
@@ -125,7 +127,7 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
                             color="primary"
                             fontWeight={600}
                         >
-                            {terminology2 ?? 'Definition'}
+                            {terminology2 ?? t('create.definition')}
                         </Typography>
                     )}
                     <Typography
@@ -158,12 +160,15 @@ const ViewStudySetCardGrid = ({ card, index, selectedStudyset }: Props) => {
                         justifyContent: 'flex-end',
                     }}
                 >
-                    <Tooltip title="Play TTS" placement="top">
+                    <Tooltip title={t('viewStudySet.playTts')} placement="top">
                         <IconButton onClick={handleAudioPlayback} size="small">
                             <VolumeUp fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Mark as important" placement="top">
+                    <Tooltip
+                        title={t('viewStudySet.markImportant')}
+                        placement="top"
+                    >
                         <IconButton onClick={markCardAsImportant} size="small">
                             {card.important ? (
                                 <Star
