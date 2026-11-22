@@ -137,5 +137,42 @@
                 "description": "合計500枚のカードを学習する"
             }
         }
+    },
+    "account": {
+        "changeUsername": "ユーザー名を変更",
+        "usernameLabel": "ユーザー名",
+        "usernamePlaceholder": "新しいユーザー名を入力",
+        "usernameRule": "3〜32文字の英字、数字、アンダースコア（先頭は数字不可）",
+        "usernameChanged": "ユーザー名を{{username}}に変更しました",
+        "oldUsernameRemains": "一部の学習セットには以前のユーザー名が引き続き表示されています",
+        "usernameTaken": "そのユーザー名は既に使用されています",
+        "usernameChangeFailed": "ユーザー名の変更に失敗しました",
+        "deleteAccount": "アカウントを削除",
+        "downloadData": "データをダウンロード"
+    },
+    "downloadDataDialog": {
+        "title": "データをダウンロード",
+        "intro": "下の「データをダウンロード」ボタンをクリックすると、データのコピーをダウンロードできます。個人情報、保存された設定、その他の関連データを含むファイルが生成されます。",
+        "note": "保存されているデータ量によっては、ダウンロードの完了までに少し時間がかかる場合があります。ダウンロードが始まったら、今後の参照や個人利用のためにファイルをデバイスに保存できます。",
+        "includeStudysets": "ダウンロードに学習セットを含める",
+        "confirmButton": "データをダウンロード",
+        "downloadFailed": "データのダウンロードに失敗しました"
+    },
+    "profilePictureDialog": {
+        "title": "プロフィール画像を選択",
+        "presetAvatars": "プリセットアバター",
+        "uploadCustomImage": "カスタム画像をアップロード",
+        "chooseFile": "ファイルを選択",
+        "uploading": "アップロード中...",
+        "selectedAlt": "選択済み",
+        "uploadHint": "最大10MB。PNG、JPEG、またはWebP。512x512pxにリサイズされます。",
+        "invalidType": "PNG、JPEG、またはWebP画像を選択してください",
+        "fileTooLarge": "ファイルサイズは10MB未満にしてください",
+        "uploadSuccess": "画像をアップロードしました！",
+        "uploadFailed": "画像のアップロードに失敗しました",
+        "selectAvatar": "アバターを選択してください",
+        "saving": "保存中...",
+        "updated": "プロフィール画像を更新しました！",
+        "saveFailed": "アバターの保存に失敗しました"
     }
 }

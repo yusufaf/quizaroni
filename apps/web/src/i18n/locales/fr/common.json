@@ -31,7 +31,10 @@
         "openMenu": "Ouvrir le menu",
         "menu": "Menu",
         "darkMode": "Mode sombre",
-        "feedback": "Commentaires"
+        "switchToLight": "Passer en mode clair",
+        "switchToDark": "Passer en mode sombre",
+        "feedback": "Commentaires",
+        "logoAlt": "Logo de Quizaroni"
     },
     "pageTitles": {
         "create": "Créer",
@@ -144,7 +147,11 @@
             "cardsToPrint": "Cartes à imprimer",
             "generatingPdf": "Génération du PDF...",
             "downloadPdf": "Télécharger le PDF",
-            "failedToGenerate": "Échec de la génération du PDF. Veuillez réessayer."
+            "failedToGenerate": "Échec de la génération du PDF. Veuillez réessayer.",
+            "loadFailed": "Impossible de charger les données de la liste d'étude.",
+            "noCards": "Aucune carte à imprimer.",
+            "noCardsImportantOnly": "Aucune carte à imprimer. Essayez de désactiver le filtre « Importantes uniquement ».",
+            "notesLabel": "Notes :"
         },
         "download": {
             "title": "Télécharger la liste d'étude",
@@ -287,7 +294,12 @@
             "filtersDialogTitle": "Rechercher et trier",
             "done": "Terminé",
             "sortBy": "Trier par",
-            "sortDirection": "Ordre de tri"
+            "sortDirection": "Ordre de tri",
+            "assignLabels": "Attribuer des étiquettes",
+            "viewToggle": "Vue d'accueil",
+            "tableView": "Vue en tableau",
+            "gridView": "Vue en grille",
+            "htmlView": "Vue en tableau HTML"
         },
         "saveTablePreferences": "Enregistrer les préférences du tableau",
         "saveColumnsAndDensity": "Enregistrer les colonnes visibles et la densité",
@@ -302,7 +314,21 @@
             "labels": "Étiquettes"
         },
         "noLabels": "Aucune",
-        "rowsPerPage": "Lignes par page"
+        "rowsPerPage": "Lignes par page",
+        "noStudySetsTitle": "Aucune liste d'étude pour le moment",
+        "noStudySetsBody": "Lancez-vous en créant votre première liste d'étude ! Ajoutez des flashcards, organisez-les et commencez à apprendre.",
+        "createFirstStudySet": "Créer votre première liste d'étude",
+        "noResultsTitle": "Aucun résultat trouvé",
+        "noResultsBody": "Essayez de modifier votre recherche ou vos filtres",
+        "untitledSet": "Liste sans titre",
+        "favorite": "Ajouter aux favoris",
+        "unfavorite": "Retirer des favoris",
+        "moreActions": "Plus d'actions",
+        "noLabelsOnSet": "Aucune étiquette",
+        "cardCount_one": "{{count}} carte",
+        "cardCount_other": "{{count}} cartes",
+        "viewInNewTab": "Voir dans un nouvel onglet",
+        "editInNewTab": "Modifier dans un nouvel onglet"
     },
     "categories": {
         "manageCategories": "Gérer les catégories",
@@ -405,6 +431,7 @@
         "switchToLight": "Passer le thème par défaut en mode Clair",
         "switchToDark": "Passer le thème par défaut en mode Sombre",
         "interfaceLanguage": "Langue de l'interface",
+        "betaLanguage": "Bêta",
         "labels": "Étiquettes",
         "manageLabels": "Gérer les étiquettes",
         "namedColors": "Couleurs nommées",
@@ -476,7 +503,18 @@
         "listView": "Vue en liste",
         "gridView": "Vue en grille",
         "all": "Toutes",
-        "important": "Importantes"
+        "important": "Importantes",
+        "viewCategories_one": "Voir {{count}} catégorie",
+        "viewCategories_other": "Voir {{count}} catégories",
+        "playTts": "Lire à voix haute",
+        "markImportant": "Marquer comme importante",
+        "textColor": "Couleur du texte",
+        "backgroundColor": "Couleur d'arrière-plan",
+        "contentOnly": "Contenu uniquement",
+        "textColorDescription": "Si activé, la couleur du texte du terme et de la définition sera appliquée et visible.",
+        "backgroundColorDescription": "Si activé, la couleur d'arrière-plan des cartes sera appliquée et visible.",
+        "contentOnlyDescription": "Si activé, les boutons et les étiquettes seront masqués sur toutes les cartes.",
+        "settingStatus": "{{label}} : {{status}}"
     },
     "publicView": {
         "createdBy": "Créée par {{username}}",
@@ -609,7 +647,16 @@
         "imageUploaded_other": "{{count}} images importées avec succès",
         "imageUploadFailed": "Échec de l'importation de l'image",
         "deleteImageTitle": "Supprimer l'image",
-        "deleteImageMessage": "Voulez-vous vraiment supprimer « {{name}} » ? Cette action est irréversible."
+        "deleteImageMessage": "Voulez-vous vraiment supprimer « {{name}} » ? Cette action est irréversible.",
+        "cardNumber": "Carte {{number}}",
+        "changeTextColor": "Changer la couleur du texte de la carte",
+        "changeBackgroundColor": "Changer la couleur d'arrière-plan de la carte",
+        "swapTermDefinition": "Permuter le terme et la définition",
+        "duplicateCard": "Dupliquer la carte",
+        "deleteCard": "Supprimer cette carte",
+        "imageLoadFailed": "Échec du chargement",
+        "deleteImage": "Supprimer l'image",
+        "replaceImage": "Remplacer l'image"
     },
     "footer": {
         "socials": "Réseaux sociaux",
@@ -686,7 +733,27 @@
     "combineSets": {
         "goBack": "Retour",
         "removeSet": "Retirer {{title}} de la combinaison",
-        "addSet": "Ajouter {{title}} à la combinaison"
+        "addSet": "Ajouter {{title}} à la combinaison",
+        "pageTitle": "Combiner des listes",
+        "title": "Combiner des listes",
+        "summary": "Combinaison en cours — {{sets}} • {{cards}}",
+        "setCount_one": "{{count}} liste",
+        "setCount_other": "{{count}} listes",
+        "cardCount_one": "{{count}} carte",
+        "cardCount_other": "{{count}} cartes",
+        "combineAndGo": "Combiner et lancer",
+        "currentlyCombining": "Combinaison en cours",
+        "combineOptions": "Options de combinaison",
+        "titleLabel": "Titre de la liste combinée",
+        "shuffleCards": "Mélanger les cartes",
+        "keepCategories": "Conserver les catégories des cartes",
+        "keepImportant": "Conserver les étoiles d'importance",
+        "yourSets": "Vos listes",
+        "searchPlaceholder": "Rechercher des listes...",
+        "noMatches": "Aucune liste ne correspond à « {{searchTerm}} »",
+        "defaultTitle": "Liste d'étude combinée",
+        "defaultTitleFromSets": "Combinée : {{titles}}",
+        "defaultDescription": "Une combinaison de : {{titles}}"
     },
     "subjects": {
         "languages": "Langues",
@@ -747,5 +814,45 @@
         "body": "Une partie de votre progression n'a pas encore été enregistrée sur votre compte. Si vous vous déconnectez maintenant, elle sera supprimée de cet appareil.",
         "confirm": "Se déconnecter quand même",
         "cancel": "Rester connecté"
+    },
+    "notFound": {
+        "title": "Page introuvable",
+        "body": "Nous n'avons pas trouvé la page que vous cherchiez. Elle a peut-être été déplacée ou le lien est incorrect.",
+        "home": "Retour à l'accueil"
+    },
+    "feedbackDialog": {
+        "title": "Envoyer des commentaires",
+        "body": "Envoyez-nous vos commentaires sur votre expérience avec Quizaroni.",
+        "label": "Commentaires"
+    },
+    "cascadePreview": {
+        "title": {
+            "edit": "Confirmer la modification de {{item}}",
+            "delete": "Confirmer la suppression de {{item}}",
+            "deleteUnused": "Confirmer la suppression de {{item}} inutilisée"
+        },
+        "confirm": {
+            "edit": "Confirmer la modification",
+            "delete": "Confirmer la suppression",
+            "deleteUnused": "Confirmer la suppression des inutilisées"
+        },
+        "items": {
+            "label": "étiquette",
+            "category": "catégorie",
+            "color": "couleur"
+        },
+        "affectedLabel_one": "Cette action affectera {{count}} liste d'étude",
+        "affectedLabel_other": "Cette action affectera {{count}} listes d'étude",
+        "affectedCategory_one": "Cette action affectera {{count}} carte",
+        "affectedCategory_other": "Cette action affectera {{count}} cartes",
+        "affectedColor_one": "Cette action affectera {{count}} utilisation",
+        "affectedColor_other": "Cette action affectera {{count}} utilisations",
+        "affectedItems": "Éléments concernés :",
+        "andMore": "... et {{count}} de plus",
+        "understand": "Je comprends que cette action est irréversible"
+    },
+    "metadataDialogs": {
+        "itemsSelected_one": "{{count}} élément sélectionné",
+        "itemsSelected_other": "{{count}} éléments sélectionnés"
     }
 }

@@ -138,5 +138,42 @@
                 "description": "Lerne insgesamt 500 Karten"
             }
         }
+    },
+    "account": {
+        "changeUsername": "Benutzername ändern",
+        "usernameLabel": "Benutzername",
+        "usernamePlaceholder": "Neuen Benutzernamen eingeben",
+        "usernameRule": "3-32 Buchstaben, Zahlen oder Unterstriche, darf nicht mit einer Zahl beginnen",
+        "usernameChanged": "Benutzername in {{username}} geändert",
+        "oldUsernameRemains": "Einige deiner Lernsets zeigen noch deinen alten Benutzernamen an",
+        "usernameTaken": "Dieser Benutzername ist bereits vergeben",
+        "usernameChangeFailed": "Benutzername konnte nicht geändert werden",
+        "deleteAccount": "Konto löschen",
+        "downloadData": "Daten herunterladen"
+    },
+    "downloadDataDialog": {
+        "title": "Daten herunterladen",
+        "intro": "Du kannst eine Kopie deiner Daten herunterladen, indem du unten auf \"Daten herunterladen\" klickst. Dadurch wird eine Datei mit deinen persönlichen Angaben, gespeicherten Einstellungen und weiteren relevanten Daten erstellt.",
+        "note": "Bitte beachte, dass der Download je nach gespeicherter Datenmenge einen Moment dauern kann. Sobald der Download startet, kannst du die Datei zur späteren Einsicht oder für den persönlichen Gebrauch auf deinem Gerät speichern.",
+        "includeStudysets": "Lernsets in den Download einschließen",
+        "confirmButton": "Daten herunterladen",
+        "downloadFailed": "Deine Daten konnten nicht heruntergeladen werden"
+    },
+    "profilePictureDialog": {
+        "title": "Profilbild auswählen",
+        "presetAvatars": "Voreingestellte Avatare",
+        "uploadCustomImage": "Eigenes Bild hochladen",
+        "chooseFile": "Datei auswählen",
+        "uploading": "Wird hochgeladen...",
+        "selectedAlt": "Ausgewählt",
+        "uploadHint": "Max. 10MB. PNG, JPEG oder WebP. Wird auf 512x512px skaliert.",
+        "invalidType": "Bitte wähle ein PNG-, JPEG- oder WebP-Bild aus",
+        "fileTooLarge": "Die Dateigröße muss kleiner als 10MB sein",
+        "uploadSuccess": "Bild erfolgreich hochgeladen!",
+        "uploadFailed": "Bild konnte nicht hochgeladen werden",
+        "selectAvatar": "Bitte wähle einen Avatar aus",
+        "saving": "Wird gespeichert...",
+        "updated": "Profilbild aktualisiert!",
+        "saveFailed": "Avatar konnte nicht gespeichert werden"
     }
 }

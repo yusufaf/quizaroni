@@ -138,5 +138,42 @@
                 "description": "Estude 500 cartões no total"
             }
         }
+    },
+    "account": {
+        "changeUsername": "Alterar Nome de Usuário",
+        "usernameLabel": "Nome de usuário",
+        "usernamePlaceholder": "Digite o novo nome de usuário",
+        "usernameRule": "3 a 32 letras, números ou sublinhados, sem começar com número",
+        "usernameChanged": "Nome de usuário alterado para {{username}}",
+        "oldUsernameRemains": "Alguns dos seus conjuntos de estudo ainda mostram seu nome de usuário antigo",
+        "usernameTaken": "Esse nome de usuário já está em uso",
+        "usernameChangeFailed": "Falha ao alterar o nome de usuário",
+        "deleteAccount": "Excluir Conta",
+        "downloadData": "Baixar Dados"
+    },
+    "downloadDataDialog": {
+        "title": "Baixar Dados",
+        "intro": "Você pode baixar uma cópia dos seus dados clicando no botão \"Baixar Dados\" abaixo. Isso gerará um arquivo contendo suas informações pessoais, configurações salvas e outros dados relevantes.",
+        "note": "Observe que, dependendo da quantidade de dados armazenados, o processo de download pode levar alguns instantes para ser concluído. Assim que o download começar, você poderá salvar o arquivo no seu dispositivo para consulta futura ou uso pessoal.",
+        "includeStudysets": "Incluir conjuntos de estudo no download",
+        "confirmButton": "Baixar Dados",
+        "downloadFailed": "Falha ao baixar seus dados"
+    },
+    "profilePictureDialog": {
+        "title": "Escolher Foto de Perfil",
+        "presetAvatars": "Avatares Predefinidos",
+        "uploadCustomImage": "Enviar Imagem Personalizada",
+        "chooseFile": "Escolher Arquivo",
+        "uploading": "Enviando...",
+        "selectedAlt": "Selecionado",
+        "uploadHint": "Máx. 10MB. PNG, JPEG ou WebP. Será redimensionada para 512x512px.",
+        "invalidType": "Selecione uma imagem PNG, JPEG ou WebP",
+        "fileTooLarge": "O tamanho do arquivo deve ser menor que 10MB",
+        "uploadSuccess": "Imagem enviada com sucesso!",
+        "uploadFailed": "Falha ao enviar imagem",
+        "selectAvatar": "Selecione um avatar",
+        "saving": "Salvando...",
+        "updated": "Foto de perfil atualizada!",
+        "saveFailed": "Falha ao salvar o avatar"
     }
 }

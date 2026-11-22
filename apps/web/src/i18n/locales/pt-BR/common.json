@@ -31,7 +31,10 @@
         "openMenu": "Abrir menu",
         "menu": "Menu",
         "darkMode": "Modo escuro",
-        "feedback": "Feedback"
+        "switchToLight": "Mudar para o modo claro",
+        "switchToDark": "Mudar para o modo escuro",
+        "feedback": "Feedback",
+        "logoAlt": "Logo do Quizaroni"
     },
     "pageTitles": {
         "create": "Criar",
@@ -144,7 +147,11 @@
             "cardsToPrint": "Cartões para Imprimir",
             "generatingPdf": "Gerando PDF...",
             "downloadPdf": "Baixar PDF",
-            "failedToGenerate": "Falha ao gerar o PDF. Tente novamente."
+            "failedToGenerate": "Falha ao gerar o PDF. Tente novamente.",
+            "loadFailed": "Não foi possível carregar os dados do conjunto de estudo.",
+            "noCards": "Nenhum cartão para imprimir.",
+            "noCardsImportantOnly": "Nenhum cartão para imprimir. Tente desativar o filtro \"Apenas Importantes\".",
+            "notesLabel": "Notas:"
         },
         "download": {
             "title": "Baixar Conjunto de Estudo",
@@ -287,7 +294,12 @@
             "filtersDialogTitle": "Buscar e ordenar",
             "done": "Concluído",
             "sortBy": "Ordenar por",
-            "sortDirection": "Direção da ordenação"
+            "sortDirection": "Direção da ordenação",
+            "assignLabels": "Atribuir Etiquetas",
+            "viewToggle": "Visualização inicial",
+            "tableView": "Visualização em Tabela",
+            "gridView": "Visualização em Grade",
+            "htmlView": "Visualização em Tabela HTML"
         },
         "saveTablePreferences": "Salvar Preferências da Tabela",
         "saveColumnsAndDensity": "Salvar colunas visíveis e densidade",
@@ -302,7 +314,21 @@
             "labels": "Etiquetas"
         },
         "noLabels": "Nenhuma",
-        "rowsPerPage": "Linhas por página"
+        "rowsPerPage": "Linhas por página",
+        "noStudySetsTitle": "Nenhum conjunto de estudo ainda",
+        "noStudySetsBody": "Comece criando seu primeiro conjunto de estudo! Adicione flashcards, organize-os e comece a aprender.",
+        "createFirstStudySet": "Criar Seu Primeiro Conjunto de Estudo",
+        "noResultsTitle": "Nenhum resultado encontrado",
+        "noResultsBody": "Tente ajustar sua busca ou filtros",
+        "untitledSet": "Conjunto sem Título",
+        "favorite": "Favoritar",
+        "unfavorite": "Desfavoritar",
+        "moreActions": "Mais ações",
+        "noLabelsOnSet": "Sem etiquetas",
+        "cardCount_one": "{{count}} Cartão",
+        "cardCount_other": "{{count}} Cartões",
+        "viewInNewTab": "Ver em nova aba",
+        "editInNewTab": "Editar em nova aba"
     },
     "categories": {
         "manageCategories": "Gerenciar Categorias",
@@ -405,6 +431,7 @@
         "switchToLight": "Mudar padrão para o modo Claro",
         "switchToDark": "Mudar padrão para o modo Escuro",
         "interfaceLanguage": "Idioma da Interface",
+        "betaLanguage": "Beta",
         "labels": "Etiquetas",
         "manageLabels": "Gerenciar Etiquetas",
         "namedColors": "Cores Nomeadas",
@@ -476,7 +503,18 @@
         "listView": "Visualização em Lista",
         "gridView": "Visualização em Grade",
         "all": "Todos",
-        "important": "Importantes"
+        "important": "Importantes",
+        "viewCategories_one": "Ver {{count}} Categoria",
+        "viewCategories_other": "Ver {{count}} Categorias",
+        "playTts": "Ler em voz alta",
+        "markImportant": "Marcar como importante",
+        "textColor": "Cor do Texto",
+        "backgroundColor": "Cor de Fundo",
+        "contentOnly": "Apenas Conteúdo",
+        "textColorDescription": "Se ativado, a cor do texto do termo/definição será aplicada e ficará visível.",
+        "backgroundColorDescription": "Se ativado, a cor de fundo dos cartões será aplicada e ficará visível.",
+        "contentOnlyDescription": "Se ativado, os botões e etiquetas de todos os cartões serão ocultados.",
+        "settingStatus": "{{label}}: {{status}}"
     },
     "publicView": {
         "createdBy": "Criado por {{username}}",
@@ -609,7 +647,16 @@
         "imageUploaded_other": "{{count}} imagens enviadas com sucesso",
         "imageUploadFailed": "Falha ao enviar imagem",
         "deleteImageTitle": "Excluir Imagem",
-        "deleteImageMessage": "Tem certeza de que deseja excluir \"{{name}}\"? Esta ação não pode ser desfeita."
+        "deleteImageMessage": "Tem certeza de que deseja excluir \"{{name}}\"? Esta ação não pode ser desfeita.",
+        "cardNumber": "Cartão {{number}}",
+        "changeTextColor": "Alterar cor do texto do cartão",
+        "changeBackgroundColor": "Alterar cor de fundo do cartão",
+        "swapTermDefinition": "Inverter termo e definição",
+        "duplicateCard": "Duplicar cartão",
+        "deleteCard": "Excluir este cartão",
+        "imageLoadFailed": "Falha ao carregar",
+        "deleteImage": "Excluir imagem",
+        "replaceImage": "Substituir imagem"
     },
     "footer": {
         "socials": "Redes Sociais",
@@ -686,7 +733,27 @@
     "combineSets": {
         "goBack": "Voltar",
         "removeSet": "Remover {{title}} da combinação",
-        "addSet": "Adicionar {{title}} à combinação"
+        "addSet": "Adicionar {{title}} à combinação",
+        "pageTitle": "Combinar Conjuntos",
+        "title": "Combinar conjuntos",
+        "summary": "Combinando atualmente — {{sets}} • {{cards}}",
+        "setCount_one": "{{count}} conjunto",
+        "setCount_other": "{{count}} conjuntos",
+        "cardCount_one": "{{count}} cartão",
+        "cardCount_other": "{{count}} cartões",
+        "combineAndGo": "Combinar e Começar",
+        "currentlyCombining": "Combinando Atualmente",
+        "combineOptions": "Opções de Combinação",
+        "titleLabel": "Título do Conjunto Combinado",
+        "shuffleCards": "Embaralhar cartões",
+        "keepCategories": "Manter categorias dos cartões",
+        "keepImportant": "Manter estrelas de importante",
+        "yourSets": "Seus Conjuntos",
+        "searchPlaceholder": "Buscar conjuntos...",
+        "noMatches": "Nenhum conjunto encontrado para \"{{searchTerm}}\"",
+        "defaultTitle": "Conjunto de Estudo Combinado",
+        "defaultTitleFromSets": "Combinado: {{titles}}",
+        "defaultDescription": "Uma combinação de: {{titles}}"
     },
     "subjects": {
         "languages": "Idiomas",
@@ -747,5 +814,45 @@
         "body": "Parte do seu progresso ainda não foi salva na sua conta. Se você sair agora, ele será removido deste dispositivo.",
         "confirm": "Sair mesmo assim",
         "cancel": "Continuar conectado"
+    },
+    "notFound": {
+        "title": "Página não encontrada",
+        "body": "Não encontramos a página que você estava procurando. Ela pode ter sido movida ou o link pode estar incorreto.",
+        "home": "Voltar para o início"
+    },
+    "feedbackDialog": {
+        "title": "Enviar Feedback",
+        "body": "Envie qualquer feedback que você tiver sobre sua experiência com o Quizaroni.",
+        "label": "Feedback"
+    },
+    "cascadePreview": {
+        "title": {
+            "edit": "Confirmar edição de {{item}}",
+            "delete": "Confirmar exclusão de {{item}}",
+            "deleteUnused": "Confirmar exclusão de {{item}} não usada"
+        },
+        "confirm": {
+            "edit": "Confirmar edição",
+            "delete": "Confirmar exclusão",
+            "deleteUnused": "Confirmar exclusão de não usadas"
+        },
+        "items": {
+            "label": "etiqueta",
+            "category": "categoria",
+            "color": "cor"
+        },
+        "affectedLabel_one": "Esta ação afetará {{count}} conjunto de estudo",
+        "affectedLabel_other": "Esta ação afetará {{count}} conjuntos de estudo",
+        "affectedCategory_one": "Esta ação afetará {{count}} cartão",
+        "affectedCategory_other": "Esta ação afetará {{count}} cartões",
+        "affectedColor_one": "Esta ação afetará {{count}} uso",
+        "affectedColor_other": "Esta ação afetará {{count}} usos",
+        "affectedItems": "Itens Afetados:",
+        "andMore": "... e mais {{count}}",
+        "understand": "Entendo que esta ação não pode ser desfeita"
+    },
+    "metadataDialogs": {
+        "itemsSelected_one": "{{count}} item selecionado",
+        "itemsSelected_other": "{{count}} itens selecionados"
     }
 }
