@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {
     Box,
     Stack,
@@ -39,6 +40,7 @@ export const NamedColorsManageTab = ({
     onDeleteSelected,
     isLoading,
 }: Props) => {
+    const { t } = useTranslation();
     const renderItem = (item: NamedColor) => (
         <Stack direction="row" spacing="1rem" alignItems="center">
             <Box
@@ -74,8 +76,9 @@ export const NamedColorsManageTab = ({
                     }}
                 >
                     <Typography variant="body2" fontWeight={500}>
-                        {deleteIndices.length} item
-                        {deleteIndices.length > 1 ? 's' : ''} selected
+                        {t('metadataDialogs.itemsSelected', {
+                            count: deleteIndices.length,
+                        })}
                     </Typography>
                     <Button
                         color="inherit"
@@ -94,7 +97,7 @@ export const NamedColorsManageTab = ({
                             },
                         }}
                     >
-                        Delete
+                        {t('buttons.delete')}
                     </Button>
                 </Box>
             </Collapse>

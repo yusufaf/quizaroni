@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Card, Studyset, PrintConfig } from 'shared/types';
 import { FORMAT_TERMINOLOGIES } from 'shared/constants';
 import {
@@ -14,6 +15,7 @@ type Props = {
 };
 
 const GridLayout = ({ studyset, cards, settings }: Props) => {
+    const { t } = useTranslation();
     const { terminology, customTerminology } = studyset.metadata;
     const [term1, term2] = (terminology === FORMAT_TERMINOLOGIES.CUSTOM
         ? customTerminology
@@ -67,7 +69,7 @@ const GridLayout = ({ studyset, cards, settings }: Props) => {
                                         fontStyle: 'italic',
                                     }}
                                 >
-                                    Notes:{' '}
+                                    {t('dialogs.print.notesLabel')}{' '}
                                     {card.notes.map((n) => n.text).join('; ')}
                                 </div>
                             )}

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Card, Studyset, PrintConfig } from 'shared/types';
 import { FORMAT_TERMINOLOGIES } from 'shared/constants';
 import {
@@ -17,6 +18,7 @@ type Props = {
 };
 
 const FlashcardLayout = ({ studyset, cards, settings }: Props) => {
+    const { t } = useTranslation();
     const { terminology, customTerminology } = studyset.metadata;
     const [term1, term2] = (terminology === FORMAT_TERMINOLOGIES.CUSTOM
         ? customTerminology
@@ -108,7 +110,9 @@ const FlashcardLayout = ({ studyset, cards, settings }: Props) => {
 
                             {settings.includeNotes && card.notes.length > 0 && (
                                 <NotesList>
-                                    <strong>Notes:</strong>
+                                    <strong>
+                                        {t('dialogs.print.notesLabel')}
+                                    </strong>
                                     {card.notes.map((note) => (
                                         <li key={note.noteUUID}>{note.text}</li>
                                     ))}

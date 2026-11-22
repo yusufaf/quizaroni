@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Card, Studyset, PrintConfig } from 'shared/types';
 import { FORMAT_TERMINOLOGIES, LABEL_TERMINOLOGIES } from 'shared/constants';
 import {
@@ -17,6 +18,7 @@ type Props = {
 };
 
 const ListLayout = ({ studyset, cards, settings }: Props) => {
+    const { t } = useTranslation();
     const {
         terminology,
         customTerminology,
@@ -151,7 +153,7 @@ const ListLayout = ({ studyset, cards, settings }: Props) => {
                                 paddingTop: '0.5rem',
                             }}
                         >
-                            <strong>Notes:</strong>
+                            <strong>{t('dialogs.print.notesLabel')}</strong>
                             <ul>
                                 {card.notes.map((note) => (
                                     <NoteItem key={note.noteUUID}>

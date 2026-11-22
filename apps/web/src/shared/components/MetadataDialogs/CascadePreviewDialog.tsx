@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     Dialog,
     DialogTitle,
@@ -18,17 +19,17 @@ import {
 import { Warning as WarningIcon } from '@mui/icons-material';
 import { CascadePreviewDialogProps } from './types';
 
-const ACTION_LABELS = {
-    edit: 'Edit',
-    delete: 'Delete',
-    'delete-unused': 'Delete Unused',
-};
+const ACTION_KEYS = {
+    edit: 'edit',
+    delete: 'delete',
+    'delete-unused': 'deleteUnused',
+} as const;
 
-const AFFECTED_TYPE_LABELS = {
-    label: 'study set',
-    category: 'card',
-    color: 'usage',
-};
+const AFFECTED_KEYS = {
+    label: 'affectedLabel',
+    category: 'affectedCategory',
+    color: 'affectedColor',
+} as const;
 
 export const CascadePreviewDialog = ({
     open,
@@ -39,6 +40,7 @@ export const CascadePreviewDialog = ({
     onConfirm,
     isLoading = false,
 }: CascadePreviewDialogProps) => {
+    const { t } = useTranslation();
     const [confirmed, setConfirmed] = useState(false);
 
     useEffect(() => {
@@ -57,24 +59,26 @@ export const CascadePreviewDialog = ({
         onClose();
     };
 
-    const actionLabel = ACTION_LABELS[actionType];
-    const affectedTypeLabel = AFFECTED_TYPE_LABELS[itemType];
+    const actionKey = ACTION_KEYS[actionType];
     const affectedCount = affectedItems.length;
 
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
             <DialogTitle>
-                Confirm {actionLabel} {itemType}
+                {t(`cascadePreview.title.${actionKey}`, {
+                    item: t(`cascadePreview.items.${itemType}`),
+                })}
             </DialogTitle>
 
             <DialogContent>
                 <Alert severity="warning" sx={{ mb: '1rem' }}>
-                    This action will affect {affectedCount} {affectedTypeLabel}
-                    {affectedCount !== 1 ? 's' : ''}
+                    {t(`cascadePreview.${AFFECTED_KEYS[itemType]}`, {
+                        count: affectedCount,
+                    })}
                 </Alert>
 
                 <Typography variant="subtitle2" gutterBottom>
-                    Affected Items:
+                    {t('cascadePreview.affectedItems')}
                 </Typography>
 
                 <Paper
@@ -106,7 +110,9 @@ export const CascadePreviewDialog = ({
                                     textAlign: 'center',
                                 }}
                             >
-                                ... and {affectedItems.length - 10} more
+                                {t('cascadePreview.andMore', {
+                                    count: affectedItems.length - 10,
+                                })}
                             </Typography>
                         )}
                     </List>
@@ -119,14 +125,14 @@ export const CascadePreviewDialog = ({
                             onChange={(e) => setConfirmed(e.target.checked)}
                         />
                     }
-                    label="I understand this action cannot be undone"
+                    label={t('cascadePreview.understand')}
                     sx={{ mt: '1rem' }}
                 />
             </DialogContent>
 
             <DialogActions>
                 <Button onClick={handleClose} disabled={isLoading}>
-                    Cancel
+                    {t('buttons.cancel')}
                 </Button>
                 <Button
                     variant="contained"
@@ -134,7 +140,7 @@ export const CascadePreviewDialog = ({
                     onClick={handleConfirm}
                     disabled={!confirmed || isLoading}
                 >
-                    Confirm {actionLabel}
+                    {t(`cascadePreview.confirm.${actionKey}`)}
                 </Button>
             </DialogActions>
         </Dialog>

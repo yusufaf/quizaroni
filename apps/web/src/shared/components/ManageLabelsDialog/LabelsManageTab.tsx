@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, ListItemText, Button, Collapse } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import { MetadataList, ErrorInfo } from 'shared/components/MetadataDialogs';
@@ -27,6 +28,7 @@ export const LabelsManageTab = ({
     onDeleteSelected,
     isLoading,
 }: Props) => {
+    const { t } = useTranslation();
     const labelItems = labels.map((name) => ({ name }));
 
     const renderItem = (item: { name: string }) => (
@@ -51,8 +53,9 @@ export const LabelsManageTab = ({
                     }}
                 >
                     <Typography variant="body2" fontWeight={500}>
-                        {deleteIndices.length} item
-                        {deleteIndices.length > 1 ? 's' : ''} selected
+                        {t('metadataDialogs.itemsSelected', {
+                            count: deleteIndices.length,
+                        })}
                     </Typography>
                     <Button
                         color="inherit"
@@ -71,7 +74,7 @@ export const LabelsManageTab = ({
                             },
                         }}
                     >
-                        Delete
+                        {t('buttons.delete')}
                     </Button>
                 </Box>
             </Collapse>
