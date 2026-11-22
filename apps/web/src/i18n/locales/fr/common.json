@@ -837,9 +837,9 @@
             "deleteUnused": "Confirmer la suppression des inutilisées"
         },
         "items": {
-            "label": "étiquette",
-            "category": "catégorie",
-            "color": "couleur"
+            "label": "l'étiquette",
+            "category": "la catégorie",
+            "color": "la couleur"
         },
         "affectedLabel_one": "Cette action affectera {{count}} liste d'étude",
         "affectedLabel_other": "Cette action affectera {{count}} listes d'étude",
