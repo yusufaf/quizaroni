@@ -31,7 +31,10 @@
         "openMenu": "メニューを開く",
         "menu": "メニュー",
         "darkMode": "ダークモード",
-        "feedback": "フィードバック"
+        "switchToLight": "ライトモードに切り替え",
+        "switchToDark": "ダークモードに切り替え",
+        "feedback": "フィードバック",
+        "logoAlt": "Quizaroniのロゴ"
     },
     "pageTitles": {
         "create": "作成",
@@ -144,7 +147,11 @@
             "cardsToPrint": "印刷するカード",
             "generatingPdf": "PDFを生成中...",
             "downloadPdf": "PDFをダウンロード",
-            "failedToGenerate": "PDFの生成に失敗しました。もう一度お試しください。"
+            "failedToGenerate": "PDFの生成に失敗しました。もう一度お試しください。",
+            "loadFailed": "学習セットのデータを読み込めませんでした。",
+            "noCards": "印刷するカードがありません。",
+            "noCardsImportantOnly": "印刷するカードがありません。「重要のみ」フィルターを解除してみてください。",
+            "notesLabel": "メモ:"
         },
         "download": {
             "title": "学習セットをダウンロード",
@@ -287,7 +294,12 @@
             "filtersDialogTitle": "検索と並べ替え",
             "done": "完了",
             "sortBy": "並べ替え",
-            "sortDirection": "並べ替え順"
+            "sortDirection": "並べ替え順",
+            "assignLabels": "ラベルを割り当て",
+            "viewToggle": "ホーム表示",
+            "tableView": "テーブル表示",
+            "gridView": "グリッド表示",
+            "htmlView": "HTMLテーブル表示"
         },
         "saveTablePreferences": "テーブル表示設定を保存",
         "saveColumnsAndDensity": "表示列と行の間隔を保存",
@@ -302,7 +314,20 @@
             "labels": "ラベル"
         },
         "noLabels": "なし",
-        "rowsPerPage": "ページあたりの行数"
+        "rowsPerPage": "ページあたりの行数",
+        "noStudySetsTitle": "学習セットはまだありません",
+        "noStudySetsBody": "最初の学習セットを作成して始めましょう！フラッシュカードを追加して整理し、学習をスタートできます。",
+        "createFirstStudySet": "最初の学習セットを作成",
+        "noResultsTitle": "結果が見つかりませんでした",
+        "noResultsBody": "検索条件やフィルターを変更してみてください",
+        "untitledSet": "無題のセット",
+        "favorite": "お気に入りに追加",
+        "unfavorite": "お気に入りを解除",
+        "moreActions": "その他の操作",
+        "noLabelsOnSet": "ラベルなし",
+        "cardCount_other": "カード{{count}}枚",
+        "viewInNewTab": "新しいタブで表示",
+        "editInNewTab": "新しいタブで編集"
     },
     "categories": {
         "manageCategories": "カテゴリーの管理",
@@ -399,6 +424,7 @@
         "switchToLight": "デフォルトをライトモードに切り替え",
         "switchToDark": "デフォルトをダークモードに切り替え",
         "interfaceLanguage": "表示言語",
+        "betaLanguage": "ベータ",
         "labels": "ラベル",
         "manageLabels": "ラベルの管理",
         "namedColors": "カラーネーム",
@@ -469,7 +495,17 @@
         "listView": "リスト表示",
         "gridView": "グリッド表示",
         "all": "すべて",
-        "important": "重要"
+        "important": "重要",
+        "viewCategories_other": "{{count}}件のカテゴリーを表示",
+        "playTts": "音声を読み上げ",
+        "markImportant": "重要としてマーク",
+        "textColor": "文字色",
+        "backgroundColor": "背景色",
+        "contentOnly": "コンテンツのみ",
+        "textColorDescription": "有効にすると、用語と定義の文字色が適用・表示されます。",
+        "backgroundColorDescription": "有効にすると、カードの背景色が適用・表示されます。",
+        "contentOnlyDescription": "有効にすると、すべてのカードのボタンとラベルが非表示になります。",
+        "settingStatus": "{{label}}: {{status}}"
     },
     "publicView": {
         "createdBy": "作成者: {{username}}",
@@ -594,7 +630,16 @@
         "imageUploaded_other": "画像を{{count}}件アップロードしました",
         "imageUploadFailed": "画像のアップロードに失敗しました",
         "deleteImageTitle": "画像の削除",
-        "deleteImageMessage": "「{{name}}」を削除してもよろしいですか？この操作は元に戻せません。"
+        "deleteImageMessage": "「{{name}}」を削除してもよろしいですか？この操作は元に戻せません。",
+        "cardNumber": "カード {{number}}",
+        "changeTextColor": "カードの文字色を変更",
+        "changeBackgroundColor": "カードの背景色を変更",
+        "swapTermDefinition": "用語と定義を入れ替え",
+        "duplicateCard": "カードを複製",
+        "deleteCard": "このカードを削除",
+        "imageLoadFailed": "読み込めませんでした",
+        "deleteImage": "画像を削除",
+        "replaceImage": "画像を差し替え"
     },
     "footer": {
         "socials": "SNS",
@@ -666,7 +711,25 @@
     "combineSets": {
         "goBack": "戻る",
         "removeSet": "{{title}}を組み合わせから除外",
-        "addSet": "{{title}}を組み合わせに追加"
+        "addSet": "{{title}}を組み合わせに追加",
+        "pageTitle": "セットの組み合わせ",
+        "title": "セットを組み合わせる",
+        "summary": "現在の組み合わせ — {{sets}} • {{cards}}",
+        "setCount_other": "{{count}}セット",
+        "cardCount_other": "カード{{count}}枚",
+        "combineAndGo": "組み合わせて開始",
+        "currentlyCombining": "現在の組み合わせ",
+        "combineOptions": "組み合わせオプション",
+        "titleLabel": "組み合わせ後のセットのタイトル",
+        "shuffleCards": "カードをシャッフル",
+        "keepCategories": "カードのカテゴリーを保持",
+        "keepImportant": "重要スターを保持",
+        "yourSets": "マイ学習セット",
+        "searchPlaceholder": "セットを検索...",
+        "noMatches": "「{{searchTerm}}」に一致するセットが見つかりませんでした",
+        "defaultTitle": "組み合わせた学習セット",
+        "defaultTitleFromSets": "組み合わせ: {{titles}}",
+        "defaultDescription": "組み合わせ元: {{titles}}"
     },
     "subjects": {
         "languages": "語学",
@@ -727,5 +790,41 @@
         "body": "一部の進捗がまだアカウントに保存されていません。今ログアウトすると、このデバイスから削除されます。",
         "confirm": "このままログアウト",
         "cancel": "ログインしたままにする"
+    },
+    "notFound": {
+        "title": "ページが見つかりません",
+        "body": "お探しのページが見つかりませんでした。移動されたか、リンクが間違っている可能性があります。",
+        "home": "ホームに戻る"
+    },
+    "feedbackDialog": {
+        "title": "フィードバックを送信",
+        "body": "Quizaroniのご利用に関するご意見・ご感想をお聞かせください。",
+        "label": "フィードバック"
+    },
+    "cascadePreview": {
+        "title": {
+            "edit": "{{item}}の編集を確認",
+            "delete": "{{item}}の削除を確認",
+            "deleteUnused": "未使用の{{item}}の削除を確認"
+        },
+        "confirm": {
+            "edit": "編集を確認",
+            "delete": "削除を確認",
+            "deleteUnused": "未使用の削除を確認"
+        },
+        "items": {
+            "label": "ラベル",
+            "category": "カテゴリー",
+            "color": "カラー"
+        },
+        "affectedLabel_other": "この操作は{{count}}件の学習セットに影響します",
+        "affectedCategory_other": "この操作は{{count}}枚のカードに影響します",
+        "affectedColor_other": "この操作は{{count}}件の使用箇所に影響します",
+        "affectedItems": "影響を受ける項目:",
+        "andMore": "...他{{count}}件",
+        "understand": "この操作は元に戻せないことを理解しています"
+    },
+    "metadataDialogs": {
+        "itemsSelected_other": "{{count}}件選択中"
     }
 }

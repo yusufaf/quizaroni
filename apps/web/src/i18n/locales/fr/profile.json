@@ -138,5 +138,42 @@
                 "description": "Étudier 500 cartes au total"
             }
         }
+    },
+    "account": {
+        "changeUsername": "Changer le nom d'utilisateur",
+        "usernameLabel": "Nom d'utilisateur",
+        "usernamePlaceholder": "Saisissez un nouveau nom d'utilisateur",
+        "usernameRule": "3 à 32 lettres, chiffres ou tirets bas, sans commencer par un chiffre",
+        "usernameChanged": "Votre nom d'utilisateur est désormais {{username}}",
+        "oldUsernameRemains": "Certaines de vos listes d'étude affichent encore votre ancien nom d'utilisateur",
+        "usernameTaken": "Ce nom d'utilisateur est déjà pris",
+        "usernameChangeFailed": "Échec du changement de nom d'utilisateur",
+        "deleteAccount": "Supprimer le compte",
+        "downloadData": "Télécharger les données"
+    },
+    "downloadDataDialog": {
+        "title": "Télécharger les données",
+        "intro": "Vous pouvez télécharger une copie de vos données en cliquant sur le bouton « Télécharger les données » ci-dessous. Cela générera un fichier contenant vos informations personnelles, vos paramètres enregistrés et d'autres données pertinentes.",
+        "note": "Veuillez noter qu'en fonction de la quantité de données stockées, le téléchargement peut prendre quelques instants. Une fois le téléchargement lancé, vous pourrez enregistrer le fichier sur votre appareil pour le consulter ultérieurement ou pour votre usage personnel.",
+        "includeStudysets": "Inclure les listes d'étude dans le téléchargement",
+        "confirmButton": "Télécharger les données",
+        "downloadFailed": "Échec du téléchargement de vos données"
+    },
+    "profilePictureDialog": {
+        "title": "Choisir une photo de profil",
+        "presetAvatars": "Avatars prédéfinis",
+        "uploadCustomImage": "Importer une image personnalisée",
+        "chooseFile": "Choisir un fichier",
+        "uploading": "Importation...",
+        "selectedAlt": "Sélectionné",
+        "uploadHint": "10 MB max. PNG, JPEG ou WebP. Sera redimensionnée en 512x512px.",
+        "invalidType": "Veuillez sélectionner une image PNG, JPEG ou WebP",
+        "fileTooLarge": "La taille du fichier doit être inférieure à 10 MB",
+        "uploadSuccess": "Image importée avec succès !",
+        "uploadFailed": "Échec de l'importation de l'image",
+        "selectAvatar": "Veuillez sélectionner un avatar",
+        "saving": "Enregistrement...",
+        "updated": "Photo de profil mise à jour !",
+        "saveFailed": "Échec de l'enregistrement de l'avatar"
     }
 }

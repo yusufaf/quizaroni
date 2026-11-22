@@ -31,7 +31,10 @@
         "openMenu": "Menü öffnen",
         "menu": "Menü",
         "darkMode": "Dunkelmodus",
-        "feedback": "Feedback"
+        "switchToLight": "Auf hellen Modus umstellen",
+        "switchToDark": "Auf dunklen Modus umstellen",
+        "feedback": "Feedback",
+        "logoAlt": "Quizaroni-Logo"
     },
     "pageTitles": {
         "create": "Erstellen",
@@ -144,7 +147,11 @@
             "cardsToPrint": "Zu druckende Karten",
             "generatingPdf": "PDF wird erstellt...",
             "downloadPdf": "PDF herunterladen",
-            "failedToGenerate": "PDF konnte nicht erstellt werden. Bitte versuche es erneut."
+            "failedToGenerate": "PDF konnte nicht erstellt werden. Bitte versuche es erneut.",
+            "loadFailed": "Lernset-Daten konnten nicht geladen werden.",
+            "noCards": "Keine Karten zum Drucken.",
+            "noCardsImportantOnly": "Keine Karten zum Drucken. Versuche, den Filter \"Nur wichtige\" zu deaktivieren.",
+            "notesLabel": "Notizen:"
         },
         "download": {
             "title": "Lernset herunterladen",
@@ -287,7 +294,12 @@
             "filtersDialogTitle": "Suchen und sortieren",
             "done": "Fertig",
             "sortBy": "Sortieren nach",
-            "sortDirection": "Sortierrichtung"
+            "sortDirection": "Sortierrichtung",
+            "assignLabels": "Labels zuweisen",
+            "viewToggle": "Startseitenansicht",
+            "tableView": "Tabellenansicht",
+            "gridView": "Rasteransicht",
+            "htmlView": "HTML-Tabellenansicht"
         },
         "saveTablePreferences": "Tabelleneinstellungen speichern",
         "saveColumnsAndDensity": "Sichtbare Spalten und Dichte speichern",
@@ -302,7 +314,21 @@
             "labels": "Labels"
         },
         "noLabels": "Keine",
-        "rowsPerPage": "Zeilen pro Seite"
+        "rowsPerPage": "Zeilen pro Seite",
+        "noStudySetsTitle": "Noch keine Lernsets",
+        "noStudySetsBody": "Erstelle zum Einstieg dein erstes Lernset! Füge Karteikarten hinzu, organisiere sie und leg los.",
+        "createFirstStudySet": "Erstes Lernset erstellen",
+        "noResultsTitle": "Keine Ergebnisse gefunden",
+        "noResultsBody": "Versuche, deine Suche oder Filter anzupassen",
+        "untitledSet": "Unbenanntes Lernset",
+        "favorite": "Als Favorit markieren",
+        "unfavorite": "Aus Favoriten entfernen",
+        "moreActions": "Weitere Aktionen",
+        "noLabelsOnSet": "Keine Labels",
+        "cardCount_one": "{{count}} Karte",
+        "cardCount_other": "{{count}} Karten",
+        "viewInNewTab": "In neuem Tab anzeigen",
+        "editInNewTab": "In neuem Tab bearbeiten"
     },
     "categories": {
         "manageCategories": "Kategorien verwalten",
@@ -405,6 +431,7 @@
         "switchToLight": "Standard auf hellen Modus umstellen",
         "switchToDark": "Standard auf dunklen Modus umstellen",
         "interfaceLanguage": "Sprache der Oberfläche",
+        "betaLanguage": "Beta",
         "labels": "Labels",
         "manageLabels": "Labels verwalten",
         "namedColors": "Benannte Farben",
@@ -476,7 +503,18 @@
         "listView": "Listenansicht",
         "gridView": "Rasteransicht",
         "all": "Alle",
-        "important": "Wichtig"
+        "important": "Wichtig",
+        "viewCategories_one": "{{count}} Kategorie anzeigen",
+        "viewCategories_other": "{{count}} Kategorien anzeigen",
+        "playTts": "Sprachausgabe abspielen",
+        "markImportant": "Als wichtig markieren",
+        "textColor": "Textfarbe",
+        "backgroundColor": "Hintergrundfarbe",
+        "contentOnly": "Nur Inhalt",
+        "textColorDescription": "Wenn aktiviert, wird die Textfarbe für Begriff und Definition angezeigt.",
+        "backgroundColorDescription": "Wenn aktiviert, wird die Hintergrundfarbe der Karten angezeigt.",
+        "contentOnlyDescription": "Wenn aktiviert, werden Schaltflächen und Labels auf allen Karten ausgeblendet.",
+        "settingStatus": "{{label}}: {{status}}"
     },
     "publicView": {
         "createdBy": "Erstellt von {{username}}",
@@ -609,7 +647,16 @@
         "imageUploaded_other": "{{count}} Bilder erfolgreich hochgeladen",
         "imageUploadFailed": "Bild konnte nicht hochgeladen werden",
         "deleteImageTitle": "Bild löschen",
-        "deleteImageMessage": "Möchtest du \"{{name}}\" wirklich löschen? Dies kann nicht rückgängig gemacht werden."
+        "deleteImageMessage": "Möchtest du \"{{name}}\" wirklich löschen? Dies kann nicht rückgängig gemacht werden.",
+        "cardNumber": "Karte {{number}}",
+        "changeTextColor": "Textfarbe der Karte ändern",
+        "changeBackgroundColor": "Hintergrundfarbe der Karte ändern",
+        "swapTermDefinition": "Begriff und Definition tauschen",
+        "duplicateCard": "Karte duplizieren",
+        "deleteCard": "Diese Karte löschen",
+        "imageLoadFailed": "Laden fehlgeschlagen",
+        "deleteImage": "Bild löschen",
+        "replaceImage": "Bild ersetzen"
     },
     "footer": {
         "socials": "Soziale Medien",
@@ -686,7 +733,27 @@
     "combineSets": {
         "goBack": "Zurück",
         "removeSet": "{{title}} aus Kombination entfernen",
-        "addSet": "{{title}} zur Kombination hinzufügen"
+        "addSet": "{{title}} zur Kombination hinzufügen",
+        "pageTitle": "Lernsets kombinieren",
+        "title": "Lernsets kombinieren",
+        "summary": "Aktuell kombiniert — {{sets}} • {{cards}}",
+        "setCount_one": "{{count}} Lernset",
+        "setCount_other": "{{count}} Lernsets",
+        "cardCount_one": "{{count}} Karte",
+        "cardCount_other": "{{count}} Karten",
+        "combineAndGo": "Kombinieren & starten",
+        "currentlyCombining": "Aktuell kombiniert",
+        "combineOptions": "Kombinationsoptionen",
+        "titleLabel": "Titel des kombinierten Lernsets",
+        "shuffleCards": "Karten mischen",
+        "keepCategories": "Kartenkategorien beibehalten",
+        "keepImportant": "Wichtig-Sterne beibehalten",
+        "yourSets": "Deine Lernsets",
+        "searchPlaceholder": "Lernsets durchsuchen...",
+        "noMatches": "Keine Lernsets für \"{{searchTerm}}\" gefunden",
+        "defaultTitle": "Kombiniertes Lernset",
+        "defaultTitleFromSets": "Kombiniert: {{titles}}",
+        "defaultDescription": "Eine Kombination aus: {{titles}}"
     },
     "subjects": {
         "languages": "Sprachen",
@@ -747,5 +814,45 @@
         "body": "Ein Teil deines Fortschritts wurde noch nicht in deinem Konto gespeichert. Wenn du dich jetzt abmeldest, geht er auf diesem Gerät verloren.",
         "confirm": "Trotzdem abmelden",
         "cancel": "Angemeldet bleiben"
+    },
+    "notFound": {
+        "title": "Seite nicht gefunden",
+        "body": "Wir konnten die gesuchte Seite nicht finden. Sie wurde möglicherweise verschoben oder der Link ist fehlerhaft.",
+        "home": "Zurück zur Startseite"
+    },
+    "feedbackDialog": {
+        "title": "Feedback senden",
+        "body": "Teile uns dein Feedback zu deinen Erfahrungen mit Quizaroni mit.",
+        "label": "Feedback"
+    },
+    "cascadePreview": {
+        "title": {
+            "edit": "Bearbeitung von {{item}} bestätigen",
+            "delete": "Löschen von {{item}} bestätigen",
+            "deleteUnused": "Unbenutzte löschen ({{item}}) bestätigen"
+        },
+        "confirm": {
+            "edit": "Bearbeitung bestätigen",
+            "delete": "Löschen bestätigen",
+            "deleteUnused": "Unbenutzte löschen bestätigen"
+        },
+        "items": {
+            "label": "Label",
+            "category": "Kategorie",
+            "color": "Farbe"
+        },
+        "affectedLabel_one": "Diese Aktion betrifft {{count}} Lernset",
+        "affectedLabel_other": "Diese Aktion betrifft {{count}} Lernsets",
+        "affectedCategory_one": "Diese Aktion betrifft {{count}} Karte",
+        "affectedCategory_other": "Diese Aktion betrifft {{count}} Karten",
+        "affectedColor_one": "Diese Aktion betrifft {{count}} Verwendung",
+        "affectedColor_other": "Diese Aktion betrifft {{count}} Verwendungen",
+        "affectedItems": "Betroffene Elemente:",
+        "andMore": "... und {{count}} weitere",
+        "understand": "Mir ist bewusst, dass diese Aktion nicht rückgängig gemacht werden kann"
+    },
+    "metadataDialogs": {
+        "itemsSelected_one": "{{count}} Element ausgewählt",
+        "itemsSelected_other": "{{count}} Elemente ausgewählt"
     }
 }
