@@ -292,7 +292,7 @@ const HomeToolbar = ({
                                 startIcon={<EditRounded />}
                                 onClick={handleEditClick}
                             >
-                                Edit
+                                {t('buttons.edit')}
                             </Button>
                             <Button
                                 startIcon={
@@ -305,8 +305,8 @@ const HomeToolbar = ({
                                 onClick={handleFavoriteClick}
                             >
                                 {firstStudyset?.favorited
-                                    ? 'Unfavorite'
-                                    : 'Favorite'}
+                                    ? t('home.unfavorite')
+                                    : t('home.favorite')}
                             </Button>
                         </>
                     )}
@@ -318,7 +318,7 @@ const HomeToolbar = ({
                             )
                         }
                     >
-                        Duplicate
+                        {t('buttons.duplicate')}
                     </Button>
                     <Button
                         startIcon={<DeleteRounded />}
@@ -328,18 +328,18 @@ const HomeToolbar = ({
                             )
                         }
                     >
-                        Delete
+                        {t('buttons.delete')}
                     </Button>
                     <Button
                         startIcon={<LabelRounded />}
                         onClick={handleAssignLabelsClick}
                     >
-                        Assign Labels
+                        {t('home.toolbar.assignLabels')}
                     </Button>
                 </SimpleFlexContainer>
             )}
             <ToggleButtonGroup
-                aria-label="Home View Toggle Group"
+                aria-label={t('home.toolbar.viewToggle')}
                 exclusive
                 onChange={handleViewChange}
                 value={selectedView}
@@ -348,21 +348,21 @@ const HomeToolbar = ({
                 <ToggleButton
                     value={HOME_LAYOUTS.TABLE}
                     key="left"
-                    title="Table View"
+                    title={t('home.toolbar.tableView')}
                 >
                     <TableViewIcon />
                 </ToggleButton>
                 <ToggleButton
                     value={HOME_LAYOUTS.GRID}
                     key="center"
-                    title="Grid View"
+                    title={t('home.toolbar.gridView')}
                 >
                     <GridViewIcon />
                 </ToggleButton>
                 <ToggleButton
                     value={HOME_LAYOUTS.HTML}
                     key="right"
-                    title="HTML Table View"
+                    title={t('home.toolbar.htmlView')}
                 >
                     <HTMLIcon />
                 </ToggleButton>

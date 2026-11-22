@@ -34,7 +34,7 @@ const CombineSets = () => {
     const { id: baseSetUUID = '' } = useParams();
     const navigate = useNavigate();
     const { t } = useTranslation();
-    useBrowserTitle('Combine Sets');
+    useBrowserTitle(t('combineSets.pageTitle'));
 
     const { data: studysetsResponse } = useGetAllStudysets();
     const allSets = studysetsResponse?.studysets ?? [];
@@ -55,11 +55,15 @@ const CombineSets = () => {
 
     const defaultTitle =
         combinedSets.length > 0
-            ? 'Combined: ' + combinedSets.map((s) => s.title).join(' + ')
-            : 'Combined Studyset';
+            ? t('combineSets.defaultTitleFromSets', {
+                  titles: combinedSets.map((s) => s.title).join(' + '),
+              })
+            : t('combineSets.defaultTitle');
     const defaultDescription =
         combinedSets.length > 0
-            ? 'A combination of: ' + combinedSets.map((s) => s.title).join(', ')
+            ? t('combineSets.defaultDescription', {
+                  titles: combinedSets.map((s) => s.title).join(', '),
+              })
             : '';
 
     const filteredAvailableSets = availableSets.filter((set) =>
@@ -185,15 +189,20 @@ const CombineSets = () => {
                         </IconButton>
                         <Box>
                             <BoldTypography variant="h4">
-                                Combine sets
+                                {t('combineSets.title')}
                             </BoldTypography>
                             <Typography
                                 variant="subtitle1"
                                 color="text.secondary"
                             >
-                                Currently Combining — {combinedSets.length}{' '}
-                                {combinedSets.length === 1 ? 'set' : 'sets'} •{' '}
-                                {totalCards} cards
+                                {t('combineSets.summary', {
+                                    sets: t('combineSets.setCount', {
+                                        count: combinedSets.length,
+                                    }),
+                                    cards: t('combineSets.cardCount', {
+                                        count: totalCards,
+                                    }),
+                                })}
                             </Typography>
                         </Box>
                     </Box>
@@ -210,7 +219,7 @@ const CombineSets = () => {
                             )
                         }
                     >
-                        Combine & Go
+                        {t('combineSets.combineAndGo')}
                     </Button>
                 </SpacedFlexContainer>
             </CombineSetsHeader>
@@ -225,7 +234,7 @@ const CombineSets = () => {
             >
                 <ColumnContainer>
                     <BoldTypography variant="h6" sx={{ mb: 2 }}>
-                        Currently Combining
+                        {t('combineSets.currentlyCombining')}
                     </BoldTypography>
                     <ScrollableList>
                         {combinedSets.map((set) => (
@@ -235,7 +244,9 @@ const CombineSets = () => {
                                         variant="body2"
                                         color="text.secondary"
                                     >
-                                        {set.cards?.length || 0} cards
+                                        {t('combineSets.cardCount', {
+                                            count: set.cards?.length || 0,
+                                        })}
                                     </Typography>
                                     <BoldTypography variant="body1">
                                         {set.title}
@@ -258,7 +269,7 @@ const CombineSets = () => {
                     </ScrollableList>
 
                     <BoldTypography variant="h6" sx={{ mb: 1, mt: 2 }}>
-                        Combine Options
+                        {t('combineSets.combineOptions')}
                     </BoldTypography>
                     <Paper
                         sx={{
@@ -270,7 +281,7 @@ const CombineSets = () => {
                         elevation={2}
                     >
                         <TextField
-                            label="Combined Set Title"
+                            label={t('combineSets.titleLabel')}
                             fullWidth
                             value={customTitle}
                             onChange={(e) => setCustomTitle(e.target.value)}
@@ -278,7 +289,7 @@ const CombineSets = () => {
                             variant="outlined"
                         />
                         <TextField
-                            label="Description"
+                            label={t('labels.description')}
                             fullWidth
                             multiline
                             rows={2}
@@ -308,7 +319,7 @@ const CombineSets = () => {
                                 }
                                 label={
                                     <Typography variant="body1">
-                                        Shuffle cards
+                                        {t('combineSets.shuffleCards')}
                                     </Typography>
                                 }
                             />
@@ -324,7 +335,7 @@ const CombineSets = () => {
                                 }
                                 label={
                                     <Typography variant="body1">
-                                        Keep card categories
+                                        {t('combineSets.keepCategories')}
                                     </Typography>
                                 }
                             />
@@ -340,7 +351,7 @@ const CombineSets = () => {
                                 }
                                 label={
                                     <Typography variant="body1">
-                                        Keep important stars
+                                        {t('combineSets.keepImportant')}
                                     </Typography>
                                 }
                             />
@@ -350,16 +361,20 @@ const CombineSets = () => {
 
                 <ColumnContainer>
                     <SpacedFlexContainer sx={{ mb: 2 }}>
-                        <BoldTypography variant="h6">Your Sets</BoldTypography>
+                        <BoldTypography variant="h6">
+                            {t('combineSets.yourSets')}
+                        </BoldTypography>
                         <Typography variant="body2" color="text.secondary">
-                            {filteredAvailableSets.length} sets
+                            {t('combineSets.setCount', {
+                                count: filteredAvailableSets.length,
+                            })}
                         </Typography>
                     </SpacedFlexContainer>
 
                     <TextField
                         fullWidth
                         size="small"
-                        placeholder="Search sets..."
+                        placeholder={t('combineSets.searchPlaceholder')}
                         variant="outlined"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -380,7 +395,7 @@ const CombineSets = () => {
                                 color="text.secondary"
                                 sx={{ p: 2, textAlign: 'center' }}
                             >
-                                No sets found matching "{searchTerm}"
+                                {t('combineSets.noMatches', { searchTerm })}
                             </Typography>
                         ) : (
                             filteredAvailableSets.map((set) => (
@@ -390,7 +405,9 @@ const CombineSets = () => {
                                             variant="body2"
                                             color="text.secondary"
                                         >
-                                            {set.cards?.length || 0} cards
+                                            {t('combineSets.cardCount', {
+                                                count: set.cards?.length || 0,
+                                            })}
                                         </Typography>
                                         <BoldTypography variant="body1">
                                             {set.title}

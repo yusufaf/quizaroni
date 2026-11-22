@@ -287,7 +287,12 @@
             "filtersDialogTitle": "Search and sort",
             "done": "Done",
             "sortBy": "Sort by",
-            "sortDirection": "Sort direction"
+            "sortDirection": "Sort direction",
+            "assignLabels": "Assign Labels",
+            "viewToggle": "Home view",
+            "tableView": "Table View",
+            "gridView": "Grid View",
+            "htmlView": "HTML Table View"
         },
         "saveTablePreferences": "Save Table Preferences",
         "saveColumnsAndDensity": "Save visible columns and density",
@@ -302,7 +307,21 @@
             "labels": "Labels"
         },
         "noLabels": "None",
-        "rowsPerPage": "Rows per page"
+        "rowsPerPage": "Rows per page",
+        "noStudySetsTitle": "No study sets yet",
+        "noStudySetsBody": "Get started by creating your first study set! Add flashcards, organize them, and start learning.",
+        "createFirstStudySet": "Create Your First Study Set",
+        "noResultsTitle": "No results found",
+        "noResultsBody": "Try adjusting your search or filters",
+        "untitledSet": "Untitled Set",
+        "favorite": "Favorite",
+        "unfavorite": "Unfavorite",
+        "moreActions": "More actions",
+        "noLabelsOnSet": "No labels",
+        "cardCount_one": "{{count}} Card",
+        "cardCount_other": "{{count}} Cards",
+        "viewInNewTab": "View in new tab",
+        "editInNewTab": "Edit in new tab"
     },
     "categories": {
         "manageCategories": "Manage Categories",
@@ -687,7 +706,27 @@
     "combineSets": {
         "goBack": "Go back",
         "removeSet": "Remove {{title}} from combination",
-        "addSet": "Add {{title}} to combination"
+        "addSet": "Add {{title}} to combination",
+        "pageTitle": "Combine Sets",
+        "title": "Combine sets",
+        "summary": "Currently Combining — {{sets}} • {{cards}}",
+        "setCount_one": "{{count}} set",
+        "setCount_other": "{{count}} sets",
+        "cardCount_one": "{{count}} card",
+        "cardCount_other": "{{count}} cards",
+        "combineAndGo": "Combine & Go",
+        "currentlyCombining": "Currently Combining",
+        "combineOptions": "Combine Options",
+        "titleLabel": "Combined Set Title",
+        "shuffleCards": "Shuffle cards",
+        "keepCategories": "Keep card categories",
+        "keepImportant": "Keep important stars",
+        "yourSets": "Your Sets",
+        "searchPlaceholder": "Search sets...",
+        "noMatches": "No sets found matching \"{{searchTerm}}\"",
+        "defaultTitle": "Combined Studyset",
+        "defaultTitleFromSets": "Combined: {{titles}}",
+        "defaultDescription": "A combination of: {{titles}}"
     },
     "subjects": {
         "languages": "Languages",

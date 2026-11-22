@@ -287,7 +287,12 @@
             "filtersDialogTitle": "Buscar y ordenar",
             "done": "Listo",
             "sortBy": "Ordenar por",
-            "sortDirection": "Dirección del orden"
+            "sortDirection": "Dirección del orden",
+            "assignLabels": "Asignar etiquetas",
+            "viewToggle": "Vista de inicio",
+            "tableView": "Vista de tabla",
+            "gridView": "Vista de cuadrícula",
+            "htmlView": "Vista de tabla HTML"
         },
         "saveTablePreferences": "Guardar Preferencias de Tabla",
         "saveColumnsAndDensity": "Guardar columnas visibles y densidad",
@@ -302,7 +307,21 @@
             "labels": "Etiquetas"
         },
         "noLabels": "Ninguna",
-        "rowsPerPage": "Filas por página"
+        "rowsPerPage": "Filas por página",
+        "noStudySetsTitle": "Aún no tienes sets de estudio",
+        "noStudySetsBody": "¡Empieza creando tu primer set de estudio! Agrega tarjetas, organízalas y comienza a aprender.",
+        "createFirstStudySet": "Crea tu primer set de estudio",
+        "noResultsTitle": "No se encontraron resultados",
+        "noResultsBody": "Prueba a ajustar tu búsqueda o los filtros",
+        "untitledSet": "Set sin título",
+        "favorite": "Marcar como favorito",
+        "unfavorite": "Quitar de favoritos",
+        "moreActions": "Más acciones",
+        "noLabelsOnSet": "Sin etiquetas",
+        "cardCount_one": "{{count}} Tarjeta",
+        "cardCount_other": "{{count}} Tarjetas",
+        "viewInNewTab": "Ver en una pestaña nueva",
+        "editInNewTab": "Editar en una pestaña nueva"
     },
     "categories": {
         "manageCategories": "Administrar Categorías",
@@ -687,7 +706,27 @@
     "combineSets": {
         "goBack": "Atrás",
         "removeSet": "Eliminar {{title}} de la combinación",
-        "addSet": "Agregar {{title}} a la combinación"
+        "addSet": "Agregar {{title}} a la combinación",
+        "pageTitle": "Combinar sets",
+        "title": "Combinar sets",
+        "summary": "Combinando actualmente — {{sets}} • {{cards}}",
+        "setCount_one": "{{count}} set",
+        "setCount_other": "{{count}} sets",
+        "cardCount_one": "{{count}} tarjeta",
+        "cardCount_other": "{{count}} tarjetas",
+        "combineAndGo": "Combinar y empezar",
+        "currentlyCombining": "Combinando actualmente",
+        "combineOptions": "Opciones de combinación",
+        "titleLabel": "Título del set combinado",
+        "shuffleCards": "Mezclar tarjetas",
+        "keepCategories": "Conservar las categorías de las tarjetas",
+        "keepImportant": "Conservar las estrellas de importantes",
+        "yourSets": "Tus sets",
+        "searchPlaceholder": "Buscar sets...",
+        "noMatches": "No se encontraron sets que coincidan con \"{{searchTerm}}\"",
+        "defaultTitle": "Set de estudio combinado",
+        "defaultTitleFromSets": "Combinado: {{titles}}",
+        "defaultDescription": "Una combinación de: {{titles}}"
     },
     "subjects": {
         "languages": "Idiomas",
