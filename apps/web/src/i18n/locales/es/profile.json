@@ -166,7 +166,7 @@
         "chooseFile": "Elegir archivo",
         "uploading": "Subiendo...",
         "selectedAlt": "Seleccionada",
-        "uploadHint": "Máx. 2 MB. PNG, JPEG o WebP. Se redimensionará a 512x512 px.",
+        "uploadHint": "Máx. 10 MB. PNG, JPEG o WebP. Se redimensionará a 512x512 px.",
         "invalidType": "Selecciona una imagen PNG, JPEG o WebP",
         "fileTooLarge": "El archivo debe pesar menos de 10 MB",
         "uploadSuccess": "¡Imagen subida correctamente!",

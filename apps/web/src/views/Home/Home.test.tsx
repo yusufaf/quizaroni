@@ -11,6 +11,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
+import 'i18n';
 import Home from './Home';
 
 const muiTheme = createTheme();
@@ -19,26 +20,6 @@ const ID = '11111111-1111-4111-8111-111111111111';
 const ID_B = '22222222-2222-4222-8222-222222222222';
 const OWNER = '33333333-3333-4333-8333-333333333333';
 const NOW = '2026-10-01T12:00:00.000Z';
-
-vi.mock('react-i18next', async () => {
-    const { default: en } = await import('../../i18n/locales/en/common.json');
-    const t = (key: string, options: Record<string, unknown> = {}) => {
-        const lookup = (path: string) =>
-            path
-                .split('.')
-                .reduce<any>((node, part) => node?.[part], en as any);
-        const plural =
-            typeof options.count === 'number'
-                ? new Intl.PluralRules('en').select(options.count)
-                : undefined;
-        const value =
-            (plural && lookup(`${key}_${plural}`)) ?? lookup(key) ?? key;
-        return String(value).replace(/{{(\w+)}}/g, (_, name) =>
-            String(options[name] ?? '')
-        );
-    };
-    return { useTranslation: () => ({ t }) };
-});
 
 // Mocked like the other component tests until #102 moves them to MemoryRouter.
 vi.mock('react-router-dom', () => {

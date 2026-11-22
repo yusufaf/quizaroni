@@ -18,9 +18,6 @@ export const SUCCESS_U = 'Success';
 export const ERROR = 'error';
 export const ERROR_U = 'Error';
 
-export const DISABLED = 'Disabled';
-export const ENABLED = 'Enabled';
-
 export const ROUTES = {
     LOGIN: '/login',
     SIGNUP: '/signup',
