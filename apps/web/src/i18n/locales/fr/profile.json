@@ -1,0 +1,142 @@
+{
+    "tabs": {
+        "overview": "Aperçu",
+        "studySets": "Listes d'étude",
+        "statistics": "Statistiques",
+        "customization": "Personnalisation",
+        "settings": "Paramètres"
+    },
+    "customization": {
+        "title": "Personnalisation",
+        "theme": {
+            "title": "Thème",
+            "light": "Clair",
+            "dark": "Sombre"
+        },
+        "language": {
+            "title": "Langue de l'interface",
+            "description": "Sélectionnez votre langue préférée"
+        },
+        "fontSize": {
+            "title": "Taille de police",
+            "small": "Petite",
+            "medium": "Moyenne",
+            "large": "Grande",
+            "extraLarge": "Très grande"
+        },
+        "dateFormat": {
+            "title": "Format de date"
+        },
+        "timeFormat": {
+            "title": "Format de l'heure",
+            "twelveHour": "12 heures",
+            "twentyFourHour": "24 heures"
+        },
+        "showSeconds": {
+            "title": "Afficher les secondes"
+        },
+        "homeView": {
+            "title": "Vue d'accueil par défaut",
+            "table": "Tableau",
+            "grid": "Grille"
+        },
+        "downloadFormat": {
+            "title": "Format de téléchargement par défaut"
+        }
+    },
+    "deleteAccountDialog": {
+        "title": "Supprimer le compte",
+        "passwordLabel": "Mot de passe",
+        "passwordPlaceholder": "Saisissez votre mot de passe",
+        "confirmButton": "Supprimer le compte"
+    },
+    "settings": {
+        "title": "Paramètres",
+        "account": "Paramètres du compte",
+        "changePassword": "Changer le mot de passe",
+        "deleteAccount": "Supprimer le compte",
+        "notifications": "Notifications",
+        "emailNotifications": "Notifications par e-mail",
+        "studyReminders": "Rappels d'étude"
+    },
+    "statistics": {
+        "title": "Statistiques",
+        "totalSets": "Total des listes d'étude",
+        "totalCards": "Total des cartes",
+        "studyTime": "Temps d'étude",
+        "averageAccuracy": "Précision moyenne",
+        "currentStreak": "Série actuelle",
+        "longestStreak": "Plus longue série"
+    },
+    "achievements": {
+        "streakTitle": "Série d'étude",
+        "currentStreak": "Série actuelle",
+        "longestStreak": "Plus longue série",
+        "streakTooltip_one": "Série de {{count}} jour d'étude",
+        "streakTooltip_other": "Série de {{count}} jours d'étude",
+        "presetTitle": "Succès prédéfinis",
+        "customTitle": "Objectifs personnalisés",
+        "createCustom": "Créer un objectif",
+        "noCustom": "Aucun objectif personnalisé pour le moment. Créez-en un pour suivre une étape personnelle !",
+        "unlocked": "Débloqué",
+        "deleteCustom": "Supprimer l'objectif personnalisé",
+        "customProgress": "Objectif : {{target}}",
+        "form": {
+            "title": "Titre de l'objectif",
+            "description": "Description",
+            "icon": "Icône (emoji)",
+            "metric": "Suivi",
+            "threshold": "Cible",
+            "cancel": "Annuler",
+            "save": "Enregistrer l'objectif"
+        },
+        "metrics": {
+            "total_sessions": "Sessions d'étude terminées",
+            "total_cards": "Cartes étudiées",
+            "daily_streak": "Série d'étude quotidienne",
+            "studyset_sessions": "Sessions sur une liste d'étude"
+        },
+        "presets": {
+            "firstStudy": {
+                "title": "Premiers pas",
+                "description": "Terminer votre première session d'étude"
+            },
+            "perfectScore": {
+                "title": "Score parfait",
+                "description": "Obtenir 100 % de précision lors d'une session"
+            },
+            "streak3": {
+                "title": "Sur sa lancée",
+                "description": "Étudier 3 jours de suite"
+            },
+            "streak7": {
+                "title": "Guerrier de la semaine",
+                "description": "Étudier 7 jours de suite"
+            },
+            "streak30": {
+                "title": "Maître du mois",
+                "description": "Étudier 30 jours de suite"
+            },
+            "sessionStreak10": {
+                "title": "Série gagnante",
+                "description": "Répondre correctement à 10 cartes de suite"
+            },
+            "sessions10": {
+                "title": "Élève assidu",
+                "description": "Terminer 10 sessions d'étude"
+            },
+            "sessions50": {
+                "title": "Marathon d'étude",
+                "description": "Terminer 50 sessions d'étude"
+            },
+            "cards100": {
+                "title": "Érudit centenaire",
+                "description": "Étudier 100 cartes au total"
+            },
+            "cards500": {
+                "title": "Champion du savoir",
+                "description": "Étudier 500 cartes au total"
+            }
+        }
+    }
+}

@@ -1,0 +1,163 @@
+{
+    "modes": {
+        "flashcards": {
+            "title": "Karteikarten",
+            "description": "Klassische Wendekarten – lerne in deinem eigenen Tempo",
+            "features": {
+                "selfPaced": "Eigenes Tempo",
+                "audioSupport": "Audio-Unterstützung",
+                "progressTracking": "Fortschrittsverfolgung"
+            }
+        },
+        "multipleChoice": {
+            "title": "Multiple Choice",
+            "description": "Teste dein Wissen mit Quizfragen",
+            "features": {
+                "timedMode": "Zeitmodus",
+                "instantFeedback": "Sofortiges Feedback",
+                "scoreTracking": "Punktestand"
+            }
+        },
+        "matching": {
+            "title": "Zuordnungsspiel",
+            "description": "Ordne Begriffe den Definitionen zu",
+            "features": {
+                "interactive": "Interaktiv",
+                "timeChallenge": "Zeit-Challenge",
+                "visualFeedback": "Visuelles Feedback"
+            }
+        },
+        "typeWrite": {
+            "title": "Tippen & Schreiben",
+            "description": "Übe durch Eintippen der Antworten",
+            "features": {
+                "activeRecall": "Aktives Abrufen",
+                "hintSystem": "Hinweissystem",
+                "smartMatching": "Intelligenter Abgleich"
+            }
+        },
+        "review": {
+            "title": "Fällige wiederholen",
+            "description": "Lerne nur die heute fälligen Karten",
+            "features": {
+                "spacedRepetition": "Verteiltes Lernen",
+                "dueCardsOnly": "Nur fällige Karten",
+                "optimizedRetention": "Optimales Behalten"
+            }
+        }
+    },
+    "actions": {
+        "startStudying": "Lernen starten",
+        "continueStudying": "Weiterlernen",
+        "restartSession": "Sitzung neu starten",
+        "viewResults": "Ergebnisse ansehen",
+        "flipCard": "Karte umdrehen",
+        "nextCard": "Nächste Karte",
+        "previousCard": "Vorherige Karte",
+        "finish": "Beenden",
+        "shuffle": "Mischen",
+        "showHint": "Hinweis anzeigen",
+        "submitAnswer": "Antwort absenden"
+    },
+    "progress": {
+        "cardsStudied": "Gelernte Karten",
+        "accuracy": "Genauigkeit",
+        "timeSpent": "Lernzeit",
+        "streak": "Serie",
+        "score": "Punkte"
+    },
+    "feedback": {
+        "correct": "Richtig!",
+        "incorrect": "Falsch",
+        "tryAgain": "Erneut versuchen",
+        "wellDone": "Gut gemacht!",
+        "keepGoing": "Weiter so!",
+        "perfectScore": "Volle Punktzahl!"
+    },
+    "ratings": {
+        "again": "Nochmal",
+        "hard": "Schwer",
+        "good": "Gut",
+        "easy": "Leicht"
+    },
+    "review": {
+        "due": "Fällige wiederholen",
+        "dueCount_one": "{{count}} Karte fällig",
+        "dueCount_other": "{{count}} Karten fällig",
+        "caughtUp": "Alles erledigt!",
+        "caughtUpSubtitle": "Derzeit sind keine Karten zur Wiederholung fällig.",
+        "ratePrompt": "Wie gut konntest du dich erinnern?"
+    },
+    "addCardsToUnlock": "Füge Karten hinzu, um diesen Modus freizuschalten",
+    "loading": "Wird geladen...",
+    "typeWriteStudy": {
+        "typeDefinitionBelow": "Tippe unten die Definition ein:",
+        "answerPlaceholder": "Deine Antwort eingeben...",
+        "useHint": "Hinweis nutzen ({{remaining}} übrig)",
+        "hintPenaltySuffix": "({{points}} Pkt.)",
+        "hint1FirstLetter": "Hinweis 1: Erster Buchstabe ist \"{{letter}}\"",
+        "hint2FirstThree": "Hinweis 2: Erste 3 Buchstaben sind \"{{letters}}\"",
+        "hint3Length": "Hinweis 3: Länge beträgt {{count}} Zeichen",
+        "difficultyLine": "Schwierigkeit: {{level}} | Enter zum Absenden",
+        "difficultyEasy": "leicht",
+        "difficultyMedium": "mittel",
+        "difficultyHard": "schwer",
+        "feedbackCorrect": "✓ Richtig!",
+        "feedbackIncorrect": "✗ Falsch. Die richtige Antwort lautet: \"{{answer}}\""
+    },
+    "results": {
+        "outstanding": "Hervorragend! 🌟",
+        "greatJob": "Super gemacht! 🎉",
+        "goodWork": "Gute Arbeit! 👍",
+        "keepPracticing": "Bleib dran! 💪",
+        "totalScore": "Gesamtpunktzahl",
+        "correct": "Richtig",
+        "accuracy": "Genauigkeit",
+        "time": "Zeit",
+        "bestStreak": "Beste Serie",
+        "newAchievements": "🎉 Neue Erfolge freigeschaltet!",
+        "backToSet": "Zurück zum Lernset",
+        "studyAgain": "Nochmal lernen"
+    },
+    "header": {
+        "backToStudySet": "Zurück zum Lernset",
+        "streak": "Serie: {{count}}",
+        "score": "Punkte: {{score}}",
+        "progress": "Karte {{current}} von {{total}}",
+        "audioOn": "Audio an",
+        "audioOff": "Audio aus",
+        "settings": "Einstellungen"
+    },
+    "matching": {
+        "time": "Zeit: {{time}}",
+        "matched": "Zugeordnet: {{matched}}/{{total}}",
+        "terms": "Begriffe",
+        "definitions": "Definitionen"
+    },
+    "multipleChoice": {
+        "correctFeedback": "✓ Richtig! Super gemacht!",
+        "incorrectFeedback": "✗ Falsch. Die richtige Antwort war: \"{{answer}}\"",
+        "optionPlaceholder": "Option {{n}}"
+    },
+    "settings": {
+        "title": "Lerneinstellungen",
+        "cardSection": "Karteneinstellungen",
+        "shuffleCards": "Karten mischen",
+        "autoAdvance": "Automatisch zur nächsten Karte",
+        "hideImages": "Kartenbilder ausblenden",
+        "audioSection": "Audioeinstellungen",
+        "tts": "Sprachausgabe (TTS) aktivieren",
+        "timerSection": "Timer-Einstellungen",
+        "timedMode": "Zeitmodus aktivieren",
+        "timePerCard": "Zeit pro Karte: {{seconds}} Sekunden",
+        "difficultySection": "Schwierigkeitsgrad",
+        "difficultyEasy": "Leicht",
+        "difficultyMedium": "Mittel",
+        "difficultyHard": "Schwer",
+        "difficultyEasyDesc": "Toleranterer Antwortabgleich, mehr Hinweise verfügbar",
+        "difficultyMediumDesc": "Ausgewogener Antwortabgleich und Hinweise",
+        "difficultyHardDesc": "Strenger Antwortabgleich, weniger Hinweise verfügbar",
+        "saveSettings": "Einstellungen speichern",
+        "secondsShort": "{{seconds}}s"
+    }
+}

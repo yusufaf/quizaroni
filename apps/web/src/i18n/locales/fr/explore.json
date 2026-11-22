@@ -1,0 +1,78 @@
+{
+    "title": "Explorer",
+    "forYou": {
+        "heading": "Pour vous",
+        "loading": "Chargement de vos listes…",
+        "error": "Impossible de charger vos listes.",
+        "retry": "Réessayer"
+    },
+    "tile": {
+        "jumpBackIn": "Reprendre",
+        "favorite": "Favori",
+        "revisit": "À revoir",
+        "previews": "Termes dans cette liste",
+        "untitled": "Liste sans titre",
+        "cardCount_one": "{{count}} carte",
+        "cardCount_other": "{{count}} cartes",
+        "due": {
+            "eyebrow": "À réviser",
+            "title_one": "{{count}} carte à réviser dans {{sets}}",
+            "title_other": "{{count}} cartes à réviser dans {{sets}}",
+            "sets_one": "{{count}} liste",
+            "sets_other": "{{count}} listes",
+            "local": "Sur cet appareil",
+            "review": "Réviser"
+        },
+        "streak": {
+            "eyebrow": "Série",
+            "title_one": "Série de {{count}} jour",
+            "title_other": "Série de {{count}} jours",
+            "atRisk_one": "Étudiez aujourd'hui pour garder votre série de {{count}} jour",
+            "atRisk_other": "Étudiez aujourd'hui pour garder votre série de {{count}} jours",
+            "studiedToday": "Vous avez étudié aujourd'hui",
+            "lastStudiedYesterday": "Dernière étude hier"
+        }
+    },
+    "empty": {
+        "heading": "Aucune liste d'étude pour le moment",
+        "body": "Créez votre première liste et elle s'affichera ici.",
+        "createSet": "Créer une liste"
+    },
+    "signUpBanner": {
+        "heading": "Appropriez-vous ces listes",
+        "body": "Inscrivez-vous gratuitement pour enregistrer des listes publiques, les étudier avec la répétition espacée et suivre vos progrès.",
+        "cta": "S'inscrire gratuitement"
+    },
+    "featured": {
+        "heading": "À la une"
+    },
+    "community": {
+        "heading": "Communauté",
+        "loading": "Chargement des listes publiques…",
+        "error": "Impossible de charger les listes publiques.",
+        "retry": "Réessayer",
+        "empty": "Aucune liste publique pour le moment.",
+        "emptySubject": "Aucune liste publique dans {{subject}} pour le moment.",
+        "loadMore": "Afficher plus",
+        "loadMoreError": "Impossible de charger plus de listes.",
+        "showing": "Affichage de {{shown}}",
+        "showingOf": "Affichage de {{shown}} sur {{total}}",
+        "showingSubject": "Affichage de {{shown}} dans {{subject}}",
+        "showingSubjectOf": "Affichage de {{shown}} sur {{total}} dans {{subject}}",
+        "subjectFilter": "Filtrer par matière",
+        "allSubjects": "Toutes",
+        "anonymous": "Anonyme",
+        "termCount_one": "{{count}} terme",
+        "termCount_other": "{{count}} termes",
+        "showingQuery": "Affichage de {{shown}} pour « {{query}} »",
+        "showingQueryOf": "Affichage de {{shown}} sur {{total}} pour « {{query}} »",
+        "showingSubjectQuery": "Affichage de {{shown}} dans {{subject}} pour « {{query}} »",
+        "showingSubjectQueryOf": "Affichage de {{shown}} sur {{total}} dans {{subject}} pour « {{query}} »",
+        "emptyQuery": "Aucune liste publique ne correspond à « {{query}} ».",
+        "emptySubjectQuery": "Aucune liste publique dans {{subject}} ne correspond à « {{query}} »."
+    },
+    "search": {
+        "label": "Rechercher des listes publiques",
+        "clear": "Effacer la recherche"
+    }
+}

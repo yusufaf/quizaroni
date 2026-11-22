@@ -1,0 +1,72 @@
+{
+    "title": "探す",
+    "forYou": {
+        "heading": "あなた向け",
+        "loading": "学習セットを読み込み中…",
+        "error": "学習セットを読み込めませんでした。",
+        "retry": "再試行"
+    },
+    "tile": {
+        "jumpBackIn": "学習を再開",
+        "favorite": "お気に入り",
+        "revisit": "もう一度復習",
+        "previews": "このセットの用語",
+        "untitled": "無題のセット",
+        "cardCount_other": "カード{{count}}枚",
+        "due": {
+            "eyebrow": "復習対象",
+            "title_other": "{{sets}}で{{count}}枚のカードが復習対象",
+            "sets_other": "{{count}}個のセット",
+            "local": "このデバイス上",
+            "review": "復習する"
+        },
+        "streak": {
+            "eyebrow": "連続学習",
+            "title_other": "{{count}}日連続学習",
+            "atRisk_other": "今日学習して{{count}}日連続学習をキープしましょう",
+            "studiedToday": "今日は学習済みです",
+            "lastStudiedYesterday": "最終学習: 昨日"
+        }
+    },
+    "empty": {
+        "heading": "学習セットはまだありません",
+        "body": "最初の学習セットを作成すると、ここに表示されます。",
+        "createSet": "セットを作成"
+    },
+    "signUpBanner": {
+        "heading": "学習セットを自分のものに",
+        "body": "無料登録して公開セットを保存し、間隔反復での学習や進捗の記録を始めましょう。",
+        "cta": "無料で登録"
+    },
+    "featured": {
+        "heading": "注目"
+    },
+    "community": {
+        "heading": "コミュニティ",
+        "loading": "公開セットを読み込み中…",
+        "error": "公開セットを読み込めませんでした。",
+        "retry": "再試行",
+        "empty": "公開セットはまだありません。",
+        "emptySubject": "{{subject}}の公開セットはまだありません。",
+        "loadMore": "もっと読み込む",
+        "loadMoreError": "さらに学習セットを読み込めませんでした。",
+        "showing": "{{shown}}件を表示中",
+        "showingOf": "全{{total}}件中{{shown}}件を表示中",
+        "showingSubject": "{{subject}}の{{shown}}件を表示中",
+        "showingSubjectOf": "{{subject}}の全{{total}}件中{{shown}}件を表示中",
+        "subjectFilter": "分野で絞り込む",
+        "allSubjects": "すべて",
+        "anonymous": "匿名",
+        "termCount_other": "用語{{count}}件",
+        "showingQuery": "「{{query}}」の検索結果 {{shown}}件を表示中",
+        "showingQueryOf": "「{{query}}」の検索結果 全{{total}}件中{{shown}}件を表示中",
+        "showingSubjectQuery": "{{subject}}の「{{query}}」の検索結果 {{shown}}件を表示中",
+        "showingSubjectQueryOf": "{{subject}}の「{{query}}」の検索結果 全{{total}}件中{{shown}}件を表示中",
+        "emptyQuery": "「{{query}}」に一致する公開セットはありません。",
+        "emptySubjectQuery": "{{subject}}に「{{query}}」と一致する公開セットはありません。"
+    },
+    "search": {
+        "label": "公開セットを検索",
+        "clear": "検索をクリア"
+    }
+}

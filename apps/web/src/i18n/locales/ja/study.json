@@ -1,0 +1,162 @@
+{
+    "modes": {
+        "flashcards": {
+            "title": "フラッシュカード",
+            "description": "定番のめくるカード — 自分のペースで学習",
+            "features": {
+                "selfPaced": "マイペース学習",
+                "audioSupport": "音声読み上げ対応",
+                "progressTracking": "進捗の記録"
+            }
+        },
+        "multipleChoice": {
+            "title": "四択クイズ",
+            "description": "クイズ形式の問題で知識をテスト",
+            "features": {
+                "timedMode": "タイマーモード",
+                "instantFeedback": "即時フィードバック",
+                "scoreTracking": "スコア記録"
+            }
+        },
+        "matching": {
+            "title": "マッチングゲーム",
+            "description": "用語と定義をペアにする",
+            "features": {
+                "interactive": "インタラクティブ",
+                "timeChallenge": "タイムチャレンジ",
+                "visualFeedback": "視覚的フィードバック"
+            }
+        },
+        "typeWrite": {
+            "title": "タイピング解答",
+            "description": "答えを入力して練習",
+            "features": {
+                "activeRecall": "アクティブリコール",
+                "hintSystem": "ヒント機能",
+                "smartMatching": "スマート判定"
+            }
+        },
+        "review": {
+            "title": "今日の復習",
+            "description": "今日が復習期限のカードだけを学習",
+            "features": {
+                "spacedRepetition": "間隔反復",
+                "dueCardsOnly": "復習対象カードのみ",
+                "optimizedRetention": "記憶定着の最適化"
+            }
+        }
+    },
+    "actions": {
+        "startStudying": "学習を始める",
+        "continueStudying": "学習を続ける",
+        "restartSession": "セッションをやり直す",
+        "viewResults": "結果を見る",
+        "flipCard": "カードをめくる",
+        "nextCard": "次のカード",
+        "previousCard": "前のカード",
+        "finish": "完了",
+        "shuffle": "シャッフル",
+        "showHint": "ヒントを表示",
+        "submitAnswer": "解答を送信"
+    },
+    "progress": {
+        "cardsStudied": "学習したカード",
+        "accuracy": "正答率",
+        "timeSpent": "学習時間",
+        "streak": "連続正解",
+        "score": "スコア"
+    },
+    "feedback": {
+        "correct": "正解！",
+        "incorrect": "不正解",
+        "tryAgain": "もう一度",
+        "wellDone": "よくできました！",
+        "keepGoing": "その調子！",
+        "perfectScore": "満点！"
+    },
+    "ratings": {
+        "again": "もう一度",
+        "hard": "難しい",
+        "good": "良い",
+        "easy": "簡単"
+    },
+    "review": {
+        "due": "今日の復習",
+        "dueCount_other": "復習対象: {{count}}枚",
+        "caughtUp": "すべて完了！",
+        "caughtUpSubtitle": "現在、復習対象のカードはありません。",
+        "ratePrompt": "どのくらい思い出せましたか？"
+    },
+    "addCardsToUnlock": "カードを追加してこのモードを解放しましょう",
+    "loading": "読み込み中...",
+    "typeWriteStudy": {
+        "typeDefinitionBelow": "下に定義を入力してください:",
+        "answerPlaceholder": "答えを入力...",
+        "useHint": "ヒントを使う（残り{{remaining}}回）",
+        "hintPenaltySuffix": "({{points}} pt)",
+        "hint1FirstLetter": "ヒント1: 最初の文字は「{{letter}}」です",
+        "hint2FirstThree": "ヒント2: 最初の3文字は「{{letters}}」です",
+        "hint3Length": "ヒント3: 文字数は{{count}}文字です",
+        "difficultyLine": "難易度: {{level}} | Enterで送信",
+        "difficultyEasy": "簡単",
+        "difficultyMedium": "普通",
+        "difficultyHard": "難しい",
+        "feedbackCorrect": "✓ 正解！",
+        "feedbackIncorrect": "✗ 不正解。正解は「{{answer}}」です"
+    },
+    "results": {
+        "outstanding": "素晴らしい！ 🌟",
+        "greatJob": "よくできました！ 🎉",
+        "goodWork": "いい調子です！ 👍",
+        "keepPracticing": "練習を続けましょう！ 💪",
+        "totalScore": "合計スコア",
+        "correct": "正解数",
+        "accuracy": "正答率",
+        "time": "時間",
+        "bestStreak": "最高連続正解",
+        "newAchievements": "🎉 新しい実績を解除しました！",
+        "backToSet": "学習セットに戻る",
+        "studyAgain": "もう一度学習する"
+    },
+    "header": {
+        "backToStudySet": "学習セットに戻る",
+        "streak": "{{count}}連続",
+        "score": "スコア: {{score}}",
+        "progress": "カード {{current}} / {{total}}",
+        "audioOn": "音声オン",
+        "audioOff": "音声オフ",
+        "settings": "設定"
+    },
+    "matching": {
+        "time": "時間: {{time}}",
+        "matched": "一致: {{matched}}/{{total}}",
+        "terms": "用語",
+        "definitions": "定義"
+    },
+    "multipleChoice": {
+        "correctFeedback": "✓ 正解！よくできました！",
+        "incorrectFeedback": "✗ 不正解。正解は「{{answer}}」でした",
+        "optionPlaceholder": "選択肢 {{n}}"
+    },
+    "settings": {
+        "title": "学習設定",
+        "cardSection": "カード設定",
+        "shuffleCards": "カードをシャッフル",
+        "autoAdvance": "自動的に次のカードへ進む",
+        "hideImages": "カードの画像を非表示",
+        "audioSection": "音声設定",
+        "tts": "音声読み上げ（TTS）を有効にする",
+        "timerSection": "タイマー設定",
+        "timedMode": "タイマーモードを有効にする",
+        "timePerCard": "カード1枚あたりの時間: {{seconds}}秒",
+        "difficultySection": "難易度レベル",
+        "difficultyEasy": "簡単",
+        "difficultyMedium": "普通",
+        "difficultyHard": "難しい",
+        "difficultyEasyDesc": "ゆとりのある正誤判定で、使えるヒントが多くなります",
+        "difficultyMediumDesc": "バランスの取れた正誤判定とヒント数になります",
+        "difficultyHardDesc": "厳密な正誤判定で、使えるヒントが少なくなります",
+        "saveSettings": "設定を保存",
+        "secondsShort": "{{seconds}}秒"
+    }
+}

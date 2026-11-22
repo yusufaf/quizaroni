@@ -1,0 +1,81 @@
+{
+    "aiChat": {
+        "title": "KI-Lernassistent",
+        "openPanel": "KI-Assistent öffnen",
+        "closePanel": "KI-Assistent schließen",
+        "modes": {
+            "chat": "Chat",
+            "quiz": "Frag mich ab",
+            "explain": "Erklären",
+            "keyConcepts": "Kernkonzepte",
+            "suggestCards": "Karten vorschlagen"
+        },
+        "modeDescriptions": {
+            "chat": "Stelle Fragen zu deinem Lernstoff",
+            "quiz": "Teste dein Wissen mit KI-generierten Fragen",
+            "explain": "Erhalte ausführliche Erklärungen zu Konzepten",
+            "keyConcepts": "Entdecke die wichtigsten Kernaussagen",
+            "suggestCards": "Erstelle neue Karteikarten ähnlich wie diese"
+        },
+        "actions": {
+            "explainCard": "Mit KI erklären",
+            "generateKeyConcepts": "Kernkonzepte erstellen",
+            "generateCards": "Karten erstellen",
+            "addToSet": "{{count}} zum Lernset hinzufügen",
+            "exportChat": "Unterhaltung exportieren"
+        },
+        "suggestedCards": {
+            "title": "Vorgeschlagene Karteikarten",
+            "added": "{{count}} Karte(n) zu deinem Lernset hinzugefügt",
+            "addedShort": "Zum Lernset hinzugefügt"
+        },
+        "input": {
+            "placeholder": "Stelle eine Frage...",
+            "send": "Senden",
+            "stop": "Generierung stoppen"
+        },
+        "messages": {
+            "welcome": "Hallo! Ich bin dein KI-Lernassistent. Ich habe Zugriff auf alle Karten in diesem Lernset. Wie kann ich dir beim Lernen helfen?",
+            "quizWelcome": "Lass uns dein Wissen testen! Ich stelle dir Fragen zu deinen Karteikarten. Bereit?",
+            "explainWelcome": "Ich kann dir jedes Konzept aus deinem Lernset ausführlich erklären. Was möchtest du besser verstehen?",
+            "keyConceptsWelcome": "Ich analysiere dein Lernset und arbeite die Kernkonzepte heraus...",
+            "suggestCardsWelcome": "Ich kann neue Karteikarten erstellen, die zu diesem Lernset passen. Tippe auf „Karten erstellen“, um zu starten.",
+            "emptyState": "Starte eine Unterhaltung, um Hilfe beim Lernen zu erhalten",
+            "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+            "clearChat": "Chat leeren",
+            "clearChatConfirm": "Möchtest du diese Unterhaltung wirklich löschen?"
+        },
+        "setup": {
+            "title": "KI-Funktionen einrichten",
+            "description": "Konfiguriere deinen KI-Anbieter und API-Schlüssel, um KI-gestützte Lernfunktionen zu nutzen.",
+            "goToSettings": "Zu den KI-Einstellungen",
+            "noApiKey": "Kein API-Schlüssel konfiguriert"
+        }
+    },
+    "aiSettings": {
+        "title": "KI-Integration",
+        "description": "Konfiguriere deinen KI-Anbieter, um KI-gestützte Lernfunktionen zu aktivieren. Dein API-Schlüssel wird verschlüsselt auf deinem Gerät gespeichert und niemals auf unseren Servern abgelegt.",
+        "provider": "KI-Anbieter",
+        "providerDescription": "Wähle deinen bevorzugten KI-Anbieter",
+        "model": "Modell",
+        "modelDescription": "Wähle das zu verwendende KI-Modell",
+        "apiKey": "API-Schlüssel",
+        "apiKeyDescription": "Gib den API-Schlüssel deines Anbieters ein",
+        "apiKeyPlaceholder": "API-Schlüssel hier einfügen",
+        "apiKeySaved": "API-Schlüssel sicher gespeichert",
+        "apiKeyMasked": "Schlüssel konfiguriert",
+        "saveKey": "Schlüssel speichern",
+        "deleteKey": "Schlüssel löschen",
+        "testConnection": "Verbindung testen",
+        "testSuccess": "Verbindung erfolgreich!",
+        "testError": "Verbindung fehlgeschlagen. Bitte überprüfe deinen API-Schlüssel.",
+        "getApiKey": "API-Schlüssel abrufen",
+        "recommended": "Empfohlen",
+        "securityNote": "Dein API-Schlüssel wird verschlüsselt und nur auf diesem Gerät gespeichert. Er wird pro Anfrage sicher übertragen, aber niemals auf unseren Servern gespeichert.",
+        "providerOptions": {
+            "openai": "OpenAI",
+            "anthropic": "Anthropic",
+            "google": "Google Gemini"
+        }
+    }
+}

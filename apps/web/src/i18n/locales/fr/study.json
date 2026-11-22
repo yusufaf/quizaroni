@@ -1,0 +1,163 @@
+{
+    "modes": {
+        "flashcards": {
+            "title": "Flashcards",
+            "description": "Cartes classiques à retourner - apprenez à votre rythme",
+            "features": {
+                "selfPaced": "À votre rythme",
+                "audioSupport": "Support audio",
+                "progressTracking": "Suivi des progrès"
+            }
+        },
+        "multipleChoice": {
+            "title": "Choix multiple",
+            "description": "Testez vos connaissances avec des questions de type quiz",
+            "features": {
+                "timedMode": "Mode chronométré",
+                "instantFeedback": "Correction instantanée",
+                "scoreTracking": "Suivi du score"
+            }
+        },
+        "matching": {
+            "title": "Jeu d'association",
+            "description": "Associez les termes à leurs définitions",
+            "features": {
+                "interactive": "Interactif",
+                "timeChallenge": "Défi chronométré",
+                "visualFeedback": "Retour visuel"
+            }
+        },
+        "typeWrite": {
+            "title": "Saisie et écriture",
+            "description": "Entraînez-vous en tapant les réponses",
+            "features": {
+                "activeRecall": "Rappel actif",
+                "hintSystem": "Système d'indices",
+                "smartMatching": "Validation intelligente"
+            }
+        },
+        "review": {
+            "title": "Révision du jour",
+            "description": "Étudiez uniquement les cartes à réviser aujourd'hui",
+            "features": {
+                "spacedRepetition": "Répétition espacée",
+                "dueCardsOnly": "Cartes à réviser uniquement",
+                "optimizedRetention": "Mémorisation optimisée"
+            }
+        }
+    },
+    "actions": {
+        "startStudying": "Commencer à étudier",
+        "continueStudying": "Continuer à étudier",
+        "restartSession": "Recommencer la session",
+        "viewResults": "Voir les résultats",
+        "flipCard": "Retourner la carte",
+        "nextCard": "Carte suivante",
+        "previousCard": "Carte précédente",
+        "finish": "Terminer",
+        "shuffle": "Mélanger",
+        "showHint": "Afficher un indice",
+        "submitAnswer": "Valider la réponse"
+    },
+    "progress": {
+        "cardsStudied": "Cartes étudiées",
+        "accuracy": "Précision",
+        "timeSpent": "Temps passé",
+        "streak": "Série",
+        "score": "Score"
+    },
+    "feedback": {
+        "correct": "Correct !",
+        "incorrect": "Incorrect",
+        "tryAgain": "Réessayer",
+        "wellDone": "Bien joué !",
+        "keepGoing": "Continuez ainsi !",
+        "perfectScore": "Score parfait !"
+    },
+    "ratings": {
+        "again": "À revoir",
+        "hard": "Difficile",
+        "good": "Bien",
+        "easy": "Facile"
+    },
+    "review": {
+        "due": "À réviser",
+        "dueCount_one": "{{count}} carte à réviser",
+        "dueCount_other": "{{count}} cartes à réviser",
+        "caughtUp": "Vous êtes à jour !",
+        "caughtUpSubtitle": "Aucune carte n'est à réviser pour le moment.",
+        "ratePrompt": "Dans quelle mesure vous en êtes-vous souvenu ?"
+    },
+    "addCardsToUnlock": "Ajoutez des cartes pour débloquer ce mode",
+    "loading": "Chargement...",
+    "typeWriteStudy": {
+        "typeDefinitionBelow": "Tapez la définition ci-dessous :",
+        "answerPlaceholder": "Saisissez votre réponse...",
+        "useHint": "Utiliser un indice ({{remaining}} restant(s))",
+        "hintPenaltySuffix": "({{points}} pts)",
+        "hint1FirstLetter": "Indice 1 : La première lettre est « {{letter}} »",
+        "hint2FirstThree": "Indice 2 : Les 3 premières lettres sont « {{letters}} »",
+        "hint3Length": "Indice 3 : La longueur est de {{count}} caractères",
+        "difficultyLine": "Difficulté : {{level}} | Appuyez sur Enter pour valider",
+        "difficultyEasy": "facile",
+        "difficultyMedium": "moyenne",
+        "difficultyHard": "difficile",
+        "feedbackCorrect": "✓ Correct !",
+        "feedbackIncorrect": "✗ Incorrect. La bonne réponse est : « {{answer}} »"
+    },
+    "results": {
+        "outstanding": "Exceptionnel ! 🌟",
+        "greatJob": "Excellent travail ! 🎉",
+        "goodWork": "Bon travail ! 👍",
+        "keepPracticing": "Continuez à vous entraîner ! 💪",
+        "totalScore": "Score total",
+        "correct": "Correctes",
+        "accuracy": "Précision",
+        "time": "Temps",
+        "bestStreak": "Meilleure série",
+        "newAchievements": "🎉 Nouveaux succès débloqués !",
+        "backToSet": "Retour à la liste",
+        "studyAgain": "Étudier à nouveau"
+    },
+    "header": {
+        "backToStudySet": "Retour à la liste d'étude",
+        "streak": "Série : {{count}}",
+        "score": "Score : {{score}}",
+        "progress": "Carte {{current}} sur {{total}}",
+        "audioOn": "Audio activé",
+        "audioOff": "Audio désactivé",
+        "settings": "Paramètres"
+    },
+    "matching": {
+        "time": "Temps : {{time}}",
+        "matched": "Associées : {{matched}}/{{total}}",
+        "terms": "Termes",
+        "definitions": "Définitions"
+    },
+    "multipleChoice": {
+        "correctFeedback": "✓ Correct ! Excellent travail !",
+        "incorrectFeedback": "✗ Incorrect. La bonne réponse était : « {{answer}} »",
+        "optionPlaceholder": "Option {{n}}"
+    },
+    "settings": {
+        "title": "Paramètres d'étude",
+        "cardSection": "Paramètres des cartes",
+        "shuffleCards": "Mélanger les cartes",
+        "autoAdvance": "Passer automatiquement à la carte suivante",
+        "hideImages": "Masquer les images des cartes",
+        "audioSection": "Paramètres audio",
+        "tts": "Activer la synthèse vocale (TTS)",
+        "timerSection": "Paramètres du minuteur",
+        "timedMode": "Activer le mode chronométré",
+        "timePerCard": "Temps par carte : {{seconds}} secondes",
+        "difficultySection": "Niveau de difficulté",
+        "difficultyEasy": "Facile",
+        "difficultyMedium": "Moyen",
+        "difficultyHard": "Difficile",
+        "difficultyEasyDesc": "Validation des réponses plus souple, plus d'indices disponibles",
+        "difficultyMediumDesc": "Validation des réponses et disponibilité des indices équilibrées",
+        "difficultyHardDesc": "Validation stricte des réponses, moins d'indices disponibles",
+        "saveSettings": "Enregistrer les paramètres",
+        "secondsShort": "{{seconds}} s"
+    }
+}
