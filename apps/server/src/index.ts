@@ -6,6 +6,13 @@ import pkg from '../package.json';
 import { createApp } from './app';
 import { createAuth, lazyAuth, scrubAuthEnv } from './auth/auth';
 import {
+    describeSocial,
+    parseSocialConfig,
+    type SocialConfig,
+    socialProviderIds,
+    socialUrlWarning,
+} from './auth/social-config';
+import {
     type ConfigDefaults,
     ConfigError,
     cookieWarning,
@@ -104,9 +111,11 @@ if (argv.includes('--help')) {
 
 let config: ServerConfig;
 let smtp: SmtpConfig | undefined;
+let social: SocialConfig;
 try {
     config = loadConfig(argv, process.env, process.cwd(), defaults);
     smtp = parseSmtpConfig(process.env);
+    social = parseSocialConfig(process.env);
 } catch (err) {
     if (!(err instanceof ConfigError)) throw err;
     console.error(err.message);
@@ -214,6 +223,7 @@ const auth = lazyAuth(() => {
             secret: authSecret,
             insecureCookies: config.insecureCookies,
             mailer,
+            social,
         }),
     };
 });
@@ -235,6 +245,7 @@ const app = createApp({
     auth,
     trustProxy: config.trustProxy,
     mailer,
+    social: socialProviderIds(social),
     ai: { enabled: config.aiChat },
 });
 
@@ -264,6 +275,7 @@ console.log(
 );
 console.log(`Data directory: ${config.dataDir}`);
 console.log(describeSmtp(smtp));
+console.log(describeSocial(social, config.publicUrl));
 if (smtp) void mailer.verify();
 console.log(
     config.aiChat
@@ -272,6 +284,8 @@ console.log(
 );
 const warning = cookieWarning(publicUrl, config.insecureCookies);
 if (warning) console.warn(warning);
+const socialWarning = socialUrlWarning(social, publicUrl);
+if (socialWarning) console.warn(socialWarning);
 if (config.trustProxy) {
     console.log('Trusting X-Forwarded-For from one reverse proxy.');
 }
