@@ -1,6 +1,7 @@
 import { Favorite, FavoriteBorder, MoreHoriz } from '@mui/icons-material/';
 import { Chip, IconButton, Tooltip, Typography } from '@mui/material/';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { useTheme } from 'theme/useTheme';
 import {
@@ -45,6 +46,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
     } = studyset;
 
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const { muiTheme } = useTheme();
 
     const { setSelectedStudySet } = useStudySetsStore();
@@ -83,6 +85,8 @@ const HomeStudySetCard = ({ studyset }: Props) => {
         setActionsMenuOpen(false);
     };
 
+    const favoriteLabel = favorited ? t('home.unfavorite') : t('home.favorite');
+
     const handleFavoriteClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         updateStudyset({
@@ -102,17 +106,18 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                             <GhostLink to={`/view/${studysetUUID}`}>
                                 {title || (
                                     <span style={{ opacity: 0.5 }}>
-                                        Untitled Set
+                                        {t('home.untitledSet')}
                                     </span>
                                 )}
                             </GhostLink>
                         </CardTitle>
-                        <Tooltip title={favorited ? 'Unfavorite' : 'Favorite'}>
+                        <Tooltip title={favoriteLabel}>
                             <motion.div
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                             >
                                 <IconButton
+                                    aria-label={favoriteLabel}
                                     onClick={handleFavoriteClick}
                                     size="small"
                                     sx={{
@@ -132,7 +137,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                     </SpacedContainer>
                     {username && (
                         <Typography variant="subtitle1">
-                            {`Created by ${username}`}
+                            {t('viewStudySet.createdBy', { username })}
                         </Typography>
                     )}
                     <CardDescription title={description}>
@@ -140,14 +145,14 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                     </CardDescription>
                     <CardInfo>
                         <Chip
-                            label={`${cards.length} Card${cards.length !== 1 ? 's' : ''}`}
+                            label={t('home.cardCount', { count: cards.length })}
                             size="small"
                             color="primary"
                             variant="outlined"
                             sx={{ fontWeight: 600 }}
                         />
                         <SpacedContainer>
-                            <Typography>Created</Typography>
+                            <Typography>{t('home.columns.created')}</Typography>
                             <Typography>
                                 {formatDateUsingPreferred(
                                     createdAt,
@@ -159,7 +164,9 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                             </Typography>
                         </SpacedContainer>
                         <SpacedContainer>
-                            <Typography>Last Viewed</Typography>
+                            <Typography>
+                                {t('home.columns.lastViewed')}
+                            </Typography>
                             <Typography>
                                 {formatDateUsingPreferred(
                                     lastViewed,
@@ -174,7 +181,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                     <CardBottom>
                         {!labels || labels.length === 0 ? (
                             <LabelChip
-                                label="No labels"
+                                label={t('home.noLabelsOnSet')}
                                 variant="outlined"
                                 color="error"
                                 size="small"
@@ -208,6 +215,7 @@ const HomeStudySetCard = ({ studyset }: Props) => {
                             ))
                         )}
                         <IconButton
+                            aria-label={t('home.moreActions')}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 openActionsMenu(e);
