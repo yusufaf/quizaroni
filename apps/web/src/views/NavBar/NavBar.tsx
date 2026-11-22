@@ -89,7 +89,7 @@ const NavBar = (props: Props) => {
                 >
                     <img
                         src={logoUrl}
-                        alt="Quizaroni Logo"
+                        alt={t('nav.logoAlt')}
                         style={{
                             width: '40px',
                             height: '40px',

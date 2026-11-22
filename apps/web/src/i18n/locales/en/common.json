@@ -31,7 +31,8 @@
         "openMenu": "Open menu",
         "menu": "Menu",
         "darkMode": "Dark mode",
-        "feedback": "Feedback"
+        "feedback": "Feedback",
+        "logoAlt": "Quizaroni logo"
     },
     "pageTitles": {
         "create": "Create",
@@ -144,7 +145,11 @@
             "cardsToPrint": "Cards to Print",
             "generatingPdf": "Generating PDF...",
             "downloadPdf": "Download PDF",
-            "failedToGenerate": "Failed to generate PDF. Please try again."
+            "failedToGenerate": "Failed to generate PDF. Please try again.",
+            "loadFailed": "Unable to load studyset data.",
+            "noCards": "No cards to print.",
+            "noCardsImportantOnly": "No cards to print. Try disabling the \"Important Only\" filter.",
+            "notesLabel": "Notes:"
         },
         "download": {
             "title": "Download Study Set",
@@ -753,5 +758,40 @@
         "title": "Page not found",
         "body": "We couldn't find the page you were looking for. It may have moved or the link may be wrong.",
         "home": "Back to home"
+    },
+    "feedbackDialog": {
+        "title": "Submit Feedback",
+        "body": "Submit any feedback you have about your experience with Quizaroni.",
+        "label": "Feedback"
+    },
+    "cascadePreview": {
+        "title": {
+            "edit": "Confirm edit of {{item}}",
+            "delete": "Confirm delete of {{item}}",
+            "deleteUnused": "Confirm delete of unused {{item}}"
+        },
+        "confirm": {
+            "edit": "Confirm edit",
+            "delete": "Confirm delete",
+            "deleteUnused": "Confirm delete unused"
+        },
+        "items": {
+            "label": "label",
+            "category": "category",
+            "color": "color"
+        },
+        "affectedLabel_one": "This action will affect {{count}} study set",
+        "affectedLabel_other": "This action will affect {{count}} study sets",
+        "affectedCategory_one": "This action will affect {{count}} card",
+        "affectedCategory_other": "This action will affect {{count}} cards",
+        "affectedColor_one": "This action will affect {{count}} usage",
+        "affectedColor_other": "This action will affect {{count}} usages",
+        "affectedItems": "Affected Items:",
+        "andMore": "... and {{count}} more",
+        "understand": "I understand this action cannot be undone"
+    },
+    "metadataDialogs": {
+        "itemsSelected_one": "{{count}} item selected",
+        "itemsSelected_other": "{{count}} items selected"
     }
 }

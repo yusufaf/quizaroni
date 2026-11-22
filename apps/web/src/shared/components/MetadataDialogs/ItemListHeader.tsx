@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, Button } from '@mui/material';
 import { Download as DownloadIcon } from '@mui/icons-material';
 import { ItemListHeaderProps } from './types';
@@ -7,6 +8,8 @@ export const ItemListHeader = ({
     onDownload,
     itemCount,
 }: ItemListHeaderProps) => {
+    const { t } = useTranslation();
+
     return (
         <Box
             sx={{
@@ -25,7 +28,7 @@ export const ItemListHeader = ({
                 size="small"
                 disabled={itemCount === 0}
             >
-                Download
+                {t('buttons.download')}
             </Button>
         </Box>
     );

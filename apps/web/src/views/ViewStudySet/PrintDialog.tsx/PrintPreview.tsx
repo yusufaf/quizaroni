@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Studyset, PrintConfig } from 'shared/types';
 import { PRINT_LAYOUTS } from 'shared/constants';
 import FlashcardLayout from './layouts/FlashcardLayout';
@@ -11,10 +12,12 @@ type Props = {
 };
 
 const PrintPreview = ({ studyset, settings }: Props) => {
+    const { t } = useTranslation();
+
     if (!studyset || !studyset.cards) {
         return (
             <EmptyStateContainer>
-                <p>Unable to load studyset data.</p>
+                <p>{t('dialogs.print.loadFailed')}</p>
             </EmptyStateContainer>
         );
     }
@@ -27,9 +30,9 @@ const PrintPreview = ({ studyset, settings }: Props) => {
         return (
             <EmptyStateContainer>
                 <p>
-                    No cards to print.{' '}
-                    {settings.importantOnly &&
-                        'Try disabling "Important Only" filter.'}
+                    {settings.importantOnly
+                        ? t('dialogs.print.noCardsImportantOnly')
+                        : t('dialogs.print.noCards')}
                 </p>
             </EmptyStateContainer>
         );
