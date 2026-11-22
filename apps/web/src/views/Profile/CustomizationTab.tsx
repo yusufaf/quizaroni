@@ -28,6 +28,7 @@ import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
 import useSpeechVoices from 'shared/hooks/useSpeechVoices';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { currentLanguage, LANGUAGE_OPTIONS } from 'i18n/languages';
 import {
     DARK,
     DATE_FORMATS,
@@ -297,15 +298,18 @@ const CustomizationTab = ({ userData }: Props) => {
                 </ActionHeader>
                 <SimpleFlexContainer style={{ gap: '1rem' }}>
                     <SimpleSelect
-                        value={i18n.language?.split('-')[0] || 'en'}
+                        value={currentLanguage(i18n.resolvedLanguage)}
                         onChange={handleLanguageChange}
                         sx={{
                             height: '2.5rem',
                             width: '10rem',
                         }}
                     >
-                        <MenuItem value="en">{t('languages.en')}</MenuItem>
-                        <MenuItem value="es">{t('languages.es')}</MenuItem>
+                        {LANGUAGE_OPTIONS.map(({ code, nativeName }) => (
+                            <MenuItem key={code} value={code} lang={code}>
+                                {nativeName}
+                            </MenuItem>
+                        ))}
                     </SimpleSelect>
                 </SimpleFlexContainer>
             </ActionColumn>

@@ -82,8 +82,8 @@
     },
     "review": {
         "due": "Repaso pendiente",
-        "dueCount": "{{count}} tarjeta pendiente",
-        "dueCount_plural": "{{count}} tarjetas pendientes",
+        "dueCount_one": "{{count}} tarjeta pendiente",
+        "dueCount_other": "{{count}} tarjetas pendientes",
         "caughtUp": "¡Todo al día!",
         "caughtUpSubtitle": "No hay tarjetas pendientes de repaso ahora mismo.",
         "ratePrompt": "¿Qué tan bien lo recordaste?"

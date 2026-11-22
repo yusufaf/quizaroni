@@ -15,8 +15,9 @@ describe('explore i18n namespace', () => {
         expect(flatKeys(es).sort()).toEqual(flatKeys(en).sort());
     });
 
-    it('is registered for both languages', () => {
+    it('is bundled for en and loaded on demand for es', async () => {
         expect(i18n.hasResourceBundle('en', 'explore')).toBe(true);
+        await i18n.loadLanguages('es');
         expect(i18n.hasResourceBundle('es', 'explore')).toBe(true);
     });
 });

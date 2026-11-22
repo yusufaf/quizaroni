@@ -3,6 +3,7 @@ import { Dialog, IconButton, Typography } from '@mui/material';
 import { CardFileMetadata } from 'shared/types';
 import { formatBytes } from 'utilities/general';
 import { useTranslation } from 'react-i18next';
+import { dateLocale } from 'i18n/languages';
 import { useState } from 'react';
 // `@mui/material/styles` rather than `@mui/system`: only the former's Theme
 // carries `shadows`, which the hover style below reads.
@@ -115,7 +116,7 @@ interface ImageGalleryProps {
 
 const formatUploadDate = (isoDate: string, locale: string): string => {
     const date = new Date(isoDate);
-    return date.toLocaleDateString(locale === 'es' ? 'es-ES' : 'en-US', {
+    return date.toLocaleDateString(dateLocale(locale), {
         month: 'short',
         day: 'numeric',
         year: 'numeric',
