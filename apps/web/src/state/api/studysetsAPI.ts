@@ -27,6 +27,7 @@ import {
 import type { z } from 'zod';
 import type { PublishError, SubjectId } from '@quizaroni/shared-types';
 import { useTranslation } from 'react-i18next';
+import type { ParseKeys } from 'i18next';
 import { toast } from 'react-toastify';
 
 /* Endpoints
@@ -370,7 +371,7 @@ const setSavesFor = (client: QueryClient, studysetUUID: string): SetSaves => {
 
 type UseUpdateStudysetOptions = {
     /** i18n key for the failure toast; false when the caller reports failures itself. */
-    errorToast?: string | false;
+    errorToast?: ParseKeys<'common'> | false;
     /** false for an editor that keeps its own copy of the set: a cache write would reload its form. */
     optimistic?: boolean;
 };

@@ -43,7 +43,7 @@ type Props = {
 
 const ViewStudySetCard = ({ card, index, selectedStudyset }: Props) => {
     const { muiTheme } = useTheme();
-    const { t } = useTranslation('ai');
+    const { t } = useTranslation(['ai', 'common']);
     const { setOpen, setMode, setQueuedPrompt } = useAIChatStore();
     const aiEnabled = useAIChatEnabled();
     const { cancel } = useSpeechSynthesis();

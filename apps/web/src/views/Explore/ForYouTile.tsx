@@ -1,6 +1,7 @@
 import { Button, Theme } from '@mui/material';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { ParseKeys } from 'i18next';
 import { Link } from 'react-router-dom';
 import { STUDY_MODES } from 'shared/constants';
 import type { EffectiveStreak } from 'shared/utilities/gamification';
@@ -25,7 +26,7 @@ import {
 } from './ExploreStyles';
 import { buildTermPreviews } from './termPreviews';
 
-const KIND_LABEL_KEYS: Partial<Record<SetTileKind, string>> = {
+const KIND_LABEL_KEYS: Partial<Record<SetTileKind, ParseKeys<'explore'>>> = {
     jumpBackIn: 'tile.jumpBackIn',
     favorite: 'tile.favorite',
     revisit: 'tile.revisit',

@@ -38,6 +38,7 @@ import { processImport, ImportFormat } from 'utilities/importUtils';
 import { parseApkg, ApkgErrorKey, MAX_APKG_BYTES } from 'utilities/ankiApkg';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import type { ParseKeys } from 'i18next';
 import ImportPreviewTable from './ImportPreviewTable';
 
 type Props = {
@@ -139,7 +140,7 @@ const DropOverlay = styled(Paper)(({ theme }) => ({
 
 // Separator presets offered for Quizlet imports. Values are descriptors the
 // importUtils parser understands (named tokens, a literal, or 'custom').
-const FIELD_SEPARATORS: { value: string; labelKey: string }[] = [
+const FIELD_SEPARATORS: { value: string; labelKey: ParseKeys<'common'> }[] = [
     { value: 'tab', labelKey: 'create.sepTab' },
     { value: 'comma', labelKey: 'create.sepComma' },
     { value: 'space', labelKey: 'create.sepSpace' },
@@ -150,7 +151,7 @@ const FIELD_SEPARATORS: { value: string; labelKey: string }[] = [
 // Maps parseApkg's stable, locale-independent error identifiers to i18n
 // keys, so .apkg failures are localized like every other import format
 // instead of showing the developer-facing English message from ankiApkg.ts.
-const APKG_ERROR_KEY_TO_I18N: Record<ApkgErrorKey, string> = {
+const APKG_ERROR_KEY_TO_I18N: Record<ApkgErrorKey, ParseKeys<'common'>> = {
     tooLarge: 'create.apkgTooLarge',
     archiveUnreadable: 'create.apkgArchiveUnreadable',
     noCollection: 'create.apkgNoCollection',
@@ -159,7 +160,7 @@ const APKG_ERROR_KEY_TO_I18N: Record<ApkgErrorKey, string> = {
     noCards: 'create.apkgNoCards',
 };
 
-const ROW_SEPARATORS: { value: string; labelKey: string }[] = [
+const ROW_SEPARATORS: { value: string; labelKey: ParseKeys<'common'> }[] = [
     { value: 'newline', labelKey: 'create.sepNewline' },
     { value: 'semicolon', labelKey: 'create.sepSemicolon' },
     { value: 'blankline', labelKey: 'create.sepBlankLine' },
@@ -868,8 +869,7 @@ const ImportCardsModal = ({
                                                 color="primary.main"
                                                 fontWeight="medium"
                                             >
-                                                {t('create.dropJsonFile') ||
-                                                    'Drop JSON file here'}
+                                                {t('create.dropJsonFile')}
                                             </Typography>
                                         </DropOverlay>
                                     )}

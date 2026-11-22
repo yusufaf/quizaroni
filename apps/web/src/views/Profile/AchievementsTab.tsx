@@ -203,7 +203,6 @@ const AchievementsTab = () => {
                                                         t(
                                                             'achievements.customProgress',
                                                             {
-                                                                current: 0,
                                                                 target:
                                                                     achievement.threshold,
                                                             }

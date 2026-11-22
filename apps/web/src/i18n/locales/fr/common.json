@@ -610,6 +610,7 @@
         "sepCustom": "Personnalisé…",
         "customSeparator": "Personnalisé",
         "dragDropHint": "Astuce : vous pouvez aussi glisser-déposer un fichier ici",
+        "dropJsonFile": "Déposez le fichier JSON ici",
         "quizletHint": "Collez votre export Quizlet (Exporter → copier le texte).",
         "ankiHint": "Collez votre export Anki (Notes en texte brut .txt).",
         "pastePlaceholderQuizlet": "Collez votre export Quizlet ici.\nExemple (Tabulation entre le terme et la définition, nouvelle ligne entre les cartes) :\nMitochondrie\tLa centrale énergétique de la cellule\nADN\tMatériel génétique",
@@ -854,5 +855,16 @@
     "metadataDialogs": {
         "itemsSelected_one": "{{count}} élément sélectionné",
         "itemsSelected_other": "{{count}} éléments sélectionnés"
+    },
+    "labelsAssign": {
+        "selectStudySets": "Sélectionner des listes",
+        "selectLabels": "Sélectionner des étiquettes",
+        "current": "Actuelle",
+        "createdOn": "Créée le {{date}}",
+        "labelCount_one": "{{count}} étiquette",
+        "labelCount_other": "{{count}} étiquettes",
+        "setCount_one": "{{count}} liste",
+        "setCount_other": "{{count}} listes",
+        "replaceWarning": "Cela attribuera {{labels}} à {{sets}} et remplacera les étiquettes existantes."
     }
 }

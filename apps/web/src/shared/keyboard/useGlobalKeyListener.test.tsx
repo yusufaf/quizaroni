@@ -31,7 +31,7 @@ describe('useGlobalKeyListener', () => {
                 id: 'c',
                 keys: ['c'],
                 scope: 'nav',
-                descriptionKey: 'k',
+                descriptionKey: 'shortcuts.actions.help',
                 handler: fn,
             },
         ]);
@@ -46,7 +46,7 @@ describe('useGlobalKeyListener', () => {
                 id: 'c',
                 keys: ['c'],
                 scope: 'nav',
-                descriptionKey: 'k',
+                descriptionKey: 'shortcuts.actions.help',
                 handler: fn,
             },
         ]);
@@ -61,7 +61,7 @@ describe('useGlobalKeyListener', () => {
                 id: 'esc',
                 keys: ['Escape'],
                 scope: 'global',
-                descriptionKey: 'k',
+                descriptionKey: 'shortcuts.actions.help',
                 handler: fn,
             },
         ]);
@@ -76,7 +76,7 @@ describe('useGlobalKeyListener', () => {
                 id: 'c',
                 keys: ['c'],
                 scope: 'nav',
-                descriptionKey: 'k',
+                descriptionKey: 'shortcuts.actions.help',
                 handler: fn,
             },
         ]);
@@ -91,7 +91,7 @@ describe('useGlobalKeyListener', () => {
                 id: 'g',
                 keys: ['1'],
                 scope: 'study:flashcards',
-                descriptionKey: 'k',
+                descriptionKey: 'shortcuts.actions.help',
                 handler: fn,
                 when: () => false,
             },
@@ -107,7 +107,7 @@ describe('useGlobalKeyListener', () => {
                 id: 'gh',
                 keys: ['g h'],
                 scope: 'nav',
-                descriptionKey: 'k',
+                descriptionKey: 'shortcuts.actions.help',
                 handler: fn,
             },
         ]);

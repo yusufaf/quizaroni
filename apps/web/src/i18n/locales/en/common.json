@@ -610,6 +610,7 @@
         "sepCustom": "Custom…",
         "customSeparator": "Custom",
         "dragDropHint": "Tip: You can also drag & drop a file here",
+        "dropJsonFile": "Drop JSON file here",
         "quizletHint": "Paste your Quizlet export (Export → copy text).",
         "ankiHint": "Paste your Anki export (Notes in Plain Text .txt).",
         "pastePlaceholderQuizlet": "Paste your Quizlet export here.\nExample (Tab between term and definition, new line between cards):\nMitochondria\tThe powerhouse of the cell\nDNA\tGenetic material",
@@ -854,5 +855,16 @@
     "metadataDialogs": {
         "itemsSelected_one": "{{count}} item selected",
         "itemsSelected_other": "{{count}} items selected"
+    },
+    "labelsAssign": {
+        "selectStudySets": "Select Study Sets",
+        "selectLabels": "Select Labels",
+        "current": "Current",
+        "createdOn": "Created: {{date}}",
+        "labelCount_one": "{{count}} label",
+        "labelCount_other": "{{count}} labels",
+        "setCount_one": "{{count}} study set",
+        "setCount_other": "{{count}} study sets",
+        "replaceWarning": "This will set {{labels}} to {{sets}}, replacing any existing labels."
     }
 }

@@ -94,6 +94,8 @@
             "total_sessions": "Study sessions completed",
             "total_cards": "Cards studied",
             "daily_streak": "Daily study streak",
+            "session_streak": "Correct answers in a row in a session",
+            "perfect_session": "Perfect sessions (100% accuracy)",
             "studyset_sessions": "Sessions on a study set"
         },
         "presets": {

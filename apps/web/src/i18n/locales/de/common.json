@@ -610,6 +610,7 @@
         "sepCustom": "Benutzerdefiniert…",
         "customSeparator": "Benutzerdefiniert",
         "dragDropHint": "Tipp: Du kannst eine Datei auch per Drag & Drop hierher ziehen",
+        "dropJsonFile": "JSON-Datei hier ablegen",
         "quizletHint": "Füge deinen Quizlet-Export ein (Exportieren → Text kopieren).",
         "ankiHint": "Füge deinen Anki-Export ein (Notizen als Reintext .txt).",
         "pastePlaceholderQuizlet": "Füge deinen Quizlet-Export hier ein.\nBeispiel (Tabulator zwischen Begriff und Definition, neue Zeile zwischen Karten):\nMitochondrien\tDas Kraftwerk der Zelle\nDNA\tErbgut",
@@ -854,5 +855,16 @@
     "metadataDialogs": {
         "itemsSelected_one": "{{count}} Element ausgewählt",
         "itemsSelected_other": "{{count}} Elemente ausgewählt"
+    },
+    "labelsAssign": {
+        "selectStudySets": "Lernsets auswählen",
+        "selectLabels": "Labels auswählen",
+        "current": "Aktuell",
+        "createdOn": "Erstellt: {{date}}",
+        "labelCount_one": "{{count}} Label",
+        "labelCount_other": "{{count}} Labels",
+        "setCount_one": "{{count}} Lernset",
+        "setCount_other": "{{count}} Lernsets",
+        "replaceWarning": "Dadurch werden {{sets}} mit {{labels}} versehen. Vorhandene Labels werden ersetzt."
     }
 }

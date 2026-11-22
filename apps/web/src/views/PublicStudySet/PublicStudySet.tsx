@@ -58,7 +58,7 @@ type Props = {
  * CTA hidden, when a logged-in user opens a set that isn't in their library.
  */
 const PublicStudySet = ({ showSignupCta = true }: Props) => {
-    const { t } = useTranslation();
+    const { t } = useTranslation(['common', 'explore']);
     const { id: studysetUUID = '' } = useParams();
 
     const { data, isLoading, isError } = useGetPublicStudyset(studysetUUID);

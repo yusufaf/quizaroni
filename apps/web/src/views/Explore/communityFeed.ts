@@ -1,3 +1,4 @@
+import type { ParseKeys } from 'i18next';
 import { isSubjectId } from '@quizaroni/shared-types';
 import type { ExploreSetSummary, SubjectId } from '@quizaroni/shared-types';
 
@@ -31,10 +32,12 @@ export const statusKey = (
         query,
         total,
     }: { subject: boolean; query: boolean; total: boolean }
-): string =>
-    `community.${base}${subject ? 'Subject' : ''}${query ? 'Query' : ''}${
-        base === 'showing' && total ? 'Of' : ''
-    }`;
+): ParseKeys<'explore'> => {
+    const filters =
+        `${subject ? 'Subject' : ''}${query ? 'Query' : ''}` as const;
+    if (base === 'empty') return `community.empty${filters}`;
+    return `community.showing${filters}${total ? 'Of' : ''}`;
+};
 
 export const toSubjectId = (value: unknown): SubjectId =>
     isSubjectId(value) ? value : 'other';
