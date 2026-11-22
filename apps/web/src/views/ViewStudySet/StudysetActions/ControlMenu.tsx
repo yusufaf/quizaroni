@@ -5,7 +5,7 @@ import {
     Switch,
     Typography,
 } from '@mui/material';
-import { SET_METADATA_FIELDS, ENABLED, DISABLED } from 'shared/constants';
+import { SET_METADATA_FIELDS } from 'shared/constants';
 import { Studyset, TODO } from 'shared/types';
 import { useTheme } from 'theme/useTheme';
 import { useMemo } from 'react';
@@ -52,26 +52,23 @@ const ControlMenu = ({
             {
                 condition: textColorVisible,
                 updateProperty: SET_METADATA_FIELDS.TEXT,
-                label: 'Text Color',
-                description:
-                    'If enabled, text color for the term/definition will be applied/visible.',
+                label: t('viewStudySet.textColor'),
+                description: t('viewStudySet.textColorDescription'),
             },
             {
                 condition: backgroundColorVisible,
                 updateProperty: SET_METADATA_FIELDS.BACKGROUND,
-                label: 'Background Color',
-                description:
-                    'If enabled, background color for cards will be applied/visible.',
+                label: t('viewStudySet.backgroundColor'),
+                description: t('viewStudySet.backgroundColorDescription'),
             },
             {
                 condition: contentOnly,
                 updateProperty: SET_METADATA_FIELDS.CONTENT_ONLY,
-                label: 'Content Only',
-                description:
-                    'If enabled, buttons and labels on all cards will be hidden.',
+                label: t('viewStudySet.contentOnly'),
+                description: t('viewStudySet.contentOnlyDescription'),
             },
         ],
-        [textColorVisible, backgroundColorVisible, contentOnly]
+        [textColorVisible, backgroundColorVisible, contentOnly, t]
     );
 
     return (
@@ -98,9 +95,14 @@ const ControlMenu = ({
                                                 : muiTheme.palette.error.main,
                                         }}
                                     >
-                                        {`${label}: ${
-                                            condition ? ENABLED : DISABLED
-                                        }`}
+                                        {t('viewStudySet.settingStatus', {
+                                            label,
+                                            status: t(
+                                                condition
+                                                    ? 'status.enabled'
+                                                    : 'status.disabled'
+                                            ),
+                                        })}
                                     </Typography>
                                 }
                                 title={description}

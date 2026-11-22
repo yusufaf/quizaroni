@@ -498,7 +498,18 @@
         "listView": "Vista de Lista",
         "gridView": "Vista de Cuadrícula",
         "all": "Todos",
-        "important": "Importante"
+        "important": "Importante",
+        "viewCategories_one": "Ver {{count}} Categoría",
+        "viewCategories_other": "Ver {{count}} Categorías",
+        "playTts": "Reproducir voz",
+        "markImportant": "Marcar como importante",
+        "textColor": "Color de Texto",
+        "backgroundColor": "Color de Fondo",
+        "contentOnly": "Solo Contenido",
+        "textColorDescription": "Si está activado, se aplicará y se verá el color de texto del término y la definición.",
+        "backgroundColorDescription": "Si está activado, se aplicará y se verá el color de fondo de las tarjetas.",
+        "contentOnlyDescription": "Si está activado, se ocultarán los botones y las etiquetas de todas las tarjetas.",
+        "settingStatus": "{{label}}: {{status}}"
     },
     "publicView": {
         "createdBy": "Creado por {{username}}",
@@ -631,7 +642,16 @@
         "imageUploaded_other": "{{count}} imágenes subidas exitosamente",
         "imageUploadFailed": "Error al subir la imagen",
         "deleteImageTitle": "Eliminar Imagen",
-        "deleteImageMessage": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Esto no se puede deshacer."
+        "deleteImageMessage": "¿Estás seguro de que quieres eliminar \"{{name}}\"? Esto no se puede deshacer.",
+        "cardNumber": "Tarjeta {{number}}",
+        "changeTextColor": "Cambiar el color de texto de la tarjeta",
+        "changeBackgroundColor": "Cambiar el color de fondo de la tarjeta",
+        "swapTermDefinition": "Intercambiar término y definición",
+        "duplicateCard": "Duplicar tarjeta",
+        "deleteCard": "Eliminar esta tarjeta",
+        "imageLoadFailed": "Error al cargar",
+        "deleteImage": "Eliminar imagen",
+        "replaceImage": "Reemplazar imagen"
     },
     "footer": {
         "socials": "Redes Sociales",
