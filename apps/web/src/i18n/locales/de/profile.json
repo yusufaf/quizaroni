@@ -94,6 +94,8 @@
             "total_sessions": "Abgeschlossene Lernsitzungen",
             "total_cards": "Gelernte Karten",
             "daily_streak": "Tägliche Lernserie",
+            "session_streak": "Richtige Antworten in Folge in einer Sitzung",
+            "perfect_session": "Perfekte Sitzungen (100 % Genauigkeit)",
             "studyset_sessions": "Sitzungen für ein Lernset"
         },
         "presets": {

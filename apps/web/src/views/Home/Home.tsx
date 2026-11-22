@@ -23,6 +23,7 @@ import useSortStudysets from 'hooks/useSortStudysets';
 import { HomeView, SortDirection, Studyset } from 'shared/types';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useNavigate } from 'react-router-dom';
 import { useGetAllStudysets, useUpdateStudyset } from 'state/api/studysetsAPI';
 import { useGetUser, useUpdateUserMetadata } from 'state/api/usersAPI';
@@ -67,7 +68,7 @@ declare module '@mui/x-data-grid' {
     interface ToolbarPropsOverrides {
         columnVisibilityModel: GridColumnVisibilityModel;
         density: GridDensity;
-        t: (key: string) => string;
+        t: TFunction<'common'>;
     }
 }
 

@@ -14,7 +14,7 @@ import {
     CustomInputRow,
     StyledTextField,
 } from './styles';
-import { LABEL_TERMINOLOGIES } from 'shared/constants';
+import { LABEL_TERMINOLOGIES, LabelTerminology } from 'shared/constants';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
 import { Check } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
@@ -130,7 +130,7 @@ const LabelTerminologies = ({ studyset }: Props) => {
                                 value={value}
                                 control={<Radio />}
                                 label={t(
-                                    `terminology.label.${value.toLowerCase()}`
+                                    `terminology.label.${value.toLowerCase() as Lowercase<LabelTerminology>}`
                                 )}
                             />
                             {value === LABEL_TERMINOLOGIES.CUSTOM &&

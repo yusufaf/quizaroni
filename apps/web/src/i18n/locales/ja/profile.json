@@ -93,6 +93,8 @@
             "total_sessions": "完了した学習セッション数",
             "total_cards": "学習したカード枚数",
             "daily_streak": "連続学習日数",
+            "session_streak": "1回のセッションでの連続正解数",
+            "perfect_session": "パーフェクトなセッション数（正答率100%）",
             "studyset_sessions": "1つの学習セットのセッション数"
         },
         "presets": {

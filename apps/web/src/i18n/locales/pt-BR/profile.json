@@ -94,6 +94,8 @@
             "total_sessions": "Sessões de estudo concluídas",
             "total_cards": "Cartões estudados",
             "daily_streak": "Sequência diária de estudo",
+            "session_streak": "Acertos seguidos em uma sessão",
+            "perfect_session": "Sessões perfeitas (100% de precisão)",
             "studyset_sessions": "Sessões em um conjunto de estudo"
         },
         "presets": {

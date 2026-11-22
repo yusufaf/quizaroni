@@ -610,6 +610,7 @@
         "sepCustom": "Personalizado…",
         "customSeparator": "Personalizado",
         "dragDropHint": "Dica: você também pode arrastar e soltar um arquivo aqui",
+        "dropJsonFile": "Solte o arquivo JSON aqui",
         "quizletHint": "Cole sua exportação do Quizlet (Exportar → copiar texto).",
         "ankiHint": "Cole sua exportação do Anki (Notas em texto simples .txt).",
         "pastePlaceholderQuizlet": "Cole sua exportação do Quizlet aqui.\nExemplo (Tabulação entre termo e definição, nova linha entre cartões):\nMitocôndria\tA usina de energia da célula\nDNA\tMaterial genético",
@@ -854,5 +855,16 @@
     "metadataDialogs": {
         "itemsSelected_one": "{{count}} item selecionado",
         "itemsSelected_other": "{{count}} itens selecionados"
+    },
+    "labelsAssign": {
+        "selectStudySets": "Selecionar conjuntos",
+        "selectLabels": "Selecionar etiquetas",
+        "current": "Atual",
+        "createdOn": "Criado em: {{date}}",
+        "labelCount_one": "{{count}} etiqueta",
+        "labelCount_other": "{{count}} etiquetas",
+        "setCount_one": "{{count}} conjunto",
+        "setCount_other": "{{count}} conjuntos",
+        "replaceWarning": "Isso vai atribuir {{labels}} a {{sets}}, substituindo as etiquetas existentes."
     }
 }

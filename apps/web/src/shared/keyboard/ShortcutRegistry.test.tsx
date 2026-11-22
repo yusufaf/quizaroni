@@ -8,7 +8,7 @@ const mk = (id: string): Shortcut => ({
     id,
     keys: ['x'],
     scope: 'global',
-    descriptionKey: 'shortcuts.actions.test',
+    descriptionKey: 'shortcuts.actions.help',
     handler: () => {},
 });
 

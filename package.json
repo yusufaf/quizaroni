@@ -20,6 +20,7 @@
         "deploy:api": "pnpm --filter @quizaroni/api exec cdk deploy",
         "test": "pnpm -r test",
         "typecheck": "pnpm --filter @quizaroni/web --filter @quizaroni/server typecheck",
+  "lint:i18n": "pnpm --filter @quizaroni/web lint:i18n",
         "start:server": "pnpm --filter @quizaroni/server start",
         "prepare": "husky"
     },

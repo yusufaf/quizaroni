@@ -10,6 +10,7 @@ import {
     Alert,
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
+import { useTranslation } from 'react-i18next';
 import { Studyset } from 'shared/types';
 import { dateLocale } from 'i18n/languages';
 
@@ -36,6 +37,7 @@ export const LabelsAssignTab = ({
     onAssign,
     isLoading,
 }: Props) => {
+    const { t } = useTranslation();
     const formatDate = (timestamp: string) => {
         try {
             return new Date(timestamp).toLocaleDateString(dateLocale(), {
@@ -64,11 +66,11 @@ export const LabelsAssignTab = ({
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <FormControl fullWidth>
                 <InputLabel id="studysets-select-label">
-                    Select Study Sets
+                    {t('labelsAssign.selectStudySets')}
                 </InputLabel>
                 <Select
                     labelId="studysets-select-label"
-                    label="Select Study Sets"
+                    label={t('labelsAssign.selectStudySets')}
                     multiple
                     value={selectedStudysetUUIDs}
                     onChange={handleStudysetsChange}
@@ -134,7 +136,9 @@ export const LabelsAssignTab = ({
                                         </Typography>
                                         {isCurrent && (
                                             <Chip
-                                                label="Current"
+                                                label={t(
+                                                    'labelsAssign.current'
+                                                )}
                                                 size="small"
                                                 color="primary"
                                                 sx={{
@@ -149,7 +153,9 @@ export const LabelsAssignTab = ({
                                             variant="caption"
                                             color="text.secondary"
                                         >
-                                            Created: {dateStr}
+                                            {t('labelsAssign.createdOn', {
+                                                date: dateStr,
+                                            })}
                                         </Typography>
                                     )}
                                 </Box>
@@ -160,10 +166,12 @@ export const LabelsAssignTab = ({
             </FormControl>
 
             <FormControl fullWidth>
-                <InputLabel id="labels-select-label">Select Labels</InputLabel>
+                <InputLabel id="labels-select-label">
+                    {t('labelsAssign.selectLabels')}
+                </InputLabel>
                 <Select
                     labelId="labels-select-label"
-                    label="Select Labels"
+                    label={t('labelsAssign.selectLabels')}
                     multiple
                     value={assignLabels}
                     onChange={handleLabelsChange}
@@ -191,11 +199,14 @@ export const LabelsAssignTab = ({
 
             {selectedStudysetUUIDs.length > 0 && assignLabels.length > 0 && (
                 <Alert severity="warning">
-                    This will set {assignLabels.length} label
-                    {assignLabels.length > 1 ? 's' : ''} to{' '}
-                    {selectedStudysetUUIDs.length} study set
-                    {selectedStudysetUUIDs.length > 1 ? 's' : ''}, replacing any
-                    existing labels.
+                    {t('labelsAssign.replaceWarning', {
+                        labels: t('labelsAssign.labelCount', {
+                            count: assignLabels.length,
+                        }),
+                        sets: t('labelsAssign.setCount', {
+                            count: selectedStudysetUUIDs.length,
+                        }),
+                    })}
                 </Alert>
             )}
 
@@ -207,7 +218,7 @@ export const LabelsAssignTab = ({
                     loading={isLoading}
                     sx={{ fontWeight: 600 }}
                 >
-                    Assign Labels
+                    {t('home.toolbar.assignLabels')}
                 </LoadingButton>
             </Box>
         </Box>

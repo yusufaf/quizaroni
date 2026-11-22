@@ -1,3 +1,5 @@
+import type { ParseKeys } from 'i18next';
+
 export type ScopeId =
     | 'global'
     | 'nav'
@@ -15,7 +17,7 @@ export interface Shortcut {
     keys: string[];
     scope: ScopeId;
     /** i18n key under shortcuts.actions.* for the help modal. */
-    descriptionKey: string;
+    descriptionKey: ParseKeys<'common'>;
     handler: (e: KeyboardEvent) => void;
     /** Optional predicate; binding only fires/lists when it returns true. */
     when?: () => boolean;

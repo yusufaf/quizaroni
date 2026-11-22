@@ -6,6 +6,7 @@ import {
 } from 'shared/types';
 import { ChangeEvent, useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { ParseKeys } from 'i18next';
 import { toast } from 'react-toastify';
 import { useIsFetching, useQueryClient } from '@tanstack/react-query';
 import { useUpdateStudyset } from 'state/api/studysetsAPI';
@@ -123,7 +124,7 @@ const ManageCategoriesDialog = (props: Props) => {
     const save = useCallback(
         async (
             updates: UpdateStudysetRequest['updates'],
-            errorKey: string
+            errorKey: ParseKeys<'common'>
         ): Promise<boolean> => {
             savingRef.current += 1;
             setSavingCount((n) => n + 1);

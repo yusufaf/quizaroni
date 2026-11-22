@@ -598,6 +598,7 @@
         "sepCustom": "カスタム…",
         "customSeparator": "カスタム",
         "dragDropHint": "ヒント: ここにファイルをドラッグ＆ドロップすることもできます",
+        "dropJsonFile": "ここにJSONファイルをドロップ",
         "quizletHint": "Quizletのエクスポートデータを貼り付けてください（エクスポート → テキストをコピー）。",
         "ankiHint": "Ankiのエクスポートデータを貼り付けてください（プレーンテキストのノート .txt）。",
         "pastePlaceholderQuizlet": "ここにQuizletのエクスポートデータを貼り付けてください。\n例（用語と定義の間はタブ、カードの間は改行）:\nミトコンドリア\t細胞のエネルギー工場\nDNA\t遺伝物質",
@@ -826,5 +827,14 @@
     },
     "metadataDialogs": {
         "itemsSelected_other": "{{count}}件選択中"
+    },
+    "labelsAssign": {
+        "selectStudySets": "学習セットを選択",
+        "selectLabels": "ラベルを選択",
+        "current": "現在",
+        "createdOn": "作成日: {{date}}",
+        "labelCount_other": "{{count}}個のラベル",
+        "setCount_other": "{{count}}個の学習セット",
+        "replaceWarning": "{{sets}}に{{labels}}を設定し、既存のラベルを置き換えます。"
     }
 }

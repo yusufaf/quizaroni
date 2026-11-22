@@ -1,8 +1,7 @@
+import type { ParseKeys, TFunction } from 'i18next';
 import { AuthRequestError } from 'shared/auth/session/sessionClient';
 
-type Translate = (key: string, options?: Record<string, unknown>) => string;
-
-const BY_CODE: Record<string, string> = {
+const BY_CODE: Record<string, ParseKeys<'auth'>> = {
     REGISTRATION_CLOSED: 'errors.registrationClosed',
     INVITE_INVALID: 'errors.inviteInvalid',
     INVALID_TOKEN: 'errors.resetLinkInvalid',
@@ -15,7 +14,10 @@ const BY_CODE: Record<string, string> = {
 
 // Better Auth codes first: one status covers several causes (422 is both
 // "email taken" and a failed insert; 400 covers email, name and password).
-export const authErrorMessage = (err: unknown, t: Translate): string => {
+export const authErrorMessage = (
+    err: unknown,
+    t: TFunction<'auth'>
+): string => {
     if (!(err instanceof AuthRequestError)) return t('errors.network');
     if (err.status === 401) return t('errors.invalidCredentials');
     if (err.status === 429) {

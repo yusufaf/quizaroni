@@ -1,0 +1,114 @@
+{
+  "src/shared/components/CustomColorPicker/CustomColorPicker.tsx": {
+    "hardcoded: Add to named colors": 1,
+    "hardcoded: Apply color": 1,
+    "hardcoded: Reset color": 1
+  },
+  "src/shared/components/ImageGallery/ImageGallery.tsx": {
+    "hardcoded: Failed to load image": 1
+  },
+  "src/shared/components/ManageLabelsDialog/LabelsCreateTab.tsx": {
+    "hardcoded: Apply to current study set": 1,
+    "hardcoded: Create": 1,
+    "hardcoded: Label Name": 1
+  },
+  "src/shared/components/ManageLabelsDialog/ManageLabelsDialog.tsx": {
+    "hardcoded: Labels": 1,
+    "hardcoded: Manage Labels": 1
+  },
+  "src/shared/components/MetadataDialogs/CreateTabLayout.tsx": {
+    "hardcoded: Preview": 1
+  },
+  "src/shared/components/MetadataDialogs/InlineEditableListItem.tsx": {
+    "hardcoded: Cancel": 1,
+    "hardcoded: Edit": 1,
+    "hardcoded: Save": 1
+  },
+  "src/shared/components/MetadataDialogs/MultiSelectDeleteFAB.tsx": {
+    "hardcoded: Delete (": 1
+  },
+  "src/shared/components/NamedColorsDialog/NamedColorsCreateTab.tsx": {
+    "hardcoded: Color Name": 1
+  },
+  "src/shared/components/NamedColorsDialog/NamedColorsDialog.tsx": {
+    "hardcoded: Manage Named Colors": 1,
+    "hardcoded: Named Colors": 1
+  },
+  "src/shared/components/ScrollToTopFab/ScrollToTopFab.tsx": {
+    "hardcoded: Scroll back to top": 2
+  },
+  "src/shared/components/StandardDialogTitle/StandardDialogTitle.tsx": {
+    "hardcoded: Close": 1,
+    "hardcoded: close": 1
+  },
+  "src/views/Callback/Callback.tsx": {
+    "hardcoded: Signing in...": 1
+  },
+  "src/views/Footer/Footer.tsx": {
+    "hardcoded: GitHub": 2,
+    "hardcoded: LinkedIn": 2
+  },
+  "src/views/Landing/sections/Hero.tsx": {
+    "concatenation: Avoid splitting text across multiple translations (<Trans> or t()). Use a single translation with placeholders instead.": 1
+  },
+  "src/views/NavBar/NavBar.tsx": {
+    "hardcoded: Quizaroni": 1
+  },
+  "src/views/NavBar/NavDrawer.tsx": {
+    "hardcoded: Quizaroni": 1
+  },
+  "src/views/Profile/AchievementsTab.tsx": {
+    "hardcoded: 🏆": 1,
+    "hardcoded: 🔥": 1
+  },
+  "src/views/Profile/AISettingsTab.tsx": {
+    "hardcoded: Select Provider": 1
+  },
+  "src/views/Profile/CustomizationTab.tsx": {
+    "hardcoded: Set default theme": 1
+  },
+  "src/views/Profile/Profile.tsx": {
+    "hardcoded: AI Settings": 1
+  },
+  "src/views/Profile/ProfileCard.tsx": {
+    "hardcoded: Change profile picture": 2,
+    "hardcoded: Profile": 1
+  },
+  "src/views/Profile/ProfileDropdown.tsx": {
+    "hardcoded: Feedback": 1,
+    "hardcoded: Profile": 1
+  },
+  "src/views/Study/FlashcardsStudy.tsx": {
+    "hardcoded: Click to flip": 1,
+    "hardcoded: Loading...": 2
+  },
+  "src/views/Study/shared/StudyHeader.tsx": {
+    "hardcoded: 🔥": 1
+  },
+  "src/views/ViewStudySet/AIChatPanel/AIChatMessages.tsx": {
+    "hardcoded: Thinking...": 1
+  },
+  "src/views/ViewStudySet/ManageCategoriesDialog/CategoriesManageTab.tsx": {
+    "hardcoded: CSV": 1,
+    "hardcoded: JSON": 1,
+    "hardcoded: TXT": 1
+  },
+  "src/views/ViewStudySet/NotesDrawer/NotesDrawer.tsx": {
+    "hardcoded: No notes found": 1,
+    "hardcoded: Search notes...": 1,
+    "hardcoded: Try a different search term": 1
+  },
+  "src/views/ViewStudySet/StudysetSettings/FormatTerminologies.tsx": {
+    "hardcoded: e.g., Back": 1,
+    "hardcoded: e.g., Front": 1
+  },
+  "src/views/ViewStudySet/StudysetSettings/LabelTerminologies.tsx": {
+    "hardcoded: e.g., Card, Item, Entry": 1
+  },
+  "src/views/ViewStudySet/ViewStudySetCard.tsx": {
+    "hardcoded: Drag to reorder": 1
+  },
+  "src/views/ViewStudySet/ViewStudysetFilters/ViewStudysetFilters.tsx": {
+    "hardcoded: View mode toggle": 1
+  }
+}

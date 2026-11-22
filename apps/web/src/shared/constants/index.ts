@@ -360,7 +360,10 @@ export const LABEL_TERMINOLOGIES = {
     IDEA: 'Idea',
     NOTE: 'Note',
     CUSTOM: 'Custom',
-};
+} as const;
+
+export type LabelTerminology =
+    (typeof LABEL_TERMINOLOGIES)[keyof typeof LABEL_TERMINOLOGIES];
 
 export const VIEW_SET_DIALOGS = {
     NOTIFICATIONS: 'NOTIFICATIONS',
