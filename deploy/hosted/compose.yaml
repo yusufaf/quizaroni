@@ -1,7 +1,8 @@
 # The hosted instance at https://quizaroni.yusufaf.dev (#269).
-# Runs on a Hetzner Cloud VPS in Hillsboro, OR (US-West, near the old
-# us-west-2 stack): the smallest shared x86 plan with at least 2 GB RAM, with
-# Hetzner backups on. Caddy in front serves HTTPS and proxies Umami (#301).
+# Runs on an AWS Lightsail instance in us-west-2 (the $7 plan: 2 vCPU, 1 GB
+# RAM, IPv4 included) with a static IP and daily automatic snapshots. Mail goes
+# through Amazon SES SMTP in us-east-1. Caddy in front serves HTTPS and
+# proxies Umami (#301).
 #
 # First deploy, from this directory with .env written from .env.example:
 #   docker compose pull
