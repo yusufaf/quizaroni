@@ -477,7 +477,18 @@
         "listView": "List View",
         "gridView": "Grid View",
         "all": "All",
-        "important": "Important"
+        "important": "Important",
+        "viewCategories_one": "View {{count}} Category",
+        "viewCategories_other": "View {{count}} Categories",
+        "playTts": "Play TTS",
+        "markImportant": "Mark as important",
+        "textColor": "Text Color",
+        "backgroundColor": "Background Color",
+        "contentOnly": "Content Only",
+        "textColorDescription": "If enabled, text color for the term/definition will be applied/visible.",
+        "backgroundColorDescription": "If enabled, background color for cards will be applied/visible.",
+        "contentOnlyDescription": "If enabled, buttons and labels on all cards will be hidden.",
+        "settingStatus": "{{label}}: {{status}}"
     },
     "publicView": {
         "createdBy": "Created by {{username}}",
@@ -610,7 +621,16 @@
         "imageUploaded_other": "{{count}} images uploaded successfully",
         "imageUploadFailed": "Failed to upload image",
         "deleteImageTitle": "Delete Image",
-        "deleteImageMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone."
+        "deleteImageMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone.",
+        "cardNumber": "Card {{number}}",
+        "changeTextColor": "Change card text color",
+        "changeBackgroundColor": "Change card background color",
+        "swapTermDefinition": "Swap term and definition",
+        "duplicateCard": "Duplicate card",
+        "deleteCard": "Delete this card",
+        "imageLoadFailed": "Failed to load",
+        "deleteImage": "Delete image",
+        "replaceImage": "Replace image"
     },
     "footer": {
         "socials": "Socials",
