@@ -56,10 +56,12 @@ export function signupNoticeMessage(o: {
     };
 }
 
+const ACCOUNT_RETRY_MS = 1000;
+
 // Better Auth's drizzle adapter runs without a real transaction, so its
 // user-created hook can fire for a sign-up whose account insert then fails.
 // The check runs after the request's own writes, and only a user with an
-// account row gets a notice.
+// account row gets a notice; one late retry covers a slow account insert.
 export function createSignupNotifier(o: {
     mailer: Mailer;
     to: string;
@@ -90,35 +92,49 @@ export function createSignupNotifier(o: {
         if (t - warnedAt >= windowMs) {
             warnedAt = t;
             console.warn(
-                `Sign-up notices are capped at ${max} per hour; dropping the rest until the window passes.`
+                `Sign-up notices are capped at ${max} per ${Math.round(windowMs / 60_000)} minutes; dropping the rest until the window passes.`
             );
         }
         return false;
     };
 
-    return (event) => {
-        setImmediate(() => {
-            try {
-                if (!hasAccount(event.userId)) return;
-                const at = now();
-                if (!claimSlot(at)) return;
-                o.mailer.notify({
-                    ...signupNoticeMessage({
-                        to: o.to,
-                        name: event.name,
-                        email: event.email,
-                        method: event.method,
-                        at,
-                        publicUrl: o.publicUrl,
-                    }),
-                    label: 'sign-up notice',
-                });
-            } catch (err) {
-                console.error(
-                    'Could not prepare a sign-up notice:',
-                    sanitizeLogArg(err)
-                );
+    const send = (event: SignupEvent, retried: boolean): void => {
+        try {
+            if (!hasAccount(event.userId)) {
+                if (retried) {
+                    console.warn(
+                        'A sign-up left no account row, so no sign-up notice was sent.'
+                    );
+                } else {
+                    setTimeout(
+                        () => send(event, true),
+                        ACCOUNT_RETRY_MS
+                    ).unref?.();
+                }
+                return;
             }
-        });
+            const at = now();
+            if (!claimSlot(at)) return;
+            o.mailer.notify({
+                ...signupNoticeMessage({
+                    to: o.to,
+                    name: event.name,
+                    email: event.email,
+                    method: event.method,
+                    at,
+                    publicUrl: o.publicUrl,
+                }),
+                label: 'sign-up notice',
+            });
+        } catch (err) {
+            console.error(
+                'Could not prepare a sign-up notice:',
+                sanitizeLogArg(err)
+            );
+        }
+    };
+
+    return (event) => {
+        setImmediate(() => send(event, false));
     };
 }

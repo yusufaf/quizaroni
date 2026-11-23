@@ -67,10 +67,14 @@ function signUpMethod(
         path?: string;
         params?: Record<string, unknown>;
         body?: unknown;
-    } | null
+    } | null,
+    registrationIsOpen: boolean
 ): SignupMethod {
     if (ctx?.path === SIGN_UP_PATH) {
-        return inviteTokenOf(ctx.body) ? 'invite' : 'email';
+        // An invite is only claimed while registration is closed.
+        return !registrationIsOpen && inviteTokenOf(ctx.body)
+            ? 'invite'
+            : 'email';
     }
     if (ctx?.path === SOCIAL_CALLBACK_PATH) {
         const id = ctx.params?.id;
@@ -347,7 +351,7 @@ export function createAuth(cfg: AuthConfig) {
                                 userId: u.id,
                                 name: u.name,
                                 email: u.email,
-                                method: signUpMethod(ctx),
+                                method: signUpMethod(ctx, registrationOpen(cfg.db)),
                             });
                         } catch (err) {
                             console.error(
