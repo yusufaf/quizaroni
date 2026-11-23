@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.6.0](https://github.com/yusufaf/quizaroni/compare/v0.5.0...v0.6.0) (2026-11-23)
+
+
+### Features
+
+* **server:** email the operator about new sign-ups ([#362](https://github.com/yusufaf/quizaroni/issues/362)) ([899865a](https://github.com/yusufaf/quizaroni/commit/899865a549385ca1f04c4a71ffd3d72924a192f8))
+* sign in with Google and GitHub ([#361](https://github.com/yusufaf/quizaroni/issues/361)) ([e6d2f05](https://github.com/yusufaf/quizaroni/commit/e6d2f055896ee3d527d01d099fb7858dde2aa9f8))
+* **web:** add German, French, Brazilian Portuguese and Japanese as beta languages ([#353](https://github.com/yusufaf/quizaroni/issues/353)) ([9e5c6e0](https://github.com/yusufaf/quizaroni/commit/9e5c6e0c68f2af6c38183eaa138f33a58db1fad9))
+* **web:** fill the beta locales with the strings added in [#355](https://github.com/yusufaf/quizaroni/issues/355) ([#356](https://github.com/yusufaf/quizaroni/issues/356)) ([d28fdd6](https://github.com/yusufaf/quizaroni/commit/d28fdd69df44c017178e5bc5757434fcae49e40f))
+
+
+### Bug Fixes
+
+* **server:** fill missing metadata defaults in set and profile responses ([#360](https://github.com/yusufaf/quizaroni/issues/360)) ([8b4f430](https://github.com/yusufaf/quizaroni/commit/8b4f430b8dad7586ed88bebce9cae5700469aeb9))
+* **web:** lazy-load locales and migrate legacy plural keys ([#350](https://github.com/yusufaf/quizaroni/issues/350)) ([c2a7c2a](https://github.com/yusufaf/quizaroni/commit/c2a7c2a65d4202d7a8ebede4dce1b02840a859d4))
+* **web:** translate the remaining hardcoded English from the [#49](https://github.com/yusufaf/quizaroni/issues/49) audit ([#355](https://github.com/yusufaf/quizaroni/issues/355)) ([af0f69b](https://github.com/yusufaf/quizaroni/commit/af0f69bac2e58787ec8a0fb84b69fc159bbc2700))
+
 ## [0.5.0](https://github.com/yusufaf/quizaroni/compare/v0.4.0...v0.5.0) (2026-11-21)
 
 
