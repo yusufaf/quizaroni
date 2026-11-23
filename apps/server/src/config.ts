@@ -77,7 +77,8 @@ Sign in with Google or GitHub (env only, optional; each provider needs both its 
   QZ_GOOGLE_CLIENT_SECRET  Its client secret; register <public URL>/api/auth/callback/google as a redirect URI
   QZ_GITHUB_CLIENT_ID      Client id of a GitHub OAuth App
   QZ_GITHUB_CLIENT_SECRET  Its client secret; set <public URL>/api/auth/callback/github as the callback URL
-                           Existing accounts can always use them; new accounts only while registration is open`;
+                           New accounts can sign up with them only while registration is open. An existing
+                           account links only if its email is verified (the admin and imported accounts)`;
 
 const ENV_NAMES = {
     'data-dir': 'QZ_DATA_DIR',
