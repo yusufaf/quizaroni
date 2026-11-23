@@ -36,8 +36,14 @@ import { runHealthcheck } from './healthcheck';
 import { runClaimLinks } from './import/claim-links';
 import { runImport } from './import/cli';
 import { binaryDataDir, openBrowser } from './launcher';
-import { describeSmtp, parseSmtpConfig, type SmtpConfig } from './mail/config';
+import {
+    describeSmtp,
+    parseSignupNotifyEmail,
+    parseSmtpConfig,
+    type SmtpConfig,
+} from './mail/config';
 import { Mailer } from './mail/mailer';
+import { createSignupNotifier } from './mail/signup-notice';
 import { smtpTransport } from './mail/smtp';
 import { isModerationCommand, runModeration } from './moderation/cli';
 import { ensureAuthSecret, getSetting, SETTING } from './settings';
@@ -112,10 +118,12 @@ if (argv.includes('--help')) {
 let config: ServerConfig;
 let smtp: SmtpConfig | undefined;
 let social: SocialConfig;
+let signupNotifyTo: string | undefined;
 try {
     config = loadConfig(argv, process.env, process.cwd(), defaults);
     smtp = parseSmtpConfig(process.env);
     social = parseSocialConfig(process.env);
+    signupNotifyTo = parseSignupNotifyEmail(process.env, smtp);
 } catch (err) {
     if (!(err instanceof ConfigError)) throw err;
     console.error(err.message);
@@ -224,6 +232,14 @@ const auth = lazyAuth(() => {
             insecureCookies: config.insecureCookies,
             mailer,
             social,
+            onSignUp: signupNotifyTo
+                ? createSignupNotifier({
+                      mailer,
+                      to: signupNotifyTo,
+                      publicUrl: authPublicUrl,
+                      db,
+                  })
+                : undefined,
         }),
     };
 });
@@ -276,6 +292,9 @@ console.log(
 console.log(`Data directory: ${config.dataDir}`);
 console.log(describeSmtp(smtp));
 console.log(describeSocial(social, config.publicUrl));
+if (signupNotifyTo) {
+    console.log('New sign-up notices are on (QZ_SIGNUP_NOTIFY_EMAIL).');
+}
 if (smtp) void mailer.verify();
 console.log(
     config.aiChat
