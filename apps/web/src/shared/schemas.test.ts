@@ -54,6 +54,19 @@ describe('stored record shapes', () => {
         });
 
         expect(result.studysets[0]?.updatedAt).toBe(NOW);
+
+        const malformed = GetAllStudysetsResponseSchema.safeParse({
+            studysets: [{ ...set, updatedAt: 1793431632340 }],
+        });
+        expect(malformed.error?.issues).toBeUndefined();
+        expect(malformed.data?.studysets[0]?.updatedAt).toBeUndefined();
+
+        const { updatedAt: _omit, ...withoutUpdatedAt } = set;
+        expect(
+            GetAllStudysetsResponseSchema.parse({
+                studysets: [withoutUpdatedAt],
+            }).studysets[0]?.updatedAt
+        ).toBeUndefined();
     });
 
     it('accepts a Logto user who signed up without a username', () => {
