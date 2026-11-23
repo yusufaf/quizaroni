@@ -232,12 +232,12 @@ describe('SignupForm', () => {
             '?error=access_denied&error_description=Pwned%20by%20me&invite=tok-1'
         );
         expect(await screen.findByText('errors.socialCancelled')).toBeTruthy();
-        expect(screen.queryByText(/Pwned/)).toBeNull();
         await waitFor(() =>
             expect(screen.getByTestId('url').textContent).toBe(
                 '/signUp?invite=tok-1|{"from":"/create"}'
             )
         );
+        expect(screen.queryByText(/Pwned/)).toBeNull();
         expect(screen.getByText('errors.socialCancelled')).toBeTruthy();
     });
 });

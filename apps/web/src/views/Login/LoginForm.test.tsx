@@ -207,12 +207,12 @@ describe('LoginForm', () => {
         expect((await screen.findByRole('alert')).textContent).toBe(
             'errors.socialCancelled'
         );
-        expect(screen.queryByText(/Pwned/)).toBeNull();
         await waitFor(() =>
             expect(screen.getByTestId('url').textContent).toBe(
                 '/login?keep=1|{"from":"/explore"}'
             )
         );
+        expect(screen.queryByText(/Pwned/)).toBeNull();
         expect(screen.getByRole('alert').textContent).toBe(
             'errors.socialCancelled'
         );
