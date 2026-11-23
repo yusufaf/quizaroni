@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.2](https://github.com/yusufaf/quizaroni/compare/v0.6.1...v0.6.2) (2026-11-23)
+
+
+### Bug Fixes
+
+* **web:** keep study set updatedAt and stop the Home table crashing on a bad date ([#369](https://github.com/yusufaf/quizaroni/issues/369)) ([23b57ab](https://github.com/yusufaf/quizaroni/commit/23b57ab0bc81d05d354b87d152e17dba362516d9))
+
 ## [0.6.1](https://github.com/yusufaf/quizaroni/compare/v0.6.0...v0.6.1) (2026-11-23)
 
 
