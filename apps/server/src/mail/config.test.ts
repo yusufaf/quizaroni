@@ -1,6 +1,11 @@
 import { describe, expect, test } from 'bun:test';
 import { ConfigError, USAGE } from '../config';
-import { describeSmtp, parseSmtpConfig, SMTP_ENV_VARS } from './config';
+import {
+    describeSmtp,
+    parseSignupNotifyEmail,
+    parseSmtpConfig,
+    SMTP_ENV_VARS,
+} from './config';
 
 const USER = 'smtp-user-xyz';
 // Built at runtime so secret scanners don't flag this fake test password.
@@ -182,4 +187,51 @@ describe('describeSmtp', () => {
 
 test('USAGE lists the SMTP settings', () => {
     for (const name of SMTP_ENV_VARS) expect(USAGE).toContain(name);
+});
+
+describe('parseSignupNotifyEmail', () => {
+    const smtp = parseSmtpConfig(base);
+
+    test('is off when unset or empty', () => {
+        expect(parseSignupNotifyEmail({}, smtp)).toBeUndefined();
+        expect(
+            parseSignupNotifyEmail({ QZ_SIGNUP_NOTIFY_EMAIL: '' }, undefined)
+        ).toBeUndefined();
+    });
+
+    test('normalizes a valid address', () => {
+        expect(
+            parseSignupNotifyEmail(
+                { QZ_SIGNUP_NOTIFY_EMAIL: '  Ops@Example.org ' },
+                smtp
+            )
+        ).toBe('ops@example.org');
+    });
+
+    test('rejects an invalid address, naming the value', () => {
+        expect(() =>
+            parseSignupNotifyEmail({ QZ_SIGNUP_NOTIFY_EMAIL: 'nope' }, smtp)
+        ).toThrow(
+            new ConfigError(
+                'QZ_SIGNUP_NOTIFY_EMAIL must be a valid email address (got "nope")'
+            )
+        );
+    });
+
+    test('needs SMTP', () => {
+        expect(() =>
+            parseSignupNotifyEmail(
+                { QZ_SIGNUP_NOTIFY_EMAIL: 'ops@example.org' },
+                undefined
+            )
+        ).toThrow(
+            new ConfigError(
+                'QZ_SIGNUP_NOTIFY_EMAIL needs SMTP; set the QZ_SMTP_* settings'
+            )
+        );
+    });
+});
+
+test('USAGE lists QZ_SIGNUP_NOTIFY_EMAIL', () => {
+    expect(USAGE).toContain('QZ_SIGNUP_NOTIFY_EMAIL');
 });

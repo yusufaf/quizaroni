@@ -14,6 +14,9 @@ services:
         # environment:
         #     QZ_PUBLIC_URL: https://quiz.example.org # the URL users open; needed behind a domain or HTTPS proxy
         #     QZ_TRUST_PROXY: 'true' # when a reverse proxy sits in front
+        #     QZ_SIGNUP_NOTIFY_EMAIL: you@example.org # email this address about new sign-ups; needs the QZ_SMTP_* settings
+        #     QZ_GOOGLE_CLIENT_ID: '' # sign in with Google; also set QZ_GOOGLE_CLIENT_SECRET
+        #     QZ_GITHUB_CLIENT_ID: '' # sign in with GitHub; also set QZ_GITHUB_CLIENT_SECRET
         healthcheck:
             test: ['CMD', '/usr/local/bin/quizaroni', 'healthcheck']
             interval: 15s

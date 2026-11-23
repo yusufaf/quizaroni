@@ -1,7 +1,7 @@
 import type { Db } from '../db';
 import { type MailTransport, Mailer } from '../mail/mailer';
 import { ensureAuthSecret } from '../settings';
-import { type AuthHandle, createAuth, lazyAuth } from './auth';
+import { type AuthConfig, type AuthHandle, createAuth, lazyAuth } from './auth';
 import type { SocialConfig } from './social-config';
 
 // Test helpers only.
@@ -13,6 +13,7 @@ export function testAuth(
         insecureCookies?: boolean;
         mailer?: Mailer;
         social?: SocialConfig;
+        onSignUp?: AuthConfig['onSignUp'];
     } = {}
 ): AuthHandle {
     const publicUrl = o.publicUrl ?? 'http://localhost';
@@ -26,6 +27,7 @@ export function testAuth(
             insecureCookies: o.insecureCookies ?? false,
             mailer,
             social: o.social ?? {},
+            onSignUp: o.onSignUp,
         }),
     }));
 }

@@ -368,6 +368,84 @@ test('clearOutbox removes only the matching kind and recipient', async () => {
     ).toEqual(['invite:ada@example.com', 'password_reset:bob@example.com']);
 });
 
+describe('Mailer.notify', () => {
+    const notice = {
+        to: 'ops@example.org',
+        subject: 'New sign-up on Quizaroni',
+        text: 'A new account was created.',
+        label: 'sign-up notice',
+    };
+
+    test('sends through the transport and never writes the outbox', async () => {
+        const db = freshDb();
+        const { transport, sent } = okTransport();
+        const mailer = new Mailer(db, transport);
+        mailer.notify(notice);
+        await mailer.flush();
+        expect(sent).toEqual([
+            { to: notice.to, subject: notice.subject, text: notice.text },
+        ]);
+        expect(db.select().from(mailOutbox).all()).toEqual([]);
+    });
+
+    test('does nothing without a transport', async () => {
+        const db = freshDb();
+        const mailer = new Mailer(db, undefined);
+        mailer.notify(notice);
+        await mailer.flush();
+        expect(db.select().from(mailOutbox).all()).toEqual([]);
+    });
+
+    test('a failure logs only the label and the error code, and stores nothing', async () => {
+        const db = freshDb();
+        const mailer = new Mailer(db, {
+            send: async () => {
+                throw Object.assign(new Error(`login ${PASSWORD}`), {
+                    code: 'EAUTH',
+                    responseCode: 535,
+                });
+            },
+        });
+        const output = captureConsole();
+        try {
+            mailer.notify(notice);
+            await mailer.flush();
+        } finally {
+            output.restore();
+        }
+        expect(output.text()).toBe(
+            'Could not send sign-up notice email over SMTP (EAUTH 535).'
+        );
+        expect(db.select().from(mailOutbox).all()).toEqual([]);
+    });
+
+    test('is started after the caller returns, and flush waits for it', async () => {
+        const db = freshDb();
+        let release: () => void = () => {};
+        let started = false;
+        const mailer = new Mailer(db, {
+            send: () => {
+                started = true;
+                return new Promise<void>((resolve) => {
+                    release = resolve;
+                });
+            },
+        });
+        mailer.notify(notice);
+        expect(started).toBe(false);
+        let flushed = false;
+        const flushing = mailer.flush().then(() => {
+            flushed = true;
+        });
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        expect(started).toBe(true);
+        expect(flushed).toBe(false);
+        release();
+        await flushing;
+        expect(flushed).toBe(true);
+    });
+});
+
 describe('Mailer.verify', () => {
     test('logs only the code when the check fails', async () => {
         const mailer = new Mailer(freshDb(), {

@@ -19,8 +19,10 @@ import {
 } from '../db/schema';
 import { createInvite, revokeInvite } from '../invites/invites';
 import { type MailTransport, Mailer, RESET_EMAIL_LIMIT } from '../mail/mailer';
+import { createSignupNotifier } from '../mail/signup-notice';
 import { SETTING } from '../settings';
-import { completeSetup, SetupGate } from '../setup/setup';
+import { applyImport } from '../import/apply';
+import { bootstrapAdmin, completeSetup, SetupGate } from '../setup/setup';
 import { hashPassword } from './auth';
 import { fakeTransport, ipEnv, nextTestIp, testAuth } from './testing';
 
@@ -48,6 +50,7 @@ async function harness(
         trustProxy?: boolean;
         setUp?: boolean;
         transport?: MailTransport;
+        notifyTo?: string;
     } = {}
 ): Promise<Harness> {
     root = mkdtempSync(join(tmpdir(), 'qz-auth-routes-'));
@@ -69,6 +72,15 @@ async function harness(
     }
     const publicUrl = o.publicUrl ?? 'http://localhost';
     const mailer = new Mailer(opened.db, o.transport);
+    const onSignUp =
+        o.notifyTo === undefined
+            ? undefined
+            : createSignupNotifier({
+                  mailer,
+                  to: o.notifyTo,
+                  publicUrl,
+                  db: opened.db,
+              });
     const app = createApp({
         sqlite: opened.sqlite,
         db: opened.db,
@@ -80,6 +92,7 @@ async function harness(
             publicUrl,
             insecureCookies: o.insecureCookies,
             mailer,
+            onSignUp,
         }),
         trustProxy: o.trustProxy ?? false,
         mailer,
@@ -914,5 +927,166 @@ describe('password reset', () => {
             ip,
         });
         expect(res.status).toBe(429);
+    });
+});
+
+describe('new sign-up notices', () => {
+    const OPS = 'ops@example.org';
+    const SUBJECT = 'New sign-up on Quizaroni';
+
+    const notices = (sent: { to: string; subject: string; text: string }[]) =>
+        sent.filter((m) => m.subject === SUBJECT);
+
+    async function settle(h: Harness): Promise<void> {
+        await new Promise((resolve) => setImmediate(resolve));
+        await h.mailer.flush();
+    }
+
+    test('an email sign-up on an open server sends one notice', async () => {
+        const { transport, sent } = fakeTransport();
+        const h = await harness({ transport, notifyTo: OPS });
+        setRegistrationMode(h.db, 'open');
+        const res = await signUp(h, {
+            name: 'Ada Lovelace',
+            email: 'ada.notice@example.com',
+        });
+        expect(res.status).toBe(200);
+        await settle(h);
+        expect(notices(sent)).toHaveLength(1);
+        const notice = notices(sent)[0]!;
+        expect(notice.to).toBe(OPS);
+        expect(notice.text).toContain('Name: Ada Lovelace');
+        expect(notice.text).toContain('Email: ada.notice@example.com');
+        expect(notice.text).toContain('Signed up with: email and password\n');
+        expect(notice.text).toContain('Admin page: http://localhost/admin');
+        expect(notice.text).not.toContain('ada-password-1');
+    });
+
+    test('an invite sign-up on an invite-only server says so', async () => {
+        const { transport, sent } = fakeTransport();
+        const h = await harness({ transport, notifyTo: OPS });
+        const { token } = createInvite(h.db, { createdBy: adminId(h.db) });
+        const res = await signUp(h, {
+            email: 'invited.notice@example.com',
+            inviteToken: token,
+        });
+        expect(res.status).toBe(200);
+        await settle(h);
+        expect(notices(sent)).toHaveLength(1);
+        expect(notices(sent)[0]?.text).toContain(
+            'Signed up with: email and password (invite link)'
+        );
+    });
+
+    test('a refused sign-up sends nothing', async () => {
+        const { transport, sent } = fakeTransport();
+        const h = await harness({ transport, notifyTo: OPS });
+        expect((await signUp(h)).status).toBe(403);
+        setRegistrationMode(h.db, 'open');
+        expect((await signUp(h, { email: ADMIN_EMAIL })).status).toBe(422);
+        setRegistrationMode(h.db, undefined);
+        expect((await signUp(h, { inviteToken: 'nope' })).status).toBe(403);
+        await settle(h);
+        expect(notices(sent)).toEqual([]);
+    });
+
+    test('nothing is sent when no notifier is configured', async () => {
+        const { transport, sent } = fakeTransport();
+        const h = await harness({ transport });
+        setRegistrationMode(h.db, 'open');
+        expect((await signUp(h)).status).toBe(200);
+        await settle(h);
+        expect(sent).toEqual([]);
+    });
+
+    test('setup, the admin bootstrap and an import create users without a notice', async () => {
+        const { transport, sent } = fakeTransport();
+        const h = await harness({ transport, notifyTo: OPS, setUp: false });
+        expect(
+            await bootstrapAdmin(
+                h.db,
+                {
+                    email: 'boot@example.com',
+                    password: 'bootstrap-pass-1',
+                    registrationMode: 'open',
+                    teacherPolicy: 'admin_approved',
+                },
+                undefined
+            )
+        ).toBe('created');
+        const now = new Date();
+        applyImport(h.db, undefined, {
+            users: [
+                {
+                    user: {
+                        id: 'imported-1',
+                        name: 'Imported',
+                        email: 'imported@example.com',
+                        emailVerified: true,
+                        image: null,
+                        role: 'user',
+                        createdAt: now,
+                        updatedAt: now,
+                    },
+                    profile: {
+                        userId: 'imported-1',
+                        username: 'imported',
+                        metadata: {},
+                        labels: [],
+                        updatedAt: now,
+                    },
+                    accounts: [
+                        {
+                            id: 'imported-acct-1',
+                            accountId: 'imported-1',
+                            providerId: 'credential',
+                            userId: 'imported-1',
+                            createdAt: now,
+                            updatedAt: now,
+                        },
+                    ],
+                },
+            ],
+            studysets: [],
+            copies: [],
+            report: { counts: {}, anomalies: [] },
+        });
+        expect(userCount(h.db)).toBe(2);
+        await settle(h);
+        expect(sent).toEqual([]);
+    });
+
+    test('the sign-up response does not wait for the transport', async () => {
+        const h = await harness({
+            transport: { send: () => new Promise<void>(() => {}) },
+            notifyTo: OPS,
+        });
+        setRegistrationMode(h.db, 'open');
+        const res = await Promise.race([
+            signUp(h),
+            new Promise<never>((_, reject) =>
+                setTimeout(() => reject(new Error('sign-up hung')), 3000)
+            ),
+        ]);
+        expect(res.status).toBe(200);
+        await new Promise((resolve) => setImmediate(resolve));
+    });
+
+    test('a sign-up whose account insert fails sends nothing', async () => {
+        const { transport, sent } = fakeTransport();
+        const h = await harness({ transport, notifyTo: OPS });
+        setRegistrationMode(h.db, 'open');
+        h.sqlite.run(
+            "CREATE TRIGGER no_accounts BEFORE INSERT ON account BEGIN SELECT RAISE(ABORT, 'blocked'); END"
+        );
+        const errors = spyOn(console, 'error').mockImplementation(() => {});
+        try {
+            const res = await signUp(h);
+            expect(res.status).toBe(500);
+            await settle(h);
+        } finally {
+            errors.mockRestore();
+        }
+        expect(notices(sent)).toEqual([]);
     });
 });

@@ -52,6 +52,7 @@ const CLEAN_ENV = {
     QZ_SMTP_USER: '',
     QZ_SMTP_PASSWORD: '',
     QZ_SMTP_FROM: '',
+    QZ_SIGNUP_NOTIFY_EMAIL: '',
     QZ_GOOGLE_CLIENT_ID: '',
     QZ_GOOGLE_CLIENT_SECRET: '',
     QZ_GITHUB_CLIENT_ID: '',
@@ -565,6 +566,65 @@ test('exits with code 1 on a URL-style QZ_SMTP_HOST, without echoing it', async 
     const stderr = await server.err.done;
     expect(stderr).toContain('QZ_SMTP_HOST must be a hostname or IP address');
     expectNoSmtpCredentials({ stdout: await server.out.done, stderr });
+}, 20_000);
+
+test('announces sign-up notices without printing the address', async () => {
+    const dirs = layout();
+    const server = start(dirs, {
+        QZ_SMTP_HOST: '127.0.0.1',
+        QZ_SMTP_PORT: String(await closedPort()),
+        QZ_SMTP_SECURITY: 'none',
+        QZ_SMTP_FROM: 'qz@example.org',
+        QZ_SIGNUP_NOTIFY_EMAIL: 'notices-to@example.org',
+    });
+    let output: { stdout: string; stderr: string };
+    try {
+        await server.out.waitFor(
+            /New sign-up notices are on \(QZ_SIGNUP_NOTIFY_EMAIL\)\./
+        );
+    } finally {
+        output = await server.stop();
+    }
+    expect(output.stdout).not.toContain('notices-to@example.org');
+    expect(output.stderr).not.toContain('notices-to@example.org');
+}, 30_000);
+
+test('says nothing about sign-up notices when they are off', async () => {
+    const dirs = layout();
+    const server = start(dirs);
+    let output: { stdout: string; stderr: string };
+    try {
+        await server.out.waitFor(/Sign-in with Google or GitHub is not/);
+    } finally {
+        output = await server.stop();
+    }
+    expect(output.stdout).not.toContain('sign-up notices');
+}, 20_000);
+
+test('exits with code 1 when QZ_SIGNUP_NOTIFY_EMAIL is set without SMTP', async () => {
+    const dirs = layout();
+    const server = start(dirs, {
+        QZ_SIGNUP_NOTIFY_EMAIL: 'notices-to@example.org',
+    });
+    expect(await server.proc.exited).toBe(1);
+    const stderr = await server.err.done;
+    expect(stderr).toContain(
+        'QZ_SIGNUP_NOTIFY_EMAIL needs SMTP; set the QZ_SMTP_* settings'
+    );
+    expect(stderr).toContain('Usage: quizaroni-server');
+}, 20_000);
+
+test('exits with code 1 on an invalid QZ_SIGNUP_NOTIFY_EMAIL', async () => {
+    const dirs = layout();
+    const server = start(dirs, {
+        QZ_SMTP_HOST: '127.0.0.1',
+        QZ_SMTP_FROM: 'qz@example.org',
+        QZ_SIGNUP_NOTIFY_EMAIL: 'not-an-address',
+    });
+    expect(await server.proc.exited).toBe(1);
+    expect(await server.err.done).toContain(
+        'QZ_SIGNUP_NOTIFY_EMAIL must be a valid email address'
+    );
 }, 20_000);
 
 const SOCIAL_SECRET = ['s3cret', 'OAUTH', 'xyz'].join('-');

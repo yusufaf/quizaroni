@@ -99,8 +99,37 @@ export class Mailer {
     // Started after the request's own work, so the response doesn't depend
     // on whether this message is sent, stored or throttled.
     enqueue(msg: MailMessage): void {
+        this.schedule(() => this.deliver(msg));
+    }
+
+    // A message to the operator, not to a user: sent when SMTP is on and
+    // otherwise dropped. It is never stored, so a failure only logs.
+    notify(o: {
+        to: string;
+        subject: string;
+        text: string;
+        label: string;
+    }): void {
+        const { transport } = this;
+        if (!transport) return;
+        this.schedule(async () => {
+            try {
+                await transport.send({
+                    to: o.to,
+                    subject: o.subject,
+                    text: o.text,
+                });
+            } catch (err) {
+                console.error(
+                    `Could not send ${o.label} email over SMTP (${mailFailureCode(err)}).`
+                );
+            }
+        });
+    }
+
+    private schedule(run: () => Promise<unknown>): void {
         const job = new Promise<void>((resolve) => setImmediate(resolve))
-            .then(() => this.deliver(msg))
+            .then(run)
             .finally(() => this.pending.delete(job));
         this.pending.add(job);
     }
