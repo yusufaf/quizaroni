@@ -20,6 +20,7 @@ import {
     MAX_METADATA_BYTES,
     mergeCustomAchievements,
     mergeGamificationState,
+    withUserMetadataDefaults,
 } from './metadata';
 
 // The shape the Lambdas returned (the Dynamo row minus its keys), so the web
@@ -76,7 +77,7 @@ function toView(account: UserRow, profile: ProfileRow): UserView {
         emailVerified: account.emailVerified,
         username: profile.username,
         labels: profile.labels,
-        metadata: profile.metadata,
+        metadata: withUserMetadataDefaults(profile.metadata),
         createdAt: account.createdAt.toISOString(),
         updatedAt: profile.updatedAt.toISOString(),
     };

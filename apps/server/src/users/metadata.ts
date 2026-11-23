@@ -91,6 +91,43 @@ export function deepMerge(target: JsonObject, source: JsonObject): JsonObject {
     return result;
 }
 
+// The web's DEFAULT_NOTIFICATION_PREFERENCES, so a stored object missing a
+// field the client requires still parses. The browser's own timezone isn't
+// known here; a user who set quiet hours has stored theirs.
+export const DEFAULT_NOTIFICATION_PREFERENCES: Readonly<JsonObject> =
+    Object.freeze({
+        enabled: false,
+        mode: 'regular',
+        email: Object.freeze({
+            enabled: true,
+            studyReminders: true,
+            streakAlerts: true,
+            weeklyDigest: true,
+            inactivityNudges: false,
+            digestDay: 0,
+        }),
+        quietHours: Object.freeze({
+            enabled: false,
+            start: '22:00',
+            end: '08:00',
+            timezone: 'UTC',
+        }),
+        studysetPrefs: Object.freeze([]),
+    });
+
+// For responses only: fills what old or imported rows never stored, without
+// touching the row. An absent `notifications` stays absent.
+export function withUserMetadataDefaults(metadata: JsonObject): JsonObject {
+    const filled = { ...DEFAULT_USER_METADATA, ...metadata };
+    if (isPlainObject(filled.notifications)) {
+        filled.notifications = deepMerge(
+            structuredClone(DEFAULT_NOTIFICATION_PREFERENCES) as JsonObject,
+            filled.notifications
+        );
+    }
+    return filled;
+}
+
 export const GamificationStateSchema = z.object({
     currentStreak: z.number(),
     longestStreak: z.number(),

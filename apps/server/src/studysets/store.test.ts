@@ -632,3 +632,29 @@ describe('card file URLs', () => {
         );
     });
 });
+
+describe('metadata defaults', () => {
+    test('a view fills what the stored row lacks, and viewBytes does not', () => {
+        const db = freshDb();
+        const a = addUser(db, 'a');
+        created(createStudyset(db, a, { studysetUUID: SET_ID }, T0));
+        db.update(studyset)
+            .set({ metadata: { textColorVisible: true } })
+            .where(eq(studyset.studysetUUID, SET_ID))
+            .run();
+        const row = rowOf(db, SET_ID)!;
+        const stored = Buffer.byteLength(
+            JSON.stringify({
+                ...toView(row),
+                cards: row.cards,
+                metadata: { textColorVisible: true, publiclyViewable: false },
+            })
+        );
+        expect(toView(row).metadata).toEqual({
+            ...DEFAULT_STUDYSET_METADATA,
+            textColorVisible: true,
+        });
+        expect(viewBytes(row)).toBe(stored);
+        expect(rowOf(db, SET_ID)?.metadata).toEqual({ textColorVisible: true });
+    });
+});

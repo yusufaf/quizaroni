@@ -4,14 +4,18 @@ import {
     type CustomAchievement,
     CustomAchievementSchema,
     deepMerge,
+    DEFAULT_NOTIFICATION_PREFERENCES,
+    DEFAULT_USER_METADATA,
     emptyGamification,
     type GamificationState,
+    type JsonObject,
     MAX_UPDATES_BYTES,
     mergeCustomAchievements,
     mergeGamificationState,
     parseMetadataUpdates,
     parseNotificationUpdates,
     UpdateGamificationBodySchema,
+    withUserMetadataDefaults,
 } from './metadata';
 
 function deepArray(depth: number): unknown {
@@ -305,5 +309,65 @@ describe('gamification schemas', () => {
             gamification: emptyGamification(),
             customAchievements: [achievement()],
         });
+    });
+});
+
+describe('withUserMetadataDefaults', () => {
+    test('fills top-level keys and keeps stored values', () => {
+        const result = withUserMetadataDefaults({ homeView: 'grid' });
+        expect(result).toEqual({ ...DEFAULT_USER_METADATA, homeView: 'grid' });
+    });
+
+    test('adds no notifications when there are none', () => {
+        expect('notifications' in withUserMetadataDefaults({})).toBe(false);
+    });
+
+    test('fills quietHours and studysetPrefs under partial notifications', () => {
+        const { notifications } = withUserMetadataDefaults({
+            notifications: { enabled: true, email: { enabled: false } },
+        });
+        expect(notifications).toEqual({
+            ...DEFAULT_NOTIFICATION_PREFERENCES,
+            enabled: true,
+            email: {
+                ...(DEFAULT_NOTIFICATION_PREFERENCES.email as JsonObject),
+                enabled: false,
+            },
+        });
+    });
+
+    test('merges partial quietHours', () => {
+        const { notifications } = withUserMetadataDefaults({
+            notifications: { quietHours: { enabled: true, start: '23:00' } },
+        }) as { notifications: typeof DEFAULT_NOTIFICATION_PREFERENCES };
+        expect(notifications.quietHours).toEqual({
+            enabled: true,
+            start: '23:00',
+            end: '08:00',
+            timezone: 'UTC',
+        });
+    });
+
+    test('keeps a stored studysetPrefs array', () => {
+        const prefs = [{ studysetUUID: 'x', enabled: true }];
+        const { notifications } = withUserMetadataDefaults({
+            notifications: { studysetPrefs: prefs },
+        }) as { notifications: typeof DEFAULT_NOTIFICATION_PREFERENCES };
+        expect(notifications.studysetPrefs).toEqual(prefs);
+    });
+
+    test('leaves a non-object notifications value alone', () => {
+        expect(
+            withUserMetadataDefaults({ notifications: 'off' }).notifications
+        ).toBe('off');
+    });
+
+    test('does not mutate its input or the defaults', () => {
+        const stored = { notifications: { email: { enabled: false } } };
+        const before = structuredClone(stored);
+        const result = withUserMetadataDefaults(stored);
+        (result.notifications as JsonObject).enabled = true;
+        expect(stored).toEqual(before);
+        expect(DEFAULT_NOTIFICATION_PREFERENCES.enabled).toBe(false);
     });
 });

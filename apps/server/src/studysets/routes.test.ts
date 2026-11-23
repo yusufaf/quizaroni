@@ -15,6 +15,7 @@ import {
     studysetPost as post,
     type StudysetJson as Studyset,
 } from '../testing/studysets';
+import { DEFAULT_STUDYSET_METADATA } from './updates';
 
 const PATHS = [
     '/get-all-studysets',
@@ -528,5 +529,55 @@ describe('card file URLs on read', () => {
         expect(set?.cards[0]?.files).toEqual([
             { key, signedURL: `/api/files/${key}` },
         ]);
+    });
+});
+
+describe('metadata defaults on read', () => {
+    const OLD_METADATA = {
+        textColorVisible: true,
+        notesDrawerInitial: 'closed',
+    };
+
+    async function oldSet(h: RouteHarness, metadata: Record<string, unknown>) {
+        const { cookie } = await signUp(h);
+        await createSet(h, cookie, { studyset: LOCAL_SET });
+        h.db.update(studyset)
+            .set({ metadata })
+            .where(eq(studyset.studysetUUID, CLIENT_ID))
+            .run();
+        return cookie;
+    }
+
+    test('fills what an old import never stored', async () => {
+        const h = await harness();
+        const cookie = await oldSet(h, { textColorVisible: true });
+        const expected = {
+            ...DEFAULT_STUDYSET_METADATA,
+            textColorVisible: true,
+        };
+        expect((await listSets(h, cookie))[0]?.metadata).toEqual(expected);
+        expect((await getSet(h, cookie, CLIENT_ID)).metadata).toEqual(expected);
+    });
+
+    test('keeps the stored values over the defaults', async () => {
+        const h = await harness();
+        const cookie = await oldSet(h, OLD_METADATA);
+        expect((await getSet(h, cookie, CLIENT_ID)).metadata).toMatchObject({
+            ...OLD_METADATA,
+            labelTerminology: 'Card',
+        });
+    });
+
+    test('leaves the stored row alone', async () => {
+        const h = await harness();
+        const cookie = await oldSet(h, OLD_METADATA);
+        await getSet(h, cookie, CLIENT_ID);
+        await listSets(h, cookie);
+        const row = h.db
+            .select()
+            .from(studyset)
+            .where(eq(studyset.studysetUUID, CLIENT_ID))
+            .get();
+        expect(row?.metadata).toEqual(OLD_METADATA);
     });
 });

@@ -7,7 +7,11 @@ import { eq } from 'drizzle-orm';
 import { closeDatabase, type Db, openDatabase } from '../db';
 import { account, session, user, userProfile } from '../db/schema';
 import { createStudyset, getStudyset } from '../studysets/store';
-import { emptyGamification, MAX_METADATA_BYTES } from './metadata';
+import {
+    DEFAULT_NOTIFICATION_PREFERENCES,
+    emptyGamification,
+    MAX_METADATA_BYTES,
+} from './metadata';
 import {
     buildUserDataExport,
     ensureProfile,
@@ -247,9 +251,12 @@ describe('updateNotificationPreferences', () => {
         const view = updateNotificationPreferences(db, id, {
             email: { enabled: true },
         });
-        expect(view.metadata.notifications).toEqual({
+        expect(view.metadata.notifications).toMatchObject({
             email: { enabled: true, weeklyDigest: true },
         });
+        expect(
+            profileRow(db, id)?.metadata.notifications
+        ).toEqual({ email: { enabled: true, weeklyDigest: true } });
     });
 });
 
@@ -364,4 +371,41 @@ test('deleting the user removes the profile', () => {
     getUserView(db, id);
     db.delete(user).where(eq(user.id, id)).run();
     expect(profileRow(db, id)).toBeUndefined();
+});
+
+describe('notification defaults on read', () => {
+    test('fills missing quietHours and studysetPrefs, never the stored row', () => {
+        const db = freshDb();
+        const id = addUser(db, 'u1');
+        ensureProfile(db, id, T0);
+        const stored = { ...profileRow(db, id)!.metadata, notifications: { enabled: true } };
+        db.update(userProfile)
+            .set({ metadata: stored })
+            .where(eq(userProfile.userId, id))
+            .run();
+        expect(getUserView(db, id, T1).metadata.notifications).toEqual({
+            ...DEFAULT_NOTIFICATION_PREFERENCES,
+            enabled: true,
+        });
+        expect(profileRow(db, id)?.metadata).toEqual(stored);
+    });
+
+    test('adds no notifications to a profile without any', () => {
+        const db = freshDb();
+        const id = addUser(db, 'u1');
+        const view = getUserView(db, id, T0);
+        expect('notifications' in view.metadata).toBe(false);
+    });
+
+    test('the data export carries the same filled view', () => {
+        const db = freshDb();
+        const id = addUser(db, 'u1');
+        ensureProfile(db, id, T0);
+        db.update(userProfile)
+            .set({ metadata: { notifications: { enabled: true } } })
+            .where(eq(userProfile.userId, id))
+            .run();
+        const data = buildUserDataExport(db, id, { now: T1 });
+        expect(data.user.metadata).toEqual(getUserView(db, id, T1).metadata);
+    });
 });
