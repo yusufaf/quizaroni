@@ -53,7 +53,8 @@ export type StudysetMetadata = {
 /**
  * Fields common to both the API's persisted DynamoDB record and the web
  * client's in-memory shape. The API composes its own `Studyset` on top
- * (adding PK/SK/updatedAt); the web client uses it as is.
+ * (adding PK/SK/updatedAt); the web client adds an optional updatedAt from
+ * responses.
  */
 export type StudysetBase = {
     cards: Card[];

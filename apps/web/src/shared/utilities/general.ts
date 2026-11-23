@@ -70,6 +70,7 @@ export const formatDateUsingPreferred = (
     showSeconds: boolean = false
 ): string => {
     const dateValue = new Date(value);
+    if (Number.isNaN(dateValue.getTime())) return '';
     let formattedDate: string = value;
     switch (dateFormat) {
         case DATE_FORMATS.ISO_8601:

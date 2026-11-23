@@ -27,8 +27,8 @@ export type {
 } from '@quizaroni/shared-types';
 
 /** The client-side shape. The API's persisted record also carries a PK/SK
- * key pair and `updatedAt`. */
-export type Studyset = StudysetBase;
+ * key pair; `updatedAt` comes back in responses. */
+export type Studyset = StudysetBase & { updatedAt?: Timestamp };
 
 // #endregion
 
