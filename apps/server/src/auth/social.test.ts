@@ -16,6 +16,7 @@ import {
 import { FileStore } from '../files/store';
 import { createInvite } from '../invites/invites';
 import { Mailer } from '../mail/mailer';
+import { createSignupNotifier } from '../mail/signup-notice';
 import { SETTING } from '../settings';
 import { completeSetup, SetupGate } from '../setup/setup';
 import { hashPassword } from './auth';
@@ -24,7 +25,7 @@ import {
     type SocialConfig,
     socialProviderIds,
 } from './social-config';
-import { ipEnv, nextTestIp, testAuth } from './testing';
+import { fakeTransport, ipEnv, nextTestIp, testAuth } from './testing';
 import { diskWebAssets } from '../web-assets';
 
 const ADMIN_EMAIL = 'admin@example.com';
@@ -47,6 +48,8 @@ type Harness = {
     db: Db;
     sqlite: Database;
     adminId: string;
+    mailer: Mailer;
+    sent: { to: string; subject: string; text: string }[];
 };
 
 let root: string | undefined;
@@ -54,7 +57,12 @@ let sqlite: Database | undefined;
 const spies: { mockRestore: () => void }[] = [];
 
 async function harness(
-    o: { social?: SocialConfig; open?: boolean; setUp?: boolean } = {}
+    o: {
+        social?: SocialConfig;
+        open?: boolean;
+        setUp?: boolean;
+        notifyTo?: string;
+    } = {}
 ): Promise<Harness> {
     root = mkdtempSync(join(tmpdir(), 'qz-social-'));
     const webDir = join(root, 'web');
@@ -79,6 +87,17 @@ async function harness(
         });
     }
     const social = o.social ?? {};
+    const { transport, sent } = fakeTransport();
+    const mailer = new Mailer(opened.db, transport);
+    const onSignUp =
+        o.notifyTo === undefined
+            ? undefined
+            : createSignupNotifier({
+                  mailer,
+                  to: o.notifyTo,
+                  publicUrl: PUBLIC_URL,
+                  db: opened.db,
+              });
     const app = createApp({
         sqlite: opened.sqlite,
         db: opened.db,
@@ -86,9 +105,14 @@ async function harness(
         web: diskWebAssets(webDir),
         version: '0.0.0-test',
         setup: new SetupGate(opened.db, setUp ? undefined : 'token'),
-        auth: testAuth(opened.db, { publicUrl: PUBLIC_URL, social }),
+        auth: testAuth(opened.db, {
+            publicUrl: PUBLIC_URL,
+            social,
+            mailer,
+            onSignUp,
+        }),
         trustProxy: false,
-        mailer: new Mailer(opened.db, undefined),
+        mailer,
         social: socialProviderIds(social),
     });
     const admin = opened.db.select().from(user).get();
@@ -97,6 +121,8 @@ async function harness(
         db: opened.db,
         sqlite: opened.sqlite,
         adminId: admin?.id ?? '',
+        mailer,
+        sent,
     };
 }
 
@@ -715,6 +741,60 @@ describe('GET /callback', () => {
         expect(rows).toHaveLength(1);
         expect(rows[0]!.providerId).toBe('google');
         expectNoTokens(rows[0]!);
+    });
+
+    test('a new Google sign-up sends one notice naming Google', async () => {
+        const h = await harness({
+            social: BOTH,
+            open: true,
+            notifyTo: 'ops@example.org',
+        });
+        stubProviders({
+            google: {
+                email: 'notice.person@example.com',
+                email_verified: true,
+            },
+        });
+        const started = await startSignIn(h, 'google', {
+            requestSignUp: true,
+            errorCallbackURL: '/signUp',
+        });
+        expect(
+            redirectOf(await callback(h, 'google', started)).searchParams.get(
+                'error'
+            )
+        ).toBeNull();
+        await new Promise((resolve) => setImmediate(resolve));
+        await h.mailer.flush();
+        expect(h.sent).toHaveLength(1);
+        expect(h.sent[0]?.to).toBe('ops@example.org');
+        expect(h.sent[0]?.text).toContain('Email: notice.person@example.com');
+        expect(h.sent[0]?.text).toContain('Signed up with: Google\n');
+    });
+
+    test('a sign-in to an existing account sends no notice', async () => {
+        const h = await harness({
+            social: BOTH,
+            open: true,
+            notifyTo: 'ops@example.org',
+        });
+        seedUser(h, {
+            email: 'back@example.com',
+            emailVerified: true,
+            link: { providerId: 'google', accountId: GOOGLE_SUB },
+        });
+        stubProviders({
+            google: { email: 'back@example.com', email_verified: true },
+        });
+        const started = await startSignIn(h, 'google');
+        expect(
+            redirectOf(await callback(h, 'google', started)).searchParams.get(
+                'error'
+            )
+        ).toBeNull();
+        await new Promise((resolve) => setImmediate(resolve));
+        await h.mailer.flush();
+        expect(h.sent).toEqual([]);
     });
 
     test('cleans the provider name of control characters', async () => {

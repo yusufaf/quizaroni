@@ -9,6 +9,7 @@ import { account, session, user, verification } from '../db/schema';
 import { claimInvite, findUsableInvite } from '../invites/invites';
 import type { Mailer } from '../mail/mailer';
 import { passwordResetMessage } from '../mail/messages';
+import type { SignupEvent, SignupMethod } from '../mail/signup-notice';
 import { getSetting, SETTING } from '../settings';
 import { displayName, NAME_MAX } from './display-name';
 import type { SocialConfig } from './social-config';
@@ -60,6 +61,24 @@ function inviteTokenOf(body: unknown): string {
     return typeof token === 'string' ? token : '';
 }
 
+// Only the route and its provider id are read, never the rest of the body.
+function signUpMethod(
+    ctx: {
+        path?: string;
+        params?: Record<string, unknown>;
+        body?: unknown;
+    } | null
+): SignupMethod {
+    if (ctx?.path === SIGN_UP_PATH) {
+        return inviteTokenOf(ctx.body) ? 'invite' : 'email';
+    }
+    if (ctx?.path === SOCIAL_CALLBACK_PATH) {
+        const id = ctx.params?.id;
+        if (id === 'google' || id === 'github') return id;
+    }
+    return 'other';
+}
+
 export function registrationOpen(db: Db): boolean {
     return getSetting(db, SETTING.registrationMode) === 'open';
 }
@@ -71,6 +90,7 @@ export type AuthConfig = {
     insecureCookies: boolean;
     mailer: Mailer;
     social: SocialConfig;
+    onSignUp?: (event: SignupEvent) => void;
 };
 
 // What hashPassword produces today (Bun's argon2id defaults).
@@ -319,6 +339,22 @@ export function createAuth(cfg: AuthConfig) {
                                 image: null,
                             },
                         };
+                    },
+                    after: async (u, ctx) => {
+                        if (!cfg.onSignUp) return;
+                        try {
+                            cfg.onSignUp({
+                                userId: u.id,
+                                name: u.name,
+                                email: u.email,
+                                method: signUpMethod(ctx),
+                            });
+                        } catch (err) {
+                            console.error(
+                                '[auth] Could not queue a sign-up notice:',
+                                sanitizeLogArg(err)
+                            );
+                        }
                     },
                 },
             },
