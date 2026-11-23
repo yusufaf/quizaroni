@@ -15,7 +15,7 @@ const BY_CODE: Record<string, ParseKeys<'auth'>> = {
 // Codes the OAuth callback puts in ?error=: Better Auth's own (lowercase) and
 // the server's (uppercase). Anything else, including a code the page was sent
 // by a stranger, gets the generic message.
-const OAUTH_BY_CODE: Record<string, string> = {
+const OAUTH_BY_CODE: Record<string, ParseKeys<'auth'>> = {
     account_not_linked: 'errors.accountNotLinked',
     signup_disabled: 'errors.noLinkedAccount',
     SOCIAL_EMAIL_UNVERIFIED: 'errors.socialEmailUnverified',
@@ -25,12 +25,15 @@ const OAUTH_BY_CODE: Record<string, string> = {
 };
 
 const lookup = (
-    table: Record<string, string>,
+    table: Record<string, ParseKeys<'auth'>>,
     code: string | undefined
-): string | undefined =>
+): ParseKeys<'auth'> | undefined =>
     code !== undefined && Object.hasOwn(table, code) ? table[code] : undefined;
 
-export const oauthErrorMessage = (code: string, t: Translate): string =>
+export const oauthErrorMessage = (
+    code: string,
+    t: TFunction<'auth'>
+): string =>
     t(lookup(OAUTH_BY_CODE, code) ?? 'errors.socialFailed');
 
 // Better Auth codes first: one status covers several causes (422 is both

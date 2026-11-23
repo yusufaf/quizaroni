@@ -1,8 +1,9 @@
+import type { TFunction } from 'i18next';
 import { describe, expect, it } from 'vite-plus/test';
 import { AuthRequestError } from 'shared/auth/session/sessionClient';
 import { authErrorMessage, oauthErrorMessage } from './authErrorMessage';
 
-const t = (key: string) => key;
+const t = ((key: string) => key) as unknown as TFunction<'auth'>;
 
 describe('oauthErrorMessage', () => {
     it.each([
