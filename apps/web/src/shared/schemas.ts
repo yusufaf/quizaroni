@@ -71,6 +71,9 @@ export const StudysetSchema = z.object({
     studysetUUID: UUIDSchema,
     subject: z.enum(SUBJECT_IDS).optional(),
     title: z.string(),
+    // Kept so the Home table's "Last updated" column has a value; zod drops
+    // keys the schema doesn't list.
+    updatedAt: TimestampSchema.optional(),
     // Null when the creator's Logto account has no username (#226).
     username: z.string().nullable(),
     userUUID: UserIdSchema,

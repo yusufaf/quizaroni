@@ -22,6 +22,40 @@ const LOGTO_USER_ID = 'a1b2c3d4e5f6';
 const NOW = '2026-10-27T05:49:52.225Z';
 
 describe('stored record shapes', () => {
+    it('keeps updatedAt on a study set for the Home table', () => {
+        const set = {
+            cards: [],
+            categories: [],
+            createdAt: NOW,
+            description: '',
+            labels: [],
+            lastViewed: NOW,
+            metadata: {
+                backgroundColorVisible: false,
+                cardCountVisible: true,
+                contentOnly: false,
+                customLabelTerminology: '',
+                customTerminology: '',
+                labelTerminology: 'Card',
+                notesDrawerInitial: 'open',
+                notesDrawerPosition: 'right',
+                publiclyViewable: false,
+                terminology: 'Term/Definition',
+                textColorVisible: false,
+            },
+            studysetUUID: '5a1e7c3b-2d4f-5e6a-8b9c-0d1e2f3a4b5c',
+            title: 'Cell biology',
+            updatedAt: NOW,
+            username: 'turtles',
+            userUUID: LOGTO_USER_ID,
+        };
+        const result = GetAllStudysetsResponseSchema.parse({
+            studysets: [set],
+        });
+
+        expect(result.studysets[0]?.updatedAt).toBe(NOW);
+    });
+
     it('accepts a Logto user who signed up without a username', () => {
         const result = GetUserResponseSchema.safeParse({
             message: 'ok',
