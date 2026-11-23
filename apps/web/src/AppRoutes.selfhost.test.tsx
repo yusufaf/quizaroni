@@ -11,8 +11,9 @@ vi.mock('views/Callback/Callback', () => ({ default: () => 'callback page' }));
 vi.mock('views/NotFound/NotFound', () => ({ default: () => 'not found' }));
 
 // useAuth picks its backend at module load, so the env is stubbed before a
-// fresh import. SessionProvider comes from the same fresh module graph, or it
-// would create a different context from the one the forms read.
+// fresh import. SessionProvider and QueryClientProvider come from the same
+// fresh module graph, or they would create different contexts from the ones
+// the forms read.
 const renderSelfHostAt = async (path: string) => {
     vi.stubEnv('VITE_BACKEND', 'selfhost');
     vi.stubGlobal(
@@ -23,12 +24,16 @@ const renderSelfHostAt = async (path: string) => {
     const { default: AppRoutes } = await import('./AppRoutes');
     const { SessionProvider } =
         await import('shared/auth/session/SessionProvider');
+    const { QueryClient, QueryClientProvider } =
+        await import('@tanstack/react-query');
     render(
-        <MemoryRouter initialEntries={[path]}>
-            <SessionProvider>
-                <AppRoutes />
-            </SessionProvider>
-        </MemoryRouter>
+        <QueryClientProvider client={new QueryClient()}>
+            <MemoryRouter initialEntries={[path]}>
+                <SessionProvider>
+                    <AppRoutes />
+                </SessionProvider>
+            </MemoryRouter>
+        </QueryClientProvider>
     );
 };
 

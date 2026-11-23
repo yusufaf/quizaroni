@@ -21,6 +21,8 @@ import { useSession } from 'shared/auth/session/SessionProvider';
 import { toReturnPath } from 'shared/utilities/returnPath';
 import useBrowserTitle from 'hooks/useBrowserTitle';
 import { authErrorMessage } from 'views/Login/authErrorMessage';
+import SocialSignIn from 'views/Login/SocialSignIn';
+import { useOAuthError } from 'views/Login/useOAuthError';
 import {
     LoginContainer as SignupContainer,
     LoginPageContainer as SignupPageContainer,
@@ -47,7 +49,8 @@ const SignupForm = () => {
     const [confirm, setConfirm] = useState('');
     const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
     const [pending, setPending] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const oauthError = useOAuthError(t);
+    const [error, setError] = useState<string | null>(oauthError);
 
     if (isAuthenticated && !pending) return <Navigate to="/" replace />;
 
@@ -94,6 +97,14 @@ const SignupForm = () => {
                     <SignupTitle variant="h5" as="h1">
                         {t('signup.title')}
                     </SignupTitle>
+                    {error && (
+                        <Alert severity="error" role="alert" sx={{ mt: 2 }}>
+                            {error}
+                        </Alert>
+                    )}
+                    {!inviteToken && (
+                        <SocialSignIn mode="signup" onError={setError} />
+                    )}
                     <Box
                         component="form"
                         noValidate
@@ -109,11 +120,6 @@ const SignupForm = () => {
                         {inviteToken && (
                             <Alert severity="info">
                                 {t('signup.inviteNotice')}
-                            </Alert>
-                        )}
-                        {error && (
-                            <Alert severity="error" role="alert">
-                                {error}
                             </Alert>
                         )}
                         <TextField

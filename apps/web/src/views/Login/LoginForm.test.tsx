@@ -7,9 +7,19 @@ import {
     it,
     vi,
 } from 'vite-plus/test';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { SessionProvider } from 'shared/auth/session/SessionProvider';
+
+const providers = vi.hoisted(() => ({
+    value: undefined as
+        | { providers: string[]; registrationOpen: boolean }
+        | undefined,
+}));
+vi.mock('state/api/authProvidersAPI', () => ({
+    useAuthProviders: () => providers.value,
+}));
+
 import LoginForm from './LoginForm';
 
 vi.mock('react-i18next', () => ({
@@ -34,9 +44,20 @@ const fetchMock = vi.fn<typeof fetch>();
 
 const Where = () => <p>at:{useLocation().pathname}</p>;
 
-const renderLogin = async (state?: unknown) => {
+const Url = () => {
+    const { pathname, search, state } = useLocation();
+    return (
+        <p data-testid="url">
+            {pathname}
+            {search}|{JSON.stringify(state ?? null)}
+        </p>
+    );
+};
+
+const renderLogin = async (state?: unknown, search = '') => {
     render(
-        <MemoryRouter initialEntries={[{ pathname: '/login', state }]}>
+        <MemoryRouter initialEntries={[{ pathname: '/login', search, state }]}>
+            <Url />
             <SessionProvider>
                 <Routes>
                     <Route path="/login" element={<LoginForm />} />
@@ -61,6 +82,7 @@ const submit = (email: string, password = 'pw-123456') => {
 const ADA = { id: 'u1', email: 'ada@example.com', name: 'Ada' };
 
 beforeEach(() => {
+    providers.value = undefined;
     localStorage.clear();
     fetchMock.mockReset();
     fetchMock.mockResolvedValueOnce(json(null));
@@ -135,5 +157,69 @@ describe('LoginForm', () => {
     it('shows no notice by default', async () => {
         await renderLogin();
         expect(screen.queryByRole('status')).toBeNull();
+    });
+
+    it('shows no provider buttons until the server lists some', async () => {
+        await renderLogin();
+        expect(screen.queryByText('social.or')).toBeNull();
+        expect(
+            screen.queryByRole('button', { name: /social\.continueWith/ })
+        ).toBeNull();
+    });
+
+    it('offers the configured providers above the email form', async () => {
+        providers.value = {
+            providers: ['google', 'github'],
+            registrationOpen: false,
+        };
+        await renderLogin();
+        const buttons = screen.getAllByRole('button', {
+            name: /social\.continueWith/,
+        });
+        expect(buttons).toHaveLength(2);
+        const email = screen.getByLabelText(/fields\.email/);
+        expect(
+            buttons[0]!.compareDocumentPosition(email) &
+                Node.DOCUMENT_POSITION_FOLLOWING
+        ).toBeTruthy();
+    });
+
+    it.each([
+        ['account_not_linked', 'errors.accountNotLinked'],
+        ['signup_disabled', 'errors.noLinkedAccount'],
+        ['SOCIAL_EMAIL_UNVERIFIED', 'errors.socialEmailUnverified'],
+        ['access_denied', 'errors.socialCancelled'],
+        ['REGISTRATION_CLOSED', 'errors.registrationClosed'],
+        ['state_mismatch', 'errors.socialFailed'],
+        ['constructor', 'errors.socialFailed'],
+        ['__proto__', 'errors.socialFailed'],
+    ])('shows the message for ?error=%s', async (code, message) => {
+        await renderLogin(undefined, `?error=${code}`);
+        expect((await screen.findByRole('alert')).textContent).toBe(message);
+    });
+
+    it('never shows the provider description, and clears the query keeping the state', async () => {
+        const state = { from: '/explore' };
+        await renderLogin(
+            state,
+            '?error=access_denied&error_description=Pwned%20by%20me&keep=1'
+        );
+        expect((await screen.findByRole('alert')).textContent).toBe(
+            'errors.socialCancelled'
+        );
+        expect(screen.queryByText(/Pwned/)).toBeNull();
+        await waitFor(() =>
+            expect(screen.getByTestId('url').textContent).toBe(
+                '/login?keep=1|{"from":"/explore"}'
+            )
+        );
+        expect(screen.getByRole('alert').textContent).toBe(
+            'errors.socialCancelled'
+        );
+    });
+
+    it('shows no error without the query', async () => {
+        await renderLogin();
+        expect(screen.queryByRole('alert')).toBeNull();
     });
 });

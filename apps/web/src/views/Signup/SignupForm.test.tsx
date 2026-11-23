@@ -7,9 +7,19 @@ import {
     it,
     vi,
 } from 'vite-plus/test';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { SessionProvider } from 'shared/auth/session/SessionProvider';
+
+const providers = vi.hoisted(() => ({
+    value: undefined as
+        | { providers: string[]; registrationOpen: boolean }
+        | undefined,
+}));
+vi.mock('state/api/authProvidersAPI', () => ({
+    useAuthProviders: () => providers.value,
+}));
+
 import SignupForm from './SignupForm';
 
 vi.mock('react-i18next', () => ({
@@ -26,6 +36,16 @@ const fetchMock = vi.fn<typeof fetch>();
 
 const Where = () => <p>at:{useLocation().pathname}</p>;
 
+const Url = () => {
+    const { pathname, search, state } = useLocation();
+    return (
+        <p data-testid="url">
+            {pathname}
+            {search}|{JSON.stringify(state ?? null)}
+        </p>
+    );
+};
+
 const renderSignup = async (search = '') => {
     render(
         <MemoryRouter
@@ -33,6 +53,7 @@ const renderSignup = async (search = '') => {
                 { pathname: '/signUp', search, state: { from: '/create' } },
             ]}
         >
+            <Url />
             <SessionProvider>
                 <Routes>
                     <Route path="/signUp" element={<SignupForm />} />
@@ -66,6 +87,7 @@ const fill = (o: {
 };
 
 beforeEach(() => {
+    providers.value = undefined;
     localStorage.clear();
     fetchMock.mockReset();
     fetchMock.mockResolvedValueOnce(json(null));
@@ -162,5 +184,60 @@ describe('SignupForm', () => {
     it('shows no invite notice without an invite', async () => {
         await renderSignup();
         expect(screen.queryByText('signup.inviteNotice')).toBeNull();
+    });
+
+    it('offers the providers when registration is open', async () => {
+        providers.value = {
+            providers: ['google', 'github'],
+            registrationOpen: true,
+        };
+        await renderSignup();
+        expect(
+            screen.getAllByRole('button', { name: /social\.continueWith/ })
+        ).toHaveLength(2);
+        expect(screen.getByText('social.or')).toBeTruthy();
+    });
+
+    it('hides the providers when registration is closed', async () => {
+        providers.value = { providers: ['google'], registrationOpen: false };
+        await renderSignup();
+        expect(
+            screen.queryByRole('button', { name: /social\.continueWith/ })
+        ).toBeNull();
+    });
+
+    it('hides the providers on an invite link', async () => {
+        providers.value = { providers: ['google'], registrationOpen: true };
+        await renderSignup('?invite=tok-123');
+        expect(
+            screen.queryByRole('button', { name: /social\.continueWith/ })
+        ).toBeNull();
+        expect(screen.queryByText('social.or')).toBeNull();
+    });
+
+    it.each([
+        ['signup_disabled', 'errors.noLinkedAccount'],
+        ['SOCIAL_EMAIL_UNVERIFIED', 'errors.socialEmailUnverified'],
+        ['REGISTRATION_CLOSED', 'errors.registrationClosed'],
+        ['INVITE_INVALID', 'errors.inviteInvalid'],
+        ['access_denied', 'errors.socialCancelled'],
+        ['constructor', 'errors.socialFailed'],
+    ])('shows the message for ?error=%s', async (code, message) => {
+        await renderSignup(`?error=${code}`);
+        expect((await screen.findByRole('alert')).textContent).toBe(message);
+    });
+
+    it('never shows the provider description, and clears the query keeping the state', async () => {
+        await renderSignup(
+            '?error=access_denied&error_description=Pwned%20by%20me&invite=tok-1'
+        );
+        expect(await screen.findByText('errors.socialCancelled')).toBeTruthy();
+        expect(screen.queryByText(/Pwned/)).toBeNull();
+        await waitFor(() =>
+            expect(screen.getByTestId('url').textContent).toBe(
+                '/signUp?invite=tok-1|{"from":"/create"}'
+            )
+        );
+        expect(screen.getByText('errors.socialCancelled')).toBeTruthy();
     });
 });
