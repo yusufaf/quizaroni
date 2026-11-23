@@ -71,6 +71,7 @@ Email (env only, optional; without it, reset and invite messages go to the admin
   QZ_SMTP_USER          SMTP user name, set together with QZ_SMTP_PASSWORD
   QZ_SMTP_PASSWORD      SMTP password
   QZ_SMTP_FROM          Sender address, as address or "Name <address>"
+  QZ_SIGNUP_NOTIFY_EMAIL  Address to email when someone creates an account (needs SMTP; off when unset)
 
 Sign in with Google or GitHub (env only, optional; each provider needs both its id and its secret):
   QZ_GOOGLE_CLIENT_ID      OAuth client id from Google Cloud Console

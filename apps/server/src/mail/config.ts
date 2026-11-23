@@ -111,6 +111,27 @@ export function parseSmtpConfig(
     };
 }
 
+// The address is not a secret, so errors may echo it.
+export function parseSignupNotifyEmail(
+    env: Record<string, string | undefined>,
+    smtp: SmtpConfig | undefined
+): string | undefined {
+    const raw = env.QZ_SIGNUP_NOTIFY_EMAIL?.trim() || undefined;
+    if (raw === undefined) return undefined;
+    const address = normalizeEmail(raw);
+    if (address === undefined) {
+        throw new ConfigError(
+            `QZ_SIGNUP_NOTIFY_EMAIL must be a valid email address (got "${raw}")`
+        );
+    }
+    if (smtp === undefined) {
+        throw new ConfigError(
+            'QZ_SIGNUP_NOTIFY_EMAIL needs SMTP; set the QZ_SMTP_* settings'
+        );
+    }
+    return address;
+}
+
 export function describeSmtp(cfg: SmtpConfig | undefined): string {
     if (!cfg) {
         return 'Email: SMTP is not configured; password reset and invite messages go to the admin outbox.';
