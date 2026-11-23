@@ -5,6 +5,7 @@ import { adminRoutes } from './admin/routes';
 import { type AiDeps, aiRoutes } from './ai/routes';
 import { AUTH_BASE_PATH, type AuthHandle } from './auth/auth';
 import { authRoutes } from './auth/routes';
+import type { SocialProviderId } from './auth/social-config';
 import type { Db } from './db';
 import { sanitizeLogArg } from './db/errors';
 import { studyset } from './db/schema';
@@ -42,6 +43,8 @@ export type AppDeps = {
     files: FileStore;
     uploads?: UploadRegistry;
     mailer: Mailer;
+    /** Providers with a sign-in route; omitted means none. */
+    social?: readonly SocialProviderId[];
     /** Omitted means AI chat is off. */
     ai?: AiDeps;
 };
@@ -67,7 +70,10 @@ function setupGuard(gate: SetupGate): MiddlewareHandler {
         if (c.req.path === '/setup' || gate.isComplete()) return next();
         c.header('Cache-Control', 'no-store');
         if (isApiPath(c.req.path)) {
-            return c.json({ message: 'Setup required', setupUrl: '/setup' }, 503);
+            return c.json(
+                { message: 'Setup required', setupUrl: '/setup' },
+                503
+            );
         }
         return c.redirect('/setup', 302);
     };
@@ -85,6 +91,7 @@ export function createApp({
     files,
     uploads = new UploadRegistry(files),
     mailer,
+    social,
     ai = { enabled: false },
 }: AppDeps): Hono {
     const app = new Hono();
@@ -102,9 +109,12 @@ export function createApp({
 
     app.route('/setup', setupRoutes({ db, gate: setup, configuredPublicUrl }));
 
-    app.use('/api/*', apiRequestGuard(() => auth().publicUrl));
+    app.use(
+        '/api/*',
+        apiRequestGuard(() => auth().publicUrl)
+    );
 
-    app.route(AUTH_BASE_PATH, authRoutes({ auth, trustProxy }));
+    app.route(AUTH_BASE_PATH, authRoutes({ db, auth, trustProxy, social }));
 
     app.route('/api/users', userRoutes({ db, auth, files }));
 

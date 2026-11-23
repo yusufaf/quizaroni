@@ -130,3 +130,41 @@ export const resetPassword = async (input: {
 }): Promise<void> => {
     await authFetch('/reset-password', { method: 'POST', body: input });
 };
+
+export const SOCIAL_PROVIDERS = ['google', 'github'] as const;
+export type SocialProvider = (typeof SOCIAL_PROVIDERS)[number];
+
+const SOCIAL_ORIGINS: Record<SocialProvider, string> = {
+    google: 'https://accounts.google.com',
+    github: 'https://github.com',
+};
+
+// Returns the provider's authorization URL for the caller to navigate to. A
+// URL on any other origin is refused, so a bad response can't send the user
+// somewhere else.
+export const startSocialSignIn = async (input: {
+    provider: SocialProvider;
+    callbackURL: string;
+    errorCallbackURL: string;
+    requestSignUp?: boolean;
+}): Promise<string> => {
+    const body = await authFetch('/sign-in/social', {
+        method: 'POST',
+        body: { ...input, disableRedirect: true },
+    });
+    const url = (body as { url?: unknown } | null)?.url;
+    if (typeof url === 'string') {
+        try {
+            if (new URL(url).origin === SOCIAL_ORIGINS[input.provider]) {
+                return url;
+            }
+        } catch {
+            // Not a URL; refused below.
+        }
+    }
+    throw new AuthRequestError(
+        502,
+        'Unexpected sign-in response',
+        'INVALID_SOCIAL_RESPONSE'
+    );
+};

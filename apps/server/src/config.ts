@@ -70,7 +70,15 @@ Email (env only, optional; without it, reset and invite messages go to the admin
   QZ_SMTP_SECURITY      tls, starttls or none (default tls on port 465, otherwise starttls)
   QZ_SMTP_USER          SMTP user name, set together with QZ_SMTP_PASSWORD
   QZ_SMTP_PASSWORD      SMTP password
-  QZ_SMTP_FROM          Sender address, as address or "Name <address>"`;
+  QZ_SMTP_FROM          Sender address, as address or "Name <address>"
+
+Sign in with Google or GitHub (env only, optional; each provider needs both its id and its secret):
+  QZ_GOOGLE_CLIENT_ID      OAuth client id from Google Cloud Console
+  QZ_GOOGLE_CLIENT_SECRET  Its client secret; register <public URL>/api/auth/callback/google as a redirect URI
+  QZ_GITHUB_CLIENT_ID      Client id of a GitHub OAuth App
+  QZ_GITHUB_CLIENT_SECRET  Its client secret; set <public URL>/api/auth/callback/github as the callback URL
+                           New accounts can sign up with them only while registration is open. An existing
+                           account links only if its email is verified (the admin and imported accounts)`;
 
 const ENV_NAMES = {
     'data-dir': 'QZ_DATA_DIR',

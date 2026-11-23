@@ -20,6 +20,8 @@ import { useSession } from 'shared/auth/session/SessionProvider';
 import { toReturnPath } from 'shared/utilities/returnPath';
 import useBrowserTitle from 'hooks/useBrowserTitle';
 import { authErrorMessage } from './authErrorMessage';
+import SocialSignIn from './SocialSignIn';
+import { useOAuthError } from './useOAuthError';
 import { LoginContainer, LoginPageContainer, LoginTitle } from './LoginStyles';
 
 // The self-host sign-in form; the AWS build redirects to Logto (Login.tsx).
@@ -32,7 +34,8 @@ const LoginForm = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [pending, setPending] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const oauthError = useOAuthError(t);
+    const [error, setError] = useState<string | null>(oauthError);
 
     if (isAuthenticated && !pending) return <Navigate to="/" replace />;
 
@@ -63,6 +66,12 @@ const LoginForm = () => {
                             {t('login.passwordResetNotice')}
                         </Alert>
                     )}
+                    {error && (
+                        <Alert severity="error" role="alert" sx={{ mt: 2 }}>
+                            {error}
+                        </Alert>
+                    )}
+                    <SocialSignIn mode="login" onError={setError} />
                     <Box
                         component="form"
                         noValidate
@@ -75,11 +84,6 @@ const LoginForm = () => {
                             minWidth: { sm: 360 },
                         }}
                     >
-                        {error && (
-                            <Alert severity="error" role="alert">
-                                {error}
-                            </Alert>
-                        )}
                         <TextField
                             id="login-email"
                             label={t('fields.email')}

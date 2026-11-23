@@ -1,12 +1,14 @@
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
-import { type AuthHandle, CLIENT_IP_HEADER } from './auth';
+import type { Db } from '../db';
+import { type AuthHandle, CLIENT_IP_HEADER, registrationOpen } from './auth';
 import { pickClientIp, socketIp } from './client-ip';
+import type { SocialProviderId } from './social-config';
 
 // Only the endpoints the web app uses; everything else under /api/auth falls
 // through to the /api 404 so endpoints like update-user stay unreachable.
 // Reset links point at the web app, so Better Auth's GET /reset-password/:token
-// redirect isn't needed.
+// redirect isn't needed. The social routes are added per configured provider.
 export const AUTH_ROUTES = [
     ['GET', '/get-session'],
     ['POST', '/sign-in/email'],
@@ -20,9 +22,21 @@ const BODY_LIMIT_BYTES = 16 * 1024;
 
 type Env = { Variables: { clientIp: string | undefined } };
 
+function socialRoutes(
+    providers: readonly SocialProviderId[]
+): readonly (readonly [string, string])[] {
+    if (providers.length === 0) return [];
+    return [
+        ['POST', '/sign-in/social'],
+        ...providers.map((id) => ['GET', `/callback/${id}`] as const),
+    ];
+}
+
 export function authRoutes(deps: {
+    db: Db;
     auth: AuthHandle;
     trustProxy: boolean;
+    social?: readonly SocialProviderId[];
 }): Hono<Env> {
     const routes = new Hono<Env>();
     let warnedUntrustedProxy = false;
@@ -52,7 +66,19 @@ export function authRoutes(deps: {
         })
     );
 
-    for (const [method, path] of AUTH_ROUTES) {
+    // What the sign-in and sign-up pages need to decide which buttons to show.
+    routes.get('/providers', (c) => {
+        c.header('Cache-Control', 'no-store');
+        return c.json({
+            providers: [...(deps.social ?? [])],
+            registrationOpen: registrationOpen(deps.db),
+        });
+    });
+
+    for (const [method, path] of [
+        ...AUTH_ROUTES,
+        ...socialRoutes(deps.social ?? []),
+    ]) {
         routes.on(method, path, (c) => {
             const { auth, publicUrl } = deps.auth();
             const headers = new Headers(c.req.raw.headers);

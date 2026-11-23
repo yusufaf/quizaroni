@@ -10,6 +10,8 @@ import { claimInvite, findUsableInvite } from '../invites/invites';
 import type { Mailer } from '../mail/mailer';
 import { passwordResetMessage } from '../mail/messages';
 import { getSetting, SETTING } from '../settings';
+import { displayName, NAME_MAX } from './display-name';
+import type { SocialConfig } from './social-config';
 
 export const AUTH_BASE_PATH = '/api/auth';
 // Better Auth reads the client IP only from this header, which the server
@@ -21,10 +23,30 @@ export const RATE_LIMITS = {
     signUp: { window: 600, max: 5 },
     resetRequest: { window: 900, max: 5 },
     resetPassword: { window: 600, max: 10 },
+    socialSignIn: { window: 60, max: 10 },
+    socialCallback: { window: 60, max: 30 },
 };
 export const RESET_TOKEN_TTL_SECONDS = 3600;
-const NAME_MAX = 100;
 const SIGN_UP_PATH = '/sign-up/email';
+const SOCIAL_SIGN_IN_PATH = '/sign-in/social';
+// Hooks see the route template, with the provider in ctx.params.id.
+const SOCIAL_CALLBACK_PATH = '/callback/:id';
+// Body fields of /sign-in/social that would let a caller pick scopes, skip the
+// redirect flow or smuggle data into the OAuth state.
+const FORBIDDEN_SOCIAL_FIELDS = [
+    'idToken',
+    'scopes',
+    'additionalParams',
+    'additionalData',
+    'loginHint',
+] as const;
+const OAUTH_TOKEN_FIELDS = {
+    accessToken: null,
+    refreshToken: null,
+    idToken: null,
+    accessTokenExpiresAt: null,
+    refreshTokenExpiresAt: null,
+};
 
 function inviteInvalid(): APIError {
     return APIError.from('FORBIDDEN', {
@@ -38,7 +60,7 @@ function inviteTokenOf(body: unknown): string {
     return typeof token === 'string' ? token : '';
 }
 
-function registrationOpen(db: Db): boolean {
+export function registrationOpen(db: Db): boolean {
     return getSetting(db, SETTING.registrationMode) === 'open';
 }
 
@@ -48,6 +70,7 @@ export type AuthConfig = {
     secret: string;
     insecureCookies: boolean;
     mailer: Mailer;
+    social: SocialConfig;
 };
 
 // What hashPassword produces today (Bun's argon2id defaults).
@@ -75,8 +98,22 @@ export async function verifyPassword({
     }
 }
 
-function registrationGate(db: Db) {
+function rejectSocialOverrides(body: unknown): void {
+    if (typeof body !== 'object' || body === null) return;
+    if (FORBIDDEN_SOCIAL_FIELDS.some((field) => Object.hasOwn(body, field))) {
+        throw APIError.from('BAD_REQUEST', {
+            code: 'INVALID_SOCIAL_REQUEST',
+            message: 'This sign-in request is not allowed.',
+        });
+    }
+}
+
+function authGate(db: Db) {
     return createAuthMiddleware(async (ctx) => {
+        if (ctx.path === SOCIAL_SIGN_IN_PATH) {
+            rejectSocialOverrides(ctx.body);
+            return;
+        }
         if (ctx.path !== SIGN_UP_PATH) return;
         // Checked before Better Auth looks the email up, so an outsider can't
         // learn which emails have accounts. The invite is claimed later, in
@@ -153,6 +190,22 @@ const authLogger = {
     },
 };
 
+function socialProviders(social: SocialConfig) {
+    // Sign-up must be asked for (requestSignUp), and the ID-token sign-in
+    // shortcut stays off so every sign-in runs the redirect flow.
+    const shared = { disableImplicitSignUp: true, disableIdTokenSignIn: true };
+    return {
+        ...(social.google && {
+            google: {
+                ...social.google,
+                ...shared,
+                prompt: 'select_account' as const,
+            },
+        }),
+        ...(social.github && { github: { ...social.github, ...shared } }),
+    };
+}
+
 export function createAuth(cfg: AuthConfig) {
     return betterAuth({
         appName: 'Quizaroni',
@@ -170,7 +223,23 @@ export function createAuth(cfg: AuthConfig) {
         logger: authLogger,
         // Rethrow errors Better Auth doesn't handle, so app.onError logs them
         // sanitized instead of better-call printing the raw query and its params.
-        onAPIError: { throw: true },
+        // errorURL sends OAuth state errors to the login page, not to
+        // Better Auth's /error page, which the server doesn't serve.
+        onAPIError: { throw: true, errorURL: `${cfg.publicUrl}/login` },
+        socialProviders: socialProviders(cfg.social),
+        account: {
+            // Tokens are never stored or used, so a sign-in has nothing to refresh.
+            updateAccountOnSignIn: false,
+            accountLinking: {
+                enabled: true,
+                trustedProviders: [],
+                // An email is linked into an existing user only when the
+                // provider vouches for it and the user's own is verified, so
+                // an unverified email sign-up can't be taken over in advance.
+                requireLocalEmailVerified: true,
+                updateUserInfoOnLink: false,
+            },
+        },
         emailAndPassword: {
             enabled: true,
             autoSignIn: true,
@@ -216,19 +285,49 @@ export function createAuth(cfg: AuthConfig) {
                     // Sign-up stores any client-sent `image`; avatars come with
                     // the profile work.
                     before: async (u, ctx) => {
+                        const social = ctx?.path === SOCIAL_CALLBACK_PATH;
+                        if (social && !u.emailVerified) {
+                            throw APIError.from('FORBIDDEN', {
+                                code: 'SOCIAL_EMAIL_UNVERIFIED',
+                                message:
+                                    'The email on that account is not verified.',
+                            });
+                        }
                         // Fail closed: on an invite-only server, only email
                         // sign-up with an invite it can claim creates users.
-                        if (
-                            !registrationOpen(cfg.db) &&
-                            (ctx?.path !== SIGN_UP_PATH ||
-                                !claimInvite(cfg.db, inviteTokenOf(ctx.body)))
-                        ) {
-                            throw inviteInvalid();
+                        if (!registrationOpen(cfg.db)) {
+                            if (social) {
+                                throw APIError.from('FORBIDDEN', {
+                                    code: 'REGISTRATION_CLOSED',
+                                    message:
+                                        'Registration on this server is invite-only.',
+                                });
+                            }
+                            if (
+                                ctx?.path !== SIGN_UP_PATH ||
+                                !claimInvite(cfg.db, inviteTokenOf(ctx.body))
+                            ) {
+                                throw inviteInvalid();
+                            }
                         }
                         return {
-                            data: { ...u, name: u.name.trim(), image: null },
+                            data: {
+                                ...u,
+                                name: social
+                                    ? displayName(u.name, u.email)
+                                    : u.name.trim(),
+                                image: null,
+                            },
                         };
                     },
+                },
+            },
+            account: {
+                create: {
+                    before: async (a) =>
+                        a.providerId === 'credential'
+                            ? undefined
+                            : { data: { ...a, ...OAUTH_TOKEN_FIELDS } },
                 },
             },
         },
@@ -249,9 +348,11 @@ export function createAuth(cfg: AuthConfig) {
                 '/sign-up/email': RATE_LIMITS.signUp,
                 '/request-password-reset': RATE_LIMITS.resetRequest,
                 '/reset-password': RATE_LIMITS.resetPassword,
+                '/sign-in/social': RATE_LIMITS.socialSignIn,
+                '/callback/*': RATE_LIMITS.socialCallback,
             },
         },
-        hooks: { before: registrationGate(cfg.db) },
+        hooks: { before: authGate(cfg.db) },
     });
 }
 
@@ -260,7 +361,9 @@ export type Auth = ReturnType<typeof createAuth>;
 // Read by Better Auth on every request, so a stray value would widen trust.
 const IGNORED_AUTH_ENV = ['BETTER_AUTH_TRUSTED_ORIGINS'] as const;
 
-export function scrubAuthEnv(env: Record<string, string | undefined>): string[] {
+export function scrubAuthEnv(
+    env: Record<string, string | undefined>
+): string[] {
     const removed: string[] = [];
     for (const name of IGNORED_AUTH_ENV) {
         if (env[name]) {

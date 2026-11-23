@@ -52,6 +52,10 @@ const CLEAN_ENV = {
     QZ_SMTP_USER: '',
     QZ_SMTP_PASSWORD: '',
     QZ_SMTP_FROM: '',
+    QZ_GOOGLE_CLIENT_ID: '',
+    QZ_GOOGLE_CLIENT_SECRET: '',
+    QZ_GITHUB_CLIENT_ID: '',
+    QZ_GITHUB_CLIENT_SECRET: '',
 };
 const LISTENING = /listening on (http:\/\/\S+) \(public URL (\S+)\)/;
 
@@ -331,8 +335,11 @@ test('the headless admin signs in and out, and cross-origin sign-in is refused',
         });
         expect(listed.status).toBe(200);
         expect(
-            ((await listed.json()) as { studysets: { studysetUUID: string }[] })
-                .studysets.map((s) => s.studysetUUID)
+            (
+                (await listed.json()) as {
+                    studysets: { studysetUUID: string }[];
+                }
+            ).studysets.map((s) => s.studysetUUID)
         ).toEqual([studyset.studysetUUID]);
 
         const signOut = await fetch(`${url}/api/auth/sign-out`, {
@@ -558,4 +565,50 @@ test('exits with code 1 on a URL-style QZ_SMTP_HOST, without echoing it', async 
     const stderr = await server.err.done;
     expect(stderr).toContain('QZ_SMTP_HOST must be a hostname or IP address');
     expectNoSmtpCredentials({ stdout: await server.out.done, stderr });
+}, 20_000);
+
+const SOCIAL_SECRET = ['s3cret', 'OAUTH', 'xyz'].join('-');
+
+test('says sign-in with Google or GitHub is off when no provider is set', async () => {
+    const dirs = layout();
+    const server = start(dirs);
+    try {
+        await server.out.waitFor(
+            /Sign-in with Google or GitHub is not configured/
+        );
+    } finally {
+        await server.stop();
+    }
+}, 20_000);
+
+test('lists the providers and their redirect URIs without the secret', async () => {
+    const dirs = layout();
+    const server = start(dirs, {
+        QZ_PUBLIC_URL: 'https://quiz.example.org',
+        QZ_GOOGLE_CLIENT_ID: 'google-id',
+        QZ_GOOGLE_CLIENT_SECRET: SOCIAL_SECRET,
+        QZ_GITHUB_CLIENT_ID: 'github-id',
+        QZ_GITHUB_CLIENT_SECRET: SOCIAL_SECRET,
+    });
+    let output: { stdout: string; stderr: string };
+    try {
+        await server.out.waitFor(
+            /Sign-in providers: Google, GitHub\. Redirect URIs to register: https:\/\/quiz\.example\.org\/api\/auth\/callback\/google, https:\/\/quiz\.example\.org\/api\/auth\/callback\/github/
+        );
+    } finally {
+        output = await server.stop();
+    }
+    expect(output.stdout).not.toContain(SOCIAL_SECRET);
+    expect(output.stderr).not.toContain(SOCIAL_SECRET);
+}, 20_000);
+
+test('exits with code 1 when a client id has no secret, without echoing it', async () => {
+    const dirs = layout();
+    const server = start(dirs, { QZ_GITHUB_CLIENT_ID: 'github-id-xyz' });
+    expect(await server.proc.exited).toBe(1);
+    const stderr = await server.err.done;
+    expect(stderr).toContain(
+        'QZ_GITHUB_CLIENT_ID and QZ_GITHUB_CLIENT_SECRET must be set together'
+    );
+    expect(stderr).not.toContain('github-id-xyz');
 }, 20_000);
