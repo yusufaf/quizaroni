@@ -510,3 +510,10 @@ export const OutboxResponseSchema = z.object({
 // #region Self-host AI Schemas
 export const AIStatusResponseSchema = z.object({ enabled: z.boolean() });
 // #endregion
+
+// #region Self-host Sign-in Schemas
+export const AuthProvidersResponseSchema = z.object({
+    providers: z.array(z.string()),
+    registrationOpen: z.boolean(),
+});
+// #endregion
