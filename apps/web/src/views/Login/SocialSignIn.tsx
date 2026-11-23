@@ -2,7 +2,9 @@ import { type ReactNode, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Box, Button, Divider, SvgIcon } from '@mui/material';
-import GitHub from '@mui/icons-material/GitHub';
+// The ESM build: the bare deep path resolves to the CommonJS file, whose
+// default import is the module object in the production bundle (React #130).
+import GitHub from '@mui/icons-material/esm/GitHub';
 import {
     startSocialSignIn,
     type SocialProvider,
