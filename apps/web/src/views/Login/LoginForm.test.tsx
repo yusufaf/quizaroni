@@ -207,12 +207,19 @@ describe('LoginForm', () => {
         expect((await screen.findByRole('alert')).textContent).toBe(
             'errors.socialCancelled'
         );
-        expect(screen.queryByText(/Pwned/)).toBeNull();
+        // The URL probe shows the raw query until it is cleared; the page itself
+        // must never show the description.
+        expect(
+            screen.queryByText(/Pwned/, {
+                ignore: 'script, style, [data-testid="url"]',
+            })
+        ).toBeNull();
         await waitFor(() =>
             expect(screen.getByTestId('url').textContent).toBe(
                 '/login?keep=1|{"from":"/explore"}'
             )
         );
+        expect(screen.queryByText(/Pwned/)).toBeNull();
         expect(screen.getByRole('alert').textContent).toBe(
             'errors.socialCancelled'
         );
