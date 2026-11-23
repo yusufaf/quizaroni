@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/yusufaf/quizaroni/compare/v0.6.0...v0.6.1) (2026-11-23)
+
+
+### Bug Fixes
+
+* **web:** import the GitHub icon from its ESM build so the login page renders ([#365](https://github.com/yusufaf/quizaroni/issues/365)) ([a602095](https://github.com/yusufaf/quizaroni/commit/a602095eba3cebd65e8680f393f80ddb0769ea9d))
+
 ## [0.6.0](https://github.com/yusufaf/quizaroni/compare/v0.5.0...v0.6.0) (2026-11-23)
 
 
