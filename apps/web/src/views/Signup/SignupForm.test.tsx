@@ -232,6 +232,13 @@ describe('SignupForm', () => {
             '?error=access_denied&error_description=Pwned%20by%20me&invite=tok-1'
         );
         expect(await screen.findByText('errors.socialCancelled')).toBeTruthy();
+        // The URL probe shows the raw query until it is cleared; the page itself
+        // must never show the description.
+        expect(
+            screen.queryByText(/Pwned/, {
+                ignore: 'script, style, [data-testid="url"]',
+            })
+        ).toBeNull();
         await waitFor(() =>
             expect(screen.getByTestId('url').textContent).toBe(
                 '/signUp?invite=tok-1|{"from":"/create"}'
