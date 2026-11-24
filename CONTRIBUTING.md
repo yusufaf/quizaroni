@@ -30,6 +30,7 @@ pnpm synth:api    # synthesize the CloudFormation template
 pnpm deploy:api   # deploy the backend to AWS
 pnpm typecheck    # type-check the frontend
 pnpm test         # run tests across workspaces
+pnpm test:smoke   # load the built self-host app in Chromium (pnpm build:web:selfhost first; once: pnpm --filter @quizaroni/web exec playwright install chromium)
 ```
 
 ## Commit conventions

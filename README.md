@@ -75,6 +75,7 @@ Run from the root:
 | `pnpm synth:api`  | Synthesize the CDK CloudFormation output |
 | `pnpm deploy:api` | Deploy the backend to AWS                |
 | `pnpm test`       | Run tests across workspaces              |
+| `pnpm test:smoke` | Smoke-test the built app in a browser    |
 
 ## Contributing
 
