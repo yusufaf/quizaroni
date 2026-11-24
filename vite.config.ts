@@ -7,7 +7,29 @@ export default defineConfig({
         '*.{js,jsx,ts,tsx}': ['vp lint --fix', 'vp fmt --write'],
         '*.{json,md,css,html,yml,yaml}': 'vp fmt --write',
     },
-    lint: { options: { typeAware: true, typeCheck: true } },
+    lint: {
+        options: { typeAware: true, typeCheck: true },
+        rules: {
+            // The bare deep path is the CommonJS file; its default import is the
+            // module object in the production bundle (React #130, #365).
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: [
+                        {
+                            group: [
+                                '@mui/icons-material/*',
+                                '!@mui/icons-material/esm/*',
+                            ],
+                            importNames: ['default'],
+                            message:
+                                "Import icons from '@mui/icons-material' or '@mui/icons-material/esm/<Icon>'.",
+                        },
+                    ],
+                },
+            ],
+        },
+    },
     fmt: {
         trailingComma: 'es5',
         tabWidth: 4,

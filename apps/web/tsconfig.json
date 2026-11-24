@@ -97,5 +97,5 @@
             "utilities/*": ["./src/shared/utilities/*"]
         }
     },
-    "include": ["src", "env.d.ts"]
+    "include": ["src", "env.d.ts", "smoke", "playwright.config.ts"]
 }
