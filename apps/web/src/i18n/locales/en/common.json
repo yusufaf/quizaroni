@@ -219,7 +219,8 @@
         "generic": "Something went wrong",
         "notFound": "Not found",
         "unauthorized": "Unauthorized",
-        "saveFailed": "Couldn't save your changes. Please try again."
+        "saveFailed": "Couldn't save your changes. Please try again.",
+        "createFailed": "Couldn't create a study set. Please try again."
     },
     "imageGallery": {
         "uploaded": "Uploaded {{date}}"
@@ -743,6 +744,7 @@
         "cardCount_one": "{{count}} card",
         "cardCount_other": "{{count}} cards",
         "combineAndGo": "Combine & Go",
+        "failed": "Couldn't combine your sets. Please try again.",
         "currentlyCombining": "Currently Combining",
         "combineOptions": "Combine Options",
         "titleLabel": "Combined Set Title",

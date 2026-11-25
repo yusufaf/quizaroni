@@ -219,7 +219,8 @@
         "generic": "Algo salió mal",
         "notFound": "No encontrado",
         "unauthorized": "No autorizado",
-        "saveFailed": "No se pudieron guardar los cambios. Inténtalo de nuevo."
+        "saveFailed": "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+        "createFailed": "No se pudo crear el set de estudio. Inténtalo de nuevo."
     },
     "imageGallery": {
         "uploaded": "Subido el {{date}}"
@@ -743,6 +744,7 @@
         "cardCount_one": "{{count}} tarjeta",
         "cardCount_other": "{{count}} tarjetas",
         "combineAndGo": "Combinar y empezar",
+        "failed": "No se pudieron combinar los sets. Inténtalo de nuevo.",
         "currentlyCombining": "Combinando actualmente",
         "combineOptions": "Opciones de combinación",
         "titleLabel": "Título del set combinado",

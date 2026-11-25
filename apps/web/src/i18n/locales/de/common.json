@@ -219,7 +219,8 @@
         "generic": "Etwas ist schiefgelaufen",
         "notFound": "Nicht gefunden",
         "unauthorized": "Nicht autorisiert",
-        "saveFailed": "Änderungen konnten nicht gespeichert werden. Bitte versuche es erneut."
+        "saveFailed": "Änderungen konnten nicht gespeichert werden. Bitte versuche es erneut.",
+        "createFailed": "Lernset konnte nicht erstellt werden. Bitte versuche es erneut."
     },
     "imageGallery": {
         "uploaded": "Hochgeladen am {{date}}"
@@ -743,6 +744,7 @@
         "cardCount_one": "{{count}} Karte",
         "cardCount_other": "{{count}} Karten",
         "combineAndGo": "Kombinieren & starten",
+        "failed": "Lernsets konnten nicht kombiniert werden. Bitte versuche es erneut.",
         "currentlyCombining": "Aktuell kombiniert",
         "combineOptions": "Kombinationsoptionen",
         "titleLabel": "Titel des kombinierten Lernsets",

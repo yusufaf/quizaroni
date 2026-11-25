@@ -15,6 +15,16 @@ vi.mock('react-router-dom', () => ({
     useNavigate: () => navigateSpy,
 }));
 
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (k: string) => k }),
+}));
+
+const toastMock = vi.hoisted(() => ({
+    error: vi.fn(),
+    POSITION: { BOTTOM_LEFT: 'bottom-left' },
+}));
+vi.mock('react-toastify', () => ({ toast: toastMock }));
+
 const mutateAsync = vi.fn();
 vi.mock('state/api/studysetsAPI', () => ({
     useCreateStudyset: () => ({ mutateAsync, isPending: false }),
@@ -36,9 +46,10 @@ describe('useCreateStudysetAction', () => {
 
         expect(navigateSpy).toHaveBeenCalledWith('/edit/u1');
         expect(useGlobalStore.getState().loadingActions).toHaveLength(0);
+        expect(toastMock.error).not.toHaveBeenCalled();
     });
 
-    it('still clears the loading action when the mutation rejects', async () => {
+    it('shows a create-failed toast and clears the loading action when the mutation rejects', async () => {
         mutateAsync.mockRejectedValueOnce(new Error('nope'));
         const consoleSpy = vi
             .spyOn(console, 'error')
@@ -51,6 +62,10 @@ describe('useCreateStudysetAction', () => {
 
         expect(navigateSpy).not.toHaveBeenCalled();
         expect(useGlobalStore.getState().loadingActions).toHaveLength(0);
+        expect(toastMock.error).toHaveBeenCalledWith(
+            'errors.createFailed',
+            expect.objectContaining({ toastId: 'createStudyset:failed' })
+        );
         consoleSpy.mockRestore();
     });
 

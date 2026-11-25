@@ -219,7 +219,8 @@
         "generic": "Une erreur s'est produite",
         "notFound": "Introuvable",
         "unauthorized": "Non autorisé",
-        "saveFailed": "Impossible d'enregistrer vos modifications. Veuillez réessayer."
+        "saveFailed": "Impossible d'enregistrer vos modifications. Veuillez réessayer.",
+        "createFailed": "Impossible de créer la liste d'étude. Veuillez réessayer."
     },
     "imageGallery": {
         "uploaded": "Importée le {{date}}"
@@ -743,6 +744,7 @@
         "cardCount_one": "{{count}} carte",
         "cardCount_other": "{{count}} cartes",
         "combineAndGo": "Combiner et lancer",
+        "failed": "Impossible de combiner les listes. Veuillez réessayer.",
         "currentlyCombining": "Combinaison en cours",
         "combineOptions": "Options de combinaison",
         "titleLabel": "Titre de la liste combinée",

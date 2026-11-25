@@ -219,7 +219,8 @@
         "generic": "Algo deu errado",
         "notFound": "Não encontrado",
         "unauthorized": "Não autorizado",
-        "saveFailed": "Não foi possível salvar suas alterações. Tente novamente."
+        "saveFailed": "Não foi possível salvar suas alterações. Tente novamente.",
+        "createFailed": "Não foi possível criar o conjunto de estudo. Tente novamente."
     },
     "imageGallery": {
         "uploaded": "Enviado em {{date}}"
@@ -743,6 +744,7 @@
         "cardCount_one": "{{count}} cartão",
         "cardCount_other": "{{count}} cartões",
         "combineAndGo": "Combinar e Começar",
+        "failed": "Não foi possível combinar os conjuntos. Tente novamente.",
         "currentlyCombining": "Combinando Atualmente",
         "combineOptions": "Opções de Combinação",
         "titleLabel": "Título do Conjunto Combinado",

@@ -10,6 +10,7 @@ import {
     isCompleteStudyset,
     PublishStudysetError,
     useCopyPublicStudyset,
+    useCreateStudyset,
     useGetAllStudysets,
     useGetStudyset,
     usePublishStudyset,
@@ -771,5 +772,76 @@ describe('useCopyPublicStudyset', () => {
 
         expect(isHttpStatus(error, 404)).toBe(true);
         expect(invalidate).not.toHaveBeenCalled();
+    });
+});
+
+describe('useCreateStudyset', () => {
+    afterEach(() => {
+        vi.unstubAllGlobals();
+        vi.restoreAllMocks();
+    });
+
+    const stubCreate = () => {
+        const fetchMock = vi.fn(() =>
+            Promise.resolve(
+                new Response(
+                    JSON.stringify({
+                        message: 'Successfully created study set',
+                        studyset: { studysetUUID: ID },
+                    }),
+                    {
+                        status: 200,
+                        headers: { 'Content-Type': 'application/json' },
+                    }
+                )
+            )
+        );
+        vi.stubGlobal('fetch', fetchMock);
+        return fetchMock;
+    };
+
+    const renderCreate = () => {
+        const qc = new QueryClient({
+            defaultOptions: { mutations: { retry: false } },
+        });
+        const wrapper = ({ children }: { children: React.ReactNode }) => (
+            <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+        );
+        return renderHook(() => useCreateStudyset(), { wrapper }).result;
+    };
+
+    it('posts no body for an empty set', async () => {
+        const fetchMock = stubCreate();
+        const result = renderCreate();
+
+        await result.current.mutateAsync();
+
+        const [url, init] = fetchMock.mock.calls[0] as unknown as [
+            string,
+            RequestInit,
+        ];
+        expect(url.endsWith('/studysets/create-studyset')).toBe(true);
+        expect(init.body).toBeUndefined();
+    });
+
+    it('posts the contents when given a set', async () => {
+        const fetchMock = stubCreate();
+        const result = renderCreate();
+
+        await result.current.mutateAsync({
+            studysetUUID: ID,
+            title: 'T',
+            cards: [],
+        });
+
+        const [, init] = fetchMock.mock.calls[0] as unknown as [
+            string,
+            RequestInit,
+        ];
+        expect(init.body).toBe(
+            JSON.stringify({
+                studyset: { studysetUUID: ID, title: 'T', cards: [] },
+            })
+        );
     });
 });
