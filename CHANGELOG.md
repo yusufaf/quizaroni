@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.3](https://github.com/yusufaf/quizaroni/compare/v0.6.2...v0.6.3) (2026-11-25)
+
+
+### Bug Fixes
+
+* let users delete their account ([#378](https://github.com/yusufaf/quizaroni/issues/378)) ([9628e5b](https://github.com/yusufaf/quizaroni/commit/9628e5b61fdc176f2a97076c18e155b1e7b1ca5c))
+* **web:** use the local day, not UTC, for study streaks ([#376](https://github.com/yusufaf/quizaroni/issues/376)) ([2a9bfa7](https://github.com/yusufaf/quizaroni/commit/2a9bfa78a54c9d13cbfed67e4ce6a4d834199e3c))
+
 ## [0.6.2](https://github.com/yusufaf/quizaroni/compare/v0.6.1...v0.6.2) (2026-11-23)
 
 

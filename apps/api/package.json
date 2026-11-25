@@ -1,6 +1,6 @@
 {
 	"name": "@quizaroni/api",
-	"version": "0.6.2",
+	"version": "0.6.3",
 	"private": true,
 	"bin": {
 		"cdk": "bin/cdk.js"
