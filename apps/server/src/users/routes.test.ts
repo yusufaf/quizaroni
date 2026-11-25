@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { eq } from 'drizzle-orm';
-import { session, userProfile } from '../db/schema';
+import { RECENT_SIGN_IN_SECONDS } from '../auth/auth';
+import { account, session, studyset, user, userProfile } from '../db/schema';
 import {
     ADMIN_EMAIL,
     ADMIN_PASSWORD,
+    apiGet,
     apiRequest as request,
     type CallOptions,
     cookieFrom,
@@ -438,5 +440,113 @@ describe('with study sets', () => {
             body: {},
         });
         expect(await without.json()).not.toHaveProperty('studysets');
+    });
+});
+
+describe('account-deletion', () => {
+    type Info = {
+        email: string;
+        reauth: 'password' | 'recent-sign-in';
+        recentSignInSecondsLeft: number;
+        providers: string[];
+        lastAdmin: boolean;
+        studysets: number;
+        publishedStudysets: number;
+    };
+
+    const info = (h: Harness, cookie?: string) =>
+        apiGet(h, '/api/users/account-deletion', { cookie });
+
+    test('needs a session', async () => {
+        const h = await harness();
+        for (const cookie of [undefined, '__Secure-quizaroni.session_token=junk']) {
+            const res = await info(h, cookie);
+            expect(res.status).toBe(401);
+        }
+    });
+
+    test('describes a password user and their sets', async () => {
+        const h = await harness();
+        const { cookie, email } = await signUp(h);
+        const id = h.db.select().from(user).where(eq(user.email, email)).get()!.id;
+        const now = new Date();
+        const base = {
+            ownerId: id,
+            description: '',
+            favorited: false,
+            cards: [],
+            categories: [],
+            labels: [],
+            metadata: {},
+            lastViewed: now,
+            createdAt: now,
+            updatedAt: now,
+        };
+        h.db
+            .insert(studyset)
+            .values([
+                { ...base, studysetUUID: crypto.randomUUID(), title: 'a' },
+                {
+                    ...base,
+                    studysetUUID: crypto.randomUUID(),
+                    title: 'b',
+                    isPublic: true,
+                    publishedAt: now,
+                },
+            ])
+            .run();
+        const res = await info(h, cookie);
+        expect(res.status).toBe(200);
+        expect(res.headers.get('Cache-Control')).toBe('no-store');
+        expect((await res.json()) as Info).toEqual({
+            email,
+            reauth: 'password',
+            recentSignInSecondsLeft: 0,
+            providers: [],
+            lastAdmin: false,
+            studysets: 2,
+            publishedStudysets: 1,
+        });
+    });
+
+    test('a user without a password gets the time left on their sign-in', async () => {
+        const h = await harness();
+        const { cookie, email } = await signUp(h);
+        const id = h.db.select().from(user).where(eq(user.email, email)).get()!.id;
+        h.db
+            .update(account)
+            .set({ providerId: 'google', password: null })
+            .where(eq(account.userId, id))
+            .run();
+        const fresh = (await (await info(h, cookie)).json()) as Info;
+        expect(fresh.reauth).toBe('recent-sign-in');
+        expect(fresh.providers).toEqual(['google']);
+        expect(fresh.recentSignInSecondsLeft).toBeGreaterThan(0);
+        expect(fresh.recentSignInSecondsLeft).toBeLessThanOrEqual(
+            RECENT_SIGN_IN_SECONDS
+        );
+
+        h.db
+            .update(session)
+            .set({
+                createdAt: new Date(
+                    Date.now() - (RECENT_SIGN_IN_SECONDS + 60) * 1000
+                ),
+            })
+            .where(eq(session.userId, id))
+            .run();
+        const stale = (await (await info(h, cookie)).json()) as Info;
+        expect(stale.reauth).toBe('recent-sign-in');
+        expect(stale.recentSignInSecondsLeft).toBe(0);
+    });
+
+    test('flags the only admin', async () => {
+        const h = await harness();
+        const res = await request(h, '/api/auth/sign-in/email', {
+            body: { email: ADMIN_EMAIL, password: ADMIN_PASSWORD },
+        });
+        const body = (await (await info(h, cookieFrom(res))).json()) as Info;
+        expect(body.lastAdmin).toBe(true);
+        expect(body.email).toBe(ADMIN_EMAIL);
     });
 });
