@@ -8,6 +8,7 @@ import type {
     GamificationState,
 } from 'shared/types';
 import type { AIMessage } from 'shared/ai/providers';
+import { migrateUtcDayKey } from 'shared/utilities/gamification';
 import { migrateProgressToFsrs } from 'shared/utilities/srs';
 
 // Local-first versions of types with sync metadata
@@ -75,7 +76,7 @@ interface QuizaroniDatabase extends Dexie {
 }
 
 const DB_NAME = 'quizaroni_v1';
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 
 let dbInstance: QuizaroniDatabase | null = null;
 
@@ -122,7 +123,7 @@ export function getDatabase(): QuizaroniDatabase {
     });
 
     // v5: card progress moves from SM-2 to FSRS state; indexes are unchanged.
-    db.version(DB_VERSION)
+    db.version(5)
         .stores({
             studysets:
                 'studysetUUID, userUUID, _syncStatus, _lastModified, labels, lastViewed',
@@ -141,6 +142,32 @@ export function getDatabase(): QuizaroniDatabase {
                 .toCollection()
                 .modify((row, ctx) => {
                     ctx.value = migrateProgressToFsrs(row);
+                })
+        );
+
+    // v6: streak day keys move from UTC to local dates (#160); indexes are unchanged.
+    db.version(DB_VERSION)
+        .stores({
+            studysets:
+                'studysetUUID, userUUID, _syncStatus, _lastModified, labels, lastViewed',
+            users: 'userUUID, _syncStatus, _lastModified',
+            sessions: 'sessionUUID, studysetUUID, completedAt, _syncStatus',
+            cardProgress:
+                'cardUUID, studysetUUID, nextReview, _syncStatus, [studysetUUID+nextReview]',
+            gamification: 'id',
+            customAchievements: 'id, unlockedAt',
+            aiChatHistory: 'studysetUUID, updatedAt',
+            syncQueue: '++id, entityType, entityId, createdAt',
+        })
+        .upgrade((tx) =>
+            tx
+                .table('gamification')
+                .toCollection()
+                .modify((row) => {
+                    row.lastStudyDate = migrateUtcDayKey(
+                        row.lastStudyDate ?? null,
+                        row._lastModified
+                    );
                 })
         );
 
