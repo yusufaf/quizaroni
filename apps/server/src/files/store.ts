@@ -11,7 +11,12 @@ import {
 import { dirname, join, resolve, sep } from 'node:path';
 import { isStudysetUUID } from '../studysets/updates';
 import type { FileCopy } from '../studysets/updates';
-import { isAvatarKey, isCardFileKey, LOWER_UUID } from './keys';
+import {
+    isAvatarKey,
+    isAvatarUserSegment,
+    isCardFileKey,
+    LOWER_UUID,
+} from './keys';
 import { SNIFF_BYTES, type SniffedType, sniffContentType } from './sniff';
 
 const STAGING_NAME = /^(\d{1,2}|assembled)$/;
@@ -107,6 +112,21 @@ export class FileStore {
             } catch (err) {
                 console.error(`Deleting the files of a set failed: ${id}`, err);
             }
+        }
+    }
+
+    deleteAvatars(userId: string): void {
+        if (!isAvatarUserSegment(userId)) return;
+        try {
+            rmSync(join(this.filesDir, 'avatars', userId), {
+                recursive: true,
+                force: true,
+            });
+        } catch (err) {
+            console.error(
+                `Deleting the avatars of a user failed: ${userId}`,
+                err
+            );
         }
     }
 
