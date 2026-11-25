@@ -8,14 +8,34 @@ import type {
     StudyStatistics,
 } from 'shared/types';
 
-export const getDateKey = (date: Date = new Date()): string => {
-    return date.toISOString().slice(0, 10);
+const pad = (n: number) => String(n).padStart(2, '0');
+
+// The user's local calendar day, as YYYY-MM-DD.
+export const getDateKey = (date: Date = new Date()): string =>
+    `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+
+const addDays = (date: Date, days: number): Date => {
+    const shifted = new Date(date);
+    shifted.setDate(shifted.getDate() + days);
+    return shifted;
 };
 
-export const getYesterdayKey = (date: Date = new Date()): string => {
-    const yesterday = new Date(date);
-    yesterday.setDate(yesterday.getDate() - 1);
-    return getDateKey(yesterday);
+export const getYesterdayKey = (date: Date = new Date()): string =>
+    getDateKey(addDays(date, -1));
+
+type StudyDay = 'today' | 'yesterday' | 'earlier';
+
+// A key one day ahead comes from a clock further east (another device, or a
+// pre-#160 UTC key from west of UTC), so it still counts as today.
+const getStudyDay = (lastStudyDate: string, today: Date): StudyDay => {
+    if (
+        lastStudyDate === getDateKey(today) ||
+        lastStudyDate === getDateKey(addDays(today, 1))
+    ) {
+        return 'today';
+    }
+    if (lastStudyDate === getYesterdayKey(today)) return 'yesterday';
+    return 'earlier';
 };
 
 export const updateDailyStreak = (
@@ -26,8 +46,11 @@ export const updateDailyStreak = (
     'currentStreak' | 'longestStreak' | 'lastStudyDate'
 > => {
     const todayKey = getDateKey(today);
+    const studyDay = state.lastStudyDate
+        ? getStudyDay(state.lastStudyDate, today)
+        : null;
 
-    if (state.lastStudyDate === todayKey) {
+    if (studyDay === 'today') {
         return {
             currentStreak: state.currentStreak,
             longestStreak: state.longestStreak,
@@ -35,9 +58,7 @@ export const updateDailyStreak = (
         };
     }
 
-    const yesterdayKey = getYesterdayKey(today);
-    const continued =
-        state.lastStudyDate === yesterdayKey && state.currentStreak > 0;
+    const continued = studyDay === 'yesterday' && state.currentStreak > 0;
     const currentStreak = continued ? state.currentStreak + 1 : 1;
 
     return {
@@ -50,7 +71,7 @@ export const updateDailyStreak = (
 export type EffectiveStreak = { days: number; atRisk: boolean };
 
 // The stored streak only updates when a session ends, so a missed day leaves
-// it stale. Uses the same day keys as updateDailyStreak, so a streak shown
+// it stale. Uses the same day rules as updateDailyStreak, so a streak shown
 // here is one the next session would continue.
 export const getEffectiveStreak = (
     state: Pick<GamificationState, 'currentStreak' | 'lastStudyDate'>,
@@ -60,13 +81,14 @@ export const getEffectiveStreak = (
     if (!lastStudyDate || currentStreak <= 0) {
         return { days: 0, atRisk: false };
     }
-    if (lastStudyDate === getDateKey(today)) {
-        return { days: currentStreak, atRisk: false };
+    switch (getStudyDay(lastStudyDate, today)) {
+        case 'today':
+            return { days: currentStreak, atRisk: false };
+        case 'yesterday':
+            return { days: currentStreak, atRisk: true };
+        default:
+            return { days: 0, atRisk: false };
     }
-    if (lastStudyDate === getYesterdayKey(today)) {
-        return { days: currentStreak, atRisk: true };
-    }
-    return { days: 0, atRisk: false };
 };
 
 type EvaluationContext = {
