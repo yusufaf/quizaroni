@@ -1,7 +1,15 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach } from 'vite-plus/test';
+import {
+    describe,
+    it,
+    expect,
+    vi,
+    beforeEach,
+    afterEach,
+} from 'vite-plus/test';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import { createLightTheme } from 'shared/theme/themes';
 import { DEFAULT_USER_DATA } from 'shared/constants';
 import { HttpError } from 'state/api/awsAPI';
@@ -12,6 +20,21 @@ import AccountTab from './AccountTab';
 const mocks = vi.hoisted(() => ({
     clearAccessToken: vi.fn(),
     updateUsername: vi.fn(),
+    deleteAccount: vi.fn(),
+    info: {
+        data: {
+            email: 'ada@example.com',
+            reauth: 'password',
+            recentSignInSecondsLeft: 0,
+            providers: [],
+            lastAdmin: false,
+            studysets: 0,
+            publishedStudysets: 0,
+        },
+        isFetching: false,
+        isError: false,
+        refetch: vi.fn(),
+    },
     toast: {
         success: vi.fn(),
         warning: vi.fn(),
@@ -29,12 +52,24 @@ vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (k: string) => k }),
 }));
 
+vi.mock('shared/auth/session/SessionProvider', () => ({
+    useSession: () => ({
+        user: { id: 'u1', email: 'ada@example.com' },
+        deleteAccount: mocks.deleteAccount,
+    }),
+}));
+
+vi.mock('state/api/authProvidersAPI', () => ({
+    useAuthProviders: () => undefined,
+}));
+
 vi.mock('state/api/usersAPI', () => ({
     useUpdateUsername: () => ({
         mutateAsync: mocks.updateUsername,
         isPending: false,
     }),
     useDownloadUserData: () => ({ mutateAsync: vi.fn(), isPending: false }),
+    useAccountDeletionInfo: () => mocks.info,
 }));
 
 const COMPLETE = {
@@ -50,13 +85,21 @@ beforeEach(() => {
     mocks.clearAccessToken.mockResolvedValue(undefined);
 });
 
-const renderTab = () =>
+const LocationProbe = () => {
+    const { pathname, search } = useLocation();
+    return <p data-testid="location">{`${pathname}${search}`}</p>;
+};
+
+const renderTab = (initialEntries = ['/profile?tab=Account']) =>
     render(
-        <ThemeProvider theme={createLightTheme()}>
-            <AccountTab
-                userData={{ ...DEFAULT_USER_DATA, username: 'turtles' }}
-            />
-        </ThemeProvider>
+        <MemoryRouter initialEntries={initialEntries}>
+            <ThemeProvider theme={createLightTheme()}>
+                <AccountTab
+                    userData={{ ...DEFAULT_USER_DATA, username: 'turtles' }}
+                />
+                <LocationProbe />
+            </ThemeProvider>
+        </MemoryRouter>
     );
 
 const input = () =>
@@ -182,5 +225,76 @@ describe('AccountTab change username', () => {
 
         expect(submit().disabled).toBe(true);
         expect(screen.queryByText(RULE)).toBeNull();
+    });
+});
+
+describe('AccountTab delete account', () => {
+    afterEach(() => {
+        vi.unstubAllEnvs();
+    });
+
+    const DELETE_BUTTON = 'account.deleteAccount';
+
+    it('hides the section outside a self-host build', () => {
+        renderTab();
+        expect(screen.queryByText(DELETE_BUTTON)).toBeNull();
+    });
+
+    describe('in a self-host build', () => {
+        beforeEach(() => {
+            vi.stubEnv('VITE_BACKEND', 'selfhost');
+        });
+
+        it('shows the section with the dialog closed', () => {
+            renderTab();
+            expect(
+                screen.getByRole('button', { name: DELETE_BUTTON })
+            ).toBeTruthy();
+            expect(screen.queryByRole('dialog')).toBeNull();
+        });
+
+        it('opens the dialog from the button', () => {
+            renderTab();
+            fireEvent.click(
+                screen.getByRole('button', { name: DELETE_BUTTON })
+            );
+            expect(screen.getByRole('dialog')).toBeTruthy();
+        });
+
+        it('opens the dialog when returning from a provider sign-in and drops the params', async () => {
+            renderTab(['/profile?tab=Account&deleteAccount=1']);
+            expect(screen.getByRole('dialog')).toBeTruthy();
+            expect(
+                screen.queryByText('deleteAccountDialog.errors.reauthFailed')
+            ).toBeNull();
+            await waitFor(() =>
+                expect(screen.getByTestId('location').textContent).toBe(
+                    '/profile?tab=Account'
+                )
+            );
+            expect(screen.getByRole('dialog')).toBeTruthy();
+        });
+
+        it('says the re-authentication failed when the provider sent back an error', async () => {
+            renderTab([
+                '/profile?tab=Account&deleteAccount=1&error=access_denied&error_description=nope',
+            ]);
+            expect(
+                screen.getByText('deleteAccountDialog.errors.reauthFailed')
+            ).toBeTruthy();
+            await waitFor(() =>
+                expect(screen.getByTestId('location').textContent).toBe(
+                    '/profile?tab=Account'
+                )
+            );
+            expect(
+                screen.getByText('deleteAccountDialog.errors.reauthFailed')
+            ).toBeTruthy();
+        });
+
+        it('stays closed without the return param, even with an error', () => {
+            renderTab(['/profile?tab=Account&error=x']);
+            expect(screen.queryByRole('dialog')).toBeNull();
+        });
     });
 });

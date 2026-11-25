@@ -154,6 +154,13 @@ describe('LoginForm', () => {
         );
     });
 
+    it('confirms a deleted account', async () => {
+        await renderLogin(undefined, '?accountDeleted=1');
+        expect(screen.getByRole('status').textContent).toBe(
+            'login.accountDeletedNotice'
+        );
+    });
+
     it('shows no notice by default', async () => {
         await renderLogin();
         expect(screen.queryByRole('status')).toBeNull();
