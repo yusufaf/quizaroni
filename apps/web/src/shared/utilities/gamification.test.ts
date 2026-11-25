@@ -8,6 +8,7 @@ import {
     getYesterdayKey,
     mergeCustomAchievements,
     mergeGamificationState,
+    migrateUtcDayKey,
     updateDailyStreak,
 } from './gamification';
 import type { StudySessionResult, StudyStatistics } from 'shared/types';
@@ -386,5 +387,166 @@ describe('getEffectiveStreak around local midnight', () => {
                 getEffectiveStreak(state, at('2026-06-05T11:00:00Z'))
             ).toEqual({ days: 3, atRisk: false });
         });
+    });
+});
+
+const legacy = (lastStudyDate: string | null) => ({
+    ...createInitialGamificationState(),
+    currentStreak: 4,
+    longestStreak: 4,
+    lastStudyDate,
+});
+
+describe('migrateUtcDayKey east of UTC', () => {
+    useTimeZone('Asia/Tokyo');
+
+    it('reads a key without a timestamp as the next local day', () => {
+        expect(
+            migrateUtcDayKey('2026-06-04', undefined, at('2026-06-10T03:00:00Z'))
+        ).toBe('2026-06-05');
+    });
+
+    it('never moves a key past today', () => {
+        expect(
+            migrateUtcDayKey('2026-06-05', undefined, at('2026-06-05T11:00:00Z'))
+        ).toBe('2026-06-05');
+    });
+
+    it('leaves a missing or malformed key alone', () => {
+        expect(migrateUtcDayKey(null, undefined)).toBeNull();
+        expect(migrateUtcDayKey('not-a-date', undefined)).toBe('not-a-date');
+    });
+
+    it('keeps a key that already matches the day of the last write', () => {
+        expect(
+            migrateUtcDayKey(
+                '2026-06-05',
+                Date.parse('2026-06-05T06:00:00Z'),
+                at('2026-06-06T01:00:00Z')
+            )
+        ).toBe('2026-06-05');
+    });
+
+    it('moves at most to the day of the last write', () => {
+        expect(
+            migrateUtcDayKey(
+                '2026-06-05',
+                Date.parse('2026-06-06T00:00:00Z'),
+                at('2026-06-07T03:00:00Z')
+            )
+        ).toBe('2026-06-06');
+    });
+
+    it('never moves a key earlier than it could have meant', () => {
+        expect(
+            migrateUtcDayKey('2026-06-05', 0, at('2026-06-07T03:00:00Z'))
+        ).toBe('2026-06-05');
+    });
+
+    // A signed-in start re-saves the record just before the update prompt, so
+    // the bound is today and the key lands one day late (accepted drift).
+    it('lands on today when the last write was this morning', () => {
+        expect(
+            migrateUtcDayKey(
+                '2026-06-05',
+                Date.parse('2026-06-06T01:00:00Z'),
+                at('2026-06-06T01:05:00Z')
+            )
+        ).toBe('2026-06-06');
+    });
+
+    it('keeps a streak studied before UTC midnight', () => {
+        const now = at('2026-06-06T03:00:00Z');
+        const migrated = {
+            ...legacy('2026-06-04'),
+            lastStudyDate: migrateUtcDayKey(
+                '2026-06-04',
+                Date.parse('2026-06-04T23:00:00Z'),
+                now
+            ),
+        };
+        expect(migrated.lastStudyDate).toBe('2026-06-05');
+        expect(getEffectiveStreak(migrated, now)).toEqual({
+            days: 4,
+            atRisk: true,
+        });
+        expect(updateDailyStreak(migrated, now).currentStreak).toBe(5);
+        expect(getEffectiveStreak(legacy('2026-06-04'), now)).toEqual({
+            days: 0,
+            atRisk: false,
+        });
+    });
+
+    it('keeps a streak studied after UTC midnight at risk the next day', () => {
+        const now = at('2026-06-06T01:00:00Z');
+        const migrated = {
+            ...legacy('2026-06-05'),
+            lastStudyDate: migrateUtcDayKey(
+                '2026-06-05',
+                Date.parse('2026-06-05T06:00:00Z'),
+                now
+            ),
+        };
+        expect(getEffectiveStreak(migrated, now)).toEqual({
+            days: 4,
+            atRisk: true,
+        });
+        expect(updateDailyStreak(migrated, now).currentStreak).toBe(5);
+    });
+});
+
+describe('migrateUtcDayKey west of UTC', () => {
+    useTimeZone('America/Los_Angeles');
+
+    it('keeps a key without a timestamp', () => {
+        expect(
+            migrateUtcDayKey('2026-06-04', undefined, at('2026-06-10T03:00:00Z'))
+        ).toBe('2026-06-04');
+    });
+
+    it('never moves a key past today', () => {
+        expect(
+            migrateUtcDayKey('2026-06-05', undefined, at('2026-06-05T01:00:00Z'))
+        ).toBe('2026-06-04');
+    });
+
+    it('never moves a key earlier than it could have meant', () => {
+        expect(
+            migrateUtcDayKey('2026-06-05', 0, at('2026-06-07T03:00:00Z'))
+        ).toBe('2026-06-04');
+    });
+
+    it('moves an evening key back to the local day of the last write', () => {
+        const now = at('2026-06-05T16:00:00Z');
+        const migrated = {
+            ...legacy('2026-06-05'),
+            lastStudyDate: migrateUtcDayKey(
+                '2026-06-05',
+                Date.parse('2026-06-05T01:00:00Z'),
+                now
+            ),
+        };
+        expect(migrated.lastStudyDate).toBe('2026-06-04');
+        expect(getEffectiveStreak(migrated, now)).toEqual({
+            days: 4,
+            atRisk: true,
+        });
+        expect(updateDailyStreak(migrated, now).currentStreak).toBe(5);
+    });
+
+    it('keeps the streak going without a timestamp', () => {
+        const migrated = {
+            ...legacy('2026-06-05'),
+            lastStudyDate: migrateUtcDayKey(
+                '2026-06-05',
+                undefined,
+                at('2026-06-05T16:00:00Z')
+            ),
+        };
+        expect(migrated.lastStudyDate).toBe('2026-06-05');
+        expect(
+            updateDailyStreak(migrated, at('2026-06-06T16:00:00Z'))
+                .currentStreak
+        ).toBe(5);
     });
 });

@@ -23,6 +23,31 @@ const addDays = (date: Date, days: number): Date => {
 export const getYesterdayKey = (date: Date = new Date()): string =>
     getDateKey(addDays(date, -1));
 
+// Day keys were UTC dates before #160. West of UTC that key is the local day
+// or the next one; east of it, the local day or the one before. Take the later
+// day, but no later than today or the local day of the record's last write,
+// and never earlier than the earliest day the key could have meant.
+export const migrateUtcDayKey = (
+    key: string | null,
+    lastModified: number | undefined,
+    now: Date = new Date()
+): string | null => {
+    const match = key ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(key) : null;
+    if (!key || !match) return key;
+    const [, y, m, d] = match;
+    const utcDay = new Date(Number(y), Number(m) - 1, Number(d));
+    const east = now.getTimezoneOffset() < 0;
+    const earliest = getDateKey(addDays(utcDay, east ? 0 : -1));
+    let latest = getDateKey(addDays(utcDay, east ? 1 : 0));
+    const todayKey = getDateKey(now);
+    if (todayKey < latest) latest = todayKey;
+    if (typeof lastModified === 'number' && Number.isFinite(lastModified)) {
+        const writtenKey = getDateKey(new Date(lastModified));
+        if (writtenKey < latest) latest = writtenKey;
+    }
+    return latest < earliest ? earliest : latest;
+};
+
 type StudyDay = 'today' | 'yesterday' | 'earlier';
 
 // A key one day ahead comes from a clock further east (another device, or a
