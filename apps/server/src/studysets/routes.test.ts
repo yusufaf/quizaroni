@@ -512,6 +512,30 @@ describe('Combine', () => {
         expect(res.status).toBe(403);
         expect((await getSet(h, b.cookie, bSet.studysetUUID)).cards).toEqual([]);
     });
+
+    // The web's Combine sends the whole set in one create-studyset (#223).
+    test('create-studyset with contents re-keys files from another own set', async () => {
+        const h = await harness();
+        const a = await signUp(h);
+        const s1 = await createSet(h, a.cookie);
+        const file = { key: `${s1.studysetUUID}/f`, name: 'f.png' };
+        h.db.update(studyset)
+            .set({ cards: [{ ...CARD, files: [file] }] })
+            .where(eq(studyset.studysetUUID, s1.studysetUUID))
+            .run();
+        const id = crypto.randomUUID();
+        const combined = await createSet(h, a.cookie, {
+            studyset: {
+                studysetUUID: id,
+                title: 'Combined',
+                cards: [{ ...CARD, files: [file] }],
+            },
+        });
+        expect(combined.studysetUUID).toBe(id);
+        expect(combined.title).toBe('Combined');
+        const files = combined.cards[0]?.files as { key: string }[];
+        expect(files[0]?.key).toStartWith(`${id}/`);
+    });
 });
 
 describe('card file URLs on read', () => {
