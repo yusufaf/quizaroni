@@ -720,6 +720,7 @@
         "setCount_other": "{{count}}セット",
         "cardCount_other": "カード{{count}}枚",
         "combineAndGo": "組み合わせて開始",
+        "failed": "セットを組み合わせられませんでした。もう一度お試しください。",
         "currentlyCombining": "現在の組み合わせ",
         "combineOptions": "組み合わせオプション",
         "titleLabel": "組み合わせ後のセットのタイトル",

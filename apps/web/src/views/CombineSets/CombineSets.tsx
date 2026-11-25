@@ -14,11 +14,8 @@ import {
     Paper,
 } from '@mui/material';
 import { Add, Remove, ArrowBack, MergeType, Search } from '@mui/icons-material';
-import {
-    useGetAllStudysets,
-    useCreateStudyset,
-    useUpdateStudyset,
-} from 'state/api/studysetsAPI';
+import { toast } from 'react-toastify';
+import { useGetAllStudysets, useCreateStudyset } from 'state/api/studysetsAPI';
 import { Studyset } from 'shared/types';
 import {
     CombineSetsContainer,
@@ -40,7 +37,6 @@ const CombineSets = () => {
     const allSets = studysetsResponse?.studysets ?? [];
 
     const { mutateAsync: createStudyset } = useCreateStudyset();
-    const { mutateAsync: updateStudyset } = useUpdateStudyset();
 
     const [combinedSets, setCombinedSets] = useState<Studyset[]>([]);
     const [availableSets, setAvailableSets] = useState<Studyset[]>([]);
@@ -100,17 +96,7 @@ const CombineSets = () => {
         if (combinedSets.length < 2) return;
         setIsCombining(true);
         try {
-            const newSetResponse = await createStudyset();
-            const newUUID = newSetResponse?.studyset?.studysetUUID;
-
-            if (!newUUID) {
-                console.error(
-                    'Could not get new studyset UUID',
-                    newSetResponse
-                );
-                setIsCombining(false);
-                return;
-            }
+            const newUUID = crypto.randomUUID();
 
             let allCards: any[] = [];
             combinedSets.forEach((set) => {
@@ -147,19 +133,25 @@ const CombineSets = () => {
                 : [];
             const baseMetadata = combinedSets[0]?.metadata || {};
 
-            await updateStudyset({
+            // One request, so a failure can't leave an empty set behind (#223).
+            const res = await createStudyset({
                 studysetUUID: newUUID,
-                updates: {
-                    title: finalTitle.substring(0, 100),
-                    cards: cleanedCards,
-                    description: finalDescription,
-                    labels: combinedLabels,
-                    metadata: baseMetadata,
-                },
+                title: finalTitle.substring(0, 100),
+                cards: cleanedCards,
+                description: finalDescription,
+                labels: combinedLabels,
+                metadata: baseMetadata,
             });
+            if (res?.studyset?.studysetUUID !== newUUID) {
+                throw new Error('Combine: create returned a different set');
+            }
             navigate(`/view/${newUUID}`);
         } catch (e) {
             console.error(e);
+            toast.error(t('combineSets.failed'), {
+                position: toast.POSITION.BOTTOM_LEFT,
+                toastId: 'combineSets:failed',
+            });
             setIsCombining(false);
         }
     };

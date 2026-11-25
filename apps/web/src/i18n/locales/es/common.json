@@ -744,6 +744,7 @@
         "cardCount_one": "{{count}} tarjeta",
         "cardCount_other": "{{count}} tarjetas",
         "combineAndGo": "Combinar y empezar",
+        "failed": "No se pudieron combinar los sets. Inténtalo de nuevo.",
         "currentlyCombining": "Combinando actualmente",
         "combineOptions": "Opciones de combinación",
         "titleLabel": "Título del set combinado",

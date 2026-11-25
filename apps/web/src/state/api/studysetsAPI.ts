@@ -81,6 +81,7 @@ import {
     BatchDuplicateStudysetsResponse,
     BatchDeleteStudysetsRequest,
     BatchDuplicateStudysetsRequest,
+    Updates,
 } from 'shared/types';
 
 // The list can include stub rows an upsert left behind with no cards or id (#127, #146).
@@ -198,15 +199,19 @@ export const useGetPublicStudyset = (
     });
 };
 
+/** A new set's contents, so create can make it in one write (#223). */
+export type NewStudyset = Updates & { studysetUUID: UUID };
+
 // Mutations
 export const useCreateStudyset = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async () => {
+        mutationFn: async (studyset: NewStudyset | void) => {
             const data = await fetchJson(
                 `${BASE_API_URL}/studysets/create-studyset`,
                 {
                     ...(await getCommonPostRequestProps()),
+                    ...(studyset && { body: JSON.stringify({ studyset }) }),
                 }
             );
             return validate({

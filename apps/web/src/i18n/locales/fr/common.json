@@ -744,6 +744,7 @@
         "cardCount_one": "{{count}} carte",
         "cardCount_other": "{{count}} cartes",
         "combineAndGo": "Combiner et lancer",
+        "failed": "Impossible de combiner les listes. Veuillez réessayer.",
         "currentlyCombining": "Combinaison en cours",
         "combineOptions": "Options de combinaison",
         "titleLabel": "Titre de la liste combinée",
