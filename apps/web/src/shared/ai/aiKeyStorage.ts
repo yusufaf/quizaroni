@@ -96,6 +96,24 @@ export const deleteApiKey = async (provider: AIProvider): Promise<void> => {
     setStorage(storage);
 };
 
+// The blob holds one key per provider for the whole browser, so only the
+// entries this user's id decrypts are theirs to remove.
+export const deleteApiKeysOf = async (userUUID: string): Promise<void> => {
+    try {
+        const storage = getStorage();
+        let changed = false;
+        for (const provider of Object.keys(storage)) {
+            if ((await getApiKey(provider as AIProvider, userUUID)) !== null) {
+                delete storage[provider];
+                changed = true;
+            }
+        }
+        if (changed) setStorage(storage);
+    } catch (error) {
+        console.error('Error removing saved AI keys:', error);
+    }
+};
+
 export const hasApiKey = (provider: AIProvider): boolean => {
     const storage = getStorage();
     return !!storage[provider];

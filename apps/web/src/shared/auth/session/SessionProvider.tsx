@@ -7,8 +7,10 @@ import {
     useMemo,
     useState,
 } from 'react';
+import { LOCAL_DATA_OWNER_KEY } from 'state/local/owner';
 import type { AuthApi } from '../useAuth';
 import {
+    deleteAccount as deleteAccountRequest,
     getSession,
     type SessionUser,
     signInEmail,
@@ -37,6 +39,7 @@ export type SessionContextValue = {
         inviteToken?: string;
     }) => Promise<void>;
     signOut: () => Promise<void>;
+    deleteAccount: (input: { password?: string }) => Promise<void>;
 };
 
 const SessionContext = createContext<SessionContextValue | null>(null);
@@ -134,6 +137,48 @@ export const SessionProvider = ({ children }: { children: ReactNode }) => {
         window.location.assign('/');
     }, []);
 
+    const deletedId = state.user?.id;
+    const deleteAccount = useCallback<SessionContextValue['deleteAccount']>(
+        async (input) => {
+            await deleteAccountRequest(input);
+
+            // Awaited so the navigation below can't cut the wipe short.
+            let cleared = false;
+            try {
+                const { clearLocalData } =
+                    await import('state/local/localData');
+                await clearLocalData();
+                cleared = true;
+            } catch (error) {
+                console.error('Error clearing local data:', error);
+            }
+
+            if (deletedId) {
+                try {
+                    const { deleteApiKeysOf } =
+                        await import('shared/ai/aiKeyStorage');
+                    await deleteApiKeysOf(deletedId);
+                } catch (error) {
+                    console.error('Error removing saved AI keys:', error);
+                }
+            }
+
+            // Removing the marker reloads other tabs. If the wipe failed it
+            // stays, so the next account to sign in here wipes what is left.
+            if (cleared) {
+                try {
+                    localStorage.removeItem(LOCAL_DATA_OWNER_KEY);
+                } catch {
+                    // Storage unavailable; nothing more to clean up.
+                }
+            }
+
+            writeCache(null);
+            window.location.assign('/login?accountDeleted=1');
+        },
+        [deletedId]
+    );
+
     const value = useMemo<SessionContextValue>(
         () => ({
             user: state.user,
@@ -141,8 +186,9 @@ export const SessionProvider = ({ children }: { children: ReactNode }) => {
             signIn,
             signUp,
             signOut,
+            deleteAccount,
         }),
-        [state, signIn, signUp, signOut]
+        [state, signIn, signUp, signOut, deleteAccount]
     );
 
     // Render nothing until the first answer, so RequireAuth never redirects a
