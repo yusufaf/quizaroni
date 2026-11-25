@@ -48,7 +48,31 @@
         "title": "Eliminar cuenta",
         "passwordLabel": "Contraseña",
         "passwordPlaceholder": "Introduce tu contraseña",
-        "confirmButton": "Eliminar cuenta"
+        "confirmButton": "Eliminar cuenta",
+        "intro": "Eliminar tu cuenta es permanente y no se puede deshacer.",
+        "accountLine": "Esto elimina de forma permanente la cuenta {{email}}.",
+        "studysetsDeleted_one": "Se eliminará {{count}} conjunto de estudio.",
+        "studysetsDeleted_other": "Se eliminarán {{count}} conjuntos de estudio.",
+        "publishedDeleted_one": "{{count}} de ellos está publicado y desaparecerá para todos.",
+        "publishedDeleted_other": "{{count}} de ellos están publicados y desaparecerán para todos.",
+        "copiesStay": "Las copias que otras personas guardaron de tus conjuntos publicados se quedan con ellas.",
+        "downloadHint": "¿Quieres una copia de tus datos antes? Usa Descargar datos abajo antes de eliminar.",
+        "acknowledge": "Entiendo que esto no se puede deshacer",
+        "reauthIntro": "Para eliminar tu cuenta, confirma que eres tú volviendo a iniciar sesión.",
+        "reauthButton": "Continuar con {{provider}}",
+        "reauthUnavailable": "Aquí no puedes volver a iniciar sesión con un proveedor. Primero crea una contraseña: elige \"¿Olvidaste tu contraseña?\" en la página de inicio de sesión, vuelve y elimina tu cuenta con esa contraseña.",
+        "recentSignIn": "Iniciaste sesión hace poco, así que puedes eliminar tu cuenta sin volver a iniciar sesión.",
+        "lastAdmin": "Eres el único administrador de este servidor, así que esta cuenta no se puede eliminar. Sin administrador, nadie podría gestionar el servidor.",
+        "deleting": "Eliminando…",
+        "loadFailed": "No se pudieron cargar los datos de tu cuenta. Cierra esta ventana e inténtalo de nuevo.",
+        "errors": {
+            "wrongPassword": "Esa contraseña no es correcta.",
+            "sessionExpired": "Tu inicio de sesión es demasiado antiguo. Vuelve a iniciar sesión para continuar.",
+            "lastAdmin": "Eres el único administrador de este servidor, así que esta cuenta no se puede eliminar.",
+            "rateLimited": "Demasiados intentos. Espera unos minutos e inténtalo de nuevo.",
+            "failed": "Algo salió mal al eliminar tu cuenta. Inténtalo de nuevo.",
+            "reauthFailed": "No se pudo volver a iniciar sesión. Inténtalo de nuevo."
+        }
     },
     "settings": {
         "title": "Configuración",

@@ -48,7 +48,31 @@
         "title": "Delete Account",
         "passwordLabel": "Password",
         "passwordPlaceholder": "Enter your password",
-        "confirmButton": "Delete Account"
+        "confirmButton": "Delete Account",
+        "intro": "Deleting your account is permanent and cannot be undone.",
+        "accountLine": "This permanently deletes the account {{email}}.",
+        "studysetsDeleted_one": "{{count}} study set will be deleted.",
+        "studysetsDeleted_other": "{{count}} study sets will be deleted.",
+        "publishedDeleted_one": "{{count}} of them is published and will disappear for everyone.",
+        "publishedDeleted_other": "{{count}} of them are published and will disappear for everyone.",
+        "copiesStay": "Copies other people saved from your published sets stay with them.",
+        "downloadHint": "Want a copy of your data first? Use Download Data below before deleting.",
+        "acknowledge": "I understand this cannot be undone",
+        "reauthIntro": "To delete your account, confirm it is you by signing in again.",
+        "reauthButton": "Continue with {{provider}}",
+        "reauthUnavailable": "You cannot sign in again with a provider here. Set a password first: choose \"Forgot password?\" on the sign-in page, then come back and delete your account with that password.",
+        "recentSignIn": "You signed in recently, so you can delete your account without signing in again.",
+        "lastAdmin": "You are the only admin of this server, so this account cannot be deleted. Without an admin, nobody could manage the server.",
+        "deleting": "Deleting…",
+        "loadFailed": "Could not load the details of your account. Close this window and try again.",
+        "errors": {
+            "wrongPassword": "That password is not correct.",
+            "sessionExpired": "Your sign-in is too old. Sign in again to continue.",
+            "lastAdmin": "You are the only admin of this server, so this account cannot be deleted.",
+            "rateLimited": "Too many attempts. Wait a few minutes and try again.",
+            "failed": "Something went wrong deleting your account. Try again.",
+            "reauthFailed": "Signing in again did not work. Try again."
+        }
     },
     "settings": {
         "title": "Settings",

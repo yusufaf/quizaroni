@@ -48,7 +48,31 @@
         "title": "Excluir Conta",
         "passwordLabel": "Senha",
         "passwordPlaceholder": "Digite sua senha",
-        "confirmButton": "Excluir Conta"
+        "confirmButton": "Excluir Conta",
+        "intro": "Excluir sua conta é permanente e não pode ser desfeito.",
+        "accountLine": "Isso exclui permanentemente a conta {{email}}.",
+        "studysetsDeleted_one": "{{count}} conjunto de estudo será excluído.",
+        "studysetsDeleted_other": "{{count}} conjuntos de estudo serão excluídos.",
+        "publishedDeleted_one": "{{count}} deles está publicado e vai desaparecer para todos.",
+        "publishedDeleted_other": "{{count}} deles estão publicados e vão desaparecer para todos.",
+        "copiesStay": "As cópias que outras pessoas salvaram dos seus conjuntos publicados continuam com elas.",
+        "downloadHint": "Quer uma cópia dos seus dados antes? Use Baixar Dados abaixo antes de excluir.",
+        "acknowledge": "Entendo que isso não pode ser desfeito",
+        "reauthIntro": "Para excluir sua conta, confirme que é você entrando novamente.",
+        "reauthButton": "Continuar com {{provider}}",
+        "reauthUnavailable": "Aqui você não pode entrar novamente com um provedor. Defina uma senha primeiro: escolha \"Esqueceu a senha?\" na página de login, depois volte e exclua sua conta com essa senha.",
+        "recentSignIn": "Você entrou há pouco tempo, então pode excluir sua conta sem entrar novamente.",
+        "lastAdmin": "Você é o único administrador deste servidor, então esta conta não pode ser excluída. Sem um administrador, ninguém poderia gerenciar o servidor.",
+        "deleting": "Excluindo…",
+        "loadFailed": "Não foi possível carregar os detalhes da sua conta. Feche esta janela e tente novamente.",
+        "errors": {
+            "wrongPassword": "Essa senha não está correta.",
+            "sessionExpired": "Seu login é muito antigo. Entre novamente para continuar.",
+            "lastAdmin": "Você é o único administrador deste servidor, então esta conta não pode ser excluída.",
+            "rateLimited": "Muitas tentativas. Aguarde alguns minutos e tente novamente.",
+            "failed": "Algo deu errado ao excluir sua conta. Tente novamente.",
+            "reauthFailed": "Entrar novamente não funcionou. Tente novamente."
+        }
     },
     "settings": {
         "title": "Configurações",

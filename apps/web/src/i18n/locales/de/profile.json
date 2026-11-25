@@ -48,7 +48,31 @@
         "title": "Konto löschen",
         "passwordLabel": "Passwort",
         "passwordPlaceholder": "Passwort eingeben",
-        "confirmButton": "Konto löschen"
+        "confirmButton": "Konto löschen",
+        "intro": "Das Löschen deines Kontos ist dauerhaft und kann nicht rückgängig gemacht werden.",
+        "accountLine": "Dadurch wird das Konto {{email}} dauerhaft gelöscht.",
+        "studysetsDeleted_one": "{{count}} Lernset wird gelöscht.",
+        "studysetsDeleted_other": "{{count}} Lernsets werden gelöscht.",
+        "publishedDeleted_one": "{{count}} davon ist veröffentlicht und verschwindet für alle.",
+        "publishedDeleted_other": "{{count}} davon sind veröffentlicht und verschwinden für alle.",
+        "copiesStay": "Kopien, die andere von deinen veröffentlichten Sets gespeichert haben, bleiben bei ihnen.",
+        "downloadHint": "Möchtest du vorher eine Kopie deiner Daten? Nutze unten „Daten herunterladen“, bevor du löschst.",
+        "acknowledge": "Ich verstehe, dass dies nicht rückgängig gemacht werden kann",
+        "reauthIntro": "Um dein Konto zu löschen, bestätige durch erneutes Anmelden, dass du es bist.",
+        "reauthButton": "Weiter mit {{provider}}",
+        "reauthUnavailable": "Hier kannst du dich nicht erneut über einen Anbieter anmelden. Lege zuerst ein Passwort fest: Wähle auf der Anmeldeseite „Passwort vergessen?“, komm dann zurück und lösche dein Konto mit diesem Passwort.",
+        "recentSignIn": "Du hast dich kürzlich angemeldet und kannst dein Konto daher ohne erneute Anmeldung löschen.",
+        "lastAdmin": "Du bist der einzige Admin dieses Servers, daher kann dieses Konto nicht gelöscht werden. Ohne Admin könnte niemand den Server verwalten.",
+        "deleting": "Wird gelöscht…",
+        "loadFailed": "Die Kontodetails konnten nicht geladen werden. Schließe dieses Fenster und versuche es erneut.",
+        "errors": {
+            "wrongPassword": "Dieses Passwort ist nicht korrekt.",
+            "sessionExpired": "Deine Anmeldung ist zu alt. Melde dich erneut an, um fortzufahren.",
+            "lastAdmin": "Du bist der einzige Admin dieses Servers, daher kann dieses Konto nicht gelöscht werden.",
+            "rateLimited": "Zu viele Versuche. Warte einige Minuten und versuche es erneut.",
+            "failed": "Beim Löschen deines Kontos ist etwas schiefgelaufen. Versuche es erneut.",
+            "reauthFailed": "Die erneute Anmeldung hat nicht funktioniert. Versuche es erneut."
+        }
     },
     "settings": {
         "title": "Einstellungen",
