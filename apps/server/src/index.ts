@@ -212,6 +212,9 @@ for (const name of scrubAuthEnv(process.env)) {
     );
 }
 
+const files = new FileStore(config.dataDir);
+files.resetStaging();
+
 let server: ReturnType<typeof Bun.serve>;
 
 // Built on the first /api request that needs it: by then the port is bound and
@@ -231,6 +234,7 @@ const auth = lazyAuth(() => {
             secret: authSecret,
             insecureCookies: config.insecureCookies,
             mailer,
+            files,
             social,
             onSignUp: signupNotifyTo
                 ? createSignupNotifier({
@@ -243,9 +247,6 @@ const auth = lazyAuth(() => {
         }),
     };
 });
-
-const files = new FileStore(config.dataDir);
-files.resetStaging();
 
 const app = createApp({
     sqlite,
