@@ -28,13 +28,16 @@ export function newCardFileKey(studysetUUID: string): string {
     return `${studysetUUID}/${crypto.randomUUID()}`;
 }
 
+export const isAvatarUserSegment = (segment: string) =>
+    USER_SEGMENT.test(segment);
+
 export function isAvatarKey(key: unknown): key is string {
     if (typeof key !== 'string') return false;
     const parts = key.split('/');
     return (
         parts.length === 3 &&
         parts[0] === 'avatars' &&
-        USER_SEGMENT.test(parts[1]!) &&
+        isAvatarUserSegment(parts[1]!) &&
         LOWER_UUID.test(parts[2]!)
     );
 }

@@ -16,6 +16,7 @@ export const AUTH_ROUTES = [
     ['POST', '/sign-out'],
     ['POST', '/request-password-reset'],
     ['POST', '/reset-password'],
+    ['POST', '/delete-user'],
 ] as const;
 
 const BODY_LIMIT_BYTES = 16 * 1024;

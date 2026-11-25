@@ -1,4 +1,8 @@
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import type { Db } from '../db';
+import { FileStore } from '../files/store';
 import { type MailTransport, Mailer } from '../mail/mailer';
 import { ensureAuthSecret } from '../settings';
 import { type AuthConfig, type AuthHandle, createAuth, lazyAuth } from './auth';
@@ -12,12 +16,16 @@ export function testAuth(
         publicUrl?: string;
         insecureCookies?: boolean;
         mailer?: Mailer;
+        files?: FileStore;
         social?: SocialConfig;
         onSignUp?: AuthConfig['onSignUp'];
     } = {}
 ): AuthHandle {
     const publicUrl = o.publicUrl ?? 'http://localhost';
     const mailer = o.mailer ?? new Mailer(db, undefined);
+    const files =
+        o.files ??
+        new FileStore(mkdtempSync(join(tmpdir(), 'qz-auth-files-')));
     return lazyAuth(() => ({
         publicUrl,
         auth: createAuth({
@@ -26,6 +34,7 @@ export function testAuth(
             secret: ensureAuthSecret(db),
             insecureCookies: o.insecureCookies ?? false,
             mailer,
+            files,
             social: o.social ?? {},
             onSignUp: o.onSignUp,
         }),

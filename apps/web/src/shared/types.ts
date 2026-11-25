@@ -330,6 +330,16 @@ export type UpdateUsernameRequest = {
     username: string;
 };
 
+export type AccountDeletionInfo = {
+    email: string;
+    reauth: 'password' | 'recent-sign-in';
+    recentSignInSecondsLeft: number;
+    providers: ('google' | 'github')[];
+    lastAdmin: boolean;
+    studysets: number;
+    publishedStudysets: number;
+};
+
 export type UpdateNotificationPreferencesRequest = {
     updates: Partial<NotificationPreferences>;
 };

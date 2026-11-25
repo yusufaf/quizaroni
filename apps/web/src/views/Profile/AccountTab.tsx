@@ -12,7 +12,9 @@ import {
     ActionSubmitButton,
     InfoChangeContainer,
 } from './ProfileStyles';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { isSelfHost } from 'shared/auth/backend';
 import { useAuth } from 'shared/auth/useAuth';
 import { toast } from 'react-toastify';
 import { isValidUsername } from '@quizaroni/shared-types';
@@ -31,10 +33,16 @@ type Props = {
 // now. The username is changed through the API, which writes it to Logto.
 const AccountTab = ({ userData }: Props) => {
     const { t } = useTranslation(['profile', 'common']);
-    const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
+    const [searchParams, setSearchParams] = useSearchParams();
+    // Back from a provider sign-in made to confirm the deletion, reopen it.
+    const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(
+        () => isSelfHost() && searchParams.get('deleteAccount') === '1'
+    );
+    const [reauthFailed] = useState<boolean>(
+        () => showDeleteDialog && searchParams.has('error')
+    );
     const [showDownloadDialog, setShowDownloadDialog] =
         useState<boolean>(false);
-    const [deletePassword, setDeletePassword] = useState<string>('');
     const [enteredNewUsername, setEnteredNewUsername] = useState<string>('');
     const { clearAccessToken } = useAuth();
     const { mutateAsync: updateUsername, isPending } = useUpdateUsername();
@@ -43,9 +51,13 @@ const AccountTab = ({ userData }: Props) => {
     const isUsernameValid = isValidUsername(trimmedUsername);
     const showUsernameRule = trimmedUsername !== '' && !isUsernameValid;
 
-    const handleDeleteAccount = async () => {
-        // TODO
-    };
+    useEffect(() => {
+        const stale = ['deleteAccount', 'error', 'error_description'];
+        if (!stale.some((name) => searchParams.has(name))) return;
+        const rest = new URLSearchParams(searchParams);
+        stale.forEach((name) => rest.delete(name));
+        setSearchParams(rest, { replace: true });
+    }, [searchParams, setSearchParams]);
 
     const handleChangeUsername = async () => {
         try {
@@ -116,34 +128,35 @@ const AccountTab = ({ userData }: Props) => {
                     </ActionSubmitButton>
                 </InfoChangeContainer>
             </ActionSection>
-            <ActionSection>
-                <ActionHeader>
-                    <RemoveCircleOutline />
-                    <Typography variant="h6">
+            {isSelfHost() && (
+                <ActionSection>
+                    <ActionHeader>
+                        <RemoveCircleOutline />
+                        <Typography variant="h6">
+                            {t('account.deleteAccount')}
+                        </Typography>
+                    </ActionHeader>
+                    <ActionSubmitButton
+                        variant="text"
+                        onClick={toggleDeleteDialog}
+                        fullWidth
+                        sx={{
+                            color: '#d32f2f',
+                            backgroundColor: 'rgba(211, 47, 47, 0.08)',
+                            '&:hover': {
+                                backgroundColor: 'rgba(211, 47, 47, 0.16)',
+                            },
+                        }}
+                    >
                         {t('account.deleteAccount')}
-                    </Typography>
-                </ActionHeader>
-                <ActionSubmitButton
-                    variant="text"
-                    onClick={toggleDeleteDialog}
-                    fullWidth
-                    sx={{
-                        color: '#d32f2f',
-                        backgroundColor: 'rgba(211, 47, 47, 0.08)',
-                        '&:hover': {
-                            backgroundColor: 'rgba(211, 47, 47, 0.16)',
-                        },
-                    }}
-                >
-                    {t('account.deleteAccount')}
-                </ActionSubmitButton>
-                <DeleteAccountDialog
-                    open={showDeleteDialog}
-                    handleClose={toggleDeleteDialog}
-                    deletePassword={deletePassword}
-                    setDeletePassword={setDeletePassword}
-                />
-            </ActionSection>
+                    </ActionSubmitButton>
+                    <DeleteAccountDialog
+                        open={showDeleteDialog}
+                        handleClose={toggleDeleteDialog}
+                        reauthFailed={reauthFailed}
+                    />
+                </ActionSection>
+            )}
             <ActionSection>
                 <ActionHeader>
                     <DataUsageRounded />

@@ -94,6 +94,22 @@ test('deleteStudysetFiles removes only the named sets', () => {
     expect(existsSync(store.pathOf(`${OTHER_ID}/${FILE_ID}`)!)).toBe(true);
 });
 
+test('deleteAvatars removes only the named user avatar dir', () => {
+    put(`avatars/u1/${FILE_ID}`);
+    put(`avatars/u2/${FILE_ID}`);
+    store.deleteAvatars('u1');
+    expect(existsSync(join(store.filesDir, 'avatars', 'u1'))).toBe(false);
+    expect(existsSync(store.pathOf(`avatars/u2/${FILE_ID}`)!)).toBe(true);
+});
+
+test('deleteAvatars ignores a user id that is not a path segment', () => {
+    put(`avatars/u1/${FILE_ID}`);
+    store.deleteAvatars('..');
+    store.deleteAvatars('../u1');
+    store.deleteAvatars('');
+    expect(existsSync(store.pathOf(`avatars/u1/${FILE_ID}`)!)).toBe(true);
+});
+
 test('listAvatarKeys lists only well-formed avatar files', () => {
     expect(store.listAvatarKeys('u1')).toEqual([]);
     put(`avatars/u1/${FILE_ID}`);

@@ -48,7 +48,31 @@
         "title": "Supprimer le compte",
         "passwordLabel": "Mot de passe",
         "passwordPlaceholder": "Saisissez votre mot de passe",
-        "confirmButton": "Supprimer le compte"
+        "confirmButton": "Supprimer le compte",
+        "intro": "La suppression de votre compte est définitive et ne peut pas être annulée.",
+        "accountLine": "Cela supprime définitivement le compte {{email}}.",
+        "studysetsDeleted_one": "{{count}} ensemble d’étude sera supprimé.",
+        "studysetsDeleted_other": "{{count}} ensembles d’étude seront supprimés.",
+        "publishedDeleted_one": "{{count}} d’entre eux est publié et disparaîtra pour tout le monde.",
+        "publishedDeleted_other": "{{count}} d’entre eux sont publiés et disparaîtront pour tout le monde.",
+        "copiesStay": "Les copies que d’autres personnes ont enregistrées de vos ensembles publiés leur restent.",
+        "downloadHint": "Vous voulez d’abord une copie de vos données ? Utilisez Télécharger les données ci-dessous avant de supprimer.",
+        "acknowledge": "Je comprends que cette action est irréversible",
+        "reauthIntro": "Pour supprimer votre compte, confirmez que c’est bien vous en vous reconnectant.",
+        "reauthButton": "Continuer avec {{provider}}",
+        "reauthUnavailable": "Vous ne pouvez pas vous reconnecter avec un fournisseur ici. Définissez d’abord un mot de passe : choisissez « Mot de passe oublié ? » sur la page de connexion, puis revenez supprimer votre compte avec ce mot de passe.",
+        "recentSignIn": "Vous vous êtes connecté récemment, vous pouvez donc supprimer votre compte sans vous reconnecter.",
+        "lastAdmin": "Vous êtes le seul administrateur de ce serveur, ce compte ne peut donc pas être supprimé. Sans administrateur, personne ne pourrait gérer le serveur.",
+        "deleting": "Suppression…",
+        "loadFailed": "Impossible de charger les détails de votre compte. Fermez cette fenêtre et réessayez.",
+        "errors": {
+            "wrongPassword": "Ce mot de passe n’est pas correct.",
+            "sessionExpired": "Votre connexion est trop ancienne. Reconnectez-vous pour continuer.",
+            "lastAdmin": "Vous êtes le seul administrateur de ce serveur, ce compte ne peut donc pas être supprimé.",
+            "rateLimited": "Trop de tentatives. Attendez quelques minutes et réessayez.",
+            "failed": "Un problème est survenu lors de la suppression de votre compte. Réessayez.",
+            "reauthFailed": "La reconnexion n’a pas fonctionné. Réessayez."
+        }
     },
     "settings": {
         "title": "Paramètres",

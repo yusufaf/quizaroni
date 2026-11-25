@@ -131,6 +131,15 @@ export const resetPassword = async (input: {
     await authFetch('/reset-password', { method: 'POST', body: input });
 };
 
+export const deleteAccount = async (input: {
+    password?: string;
+}): Promise<void> => {
+    await authFetch('/delete-user', {
+        method: 'POST',
+        body: input.password ? { password: input.password } : {},
+    });
+};
+
 export const SOCIAL_PROVIDERS = ['google', 'github'] as const;
 export type SocialProvider = (typeof SOCIAL_PROVIDERS)[number];
 

@@ -1,16 +1,22 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { APIError, createAuthMiddleware } from 'better-auth/api';
+import {
+    APIError,
+    createAuthMiddleware,
+    getSessionFromCtx,
+} from 'better-auth/api';
 import { and, eq } from 'drizzle-orm';
 import { normalizeEmail, PASSWORD_MAX, PASSWORD_MIN } from '../config';
 import type { Db } from '../db';
 import { sanitizeLogArg } from '../db/errors';
 import { account, session, user, verification } from '../db/schema';
+import type { FileStore } from '../files/store';
 import { claimInvite, findUsableInvite } from '../invites/invites';
 import type { Mailer } from '../mail/mailer';
 import { passwordResetMessage } from '../mail/messages';
 import type { SignupEvent, SignupMethod } from '../mail/signup-notice';
 import { getSetting, SETTING } from '../settings';
+import { deleteAccountData, hasPassword } from '../users/delete-account';
 import { displayName, NAME_MAX } from './display-name';
 import type { SocialConfig } from './social-config';
 
@@ -26,10 +32,15 @@ export const RATE_LIMITS = {
     resetPassword: { window: 600, max: 10 },
     socialSignIn: { window: 60, max: 10 },
     socialCallback: { window: 60, max: 30 },
+    deleteUser: { window: 600, max: 10 },
 };
+// How recently a user without a password must have signed in to delete their
+// account; it is also Better Auth's freshAge, which /delete-user checks.
+export const RECENT_SIGN_IN_SECONDS = 10 * 60;
 export const RESET_TOKEN_TTL_SECONDS = 3600;
 const SIGN_UP_PATH = '/sign-up/email';
 const SOCIAL_SIGN_IN_PATH = '/sign-in/social';
+const DELETE_USER_PATH = '/delete-user';
 // Hooks see the route template, with the provider in ctx.params.id.
 const SOCIAL_CALLBACK_PATH = '/callback/:id';
 // Body fields of /sign-in/social that would let a caller pick scopes, skip the
@@ -93,6 +104,7 @@ export type AuthConfig = {
     secret: string;
     insecureCookies: boolean;
     mailer: Mailer;
+    files: FileStore;
     social: SocialConfig;
     onSignUp?: (event: SignupEvent) => void;
 };
@@ -132,10 +144,48 @@ function rejectSocialOverrides(body: unknown): void {
     }
 }
 
+// Fails closed: with no session of its own to check, the gate refuses rather
+// than leaving the password rule to an endpoint that could be skipped.
+async function gateDeleteUser(
+    db: Db,
+    ctx: Parameters<typeof getSessionFromCtx>[0]
+): Promise<void> {
+    const body = ctx.body;
+    const sent = (field: string) =>
+        typeof body === 'object' && body !== null && Object.hasOwn(body, field);
+    if (sent('token') || sent('callbackURL')) {
+        throw APIError.from('BAD_REQUEST', {
+            code: 'INVALID_DELETE_REQUEST',
+            message: 'This delete request is not allowed.',
+        });
+    }
+    const current = await getSessionFromCtx(ctx);
+    if (!current) {
+        throw APIError.from('UNAUTHORIZED', {
+            code: 'UNAUTHORIZED',
+            message: 'Sign in to delete your account.',
+        });
+    }
+    const password = (body as { password?: unknown } | undefined)?.password;
+    if (
+        hasPassword(db, current.user.id) &&
+        !(typeof password === 'string' && password !== '')
+    ) {
+        throw APIError.from('BAD_REQUEST', {
+            code: 'PASSWORD_REQUIRED',
+            message: 'Enter your password to delete your account.',
+        });
+    }
+}
+
 function authGate(db: Db) {
     return createAuthMiddleware(async (ctx) => {
         if (ctx.path === SOCIAL_SIGN_IN_PATH) {
             rejectSocialOverrides(ctx.body);
+            return;
+        }
+        if (ctx.path === DELETE_USER_PATH) {
+            await gateDeleteUser(db, ctx);
             return;
         }
         if (ctx.path !== SIGN_UP_PATH) return;
@@ -293,7 +343,28 @@ export function createAuth(cfg: AuthConfig) {
             },
         },
         verification: { storeIdentifier: 'hashed' },
+        session: { freshAge: RECENT_SIGN_IN_SECONDS },
         user: {
+            deleteUser: {
+                enabled: true,
+                // The real delete happens here, in one transaction with the
+                // last-admin check; Better Auth's own deletes then find
+                // nothing left to remove.
+                beforeDelete: async (u) => {
+                    const result = deleteAccountData(cfg.db, u.id);
+                    if (result.status === 'last_admin') {
+                        throw APIError.from('FORBIDDEN', {
+                            code: 'LAST_ADMIN',
+                            message:
+                                'You are the only admin of this server, so this account cannot be deleted.',
+                        });
+                    }
+                    if (result.status === 'deleted') {
+                        cfg.files.deleteStudysetFiles(result.studysetIds);
+                        cfg.files.deleteAvatars(u.id);
+                    }
+                },
+            },
             additionalFields: {
                 role: {
                     type: 'string',
@@ -390,6 +461,7 @@ export function createAuth(cfg: AuthConfig) {
                 '/reset-password': RATE_LIMITS.resetPassword,
                 '/sign-in/social': RATE_LIMITS.socialSignIn,
                 '/callback/*': RATE_LIMITS.socialCallback,
+                '/delete-user': RATE_LIMITS.deleteUser,
             },
         },
         hooks: { before: authGate(cfg.db) },

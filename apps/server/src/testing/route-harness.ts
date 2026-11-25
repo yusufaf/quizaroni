@@ -77,7 +77,11 @@ export async function createRouteHarness(
         web: diskWebAssets(webDir),
         version: '0.0.0-test',
         setup: new SetupGate(opened.db, undefined),
-        auth: testAuth(opened.db, { publicUrl: PUBLIC_URL, mailer }),
+        auth: testAuth(opened.db, {
+            publicUrl: PUBLIC_URL,
+            mailer,
+            files,
+        }),
         trustProxy: false,
         mailer,
         ai: o.ai ?? { enabled: true, fetch: refuseFetch },

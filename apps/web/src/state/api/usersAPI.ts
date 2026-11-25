@@ -6,15 +6,18 @@ import {
 } from '@tanstack/react-query';
 import { BASE_API_URL, fetchJson, getCommonPostRequestProps } from './awsAPI';
 import { isSelfHost } from 'shared/auth/backend';
+import { SOCIAL_PROVIDERS } from 'shared/auth/session/sessionClient';
 import { downloadObjectAsJSON } from 'shared/utilities/general';
 import { validate } from 'shared/validation';
 import {
+    AccountDeletionInfoSchema,
     BaseResponseSchema,
     GetUserResponseSchema,
     UpdateUsernameResponseSchema,
     UploadProfilePictureResponseSchema,
 } from 'shared/schemas';
 import {
+    AccountDeletionInfo,
     DownloadUserDataRequest,
     GetUserRequest,
     GetUserResponse,
@@ -49,6 +52,39 @@ export const useGetUser = (
         ...options,
     });
 };
+
+export const ACCOUNT_DELETION_KEY = ['user', 'account-deletion'];
+
+// What deleting the signed-in account would remove and how it must be
+// confirmed. Never cached: the time left on a recent sign-in goes stale.
+export const useAccountDeletionInfo = (enabled: boolean) =>
+    useQuery({
+        queryKey: ACCOUNT_DELETION_KEY,
+        queryFn: async (): Promise<AccountDeletionInfo> => {
+            const data = await fetchJson(
+                `${BASE_API_URL}/users/account-deletion`,
+                { credentials: 'same-origin' }
+            );
+            const parsed = validate({
+                schema: AccountDeletionInfoSchema,
+                data,
+                type: 'response',
+                context: 'AccountDeletionInfo',
+                reThrow: true,
+            });
+            return {
+                ...parsed,
+                providers: SOCIAL_PROVIDERS.filter((id) =>
+                    parsed.providers.includes(id)
+                ),
+            };
+        },
+        enabled: enabled && isSelfHost(),
+        retry: false,
+        staleTime: 0,
+        gcTime: 0,
+        refetchOnWindowFocus: false,
+    });
 
 export const useUpdateUserMetadata = () => {
     const queryClient = useQueryClient();

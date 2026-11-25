@@ -98,10 +98,11 @@ async function harness(
                   publicUrl: PUBLIC_URL,
                   db: opened.db,
               });
+    const files = new FileStore(join(root, 'data'));
     const app = createApp({
         sqlite: opened.sqlite,
         db: opened.db,
-        files: new FileStore(join(root, 'data')),
+        files,
         web: diskWebAssets(webDir),
         version: '0.0.0-test',
         setup: new SetupGate(opened.db, setUp ? undefined : 'token'),
@@ -109,6 +110,7 @@ async function harness(
             publicUrl: PUBLIC_URL,
             social,
             mailer,
+            files,
             onSignUp,
         }),
         trustProxy: false,

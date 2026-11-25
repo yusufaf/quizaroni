@@ -515,6 +515,18 @@ export const OutboxResponseSchema = z.object({
 export const AIStatusResponseSchema = z.object({ enabled: z.boolean() });
 // #endregion
 
+// #region Self-host Account Deletion Schemas
+export const AccountDeletionInfoSchema = z.object({
+    email: z.string(),
+    reauth: z.enum(['password', 'recent-sign-in']),
+    recentSignInSecondsLeft: z.number(),
+    providers: z.array(z.string()),
+    lastAdmin: z.boolean(),
+    studysets: z.number(),
+    publishedStudysets: z.number(),
+});
+// #endregion
+
 // #region Self-host Sign-in Schemas
 export const AuthProvidersResponseSchema = z.object({
     providers: z.array(z.string()),

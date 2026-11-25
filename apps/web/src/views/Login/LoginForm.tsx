@@ -4,6 +4,7 @@ import {
     Navigate,
     useLocation,
     useNavigate,
+    useSearchParams,
 } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -31,6 +32,7 @@ const LoginForm = () => {
     const { isAuthenticated, signIn } = useSession();
     const location = useLocation();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [pending, setPending] = useState(false);
@@ -64,6 +66,11 @@ const LoginForm = () => {
                     {location.state?.notice === 'passwordReset' && (
                         <Alert severity="success" role="status" sx={{ mt: 2 }}>
                             {t('login.passwordResetNotice')}
+                        </Alert>
+                    )}
+                    {searchParams.get('accountDeleted') === '1' && (
+                        <Alert severity="success" role="status" sx={{ mt: 2 }}>
+                            {t('login.accountDeletedNotice')}
                         </Alert>
                     )}
                     {error && (

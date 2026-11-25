@@ -1,12 +1,13 @@
 import { isValidUsername } from '@quizaroni/shared-types';
 import { type Context, Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
-import type { AuthHandle } from '../auth/auth';
+import { type AuthHandle, RECENT_SIGN_IN_SECONDS } from '../auth/auth';
 import type { Db } from '../db';
 import { uploadAvatar } from '../files/avatars';
 import type { FileStore } from '../files/store';
 import { INVALID_JSON, readJsonBody } from '../http/json-body';
 import { noStore, requireSession, type SessionEnv } from '../http/session';
+import { accountDeletionSummary } from './delete-account';
 import {
     parseMetadataUpdates,
     parseNotificationUpdates,
@@ -179,6 +180,28 @@ export function userRoutes(deps: {
             if (err instanceof MetadataTooLargeError) return tooLarge(c);
             throw err;
         }
+    });
+
+    routes.get('/account-deletion', async (c) => {
+        const found = await deps.auth().auth.api.getSession({
+            headers: c.req.raw.headers,
+        });
+        if (!found) return c.json({ message: 'Unauthorized' }, 401);
+        const { hasPassword, ...summary } = accountDeletionSummary(
+            db,
+            found.user.id
+        );
+        const ageSeconds = Math.floor(
+            (Date.now() - found.session.createdAt.getTime()) / 1000
+        );
+        return c.json({
+            email: found.user.email,
+            reauth: hasPassword ? 'password' : 'recent-sign-in',
+            recentSignInSecondsLeft: hasPassword
+                ? 0
+                : Math.max(0, RECENT_SIGN_IN_SECONDS - ageSeconds),
+            ...summary,
+        });
     });
 
     routes.post('/download-user-data', async (c) => {
