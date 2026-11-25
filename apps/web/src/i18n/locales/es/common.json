@@ -219,7 +219,8 @@
         "generic": "Algo salió mal",
         "notFound": "No encontrado",
         "unauthorized": "No autorizado",
-        "saveFailed": "No se pudieron guardar los cambios. Inténtalo de nuevo."
+        "saveFailed": "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+        "createFailed": "No se pudo crear el set de estudio. Inténtalo de nuevo."
     },
     "imageGallery": {
         "uploaded": "Subido el {{date}}"

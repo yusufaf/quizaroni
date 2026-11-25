@@ -219,7 +219,8 @@
         "generic": "Algo deu errado",
         "notFound": "Não encontrado",
         "unauthorized": "Não autorizado",
-        "saveFailed": "Não foi possível salvar suas alterações. Tente novamente."
+        "saveFailed": "Não foi possível salvar suas alterações. Tente novamente.",
+        "createFailed": "Não foi possível criar o conjunto de estudo. Tente novamente."
     },
     "imageGallery": {
         "uploaded": "Enviado em {{date}}"

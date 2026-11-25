@@ -219,7 +219,8 @@
         "generic": "Une erreur s'est produite",
         "notFound": "Introuvable",
         "unauthorized": "Non autorisé",
-        "saveFailed": "Impossible d'enregistrer vos modifications. Veuillez réessayer."
+        "saveFailed": "Impossible d'enregistrer vos modifications. Veuillez réessayer.",
+        "createFailed": "Impossible de créer la liste d'étude. Veuillez réessayer."
     },
     "imageGallery": {
         "uploaded": "Importée le {{date}}"

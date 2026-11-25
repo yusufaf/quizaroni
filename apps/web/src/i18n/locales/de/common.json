@@ -219,7 +219,8 @@
         "generic": "Etwas ist schiefgelaufen",
         "notFound": "Nicht gefunden",
         "unauthorized": "Nicht autorisiert",
-        "saveFailed": "Änderungen konnten nicht gespeichert werden. Bitte versuche es erneut."
+        "saveFailed": "Änderungen konnten nicht gespeichert werden. Bitte versuche es erneut.",
+        "createFailed": "Lernset konnte nicht erstellt werden. Bitte versuche es erneut."
     },
     "imageGallery": {
         "uploaded": "Hochgeladen am {{date}}"

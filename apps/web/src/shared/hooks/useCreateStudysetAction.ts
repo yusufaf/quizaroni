@@ -1,5 +1,7 @@
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { LOADING_ACTIONS } from 'shared/constants';
 import { useCreateStudyset } from 'state/api/studysetsAPI';
 import { useGlobalStore } from 'state/stores/global';
@@ -15,6 +17,7 @@ type Options = {
  * bookkeeping lives in exactly one place.
  */
 export const useCreateStudysetAction = ({ onStart }: Options = {}) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const setLoadingAdd = useGlobalStore((state) => state.setLoadingAdd);
     const setLoadingRemove = useGlobalStore((state) => state.setLoadingRemove);
@@ -28,10 +31,14 @@ export const useCreateStudysetAction = ({ onStart }: Options = {}) => {
             void navigate(`/edit/${studyset.studysetUUID}`);
         } catch (error) {
             console.error('Error creating studyset:', error);
+            toast.error(t('errors.createFailed'), {
+                position: toast.POSITION.BOTTOM_LEFT,
+                toastId: 'createStudyset:failed',
+            });
         } finally {
             setLoadingRemove(LOADING_ACTIONS.CREATE_STUDYSET);
         }
-    }, [createStudyset, navigate, onStart, setLoadingAdd, setLoadingRemove]);
+    }, [createStudyset, navigate, onStart, setLoadingAdd, setLoadingRemove, t]);
 
     return { createAndOpen, isPending };
 };

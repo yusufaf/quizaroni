@@ -219,7 +219,8 @@
         "generic": "問題が発生しました",
         "notFound": "見つかりません",
         "unauthorized": "権限がありません",
-        "saveFailed": "変更を保存できませんでした。もう一度お試しください。"
+        "saveFailed": "変更を保存できませんでした。もう一度お試しください。",
+        "createFailed": "学習セットを作成できませんでした。もう一度お試しください。"
     },
     "imageGallery": {
         "uploaded": "{{date}}にアップロード"

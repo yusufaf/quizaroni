@@ -219,7 +219,8 @@
         "generic": "Something went wrong",
         "notFound": "Not found",
         "unauthorized": "Unauthorized",
-        "saveFailed": "Couldn't save your changes. Please try again."
+        "saveFailed": "Couldn't save your changes. Please try again.",
+        "createFailed": "Couldn't create a study set. Please try again."
     },
     "imageGallery": {
         "uploaded": "Uploaded {{date}}"
