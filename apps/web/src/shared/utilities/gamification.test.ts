@@ -402,13 +402,21 @@ describe('migrateUtcDayKey east of UTC', () => {
 
     it('reads a key without a timestamp as the next local day', () => {
         expect(
-            migrateUtcDayKey('2026-06-04', undefined, at('2026-06-10T03:00:00Z'))
+            migrateUtcDayKey(
+                '2026-06-04',
+                undefined,
+                at('2026-06-10T03:00:00Z')
+            )
         ).toBe('2026-06-05');
     });
 
     it('never moves a key past today', () => {
         expect(
-            migrateUtcDayKey('2026-06-05', undefined, at('2026-06-05T11:00:00Z'))
+            migrateUtcDayKey(
+                '2026-06-05',
+                undefined,
+                at('2026-06-05T11:00:00Z')
+            )
         ).toBe('2026-06-05');
     });
 
@@ -500,13 +508,21 @@ describe('migrateUtcDayKey west of UTC', () => {
 
     it('keeps a key without a timestamp', () => {
         expect(
-            migrateUtcDayKey('2026-06-04', undefined, at('2026-06-10T03:00:00Z'))
+            migrateUtcDayKey(
+                '2026-06-04',
+                undefined,
+                at('2026-06-10T03:00:00Z')
+            )
         ).toBe('2026-06-04');
     });
 
     it('never moves a key past today', () => {
         expect(
-            migrateUtcDayKey('2026-06-05', undefined, at('2026-06-05T01:00:00Z'))
+            migrateUtcDayKey(
+                '2026-06-05',
+                undefined,
+                at('2026-06-05T01:00:00Z')
+            )
         ).toBe('2026-06-04');
     });
 
