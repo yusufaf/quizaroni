@@ -23,6 +23,7 @@ import {
     pushGamificationToServer,
 } from 'state/local/sync/gamificationSync';
 import type { User } from 'shared/types';
+import { randomUUID } from 'shared/utilities/uuid';
 
 type GamificationStore = {
     state: GamificationState;
@@ -247,7 +248,7 @@ export const useGamificationStore = create<GamificationStore>()(
             addCustomAchievement: (achievement) => {
                 const newAchievement: CustomAchievement = {
                     ...achievement,
-                    id: crypto.randomUUID(),
+                    id: randomUUID(),
                     createdAt: new Date().toISOString(),
                 };
                 set((prev) => ({

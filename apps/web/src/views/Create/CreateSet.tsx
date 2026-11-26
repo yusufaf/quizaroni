@@ -48,6 +48,7 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useTranslation } from 'react-i18next';
+import { randomUUID } from 'shared/utilities/uuid';
 
 type Props = {};
 const CreateSet = (props: Props) => {
@@ -96,7 +97,7 @@ const CreateSet = (props: Props) => {
     const [description, setDescription] = useState<string>('');
     const [selectedLabels, setSelectedLabels] = useState<string[]>([]);
     const [createdSetCards, setCreatedSetCards] = useState<Card[]>([
-        { ...EMPTY_CARD, cardUUID: crypto.randomUUID() },
+        { ...EMPTY_CARD, cardUUID: randomUUID() },
     ]);
     const [actionsStack, setActionsStack] = useState<any[]>([]);
 

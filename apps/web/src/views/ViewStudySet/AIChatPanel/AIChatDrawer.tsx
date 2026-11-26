@@ -17,6 +17,7 @@ import AIChatHeader from './AIChatHeader';
 import AIChatMessages from './AIChatMessages';
 import AIChatInput from './AIChatInput';
 import AIChatSetupBanner from './AIChatSetupBanner';
+import { randomUUID } from 'shared/utilities/uuid';
 
 type Props = {
     selectedStudyset: Studyset;
@@ -71,7 +72,7 @@ const AIChatDrawer = ({ selectedStudyset }: Props) => {
             }
 
             const newUserMessage = {
-                id: crypto.randomUUID(),
+                id: randomUUID(),
                 role: 'user' as const,
                 content,
                 timestamp: new Date().toISOString(),
@@ -112,7 +113,7 @@ const AIChatDrawer = ({ selectedStudyset }: Props) => {
                                 ? parseSuggestedCards(finalContent)
                                 : undefined;
                         store.addMessage({
-                            id: crypto.randomUUID(),
+                            id: randomUUID(),
                             role: 'assistant',
                             content: finalContent,
                             timestamp: new Date().toISOString(),

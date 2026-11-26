@@ -29,6 +29,25 @@ export default defineConfig({
                 },
             ],
         },
+        overrides: [
+            {
+                // crypto.randomUUID only exists in a secure context, so a
+                // plain-HTTP self-host can't boot when the web calls it (#381).
+                files: ['apps/web/src/**'],
+                excludeFiles: ['apps/web/src/shared/utilities/uuid.ts'],
+                rules: {
+                    'no-restricted-properties': [
+                        'error',
+                        {
+                            object: 'crypto',
+                            property: 'randomUUID',
+                            message:
+                                "Use randomUUID() from 'shared/utilities/uuid'; crypto.randomUUID is missing on plain-HTTP origins (#381).",
+                        },
+                    ],
+                },
+            },
+        ],
     },
     fmt: {
         trailingComma: 'es5',

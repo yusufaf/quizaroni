@@ -1,6 +1,7 @@
 import type { TODO, Card, CardFileMetadata, UUID } from 'shared/types';
 import { EMPTY_CARD } from '../constants';
 import { Dispatch, SetStateAction } from 'react';
+import { randomUUID } from './uuid';
 
 type CommonCardUtility = {
     createdSetCards: TODO[];
@@ -17,7 +18,7 @@ type ActionsStackBaseProps = {
 };
 
 export const generateEmptyCard = (): Card => {
-    return { ...EMPTY_CARD, cardUUID: crypto.randomUUID() };
+    return { ...EMPTY_CARD, cardUUID: randomUUID() };
 };
 
 type DeleteCardParams = ActionsStackBaseProps & CardUtilityWithIndex;
@@ -64,7 +65,7 @@ export const addCreateCardInput = ({
     EMPTY_CARD,
     setStateCallback,
 }: AddCreateCardInputParams): void => {
-    const newEmptyCard = { ...EMPTY_CARD, cardUUID: crypto.randomUUID() };
+    const newEmptyCard = { ...EMPTY_CARD, cardUUID: randomUUID() };
     setStateCallback(createdSetCards.concat(newEmptyCard));
 };
 
@@ -79,7 +80,7 @@ export const duplicateCard = ({
 }: DuplicateCardParams): void => {
     const duplicateCard = {
         ...createdSetCards[index],
-        cardUUID: crypto.randomUUID(),
+        cardUUID: randomUUID(),
     };
     setStateCallback([...createdSetCards].concat(duplicateCard));
 };
