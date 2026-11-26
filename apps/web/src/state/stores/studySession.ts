@@ -15,6 +15,7 @@ import {
 } from 'shared/utilities/srs';
 import { cardProgressRepository } from 'state/local/repositories';
 import { useGamificationStore } from './gamification';
+import { randomUUID } from 'shared/utilities/uuid';
 
 type StudySessionStore = {
     // Active session
@@ -91,7 +92,7 @@ export const useStudySessionStore = create<StudySessionStore>()(
                         : 0;
 
                 let result: StudySessionResult = {
-                    sessionUUID: crypto.randomUUID(),
+                    sessionUUID: randomUUID(),
                     studysetUUID: session.studysetUUID,
                     mode: session.mode,
                     totalCards: session.cards.length,

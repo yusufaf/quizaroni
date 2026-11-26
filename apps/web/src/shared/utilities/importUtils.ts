@@ -1,5 +1,6 @@
 import { Card } from 'shared/types';
 import { EMPTY_CARD } from 'constants/index';
+import { randomUUID } from './uuid';
 
 /**
  * Parses JSON string and returns parsed object or null on error
@@ -72,7 +73,7 @@ export const validateAndNormalizeCard = (rawCard: any): Card | null => {
     const normalized: Card = {
         term: rawCard.term.trim(),
         definition: rawCard.definition.trim(),
-        cardUUID: rawCard.cardUUID || crypto.randomUUID(),
+        cardUUID: rawCard.cardUUID || randomUUID(),
         categories: Array.isArray(rawCard.categories)
             ? rawCard.categories.filter((cat: any) => typeof cat === 'string')
             : [],
@@ -277,7 +278,7 @@ const parseMarkdownCardBlocks = (
                 definition,
                 notes: noteLines.map((text) => ({
                     text,
-                    noteUUID: crypto.randomUUID(),
+                    noteUUID: randomUUID(),
                 })),
             });
             if (normalized) {

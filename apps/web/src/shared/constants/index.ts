@@ -5,6 +5,7 @@ import type {
     SortDirection,
     User,
 } from 'shared/types';
+import { randomUUID } from '../utilities/uuid';
 
 // Canonical URLs always name the custom domain, whichever host served the
 // page. Mirrors SITE_ORIGIN in netlify/lib/site.ts.
@@ -68,7 +69,7 @@ export const EMPTY_CARD: Card = {
     important: false,
     notes: [],
     term: '',
-    cardUUID: crypto.randomUUID(),
+    cardUUID: randomUUID(),
 };
 
 export const VIEW_SET = {

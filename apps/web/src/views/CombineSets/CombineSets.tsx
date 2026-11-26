@@ -26,6 +26,7 @@ import {
 } from './styles';
 import useBrowserTitle from 'hooks/useBrowserTitle';
 import { BoldTypography, SpacedFlexContainer } from 'styles/AppStyles';
+import { randomUUID } from 'shared/utilities/uuid';
 
 const CombineSets = () => {
     const { id: baseSetUUID = '' } = useParams();
@@ -96,7 +97,7 @@ const CombineSets = () => {
         if (combinedSets.length < 2) return;
         setIsCombining(true);
         try {
-            const newUUID = crypto.randomUUID();
+            const newUUID = randomUUID();
 
             let allCards: any[] = [];
             combinedSets.forEach((set) => {
@@ -118,7 +119,7 @@ const CombineSets = () => {
                     ...rest,
                     categories: keepCategories ? categories || [] : [],
                     important: keepImportant ? important || false : false,
-                    cardUUID: crypto.randomUUID(),
+                    cardUUID: randomUUID(),
                     studysetUUID: newUUID,
                 };
             });

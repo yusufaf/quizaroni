@@ -113,10 +113,11 @@ Use repositories for direct database operations:
 
 ```tsx
 import { studysetRepository, userRepository } from 'state/local';
+import { randomUUID } from 'shared/utilities/uuid';
 
 // Create studyset locally
 const newStudyset = await studysetRepository.create({
-    studysetUUID: crypto.randomUUID(),
+    studysetUUID: randomUUID(),
     title: 'My Studyset',
     // ... other fields
 });
