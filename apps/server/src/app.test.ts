@@ -5,6 +5,7 @@ import {
     existsSync,
     mkdirSync,
     mkdtempSync,
+    readFileSync,
     rmSync,
     writeFileSync,
 } from 'node:fs';
@@ -223,6 +224,52 @@ describe('web app', () => {
         }).request('/explore');
         expect(res.status).toBe(503);
     });
+});
+
+describe('SPA routes', () => {
+    const webSource = (p: string) =>
+        readFileSync(new URL(`../../web/src/${p}`, import.meta.url), 'utf8');
+
+    // Read as text: importing the web modules would pull its path aliases into bun.
+    const appRoutes = [
+        ...webSource('AppRoutes.tsx').matchAll(
+            /\bpath(?:=|:\s*)["']([^"']+)["']/g
+        ),
+    ]
+        .map((m) => m[1]!)
+        .filter((path) => path !== '*');
+
+    const routesBlock =
+        webSource('shared/constants/index.ts').match(
+            /export const ROUTES = \{([^}]*)\}/
+        )?.[1] ?? '';
+    const linkRoutes = [...routesBlock.matchAll(/["']([^"']+)["']/g)].map(
+        (m) => m[1]!
+    );
+
+    const samplePath = (path: string) =>
+        path.replace(/:[^/]+/g, '00000000-0000-4000-8000-000000000000');
+
+    test('finds the routes in AppRoutes.tsx', () => {
+        expect(appRoutes).toEqual(
+            expect.arrayContaining([
+                '/login',
+                '/view/:id',
+                '/study/:studysetId/:mode',
+                '/admin',
+            ])
+        );
+        expect(linkRoutes.length).toBeGreaterThan(0);
+    });
+
+    test.each([...new Set([...appRoutes, ...linkRoutes])])(
+        'GET %s serves the app shell',
+        async (route) => {
+            const res = await app.request(samplePath(route));
+            expect(res.status).toBe(200);
+            expect(res.headers.get('content-type')).toContain('text/html');
+        }
+    );
 });
 
 describe('embedded web app', () => {
