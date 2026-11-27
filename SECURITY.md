@@ -15,5 +15,5 @@ reproduce and the impact you've identified.
 
 This repository must never contain real secrets (API keys, client secrets,
 tokens). All credentials are supplied via untracked `.env` files — see the
-`.env.example` files in `apps/web` and `apps/api`. If you find a committed
+`.env.example` files in `apps/web` and `deploy/hosted`. If you find a committed
 secret, report it as above.
