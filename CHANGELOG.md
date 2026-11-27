@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.4](https://github.com/yusufaf/quizaroni/compare/v0.6.3...v0.6.4) (2026-11-27)
+
+
+### Bug Fixes
+
+* **web:** fall back when crypto.randomUUID is missing on plain HTTP ([#383](https://github.com/yusufaf/quizaroni/issues/383)) ([50582c2](https://github.com/yusufaf/quizaroni/commit/50582c2240241ca7cbc3cb8548e7ec744b32d168))
+* **web:** surface failed study set creates and combine in one request ([#379](https://github.com/yusufaf/quizaroni/issues/379)) ([5c26440](https://github.com/yusufaf/quizaroni/commit/5c264400a995e78b917f0f9442fc7e34a6f75ba3))
+
 ## [0.6.3](https://github.com/yusufaf/quizaroni/compare/v0.6.2...v0.6.3) (2026-11-25)
 
 
