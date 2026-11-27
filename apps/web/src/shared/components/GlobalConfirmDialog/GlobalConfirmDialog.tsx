@@ -22,7 +22,6 @@ import { useNavigate } from 'react-router-dom';
 
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import { useTranslation } from 'react-i18next';
-import { randomUUID } from 'shared/utilities/uuid';
 
 type Props = {};
 const ConfirmDialog = (props: Props) => {
@@ -124,9 +123,9 @@ const ConfirmDialog = (props: Props) => {
                     <DialogContentText>
                         <ul>
                             {dialogProps?.props?.messages?.map(
-                                (message: string) => {
+                                (message: string, index: number) => {
                                     return (
-                                        <li key={randomUUID()}>{message}</li>
+                                        <li key={`${index}-${message}`}>{message}</li>
                                     );
                                 }
                             )}
