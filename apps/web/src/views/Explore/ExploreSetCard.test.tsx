@@ -86,6 +86,14 @@ describe('ExploreSetCard', () => {
         ).toBe(`/view/${UUID}`);
     });
 
+    it("keeps the title as the card's first link", () => {
+        renderCard();
+        // Load more focuses a card's first link, which must stay the title.
+        expect(screen.getAllByRole('link')[0]?.getAttribute('href')).toBe(
+            `/view/${UUID}`
+        );
+    });
+
     it('shows the subject eyebrow, and other for a retired subject', () => {
         const { unmount } = renderCard();
         expect(screen.getByText('common:subjects.math')).toBeTruthy();
