@@ -82,7 +82,7 @@ export const useAccountDeletionInfo = (enabled: boolean) =>
                 ),
             };
         },
-        enabled: enabled,
+        enabled,
         retry: false,
         staleTime: 0,
         gcTime: 0,
