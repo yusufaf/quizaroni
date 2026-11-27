@@ -9,13 +9,6 @@
 		reverse_proxy https://analytics.yusufaf.dev
 	}
 
-	# Images built before #270 still load /s.js and post to /api/e. Remove
-	# once the host runs a release built with /q.
-	@umami_legacy path /s.js /api/e
-	handle @umami_legacy {
-		reverse_proxy https://analytics.yusufaf.dev
-	}
-
 	handle {
 		reverse_proxy quizaroni:8080
 	}
