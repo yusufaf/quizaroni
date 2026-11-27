@@ -41,16 +41,20 @@ jobs:
         with:
           bun-version: 1.4.4
       - run: pnpm install --frozen-lockfile
-      # The hosted instance's Umami values (#301). Caddy proxies /s.js and
-      # /api/e to Umami, see deploy/hosted/Caddyfile.
+      # The hosted instance's Umami values (#301). Caddy proxies /q/s.js and
+      # /q/api/e to Umami under /q, off the server's /api (#270), see
+      # deploy/hosted/Caddyfile.
       - name: Build the Linux binaries with analytics
         run: pnpm build:binary --targets linux-x64,linux-arm64
         env:
           VITE_UMAMI_WEBSITE_ID: 883ce165-bace-46c2-93df-994219b0f916
-          VITE_UMAMI_SRC: /s.js
-          VITE_UMAMI_HOST_URL: /
+          VITE_UMAMI_SRC: /q/s.js
+          VITE_UMAMI_HOST_URL: /q
       - name: Check the Umami tag is in the build
-        run: grep -F 'data-website-id="883ce165-bace-46c2-93df-994219b0f916"' apps/web/dist/index.html
+        run: |
+          grep -F 'data-website-id="883ce165-bace-46c2-93df-994219b0f916"' apps/web/dist/index.html
+          grep -F 'src="/q/s.js"' apps/web/dist/index.html
+          grep -F 'data-host-url="/q"' apps/web/dist/index.html
       # A throwaway admin completes setup on boot; without one, / redirects to
       # the server-rendered /setup page, which has no Umami tag.
       - name: Smoke-test the image

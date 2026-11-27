@@ -10,8 +10,8 @@ const hostedTag = {
     injectTo: 'head',
     attrs: {
         defer: true,
-        src: '/s.js',
-        'data-host-url': '/',
+        src: '/q/s.js',
+        'data-host-url': '/q',
         'data-website-id': HOSTED_ID,
     },
 };
@@ -31,8 +31,8 @@ describe('umamiScriptTag', () => {
         expect(
             umamiScriptTag({
                 VITE_UMAMI_WEBSITE_ID: HOSTED_ID,
-                VITE_UMAMI_SRC: '/s.js',
-                VITE_UMAMI_HOST_URL: '/',
+                VITE_UMAMI_SRC: '/q/s.js',
+                VITE_UMAMI_HOST_URL: '/q',
             })
         ).toEqual(hostedTag);
     });
