@@ -10,7 +10,6 @@ import { StyledDialogActions } from 'styles/AppStyles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import { DeleteDialogContent } from './ProfileStyles';
 import { useDownloadUserData } from 'state/api/usersAPI';
-import { isSelfHost } from 'shared/auth/backend';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 
@@ -24,11 +23,8 @@ const DownloadDataDialog = ({ open, handleClose }: Props) => {
     const [includeStudysets, setIncludeStudysets] = useState(false);
 
     const { mutateAsync, isPending } = useDownloadUserData();
-    const selfHost = isSelfHost();
 
-    // Only the self-host server builds an export; the AWS button stays inert.
     const handleDownloadData = async () => {
-        if (!selfHost) return;
         try {
             await mutateAsync({ includeStudysets });
             handleClose();

@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import type { ExploreSort, SubjectId } from '@quizaroni/shared-types';
-import { BASE_API_URL, fetchJson } from './awsAPI';
+import { BASE_API_URL, fetchJson } from './apiClient';
 import { validate } from 'shared/validation';
 import { ExploreFeedResponseSchema } from 'shared/schemas';
 

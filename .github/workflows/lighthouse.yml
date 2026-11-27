@@ -1,16 +1,12 @@
-# Lighthouse against the live site, after each web deploy and weekly.
-# It audits a URL rather than a build, so it doesn't care where the site is
-# hosted. A host move touches: the new host's commit-SHA variable in
-# apps/web/vite.config.ts, the push paths below (match what the host
-# rebuilds on), and SITE here plus the blocked hosts in lighthouserc.json if
-# the domain changes.
+# Lighthouse against the live site, after each release reaches the host and
+# weekly. hosted-image.yml builds a release's image; the host is upgraded by
+# hand, so a release run waits until /version.json reports the tag's commit.
+# It audits a URL rather than a build; if the domain changes, update SITE
+# here and the blocked URLs in lighthouserc.json.
 name: lighthouse
 on:
-  # Netlify only builds when apps/web changes (base directory), so only
-  # those pushes have a deploy to wait for.
-  push:
-    branches: [main]
-    paths: ['apps/web/**']
+  release:
+    types: [published]
   schedule:
     - cron: '23 7 * * 1'
   workflow_dispatch:
@@ -30,6 +26,7 @@ env:
 jobs:
   # Not `build`: that's ci.yml's job, and the main ruleset requires it.
   lighthouse:
+    if: github.event_name != 'release' || !github.event.release.prerelease
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -39,7 +36,7 @@ jobs:
       - name: Wait for the deploy of this commit
         env:
           WANT: ${{ github.sha }}
-          WAIT: ${{ github.event_name == 'push' }}
+          WAIT: ${{ github.event_name == 'release' }}
         run: |
           deployed() {
             curl -fsS "$SITE/version.json?t=$(date +%s)" 2>/dev/null \
@@ -50,7 +47,7 @@ jobs:
             echo "Live site is on ${sha:-an unknown commit}; auditing it as is."
             exit 0
           fi
-          # A later push can go live first (its build overtook this one);
+          # A later release can go live first (the host skipped this one);
           # it still contains this commit, so audit it.
           includes_want() {
             git cat-file -e "$1^{commit}" 2>/dev/null || git fetch -q origin main 2>/dev/null || true
@@ -68,14 +65,14 @@ jobs:
             fi
             sleep 20
           done
-          echo "::error::$WANT wasn't live after 25 minutes (site is on ${sha:-unknown}). Check the site's latest deploy."
+          echo "::error::$WANT wasn't live after 25 minutes (site is on ${sha:-unknown}). Upgrade the host per deploy/hosted/compose.yaml, then re-run this job."
           exit 1
       - name: Lighthouse
         id: lh
         uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # 12.6.2
         with:
-          # Medical prefixes & suffixes, a seeded starter set
-          # (apps/api/scripts/seed/sets/medical-prefixes-suffixes.json).
+          # Medical prefixes & suffixes, a starter set seeded before the move,
+          # imported with its id.
           urls: |
             ${{ env.SITE }}/
             ${{ env.SITE }}/explore

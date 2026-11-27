@@ -48,8 +48,8 @@ vi.mock('react-router-dom', () => ({
 }));
 
 let isAuthenticated = true;
-vi.mock('@logto/react', () => ({
-    useLogto: () => ({ isAuthenticated }),
+vi.mock('shared/auth/useAuth', () => ({
+    useAuth: () => ({ isAuthenticated, signOut: vi.fn() }),
 }));
 
 const handleLogout = vi.fn();

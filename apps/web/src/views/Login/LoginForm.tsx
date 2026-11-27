@@ -25,7 +25,6 @@ import SocialSignIn from './SocialSignIn';
 import { useOAuthError } from './useOAuthError';
 import { LoginContainer, LoginPageContainer, LoginTitle } from './LoginStyles';
 
-// The self-host sign-in form; the AWS build redirects to Logto (Login.tsx).
 const LoginForm = () => {
     const { t } = useTranslation('auth');
     useBrowserTitle(PAGE_TITLES.LOGIN);

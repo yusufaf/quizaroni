@@ -32,7 +32,6 @@ type Loaded = Awaited<ReturnType<typeof load>>;
 
 // BASE_API_URL is read once at import, so the modules load fresh per test.
 async function load() {
-    vi.stubEnv('VITE_BACKEND', 'selfhost');
     vi.resetModules();
     const { SyncEngine } = await import('./SyncEngine');
     const { syncApiClient } = await import('../api/syncApiClient');
@@ -69,7 +68,6 @@ afterEach(async () => {
     }
     loaded = undefined;
     localStorage.clear();
-    vi.unstubAllEnvs();
     vi.unstubAllGlobals();
     vi.resetModules();
 });

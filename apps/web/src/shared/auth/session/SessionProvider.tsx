@@ -8,7 +8,6 @@ import {
     useState,
 } from 'react';
 import { LOCAL_DATA_OWNER_KEY } from 'state/local/owner';
-import type { AuthApi } from '../useAuth';
 import {
     deleteAccount as deleteAccountRequest,
     getSession,
@@ -208,22 +207,4 @@ export const useSession = (): SessionContextValue => {
         throw new Error('useSession must be used inside SessionProvider');
     }
     return context;
-};
-
-// For components shared with the AWS build, where there is no provider.
-export const useOptionalSession = (): SessionContextValue | null =>
-    useContext(SessionContext);
-
-export const useSessionAuth = (): AuthApi => {
-    const { isAuthenticated, signOut } = useSession();
-    return useMemo(
-        () => ({
-            isAuthenticated,
-            isLoading: false,
-            signOut,
-            getAccessToken: async () => undefined,
-            clearAccessToken: async () => {},
-        }),
-        [isAuthenticated, signOut]
-    );
 };

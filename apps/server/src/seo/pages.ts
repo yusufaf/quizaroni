@@ -1,7 +1,6 @@
 import type { PublicStudyset } from '../public/views';
 
-// Ported from apps/web/netlify/edge-functions (og-meta.ts, sitemap.ts),
-// which serve these on the hosted instance today.
+// Ported from the og-meta and sitemap edge functions this server replaced.
 
 // The web shell is built for the hosted instance and names it in its
 // canonical and OG tags; a self-host instance names itself instead.

@@ -17,7 +17,7 @@ const api = vi.hoisted(() => ({
     getMultipartSignedUploadUrls: vi.fn(),
     completeMultipartUpload: vi.fn(),
 }));
-vi.mock('state/api/awsAPI', () => api);
+vi.mock('state/api/apiClient', () => api);
 
 const KEY = 'set/file';
 const UPLOADED = {

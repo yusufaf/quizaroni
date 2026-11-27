@@ -8,12 +8,9 @@ vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (k: string) => k, i18n: { language: 'en' } }),
 }));
 
-const backend = { selfHost: true };
-vi.mock('shared/auth/backend', () => ({ isSelfHost: () => backend.selfHost }));
-
-let session: { user: { role: string } } | null = null;
+let session: { user: { role: string } | null } = { user: null };
 vi.mock('shared/auth/session/SessionProvider', () => ({
-    useOptionalSession: () => session,
+    useSession: () => session,
 }));
 
 vi.mock('theme/useTheme', async () => {
@@ -40,12 +37,11 @@ const renderMenu = () => {
 };
 
 beforeEach(() => {
-    backend.selfHost = true;
-    session = null;
+    session = { user: null };
 });
 
 describe('ProfileDropdown', () => {
-    it('shows Admin to the self-host instance admin', () => {
+    it('shows Admin to the instance admin', () => {
         session = { user: { role: 'admin' } };
         renderMenu();
         expect(
@@ -60,12 +56,5 @@ describe('ProfileDropdown', () => {
         renderMenu();
         expect(screen.queryByRole('menuitem', { name: 'menuItem' })).toBeNull();
         expect(screen.getByRole('menuitem', { name: 'Profile' })).toBeTruthy();
-    });
-
-    it('hides Admin on the AWS build', () => {
-        backend.selfHost = false;
-        session = { user: { role: 'admin' } };
-        renderMenu();
-        expect(screen.queryByRole('menuitem', { name: 'menuItem' })).toBeNull();
     });
 });

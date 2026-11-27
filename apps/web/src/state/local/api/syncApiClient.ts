@@ -2,7 +2,7 @@ import {
     BASE_API_URL,
     fetchJson,
     getCommonPostRequestProps,
-} from 'state/api/awsAPI';
+} from 'state/api/apiClient';
 import { validate } from 'shared/validation';
 import {
     BaseResponseSchema,

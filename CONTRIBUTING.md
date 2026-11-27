@@ -1,37 +1,45 @@
 # Contributing to Quizaroni
 
-Thanks for your interest in contributing! This is a pnpm monorepo with two
-workspaces: `apps/web` (React frontend) and `apps/api` (AWS CDK backend).
+Thanks for your interest in contributing! This is a pnpm monorepo with three
+workspaces: `apps/web` (React frontend), `apps/server` (Bun server: API, auth,
+SQLite, file storage, and serving the built app) and `packages/shared-types`
+(types shared by both).
 
 ## Prerequisites
 
 - Node.js 24.11+ (matches `apps/web/.node-version`) or 22.18+. The test runner
   (Vitest 5, bundled in Vite+ 1.x) does not support Node 20.
 - pnpm >= 10 (`npm i -g pnpm`)
-- For backend work: an AWS account + the AWS CLI configured, and the AWS CDK.
+- Bun 1.4.4+ for `apps/server` (it runs the server and its tests).
+
+No cloud account is needed: everything runs locally.
 
 ## Setup
 
 ```bash
 pnpm install                      # installs all workspaces
-cp apps/web/.env.example apps/web/.env
-cp apps/api/.env.example apps/api/.env   # fill in your values
 ```
+
+That's all. `apps/web/.env.example` lists optional build-time flags; copy it to
+`apps/web/.env` only if you want to change one.
 
 ## Common commands
 
 Run from the repo root:
 
 ```bash
-pnpm dev:web      # start the frontend dev server (port 3000)
+pnpm dev:server   # start the server on port 8080 (watch mode)
+pnpm dev:web      # start the frontend dev server (port 3000, proxies /api to :8080)
 pnpm build:web    # production build of the frontend
-pnpm build:api    # compile the CDK / Lambda TypeScript
-pnpm synth:api    # synthesize the CloudFormation template
-pnpm deploy:api   # deploy the backend to AWS
-pnpm typecheck    # type-check the frontend
+pnpm start:server # serve the built frontend and the API on port 8080
+pnpm build:binary # build the standalone server binaries
+pnpm typecheck    # type-check the frontend and the server
 pnpm test         # run tests across workspaces
-pnpm test:smoke   # load the built self-host app in Chromium (pnpm build:web:selfhost first; once: pnpm --filter @quizaroni/web exec playwright install chromium)
+pnpm test:smoke   # load the built app in Chromium (pnpm build:web first; once: pnpm --filter @quizaroni/web exec playwright install chromium)
 ```
+
+On first start the server prints a setup token; open
+`http://127.0.0.1:8080/setup` to create the admin account.
 
 ## Commit conventions
 
@@ -40,8 +48,8 @@ enforced by commitlint via a husky `commit-msg` hook. Examples:
 
 ```
 feat(web): add dark mode toggle
-fix(api): correct CORS origin handling
-chore(deps): bump aws-cdk-lib
+fix(server): reject an expired invite link
+chore(deps): bump hono
 ```
 
 Releases are automated with release-please based on these commit messages.
@@ -88,12 +96,9 @@ The web app supports English and Spanish via `react-i18next`.
    # apps/web: lint .ts/.tsx, format .ts/.tsx/.json/.css
    pnpm exec vp lint --fix apps/web/src/path/to/File.tsx ...
    pnpm exec vp fmt apps/web/src/path/to/File.tsx ...
-
-   # apps/api (Prettier, paths relative to apps/api)
-   pnpm --filter @quizaroni/api exec prettier --write path/to/file.ts ...
    ```
 4. Make sure `pnpm typecheck`, `pnpm test` and `pnpm build` (all workspaces)
-   pass. If you touched `apps/api` or `packages/`, also run `pnpm synth:api`.
+   pass.
 5. Open a PR with a clear description, and include `Fixes #<issue>` so the
    issue closes when the PR merges. For UI changes, add a screenshot or short
    recording. Leave "Allow edits from maintainers" checked.

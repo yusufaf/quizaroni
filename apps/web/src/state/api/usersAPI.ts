@@ -4,8 +4,11 @@ import {
     useQueryClient,
     UseQueryOptions,
 } from '@tanstack/react-query';
-import { BASE_API_URL, fetchJson, getCommonPostRequestProps } from './awsAPI';
-import { isSelfHost } from 'shared/auth/backend';
+import {
+    BASE_API_URL,
+    fetchJson,
+    getCommonPostRequestProps,
+} from './apiClient';
 import { SOCIAL_PROVIDERS } from 'shared/auth/session/sessionClient';
 import { downloadObjectAsJSON } from 'shared/utilities/general';
 import { validate } from 'shared/validation';
@@ -79,7 +82,7 @@ export const useAccountDeletionInfo = (enabled: boolean) =>
                 ),
             };
         },
-        enabled: enabled && isSelfHost(),
+        enabled,
         retry: false,
         staleTime: 0,
         gcTime: 0,
@@ -162,25 +165,7 @@ export const downloadUserData = async ({
 
 export const useDownloadUserData = () => {
     return useMutation({
-        mutationFn: async (params: DownloadUserDataRequest) => {
-            if (isSelfHost()) {
-                await downloadUserData(params);
-                return;
-            }
-            const data = await fetchJson(
-                `${BASE_API_URL}/users/download-user-data`,
-                {
-                    ...(await getCommonPostRequestProps()),
-                    body: JSON.stringify(params),
-                }
-            );
-            return validate({
-                schema: BaseResponseSchema,
-                data,
-                type: 'response',
-                context: 'DownloadUserData',
-            });
-        },
+        mutationFn: downloadUserData,
     });
 };
 

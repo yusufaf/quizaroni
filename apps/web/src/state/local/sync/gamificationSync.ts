@@ -1,4 +1,4 @@
-import { BASE_API_URL, getCommonPostRequestProps } from 'state/api/awsAPI';
+import { BASE_API_URL, getCommonPostRequestProps } from 'state/api/apiClient';
 import { validate } from 'shared/validation';
 import { UpdateGamificationResponseSchema } from 'shared/schemas';
 import type { CustomAchievement, GamificationState, User } from 'shared/types';

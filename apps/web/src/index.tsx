@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { AuthProvider } from './shared/auth/AuthProvider';
+import { SessionProvider } from './shared/auth/session/SessionProvider';
 import { CustomThemeProvider } from './shared/theme/ThemeProvider';
 import { CssBaseline } from '@mui/material';
 
@@ -15,7 +15,7 @@ import CrashFallback from './shared/components/ErrorBoundary/CrashFallback';
 const domElement = document.getElementById('root') as Element;
 const root = createRoot(domElement);
 root.render(
-    <AuthProvider>
+    <SessionProvider>
         <BrowserRouter>
             <CustomThemeProvider>
                 <CssBaseline />
@@ -24,5 +24,5 @@ root.render(
                 </ErrorBoundary>
             </CustomThemeProvider>
         </BrowserRouter>
-    </AuthProvider>
+    </SessionProvider>
 );

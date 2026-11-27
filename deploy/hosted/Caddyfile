@@ -1,10 +1,18 @@
 {$SITE_ADDRESS:quizaroni.yusufaf.dev} {
 	encode zstd gzip
 
-	# Umami, proxied same-origin as netlify.toml does today (#301), so the
-	# server never sees these paths.
-	@umami path /s.js /api/e
+	# Umami, proxied same-origin so ad blockers see first-party requests,
+	# under /q since the server owns /api (#270).
+	@umami path /q/s.js /q/api/e
 	handle @umami {
+		uri strip_prefix /q
+		reverse_proxy https://analytics.yusufaf.dev
+	}
+
+	# Images built before #270 still load /s.js and post to /api/e. Remove
+	# once the host runs a release built with /q.
+	@umami_legacy path /s.js /api/e
+	handle @umami_legacy {
 		reverse_proxy https://analytics.yusufaf.dev
 	}
 

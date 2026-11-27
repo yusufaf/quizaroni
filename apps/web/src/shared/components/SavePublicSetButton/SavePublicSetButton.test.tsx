@@ -19,8 +19,8 @@ vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (k: string) => k }),
 }));
 
-vi.mock('@logto/react', () => ({
-    useLogto: () => ({ isAuthenticated: authenticated }),
+vi.mock('shared/auth/useAuth', () => ({
+    useAuth: () => ({ isAuthenticated: authenticated, signOut: vi.fn() }),
 }));
 
 vi.mock('react-router-dom', () => {

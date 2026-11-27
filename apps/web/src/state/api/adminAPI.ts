@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { z } from 'zod';
-import { BASE_API_URL, fetchJson, getCommonPostRequestProps } from './awsAPI';
+import {
+    BASE_API_URL,
+    fetchJson,
+    getCommonPostRequestProps,
+} from './apiClient';
 import { validate } from 'shared/validation';
 import {
     CreateInviteResponseSchema,

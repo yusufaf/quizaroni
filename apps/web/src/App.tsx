@@ -1,7 +1,5 @@
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { lazy, Suspense, useEffect } from 'react';
-import { useAuth } from 'shared/auth/useAuth';
-import { setAccessTokenGetter } from 'state/api/awsAPI';
 import Footer from 'views/Footer/Footer';
 import NavBar from 'views/NavBar/NavBar';
 import MobileBottomNav from 'views/NavBar/MobileBottomNav';
@@ -75,22 +73,10 @@ const App = () => {
         labelsDialogProps,
         logoutConfirmOpen,
     } = useGlobalStore();
-    const { getAccessToken } = useAuth();
 
     useEffect(() => {
         prefersDarkMode ? setTheme(DARK) : setTheme(LIGHT);
     }, [prefersDarkMode]);
-
-    // useAuth() only works inside a component's render tree, so awsAPI.ts
-    // can't call it directly — wire the real getter here instead. This runs
-    // during render, not in a useEffect: effects fire children-first, so a
-    // child's query (e.g. useGetUser() on mount) could otherwise call
-    // getCommonPostRequestProps() before this effect ever ran, sending an
-    // unauthenticated request that 401s. React Query would retry and recover
-    // on its own, but by then it's too late: some callers destructure the
-    // errored response without a fallback, so the render throws before the
-    // retry ever lands and the page falls back to the crash screen.
-    setAccessTokenGetter(getAccessToken);
 
     return (
         <QueryClientProvider client={queryClient}>

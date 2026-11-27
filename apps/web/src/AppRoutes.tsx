@@ -2,14 +2,10 @@ import { lazy, ReactNode, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Landing from 'views/Landing/Landing';
 import LoadingIndicator from 'shared/components/LoadingIndicator/LoadingIndicator';
-import Login from 'views/Login/Login';
-import Signup from 'views/Signup/Signup';
-import Callback from 'views/Callback/Callback';
 import LoginForm from 'views/Login/LoginForm';
 import SignupForm from 'views/Signup/SignupForm';
 import ForgotPasswordForm from 'views/ForgotPassword/ForgotPasswordForm';
 import ResetPasswordForm from 'views/ResetPassword/ResetPasswordForm';
-import { isSelfHost } from 'shared/auth/backend';
 import { useAuth } from 'shared/auth/useAuth';
 import useCanonical from 'shared/hooks/useCanonical';
 
@@ -56,7 +52,7 @@ const AppRoutes = () => {
         { path: '/combine/:id', element: <CombineSets /> },
         { path: '/edit/:id', element: <CreateSet /> },
         { path: '/study/:studysetId/:mode', element: <StudyMode /> },
-        ...(isSelfHost() ? [{ path: '/admin', element: <Admin /> }] : []),
+        { path: '/admin', element: <Admin /> },
     ];
 
     return (
@@ -67,29 +63,13 @@ const AppRoutes = () => {
                     path="/"
                     element={authenticated ? <Home /> : <Landing />}
                 />
+                <Route path="/login" element={<LoginForm />} />
+                <Route path="/signUp" element={<SignupForm />} />
                 <Route
-                    path="/login"
-                    element={isSelfHost() ? <LoginForm /> : <Login />}
+                    path="/forgot-password"
+                    element={<ForgotPasswordForm />}
                 />
-                <Route
-                    path="/signUp"
-                    element={isSelfHost() ? <SignupForm /> : <Signup />}
-                />
-                {!isSelfHost() && (
-                    <Route path="/callback" element={<Callback />} />
-                )}
-                {isSelfHost() && (
-                    <Route
-                        path="/forgot-password"
-                        element={<ForgotPasswordForm />}
-                    />
-                )}
-                {isSelfHost() && (
-                    <Route
-                        path="/reset-password"
-                        element={<ResetPasswordForm />}
-                    />
-                )}
+                <Route path="/reset-password" element={<ResetPasswordForm />} />
 
                 {/* Study set view — full owner experience when authenticated,
                     read-only public page (via the no-auth endpoint) otherwise.

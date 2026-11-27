@@ -1,5 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
-import { BASE_API_URL, fetchJson, getCommonPostRequestProps } from './awsAPI';
+import {
+    BASE_API_URL,
+    fetchJson,
+    getCommonPostRequestProps,
+} from './apiClient';
 import { validate } from 'shared/validation';
 import {
     InitiateMultipartUploadResponseSchema,

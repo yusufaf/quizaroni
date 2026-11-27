@@ -70,7 +70,7 @@ describe('collectWebFiles', () => {
     test('fails when the web app was not built', () => {
         const dist = temp();
         writeFileSync(join(dist, 'a.js'), '');
-        expect(() => collectWebFiles(dist)).toThrow(/build:web:selfhost/);
+        expect(() => collectWebFiles(dist)).toThrow(/build:web/);
     });
 });
 

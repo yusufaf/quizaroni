@@ -280,7 +280,7 @@ const mutation = useHybridUpdateStudyset();
 
 ## File Storage Notes
 
-File attachments use S3 signed URLs. In pure local mode:
+File attachments are uploaded to the server, which stores them in its data directory and serves them from `/api/files/…`. In pure local mode:
 
 - Files are stored as base64 in IndexedDB (not recommended for large files)
 - Or use File System Access API (future enhancement)

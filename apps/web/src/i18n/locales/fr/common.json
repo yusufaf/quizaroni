@@ -793,15 +793,6 @@
             "generic": "Une erreur s'est produite. Réessayez."
         }
     },
-    "report": {
-        "action": "Signaler",
-        "cardLabel": "Signaler {{title}}",
-        "emailSubject": "Signalement : {{title}}",
-        "emailIntro": "Je souhaite signaler cette liste d'étude publique.",
-        "setId": "ID de la liste",
-        "setLink": "Lien",
-        "reason": "Motif"
-    },
     "save": {
         "action": "Enregistrer",
         "saving": "Enregistrement…",

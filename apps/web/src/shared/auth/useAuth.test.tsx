@@ -1,51 +1,82 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it, vi } from 'vite-plus/test';
-import { renderHook } from '@testing-library/react';
-import { useLogtoAuth } from './useAuth';
+import {
+    afterEach,
+    beforeEach,
+    describe,
+    expect,
+    it,
+    vi,
+} from 'vite-plus/test';
+import { renderHook, waitFor } from '@testing-library/react';
+import type { ReactNode } from 'react';
+import {
+    SESSION_CACHE_KEY,
+    SessionProvider,
+    useSession,
+} from './session/SessionProvider';
+import { useAuth } from './useAuth';
 
-const logto = {
-    isAuthenticated: false,
-    isLoading: undefined as boolean | undefined,
-    signOut: vi.fn(),
-    getAccessToken: vi.fn(),
-    clearAccessToken: vi.fn(),
-};
+const ADA = { id: 'u1', email: 'ada@example.com', name: 'Ada', role: 'user' };
 
-vi.mock('@logto/react', () => ({
-    useLogto: () => logto,
-}));
+const wrapper = ({ children }: { children: ReactNode }) => (
+    <SessionProvider>{children}</SessionProvider>
+);
 
 beforeEach(() => {
-    logto.isAuthenticated = false;
-    logto.isLoading = undefined;
-    vi.clearAllMocks();
+    localStorage.clear();
 });
 
-describe('useLogtoAuth', () => {
-    it('gives no access token when signed out', async () => {
-        const { result } = renderHook(() => useLogtoAuth());
-        expect(await result.current.getAccessToken()).toBeUndefined();
-        expect(logto.getAccessToken).not.toHaveBeenCalled();
+afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+});
+
+describe('useAuth', () => {
+    it('is authenticated once the session has a cached user', () => {
+        // get-session never answers, so the provider keeps the cached user.
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() => new Promise<Response>(() => {}))
+        );
+        localStorage.setItem(SESSION_CACHE_KEY, JSON.stringify(ADA));
+
+        const { result } = renderHook(() => useAuth(), { wrapper });
+
+        expect(result.current.isAuthenticated).toBe(true);
     });
 
-    it('asks Logto for an API token when signed in', async () => {
-        logto.isAuthenticated = true;
-        logto.getAccessToken.mockResolvedValue('token');
-        const { result } = renderHook(() => useLogtoAuth());
-        expect(await result.current.getAccessToken()).toBe('token');
-        expect(logto.getAccessToken).toHaveBeenCalledWith(
-            import.meta.env.VITE_LOGTO_API_RESOURCE
+    it('is not authenticated when the server has no session', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(async () => new Response('null', { status: 200 }))
+        );
+
+        const { result } = renderHook(() => useAuth(), { wrapper });
+
+        await waitFor(() => expect(result.current).not.toBeNull());
+        expect(result.current.isAuthenticated).toBe(false);
+    });
+
+    it('signs out through the session', () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn(() => new Promise<Response>(() => {}))
+        );
+        localStorage.setItem(SESSION_CACHE_KEY, JSON.stringify(ADA));
+
+        const { result } = renderHook(
+            () => ({ auth: useAuth(), session: useSession() }),
+            { wrapper }
+        );
+
+        expect(result.current.auth.signOut).toBe(
+            result.current.session.signOut
         );
     });
 
-    it('signs out back to this origin', async () => {
-        const { result } = renderHook(() => useLogtoAuth());
-        await result.current.signOut();
-        expect(logto.signOut).toHaveBeenCalledWith(window.location.origin);
-    });
+    it('throws outside SessionProvider', () => {
+        vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    it('treats an unknown loading state as loaded', () => {
-        const { result } = renderHook(() => useLogtoAuth());
-        expect(result.current.isLoading).toBe(false);
+        expect(() => renderHook(() => useAuth())).toThrow(/SessionProvider/);
     });
 });

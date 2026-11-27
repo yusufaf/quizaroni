@@ -793,15 +793,6 @@
             "generic": "Algo deu errado. Tente novamente."
         }
     },
-    "report": {
-        "action": "Denunciar",
-        "cardLabel": "Denunciar {{title}}",
-        "emailSubject": "Denúncia: {{title}}",
-        "emailIntro": "Gostaria de denunciar este conjunto de estudo público.",
-        "setId": "ID do conjunto",
-        "setLink": "Link",
-        "reason": "Motivo"
-    },
     "save": {
         "action": "Salvar",
         "saving": "Salvando…",

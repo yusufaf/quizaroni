@@ -40,7 +40,7 @@ export function collectWebFiles(distDir: string): string[] {
         .sort();
     if (!files.includes('index.html')) {
         throw new Error(
-            `No index.html in ${distDir}; run pnpm build:web:selfhost first`
+            `No index.html in ${distDir}; run pnpm build:web first`
         );
     }
     return files;

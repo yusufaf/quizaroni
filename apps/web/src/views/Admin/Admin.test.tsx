@@ -26,8 +26,6 @@ vi.mock('react-i18next', () => ({
     }),
 }));
 
-vi.mock('shared/auth/backend', () => ({ isSelfHost: () => true }));
-
 const session = {
     user: {
         id: 'a1',

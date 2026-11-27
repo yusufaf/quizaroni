@@ -9,7 +9,7 @@ import {
     Stack,
     Typography,
 } from '@mui/material/';
-import { OutlinedFlag, School as SchoolIcon } from '@mui/icons-material/';
+import { School as SchoolIcon } from '@mui/icons-material/';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import {
@@ -19,8 +19,6 @@ import {
 import useBrowserTitle from 'hooks/useBrowserTitle';
 import ImageGallery from 'components/ImageGallery/ImageGallery';
 import { CardFileMetadata } from 'shared/types';
-import { isSelfHost } from 'shared/auth/backend';
-import { useReportHref } from 'shared/report';
 import SavePublicSetButton from 'shared/components/SavePublicSetButton/SavePublicSetButton';
 
 type PublicCardFiles =
@@ -66,7 +64,6 @@ const PublicStudySet = ({ showSignupCta = true }: Props) => {
 
     useBrowserTitle(studyset?.title ?? 'Quizaroni');
     const displayTitle = studyset?.title?.trim() || t('explore:tile.untitled');
-    const reportHref = useReportHref(studysetUUID, displayTitle);
 
     if (isLoading) {
         return (
@@ -137,18 +134,6 @@ const PublicStudySet = ({ showSignupCta = true }: Props) => {
                             title={displayTitle}
                             variant="text"
                         />
-                        {/* Reports mail the hosted team, who can't
-                            moderate a self-host instance. */}
-                        {!isSelfHost() && (
-                            <Button
-                                size="small"
-                                href={reportHref}
-                                startIcon={<OutlinedFlag />}
-                                sx={{ color: 'text.secondary' }}
-                            >
-                                {t('report.action')}
-                            </Button>
-                        )}
                     </Stack>
                 </Stack>
             </Paper>

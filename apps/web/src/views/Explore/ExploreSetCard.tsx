@@ -1,14 +1,10 @@
-import { OutlinedFlag } from '@mui/icons-material';
-import { Avatar, Tooltip } from '@mui/material';
+import { Avatar } from '@mui/material';
 import type { ExploreSetSummary } from '@quizaroni/shared-types';
 import { useTranslation } from 'react-i18next';
-import { isSelfHost } from 'shared/auth/backend';
-import { useReportHref } from 'shared/report';
 import SavePublicSetButton from 'shared/components/SavePublicSetButton/SavePublicSetButton';
 import { formatRelativeDate, toSubjectId } from './communityFeed';
 import {
     CardByline,
-    TileAction,
     TileArticle,
     TileDescription,
     TileEyebrow,
@@ -40,7 +36,6 @@ const ExploreSetCard = ({ item }: Props) => {
     } = item;
     const locale = i18n?.language ?? 'en';
     const displayTitle = title.trim() || t('tile.untitled');
-    const reportHref = useReportHref(studysetUUID, displayTitle);
 
     return (
         <TileArticle interactive>
@@ -96,21 +91,6 @@ const ExploreSetCard = ({ item }: Props) => {
                         title={displayTitle}
                         variant="icon"
                     />
-                    {/* Reports mail the hosted team, who can't moderate a
-                        self-host instance. */}
-                    {!isSelfHost() && (
-                        <Tooltip title={t('common:report.action')}>
-                            <TileAction
-                                size="small"
-                                href={reportHref}
-                                aria-label={t('common:report.cardLabel', {
-                                    title: displayTitle,
-                                })}
-                            >
-                                <OutlinedFlag fontSize="small" />
-                            </TileAction>
-                        </Tooltip>
-                    )}
                 </TileFooterEnd>
             </TileFooter>
         </TileArticle>

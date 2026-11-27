@@ -15,7 +15,6 @@ import type {
     ExploreFeedResponse,
     ExploreSetSummary,
 } from '@quizaroni/shared-types';
-import { setAccessTokenGetter } from 'state/api/awsAPI';
 import { createLightTheme } from 'shared/theme/themes';
 import Explore from './Explore';
 
@@ -30,13 +29,13 @@ vi.mock('react-i18next', () => ({
     }),
 }));
 
-const tokenSpy = vi.fn(async () => 'token');
-const logto = {
-    isAuthenticated: false,
-    isLoading: false,
-    getAccessToken: tokenSpy,
-};
-vi.mock('@logto/react', () => ({ useLogto: () => logto }));
+const auth = { isAuthenticated: false };
+vi.mock('shared/auth/useAuth', () => ({
+    useAuth: () => ({
+        isAuthenticated: auth.isAuthenticated,
+        signOut: vi.fn(),
+    }),
+}));
 
 const dueSpy = vi.fn();
 const lastStudiedSpy = vi.fn();
@@ -103,15 +102,10 @@ const renderExplore = (entry = '/explore?subject=biology') =>
 const heading = (name: string) => screen.queryByRole('heading', { name });
 
 beforeEach(() => {
-    logto.isAuthenticated = false;
-    logto.isLoading = false;
-    tokenSpy.mockClear();
+    auth.isAuthenticated = false;
     dueSpy.mockReset().mockResolvedValue(new Map());
     lastStudiedSpy.mockReset().mockResolvedValue(new Map());
     fetchMock.mockClear();
-    // The raw spy, not App.tsx's guarded getter: any authenticated request
-    // would call it.
-    setAccessTokenGetter(tokenSpy);
     vi.stubGlobal('fetch', fetchMock);
     vi.spyOn(console, 'error').mockImplementation(() => {});
 });
@@ -143,7 +137,6 @@ describe('Explore, logged out', () => {
         await screen.findByText('Featured set');
         await screen.findByText('Community set');
 
-        expect(tokenSpy).not.toHaveBeenCalled();
         expect(fetchMock).toHaveBeenCalled();
         for (const [url, init] of fetchMock.mock.calls) {
             expect(url).toContain('/public/explore');
@@ -183,15 +176,5 @@ describe('Explore, logged out', () => {
         expect((await screen.findByTestId('state')).textContent).toBe(
             '{"from":"/explore?subject=biology"}'
         );
-    });
-
-    it('shows neither the banner nor For you while Logto is loading', async () => {
-        logto.isLoading = true;
-        renderExplore();
-
-        await screen.findByText('Community set');
-        expect(heading('signUpBanner.heading')).toBeNull();
-        expect(heading('forYou.heading')).toBeNull();
-        expect(heading('community.heading')).toBeTruthy();
     });
 });

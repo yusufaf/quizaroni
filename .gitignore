@@ -7,8 +7,6 @@ node_modules/
 .env
 .env.*
 !.env.example
-!apps/web/.env.selfhost
-!apps/web/.env.production
 *.env
 
 # build output
@@ -16,10 +14,6 @@ dist/
 dist-ssr/
 build/
 /coverage
-
-# CDK
-apps/api/cdk.out/
-.cdk.staging
 
 # self-host server
 apps/server/data/

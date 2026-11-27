@@ -12,10 +12,6 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import PublicStudySet from './PublicStudySet';
 
-afterEach(() => {
-    vi.unstubAllEnvs();
-});
-
 // #128: the public page now renders the allowlisted payload from
 // toPublicStudyset, which has no labels, owner ids or storage keys.
 
@@ -32,8 +28,8 @@ vi.mock('react-i18next', () => ({
 }));
 
 // The Save button reads auth itself (#140).
-vi.mock('@logto/react', () => ({
-    useLogto: () => ({ isAuthenticated: false }),
+vi.mock('shared/auth/useAuth', () => ({
+    useAuth: () => ({ isAuthenticated: false, signOut: vi.fn() }),
 }));
 
 // Mocked like the other component tests until #102 moves them to MemoryRouter.
@@ -181,28 +177,6 @@ describe('PublicStudySet', () => {
             expect.stringContaining('validation failed'),
             expect.anything()
         );
-    });
-
-    it('offers a Report link that mails the set id', async () => {
-        response = () => json(200, { studyset: publicSet() });
-        renderView();
-
-        const report = await screen.findByRole('link', {
-            name: 'report.action',
-        });
-
-        expect(report.getAttribute('href')).toMatch(/^mailto:/);
-        expect(report.getAttribute('href')).toContain(ID);
-    });
-
-    it('has no Report link on a self-host build', async () => {
-        vi.stubEnv('VITE_BACKEND', 'selfhost');
-        response = () => json(200, { studyset: publicSet() });
-        renderView();
-
-        await screen.findByText('Cell biology');
-
-        expect(screen.queryByRole('link', { name: 'report.action' })).toBeNull();
     });
 
     it('shows the sign-up call to action by default', async () => {

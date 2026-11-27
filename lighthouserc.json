@@ -3,6 +3,8 @@
         "collect": {
             "settings": {
                 "blockedUrlPatterns": [
+                    "https://quizaroni.yusufaf.dev/q/s.js*",
+                    "https://quizaroni.yusufaf.dev/q/api/e*",
                     "https://quizaroni.yusufaf.dev/s.js*",
                     "https://quizaroni.yusufaf.dev/api/e*"
                 ]

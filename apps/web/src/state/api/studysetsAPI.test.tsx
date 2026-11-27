@@ -16,7 +16,7 @@ import {
     usePublishStudyset,
     useUpdateStudyset,
 } from './studysetsAPI';
-import { isHttpStatus } from './awsAPI';
+import { isHttpStatus } from './apiClient';
 import { EMPTY_CARD } from 'shared/constants';
 import en from 'i18n/locales/en/common.json';
 import es from 'i18n/locales/es/common.json';

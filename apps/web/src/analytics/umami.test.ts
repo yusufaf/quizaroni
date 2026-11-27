@@ -10,8 +10,8 @@ const hostedTag = {
     injectTo: 'head',
     attrs: {
         defer: true,
-        src: '/s.js',
-        'data-host-url': '/',
+        src: '/q/s.js',
+        'data-host-url': '/q',
         'data-website-id': HOSTED_ID,
     },
 };
@@ -19,7 +19,6 @@ const hostedTag = {
 describe('umamiScriptTag', () => {
     test('returns null when no Umami env is set', () => {
         expect(umamiScriptTag({})).toBeNull();
-        expect(umamiScriptTag({ VITE_BACKEND: 'selfhost' })).toBeNull();
     });
 
     test('treats empty values as unset', () => {
@@ -32,8 +31,8 @@ describe('umamiScriptTag', () => {
         expect(
             umamiScriptTag({
                 VITE_UMAMI_WEBSITE_ID: HOSTED_ID,
-                VITE_UMAMI_SRC: '/s.js',
-                VITE_UMAMI_HOST_URL: '/',
+                VITE_UMAMI_SRC: '/q/s.js',
+                VITE_UMAMI_HOST_URL: '/q',
             })
         ).toEqual(hostedTag);
     });
@@ -68,16 +67,7 @@ test('the plugin runs in builds only, so dev and vitest never load the tag', () 
     expect(umamiPlugin().apply).toBe('build');
 });
 
-describe('build env files', () => {
+test('the production build env emits no tag', () => {
     const webRoot = fileURLToPath(new URL('../../', import.meta.url));
-
-    test('hosted build emits the hosted tag', () => {
-        expect(umamiScriptTag(loadEnv('production', webRoot))).toEqual(
-            hostedTag
-        );
-    });
-
-    test('self-host build emits no tag', () => {
-        expect(umamiScriptTag(loadEnv('selfhost', webRoot))).toBeNull();
-    });
+    expect(umamiScriptTag(loadEnv('production', webRoot))).toBeNull();
 });

@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv, lazyPlugins } from 'vite-plus';
+import { defineConfig, lazyPlugins } from 'vite-plus';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
@@ -8,33 +8,23 @@ import { umamiPlugin } from './src/analytics/umami';
 
 // https://vitejs.dev/config/
 
-// This file is outside the Vite import graph, so it can't read
-// import.meta.env — load the same .env files Vite itself would for this mode.
-const apiProxyURL =
-    loadEnv(process.env.NODE_ENV ?? 'development', process.cwd(), '')
-        .VITE_API_BASE_URL ?? 'http://localhost:3000/api';
-
 // The commit this build came from, served at /version.json so the Lighthouse
-// workflow can wait until the live site runs the commit it pushed.
-// COMMIT_REF is Netlify's; a new host needs its own variable added here.
+// workflow can wait until the live site reports a release's commit. Git comes
+// first: hosted-image.yml's dispatch builds a tag whose sha GITHUB_SHA
+// doesn't name.
 const buildSha = (): string => {
-    const fromEnv = process.env.COMMIT_REF ?? process.env.GITHUB_SHA;
-    if (fromEnv) return fromEnv;
     try {
         return execSync('git rev-parse HEAD', {
             encoding: 'utf8',
             stdio: ['ignore', 'pipe', 'ignore'],
         }).trim();
     } catch {
-        return 'unknown';
+        return process.env.GITHUB_SHA ?? 'unknown';
     }
 };
 
 export default defineConfig({
-    // fetchJson (awsAPI.ts) is now exercised directly by a real unit test
-    // rather than only through mocked hooks, so the module's top-level
-    // `VITE_API_BASE_URL` guard needs something to read in test mode too.
-    test: { globals: true, env: { VITE_API_BASE_URL: 'http://localhost/api' } },
+    test: { globals: true },
     define: {
         global: {},
     },
@@ -234,12 +224,7 @@ export default defineConfig({
     server: {
         host: '127.0.0.1',
         proxy: {
-            '/api': {
-                target: apiProxyURL,
-                changeOrigin: true,
-                secure: false,
-                rewrite: (path) => path.replace(/^\/api/, ''),
-            },
+            '/api': { target: 'http://127.0.0.1:8080' },
         },
         port: 3000,
     },

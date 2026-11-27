@@ -41,9 +41,6 @@
     "hardcoded: Close": 1,
     "hardcoded: close": 1
   },
-  "src/views/Callback/Callback.tsx": {
-    "hardcoded: Signing in...": 1
-  },
   "src/views/Footer/Footer.tsx": {
     "hardcoded: GitHub": 2,
     "hardcoded: LinkedIn": 2
