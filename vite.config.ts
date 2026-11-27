@@ -56,10 +56,9 @@ export default defineConfig({
         singleQuote: true,
         printWidth: 80,
         sortPackageJson: false,
-        // Only apps/web was ever vp-formatted; apps/api has its own
-        // .prettierrc and the rest was never run through a formatter.
+        // Only apps/web was ever vp-formatted; the rest was never run
+        // through a formatter.
         ignorePatterns: [
-            'apps/api',
             'apps/server/drizzle',
             'packages',
             'docs',

@@ -15,10 +15,6 @@ dist-ssr/
 build/
 /coverage
 
-# CDK
-apps/api/cdk.out/
-.cdk.staging
-
 # self-host server
 apps/server/data/
 

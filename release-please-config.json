@@ -16,11 +16,6 @@
                     "type": "json",
                     "path": "apps/server/package.json",
                     "jsonpath": "$.version"
-                },
-                {
-                    "type": "json",
-                    "path": "apps/api/package.json",
-                    "jsonpath": "$.version"
                 }
             ]
         }

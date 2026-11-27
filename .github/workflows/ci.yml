@@ -31,15 +31,6 @@ jobs:
         run: pnpm test
       - name: Build frontend
         run: pnpm build:web
-      - name: Build backend
-        run: pnpm build:api
-      - name: Synthesize CDK template
-        run: pnpm synth:api
-        env:
-          account: "000000000000"
-          region: us-west-2
-          appName: quizaroni
-          deploymentType: development
   # The hosted instance's compose file and Caddyfile (deploy/hosted). Caddy is
   # validated through compose so its pinned digest lives in one place.
   hosted-config:

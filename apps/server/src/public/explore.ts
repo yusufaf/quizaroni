@@ -15,7 +15,7 @@ import { studyset } from '../db/schema';
 import { LISTED } from '../studysets/gate';
 import { toSummary } from './views';
 
-// Ported from apps/api/utilities/exploreFeed.ts; the SQLite index replaces
+// Ported from the old Lambda explore feed; the SQLite index replaces
 // the DynamoDB public index and its cache.
 export const EXPLORE_DEFAULT_LIMIT = 24;
 export const EXPLORE_MAX_LIMIT = 48;
