@@ -9,18 +9,17 @@ import { umamiPlugin } from './src/analytics/umami';
 // https://vitejs.dev/config/
 
 // The commit this build came from, served at /version.json so the Lighthouse
-// workflow can wait until the live site runs the commit it pushed.
-// COMMIT_REF is Netlify's; a new host needs its own variable added here.
+// workflow can wait until the live site reports a release's commit. Git comes
+// first: hosted-image.yml's dispatch builds a tag whose sha GITHUB_SHA
+// doesn't name.
 const buildSha = (): string => {
-    const fromEnv = process.env.COMMIT_REF ?? process.env.GITHUB_SHA;
-    if (fromEnv) return fromEnv;
     try {
         return execSync('git rev-parse HEAD', {
             encoding: 'utf8',
             stdio: ['ignore', 'pipe', 'ignore'],
         }).trim();
     } catch {
-        return 'unknown';
+        return process.env.GITHUB_SHA ?? 'unknown';
     }
 };
 
