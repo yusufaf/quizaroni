@@ -6,7 +6,7 @@ import {
     DEFAULT_USER_DATA,
 } from 'shared/constants';
 import type { Studyset, User, UUID } from 'shared/types';
-import { HttpError } from 'state/api/awsAPI';
+import { HttpError } from 'state/api/apiClient';
 import { getDatabase } from '../db';
 import { claimLocalData, clearLocalData } from '../localData';
 import { setClaimedOwner } from '../owner';

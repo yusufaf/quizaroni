@@ -6,7 +6,7 @@ import {
     fetchJson,
     getCommonPostRequestProps,
     isHttpStatus,
-} from './awsAPI';
+} from './apiClient';
 
 const mockFetch = (response: Partial<Response> & { json?: () => unknown }) =>
     vi.stubGlobal(

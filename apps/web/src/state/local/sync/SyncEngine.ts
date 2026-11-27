@@ -8,7 +8,7 @@ import {
 import { isClaimCurrent } from '../owner';
 import { studysetRepository, userRepository } from '../repositories';
 import type { Studyset, UUID } from 'shared/types';
-import { HttpError, isHttpStatus } from 'state/api/awsAPI';
+import { HttpError, isHttpStatus } from 'state/api/apiClient';
 
 // Sync status events for UI feedback
 type SyncStatus = 'idle' | 'syncing' | 'error' | 'offline';

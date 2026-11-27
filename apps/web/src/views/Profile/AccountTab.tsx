@@ -17,7 +17,7 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { isValidUsername } from '@quizaroni/shared-types';
 import { User } from 'shared/types';
-import { isHttpStatus } from 'state/api/awsAPI';
+import { isHttpStatus } from 'state/api/apiClient';
 import { useUpdateUsername } from 'state/api/usersAPI';
 import DownloadDataDialog from './DownloadDataDialog';
 import { useTranslation } from 'react-i18next';

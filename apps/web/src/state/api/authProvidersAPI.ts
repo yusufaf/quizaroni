@@ -5,7 +5,7 @@ import {
 } from 'shared/auth/session/sessionClient';
 import { AuthProvidersResponseSchema } from 'shared/schemas';
 import { validate } from 'shared/validation';
-import { BASE_API_URL, fetchJson } from './awsAPI';
+import { BASE_API_URL, fetchJson } from './apiClient';
 
 export const AUTH_PROVIDERS_KEY = ['auth', 'providers'];
 

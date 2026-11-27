@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { AIStatusResponseSchema } from 'shared/schemas';
 import { validate } from 'shared/validation';
-import { BASE_API_URL, fetchJson } from './awsAPI';
+import { BASE_API_URL, fetchJson } from './apiClient';
 
 export const AI_STATUS_KEY = ['ai', 'status'];
 

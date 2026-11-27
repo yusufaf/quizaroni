@@ -5,7 +5,7 @@ import { useAuth } from 'shared/auth/useAuth';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { isHttpStatus } from 'state/api/awsAPI';
+import { isHttpStatus } from 'state/api/apiClient';
 import { useCopyPublicStudyset } from 'state/api/studysetsAPI';
 import { TileAction } from 'views/Explore/ExploreStyles';
 

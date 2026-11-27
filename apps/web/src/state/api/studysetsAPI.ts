@@ -10,7 +10,7 @@ import {
     fetchJson,
     getCommonPostRequestProps,
     isHttpStatus,
-} from './awsAPI';
+} from './apiClient';
 import { validate } from 'shared/validation';
 import {
     BaseResponseSchema,

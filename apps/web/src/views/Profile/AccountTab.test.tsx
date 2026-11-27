@@ -5,7 +5,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { createLightTheme } from 'shared/theme/themes';
 import { DEFAULT_USER_DATA } from 'shared/constants';
-import { HttpError } from 'state/api/awsAPI';
+import { HttpError } from 'state/api/apiClient';
 import AccountTab from './AccountTab';
 
 // #45: Submit under Change Username called an empty stub, so nothing was sent.

@@ -4,7 +4,11 @@ import {
     useQueryClient,
     UseQueryOptions,
 } from '@tanstack/react-query';
-import { BASE_API_URL, fetchJson, getCommonPostRequestProps } from './awsAPI';
+import {
+    BASE_API_URL,
+    fetchJson,
+    getCommonPostRequestProps,
+} from './apiClient';
 import { SOCIAL_PROVIDERS } from 'shared/auth/session/sessionClient';
 import { downloadObjectAsJSON } from 'shared/utilities/general';
 import { validate } from 'shared/validation';

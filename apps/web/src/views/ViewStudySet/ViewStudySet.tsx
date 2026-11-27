@@ -23,7 +23,7 @@ import {
   useGetStudyset,
   useUpdateStudyset,
 } from "state/api/studysetsAPI";
-import { isHttpStatus } from "state/api/awsAPI";
+import { isHttpStatus } from "state/api/apiClient";
 import { useGetUser } from "state/api/usersAPI";
 import {
   DEFAULT_CATEGORIES,

@@ -4,7 +4,7 @@ import {
     initiateMultipartUpload,
     getMultipartSignedUploadUrls,
     completeMultipartUpload,
-} from 'state/api/awsAPI';
+} from 'state/api/apiClient';
 import { CardFileMetadata, UUID, Part } from 'shared/types';
 
 const FILE_CHUNK_SIZE = 10_000_000; // 10 MB

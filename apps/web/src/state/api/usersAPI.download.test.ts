@@ -20,7 +20,7 @@ const EXPORT = { format: 'quizaroni-user-data', version: 1 };
 const loadSelfHost = async () => {
     vi.resetModules();
     const { downloadUserData } = await import('./usersAPI');
-    const { HttpError } = await import('./awsAPI');
+    const { HttpError } = await import('./apiClient');
     return { downloadUserData, HttpError };
 };
 
