@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, afterEach } from 'vite-plus/test';
+import { describe, it, expect, vi } from 'vite-plus/test';
 import { render, screen, within } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -7,17 +7,13 @@ import type { ExploreSetSummary } from '@quizaroni/shared-types';
 import { createLightTheme } from 'shared/theme/themes';
 import ExploreSetCard from './ExploreSetCard';
 
-afterEach(() => {
-    vi.unstubAllEnvs();
-});
-
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (k: string) => k, i18n: { language: 'en' } }),
 }));
 
 // The Save button reads auth itself (#140).
-vi.mock('@logto/react', () => ({
-    useLogto: () => ({ isAuthenticated: false }),
+vi.mock('shared/auth/useAuth', () => ({
+    useAuth: () => ({ isAuthenticated: false, signOut: vi.fn() }),
 }));
 
 vi.mock('react-router-dom', () => {
@@ -122,36 +118,6 @@ describe('ExploreSetCard', () => {
         const { container } = renderCard();
         expect(container.querySelector('time')?.getAttribute('dateTime')).toBe(
             '2026-10-01T00:00:00.000Z'
-        );
-    });
-
-    it('has no Report link on a self-host build', () => {
-        vi.stubEnv('VITE_BACKEND', 'selfhost');
-        renderCard();
-        expect(
-            screen.queryByRole('link', { name: 'common:report.cardLabel' })
-        ).toBeNull();
-    });
-
-    it('offers a Report link above the card link, mailing the set id', () => {
-        renderCard();
-        const report = screen.getByRole('link', {
-            name: 'common:report.cardLabel',
-        });
-        expect(report.getAttribute('href')).toMatch(/^mailto:/);
-        expect(report.getAttribute('href')).toContain(UUID);
-        expect(report.closest('h3')).toBeNull();
-        // Load more focuses a card's first link, which must stay the title.
-        expect(screen.getAllByRole('link')[0]?.getAttribute('href')).toBe(
-            `/view/${UUID}`
-        );
-        report.focus();
-        expect(document.activeElement).toBe(report);
-        const cls = Array.from(report.classList).find((c) =>
-            c.startsWith('css-')
-        );
-        expect(allStyles()).toMatch(
-            new RegExp(`\\.${escapeRegExp(cls!)} ?\\{[^}]*z-index: ?1`)
         );
     });
 

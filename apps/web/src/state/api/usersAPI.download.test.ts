@@ -18,7 +18,6 @@ const EXPORT = { format: 'quizaroni-user-data', version: 1 };
 
 // BASE_API_URL is read once at import, so each test loads the module fresh.
 const loadSelfHost = async () => {
-    vi.stubEnv('VITE_BACKEND', 'selfhost');
     vi.resetModules();
     const { downloadUserData } = await import('./usersAPI');
     const { HttpError } = await import('./awsAPI');
@@ -42,7 +41,6 @@ describe('downloadUserData (self-host)', () => {
     });
 
     afterEach(() => {
-        vi.unstubAllEnvs();
         vi.unstubAllGlobals();
         vi.resetModules();
     });

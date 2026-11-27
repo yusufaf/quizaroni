@@ -2,30 +2,21 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SessionProvider } from 'shared/auth/session/SessionProvider';
+import AppRoutes from './AppRoutes';
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (k: string) => k, i18n: { language: 'en' } }),
 }));
 vi.mock('views/Landing/Landing', () => ({ default: () => 'landing page' }));
-vi.mock('views/Callback/Callback', () => ({ default: () => 'callback page' }));
 vi.mock('views/NotFound/NotFound', () => ({ default: () => 'not found' }));
 
-// useAuth picks its backend at module load, so the env is stubbed before a
-// fresh import. SessionProvider and QueryClientProvider come from the same
-// fresh module graph, or they would create different contexts from the ones
-// the forms read.
-const renderSelfHostAt = async (path: string) => {
-    vi.stubEnv('VITE_BACKEND', 'selfhost');
+const renderAt = (path: string) => {
     vi.stubGlobal(
         'fetch',
         vi.fn(async () => new Response('null', { status: 200 }))
     );
-    vi.resetModules();
-    const { default: AppRoutes } = await import('./AppRoutes');
-    const { SessionProvider } =
-        await import('shared/auth/session/SessionProvider');
-    const { QueryClient, QueryClientProvider } =
-        await import('@tanstack/react-query');
     render(
         <QueryClientProvider client={new QueryClient()}>
             <MemoryRouter initialEntries={[path]}>
@@ -38,36 +29,34 @@ const renderSelfHostAt = async (path: string) => {
 };
 
 afterEach(() => {
-    vi.unstubAllEnvs();
     vi.unstubAllGlobals();
 });
 
-describe('AppRoutes on the self-host backend', () => {
+describe('AppRoutes auth forms', () => {
     it('serves the built-in login form', async () => {
-        await renderSelfHostAt('/login');
+        renderAt('/login');
         expect(await screen.findByLabelText(/fields\.email/)).toBeTruthy();
     });
 
     it('serves the built-in sign-up form', async () => {
-        await renderSelfHostAt('/signUp');
+        renderAt('/signUp');
         expect(await screen.findByLabelText(/fields\.name/)).toBeTruthy();
     });
 
     it('has no Logto callback route', async () => {
-        await renderSelfHostAt('/callback');
+        renderAt('/callback');
         expect(await screen.findByText('not found')).toBeTruthy();
-        expect(screen.queryByText('callback page')).toBeNull();
     });
 
     it('serves the forgot-password form', async () => {
-        await renderSelfHostAt('/forgot-password');
+        renderAt('/forgot-password');
         expect(
             await screen.findByRole('button', { name: 'forgot.submit' })
         ).toBeTruthy();
     });
 
     it('serves the reset-password form', async () => {
-        await renderSelfHostAt('/reset-password?token=abc');
+        renderAt('/reset-password?token=abc');
         expect(
             await screen.findByRole('button', { name: 'reset.submit' })
         ).toBeTruthy();

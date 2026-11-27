@@ -14,8 +14,6 @@ import {
 } from './ProfileStyles';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { isSelfHost } from 'shared/auth/backend';
-import { useAuth } from 'shared/auth/useAuth';
 import { toast } from 'react-toastify';
 import { isValidUsername } from '@quizaroni/shared-types';
 import { User } from 'shared/types';
@@ -28,15 +26,13 @@ type Props = {
     userData: User;
 };
 
-// Change Password and Change Email used to live here as Amplify attribute
-// mutations — Logto's hosted pages (and its own account settings) own both
-// now. The username is changed through the API, which writes it to Logto.
+// Username, account deletion and data download.
 const AccountTab = ({ userData }: Props) => {
     const { t } = useTranslation(['profile', 'common']);
     const [searchParams, setSearchParams] = useSearchParams();
     // Back from a provider sign-in made to confirm the deletion, reopen it.
     const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(
-        () => isSelfHost() && searchParams.get('deleteAccount') === '1'
+        () => searchParams.get('deleteAccount') === '1'
     );
     const [reauthFailed] = useState<boolean>(
         () => showDeleteDialog && searchParams.has('error')
@@ -44,7 +40,6 @@ const AccountTab = ({ userData }: Props) => {
     const [showDownloadDialog, setShowDownloadDialog] =
         useState<boolean>(false);
     const [enteredNewUsername, setEnteredNewUsername] = useState<string>('');
-    const { clearAccessToken } = useAuth();
     const { mutateAsync: updateUsername, isPending } = useUpdateUsername();
 
     const trimmedUsername = enteredNewUsername.trim();
@@ -62,9 +57,6 @@ const AccountTab = ({ userData }: Props) => {
     const handleChangeUsername = async () => {
         try {
             const result = await updateUsername({ username: trimmedUsername });
-            // The cached token still carries the old username claim, which
-            // the API stamps on new sets; the next call mints a fresh one.
-            await clearAccessToken();
             setEnteredNewUsername('');
             toast.success(
                 t('account.usernameChanged', { username: trimmedUsername })
@@ -128,35 +120,33 @@ const AccountTab = ({ userData }: Props) => {
                     </ActionSubmitButton>
                 </InfoChangeContainer>
             </ActionSection>
-            {isSelfHost() && (
-                <ActionSection>
-                    <ActionHeader>
-                        <RemoveCircleOutline />
-                        <Typography variant="h6">
-                            {t('account.deleteAccount')}
-                        </Typography>
-                    </ActionHeader>
-                    <ActionSubmitButton
-                        variant="text"
-                        onClick={toggleDeleteDialog}
-                        fullWidth
-                        sx={{
-                            color: '#d32f2f',
-                            backgroundColor: 'rgba(211, 47, 47, 0.08)',
-                            '&:hover': {
-                                backgroundColor: 'rgba(211, 47, 47, 0.16)',
-                            },
-                        }}
-                    >
+            <ActionSection>
+                <ActionHeader>
+                    <RemoveCircleOutline />
+                    <Typography variant="h6">
                         {t('account.deleteAccount')}
-                    </ActionSubmitButton>
-                    <DeleteAccountDialog
-                        open={showDeleteDialog}
-                        handleClose={toggleDeleteDialog}
-                        reauthFailed={reauthFailed}
-                    />
-                </ActionSection>
-            )}
+                    </Typography>
+                </ActionHeader>
+                <ActionSubmitButton
+                    variant="text"
+                    onClick={toggleDeleteDialog}
+                    fullWidth
+                    sx={{
+                        color: '#d32f2f',
+                        backgroundColor: 'rgba(211, 47, 47, 0.08)',
+                        '&:hover': {
+                            backgroundColor: 'rgba(211, 47, 47, 0.16)',
+                        },
+                    }}
+                >
+                    {t('account.deleteAccount')}
+                </ActionSubmitButton>
+                <DeleteAccountDialog
+                    open={showDeleteDialog}
+                    handleClose={toggleDeleteDialog}
+                    reauthFailed={reauthFailed}
+                />
+            </ActionSection>
             <ActionSection>
                 <ActionHeader>
                     <DataUsageRounded />

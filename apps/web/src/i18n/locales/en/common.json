@@ -793,15 +793,6 @@
             "generic": "Something went wrong. Try again."
         }
     },
-    "report": {
-        "action": "Report",
-        "cardLabel": "Report {{title}}",
-        "emailSubject": "Report: {{title}}",
-        "emailIntro": "I'd like to report this public study set.",
-        "setId": "Set ID",
-        "setLink": "Link",
-        "reason": "Reason"
-    },
     "save": {
         "action": "Save",
         "saving": "Saving…",

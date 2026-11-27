@@ -1,7 +1,4 @@
 import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
-
-vi.mock('shared/auth/backend', () => ({ isSelfHost: () => true }));
-
 import {
     AI_LIMITS,
     buildChatBody,

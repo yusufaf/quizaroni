@@ -1,12 +1,5 @@
 // @vitest-environment jsdom
-import {
-    afterEach,
-    beforeEach,
-    describe,
-    expect,
-    it,
-    vi,
-} from 'vite-plus/test';
+import { beforeEach, describe, expect, it, vi } from 'vite-plus/test';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { createLightTheme } from 'shared/theme/themes';
@@ -36,10 +29,6 @@ beforeEach(() => {
     mocks.mutateAsync.mockResolvedValue(undefined);
 });
 
-afterEach(() => {
-    vi.unstubAllEnvs();
-});
-
 const renderDialog = () =>
     render(
         <ThemeProvider theme={createLightTheme()}>
@@ -54,11 +43,7 @@ const download = () =>
 
 const CHECKBOX_LABEL = 'downloadDataDialog.includeStudysets';
 
-describe('DownloadDataDialog in a self-host build', () => {
-    beforeEach(() => {
-        vi.stubEnv('VITE_BACKEND', 'selfhost');
-    });
-
+describe('DownloadDataDialog', () => {
     it('downloads the profile alone by default and closes', async () => {
         renderDialog();
         expect(screen.getByLabelText(CHECKBOX_LABEL)).toBeTruthy();
@@ -95,16 +80,5 @@ describe('DownloadDataDialog in a self-host build', () => {
             )
         );
         expect(mocks.handleClose).not.toHaveBeenCalled();
-    });
-});
-
-describe('DownloadDataDialog in the AWS build', () => {
-    it('keeps the checkbox and does not call the server', () => {
-        renderDialog();
-        expect(screen.getByLabelText(CHECKBOX_LABEL)).toBeTruthy();
-
-        download();
-
-        expect(mocks.mutateAsync).not.toHaveBeenCalled();
     });
 });

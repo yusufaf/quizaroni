@@ -4,14 +4,25 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AppRoutes from './AppRoutes';
 
-const logto = { isAuthenticated: false };
-vi.mock('@logto/react', () => ({ useLogto: () => logto }));
+const auth = { isAuthenticated: false };
+vi.mock('shared/auth/useAuth', () => ({
+    useAuth: () => ({
+        isAuthenticated: auth.isAuthenticated,
+        signOut: vi.fn(),
+    }),
+}));
 
 // Each view is a text stub; this test is only about which one a path reaches.
 vi.mock('views/Landing/Landing', () => ({ default: () => 'landing page' }));
-vi.mock('views/Login/Login', () => ({ default: () => 'login page' }));
-vi.mock('views/Signup/Signup', () => ({ default: () => 'signup page' }));
-vi.mock('views/Callback/Callback', () => ({ default: () => 'callback page' }));
+vi.mock('views/Login/LoginForm', () => ({ default: () => 'login page' }));
+vi.mock('views/Signup/SignupForm', () => ({ default: () => 'signup page' }));
+vi.mock('views/ForgotPassword/ForgotPasswordForm', () => ({
+    default: () => 'forgot page',
+}));
+vi.mock('views/ResetPassword/ResetPasswordForm', () => ({
+    default: () => 'reset page',
+}));
+vi.mock('views/Admin/Admin', () => ({ default: () => 'admin page' }));
 vi.mock('views/Home/Home', () => ({ default: () => 'home page' }));
 vi.mock('views/Create/CreateSet', () => ({ default: () => 'create page' }));
 vi.mock('views/Profile/Profile', () => ({ default: () => 'profile page' }));
@@ -36,7 +47,7 @@ const renderAt = (path: string) =>
     );
 
 beforeEach(() => {
-    logto.isAuthenticated = false;
+    auth.isAuthenticated = false;
 });
 
 describe('AppRoutes', () => {
@@ -49,7 +60,7 @@ describe('AppRoutes', () => {
     });
 
     it('serves Explore when signed in', async () => {
-        logto.isAuthenticated = true;
+        auth.isAuthenticated = true;
         renderAt('/explore');
 
         expect(await screen.findByText('explore page')).toBeTruthy();
@@ -62,11 +73,26 @@ describe('AppRoutes', () => {
         expect(screen.queryByText('profile page')).toBeNull();
     });
 
-    it.each([['/forgot-password'], ['/reset-password?token=abc'], ['/admin']])(
-        'has no self-host-only page at %s',
-        async (path) => {
-            renderAt(path);
-            expect(await screen.findByText('not found')).toBeTruthy();
-        }
-    );
+    it.each([
+        ['/forgot-password', 'forgot page'],
+        ['/reset-password?token=abc', 'reset page'],
+        ['/callback', 'not found'],
+    ])('serves %s', async (path, page) => {
+        renderAt(path);
+        expect(await screen.findByText(page)).toBeTruthy();
+    });
+
+    it('serves the admin page when signed in', async () => {
+        auth.isAuthenticated = true;
+        renderAt('/admin');
+
+        expect(await screen.findByText('admin page')).toBeTruthy();
+    });
+
+    it('sends a logged-out visitor from the admin page to login', async () => {
+        renderAt('/admin');
+
+        expect(await screen.findByText('login page')).toBeTruthy();
+        expect(screen.queryByText('admin page')).toBeNull();
+    });
 });

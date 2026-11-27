@@ -19,8 +19,8 @@ vi.mock('react-i18next', () => ({
 
 // The Save button on the fallback reads auth itself (#140).
 let authenticated = false;
-vi.mock('@logto/react', () => ({
-    useLogto: () => ({ isAuthenticated: authenticated }),
+vi.mock('shared/auth/useAuth', () => ({
+    useAuth: () => ({ isAuthenticated: authenticated, signOut: vi.fn() }),
 }));
 
 const toastMock = vi.hoisted(() => ({

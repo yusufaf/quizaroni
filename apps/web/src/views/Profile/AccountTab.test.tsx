@@ -1,12 +1,5 @@
 // @vitest-environment jsdom
-import {
-    describe,
-    it,
-    expect,
-    vi,
-    beforeEach,
-    afterEach,
-} from 'vite-plus/test';
+import { describe, it, expect, vi, beforeEach } from 'vite-plus/test';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { MemoryRouter, useLocation } from 'react-router-dom';
@@ -18,7 +11,6 @@ import AccountTab from './AccountTab';
 // #45: Submit under Change Username called an empty stub, so nothing was sent.
 
 const mocks = vi.hoisted(() => ({
-    clearAccessToken: vi.fn(),
     updateUsername: vi.fn(),
     deleteAccount: vi.fn(),
     info: {
@@ -43,10 +35,6 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('react-toastify', () => ({ toast: mocks.toast }));
-
-vi.mock('@logto/react', () => ({
-    useLogto: () => ({ clearAccessToken: mocks.clearAccessToken }),
-}));
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (k: string) => k }),
@@ -82,7 +70,6 @@ const COMPLETE = {
 beforeEach(() => {
     vi.clearAllMocks();
     mocks.updateUsername.mockResolvedValue(COMPLETE);
-    mocks.clearAccessToken.mockResolvedValue(undefined);
 });
 
 const LocationProbe = () => {
@@ -138,13 +125,12 @@ describe('AccountTab change username', () => {
         );
     });
 
-    it('on success clears the field, drops the cached access token and toasts', async () => {
+    it('on success clears the field and toasts', async () => {
         renderTab();
         enter('new_name');
         fireEvent.click(submit());
 
         await waitFor(() => expect(mocks.toast.success).toHaveBeenCalled());
-        expect(mocks.clearAccessToken).toHaveBeenCalledTimes(1);
         expect(input().value).toBe('');
         expect(mocks.toast.warning).not.toHaveBeenCalled();
     });
@@ -176,7 +162,6 @@ describe('AccountTab change username', () => {
             )
         );
         expect(input().value).toBe('new_name');
-        expect(mocks.clearAccessToken).not.toHaveBeenCalled();
     });
 
     it('shows the rule on a 400', async () => {
@@ -229,72 +214,55 @@ describe('AccountTab change username', () => {
 });
 
 describe('AccountTab delete account', () => {
-    afterEach(() => {
-        vi.unstubAllEnvs();
-    });
-
     const DELETE_BUTTON = 'account.deleteAccount';
 
-    it('hides the section outside a self-host build', () => {
+    it('shows the section with the dialog closed', () => {
         renderTab();
-        expect(screen.queryByText(DELETE_BUTTON)).toBeNull();
+        expect(
+            screen.getByRole('button', { name: DELETE_BUTTON })
+        ).toBeTruthy();
+        expect(screen.queryByRole('dialog')).toBeNull();
     });
 
-    describe('in a self-host build', () => {
-        beforeEach(() => {
-            vi.stubEnv('VITE_BACKEND', 'selfhost');
-        });
+    it('opens the dialog from the button', () => {
+        renderTab();
+        fireEvent.click(screen.getByRole('button', { name: DELETE_BUTTON }));
+        expect(screen.getByRole('dialog')).toBeTruthy();
+    });
 
-        it('shows the section with the dialog closed', () => {
-            renderTab();
-            expect(
-                screen.getByRole('button', { name: DELETE_BUTTON })
-            ).toBeTruthy();
-            expect(screen.queryByRole('dialog')).toBeNull();
-        });
+    it('opens the dialog when returning from a provider sign-in and drops the params', async () => {
+        renderTab(['/profile?tab=Account&deleteAccount=1']);
+        expect(screen.getByRole('dialog')).toBeTruthy();
+        expect(
+            screen.queryByText('deleteAccountDialog.errors.reauthFailed')
+        ).toBeNull();
+        await waitFor(() =>
+            expect(screen.getByTestId('location').textContent).toBe(
+                '/profile?tab=Account'
+            )
+        );
+        expect(screen.getByRole('dialog')).toBeTruthy();
+    });
 
-        it('opens the dialog from the button', () => {
-            renderTab();
-            fireEvent.click(
-                screen.getByRole('button', { name: DELETE_BUTTON })
-            );
-            expect(screen.getByRole('dialog')).toBeTruthy();
-        });
+    it('says the re-authentication failed when the provider sent back an error', async () => {
+        renderTab([
+            '/profile?tab=Account&deleteAccount=1&error=access_denied&error_description=nope',
+        ]);
+        expect(
+            screen.getByText('deleteAccountDialog.errors.reauthFailed')
+        ).toBeTruthy();
+        await waitFor(() =>
+            expect(screen.getByTestId('location').textContent).toBe(
+                '/profile?tab=Account'
+            )
+        );
+        expect(
+            screen.getByText('deleteAccountDialog.errors.reauthFailed')
+        ).toBeTruthy();
+    });
 
-        it('opens the dialog when returning from a provider sign-in and drops the params', async () => {
-            renderTab(['/profile?tab=Account&deleteAccount=1']);
-            expect(screen.getByRole('dialog')).toBeTruthy();
-            expect(
-                screen.queryByText('deleteAccountDialog.errors.reauthFailed')
-            ).toBeNull();
-            await waitFor(() =>
-                expect(screen.getByTestId('location').textContent).toBe(
-                    '/profile?tab=Account'
-                )
-            );
-            expect(screen.getByRole('dialog')).toBeTruthy();
-        });
-
-        it('says the re-authentication failed when the provider sent back an error', async () => {
-            renderTab([
-                '/profile?tab=Account&deleteAccount=1&error=access_denied&error_description=nope',
-            ]);
-            expect(
-                screen.getByText('deleteAccountDialog.errors.reauthFailed')
-            ).toBeTruthy();
-            await waitFor(() =>
-                expect(screen.getByTestId('location').textContent).toBe(
-                    '/profile?tab=Account'
-                )
-            );
-            expect(
-                screen.getByText('deleteAccountDialog.errors.reauthFailed')
-            ).toBeTruthy();
-        });
-
-        it('stays closed without the return param, even with an error', () => {
-            renderTab(['/profile?tab=Account&error=x']);
-            expect(screen.queryByRole('dialog')).toBeNull();
-        });
+    it('stays closed without the return param, even with an error', () => {
+        renderTab(['/profile?tab=Account&error=x']);
+        expect(screen.queryByRole('dialog')).toBeNull();
     });
 });

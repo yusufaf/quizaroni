@@ -1,24 +1,7 @@
 import { FileMetadata, Part, UUID } from 'shared/types';
-import { isSelfHost } from 'shared/auth/backend';
 
-// The self-host server serves the API on the app's own origin.
-export const BASE_API_URL = isSelfHost()
-    ? '/api'
-    : import.meta.env.VITE_API_BASE_URL;
-if (!BASE_API_URL) {
-    throw new Error('VITE_API_BASE_URL env var is not set');
-}
-
-// Wired up by App.tsx on mount, once useAuth() is available inside a
-// component's render tree (this module isn't one). Before that happens — or
-// if the user isn't signed in — requests simply go out unauthenticated, same
-// as today; apiAuthorizer.ts is what actually enforces auth.
-type AccessTokenGetter = () => Promise<string | undefined>;
-let getAccessToken: AccessTokenGetter | undefined;
-
-export const setAccessTokenGetter = (getter: AccessTokenGetter): void => {
-    getAccessToken = getter;
-};
+// The server serves the API on the app's own origin.
+export const BASE_API_URL = '/api';
 
 export class HttpError extends Error {
     constructor(
@@ -57,27 +40,13 @@ export const fetchJson = async <T>(
     return response.json();
 };
 
-export const getCommonPostRequestProps = async (): Promise<RequestInit> => {
-    if (isSelfHost()) {
-        // Authenticated by the session cookie, which the server's CSRF check
-        // accepts only from the same origin.
-        return {
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json' },
-            method: 'POST',
-        };
-    }
-    const accessToken = await getAccessToken?.();
-
-    return {
-        credentials: 'omit',
-        headers: {
-            'Content-Type': 'application/json',
-            ...(accessToken ? { authorization: `Bearer ${accessToken}` } : {}),
-        },
-        method: 'POST',
-    };
-};
+// Authenticated by the session cookie, which the server's CSRF check accepts
+// only from the same origin.
+export const getCommonPostRequestProps = async (): Promise<RequestInit> => ({
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/json' },
+    method: 'POST',
+});
 
 type InitiateMultipartUploadProps = {
     contentType: string;

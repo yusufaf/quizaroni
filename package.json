@@ -11,8 +11,8 @@
     },
     "scripts": {
         "dev:web": "pnpm --filter @quizaroni/web dev",
+        "dev:server": "pnpm --filter @quizaroni/server dev --public-url http://127.0.0.1:3000",
         "build:web": "pnpm --filter @quizaroni/web build",
-        "build:web:selfhost": "pnpm --filter @quizaroni/web build:selfhost",
         "build:binary": "pnpm --filter @quizaroni/server build:binary",
         "build:api": "pnpm --filter @quizaroni/api build",
         "build": "pnpm -r build",

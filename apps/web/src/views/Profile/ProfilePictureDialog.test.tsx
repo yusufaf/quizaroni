@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it, vi } from 'vite-plus/test';
+import { describe, expect, it, vi } from 'vite-plus/test';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { createLightTheme } from 'shared/theme/themes';
@@ -19,10 +19,6 @@ vi.mock('state/api/usersAPI', () => ({
     useUploadProfilePicture: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }));
 
-afterEach(() => {
-    vi.unstubAllEnvs();
-});
-
 const renderDialog = () =>
     render(
         <ThemeProvider theme={createLightTheme()}>
@@ -35,24 +31,11 @@ const renderDialog = () =>
     );
 
 describe('ProfilePictureDialog', () => {
-    it('offers the upload in a self-host build', () => {
-        vi.stubEnv('VITE_BACKEND', 'selfhost');
+    it('offers the upload', () => {
         renderDialog();
         expect(
             screen.getByText('profilePictureDialog.presetAvatars')
         ).toBeTruthy();
-        expect(
-            screen.getByText('profilePictureDialog.uploadCustomImage')
-        ).toBeTruthy();
-        expect(
-            screen.getByRole('button', {
-                name: 'profilePictureDialog.chooseFile',
-            })
-        ).toBeTruthy();
-    });
-
-    it('offers the upload in the AWS build', () => {
-        renderDialog();
         expect(
             screen.getByText('profilePictureDialog.uploadCustomImage')
         ).toBeTruthy();

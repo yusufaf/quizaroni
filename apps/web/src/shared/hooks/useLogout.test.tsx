@@ -6,10 +6,10 @@ import { clearLocalData, hasUnsyncedLocalChanges } from 'state/local/localData';
 import { reloadPage } from 'state/local/owner';
 import { useLogout, useSignOut } from './useLogout';
 
-const signOut = vi.fn<(redirectUri?: string) => Promise<void>>();
+const signOut = vi.fn<() => Promise<void>>();
 
-vi.mock('@logto/react', () => ({
-    useLogto: () => ({ signOut }),
+vi.mock('shared/auth/useAuth', () => ({
+    useAuth: () => ({ isAuthenticated: true, signOut }),
 }));
 
 vi.mock('state/local/owner', () => ({
@@ -42,7 +42,7 @@ describe('useLogout', () => {
         await logout();
 
         expect(clearLocalData).toHaveBeenCalledOnce();
-        expect(signOut).toHaveBeenCalledExactlyOnceWith(window.location.origin);
+        expect(signOut).toHaveBeenCalledOnce();
         expect(
             vi.mocked(clearLocalData).mock.invocationCallOrder[0]!
         ).toBeLessThan(signOut.mock.invocationCallOrder[0]!);

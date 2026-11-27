@@ -793,15 +793,6 @@
             "generic": "Etwas ist schiefgelaufen. Versuche es erneut."
         }
     },
-    "report": {
-        "action": "Melden",
-        "cardLabel": "{{title}} melden",
-        "emailSubject": "Meldung: {{title}}",
-        "emailIntro": "Ich möchte dieses öffentliche Lernset melden.",
-        "setId": "Lernset-ID",
-        "setLink": "Link",
-        "reason": "Grund"
-    },
     "save": {
         "action": "Speichern",
         "saving": "Wird gespeichert…",

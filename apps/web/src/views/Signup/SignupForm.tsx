@@ -34,7 +34,6 @@ const NAME_MAX = 100;
 
 type FieldErrors = Partial<Record<'name' | 'password' | 'confirm', string>>;
 
-// The self-host sign-up form; the AWS build redirects to Logto (Signup.tsx).
 const SignupForm = () => {
     const { t } = useTranslation('auth');
     useBrowserTitle(PAGE_TITLES.SIGN_UP);

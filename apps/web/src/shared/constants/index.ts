@@ -7,10 +7,6 @@ import type {
 } from 'shared/types';
 import { randomUUID } from '../utilities/uuid';
 
-// Canonical URLs always name the custom domain, whichever host served the
-// page. Mirrors SITE_ORIGIN in netlify/lib/site.ts.
-export const SITE_ORIGIN = 'https://quizaroni.yusufaf.dev';
-
 export const LIGHT = 'light';
 export const DARK = 'dark';
 
@@ -30,11 +26,6 @@ export const QUERY_PARAMS = {
     EXPLORE_SUBJECT: 'subject',
     EXPLORE_QUERY: 'q',
 } as const;
-
-// Login.tsx and Signup.tsx stash the return path here (rememberReturnPath)
-// before the full-page redirect to Logto's hosted page (which loses React
-// Router state); Callback.tsx reads it back once the OIDC exchange completes.
-export const POST_SIGN_IN_REDIRECT_KEY = 'quizaroni.postSignInRedirect';
 
 export const PAGE_TITLES = {
     CREATE: 'Create',

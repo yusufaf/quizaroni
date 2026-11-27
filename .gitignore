@@ -7,8 +7,6 @@ node_modules/
 .env
 .env.*
 !.env.example
-!apps/web/.env.selfhost
-!apps/web/.env.production
 *.env
 
 # build output

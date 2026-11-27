@@ -769,15 +769,6 @@
             "generic": "問題が発生しました。もう一度お試しください。"
         }
     },
-    "report": {
-        "action": "報告",
-        "cardLabel": "{{title}}を報告",
-        "emailSubject": "報告: {{title}}",
-        "emailIntro": "この公開学習セットについて報告します。",
-        "setId": "セットID",
-        "setLink": "リンク",
-        "reason": "理由"
-    },
     "save": {
         "action": "保存",
         "saving": "保存中…",

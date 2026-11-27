@@ -1,16 +1,10 @@
 // @vitest-environment jsdom
-import {
-    describe,
-    it,
-    expect,
-    beforeEach,
-    afterEach,
-    vi,
-} from 'vite-plus/test';
+import { describe, it, expect, beforeEach } from 'vite-plus/test';
 import { renderHook } from '@testing-library/react';
 import useCanonical from './useCanonical';
 
-const ORIGIN = 'https://quizaroni.yusufaf.dev';
+const SHELL_ORIGIN = 'https://quizaroni.yusufaf.dev';
+const ORIGIN = window.location.origin;
 const NOINDEX = '<meta name="robots" content="noindex" />';
 
 const canonical = () =>
@@ -26,31 +20,20 @@ const navigate = (from: string, to: string) => {
 
 describe('useCanonical', () => {
     beforeEach(() => {
-        document.head.innerHTML = `<link rel="canonical" href="${ORIGIN}/" />`;
+        document.head.innerHTML = `<link rel="canonical" href="${SHELL_ORIGIN}/" />`;
     });
 
-    afterEach(() => {
-        vi.unstubAllEnvs();
-    });
-
-    it('names this instance on a self-host build', () => {
-        vi.stubEnv('VITE_BACKEND', 'selfhost');
+    it('names this instance, not the domain in the shell', () => {
         renderHook(() => useCanonical('/explore'));
 
-        expect(canonical()).toBe(`${window.location.origin}/explore`);
+        expect(ORIGIN).not.toBe(SHELL_ORIGIN);
+        expect(canonical()).toBe(`${ORIGIN}/explore`);
     });
 
     it.each(['/', '/explore', '/view/abc'])('points %s at itself', (path) => {
         renderHook(() => useCanonical(path));
 
         expect(canonical()).toBe(`${ORIGIN}${path}`);
-    });
-
-    it('names the custom domain whichever host served the page', () => {
-        renderHook(() => useCanonical('/explore'));
-
-        expect(window.location.origin).not.toBe(ORIGIN);
-        expect(canonical()).toBe(`${ORIGIN}/explore`);
     });
 
     it.each([
@@ -85,7 +68,7 @@ describe('useCanonical', () => {
         expect(canonical()).toBeNull();
     });
 
-    // og-meta's noindex meta stays in the head after SPA navigation, but it
+    // The server's noindex meta stays in the head after SPA navigation, but it
     // only describes the page the server sent.
     it.each(['/explore', '/view/public'])(
         'sets a canonical on %s after leaving a noindex set',

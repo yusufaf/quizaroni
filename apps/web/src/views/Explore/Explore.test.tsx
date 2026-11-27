@@ -68,8 +68,8 @@ vi.mock('./CommunitySection', () => ({ default: () => null }));
 vi.mock('./FeaturedSection', () => ({ default: () => null }));
 
 // Signed in: For you. The logged-out page has its own test file.
-vi.mock('@logto/react', () => ({
-    useLogto: () => ({ isAuthenticated: true, isLoading: false }),
+vi.mock('shared/auth/useAuth', () => ({
+    useAuth: () => ({ isAuthenticated: true, signOut: vi.fn() }),
 }));
 
 vi.mock('state/local/repositories', () => ({

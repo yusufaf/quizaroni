@@ -15,7 +15,7 @@ import SignUpBanner from './SignUpBanner';
 const Explore = () => {
     const { t } = useTranslation('explore');
     useBrowserTitle(t('title'));
-    const { isAuthenticated, isLoading } = useAuth();
+    const { isAuthenticated } = useAuth();
     const [searchParams] = useSearchParams();
     // While searching, the results sit right under the field: For you and
     // Featured step aside (#137).
@@ -45,13 +45,10 @@ const Explore = () => {
                         </Typography>
                         <ExploreSearchField />
                     </Box>
-                    {/* Logto starts every page load logged out and loading, so
-                        the banner waits for it: a signed-in reload mustn't
-                        flash a sign-up pitch. */}
                     {isAuthenticated ? (
                         <PersonalSection searching={searching} />
                     ) : (
-                        !isLoading && <SignUpBanner />
+                        <SignUpBanner />
                     )}
                     {/* Below the empty-library state and the banner too: a
                         new user can still browse public sets. Featured

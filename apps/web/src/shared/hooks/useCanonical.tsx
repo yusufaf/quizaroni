@@ -1,9 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { isSelfHost } from 'shared/auth/backend';
-import { SITE_ORIGIN } from 'shared/constants';
 
 // index.html ships one canonical naming the home page, and only /view/* is
-// rewritten server-side (netlify/edge-functions/og-meta.ts). Without this,
+// rewritten server-side (apps/server/src/seo/pages.ts). Without this,
 // every other route claims to be "/" and fails Lighthouse's canonical audit.
 const isIndexable = (path: string) =>
     path === '/' || path === '/explore' || /^\/view\/[^/]+$/.test(path);
@@ -14,7 +12,7 @@ const normalize = (pathname: string) =>
 
 export default function useCanonical(pathname: string) {
     // The first path this hook sees is the page the server sent, the only
-    // one og-meta's noindex meta can speak for: it outlives SPA navigation.
+    // one the server's noindex meta can speak for: it outlives SPA navigation.
     const servedPath = useRef(pathname);
 
     useEffect(() => {
@@ -22,7 +20,7 @@ export default function useCanonical(pathname: string) {
         let link = document.head.querySelector<HTMLLinkElement>(
             'link[rel="canonical"]'
         );
-        // og-meta marks a private or missing set noindex and strips the
+        // The server marks a private or missing set noindex and strips the
         // canonical; don't put one back.
         const noindexSet =
             pathname === servedPath.current &&
@@ -39,8 +37,7 @@ export default function useCanonical(pathname: string) {
             link.rel = 'canonical';
             document.head.appendChild(link);
         }
-        // A self-host instance has no fixed domain; it names itself.
-        const origin = isSelfHost() ? window.location.origin : SITE_ORIGIN;
-        link.href = `${origin}${path}`;
+        // An instance has no fixed domain; it names itself.
+        link.href = `${window.location.origin}${path}`;
     }, [pathname]);
 }

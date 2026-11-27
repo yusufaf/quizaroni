@@ -2,8 +2,9 @@ import type { HtmlTagDescriptor, Plugin } from 'vite-plus';
 
 /**
  * The Umami <script> tag for this build's env, or null when analytics is off.
- * The hosted build sets the VITE_UMAMI_* values in .env.production; the
- * self-host build leaves them unset, so its index.html has no tag.
+ * The hosted image sets the VITE_UMAMI_* values in
+ * .github/workflows/hosted-image.yml; the stock build leaves them unset, so
+ * its index.html has no tag.
  */
 export function umamiScriptTag(
     env: Record<string, string | undefined>

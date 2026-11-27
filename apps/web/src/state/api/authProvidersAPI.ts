@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { isSelfHost } from 'shared/auth/backend';
 import {
     SOCIAL_PROVIDERS,
     type SocialProvider,
@@ -15,11 +14,10 @@ export type AuthProviders = {
     registrationOpen: boolean;
 };
 
-// The sign-in methods the self-host server offers besides email and password.
-// undefined while loading, on failure and in the hosted build, so the forms
-// simply show no extra buttons.
+// The sign-in methods the server offers besides email and password.
+// undefined while loading and on failure, so the forms simply show no extra
+// buttons.
 export const useAuthProviders = (): AuthProviders | undefined => {
-    const selfHost = isSelfHost();
     const { data } = useQuery({
         queryKey: AUTH_PROVIDERS_KEY,
         queryFn: async (): Promise<AuthProviders> => {
@@ -40,9 +38,8 @@ export const useAuthProviders = (): AuthProviders | undefined => {
                 registrationOpen: parsed.registrationOpen,
             };
         },
-        enabled: selfHost,
         retry: false,
         staleTime: 60_000,
     });
-    return selfHost ? data : undefined;
+    return data;
 };

@@ -33,8 +33,8 @@ vi.mock('react-i18next', () => ({
 }));
 
 // The Save button reads auth itself (#140).
-vi.mock('@logto/react', () => ({
-    useLogto: () => ({ isAuthenticated: false }),
+vi.mock('shared/auth/useAuth', () => ({
+    useAuth: () => ({ isAuthenticated: false, signOut: vi.fn() }),
 }));
 
 const uuid = (n: number) =>
@@ -66,7 +66,7 @@ type Reply =
 // it between calls.
 let replies: Record<string, Reply | (() => Reply)>;
 const fetchMock = vi.fn(async (url: string) => {
-    const params = new URL(url).searchParams;
+    const params = new URL(url, 'http://localhost').searchParams;
     const cursor = params.get('cursor') ?? '';
     const subject = params.get('subject');
     const q = params.get('q');
@@ -434,7 +434,8 @@ describe('CommunitySection', () => {
 
             fireEvent.click(loadMore()!);
             await waitFor(() => expect(titles()).toHaveLength(26));
-            const last = new URL(fetchedUrls().at(-1)!).searchParams;
+            const last = new URL(fetchedUrls().at(-1)!, 'http://localhost')
+                .searchParams;
             expect(last.get('subject')).toBe('math');
             expect(last.get('cursor')).toBe('m1');
         });

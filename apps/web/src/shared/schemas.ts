@@ -5,11 +5,11 @@ import type { PublishError } from '@quizaroni/shared-types';
 // #region Base Schemas
 // Any version: the Explore seed script derives v5 study set ids.
 export const UUIDSchema = z.uuid();
-// Logto's `sub`, a short random string rather than a UUID.
+// Imported accounts keep their Logto `sub`, a short random string, not a UUID.
 export const UserIdSchema = z.string().min(1);
 export const TimestampSchema = z.iso.datetime();
-// A self-host server serves files from its own origin at /api/files/…; the
-// AWS build hands out absolute signed URLs.
+// Files are served from /api/files/…; absolute URLs survive in data cached
+// before the move off AWS.
 export const FileURLSchema = z.union([
     z.url(),
     z.string().regex(/^\/api\/files\/[^?#\s]+$/),
@@ -227,7 +227,7 @@ export const CreateStudysetResponseSchema = z.object({
 });
 
 // Public (unauthenticated) read of a shared set. An explicit allowlist that
-// mirrors `toPublicStudyset` in `apps/api/utilities/publicStudyset.ts`; the
+// mirrors `toPublicStudyset` in `apps/server/src/public/views.ts`; the
 // owner's private fields and storage keys are never sent.
 export const PublicCardFileSchema = z.object({
     association: z.enum(['term', 'definition']),
@@ -256,7 +256,7 @@ export const GetPublicStudysetResponseSchema = z.object({
 });
 
 // Community feed (#135). Mirrors `toSummary` in
-// `apps/api/utilities/exploreFeed.ts`: text-only previews, no file data.
+// `apps/server/src/public/views.ts`: text-only previews, no file data.
 // `subject` is a plain string so a retired id doesn't fail validation.
 export const ExploreSetSummarySchema = z.object({
     studysetUUID: z.string(),

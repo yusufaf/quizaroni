@@ -42,7 +42,7 @@ try {
 }
 
 if (!values['skip-web']) {
-    await Bun.$`pnpm --filter @quizaroni/web build:selfhost`.cwd(repoRoot);
+    await Bun.$`pnpm --filter @quizaroni/web build`.cwd(repoRoot);
 }
 
 const webFiles = collectWebFiles(webDist);

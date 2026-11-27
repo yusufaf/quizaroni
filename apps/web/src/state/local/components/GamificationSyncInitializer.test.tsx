@@ -18,8 +18,8 @@ import { GamificationSyncInitializer } from './GamificationSyncInitializer';
 
 const userB: User = { ...DEFAULT_USER_DATA, userUUID: 'user-B' };
 
-vi.mock('@logto/react', () => ({
-    useLogto: () => ({ isAuthenticated: true }),
+vi.mock('shared/auth/useAuth', () => ({
+    useAuth: () => ({ isAuthenticated: true, signOut: vi.fn() }),
 }));
 
 vi.mock('state/api/usersAPI', () => ({

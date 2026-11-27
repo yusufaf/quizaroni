@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Menu, MenuItem } from '@mui/material/';
-import { isSelfHost } from 'shared/auth/backend';
-import { useOptionalSession } from 'shared/auth/session/SessionProvider';
+import { useSession } from 'shared/auth/session/SessionProvider';
 import { useTheme } from 'theme/useTheme';
 import { styled } from '@mui/system';
 import { useGlobalStore } from 'state/stores/global';
@@ -13,8 +12,8 @@ const ProfileDropdown = (props) => {
 
     const { setFeedbackDialogOpen } = useGlobalStore();
     const { t } = useTranslation('admin');
-    const session = useOptionalSession();
-    const isAdmin = isSelfHost() && session?.user?.role === 'admin';
+    const { user } = useSession();
+    const isAdmin = user?.role === 'admin';
 
     const StyledProfileLink = styled(Link)({
         textDecoration: 'none',
