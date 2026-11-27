@@ -1,6 +1,6 @@
 {
     "name": "quizaroni",
-    "version": "0.6.3",
+    "version": "0.6.4",
     "private": true,
     "description": "Quizaroni — a flashcard / quiz study app. React PWA and a self-hostable Bun server.",
     "license": "MIT",
