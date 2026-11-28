@@ -7,6 +7,12 @@ import type {
     UnpublishedOnSave,
     UUID,
 } from '@quizaroni/shared-types';
+import type {
+    DarkThemeId,
+    LightThemeId,
+    ThemeId,
+    ThemeModePref,
+} from 'shared/theme/themeIds';
 
 // #region Utility Types
 export type TODO = any;
@@ -40,11 +46,14 @@ export type User = {
     metadata: {
         avatar?: AvatarMetadata;
         confirmDestructiveActions?: boolean;
+        darkTheme?: DarkThemeId;
         defaultDownloadFormat: DownloadSetFormat;
+        /** @deprecated Nothing reads or writes it; kept so old JSON backups still import. */
         defaultTheme: AppTheme;
         density?: 'compact' | 'standard' | 'comfortable';
         fontSizeScale?: number;
         homeView: HomeView;
+        lightTheme?: LightThemeId;
         namedColors: NamedColor[];
         notifications?: NotificationPreferences;
         gamification?: GamificationState;
@@ -52,6 +61,8 @@ export type User = {
         preferredDateFormat: PreferredDateFormat;
         preferredTimeFormat?: PreferredTimeFormat;
         showSeconds?: boolean;
+        themeAccents?: Partial<Record<ThemeId, string>>;
+        themeMode?: ThemeModePref;
         ttsVoice?: string;
         hapticsEnabled?: boolean;
         aiProvider?: 'openai' | 'anthropic' | 'google';

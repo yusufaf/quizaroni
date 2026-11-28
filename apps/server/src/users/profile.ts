@@ -165,7 +165,13 @@ export function updateMetadata(
     now = new Date()
 ): UserView {
     return writeProfile(db, userId, now, (tx, profile) => {
-        writeMetadata(tx, userId, { ...profile.metadata, ...updates }, now);
+        const merged: JsonObject = { ...profile.metadata, ...updates };
+        // Accents are per theme, so one device's pick must not drop another's.
+        const stored = profile.metadata.themeAccents;
+        if (isPlainObject(stored) && isPlainObject(updates.themeAccents)) {
+            merged.themeAccents = deepMerge(stored, updates.themeAccents);
+        }
+        writeMetadata(tx, userId, merged, now);
         return viewAfterWrite(tx, userId);
     });
 }

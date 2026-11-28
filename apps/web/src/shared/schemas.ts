@@ -1,6 +1,11 @@
 import { z } from 'zod';
 import { SUBJECT_IDS } from '@quizaroni/shared-types';
 import type { PublishError } from '@quizaroni/shared-types';
+import {
+    DARK_THEME_IDS,
+    LIGHT_THEME_IDS,
+    THEME_MODE_PREFS,
+} from 'shared/theme/themeIds';
 
 // #region Base Schemas
 // Any version: the Explore seed script derives v5 study set ids.
@@ -159,12 +164,15 @@ export const UserMetadataSchema = z.object({
     aiProvider: z.enum(['openai', 'anthropic', 'google']).optional(),
     avatar: AvatarMetadataSchema.optional(),
     confirmDestructiveActions: z.boolean().optional(),
+    darkTheme: z.enum(DARK_THEME_IDS).optional(),
     defaultDownloadFormat: z.enum(['TXT', 'JSON', 'CSV', 'MD']),
+    // Deprecated: never read; kept so old JSON backups still import.
     defaultTheme: z.enum(['light', 'dark']),
     density: z.enum(['compact', 'standard', 'comfortable']).optional(),
     fontSizeScale: z.number().min(0.75).max(1.5).optional(),
     hapticsEnabled: z.boolean().optional(),
     homeView: z.enum(['table', 'grid', 'html']),
+    lightTheme: z.enum(LIGHT_THEME_IDS).optional(),
     namedColors: z.array(NamedColorSchema),
     notifications: NotificationPreferencesSchema.optional(),
     gamification: GamificationStateSchema.optional(),
@@ -172,6 +180,8 @@ export const UserMetadataSchema = z.object({
     preferredDateFormat: z.enum(['YYYY-MM-DD', 'DD/MM/YYYY', 'MM/DD/YYYY']),
     preferredTimeFormat: z.enum(['12h', '24h']).optional(),
     showSeconds: z.boolean().optional(),
+    themeAccents: z.record(z.string().max(64), z.string().max(64)).optional(),
+    themeMode: z.enum(THEME_MODE_PREFS).optional(),
     ttsVoice: z.string().optional(),
     visibleColumns: z.record(z.string(), z.boolean()).optional(),
 });

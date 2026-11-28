@@ -162,6 +162,33 @@ describe('updateMetadata', () => {
         expect(view.updatedAt).toBe(T1.toISOString());
     });
 
+    test('merges themeAccents per theme and still replaces other keys', () => {
+        const db = freshDb();
+        const id = addUser(db, 'u1');
+        updateMetadata(
+            db,
+            id,
+            { themeAccents: { a: 'x' }, homeView: 'grid' },
+            T0
+        );
+        const view = updateMetadata(
+            db,
+            id,
+            { themeAccents: { b: 'y' }, homeView: 'table' },
+            T1
+        );
+        expect(view.metadata.themeAccents).toEqual({ a: 'x', b: 'y' });
+        expect(view.metadata.homeView).toBe('table');
+    });
+
+    test('replaces a stored themeAccents that is not an object', () => {
+        const db = freshDb();
+        const id = addUser(db, 'u1');
+        updateMetadata(db, id, { themeAccents: 'broken' }, T0);
+        const view = updateMetadata(db, id, { themeAccents: { b: 'y' } }, T1);
+        expect(view.metadata.themeAccents).toEqual({ b: 'y' });
+    });
+
     test('refuses to store more than the cap and leaves the row alone', () => {
         const db = freshDb();
         const id = addUser(db, 'u1');
