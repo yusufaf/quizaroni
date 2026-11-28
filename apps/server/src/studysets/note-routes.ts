@@ -5,7 +5,6 @@ import type { SessionEnv } from '../http/session';
 import type { JsonObject } from '../users/metadata';
 import { createNote, deleteNote, editNote } from './notes';
 import { message } from './respond';
-import { StudysetTooLargeError } from './store';
 import { isStudysetUUID } from './updates';
 
 const isId = (value: unknown): value is string =>
@@ -43,16 +42,9 @@ async function handle(
     if (body === INVALID_JSON) return message(c, 'Invalid JSON', 400);
     const ids = readIds(body, needsNote);
     if (typeof ids === 'string') return message(c, ids, 400);
-    try {
-        const result = run(ids, body);
-        if (result instanceof Response) return result;
-        return message(c, NOT_FOUND[result.what], 404);
-    } catch (err) {
-        if (err instanceof StudysetTooLargeError) {
-            return message(c, 'Study set too large', 413);
-        }
-        throw err;
-    }
+    const result = run(ids, body);
+    if (result instanceof Response) return result;
+    return message(c, NOT_FOUND[result.what], 404);
 }
 
 export function addNoteRoutes(routes: Hono<SessionEnv>, db: Db): void {
