@@ -13,6 +13,7 @@ import { BoldTypography } from "styles/AppStyles";
 import ScrollToTopFab from "components/ScrollToTopFab/ScrollToTopFab";
 import useBrowserTitle from "hooks/useBrowserTitle";
 import useFilterViewCards from "hooks/useFilterViewCards";
+import useFooterOverlap from "hooks/useFooterOverlap";
 import useSortViewCards from "hooks/useSortViewCards";
 import { SortDirection, Studyset } from "shared/types";
 import { useEffect, useRef, useState } from "react";
@@ -163,6 +164,9 @@ const ViewStudySet = (props: Props) => {
       setIsNotesDrawerHidden(isWideScreen ? shouldBeHidden : true);
     }
   }, [selectedStudyset?.metadata?.notesDrawerInitial, isWideScreen]);
+
+  // The notes and AI panels are viewport-fixed; keep them above the footer.
+  useFooterOverlap();
 
   // Sync view mode from metadata
   useEffect(() => {

@@ -80,6 +80,7 @@ vi.mock('./ViewStudysetFilters/ViewStudysetFilters', () => ({
 vi.mock('./StudyModesGrid/StudyModesGrid', () => ({ default: () => null }));
 vi.mock('./NotesDrawer/NotesDrawer', () => ({ default: () => null }));
 vi.mock('./AIChatPanel/AIChatPanel', () => ({ default: () => null }));
+vi.mock('hooks/useFooterOverlap', () => ({ default: () => {} }));
 vi.mock('components/ScrollToTopFab/ScrollToTopFab', () => ({
     default: () => null,
 }));

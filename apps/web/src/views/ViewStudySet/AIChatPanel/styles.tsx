@@ -6,7 +6,7 @@ export const AIChatStyledDrawer = styled(Drawer)<{ anchor?: 'left' | 'right' }>(
         '& .MuiDrawer-paper': {
             position: 'fixed',
             top: '5rem',
-            height: 'calc(100vh - 6.5rem)',
+            height: 'calc(100vh - 6.5rem - var(--footer-overlap, 0px))',
             width: '24rem',
             ...(anchor === 'left' ? { left: '1.5rem' } : { right: '1.5rem' }),
             overflowY: 'auto',
@@ -14,6 +14,11 @@ export const AIChatStyledDrawer = styled(Drawer)<{ anchor?: 'left' | 'right' }>(
             background: 'transparent',
             display: 'flex',
             flexDirection: 'column',
+            // Below the scroll-to-top button, which shares this corner. Narrow
+            // screens keep the drawer layer so the mobile nav stays underneath.
+            [theme.breakpoints.up('lg')]: {
+                zIndex: theme.zIndex.fab - 1,
+            },
             '& > div': {
                 background: theme.palette.background.paper,
                 borderRadius: '0.75rem',
