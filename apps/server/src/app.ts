@@ -27,6 +27,7 @@ import { setupRoutes } from './setup/routes';
 import type { SetupGate } from './setup/setup';
 import { LISTED } from './studysets/gate';
 import { studysetRoutes } from './studysets/routes';
+import { StudysetTooLargeError } from './studysets/store';
 import { isStudysetUUID } from './studysets/updates';
 import { userRoutes } from './users/routes';
 import type { WebAssets } from './web-assets';
@@ -210,6 +211,10 @@ export function createApp({
     });
 
     app.onError((err, c) => {
+        // The one place a set over the size cap becomes a 413.
+        if (err instanceof StudysetTooLargeError) {
+            return c.json({ message: 'Study set too large' }, 413);
+        }
         console.error(sanitizeLogArg(err));
         if (isApiPath(c.req.path))
             return c.json({ message: 'Internal server error' }, 500);
