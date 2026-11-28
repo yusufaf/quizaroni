@@ -1,5 +1,5 @@
 import { PreferredDateFormat, PreferredTimeFormat } from 'shared/types';
-import { DATE_FORMATS, MIME_TYPES, TIME_FORMATS } from '../constants';
+import { DATE_FORMATS, TIME_FORMATS } from '../constants';
 
 export const getFormattedTimestamp = (): string => {
     const isoString = new Date().toISOString();
@@ -32,27 +32,29 @@ export const getRandomNumber = (min: number, max: number): number => {
     return Math.random() * (max - min) + min;
 };
 
-export const downloadObjectAsJSON = (data: object, fileName: string) => {
-    const jsonData = JSON.stringify(data, null, 4);
-    const blob = new Blob([jsonData], { type: MIME_TYPES.JSON });
-    const anchor = document.createElement('a');
-    anchor.download = fileName;
-    anchor.href = window.URL.createObjectURL(blob);
-    anchor.click();
-    anchor.remove();
-};
-
+/**
+ * Downloads `content` as a file through a temporary link, then releases the
+ * object URL so the blob does not stay in memory until the page closes.
+ * This is the only place that should build a download link.
+ */
 export const downloadFile = (
     content: string,
     fileName: string,
     mimeType: string
 ) => {
     const blob = new Blob([content], { type: mimeType });
+    const url = window.URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.download = fileName;
-    anchor.href = window.URL.createObjectURL(blob);
+    anchor.href = url;
     anchor.click();
     anchor.remove();
+    // Revoke on the next tick so the browser has started the download first.
+    setTimeout(() => window.URL.revokeObjectURL(url), 0);
+};
+
+export const downloadObjectAsJSON = (data: object, fileName: string) => {
+    downloadFile(JSON.stringify(data, null, 4), fileName, 'application/json');
 };
 
 export const formatBytes = (bytes: number): string => {
