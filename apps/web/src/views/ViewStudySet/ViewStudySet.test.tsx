@@ -69,7 +69,7 @@ vi.mock('./ManageCategoriesDialog/ManageCategoriesDialog', () => ({
 vi.mock('./NotificationsDialog/NotificationsDialog', () => ({
     default: () => null,
 }));
-vi.mock('./PrintDialog.tsx/PrintDialog', () => ({ default: () => null }));
+vi.mock('./PrintDialog/PrintDialog', () => ({ default: () => null }));
 vi.mock('./StudysetActions/StudysetActions', () => ({ default: () => null }));
 vi.mock('./StudysetSettings/StudysetSettings', () => ({ default: () => null }));
 vi.mock('./ViewStudySetCard', () => ({ default: () => null }));
