@@ -8,6 +8,7 @@ import {
     LinearProgress,
     Tooltip,
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -51,7 +52,8 @@ const StudyHeader = ({
                 backgroundColor: 'background.paper',
                 color: 'text.primary',
                 boxShadow: 2,
-                borderTop: '1px solid rgba(255, 160, 0, 0.2)',
+                borderTop: (theme) =>
+                    `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
             }}
         >
             <Toolbar
@@ -126,8 +128,10 @@ const StudyHeader = ({
                             px: '1rem',
                             py: '0.5rem',
                             borderRadius: '1.5rem',
-                            backgroundColor: 'rgba(255, 160, 0, 0.1)',
-                            border: '0.0625rem solid rgba(255, 160, 0, 0.3)',
+                            backgroundColor: (theme) =>
+                                alpha(theme.palette.primary.main, 0.1),
+                            border: (theme) =>
+                                `0.0625rem solid ${alpha(theme.palette.primary.main, 0.3)}`,
                         }}
                     >
                         <Typography variant="body1" sx={{ fontWeight: 600 }}>

@@ -64,6 +64,7 @@
     "devDependencies": {
         "@commitlint/cli": "^20.5.3",
         "@commitlint/config-conventional": "^20.5.3",
+        "@emotion/cache": "^11.14.0",
         "@playwright/test": "^1.65.1",
         "@tanstack/eslint-plugin-query": "^5.91.2",
         "@testing-library/dom": "^10.4.1",

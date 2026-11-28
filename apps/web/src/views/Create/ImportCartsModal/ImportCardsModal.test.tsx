@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vite-plus/test';
 import { render, screen, fireEvent, within } from '@testing-library/react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import ImportCardsModal from './ImportCardsModal';
 import { Card } from 'shared/types';
+import { createLightTheme } from 'shared/theme/themes';
 
-const theme = createTheme();
+const theme = createLightTheme();
 
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (k: string) => k }),

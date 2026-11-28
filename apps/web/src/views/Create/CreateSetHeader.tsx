@@ -1,5 +1,6 @@
 import { ArrowBack, Create } from '@mui/icons-material';
 import {
+    Box,
     Button,
     Autocomplete,
     TextField,
@@ -78,14 +79,15 @@ const CreateSetHeader = ({
                         <div>
                             <BoldTypography variant="subtitle1">
                                 {t('create.title')}
-                                <span
-                                    style={{
-                                        color: '#ff9800',
+                                <Box
+                                    component="span"
+                                    sx={{
+                                        color: 'primary.main',
                                         marginLeft: '4px',
                                     }}
                                 >
                                     *
-                                </span>
+                                </Box>
                             </BoldTypography>
                             <TitleInput
                                 variant="standard"

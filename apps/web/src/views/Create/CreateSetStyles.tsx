@@ -10,6 +10,7 @@ import {
     Typography,
 } from '@mui/material';
 import { styled } from '@mui/system';
+import { alpha } from '@mui/material/styles';
 import {
     BasePage,
     FlexColumn,
@@ -130,7 +131,7 @@ export const KeysToPressContainer = styled('div')({
 });
 
 /* ==== New Card Styled Components ====  */
-export const NewCard = styled(Card)({
+export const NewCard = styled(Card)(({ theme }) => ({
     padding: '1.25rem 0 2rem 0',
     borderRadius: '0.75rem',
     overflow: 'unset',
@@ -139,11 +140,11 @@ export const NewCard = styled(Card)({
     gap: '0.75rem',
     width: '100%',
     transition: 'all 0.2s ease',
-    boxShadow: '0 0.25rem 0.75rem rgba(255,160,0,0.15)',
+    boxShadow: `0 0.25rem 0.75rem ${alpha(theme.palette.primary.main, 0.15)}`,
     '&:hover': {
-        boxShadow: '0 0.375rem 1rem rgba(255,160,0,0.25)',
+        boxShadow: `0 0.375rem 1rem ${alpha(theme.palette.primary.main, 0.25)}`,
     },
-});
+}));
 
 export const AddCardButton = styled(Button)({
     display: 'flex',

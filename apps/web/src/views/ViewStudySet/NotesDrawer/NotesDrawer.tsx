@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { alpha } from "@mui/material/styles";
 import {
   Add as AddIcon,
   Close as CloseIcon,
@@ -391,7 +392,8 @@ const NotesDrawer = (props: Props) => {
                   "&:before": { display: "none" },
                   boxShadow: "0 0.125rem 0.375rem rgba(0,0,0,0.1)",
                   "&.Mui-expanded": {
-                    boxShadow: "0 0.25rem 0.75rem rgba(255,160,0,0.15)",
+                    boxShadow: (theme) =>
+                      `0 0.25rem 0.75rem ${alpha(theme.palette.primary.main, 0.15)}`,
                   },
                 }}
               >

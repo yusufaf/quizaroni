@@ -21,7 +21,7 @@ export const HomePage = styled(BasePage)(({ theme }) => ({
     [theme.breakpoints.up('md')]: {
         padding: '2rem',
     },
-    background: `linear-gradient(to bottom, ${theme.palette.background.default}, ${theme.palette.mode === 'dark' ? '#1a1a1a' : '#f5f5f5'})`,
+    background: `linear-gradient(to bottom, ${theme.palette.background.default}, ${theme.palette.other.gradientEnd})`,
 }));
 
 export const HomePaper = styled(Paper)(({ theme }) => ({

@@ -11,6 +11,7 @@ import {
     Snackbar,
     Alert,
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { Lightbulb } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useGetStudyset } from 'state/api/studysetsAPI';
@@ -401,10 +402,14 @@ const TypeWriteStudy = ({ studysetId }: Props) => {
                                             flexDirection: 'column',
                                             gap: '0.5rem',
                                             p: '1rem',
-                                            backgroundColor:
-                                                'rgba(255, 160, 0, 0.1)',
+                                            backgroundColor: (theme) =>
+                                                alpha(
+                                                    theme.palette.primary.main,
+                                                    0.1
+                                                ),
                                             borderRadius: '0.5rem',
-                                            border: '1px solid rgba(255, 160, 0, 0.3)',
+                                            border: (theme) =>
+                                                `1px solid ${alpha(theme.palette.primary.main, 0.3)}`,
                                         }}
                                     >
                                         {hintsUsed >= 1 && (

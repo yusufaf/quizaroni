@@ -10,6 +10,7 @@ import {
     Typography,
 } from '@mui/material';
 import { styled } from '@mui/system';
+import { alpha } from '@mui/material/styles';
 import {
     BasePage,
     BoldTypography,
@@ -170,7 +171,7 @@ export const StudyModePaper = styled(Paper)(({ theme }) => ({
         boxShadow:
             theme.palette.mode === 'dark'
                 ? 'none'
-                : '0 0.375rem 1rem rgba(255, 160, 0, 0.12), 0 0.125rem 0.5rem rgba(0, 0, 0, 0.06)',
+                : `0 0.375rem 1rem ${alpha(theme.palette.primary.main, 0.12)}, 0 0.125rem 0.5rem rgba(0, 0, 0, 0.06)`,
     },
 }));
 
@@ -233,7 +234,7 @@ export const ViewFlashsetCard = styled(Card)(({ theme }) => ({
     transition: 'all 0.2s ease',
     boxShadow:
         theme.palette.mode === 'dark'
-            ? '0 0.25rem 0.75rem rgba(255,160,0,0.15)'
+            ? `0 0.25rem 0.75rem ${alpha(theme.palette.primary.main, 0.15)}`
             : '0 0.25rem 1rem rgba(0, 0, 0, 0.08), 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04)',
     border:
         theme.palette.mode === 'light'
@@ -242,8 +243,8 @@ export const ViewFlashsetCard = styled(Card)(({ theme }) => ({
     '&:hover': {
         boxShadow:
             theme.palette.mode === 'dark'
-                ? '0 0.375rem 1rem rgba(255,160,0,0.25)'
-                : '0 0.5rem 1.5rem rgba(255, 160, 0, 0.12), 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08)',
+                ? `0 0.375rem 1rem ${alpha(theme.palette.primary.main, 0.25)}`
+                : `0 0.5rem 1.5rem ${alpha(theme.palette.primary.main, 0.12)}, 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08)`,
     },
 }));
 
@@ -322,7 +323,7 @@ export const ViewGridCard = styled(Card)(({ theme }) => ({
     transition: 'all 0.2s ease',
     boxShadow:
         theme.palette.mode === 'dark'
-            ? '0 0.25rem 0.75rem rgba(255,160,0,0.15)'
+            ? `0 0.25rem 0.75rem ${alpha(theme.palette.primary.main, 0.15)}`
             : '0 0.25rem 1rem rgba(0, 0, 0, 0.08), 0 0.125rem 0.5rem rgba(0, 0, 0, 0.04)',
     border:
         theme.palette.mode === 'light'
@@ -331,8 +332,8 @@ export const ViewGridCard = styled(Card)(({ theme }) => ({
     '&:hover': {
         boxShadow:
             theme.palette.mode === 'dark'
-                ? '0 0.375rem 1rem rgba(255,160,0,0.25)'
-                : '0 0.5rem 1.5rem rgba(255, 160, 0, 0.12), 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08)',
+                ? `0 0.375rem 1rem ${alpha(theme.palette.primary.main, 0.25)}`
+                : `0 0.5rem 1.5rem ${alpha(theme.palette.primary.main, 0.12)}, 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08)`,
     },
 }));
 

@@ -9,13 +9,14 @@ import {
     afterEach,
 } from 'vite-plus/test';
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
+import { createLightTheme } from 'shared/theme/themes';
 import i18n from 'i18n';
 import Home from './Home';
 
-const muiTheme = createTheme();
+const muiTheme = createLightTheme();
 
 const ID = '11111111-1111-4111-8111-111111111111';
 const ID_B = '22222222-2222-4222-8222-222222222222';

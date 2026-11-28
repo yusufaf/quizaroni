@@ -15,6 +15,7 @@ import {
     FileUpload as UploadIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/system';
+import { alpha } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import { SERVER_MANAGED_USER_METADATA_KEYS } from '@quizaroni/shared-types';
 import { User } from 'shared/types';
@@ -37,7 +38,7 @@ const EditorHeader = styled(Box)({
     alignItems: 'center',
 });
 
-const StyledTextarea = styled('textarea')<{ hasError: boolean }>(
+export const StyledTextarea = styled('textarea')<{ hasError: boolean }>(
     ({ theme, hasError }) => ({
         width: '100%',
         minHeight: '30rem',
@@ -47,8 +48,8 @@ const StyledTextarea = styled('textarea')<{ hasError: boolean }>(
         fontSize: '0.875rem',
         lineHeight: '1.5',
         tabSize: 4,
-        backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
-        color: theme.palette.mode === 'dark' ? '#d4d4d4' : '#1e1e1e',
+        backgroundColor: theme.palette.other.codeBg,
+        color: theme.palette.other.codeFg,
         border: `1px solid ${hasError ? theme.palette.error.main : theme.palette.divider}`,
         borderRadius: '0.5rem',
         outline: 'none',
@@ -58,19 +59,24 @@ const StyledTextarea = styled('textarea')<{ hasError: boolean }>(
             borderColor: hasError
                 ? theme.palette.error.main
                 : theme.palette.primary.main,
-            boxShadow: `0 0 0 2px ${hasError ? theme.palette.error.main + '33' : theme.palette.primary.main + '33'}`,
+            boxShadow: `0 0 0 2px ${alpha(
+                hasError
+                    ? theme.palette.error.main
+                    : theme.palette.primary.main,
+                0.2
+            )}`,
         },
         '&::selection': {
-            backgroundColor: theme.palette.primary.main + '44',
+            backgroundColor: alpha(theme.palette.primary.main, 0.267),
         },
     })
 );
 
-const ErrorList = styled(Box)(({ theme }) => ({
+export const ErrorList = styled(Box)(({ theme }) => ({
     maxHeight: '8rem',
     overflowY: 'auto',
     padding: '0.75rem',
-    backgroundColor: theme.palette.mode === 'dark' ? '#2d1515' : '#fef2f2',
+    backgroundColor: alpha(theme.palette.error.main, 0.12),
     border: `1px solid ${theme.palette.error.main}`,
     borderRadius: '0.25rem',
     display: 'flex',

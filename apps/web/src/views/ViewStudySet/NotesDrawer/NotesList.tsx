@@ -99,11 +99,11 @@ const NoteList = ({
                             }
                             style={{
                                 '& .MuiInput-underline:after': {
-                                    borderBottomColor: '#ffa000',
+                                    borderBottomColor: 'primary.main',
                                 },
                                 '& .MuiInput-underline:hover:not(.Mui-disabled):before':
                                     {
-                                        borderBottomColor: '#ffa000',
+                                        borderBottomColor: 'primary.main',
                                     },
                             }}
                         />
@@ -128,7 +128,7 @@ const NoteList = ({
                                             : 'text.secondary',
                                         '&:hover': {
                                             color: 'primary.main',
-                                            bgcolor: 'rgba(255,160,0,0.08)',
+                                            bgcolor: 'action.hover',
                                         },
                                     }}
                                 >
