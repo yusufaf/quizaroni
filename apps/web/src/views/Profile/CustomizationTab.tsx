@@ -1,10 +1,8 @@
 import {
     AccessTime as AccessTimeIcon,
-    DarkMode,
     Label,
     Language as LanguageIcon,
     Launch,
-    LightMode,
     Notifications as NotificationsIcon,
     Palette,
     DateRange as DateRangeIcon,
@@ -21,8 +19,6 @@ import {
     Select,
     SelectChangeEvent,
     Switch,
-    ToggleButton,
-    ToggleButtonGroup,
     Typography,
 } from '@mui/material';
 import NamedColorsDialog from 'components/NamedColorsDialog/NamedColorsDialog';
@@ -35,10 +31,8 @@ import {
     SUPPORTED_LANGUAGES,
 } from 'i18n/languages';
 import {
-    DARK,
     DATE_FORMATS,
     DOWNLOAD_FILE_TYPES,
-    LIGHT,
     TIME_FORMATS,
 } from 'shared/constants';
 import { SimpleFlexContainer } from 'shared/styles/AppStyles';
@@ -53,6 +47,7 @@ import {
 import { useGlobalStore } from 'state/stores/global';
 import NotificationsDialog from 'views/ViewStudySet/NotificationsDialog/NotificationsDialog';
 import { downloadTypeItems } from 'shared/components/downloadTypeItems';
+import ThemeModeControl from './Appearance/ThemeModeControl';
 
 const LOADING_IDS = {
     DATE_FORMAT: 'preferredDateFormat',
@@ -60,7 +55,6 @@ const LOADING_IDS = {
     SHOW_SECONDS: 'showSeconds',
     CONFIRM_DESTRUCTIVE: 'confirmDestructiveActions',
     DOWNLOAD_FORMAT: 'defaultDownloadFormat',
-    DEFAULT_THEME: 'defaultTheme',
     TTS_VOICE: 'ttsVoice',
     HAPTICS_ENABLED: 'hapticsEnabled',
 };
@@ -79,10 +73,8 @@ const CustomizationTab = ({ userData }: Props) => {
     } = useGlobalStore();
 
     const {
-        userUUID = '',
         labels = [],
         metadata: {
-            defaultTheme = 'dark',
             preferredDateFormat,
             preferredTimeFormat = TIME_FORMATS.TWELVE_HOUR,
             showSeconds = false,
@@ -96,10 +88,6 @@ const CustomizationTab = ({ userData }: Props) => {
     const [loadingID, setLoadingID] = useState<string>('');
     const [notificationsDialogOpen, setNotificationsDialogOpen] =
         useState(false);
-
-    const defaultThemeLoading = useMemo(() => {
-        return loadingID === LOADING_IDS.DEFAULT_THEME;
-    }, [loadingID]);
 
     const dateFormatLoading = useMemo(() => {
         return loadingID === LOADING_IDS.DATE_FORMAT;
@@ -132,34 +120,6 @@ const CustomizationTab = ({ userData }: Props) => {
     const { voices } = useSpeechVoices();
 
     const { mutateAsync: updateUserMetadata } = useUpdateUserMetadata();
-
-    /**
-     * Update user's selected default theme
-     */
-    const handleDefaultTheme = async (event, newTheme) => {
-        try {
-            /* Don't take any action if selected theme is the same */
-            if (!userUUID || newTheme === null || newTheme === defaultTheme) {
-                return;
-            }
-
-            setLoadingID(LOADING_IDS.DEFAULT_THEME);
-
-            updateUserMetadata({
-                updates: {
-                    defaultTheme: newTheme,
-                },
-            })
-                .catch((error) => {
-                    console.error(`Failed to update default theme:`, error);
-                })
-                .finally(() => {
-                    setLoadingID('');
-                });
-        } catch (error) {
-            console.error('Error updating default theme');
-        }
-    };
 
     // #region Named Colors
     const openNamedColorsDialog = () => {
@@ -263,37 +223,7 @@ const CustomizationTab = ({ userData }: Props) => {
 
     return (
         <AccountViewContainer>
-            <ActionColumn>
-                <ActionHeader>
-                    <DarkMode />
-                    <Typography variant="h6">
-                        {t('profile.defaultTheme')}
-                    </Typography>
-                </ActionHeader>
-                <SimpleFlexContainer style={{ gap: '1rem' }}>
-                    <ToggleButtonGroup
-                        aria-label="Set default theme"
-                        exclusive
-                        onChange={handleDefaultTheme}
-                        value={defaultTheme}
-                        disabled={defaultThemeLoading}
-                    >
-                        <ToggleButton
-                            value={LIGHT}
-                            title={t('profile.switchToLight')}
-                        >
-                            <LightMode />
-                        </ToggleButton>
-                        <ToggleButton
-                            value={DARK}
-                            title={t('profile.switchToDark')}
-                        >
-                            <DarkMode />
-                        </ToggleButton>
-                    </ToggleButtonGroup>
-                    {defaultThemeLoading && <CircularProgress size={24} />}
-                </SimpleFlexContainer>
-            </ActionColumn>
+            <ThemeModeControl />
             <ActionColumn>
                 <ActionHeader>
                     <LanguageIcon />
