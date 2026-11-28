@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.7.0](https://github.com/yusufaf/quizaroni/compare/v0.6.4...v0.7.0) (2026-11-28)
+
+
+### Features
+
+* **web:** theme mode setting with account sync and first-paint theme ([#450](https://github.com/yusufaf/quizaroni/issues/450)) ([68b111e](https://github.com/yusufaf/quizaroni/commit/68b111e50c49db75abc3c8f3e8a857e1e5d8ae33))
+
+
+### Bug Fixes
+
+* remove [@ts-ignore](https://github.com/ts-ignore) comments in ControlMenu and NewCardHeader ([#438](https://github.com/yusufaf/quizaroni/issues/438)) ([#442](https://github.com/yusufaf/quizaroni/issues/442)) ([31ab092](https://github.com/yusufaf/quizaroni/commit/31ab092e637d803593785b2cbf0c4972ea362222))
+* **web:** keep notes and AI panels above the footer ([#444](https://github.com/yusufaf/quizaroni/issues/444)) ([#445](https://github.com/yusufaf/quizaroni/issues/445)) ([dfb8e35](https://github.com/yusufaf/quizaroni/commit/dfb8e35cf8ff05624bb54e3a184a8167c1dbaed7))
+* **web:** use stable keys for GlobalConfirmDialog message list ([#386](https://github.com/yusufaf/quizaroni/issues/386)) ([#390](https://github.com/yusufaf/quizaroni/issues/390)) ([8f134c6](https://github.com/yusufaf/quizaroni/commit/8f134c6fb5b1b68651fbf168640145b3b77e552e))
+
 ## [0.6.4](https://github.com/yusufaf/quizaroni/compare/v0.6.3...v0.6.4) (2026-11-27)
 
 
