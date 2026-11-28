@@ -69,12 +69,12 @@ const NewCardHeader = ({
             for (const el of elements) {
                 if (el.id.startsWith('rc-editable-input')) {
                     const domElement = document.getElementById(el.id);
-                    // @ts-ignore
-                    domElement.style.color = muiTheme.palette.text.primary;
-                    // @ts-ignore
-                    domElement.style.background =
-                        muiTheme.palette.background.paper;
-                    break;
+                    if (domElement instanceof HTMLElement) {
+                        domElement.style.color = muiTheme.palette.text.primary;
+                        domElement.style.background =
+                            muiTheme.palette.background.paper;
+                        break;
+                    }
                 }
             }
         }

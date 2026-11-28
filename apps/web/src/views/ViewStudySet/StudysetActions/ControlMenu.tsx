@@ -6,7 +6,7 @@ import {
     Typography,
 } from '@mui/material';
 import { SET_METADATA_FIELDS } from 'shared/constants';
-import { Studyset, TODO } from 'shared/types';
+import { Studyset, StudysetMetadata, TODO } from 'shared/types';
 import { useTheme } from 'theme/useTheme';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +17,7 @@ type Props = {
     onClose: () => void;
     open: boolean;
     selectedStudyset: Studyset | undefined;
-    updateMetadataState: any;
+    updateMetadataState: (property: string) => void;
     onOpenPublish: () => void;
 };
 
@@ -32,15 +32,11 @@ const ControlMenu = ({
     const { muiTheme } = useTheme();
     const { t } = useTranslation();
 
-    const { metadata = {} } = selectedStudyset || {};
+    const metadata: Partial<StudysetMetadata> = selectedStudyset?.metadata ?? {};
     const {
-        // @ts-ignore
         backgroundColorVisible = false,
-        // @ts-ignore
         publiclyViewable = false,
-        // @ts-ignore
         textColorVisible = false,
-        // @ts-ignore
         contentOnly = false,
     } = metadata;
 
