@@ -72,19 +72,25 @@ issue to discuss it before writing code.
 
 ## Translations
 
-The web app supports English and Spanish via `react-i18next`.
+The web app supports six locales (`en`, `es`, `de`, `fr`, `pt-BR`, `ja`) via
+`react-i18next`. `en` and `es` are marked `complete` in
+`apps/web/src/i18n/languages.ts`; the other four are `beta` and fall back to
+English for missing keys.
 
 - New user-facing strings, including `aria-label`s and tooltip titles, go
   through `t()`. New components should always use `useTranslation`. Some
-  older files are still hardcoded (tracked in #49); when editing one of those,
-  matching its existing strings is fine unless your issue is to translate it.
-- Add every new key to both `apps/web/src/i18n/locales/en/` and
-  `apps/web/src/i18n/locales/es/`. If you can't write Spanish, copy the English
-  text into the `es` file and say so in your PR.
-- A new namespace (a new `.json` file) also needs three edits in
-  `apps/web/src/i18n/index.ts`: import both the `en` and `es` files, add both
-  under `resources`, and add the name to the `ns` array. Otherwise `t()`
-  returns raw keys.
+  older files may still be hardcoded; when editing one of those, matching its
+  existing strings is fine unless your issue is to translate it.
+- Add every new key to the `complete` locales in
+  `apps/web/src/i18n/locales/en/` and `apps/web/src/i18n/locales/es/` (copy the
+  English text into `es` if you can't write Spanish and say so in your PR).
+  Add it to the beta locales when you can; missing keys there fall back to
+  English.
+- A new namespace (a new `.json` file) needs these edits: import the `en` file
+  in `apps/web/src/i18n/index.ts`, add it under `resources.en`, and add the
+  namespace name to `NAMESPACES` in `apps/web/src/i18n/languages.ts`. The other
+  locales are lazy-loaded by the `import.meta.glob` call in `i18n/index.ts`, so
+  adding their `.json` files is enough. Otherwise `t()` returns raw keys.
 
 ## Pull requests
 
