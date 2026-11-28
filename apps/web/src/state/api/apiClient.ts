@@ -16,6 +16,16 @@ export class HttpError extends Error {
 export const isHttpStatus = (error: unknown, status: number): boolean =>
     error instanceof HttpError && error.status === status;
 
+// Whether a failed push may succeed later without a local change, so it
+// shouldn't count toward the retry limit. 403 is included because the hosted
+// API's authorizer answers an expired or invalid token with 403, and a
+// read-only freeze answers 503: neither should retire an edit.
+export function isRetryableSyncError(error: unknown): boolean {
+    if (!(error instanceof HttpError)) return true;
+    if (error.status >= 500) return true;
+    return [401, 403, 408, 429].includes(error.status);
+}
+
 // A non-2xx response was being parsed as if it were success data at nearly
 // every call site (only studysetsAPI.ts's update-studyset checked
 // response.ok), then handed to validate(), which logs-and-swallows schema

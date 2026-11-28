@@ -162,6 +162,110 @@ describe('updateMetadata', () => {
         expect(view.updatedAt).toBe(T1.toISOString());
     });
 
+    test('merges themeAccents per theme and still replaces other keys', () => {
+        const db = freshDb();
+        const id = addUser(db, 'u1');
+        updateMetadata(
+            db,
+            id,
+            { themeAccents: { a: 'x' }, homeView: 'grid' },
+            T0
+        );
+        const view = updateMetadata(
+            db,
+            id,
+            { themeAccents: { b: 'y' }, homeView: 'table' },
+            T1
+        );
+        expect(view.metadata.themeAccents).toEqual({ a: 'x', b: 'y' });
+        expect(view.metadata.homeView).toBe('table');
+    });
+
+    test('ignores a themeAccents update that is not an object', () => {
+        const db = freshDb();
+        const id = addUser(db, 'u1');
+        expect(
+            updateMetadata(db, id, { themeAccents: 'broken' }, T0).metadata
+        ).not.toHaveProperty('themeAccents');
+        updateMetadata(db, id, { themeAccents: { a: 'x' } }, T0);
+        for (const bad of [null, ['x'], 'broken']) {
+            const view = updateMetadata(db, id, { themeAccents: bad }, T1);
+            expect(view.metadata.themeAccents).toEqual({ a: 'x' });
+        }
+    });
+
+    test('replaces a stored themeAccents that is not an object', () => {
+        const db = freshDb();
+        const id = addUser(db, 'u1');
+        ensureProfile(db, id, T0);
+        db.update(userProfile)
+            .set({
+                metadata: {
+                    ...profileRow(db, id)!.metadata,
+                    themeAccents: 'x',
+                },
+            })
+            .where(eq(userProfile.userId, id))
+            .run();
+        const view = updateMetadata(db, id, { themeAccents: { b: 'y' } }, T1);
+        expect(view.metadata.themeAccents).toEqual({ b: 'y' });
+    });
+
+    test('does not let unsafe keys use up the accent cap', () => {
+        const db = freshDb();
+        const id = addUser(db, 'u1');
+        const full = Object.fromEntries(
+            Array.from({ length: 63 }, (_, i) => [`t${i}`, 'a'])
+        );
+        updateMetadata(db, id, { themeAccents: full }, T0);
+        const updates = JSON.parse(
+            '{"themeAccents":{"__proto__":"a","constructor":"a","last":"b"}}'
+        );
+        const view = updateMetadata(db, id, updates, T1);
+        const accents = view.metadata.themeAccents as Record<string, string>;
+        expect(accents.last).toBe('b');
+        expect(Object.keys(accents)).toHaveLength(64);
+    });
+
+    test('keeps only short string accent entries', () => {
+        const db = freshDb();
+        const id = addUser(db, 'u1');
+        const view = updateMetadata(
+            db,
+            id,
+            {
+                themeAccents: {
+                    ok: 'orange',
+                    empty: '',
+                    number: 7,
+                    long: 'x'.repeat(65),
+                    ['k'.repeat(65)]: 'orange',
+                },
+            },
+            T0
+        );
+        expect(view.metadata.themeAccents).toEqual({ ok: 'orange' });
+    });
+
+    test('stops adding accent themes past the cap but still updates existing ones', () => {
+        const db = freshDb();
+        const id = addUser(db, 'u1');
+        const full = Object.fromEntries(
+            Array.from({ length: 64 }, (_, i) => [`t${i}`, 'a'])
+        );
+        updateMetadata(db, id, { themeAccents: full }, T0);
+        const view = updateMetadata(
+            db,
+            id,
+            { themeAccents: { t0: 'b', extra: 'c' } },
+            T1
+        );
+        const accents = view.metadata.themeAccents as Record<string, string>;
+        expect(Object.keys(accents)).toHaveLength(64);
+        expect(accents.t0).toBe('b');
+        expect(accents.extra).toBeUndefined();
+    });
+
     test('refuses to store more than the cap and leaves the row alone', () => {
         const db = freshDb();
         const id = addUser(db, 'u1');

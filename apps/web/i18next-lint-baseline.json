@@ -61,9 +61,6 @@
   "src/views/Profile/AISettingsTab.tsx": {
     "hardcoded: Select Provider": 1
   },
-  "src/views/Profile/CustomizationTab.tsx": {
-    "hardcoded: Set default theme": 1
-  },
   "src/views/Profile/Profile.tsx": {
     "hardcoded: AI Settings": 1
   },

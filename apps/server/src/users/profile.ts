@@ -20,6 +20,7 @@ import {
     MAX_METADATA_BYTES,
     mergeCustomAchievements,
     mergeGamificationState,
+    UNSAFE_KEYS,
     withUserMetadataDefaults,
 } from './metadata';
 
@@ -158,6 +159,33 @@ function writeMetadata(
         .run();
 }
 
+const MAX_THEME_ACCENTS = 64;
+const MAX_THEME_ACCENT_LENGTH = 64;
+
+// Accents are per theme, so one device's pick must not drop another's. Merged
+// entries are never pruned, so only short string pairs are kept and new
+// themes stop being added past a cap.
+function mergeThemeAccents(stored: unknown, incoming: JsonObject): JsonObject {
+    const base = isPlainObject(stored) ? stored : {};
+    let room = MAX_THEME_ACCENTS - Object.keys(base).length;
+    const accepted = Object.entries(incoming).filter(([key, value]) => {
+        if (
+            UNSAFE_KEYS.has(key) ||
+            key.length > MAX_THEME_ACCENT_LENGTH ||
+            typeof value !== 'string' ||
+            value.length === 0 ||
+            value.length > MAX_THEME_ACCENT_LENGTH
+        ) {
+            return false;
+        }
+        if (Object.hasOwn(base, key)) return true;
+        if (room <= 0) return false;
+        room -= 1;
+        return true;
+    });
+    return deepMerge(base, Object.fromEntries(accepted));
+}
+
 export function updateMetadata(
     db: Db,
     userId: string,
@@ -165,7 +193,21 @@ export function updateMetadata(
     now = new Date()
 ): UserView {
     return writeProfile(db, userId, now, (tx, profile) => {
-        writeMetadata(tx, userId, { ...profile.metadata, ...updates }, now);
+        const merged: JsonObject = { ...profile.metadata, ...updates };
+        if (isPlainObject(updates.themeAccents)) {
+            merged.themeAccents = mergeThemeAccents(
+                profile.metadata.themeAccents,
+                updates.themeAccents
+            );
+        } else if ('themeAccents' in updates) {
+            // A malformed value must not wipe every theme's accent.
+            if ('themeAccents' in profile.metadata) {
+                merged.themeAccents = profile.metadata.themeAccents;
+            } else {
+                delete merged.themeAccents;
+            }
+        }
+        writeMetadata(tx, userId, merged, now);
         return viewAfterWrite(tx, userId);
     });
 }

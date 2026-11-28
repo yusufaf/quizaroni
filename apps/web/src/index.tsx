@@ -18,7 +18,7 @@ root.render(
     <SessionProvider>
         <BrowserRouter>
             <CustomThemeProvider>
-                <CssBaseline />
+                <CssBaseline enableColorScheme />
                 <ErrorBoundary fallback={<CrashFallback />}>
                     <App />
                 </ErrorBoundary>

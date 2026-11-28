@@ -231,6 +231,53 @@ describe('EditableUserMetadataSchema', () => {
     });
 });
 
+describe('theme settings', () => {
+    it('keeps the theme keys when a user loads', () => {
+        const theme = {
+            themeMode: 'dark',
+            lightTheme: 'quizaroni-light',
+            darkTheme: 'quizaroni-dark',
+            themeAccents: { 'quizaroni-dark': 'orange' },
+        };
+        const parsed = GetUserResponseSchema.parse({
+            message: 'ok',
+            user: {
+                ...DEFAULT_USER_DATA,
+                email: 'user@example.com',
+                userUUID: '00000000-0000-4000-8000-000000000000',
+                metadata: { ...DEFAULT_USER_DATA.metadata, ...theme },
+            },
+        });
+        expect(parsed.user.metadata).toMatchObject(theme);
+    });
+
+    it('accepts a one-entry themeAccents in the settings editor', () => {
+        expect(
+            EditableUserMetadataSchema.safeParse({
+                themeAccents: { 'quizaroni-light': 'orange' },
+            }).success
+        ).toBe(true);
+    });
+
+    it('rejects a dark id in lightTheme', () => {
+        expect(
+            UserMetadataSchema.shape.lightTheme.safeParse('quizaroni-dark')
+                .success
+        ).toBe(false);
+        expect(
+            EditableUserMetadataSchema.safeParse({
+                lightTheme: 'quizaroni-dark',
+            }).success
+        ).toBe(false);
+    });
+
+    it('rejects an unknown themeMode', () => {
+        expect(
+            EditableUserMetadataSchema.safeParse({ themeMode: 'sepia' }).success
+        ).toBe(false);
+    });
+});
+
 describe('self-host file URLs', () => {
     const file = (signedURL: string) => ({
         association: 'term',

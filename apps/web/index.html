@@ -11,6 +11,51 @@
             content="Quizaroni turns any topic into flashcards you'll actually enjoy studying. Create study sets, study with 5 modes and spaced repetition, and share publicly — free forever."
         />
         <meta name="theme-color" content="#2b2b2b" />
+        <!-- Paints the saved theme's background before any CSS or JS loads.
+             Keep it directly after the theme-color meta (themeInit.test.ts). -->
+        <script id="theme-init">
+            (function () {
+                try {
+                    var s = {};
+                    try {
+                        s =
+                            JSON.parse(
+                                localStorage.getItem('quizaroni.theme')
+                            ) || {};
+                    } catch (e) {}
+                    if (s.v !== 1) s = {};
+                    var p = s.prefs || {};
+                    var o = s.modeOverride;
+                    var os =
+                        window.matchMedia &&
+                        window.matchMedia('(prefers-color-scheme: dark)')
+                            .matches
+                            ? 'dark'
+                            : 'light';
+                    var m =
+                        o === 'light' || o === 'dark'
+                            ? o
+                            : p.themeMode === 'light' || p.themeMode === 'dark'
+                              ? p.themeMode
+                              : os;
+                    var c = (s.paint && s.paint[m]) || {};
+                    var d = document.documentElement;
+                    d.style.backgroundColor =
+                        c.bg || (m === 'dark' ? '#121212' : '#f5f5f7');
+                    d.style.colorScheme = m;
+                    var meta = document.querySelector(
+                        'meta[name="theme-color"]'
+                    );
+                    if (!meta) {
+                        meta = document.createElement('meta');
+                        meta.name = 'theme-color';
+                        document.head.appendChild(meta);
+                    }
+                    meta.content =
+                        c.bar || (m === 'dark' ? '#1e1e1e' : '#ffffff');
+                } catch (e) {}
+            })();
+        </script>
 
         <!-- Default Open Graph / Twitter tags (app shell). Per-public-set pages
              should override og:title/description/image/url dynamically. -->
