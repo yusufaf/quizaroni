@@ -26,6 +26,7 @@ import {
     Tooltip,
     Typography,
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import {
     ArrowUpward,
     ArrowDownward,
@@ -128,8 +129,10 @@ const ViewStudysetFilters = ({
                             gap: '0.5rem',
                             padding: '0.5rem 1rem',
                             borderRadius: '1.5rem',
-                            backgroundColor: 'rgba(255, 160, 0, 0.1)',
-                            border: '0.0625rem solid rgba(255, 160, 0, 0.3)',
+                            backgroundColor: (theme) =>
+                                alpha(theme.palette.primary.main, 0.1),
+                            border: (theme) =>
+                                `0.0625rem solid ${alpha(theme.palette.primary.main, 0.3)}`,
                             width: 'fit-content',
                             flexShrink: 0,
                         }}
