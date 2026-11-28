@@ -3,6 +3,7 @@ import Footer from 'views/Footer/Footer';
 import NavBar from 'views/NavBar/NavBar';
 import MobileBottomNav from 'views/NavBar/MobileBottomNav';
 import { useTheme } from 'shared/theme/useTheme';
+import { ThemeSync } from 'shared/theme/ThemeSync';
 import AppRoutes from './AppRoutes';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -73,6 +74,7 @@ const App = () => {
 
     return (
         <QueryClientProvider client={queryClient}>
+            <ThemeSync />
             <ShortcutProvider>
                 <Suspense fallback={null}>
                     <GlobalSyncInitializer enableSync={true} />
