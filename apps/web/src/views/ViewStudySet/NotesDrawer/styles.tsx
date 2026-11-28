@@ -34,7 +34,7 @@ export const StyledDrawer = styled(Drawer, {
                   '& .MuiDrawer-paper': {
                       position: 'fixed',
                       top: '5rem',
-                      height: 'calc(100vh - 5rem)',
+                      height: 'calc(100vh - 5rem - var(--footer-overlap, 0px))',
                       width: 'min(24rem, calc(100vw - 3rem))',
                       ...(anchor === 'left'
                           ? { left: '1.5rem' }

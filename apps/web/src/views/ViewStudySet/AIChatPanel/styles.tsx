@@ -6,7 +6,7 @@ export const AIChatStyledDrawer = styled(Drawer)<{ anchor?: 'left' | 'right' }>(
         '& .MuiDrawer-paper': {
             position: 'fixed',
             top: '5rem',
-            height: 'calc(100vh - 6.5rem)',
+            height: 'calc(100vh - 6.5rem - var(--footer-overlap, 0px))',
             width: '24rem',
             ...(anchor === 'left' ? { left: '1.5rem' } : { right: '1.5rem' }),
             overflowY: 'auto',
