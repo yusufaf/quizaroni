@@ -20,6 +20,7 @@ import {
     MAX_METADATA_BYTES,
     mergeCustomAchievements,
     mergeGamificationState,
+    UNSAFE_KEYS,
     withUserMetadataDefaults,
 } from './metadata';
 
@@ -169,6 +170,7 @@ function mergeThemeAccents(stored: unknown, incoming: JsonObject): JsonObject {
     let room = MAX_THEME_ACCENTS - Object.keys(base).length;
     const accepted = Object.entries(incoming).filter(([key, value]) => {
         if (
+            UNSAFE_KEYS.has(key) ||
             key.length > MAX_THEME_ACCENT_LENGTH ||
             typeof value !== 'string' ||
             value.length === 0 ||
@@ -197,6 +199,13 @@ export function updateMetadata(
                 profile.metadata.themeAccents,
                 updates.themeAccents
             );
+        } else if ('themeAccents' in updates) {
+            // A malformed value must not wipe every theme's accent.
+            if ('themeAccents' in profile.metadata) {
+                merged.themeAccents = profile.metadata.themeAccents;
+            } else {
+                delete merged.themeAccents;
+            }
         }
         writeMetadata(tx, userId, merged, now);
         return viewAfterWrite(tx, userId);
