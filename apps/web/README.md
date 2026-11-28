@@ -8,10 +8,10 @@ Live: [quizaroni.yusufaf.dev](https://quizaroni.yusufaf.dev)
 
 - **React 18** + **TypeScript** on **Vite+** (`vp`) — unified toolchain wrapping Vite, Vitest, Oxlint, Oxfmt
 - **Material UI v5**, Emotion, Framer Motion
-- **State**: Redux Toolkit (RTK Query), Zustand, TanStack Query
-- **Routing**: React Router v6
+- **State**: Zustand stores, TanStack Query, Dexie (IndexedDB) for offline data
+- **Routing**: React Router v7
 - **Auth**: session cookie from the server's better-auth endpoints
-- **i18n**: react-i18next (English, Spanish)
+- **i18n**: react-i18next (English, Spanish, German, French, Portuguese (Brazil) and Japanese)
 - **Storage**: Dexie (IndexedDB) for offline cache
 - **Deploy**: served by `apps/server`, which embeds this build in its binaries and Docker image
 
@@ -48,8 +48,8 @@ src/
 ├── resources/    # Static assets
 ├── shared/       # Reusable components, hooks, theme
 ├── state/
-│   ├── api/      # RTK Query + custom API clients
-│   ├── slices/   # Redux slices
+│   ├── api/      # API clients used with TanStack Query
+│   ├── local/    # Dexie (IndexedDB) cache and offline sync engine
 │   └── stores/   # Zustand stores
 ├── views/        # Page-level route components
 └── i18n/         # Translation files
@@ -67,14 +67,14 @@ The app calls the same-origin `/api` (`src/state/api/apiClient.ts`). In developm
 
 ## Internationalization
 
-User-facing strings live in `src/i18n/locales/{en,es}/common.json`. Use the `useTranslation` hook:
+User-facing strings live in `src/i18n/locales/<language>/<namespace>.json` (e.g. `en/common.json`). Use the `useTranslation` hook:
 
 ```tsx
 const { t } = useTranslation();
 <Typography>{t('home.title')}</Typography>;
 ```
 
-Add new keys to both language files.
+English is bundled; the other five locales (`es`, `de`, `fr`, `pt-BR`, `ja`) are lazy-loaded. `en` and `es` are marked `complete` in `src/i18n/languages.ts` and must translate every key; the others are `beta` and fall back to English for missing keys. Add new keys to both `complete` locales, and to the beta locales when you can.
 
 ## Known Limitations
 
