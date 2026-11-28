@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, TextField } from '@mui/material';
 import styled from '@emotion/styled';
+import { alpha } from '@mui/material/styles';
 
 export const StyledDialog = styled(Dialog)({
     '& .MuiDialog-paper': {
@@ -28,7 +29,7 @@ export const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
     },
 }));
 
-export const CustomInputsContainer = styled('div')({
+export const CustomInputsContainer = styled('div')(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
     gap: '0.75rem',
@@ -36,10 +37,10 @@ export const CustomInputsContainer = styled('div')({
     marginLeft: '2rem',
     padding: '1rem',
     borderLeft: '0.1875rem solid',
-    borderColor: 'rgba(255, 165, 0, 0.3)',
-    backgroundColor: 'rgba(255, 165, 0, 0.05)',
+    borderColor: alpha(theme.palette.primary.main, 0.3),
+    backgroundColor: alpha(theme.palette.primary.main, 0.05),
     borderRadius: '0.25rem',
-});
+}));
 
 export const CustomInputRow = styled('div')({
     display: 'flex',

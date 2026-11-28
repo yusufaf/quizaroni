@@ -1,6 +1,6 @@
 import { styled } from '@mui/system';
 import { Button, IconButton, Paper } from '@mui/material';
-import type { SxProps, Theme } from '@mui/material/styles';
+import { alpha, type SxProps, type Theme } from '@mui/material/styles';
 import {
     AccountCircle,
     DarkMode,
@@ -18,9 +18,10 @@ export const activeNavLinkSx: SxProps<Theme> = {
     '&.active': {
         color: 'primary.main',
         backgroundColor: (theme) =>
-            theme.palette.mode === 'dark'
-                ? 'rgba(255, 152, 0, 0.12)'
-                : 'rgba(255, 152, 0, 0.08)',
+            alpha(
+                theme.palette.primary.main,
+                theme.palette.mode === 'dark' ? 0.12 : 0.08
+            ),
     },
 };
 
@@ -53,10 +54,10 @@ export const StyledNavLink = styled(NavLink)(({ theme }) => ({
     },
     '&.active': {
         color: theme.palette.primary.main,
-        backgroundColor:
-            theme.palette.mode === 'dark'
-                ? 'rgba(255, 152, 0, 0.12)'
-                : 'rgba(255, 152, 0, 0.08)',
+        backgroundColor: alpha(
+            theme.palette.primary.main,
+            theme.palette.mode === 'dark' ? 0.12 : 0.08
+        ),
     },
 }));
 
@@ -125,14 +126,14 @@ export const CreateStudySetButton = styled(Button)(({ theme }) => ({
     padding: '0.5rem 1.25rem',
     boxShadow:
         theme.palette.mode === 'dark'
-            ? '0 0 1rem rgba(255, 152, 0, 0.2)'
-            : '0 0.125rem 0.5rem rgba(255, 152, 0, 0.3)',
+            ? `0 0 1rem ${alpha(theme.palette.primary.main, 0.2)}`
+            : `0 0.125rem 0.5rem ${alpha(theme.palette.primary.main, 0.3)}`,
     transition: 'all 0.2s ease',
     '&:hover': {
         boxShadow:
             theme.palette.mode === 'dark'
-                ? '0 0 1.25rem rgba(255, 152, 0, 0.35)'
-                : '0 0.25rem 0.75rem rgba(255, 152, 0, 0.4)',
+                ? `0 0 1.25rem ${alpha(theme.palette.primary.main, 0.35)}`
+                : `0 0.25rem 0.75rem ${alpha(theme.palette.primary.main, 0.4)}`,
         transform: 'translateY(-0.0625rem)',
     },
 }));
