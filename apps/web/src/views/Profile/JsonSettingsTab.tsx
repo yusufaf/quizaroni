@@ -76,7 +76,7 @@ export const ErrorList = styled(Box)(({ theme }) => ({
     maxHeight: '8rem',
     overflowY: 'auto',
     padding: '0.75rem',
-    backgroundColor: theme.palette.mode === 'dark' ? '#2d1515' : '#fef2f2',
+    backgroundColor: alpha(theme.palette.error.main, 0.12),
     border: `1px solid ${theme.palette.error.main}`,
     borderRadius: '0.25rem',
     display: 'flex',

@@ -29,7 +29,7 @@
 &::selection{background-color:rgba(255,160,0,68)}
 
 /* JsonSettingsTab.ErrorList */
-&{background-color:rgba(254,242,242,255);border:1px solid rgba(211,47,47,255);border-radius:0.25rem}
+&{background-color:rgba(211,47,47,31);border:1px solid rgba(211,47,47,255);border-radius:0.25rem}
 
 /* JsonSettingsTab.StyledTextarea */
 &{background-color:rgba(245,245,245,255);color:rgba(30,30,30,255);border:1px solid rgba(0,0,0,31);border-radius:0.5rem;outline:none}
