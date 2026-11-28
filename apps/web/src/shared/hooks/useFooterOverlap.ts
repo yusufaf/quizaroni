@@ -12,21 +12,24 @@ export const FOOTER_OVERLAP_VAR = '--footer-overlap';
  */
 const useFooterOverlap = () => {
     useEffect(() => {
-        const footer = document.querySelector('footer');
-        if (!footer) return;
-
         const root = document.documentElement;
         let frame = 0;
         let lastOverlap = -1;
 
         const update = () => {
             frame = 0;
-            const overlap = Math.max(
-                0,
-                Math.round(
-                    window.innerHeight - footer.getBoundingClientRect().top
-                )
-            );
+            // Looked up on every update so a footer that mounts or remounts
+            // after this page still gets tracked.
+            const footer = document.querySelector('footer');
+            const overlap = footer
+                ? Math.max(
+                      0,
+                      Math.round(
+                          window.innerHeight -
+                              footer.getBoundingClientRect().top
+                      )
+                  )
+                : 0;
             if (overlap === lastOverlap) return;
             lastOverlap = overlap;
             root.style.setProperty(FOOTER_OVERLAP_VAR, `${overlap}px`);

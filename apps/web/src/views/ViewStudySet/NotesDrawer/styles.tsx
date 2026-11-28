@@ -33,6 +33,8 @@ export const StyledDrawer = styled(Drawer, {
                   // margin beside the content, so its background is transparent.
                   '& .MuiDrawer-paper': {
                       position: 'fixed',
+                      // Below the scroll-to-top button, which shares this corner.
+                      zIndex: theme.zIndex.fab - 1,
                       top: '5rem',
                       height: 'calc(100vh - 5rem - var(--footer-overlap, 0px))',
                       width: 'min(24rem, calc(100vw - 3rem))',

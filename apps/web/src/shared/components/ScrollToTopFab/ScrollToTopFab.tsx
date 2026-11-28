@@ -23,8 +23,7 @@ const ScrollToTopFab = () => {
                     position: 'fixed',
                     bottom: 'calc(var(--bottom-nav-offset) + 2rem)',
                     right: 'max(2rem, env(safe-area-inset-right, 0px))',
-                    // Above the floating notes and AI panels, which overlap this corner.
-                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                    zIndex: (theme) => theme.zIndex.fab,
                 }}
             >
                 <Fab

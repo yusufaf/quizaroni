@@ -55,6 +55,17 @@ describe('useFooterOverlap', () => {
         expect(readOverlap()).toBe('90px');
     });
 
+    it('picks up a footer that mounts after the hook', () => {
+        footer.remove();
+        footerTop = 750;
+        renderHook(() => useFooterOverlap());
+        expect(readOverlap()).toBe('0px');
+
+        document.body.appendChild(footer);
+        window.dispatchEvent(new Event('resize'));
+        expect(readOverlap()).toBe('50px');
+    });
+
     it('removes the variable on unmount', () => {
         footerTop = 700;
         const { unmount } = renderHook(() => useFooterOverlap());
