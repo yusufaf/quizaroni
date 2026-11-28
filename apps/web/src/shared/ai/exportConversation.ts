@@ -1,3 +1,4 @@
+import { downloadFile } from 'shared/utilities/general';
 import { AIMessage, AI_CHAT_MODES, AIChatMode } from './providers';
 
 const formatTimestamp = (iso: string): string => {
@@ -40,10 +41,9 @@ export const exportConversation = (
     messages: AIMessage[]
 ): void => {
     const markdown = buildConversationMarkdown(studysetTitle, messages);
-    const blob = new Blob([markdown], { type: 'text/markdown' });
-    const anchor = document.createElement('a');
-    anchor.download = `${studysetTitle}_AI_Conversation.md`;
-    anchor.href = window.URL.createObjectURL(blob);
-    anchor.click();
-    anchor.remove();
+    downloadFile(
+        markdown,
+        `${studysetTitle}_AI_Conversation.md`,
+        'text/markdown'
+    );
 };

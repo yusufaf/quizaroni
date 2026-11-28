@@ -24,12 +24,7 @@ import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTi
 import { useGetUser } from 'state/api/usersAPI';
 import { useTranslation } from 'react-i18next';
 import { downloadTypeItems } from 'shared/components/downloadTypeItems';
-
-type DownloadFileParams = {
-    data: any;
-    fileName: string;
-    fileType: string;
-};
+import { downloadFile } from 'shared/utilities/general';
 
 type Props = {
     onClose: () => void;
@@ -53,15 +48,6 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
     const [customFileName, setCustomFileName] = useState<string>(
         `${studyset.title}_Studyset`
     );
-
-    const downloadFile = ({ data, fileName, fileType }: DownloadFileParams) => {
-        const blob = new Blob([data], { type: MIME_TYPES[fileType] });
-        const anchor = document.createElement('a');
-        anchor.download = fileName;
-        anchor.href = window.URL.createObjectURL(blob);
-        anchor.click();
-        anchor.remove();
-    };
 
     const handleDownloadSet = () => {
         const { description, labels, title, cards } = studyset;
@@ -233,7 +219,11 @@ const DownloadSetModal = ({ open, onClose, studyset }: Props) => {
                 break;
         }
 
-        downloadFile({ data: blobData, fileName, fileType: downloadFileType });
+        downloadFile(
+            blobData,
+            fileName,
+            MIME_TYPES[downloadFileType] ?? 'application/json'
+        );
         onClose();
     };
 
