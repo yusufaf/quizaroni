@@ -8,7 +8,9 @@ import {
 import { isClaimCurrent } from '../owner';
 import { studysetRepository, userRepository } from '../repositories';
 import type { Studyset, UUID } from 'shared/types';
-import { HttpError, isHttpStatus } from 'state/api/apiClient';
+import { isHttpStatus, isRetryableSyncError } from 'state/api/apiClient';
+
+export { isRetryableSyncError } from 'state/api/apiClient';
 
 // Sync status events for UI feedback
 type SyncStatus = 'idle' | 'syncing' | 'error' | 'offline';
@@ -20,16 +22,6 @@ interface SyncState {
     // Study sets the server kept rejecting; they wait for a local edit.
     failedCount: number;
     error: string | null;
-}
-
-// Whether a failed push may succeed later without a local change, so it
-// shouldn't count toward the retry limit. 403 is included because the hosted
-// API's authorizer answers an expired or invalid token with 403, and a
-// read-only freeze answers 503: neither should retire an edit.
-export function isRetryableSyncError(error: unknown): boolean {
-    if (!(error instanceof HttpError)) return true;
-    if (error.status >= 500) return true;
-    return [401, 403, 408, 429].includes(error.status);
 }
 
 type SyncListener = (state: SyncState) => void;
