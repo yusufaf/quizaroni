@@ -19,7 +19,7 @@ import { useGetUser } from 'state/api/usersAPI';
 import { DEFAULT_USER_RESPONSE } from 'shared/constants';
 import CreateSetHeader from './CreateSetHeader';
 import { AddCardButton, AddCardIcon, CreateSetPage } from './CreateSetStyles';
-import ImportCardsModal from './ImportCartsModal/ImportCardsModal';
+import ImportCardsModal from './ImportCardsModal/ImportCardsModal';
 import NewCardInput from './NewCardInput/NewCardInput';
 import SetModificationButtons from './SetModificationButtons';
 import { Virtuoso } from 'react-virtuoso';

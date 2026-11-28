@@ -51,7 +51,7 @@ import {
 import DownloadSetModal from "./DownloadSetModal/DownloadSetModal";
 import ManageCategoriesDialog from "./ManageCategoriesDialog/ManageCategoriesDialog";
 import NotificationsDialog from "./NotificationsDialog/NotificationsDialog";
-import PrintDialog from "./PrintDialog.tsx/PrintDialog";
+import PrintDialog from "./PrintDialog/PrintDialog";
 import StudysetActions from "./StudysetActions/StudysetActions";
 import StudysetSettings from "./StudysetSettings/StudysetSettings";
 import ViewStudySetCard from "./ViewStudySetCard";
