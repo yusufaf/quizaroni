@@ -1,6 +1,7 @@
 import { createContext } from 'react';
 import { Theme } from '@mui/material/styles';
 import { type ThemeName } from 'shared/types';
+import type { PaletteOther } from './tokens';
 
 declare module '@mui/material/styles' {
     interface Theme {
@@ -8,11 +9,11 @@ declare module '@mui/material/styles' {
     }
 
     interface Palette {
-        other: any;
+        other: PaletteOther;
     }
 
     interface PaletteOptions {
-        other: any;
+        other?: PaletteOther;
     }
 }
 

@@ -60,3 +60,43 @@ describe('Quizaroni theme snapshots', () => {
         );
     });
 });
+
+describe('palette.other theme fields', () => {
+    it.each([
+        [
+            'quizaroni-light',
+            createLightTheme(),
+            {
+                surface: '#f5f5f5',
+                themeId: 'quizaroni-light',
+                highContrast: false,
+                gradientEnd: '#f5f5f5',
+                codeBg: '#f5f5f5',
+                codeFg: '#1e1e1e',
+            },
+        ],
+        [
+            'quizaroni-dark',
+            createDarkTheme(),
+            {
+                surface: '#262626',
+                themeId: 'quizaroni-dark',
+                highContrast: false,
+                gradientEnd: '#1a1a1a',
+                codeBg: '#1e1e1e',
+                codeFg: '#d4d4d4',
+            },
+        ],
+    ] as const)('%s', (_id, theme, expected) => {
+        const other = { ...theme.palette.other } as Record<string, unknown>;
+        expect(
+            Object.fromEntries(NEW_FIELDS.map((f) => [f, other[f]]))
+        ).toEqual(expected);
+    });
+
+    it('NEW_FIELDS lists every field beyond gold and primaryText', () => {
+        expect(Object.keys(createLightTheme().palette.other).sort()).toEqual(
+            ['gold', 'primaryText', ...NEW_FIELDS].sort()
+        );
+    });
+});
