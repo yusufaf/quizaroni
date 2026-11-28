@@ -158,6 +158,32 @@ function writeMetadata(
         .run();
 }
 
+const MAX_THEME_ACCENTS = 64;
+const MAX_THEME_ACCENT_LENGTH = 64;
+
+// Accents are per theme, so one device's pick must not drop another's. Merged
+// entries are never pruned, so only short string pairs are kept and new
+// themes stop being added past a cap.
+function mergeThemeAccents(stored: unknown, incoming: JsonObject): JsonObject {
+    const base = isPlainObject(stored) ? stored : {};
+    let room = MAX_THEME_ACCENTS - Object.keys(base).length;
+    const accepted = Object.entries(incoming).filter(([key, value]) => {
+        if (
+            key.length > MAX_THEME_ACCENT_LENGTH ||
+            typeof value !== 'string' ||
+            value.length === 0 ||
+            value.length > MAX_THEME_ACCENT_LENGTH
+        ) {
+            return false;
+        }
+        if (Object.hasOwn(base, key)) return true;
+        if (room <= 0) return false;
+        room -= 1;
+        return true;
+    });
+    return deepMerge(base, Object.fromEntries(accepted));
+}
+
 export function updateMetadata(
     db: Db,
     userId: string,
@@ -166,10 +192,11 @@ export function updateMetadata(
 ): UserView {
     return writeProfile(db, userId, now, (tx, profile) => {
         const merged: JsonObject = { ...profile.metadata, ...updates };
-        // Accents are per theme, so one device's pick must not drop another's.
-        const stored = profile.metadata.themeAccents;
-        if (isPlainObject(stored) && isPlainObject(updates.themeAccents)) {
-            merged.themeAccents = deepMerge(stored, updates.themeAccents);
+        if (isPlainObject(updates.themeAccents)) {
+            merged.themeAccents = mergeThemeAccents(
+                profile.metadata.themeAccents,
+                updates.themeAccents
+            );
         }
         writeMetadata(tx, userId, merged, now);
         return viewAfterWrite(tx, userId);

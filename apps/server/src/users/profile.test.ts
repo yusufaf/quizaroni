@@ -189,6 +189,45 @@ describe('updateMetadata', () => {
         expect(view.metadata.themeAccents).toEqual({ b: 'y' });
     });
 
+    test('keeps only short string accent entries', () => {
+        const db = freshDb();
+        const id = addUser(db, 'u1');
+        const view = updateMetadata(
+            db,
+            id,
+            {
+                themeAccents: {
+                    ok: 'orange',
+                    empty: '',
+                    number: 7,
+                    long: 'x'.repeat(65),
+                    ['k'.repeat(65)]: 'orange',
+                },
+            },
+            T0
+        );
+        expect(view.metadata.themeAccents).toEqual({ ok: 'orange' });
+    });
+
+    test('stops adding accent themes past the cap but still updates existing ones', () => {
+        const db = freshDb();
+        const id = addUser(db, 'u1');
+        const full = Object.fromEntries(
+            Array.from({ length: 64 }, (_, i) => [`t${i}`, 'a'])
+        );
+        updateMetadata(db, id, { themeAccents: full }, T0);
+        const view = updateMetadata(
+            db,
+            id,
+            { themeAccents: { t0: 'b', extra: 'c' } },
+            T1
+        );
+        const accents = view.metadata.themeAccents as Record<string, string>;
+        expect(Object.keys(accents)).toHaveLength(64);
+        expect(accents.t0).toBe('b');
+        expect(accents.extra).toBeUndefined();
+    });
+
     test('refuses to store more than the cap and leaves the row alone', () => {
         const db = freshDb();
         const id = addUser(db, 'u1');
