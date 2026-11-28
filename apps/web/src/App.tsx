@@ -1,10 +1,8 @@
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense } from 'react';
 import Footer from 'views/Footer/Footer';
 import NavBar from 'views/NavBar/NavBar';
 import MobileBottomNav from 'views/NavBar/MobileBottomNav';
 import { useTheme } from 'shared/theme/useTheme';
-import { DARK, LIGHT } from 'shared/constants/index';
 import AppRoutes from './AppRoutes';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -63,8 +61,7 @@ const ShortcutLayer = () => {
 };
 
 const App = () => {
-    const { setTheme, theme } = useTheme();
-    const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+    const { theme } = useTheme();
 
     const {
         loadingActions,
@@ -73,10 +70,6 @@ const App = () => {
         labelsDialogProps,
         logoutConfirmOpen,
     } = useGlobalStore();
-
-    useEffect(() => {
-        prefersDarkMode ? setTheme(DARK) : setTheme(LIGHT);
-    }, [prefersDarkMode]);
 
     return (
         <QueryClientProvider client={queryClient}>

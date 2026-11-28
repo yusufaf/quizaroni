@@ -1,7 +1,13 @@
 import { createContext } from 'react';
 import { Theme } from '@mui/material/styles';
-import { type ThemeName } from 'shared/types';
-import type { PaletteOther } from './tokens';
+import type {
+    FlatPrefs,
+    StoredTheme,
+    ThemePrefs,
+    ThemePrefsPatch,
+} from './prefs';
+import type { ThemeId } from './themeIds';
+import type { PaletteOther, ThemeMode } from './tokens';
 
 declare module '@mui/material/styles' {
     interface Theme {
@@ -18,13 +24,24 @@ declare module '@mui/material/styles' {
 }
 
 export interface ThemeContextType {
-    theme: ThemeName;
+    /** The effective mode, for ToastContainer. */
+    theme: ThemeMode;
     isDarkMode: boolean;
     muiTheme: Theme;
     fontSizeScale: number;
-    setTheme: (name: ThemeName) => void;
     setFontSizeScale: (scale: number) => void;
     toggleDarkMode: () => void;
+    prefs: ThemePrefs;
+    modeOverride: ThemeMode | null;
+    activeThemeId: ThemeId;
+    setThemePrefs: (patch: ThemePrefsPatch) => void;
+    // Used by ThemeSync only.
+    editSeq: number;
+    getStored: () => StoredTheme;
+    applyServerPrefs: (server: FlatPrefs, userId: string) => void;
+    markSynced: (sent: FlatPrefs) => void;
+    revertSent: (sent: FlatPrefs) => void;
+    resetSync: () => void;
 }
 
 export const ThemeContext = createContext<ThemeContextType | null>(null);
