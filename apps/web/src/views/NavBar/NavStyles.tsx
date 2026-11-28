@@ -1,6 +1,6 @@
 import { styled } from '@mui/system';
 import { Button, IconButton, Paper } from '@mui/material';
-import type { Theme } from '@mui/material/styles';
+import type { SxProps, Theme } from '@mui/material/styles';
 import {
     AccountCircle,
     DarkMode,
@@ -8,6 +8,21 @@ import {
     KeyboardArrowDown,
 } from '@mui/icons-material';
 import { NavLink } from 'react-router-dom';
+
+export const activeNavLinkSx: SxProps<Theme> = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.75rem',
+    borderRadius: '0.5rem',
+    color: 'text.secondary',
+    '&.active': {
+        color: 'primary.main',
+        backgroundColor: (theme) =>
+            theme.palette.mode === 'dark'
+                ? 'rgba(255, 152, 0, 0.12)'
+                : 'rgba(255, 152, 0, 0.08)',
+    },
+};
 
 // TODO: Change logo styling
 export const AppLogo = styled('img')({

@@ -37,7 +37,7 @@ const EditorHeader = styled(Box)({
     alignItems: 'center',
 });
 
-const StyledTextarea = styled('textarea')<{ hasError: boolean }>(
+export const StyledTextarea = styled('textarea')<{ hasError: boolean }>(
     ({ theme, hasError }) => ({
         width: '100%',
         minHeight: '30rem',
@@ -66,7 +66,7 @@ const StyledTextarea = styled('textarea')<{ hasError: boolean }>(
     })
 );
 
-const ErrorList = styled(Box)(({ theme }) => ({
+export const ErrorList = styled(Box)(({ theme }) => ({
     maxHeight: '8rem',
     overflowY: 'auto',
     padding: '0.75rem',

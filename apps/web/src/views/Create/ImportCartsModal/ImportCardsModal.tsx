@@ -66,7 +66,7 @@ const ActionsRow = styled(Box)({
     alignItems: 'center',
 });
 
-const StyledTextarea = styled('textarea')<{
+export const StyledTextarea = styled('textarea')<{
     hasError: boolean;
     isDragging: boolean;
 }>(({ theme, hasError, isDragging }) => ({
@@ -104,7 +104,7 @@ const StyledTextarea = styled('textarea')<{
     },
 }));
 
-const DropOverlay = styled(Paper)(({ theme }) => ({
+export const DropOverlay = styled(Paper)(({ theme }) => ({
     position: 'absolute',
     top: 0,
     left: 0,
