@@ -21,7 +21,6 @@ import {
     deleteStudysets,
     getStudyset,
     listStudysets,
-    StudysetTooLargeError,
     updateStudyset,
 } from './store';
 import {
@@ -98,22 +97,15 @@ export function studysetRoutes(deps: {
                 write: parsed.value,
             };
         }
-        try {
-            const result = createStudyset(db, c.get('userId'), input);
-            if (result.status === 'forbidden') {
-                return message(c, 'Forbidden', 403);
-            }
-            files.copyAll(result.fileCopies);
-            return c.json({
-                message: 'Successfully created study set',
-                studyset: result.studyset,
-            });
-        } catch (err) {
-            if (err instanceof StudysetTooLargeError) {
-                return message(c, 'Study set too large', 413);
-            }
-            throw err;
+        const result = createStudyset(db, c.get('userId'), input);
+        if (result.status === 'forbidden') {
+            return message(c, 'Forbidden', 403);
         }
+        files.copyAll(result.fileCopies);
+        return c.json({
+            message: 'Successfully created study set',
+            studyset: result.studyset,
+        });
     });
 
     // Card files combined from another set get their own copies, made after
@@ -129,31 +121,24 @@ export function studysetRoutes(deps: {
             body.isMetadataUpdate === true
         );
         if (!parsed.ok) return message(c, parsed.message, parsed.status);
-        try {
-            const result = updateStudyset(
-                db,
-                c.get('userId'),
-                body.studysetUUID,
-                parsed.value
-            );
-            if (result.status === 'not_found') {
-                return message(c, 'Study set not found', 404);
-            }
-            if (result.status === 'forbidden') {
-                return message(c, 'Forbidden', 403);
-            }
-            files.copyAll(result.fileCopies);
-            return c.json({
-                message: 'Successfully updated study set',
-                studyset: result.studyset,
-                ...(result.unpublished && { unpublished: result.unpublished }),
-            });
-        } catch (err) {
-            if (err instanceof StudysetTooLargeError) {
-                return message(c, 'Study set too large', 413);
-            }
-            throw err;
+        const result = updateStudyset(
+            db,
+            c.get('userId'),
+            body.studysetUUID,
+            parsed.value
+        );
+        if (result.status === 'not_found') {
+            return message(c, 'Study set not found', 404);
         }
+        if (result.status === 'forbidden') {
+            return message(c, 'Forbidden', 403);
+        }
+        files.copyAll(result.fileCopies);
+        return c.json({
+            message: 'Successfully updated study set',
+            studyset: result.studyset,
+            ...(result.unpublished && { unpublished: result.unpublished }),
+        });
     });
 
     routes.post('/delete-studyset', async (c) => {
@@ -176,24 +161,17 @@ export function studysetRoutes(deps: {
         if (!isStudysetUUID(body.studysetUUID)) {
             return message(c, 'Invalid studysetUUID', 400);
         }
-        try {
-            const result = duplicateStudysets(db, c.get('userId'), [
-                body.studysetUUID,
-            ]);
-            if (result.status === 'not_found') {
-                return message(c, 'Study set not found', 404);
-            }
-            files.copyAll(result.fileCopies);
-            return c.json({
-                message: 'Successfully duplicated study set',
-                studyset: result.studysets[0],
-            });
-        } catch (err) {
-            if (err instanceof StudysetTooLargeError) {
-                return message(c, 'Study set too large', 413);
-            }
-            throw err;
+        const result = duplicateStudysets(db, c.get('userId'), [
+            body.studysetUUID,
+        ]);
+        if (result.status === 'not_found') {
+            return message(c, 'Study set not found', 404);
         }
+        files.copyAll(result.fileCopies);
+        return c.json({
+            message: 'Successfully duplicated study set',
+            studyset: result.studysets[0],
+        });
     });
 
     routes.post('/batch-duplicate-studysets', async (c) => {
@@ -204,22 +182,15 @@ export function studysetRoutes(deps: {
             MAX_BATCH_DUPLICATES
         );
         if (!ids.ok) return message(c, ids.message, ids.status);
-        try {
-            const result = duplicateStudysets(db, c.get('userId'), ids.value);
-            if (result.status === 'not_found') {
-                return message(c, 'Study set not found', 404);
-            }
-            files.copyAll(result.fileCopies);
-            return c.json({
-                message: 'Successfully duplicated study sets',
-                studysetUUIDs: result.studysets.map((s) => s.studysetUUID),
-            });
-        } catch (err) {
-            if (err instanceof StudysetTooLargeError) {
-                return message(c, 'Study set too large', 413);
-            }
-            throw err;
+        const result = duplicateStudysets(db, c.get('userId'), ids.value);
+        if (result.status === 'not_found') {
+            return message(c, 'Study set not found', 404);
         }
+        files.copyAll(result.fileCopies);
+        return c.json({
+            message: 'Successfully duplicated study sets',
+            studysetUUIDs: result.studysets.map((s) => s.studysetUUID),
+        });
     });
 
     // Saving someone's public set makes the caller a private copy.
@@ -229,30 +200,23 @@ export function studysetRoutes(deps: {
         if (!isStudysetUUID(body.studysetUUID)) {
             return message(c, 'Invalid studysetUUID', 400);
         }
-        try {
-            const result = copyPublicStudyset(
-                db,
-                c.get('userId'),
-                body.studysetUUID
+        const result = copyPublicStudyset(
+            db,
+            c.get('userId'),
+            body.studysetUUID
+        );
+        if (result.status === 'not_found') {
+            return message(
+                c,
+                'This study set is private or does not exist.',
+                404
             );
-            if (result.status === 'not_found') {
-                return message(
-                    c,
-                    'This study set is private or does not exist.',
-                    404
-                );
-            }
-            files.copyAll(result.fileCopies);
-            return c.json({
-                message: 'Successfully saved study set',
-                studyset: result.studyset,
-            });
-        } catch (err) {
-            if (err instanceof StudysetTooLargeError) {
-                return message(c, 'Study set too large', 413);
-            }
-            throw err;
         }
+        files.copyAll(result.fileCopies);
+        return c.json({
+            message: 'Successfully saved study set',
+            studyset: result.studyset,
+        });
     });
 
     routes.post('/publish-studyset', async (c) => {

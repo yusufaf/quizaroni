@@ -14,7 +14,6 @@ import {
     setStudysetLabels,
 } from './labels';
 import { message } from './respond';
-import { StudysetTooLargeError } from './store';
 import { isStudysetUUID } from './updates';
 
 type Handler = (body: JsonObject, userId: string) => Response;
@@ -24,14 +23,7 @@ type Handler = (body: JsonObject, userId: string) => Response;
 function route(c: Context<SessionEnv>, run: Handler): Promise<Response> {
     return readJsonBody(c).then((body) => {
         if (body === INVALID_JSON) return message(c, 'Invalid JSON', 400);
-        try {
-            return run(body, c.get('userId'));
-        } catch (err) {
-            if (err instanceof StudysetTooLargeError) {
-                return message(c, 'Study set too large', 413);
-            }
-            throw err;
-        }
+        return run(body, c.get('userId'));
     });
 }
 
