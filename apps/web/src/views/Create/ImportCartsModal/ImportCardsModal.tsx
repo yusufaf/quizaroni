@@ -23,6 +23,7 @@ import {
     CloudUpload as CloudUploadIcon,
 } from '@mui/icons-material';
 import { styled } from '@mui/system';
+import { alpha } from '@mui/material/styles';
 import { StyledDialogActions } from 'styles/AppStyles';
 import StandardDialogTitle from 'components/StandardDialogTitle/StandardDialogTitle';
 import {
@@ -78,8 +79,8 @@ export const StyledTextarea = styled('textarea')<{
     fontSize: '0.875rem',
     lineHeight: '1.5',
     tabSize: 4,
-    backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#f5f5f5',
-    color: theme.palette.mode === 'dark' ? '#d4d4d4' : '#1e1e1e',
+    backgroundColor: theme.palette.other.codeBg,
+    color: theme.palette.other.codeFg,
     border: `2px dashed ${
         isDragging
             ? theme.palette.primary.main
@@ -97,10 +98,13 @@ export const StyledTextarea = styled('textarea')<{
             : isDragging
               ? theme.palette.primary.main
               : theme.palette.primary.main,
-        boxShadow: `0 0 0 2px ${hasError ? theme.palette.error.main + '33' : theme.palette.primary.main + '33'}`,
+        boxShadow: `0 0 0 2px ${alpha(
+            hasError ? theme.palette.error.main : theme.palette.primary.main,
+            0.2
+        )}`,
     },
     '&::selection': {
-        backgroundColor: theme.palette.primary.main + '44',
+        backgroundColor: alpha(theme.palette.primary.main, 0.267),
     },
 }));
 
@@ -114,20 +118,14 @@ export const DropOverlay = styled(Paper)(({ theme }) => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor:
-        theme.palette.mode === 'dark'
-            ? 'rgba(30, 30, 30, 0.95)'
-            : 'rgba(245, 245, 245, 0.95)',
+    backgroundColor: alpha(theme.palette.other.codeBg, 0.95),
     borderRadius: '0.5rem',
     pointerEvents: 'none',
     zIndex: 10,
     animation: 'pulse 1.5s ease-in-out infinite',
     '@keyframes pulse': {
         '0%, 100%': {
-            backgroundColor:
-                theme.palette.mode === 'dark'
-                    ? 'rgba(30, 30, 30, 0.95)'
-                    : 'rgba(245, 245, 245, 0.95)',
+            backgroundColor: alpha(theme.palette.other.codeBg, 0.95),
         },
         '50%': {
             backgroundColor:
