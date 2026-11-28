@@ -18,7 +18,6 @@ import { message } from '../studysets/respond';
 import {
     attachCardFile,
     ownedRow,
-    StudysetTooLargeError,
 } from '../studysets/store';
 import { isStudysetUUID } from '../studysets/updates';
 import { isPlainObject } from '../users/metadata';
@@ -405,9 +404,6 @@ async function assembleAndAttach(
         }
     } catch (err) {
         files.remove(key);
-        if (err instanceof StudysetTooLargeError) {
-            return message(c, 'Study set too large', 413);
-        }
         throw err;
     }
     return c.json(file);
